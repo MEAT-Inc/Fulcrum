@@ -3,7 +3,7 @@
 #include "afxcmn.h"
 
 #include "resource.h"
-#include "shim_loader.h"
+#include "fulcrum_loader.h"
 #include <set>
 #include <string>
 
