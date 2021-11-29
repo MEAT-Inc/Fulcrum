@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <ProjectName>FulcrumShim32</ProjectName>
     <ProjectGuid>{B6A85A8B-2D2E-4A25-84F6-A16E16F3C7FF}</ProjectGuid>
     <RootNamespace>ptshim32</RootNamespace>
     <Keyword>MFCDLLProj</Keyword>
-    <ProjectName>FulcrumShim32_bak</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -47,11 +47,17 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -113,7 +119,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="fulcrum_shim.cpp" />
+    <ClCompile Include="ptshim.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="shim_debug.cpp" />
     <ClCompile Include="shim_frontend.cpp" />
@@ -125,12 +131,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fulcrum_shim32.def" />
-    <None Include="res\fulcrum_shim.rc2" />
+    <None Include="ptshim32.def" />
+    <None Include="res\ptshim.rc2" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="j2534_v0404.h" />
-    <ClInclude Include="fulcrum_shim.h" />
+    <ClInclude Include="ptshim.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectionBox.h" />
     <ClInclude Include="shim_debug.h" />
@@ -141,7 +147,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="fulcrum_shim.rc" />
+    <ResourceCompile Include="ptshim.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
