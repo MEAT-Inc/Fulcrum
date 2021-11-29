@@ -1,49 +1,28 @@
-/*
-**
-** Copyright (C) 2009 Drew Technologies Inc.
-** Author: Joey Oravec <joravec@drewtech.com>
-**
-** This library is free software; you can redistribute it and/or modify
-** it under the terms of the GNU Lesser General Public License as published
-** by the Free Software Foundation, either version 3 of the License, or (at
-** your option) any later version.
-**
-** This library is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-** Lesser General Public License for more details.
-**
-** You should have received a copy of the GNU Lesser General Public
-** License along with this library; if not, <http://www.gnu.org/licenses/>.
-**
-*/
-
-
-#include <stdafx.h>
+#include "stdafx.h"
 
 #include <tchar.h>
 #include <windows.h> 
 
-#include "j2534_v0404.h"
-#include "shim_debug.h"
-#include "shim_loader.h"
-#include "shim_output.h"
+#include "fulcrum_j2534.h"
+#include "fulcrum_debug.h"
+#include "fulcrum_loader.h"
+#include "fulcrum_output.h"
 
-#define SHIM_CHECK_DLL() \
+#define fulcrum_CHECK_DLL() \
 { \
-	if (! shim_checkAndAutoload()) \
+	if (! fulcrum_checkAndAutoload()) \
 	{ \
-		shim_setInternalError(_T("PassThruShim has not loaded a J2534 DLL")); \
+		fulcrum_setInternalError(_T("PassThruShim has not loaded a J2534 DLL")); \
 		dbug_printretval(ERR_FAILED); \
 		return ERR_FAILED; \
 	} \
 }
 
-#define SHIM_CHECK_FUNCTION(fcn) \
+#define fulcrum_CHECK_FUNCTION(fcn) \
 { \
 	if (__FUNCTION__ == NULL) \
 	{ \
-		shim_setInternalError(_T("DLL loaded but does not export %s"), __FUNCTION__); \
+		fulcrum_setInternalError(_T("DLL loaded but does not export %s"), __FUNCTION__); \
 		dbug_printretval(ERR_FAILED); \
 		return ERR_FAILED; \
 	} \
@@ -54,24 +33,24 @@ extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 
 	dtDebug(_T("%.3fs ++ PTLoadLibrary(%s)\n"), GetTimeSinceInit(), (szFunctionLibrary==NULL)?_T("*NULL*"):_T("test")/*szLibrary*/);
 
 	if (szFunctionLibrary == NULL)
 	{
 		// Return an error. Perhaps we want to change NULL to do an autodetect and popup?
-		shim_setInternalError(_T("szFunctionLibrary was zero"));
+		fulcrum_setInternalError(_T("szFunctionLibrary was zero"));
 		dbug_printretval(ERR_NULL_PARAMETER);
 		return ERR_NULL_PARAMETER;
 	}
 
 	CStringW cstrLibrary(szFunctionLibrary);
 	bool fSuccess;
-	fSuccess = shim_loadLibrary(cstrLibrary);
+	fSuccess = fulcrum_loadLibrary(cstrLibrary);
 	if (! fSuccess)
 	{
-		shim_setInternalError(_T("Failed to open '%s'"), cstrLibrary);
+		fulcrum_setInternalError(_T("Failed to open '%s'"), cstrLibrary);
 		dbug_printretval(ERR_FAILED);
 		return ERR_FAILED;
 	}
@@ -85,11 +64,11 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 
 	dtDebug(_T("%.3fs ++ PTUnloadLibrary()\n"), GetTimeSinceInit());
 
-	shim_unloadLibrary();
+	fulcrum_unloadLibrary();
 
 	dbug_printretval(STATUS_NOERROR);
 	return STATUS_NOERROR;
@@ -119,12 +98,12 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 
 	dtDebug(_T("%.3fs ++ PTSaveLog(%s)\n"), GetTimeSinceInit(), (szFilename==NULL)?_T("*NULL*"):_T("")/*pName*/);
 
 	CStringW cstrFilename(szFilename);
-	shim_writeLogfile(cstrFilename, false);
+	fulcrum_writeLogfile(cstrFilename, false);
 
 	dbug_printretval(STATUS_NOERROR);
 	return STATUS_NOERROR;
@@ -136,10 +115,10 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	auto_lock lock;
 	unsigned long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ++ PTOpen(%s, 0x%08X)\n"), GetTimeSinceInit(), (pName==NULL)?_T("*NULL*"):_T("")/*pName*/, pDeviceID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruOpen);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruOpen);
 
 	retval = _PassThruOpen(pName, pDeviceID);
 	dtDebug(_T("  returning DeviceID: %ld\n"), *pDeviceID);
@@ -154,10 +133,10 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs -- PTClose(%ld)\n"), GetTimeSinceInit(), DeviceID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruClose);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruClose);
 
 	retval = _PassThruClose(DeviceID);
 
@@ -171,10 +150,10 @@ extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long 
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ++ PTConnect(%ld, %s, 0x%08X, %ld, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, dbug_prot(ProtocolID).c_str(), Flags, Baudrate, pChannelID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruConnect);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruConnect);
 
 	dbug_printcflag(Flags);
 	retval = _PassThruConnect(DeviceID, ProtocolID, Flags, Baudrate, pChannelID);
@@ -193,10 +172,10 @@ extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs -- PTDisconnect(%ld)\n"), GetTimeSinceInit(), ChannelID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruDisconnect);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruDisconnect);
 
 	retval = _PassThruDisconnect(ChannelID);
 
@@ -211,10 +190,10 @@ extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG
 	long retval;
 	unsigned long reqNumMsgs;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs << PTReadMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruReadMsgs);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruReadMsgs);
 
 	if (pNumMsgs != NULL)
 		reqNumMsgs = *pNumMsgs;
@@ -234,10 +213,10 @@ extern "C" long J2534_API PassThruWriteMsgs(unsigned long ChannelID, PASSTHRU_MS
 	long retval;
 	unsigned long reqNumMsgs = *pNumMsgs;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs >> PTWriteMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruWriteMsgs);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruWriteMsgs);
 
 	if (pNumMsgs != NULL)
 		reqNumMsgs = *pNumMsgs;
@@ -257,10 +236,10 @@ extern "C" long J2534_API PassThruStartPeriodicMsg(unsigned long ChannelID, PASS
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ++ PTStartPeriodicMsg(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pMsgID, TimeInterval);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruStartPeriodicMsg);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruStartPeriodicMsg);
 	
 	dbug_printmsg(pMsg, _T("Msg"), 1, true);
 	retval = _PassThruStartPeriodicMsg(ChannelID, pMsg, pMsgID, TimeInterval);
@@ -277,10 +256,10 @@ extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsig
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs -- PTStopPeriodicMsg(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruStopPeriodicMsg);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruStopPeriodicMsg);
 
 	retval = _PassThruStopPeriodicMsg(ChannelID, MsgID);
 
@@ -296,11 +275,11 @@ extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ++ PTStartMsgFilter(%ld, %s, 0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, dbug_filter(FilterType).c_str(),
 		pMaskMsg, pPatternMsg, pFlowControlMsg, pMsgID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruStartMsgFilter);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruStartMsgFilter);
 
 	dbug_printmsg(pMaskMsg, _T("Mask"), 1, true);
 	dbug_printmsg(pPatternMsg, _T("Pattern"), 1, true);
@@ -319,10 +298,10 @@ extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigne
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs -- PTStopMsgFilter(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruStopMsgFilter);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruStopMsgFilter);
 
 	retval = _PassThruStopMsgFilter(ChannelID, MsgID);
 
@@ -336,10 +315,10 @@ extern "C" long J2534_API PassThruSetProgrammingVoltage(unsigned long DeviceID, 
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ** PTSetProgrammingVoltage(%ld, %ld, %ld)\n"), GetTimeSinceInit(), DeviceID, Pin, Voltage);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruSetProgrammingVoltage);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruSetProgrammingVoltage);
 
 	switch (Voltage)
 	{
@@ -365,10 +344,10 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ** PTReadVersion(%ld, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, pFirmwareVersion, pDllVersion, pApiVersion);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruReadVersion);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruReadVersion);
 
 	retval = _PassThruReadVersion(DeviceID, pFirmwareVersion, pDllVersion, pApiVersion);
 
@@ -384,26 +363,26 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 	return retval;
 }
 
-long shim_PassThruGetLastError(char *pErrorDescription)
+long fulcrum_PassThruGetLastError(char *pErrorDescription)
 {
-	if (shim_hadInternalError())
+	if (fulcrum_hadInternalError())
 	{
 		if (pErrorDescription == NULL)
 			return ERR_NULL_PARAMETER;
 
 		// We'll intercept GetLastError if we're reporting something about the shim
-		CStringA cstrInternalLastError((LPCTSTR) shim_getInternalError());
+		CStringA cstrInternalLastError((LPCTSTR) fulcrum_getInternalError());
 		strncpy_s(pErrorDescription, 80, cstrInternalLastError, _TRUNCATE);
 		return STATUS_NOERROR;
 	}
 	else
 	{
-		// These macros call shim_setInternalError() which does not work the way
+		// These macros call fulcrum_setInternalError() which does not work the way
 		// this function is documented. They should be replaced with code that
 		// prints an error to the debug log and copies the text to pErrorDescription
 		// if the pointer is non-NULL
-		SHIM_CHECK_DLL();
-		SHIM_CHECK_FUNCTION(_PassThruGetLastError);
+		fulcrum_CHECK_DLL();
+		fulcrum_CHECK_FUNCTION(_PassThruGetLastError);
 
 		return _PassThruGetLastError(pErrorDescription);
 	}
@@ -426,7 +405,7 @@ extern "C" long J2534_API PassThruGetLastError(char *pErrorDescription)
 		dtDebug(_T("  pErrorDescription is NULL\n"));
 	}
 
-	retval = shim_PassThruGetLastError(pErrorDescription);
+	retval = fulcrum_PassThruGetLastError(pErrorDescription);
 
 	if (pErrorDescription != NULL)
 	{
@@ -451,10 +430,10 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 	auto_lock lock;
 	long retval;
 
-	shim_clearInternalError();
+	fulcrum_clearInternalError();
 	dtDebug(_T("%.3fs ** PTIoctl(%ld, %s, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, dbug_ioctl(IoctlID).c_str(), pInput, pOutput);
-	SHIM_CHECK_DLL();
-	SHIM_CHECK_FUNCTION(_PassThruIoctl);
+	fulcrum_CHECK_DLL();
+	fulcrum_CHECK_FUNCTION(_PassThruIoctl);
 
 	// Print any relevant info before making the call
 	switch (IoctlID)

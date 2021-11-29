@@ -1,32 +1,11 @@
-/*
-**
-** Copyright (C) 2009 Drew Technologies Inc.
-** Author: Joey Oravec <joravec@drewtech.com>
-**
-** This library is free software; you can redistribute it and/or modify
-** it under the terms of the GNU Lesser General Public License as published
-** by the Free Software Foundation, either version 3 of the License, or (at
-** your option) any later version.
-**
-** This library is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-** Lesser General Public License for more details.
-**
-** You should have received a copy of the GNU Lesser General Public
-** License along with this library; if not, <http://www.gnu.org/licenses/>.
-**
-*/
-
-
-#include <stdafx.h>
+#include "stdafx.h"
 #include <afxmt.h>
 
-#include "j2534_v0404.h"
+#include "fulcrum_j2534.h"
 #include "SelectionBox.h"
-#include "shim_debug.h"
-#include "shim_loader.h"
-#include "shim_output.h"
+#include "fulcrum_debug.h"
+#include "fulcrum_loader.h"
+#include "fulcrum_output.h"
 
 // Pointers to J2534 API functions in the loaded library
 PTOPEN _PassThruOpen = 0;
@@ -217,7 +196,7 @@ double GetTimeSinceInit()
 	return time;
 }
 
-bool shim_checkAndAutoload(void)
+bool fulcrum_checkAndAutoload(void)
 {
 	// We're OK if a library is loaded
 	if (fLibLoaded)
@@ -268,10 +247,10 @@ bool shim_checkAndAutoload(void)
 		cPassThruInfo * tmp = Dlg.GetSelectedPassThru();
 
 		bool fSuccess;
-		fSuccess = shim_loadLibrary(tmp->FunctionLibrary.c_str());
+		fSuccess = fulcrum_loadLibrary(tmp->FunctionLibrary.c_str());
 		if (! fSuccess)
 		{
-			//shim_setInternalError(_T("Failed to open '%s'"), tmp->FunctionLibrary.c_str());
+			//fulcrum_setInternalError(_T("Failed to open '%s'"), tmp->FunctionLibrary.c_str());
 			//dbug_printretval(ERR_FAILED);
 			return false;
 		}
@@ -279,13 +258,13 @@ bool shim_checkAndAutoload(void)
 
 		// The user specified a debug output file in the dialog. Write any buffered text to this file
 		// and start using it from now on
-		shim_writeLogfile(Dlg.GetDebugFilename(), true);
+		fulcrum_writeLogfile(Dlg.GetDebugFilename(), true);
 
 		return true;
 	}
 }
 
-bool shim_loadLibrary(LPCTSTR szDLL)
+bool fulcrum_loadLibrary(LPCTSTR szDLL)
 {
 	// Can't load a library if the string is NULL
 	if (szDLL == NULL)
@@ -327,7 +306,7 @@ bool shim_loadLibrary(LPCTSTR szDLL)
 	return true;
 }
 
-void shim_unloadLibrary()
+void fulcrum_unloadLibrary()
 {
 	// Can't unload a library if there's nothing loaded
 	if (! fLibLoaded)
@@ -360,7 +339,7 @@ void shim_unloadLibrary()
 	}
 }
 
-bool shim_hasLibraryLoaded()
+bool fulcrum_hasLibraryLoaded()
 {
 	return fLibLoaded;
 }

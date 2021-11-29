@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FulcrumInjector
 {
-    class Program
+    class InjectorMain
     {
         static void Main(string[] args)
         {

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "j2534_v0404.h"
+#include "fulcrum_j2534.h"
 
 extern "C"
 {
@@ -46,4 +46,4 @@ extern "C"
 	long J2534_API PassThruUnloadLibrary();
 }
 
-long shim_PassThruGetLastError(char *pErrorDescription);
+long fulcrum_PassThruGetLastError(char *pErrorDescription);
