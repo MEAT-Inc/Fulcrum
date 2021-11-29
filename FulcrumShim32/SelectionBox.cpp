@@ -8,7 +8,7 @@
 #include <string>
 #include <tchar.h>
 
-#include "ptshim.h"
+#include "fulcrum_shim.h"
 #include "SelectionBox.h"
 using namespace std;
 

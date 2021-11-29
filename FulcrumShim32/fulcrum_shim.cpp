@@ -1,8 +1,8 @@
-// ptshim.cpp : Defines the initialization routines for the DLL.
+// fulcrum_shim.cpp : Defines the initialization routines for the DLL.
 //
 
 #include "stdafx.h"
-#include "ptshim.h"
+#include "fulcrum_shim.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -33,29 +33,29 @@
 //		details.
 //
 
-// CptshimApp
+// Cfulcrum_shimApp
 
-BEGIN_MESSAGE_MAP(CptshimApp, CWinApp)
+BEGIN_MESSAGE_MAP(Cfulcrum_shimApp, CWinApp)
 END_MESSAGE_MAP()
 
 
-// CptshimApp construction
+// Cfulcrum_shimApp construction
 
-CptshimApp::CptshimApp()
+Cfulcrum_shimApp::Cfulcrum_shimApp()
 {
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
 }
 
 
-// The one and only CptshimApp object
+// The one and only Cfulcrum_shimApp object
 
-CptshimApp theApp;
+Cfulcrum_shimApp theApp;
 
 
-// CptshimApp initialization
+// Cfulcrum_shimApp initialization
 
-BOOL CptshimApp::InitInstance()
+BOOL Cfulcrum_shimApp::InitInstance()
 {
 	CWinApp::InitInstance();
 

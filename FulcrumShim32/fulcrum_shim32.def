@@ -1,6 +1,6 @@
-; ptshim32.def : Declares the module parameters for the DLL.
+; fulcrum_shim32.def : Declares the module parameters for the DLL.
 
-LIBRARY      "ptshim32"
+LIBRARY      "fulcrum_shim32"
 
 EXPORTS
 	PassThruOpen					@1

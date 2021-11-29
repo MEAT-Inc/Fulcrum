@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by ptshim.rc
+// Used by fulcrum_shim.rc
 //
 #define IDD_DIALOG1                     1000
 #define IDC_LIST1                       1000

@@ -1,4 +1,4 @@
-// ptshim.h : main header file for the ptshim DLL
+// fulcrum_shim.h : main header file for the fulcrum_shim DLL
 //
 
 #pragma once
@@ -10,14 +10,14 @@
 #include "resource.h"		// main symbols
 
 
-// CptshimApp
-// See ptshim.cpp for the implementation of this class
+// Cfulcrum_shimApp
+// See fulcrum_shim.cpp for the implementation of this class
 //
 
-class CptshimApp : public CWinApp
+class Cfulcrum_shimApp : public CWinApp
 {
 public:
-	CptshimApp();
+	Cfulcrum_shimApp();
 
 // Overrides
 public:
