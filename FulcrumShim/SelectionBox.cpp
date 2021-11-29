@@ -52,15 +52,17 @@ BOOL CSelectionBox::OnInitDialog()
 	ShowWindow(SW_HIDE);
 
 	TCHAR szPath[MAX_PATH];
-	SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, 0, szPath);
+	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
 
 	SYSTEMTIME LocalTime;
 	GetLocalTime(&LocalTime);
 
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\%s_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"), szPath, _T("ShimDLL"), LocalTime.wYear,
-		LocalTime.wMonth, LocalTime.wDay, LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
-		LocalTime.wMilliseconds);
+	cstrPath.Format(_T("%s\\%s\\%s\\%s\\%s_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"), szPath, _T("MEAT Inc"), _T("FulcrumShim"), _T("FulcrumLogs"), _T("Fulcrum"),
+		LocalTime.wYear, LocalTime.wMonth, LocalTime.wDay,
+		LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
+		LocalTime.wMilliseconds
+	);
 
 	m_logfilename.SetWindowText(cstrPath);
 

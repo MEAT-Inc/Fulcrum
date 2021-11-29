@@ -1,24 +1,4 @@
-/*
-**
-** Copyright (C) 2009 Drew Technologies Inc.
-** Author: Joey Oravec <joravec@drewtech.com>
-**
-** This library is free software; you can redistribute it and/or modify
-** it under the terms of the GNU Lesser General Public License as published
-** by the Free Software Foundation, either version 3 of the License, or (at
-** your option) any later version.
-**
-** This library is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-** Lesser General Public License for more details.
-**
-** You should have received a copy of the GNU Lesser General Public
-** License along with this library; if not, <http://www.gnu.org/licenses/>.
-**
-*/
-
-#include <stdafx.h>
+#include "stdafx.h"
 
 #include <iomanip>
 #include <iostream>
@@ -28,16 +8,16 @@
 #include <tchar.h>
 #include <windows.h>
 
-#include "j2534_v0404.h"
-#include "shim_debug.h"
-#include "shim_frontend.h"
-#include "shim_output.h"
+#include "fulcrum_j2534.h"
+#include "fulcrum_debug.h"
+#include "fulcrum_frontend.h"
+#include "fulcrum_output.h"
 
 // In case of some internal errors we'll return ERR_FAILED, set our own internal string,
 // and return that until the app makes another PassThru function call
 bool fUseLastInternalError = false;
 TCHAR szLastInternalError[80] = {0};
-void shim_setInternalError(LPCTSTR format, ...)
+void fulcrum_setInternalError(LPCTSTR format, ...)
 {
 	va_list	args;
 
@@ -48,16 +28,16 @@ void shim_setInternalError(LPCTSTR format, ...)
 
 	fUseLastInternalError = true;
 }
-LPCTSTR shim_getInternalError()
+LPCTSTR fulcrum_getInternalError()
 {
 	return szLastInternalError;
 }
-void shim_clearInternalError()
+void fulcrum_clearInternalError()
 {
 	_tcscpy_s(szLastInternalError, sizeof(szLastInternalError)/sizeof(szLastInternalError[0]), _T("No internal error"));
 	fUseLastInternalError = false;
 }
-bool shim_hadInternalError()
+bool fulcrum_hadInternalError()
 {
 	return fUseLastInternalError;
 }
@@ -73,7 +53,7 @@ void dbug_printretval(unsigned long retval)
 	else
 	{
 		char szErrorDescription[80];
-		shim_PassThruGetLastError(szErrorDescription);
+		fulcrum_PassThruGetLastError(szErrorDescription);
 		CStringW cstrErrorDescription(szErrorDescription);
 		dtDebug(_T("  %.3fs %s '%s'\n"), GetTimeSinceInit(), dbug_return(retval).c_str(), cstrErrorDescription);
 	}

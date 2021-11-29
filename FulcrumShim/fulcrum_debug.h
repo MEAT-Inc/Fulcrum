@@ -21,15 +21,13 @@
 
 #pragma once
 
-#include "j2534_v0404.h"
-#include <tchar.h>
+#include "fulcrum_j2534.h"
+#include "fulcrum_loader.h" // for tstring
 
-#include "shim_loader.h" // for tstring
-
-void shim_setInternalError(LPCTSTR szError, ...);
-LPCTSTR shim_getInternalError();
-void shim_clearInternalError();
-bool shim_hadInternalError();
+void fulcrum_setInternalError(LPCTSTR szError, ...);
+LPCTSTR fulcrum_getInternalError();
+void fulcrum_clearInternalError();
+bool fulcrum_hadInternalError();
 
 tstring dbug_return(unsigned long RetVal);
 tstring dbug_filter(unsigned long FilterType);

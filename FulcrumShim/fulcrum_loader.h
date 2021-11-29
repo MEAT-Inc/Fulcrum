@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include "j2534_v0404.h"
+#include "fulcrum_j2534.h"
 #include <set>
 #include <string>
+#include <wtypes.h>
 
 #ifdef _UNICODE
 typedef std::wstring tstring;
@@ -58,10 +59,10 @@ public:
 
 double GetTimeSinceInit();
 
-bool shim_checkAndAutoload(void);
-bool shim_loadLibrary(LPCTSTR szDLL);
-void shim_unloadLibrary();
-bool shim_hasLibraryLoaded();
+bool fulcrum_checkAndAutoload(void);
+bool fulcrum_loadLibrary(LPCTSTR szDLL);
+void fulcrum_unloadLibrary();
+bool fulcrum_hasLibraryLoaded();
 
 extern PTOPEN _PassThruOpen;
 extern PTCLOSE _PassThruClose;
