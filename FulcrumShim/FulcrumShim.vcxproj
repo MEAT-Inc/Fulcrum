@@ -33,6 +33,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -41,6 +42,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -48,6 +50,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -56,6 +59,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -80,6 +84,8 @@
     <ExecutablePath>$(IncludePath);$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files %28x86%29\Windows Kits\8.1\Include;C:\Program Files %28x86%29\Windows Kits\8.1\Include\shared;C:\Program Files %28x86%29\Windows Kits\8.1\Include\winrt;C:\Program Files %28x86%29\Windows Kits\8.1\Include\um;C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.18362.0\ucrt;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Windows Kits\8.1\Lib;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.18362.0\ucrt;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.18362.0\ucrt\x86;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.18362.0\ucrt\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(Configuration)\</OutDir>
+    <CustomBuildBeforeTargets>PreBuildEvent</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -189,10 +195,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fulcrum_bitconverter.cpp" />
+    <ClCompile Include="FulcrumShim.cpp" />
     <ClCompile Include="fulcrum_jpipe.cpp" />
     <ClCompile Include="fulcrum_output.cpp" />
     <ClCompile Include="fulcrum_pipe.cpp" />
-    <ClCompile Include="fulcrum_shim.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="fulcrum_debug.cpp" />
     <ClCompile Include="fulcrum_frontend.cpp" />
@@ -200,16 +206,18 @@
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FulcrumVersionTick.py" />
     <None Include="fulcrum_shim.def" />
     <None Include="res\fulcrum_shim.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="fulcrum_bitconverter.h" />
+    <ClInclude Include="FulcrumShim.h" />
     <ClInclude Include="fulcrum_jpipe.h" />
     <ClInclude Include="fulcrum_output.h" />
     <ClInclude Include="fulcrum_pipe.h" />
-    <ClInclude Include="fulcrum_shim.h" />
     <ClInclude Include="fulcrum_j2534.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SelectionBox.h" />

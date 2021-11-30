@@ -2,17 +2,19 @@
 
 #include <tchar.h>
 #include <windows.h> 
+#include <chrono>
 
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
+#include "SelectionBox.h"
 
 #define fulcrum_CHECK_DLL() \
 { \
 	if (! fulcrum_checkAndAutoload()) \
 	{ \
-		fulcrum_setInternalError(_T("PassThruShim has not loaded a J2534 DLL")); \
+		fulcrum_setInternalError(_T("FulcrumShim has not loaded a J2534 DLL")); \
 		dbug_printretval(ERR_FAILED); \
 		return ERR_FAILED; \
 	} \
@@ -28,13 +30,32 @@
 	} \
 }
 
+
+// Used to pulling infor staticly from commands.
+static unsigned int lastVBATTVal = 0;
+static auto lastVBATTReadTime = std::chrono::steady_clock::now();
+using lastVBATTReadResolution = std::chrono::seconds;
+static int lastVBATTReadThreshold = 10; // seconds
+
+void PASSTHRU_MSG_ToVOIDPointer(PASSTHRU_MSG* pMsgIn, void* pMsgOut)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	PASSTHRU_MSG* ptmOut = (PASSTHRU_MSG*)pMsgOut;
+	ptmOut->ProtocolID = pMsgIn->ProtocolID;
+	ptmOut->RxStatus = pMsgIn->RxStatus;
+	ptmOut->TxFlags = pMsgIn->TxFlags;
+	ptmOut->Timestamp = pMsgIn->Timestamp;
+	ptmOut->DataSize = pMsgIn->DataSize;
+	ptmOut->ExtraDataIndex = pMsgIn->ExtraDataIndex;
+	memcpy_s(ptmOut->Data, 4128, pMsgIn->Data, pMsgIn->DataSize);
+}
+
 extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
 
 	fulcrum_clearInternalError();
-
 	dtDebug(_T("%.3fs ++ PTLoadLibrary(%s)\n"), GetTimeSinceInit(), (szFunctionLibrary==NULL)?_T("*NULL*"):_T("test")/*szLibrary*/);
 
 	if (szFunctionLibrary == NULL)
@@ -65,11 +86,8 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 	auto_lock lock;
 
 	fulcrum_clearInternalError();
-
 	dtDebug(_T("%.3fs ++ PTUnloadLibrary()\n"), GetTimeSinceInit());
-
 	fulcrum_unloadLibrary();
-
 	dbug_printretval(STATUS_NOERROR);
 	return STATUS_NOERROR;
 }
@@ -80,16 +98,13 @@ extern "C" long J2534_API PassThruWriteToLogA(char *szMsg)
 	CStringW cstrMsg(szMsg);
 
 	dtDebug(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), cstrMsg);
-
 	return STATUS_NOERROR;
 }
 
 extern "C" long J2534_API PassThruWriteToLogW(wchar_t *szMsg)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
 	dtDebug(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), szMsg);
-
 	return STATUS_NOERROR;
 }
 
@@ -99,9 +114,7 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 	auto_lock lock;
 
 	fulcrum_clearInternalError();
-
 	dtDebug(_T("%.3fs ++ PTSaveLog(%s)\n"), GetTimeSinceInit(), (szFilename==NULL)?_T("*NULL*"):_T("")/*pName*/);
-
 	CStringW cstrFilename(szFilename);
 	fulcrum_writeLogfile(cstrFilename, false);
 
@@ -122,7 +135,6 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 
 	retval = _PassThruOpen(pName, pDeviceID);
 	dtDebug(_T("  returning DeviceID: %ld\n"), *pDeviceID);
-
 	dbug_printretval(retval);
 	return retval;
 }
@@ -139,7 +151,6 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	fulcrum_CHECK_FUNCTION(_PassThruClose);
 
 	retval = _PassThruClose(DeviceID);
-
 	dbug_printretval(retval);
 	return retval;
 }
@@ -157,10 +168,8 @@ extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long 
 
 	dbug_printcflag(Flags);
 	retval = _PassThruConnect(DeviceID, ProtocolID, Flags, Baudrate, pChannelID);
-	if (pChannelID == NULL)
-		dtDebug(_T("  pChannelID was NULL\n"));
-	else
-		dtDebug(_T("  returning ChannelID: %ld\n"), *pChannelID);
+	if (pChannelID == NULL) dtDebug(_T("  pChannelID was NULL\n"));
+	else dtDebug(_T("  returning ChannelID: %ld\n"), *pChannelID);
 
 	dbug_printretval(retval);
 	return retval;
@@ -178,7 +187,6 @@ extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 	fulcrum_CHECK_FUNCTION(_PassThruDisconnect);
 
 	retval = _PassThruDisconnect(ChannelID);
-
 	dbug_printretval(retval);
 	return retval;
 }
@@ -195,11 +203,9 @@ extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruReadMsgs);
 
-	if (pNumMsgs != NULL)
-		reqNumMsgs = *pNumMsgs;
+	if (pNumMsgs != NULL) reqNumMsgs = *pNumMsgs;
 	retval = _PassThruReadMsgs(ChannelID, pMsg, pNumMsgs, Timeout);
-	if (pNumMsgs != NULL)
-		dtDebug(_T("  read %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
+	if (pNumMsgs != NULL) dtDebug(_T("  read %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
 	dbug_printmsg(pMsg, _T("Msg"), pNumMsgs, FALSE);
 
 	dbug_printretval(retval);
@@ -218,12 +224,10 @@ extern "C" long J2534_API PassThruWriteMsgs(unsigned long ChannelID, PASSTHRU_MS
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruWriteMsgs);
 
-	if (pNumMsgs != NULL)
-		reqNumMsgs = *pNumMsgs;
+	if (pNumMsgs != NULL) reqNumMsgs = *pNumMsgs;
 	dbug_printmsg(pMsg, _T("Msg"), pNumMsgs, true);
 	retval = _PassThruWriteMsgs(ChannelID, pMsg, pNumMsgs, Timeout);
-	if (pNumMsgs != NULL)
-		dtDebug(_T("  sent %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
+	if (pNumMsgs != NULL) dtDebug(_T("  sent %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
 
 	dbug_printretval(retval);
 	return retval;
@@ -243,8 +247,7 @@ extern "C" long J2534_API PassThruStartPeriodicMsg(unsigned long ChannelID, PASS
 	
 	dbug_printmsg(pMsg, _T("Msg"), 1, true);
 	retval = _PassThruStartPeriodicMsg(ChannelID, pMsg, pMsgID, TimeInterval);
-	if (pMsgID != NULL)
-		dtDebug(_T("  returning PeriodicID: %ld\n"), *pMsgID);
+	if (pMsgID != NULL)	dtDebug(_T("  returning PeriodicID: %ld\n"), *pMsgID);
 
 	dbug_printretval(retval);
 	return retval;
@@ -262,7 +265,6 @@ extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsig
 	fulcrum_CHECK_FUNCTION(_PassThruStopPeriodicMsg);
 
 	retval = _PassThruStopPeriodicMsg(ChannelID, MsgID);
-
 	dbug_printretval(retval);
 	return retval;
 }
@@ -285,8 +287,7 @@ extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
 	dbug_printmsg(pPatternMsg, _T("Pattern"), 1, true);
 	dbug_printmsg(pFlowControlMsg, _T("FlowControl"), 1, true);
 	retval = _PassThruStartMsgFilter(ChannelID, FilterType, pMaskMsg, pPatternMsg, pFlowControlMsg, pMsgID);
-	if (pMsgID != NULL)
-		dtDebug(_T("  returning FilterID: %ld\n"), *pMsgID);
+	if (pMsgID != NULL) dtDebug(_T("  returning FilterID: %ld\n"), *pMsgID);
 
 	dbug_printretval(retval);
 	return retval;
@@ -304,7 +305,6 @@ extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigne
 	fulcrum_CHECK_FUNCTION(_PassThruStopMsgFilter);
 
 	retval = _PassThruStopMsgFilter(ChannelID, MsgID);
-
 	dbug_printretval(retval);
 	return retval;
 }

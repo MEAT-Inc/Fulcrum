@@ -13,12 +13,11 @@ fulcrum_pipe::fulcrum_pipe()
 	Loaded = false;
 	Startup();
 }
-
-
 fulcrum_pipe::~fulcrum_pipe()
 {
 	ShutdownPipe();
 }
+
 
 bool fulcrum_pipe::ConnectPipe1()
 {
@@ -27,19 +26,17 @@ bool fulcrum_pipe::ConnectPipe1()
 
 	if ((hPipe1 == NULL || hPipe1 == INVALID_HANDLE_VALUE))
 	{
-		dtDebug(_T("%.3fs :: fulcrum PIPE 1 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
+		dtDebug(_T("%.3fs :: FULCRUM PIPE 1 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
 		if (hPipe1 == NULL) { dtDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
 		else {dtDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
 
 		return false;
 	}
 
-	dtDebug(_T("%.3fs :: fulcrum PIPE 1 --> OPENED OK!\n"), GetTimeSinceInit());
+	dtDebug(_T("%.3fs :: FULCRUM PIPE 1 --> OPENED OK!\n"), GetTimeSinceInit());
 
 	return true;
 }
-
-
 bool fulcrum_pipe::ConnectPipe2()
 {
 	LPTSTR lpszPipename2 = TEXT("\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3");
@@ -47,7 +44,7 @@ bool fulcrum_pipe::ConnectPipe2()
 
 	if ((hPipe2 == NULL || hPipe2 == INVALID_HANDLE_VALUE))
 	{
-		dtDebug(_T("%.3fs :: fulcrum PIPE 2 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
+		dtDebug(_T("%.3fs :: FULCRUM PIPE 2 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
 		if (hPipe2 == NULL) { dtDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
 		else { dtDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
 
@@ -55,10 +52,11 @@ bool fulcrum_pipe::ConnectPipe2()
 		return false;
 	}
 
-	dtDebug(_T("%.3fs :: fulcrum PIPE 2 --> OPENED OK!\n"), GetTimeSinceInit());
+	dtDebug(_T("%.3fs :: FULCRUM PIPE 2 --> OPENED OK!\n"), GetTimeSinceInit());
 
 	return true;
 }
+
 
 bool fulcrum_pipe::Startup()
 {
@@ -79,7 +77,7 @@ bool fulcrum_pipe::Startup()
 		return Loaded;
 	}
 
-	dtDebug(_T("%.3fs :: fulcrum PIPES ARE LOOKIN GOOD LETS SEND THIS BITCH\n"), GetTimeSinceInit());
+	dtDebug(_T("%.3fs :: FULCRUM PIPES ARE LOOKIN GOOD LETS SEND THIS BITCH\n"), GetTimeSinceInit());
 
 	Loaded = true;
 	return Loaded;

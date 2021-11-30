@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="fulcrum_shim.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SelectionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,6 +42,9 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FulcrumShim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fulcrum_shim.def">
@@ -53,15 +53,13 @@
     <None Include="res\fulcrum_shim.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="FulcrumVersionTick.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fulcrum_shim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fulcrum_j2534.h">
@@ -95,6 +93,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FulcrumShim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
