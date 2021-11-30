@@ -53,6 +53,7 @@
     <None Include="res\fulcrum_shim.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="FulcrumVersionTick.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
