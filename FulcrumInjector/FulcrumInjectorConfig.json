@@ -1,0 +1,14 @@
+﻿{
+  "FulcrumLogging": {
+    "AppInstanceName": "FulcrumInjector",
+    "DefaultLoggingPath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumLogs",
+    "LogArchiveSetup": {
+      "ProgressToConsole": false,
+      "LogArchivePath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumArchives",
+      "ArchiveOnFileCount": 20,
+      "ArchiveFileSetSize": 15,
+      "CompressionLevel": "Optimal",
+      "CompressionStyle": "ZIP_COMPRESSION"
+    }
+  }
+}

@@ -33,8 +33,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.7.12\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,7 +54,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FulcrumPipeReader.cs" />
+    <Compile Include="FulcrumJsonHelpers\ValueLoaders.cs" />
+    <Compile Include="FulcrumJsonHelpers\ValueSetters.cs" />
+    <Compile Include="FulcrumJsonHelpers\WatchdogJsonConfigFiles.cs" />
+    <Compile Include="FulcrumLogging\LogArchiving\LogArchiveConfiguration.cs" />
+    <Compile Include="FulcrumLogging\LogArchiving\LogArchiveEvents.cs" />
+    <Compile Include="FulcrumLogging\LogArchiving\LogArchiver.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\BaseLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\ConsoleLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\FileLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\MasterLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\SubServiceLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\TimerLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerQueue.cs" />
+    <Compile Include="FulcrumLogging\LoggerSupport\LoggerConfiguration.cs" />
+    <Compile Include="FulcrumLogging\LoggerSupport\LoggerEnums.cs" />
+    <Compile Include="FulcrumLogging\FulcrumLogBroker.cs" />
+    <Compile Include="FulcrumLogic\FulcrumLoggingSetup.cs" />
+    <Compile Include="FulcrumLogic\FulcrumPipeReader.cs" />
     <Compile Include="InjectorMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
@@ -53,6 +81,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="FulcrumInjectorConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -63,6 +95,7 @@
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
