@@ -1,5 +1,4 @@
 // SelectionBox.cpp : implementation file
-//
 
 #include "stdafx.h"
 
@@ -10,10 +9,11 @@
 
 #include "fulcrum_shim.h"
 #include "SelectionBox.h"
+#include "fulcrum_output.h"
+
 using namespace std;
 
 // SelectionBox dialog
-
 IMPLEMENT_DYNAMIC(CSelectionBox, CDialog)
 
 CSelectionBox::CSelectionBox(std::set<cPassThruInfo>& connectedList, CWnd* pParent /*=NULL*/)
@@ -57,22 +57,26 @@ BOOL CSelectionBox::OnInitDialog()
 	SYSTEMTIME LocalTime;
 	GetLocalTime(&LocalTime);
 
+	// Build the log filder dir.
+	CString logDir;
+	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumJ2534", szPath));
+	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) { dtDebug(_T("Log file folder exists. Skipping creation for this directory...")); }
+
+	// Build the log file path
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumJ2534\\Fulcrum_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"), 
-		szPath, 
+	cstrPath.Format(_T("%s\\Fulcrum_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
+		logDir,
 		LocalTime.wYear,
 		LocalTime.wMonth,
 		LocalTime.wDay,
-		LocalTime.wHour, 
-		LocalTime.wMinute, 
+		LocalTime.wHour,
+		LocalTime.wMinute,
 		LocalTime.wSecond,
 		LocalTime.wMilliseconds
 	);
 
 	m_logfilename.SetWindowText(cstrPath);
-
 	DoPopulateRegistryListbox();
-
 	ShowWindow(SW_SHOW);
 	BringWindowToTop();
 

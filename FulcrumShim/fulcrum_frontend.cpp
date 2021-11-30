@@ -2,17 +2,19 @@
 
 #include <tchar.h>
 #include <windows.h> 
+#include <chrono>
 
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
+#include "SelectionBox.h"
 
 #define fulcrum_CHECK_DLL() \
 { \
 	if (! fulcrum_checkAndAutoload()) \
 	{ \
-		fulcrum_setInternalError(_T("PassThruShim has not loaded a J2534 DLL")); \
+		fulcrum_setInternalError(_T("FulcrumShim has not loaded a J2534 DLL")); \
 		dbug_printretval(ERR_FAILED); \
 		return ERR_FAILED; \
 	} \
@@ -26,6 +28,26 @@
 		dbug_printretval(ERR_FAILED); \
 		return ERR_FAILED; \
 	} \
+}
+
+
+// Used to pulling infor staticly from commands.
+static unsigned int lastVBATTVal = 0;
+static auto lastVBATTReadTime = std::chrono::steady_clock::now();
+using lastVBATTReadResolution = std::chrono::seconds;
+static int lastVBATTReadThreshold = 10; // seconds
+
+void PASSTHRU_MSG_ToVOIDPointer(PASSTHRU_MSG* pMsgIn, void* pMsgOut)
+{
+
+	PASSTHRU_MSG* ptmOut = (PASSTHRU_MSG*)pMsgOut;
+	ptmOut->ProtocolID = pMsgIn->ProtocolID;
+	ptmOut->RxStatus = pMsgIn->RxStatus;
+	ptmOut->TxFlags = pMsgIn->TxFlags;
+	ptmOut->Timestamp = pMsgIn->Timestamp;
+	ptmOut->DataSize = pMsgIn->DataSize;
+	ptmOut->ExtraDataIndex = pMsgIn->ExtraDataIndex;
+	memcpy_s(ptmOut->Data, 4128, pMsgIn->Data, pMsgIn->DataSize);
 }
 
 extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
