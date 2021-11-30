@@ -97,7 +97,7 @@ namespace FulcrumInjector.FulcrumConsoleGui
 
                 // Setup window shading
                 Width = Dim.Fill(),           // Window filling values
-                Height = Dim.Fill() - 1     // Window filling values
+                Height = Dim.Fill()           // Window filling values
             };
         }
         /// <summary>
@@ -113,7 +113,7 @@ namespace FulcrumInjector.FulcrumConsoleGui
                 new MenuBarItem ("_File", new MenuItem []
                 {
                     // Menu entry object for Quitting on top of the file dropdown
-                    new MenuItem ("_Quit", "", () => { Application.RequestStop (); })
+                    new MenuItem ("_Quit", "", () => { Environment.Exit(0); })
                 }),
             });
         }
