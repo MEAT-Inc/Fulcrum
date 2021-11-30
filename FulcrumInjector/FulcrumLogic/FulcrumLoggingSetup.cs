@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumLogic
         public void ConfigureLogCleanup()
         {
             // Pull values for log archive trigger and set values
-            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("WatchdogLogging.LogArchiveSetup");
+            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumLogging.LogArchiveSetup");
             FulcrumLogBroker.Logger?.WriteLog($"CLEANUP ARCHIVE FILE SETUP STARTED! CHECKING FOR {ConfigObj.ArchiveOnFileCount} OR MORE LOG FILES...");
             if (Directory.GetFiles(FulcrumLogBroker.BaseOutputPath).Length < (int)ConfigObj.ArchiveOnFileCount)
             {
