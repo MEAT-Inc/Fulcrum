@@ -35,13 +35,13 @@ namespace FulcrumInjector
         public static void Main(string[] args)
         {
             // Build logging and console configurations
-            ConfigureLogging(); 
-            ConfigureConsoleOutput(); 
-            FulcrumLogBroker.Logger?.WriteLog("LOGGERS AND CONSOLE OUTPUT BUILT OK! GENERATING LOGGER FOR MAIN NOW...", LogType.InfoLog);
-
-            // Build instance logger for main method
+            ConfigureLogging();
             InjectorMainLogger = new SubServiceLogger("InjectorMainLogger");
             InjectorMainLogger.WriteLog("LOGGER CONFIGURED OK FOR MAIN FULCRUM INJECTOR!", LogType.InfoLog);
+
+            // Configure console output view contents
+            ConfigureConsoleOutput();
+            InjectorMainLogger.WriteLog("LOGGERS AND CONSOLE OUTPUT BUILT OK! GENERATING LOGGER FOR MAIN NOW...", LogType.InfoLog);
 
             // Build out new Pipe Servers.
             if (!ConfigurePipes(out FulcrumPipeReader[] BuiltPipeReaders)) 
@@ -51,6 +51,9 @@ namespace FulcrumInjector
             AlphaPipe = BuiltPipeReaders[0];
             BravoPipe = BuiltPipeReaders[1];
             InjectorMainLogger.WriteLog("PIPES ARE OPEN AND STORED CORRECTLY! READY TO PROCESS OR SEND DATA THROUGH THEM!", LogType.InfoLog);
+
+            // Add a final console readline output call
+            Console.ReadLine();
         }
 
 
@@ -60,7 +63,7 @@ namespace FulcrumInjector
         private static void ConfigureConsoleOutput()
         {
             // Setup Console Output and lock window location to what is set.
-            var ConsoleSizes = ValueLoaders.GetConfigValue<int[]>("FulcrumConsoleConfig.ConsoleWindowSize");
+            var ConsoleSizes = ValueLoaders.GetConfigValue<int[]>("FulcrumConsole.ConsoleWindowSize");
             var RectShape = ConsoleShapeSetup.InitializeConsole(ConsoleSizes[0], ConsoleSizes[1]);
             var ConsoleLocker = new ConsoleLocker(RectShape, IntPtr.Zero);
             ConsoleLocker.LockWindowLocation();

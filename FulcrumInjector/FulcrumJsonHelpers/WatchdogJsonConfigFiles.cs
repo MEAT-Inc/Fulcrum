@@ -15,8 +15,8 @@ namespace FulcrumInjector.FulcrumJsonHelpers
     public enum JConfigType
     {
         // Possible config sections.
-        [Description("FulcrumLogging")]         FulcrumLogging,         // Logging config
-        [Description("FulcrumConsoleConfig")]   FulcrumConsoleConfig,   // Console config
+        [Description("FulcrumLogging")]     FulcrumLogging,   // Logging config
+        [Description("FulcrumConsole")]     FulcrumConsole,   // Console config
     }
 
     /// <summary>

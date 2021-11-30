@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using NLog;
 
 namespace FulcrumInjector.FulcrumLogging.LoggerObjects
 {
