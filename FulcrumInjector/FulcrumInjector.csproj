@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -31,19 +32,66 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.7.12\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="NStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NStack.Core.0.16.0\lib\netstandard2.0\NStack.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Terminal.Gui, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Terminal.Gui.1.3.1\lib\net472\Terminal.Gui.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InjectorMain.cs" />
+    <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleLocker.cs" />
+    <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleScreenConfiguration.cs" />
+    <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleShape.cs" />
+    <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleWin32.cs" />
+    <Compile Include="FulcrumConsoleGui\FulcrumGuiConstructor.cs" />
+    <Compile Include="FulcrumJsonHelpers\ValueLoaders.cs" />
+    <Compile Include="FulcrumJsonHelpers\ValueSetters.cs" />
+    <Compile Include="FulcrumJsonHelpers\WatchdogJsonConfigFiles.cs" />
+    <Compile Include="FulcrumLogging\LogArchiving\LogArchiveConfiguration.cs" />
+    <Compile Include="FulcrumLogging\LogArchiving\LogArchiveEvents.cs" />
+    <Compile Include="FulcrumLogging\LogArchiving\LogArchiver.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\BaseLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\ConsoleLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\FileLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\MasterLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\SubServiceLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerObjects\TimerLogger.cs" />
+    <Compile Include="FulcrumLogging\LoggerQueue.cs" />
+    <Compile Include="FulcrumLogging\LoggerSupport\LoggerConfiguration.cs" />
+    <Compile Include="FulcrumLogging\LoggerSupport\LoggerEnums.cs" />
+    <Compile Include="FulcrumLogging\FulcrumLogBroker.cs" />
+    <Compile Include="FulcrumLogic\FulcrumLoggingSetup.cs" />
+    <Compile Include="FulcrumLogic\FulcrumPipeReader.cs" />
+    <Compile Include="FulcrumInjectorMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -52,6 +100,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="FulcrumInjectorConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -62,6 +114,7 @@
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
