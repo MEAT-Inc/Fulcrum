@@ -60,7 +60,7 @@ BOOL CSelectionBox::OnInitDialog()
 	CString logDir;
 	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
 	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
-		dtDebug(_T("Log file folder exists. Skipping creation for this directory...")); 
+		dtDebug(_T("Log file folder exists. Skipping creation for this directory...\n")); 
 	}
 
 	// Build the log file path using the log dir above
@@ -77,7 +77,8 @@ BOOL CSelectionBox::OnInitDialog()
 	);
 
 	// Log new file name output.
-	dtDebug(_T("Configured new log file named: " + cstrPath ));
+	dtDebug(_T("Configured new log file named: " + cstrPath));
+	dtDebug(_T("\n"));
 
 	// Set information about the new output file
 	m_logfilename.SetWindowText(cstrPath);
