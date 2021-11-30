@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <?define RTMProductVersion="2.5.0" ?>
-  <?define ProductVersion="2.5.14" ?>
+  <?define ProductVersion="3.5.14" ?>
   <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
   <Product Id="*" Name="FulcrumShim" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
 
