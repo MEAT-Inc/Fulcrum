@@ -1,6 +1,6 @@
 ; fulcrum_shim.def : Declares the module parameters for the DLL.
 
-LIBRARY      "fulcrum_shim"
+LIBRARY      "FulcrumShim"
 
 EXPORTS
 	PassThruOpen					@1

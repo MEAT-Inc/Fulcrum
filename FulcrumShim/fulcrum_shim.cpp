@@ -39,21 +39,16 @@
 BEGIN_MESSAGE_MAP(fulcrum_dll, CWinApp)
 END_MESSAGE_MAP()
 
-fulcrum_dll fulcrum_app_main;
-fulcrum_dll::fulcrum_dll()
-{
-	// Place all significant initialization in InitInstance
-	InitInstance();
-}
-
 // Open and close instance event controling
 BOOL fulcrum_dll::InitInstance()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	CWinApp::InitInstance();
 	return TRUE;
 }
 BOOL fulcrum_dll::ExitInstance()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	CWinApp::ExitInstance();
 	return TRUE;
 }
@@ -62,6 +57,7 @@ BOOL fulcrum_dll::ExitInstance()
 void fulcrum_dll::InitPipes()
 {
 	// Check if pipes need to be configured
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (!pipesLoaded)
 	{
 		// Build pipe server

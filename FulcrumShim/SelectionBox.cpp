@@ -173,20 +173,23 @@ void CSelectionBox::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CSelectionBox::OnBnClickedOk()
 {
+	// Find current PT Device
 	POSITION pos = m_listview.GetFirstSelectedItemPosition();
 	if (pos == NULL)
 		return;
 
+	// Select it here
 	int nItem = m_listview.GetNextSelectedItem(pos);
-
 	DWORD_PTR item_data = m_listview.GetItemData(nItem);
-
 	sel = (cPassThruInfo *) item_data;
 	m_logfilename.GetWindowText(cstrDebugFile);
 
+	// Boot the pipes
+	fulcrum_dll* fulcrum_app = static_cast<fulcrum_dll*>(AfxGetApp());
+	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
+
 	// Return if you determine that the FunctionLibrary does not exist or
 	// is unusable for some reason
-
 	OnOK();
 }
 
