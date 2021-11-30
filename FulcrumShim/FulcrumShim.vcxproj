@@ -195,11 +195,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fulcrum_bitconverter.cpp" />
-    <ClCompile Include="fulcrum_dll.cpp" />
+    <ClCompile Include="fulcrum_shim.cpp" />
     <ClCompile Include="fulcrum_jpipe.cpp" />
     <ClCompile Include="fulcrum_output.cpp" />
     <ClCompile Include="fulcrum_pipe.cpp" />
-    <ClCompile Include="fulcrum_shim.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="fulcrum_debug.cpp" />
     <ClCompile Include="fulcrum_frontend.cpp" />
@@ -214,11 +213,10 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="fulcrum_bitconverter.h" />
-    <ClInclude Include="fulcrum_dll.h" />
+    <ClInclude Include="fulcrum_shim.h" />
     <ClInclude Include="fulcrum_jpipe.h" />
     <ClInclude Include="fulcrum_output.h" />
     <ClInclude Include="fulcrum_pipe.h" />
-    <ClInclude Include="fulcrum_shim.h" />
     <ClInclude Include="fulcrum_j2534.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SelectionBox.h" />

@@ -1,27 +1,31 @@
-// fulcrum_shim.h : main header file for the fulcrum_shim DLL
-//
+// FulcrumShim.h : main header file for the Wombat DLL
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error "include 'stdafx.h' before including this file for PCH"
+#error "include 'stdafx.h' before including this file for PCH"
 #endif
 
-#include "resource.h"		// main symbols
+#include "resource.h"	
+#include "fulcrum_jpipe.h"
 
+// CFulcrumDLL.h
+// See FulcrumShim.cpp for the implementation of this class
 
-// Cfulcrum_shimApp
-// See fulcrum_shim.cpp for the implementation of this class
-//
+class fulcrum_dll : public CWinApp {
+    public:
+		// Building commands
+		fulcrum_dll();
+		BOOL ExitInstance();		
 
-class Cfulcrum_shimApp : public CWinApp
-{
-public:
-	Cfulcrum_shimApp();
+		// Pipe configuration
+		void InitPipes();
+		bool pipesLoaded;
+		fulcrum_jpipe* fulcrumPiper;
 
-// Overrides
-public:
-	virtual BOOL InitInstance();
+	// Overrides
+    public:
+		virtual BOOL InitInstance();
 
 	DECLARE_MESSAGE_MAP()
 };

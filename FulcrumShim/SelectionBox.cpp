@@ -16,16 +16,12 @@ using namespace std;
 // SelectionBox dialog
 IMPLEMENT_DYNAMIC(CSelectionBox, CDialog)
 
+// Open and close events
+CSelectionBox::~CSelectionBox() { }
 CSelectionBox::CSelectionBox(std::set<cPassThruInfo>& connectedList, CWnd* pParent /*=NULL*/)
-	: CDialog(CSelectionBox::IDD, pParent), connectedList(connectedList), sel(NULL)
-{
+	: CDialog(CSelectionBox::IDD, pParent), connectedList(connectedList), sel(NULL) { }
 
-}
-
-CSelectionBox::~CSelectionBox()
-{
-}
-
+// On information registered into here
 void CSelectionBox::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
@@ -36,7 +32,7 @@ void CSelectionBox::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, m_logfilename);
 }
 
-
+// Open event and init for new content.
 BEGIN_MESSAGE_MAP(CSelectionBox, CDialog)
 	ON_BN_CLICKED(IDOK, &CSelectionBox::OnBnClickedOk)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST1, &CSelectionBox::OnLvnItemchangedList1)
@@ -48,24 +44,29 @@ END_MESSAGE_MAP()
 // SelectionBox message handlers
 BOOL CSelectionBox::OnInitDialog()
 {
+	// Show window output
 	CDialog::OnInitDialog();
 	ShowWindow(SW_HIDE);
 
+	// Find the Progfiles folder
 	TCHAR szPath[MAX_PATH];
 	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
 
+	// Find the current time value
 	SYSTEMTIME LocalTime;
 	GetLocalTime(&LocalTime);
 
 	// Build the log filder dir.
 	CString logDir;
-	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumJ2534", szPath));
-	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) { dtDebug(_T("Log file folder exists. Skipping creation for this directory...")); }
+	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
+	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
+		dtDebug(_T("Log file folder exists. Skipping creation for this directory...")); 
+	}
 
-	// Build the log file path
+	// Build the log file path using the log dir above
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\Fulcrum_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
-		logDir,
+	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\Fulcrum_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
+		szPath,
 		LocalTime.wYear,
 		LocalTime.wMonth,
 		LocalTime.wDay,
@@ -75,6 +76,10 @@ BOOL CSelectionBox::OnInitDialog()
 		LocalTime.wMilliseconds
 	);
 
+	// Log new file name output.
+	dtDebug(_T("Configured new log file named: " + cstrPath ));
+
+	// Set information about the new output file
 	m_logfilename.SetWindowText(cstrPath);
 	DoPopulateRegistryListbox();
 	ShowWindow(SW_SHOW);
@@ -89,21 +94,14 @@ BOOL CSelectionBox::OnInitDialog()
 // serial number
 static int CALLBACK CompareByName(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
+	// Build PT Info based on args
 	cPassThruInfo * item1 = (cPassThruInfo *) lParam1;
 	cPassThruInfo * item2 = (cPassThruInfo *) lParam2;
 
-	if (item1->Name < item2->Name)
-	{
-		return -1;
-	}
-	else if (item1->Name > item2->Name)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+	// Check name values
+	if (item1->Name < item2->Name) { return -1; }
+	else if (item1->Name > item2->Name) { return 1; }
+	else { return 0; }
 }
 
 void CSelectionBox::DoPopulateRegistryListbox()

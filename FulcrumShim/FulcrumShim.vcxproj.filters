@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="fulcrum_shim.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SelectionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,7 +42,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fulcrum_dll.cpp">
+    <ClCompile Include="fulcrum_shim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fulcrum_shim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fulcrum_j2534.h">
@@ -101,7 +95,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fulcrum_dll.h">
+    <ClInclude Include="fulcrum_shim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
