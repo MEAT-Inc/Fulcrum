@@ -2,8 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "fulcrum_shim.h"
+#include "FulcrumShim.h"
 #include "fulcrum_jpipe.h"
+#include "SelectionBox.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -34,37 +35,30 @@
 //		details.
 //
 
-// CFulcrumShim
-
-BEGIN_MESSAGE_MAP(fulcrum_dll, CWinApp)
+// Message controls for new instance
+BEGIN_MESSAGE_MAP(CFulcrumShim, CWinApp)
 END_MESSAGE_MAP()
 
-// Open and close instance event controling
-BOOL fulcrum_dll::InitInstance()
+// CTOR init for fulcrum runs
+CFulcrumShim::CFulcrumShim() { }	// Builds a new fulcrum app
+CFulcrumShim fulcrum_instance;		// Standalone fulcrum instance
+
+// Init override for app startup
+BOOL CFulcrumShim::InitInstance()
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	// Build instance and show the window
 	CWinApp::InitInstance();
-	return TRUE;
-}
-BOOL fulcrum_dll::ExitInstance()
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	CWinApp::ExitInstance();
 	return TRUE;
 }
 
 // Build a new init method sequence.
-void fulcrum_dll::InitPipes()
+void CFulcrumShim::InitPipes()
 {
 	// Check if pipes need to be configured
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	if (!pipesLoaded)
-	{
-		// Build pipe server
-		if (fulcrumPiper == nullptr) { fulcrumPiper = new fulcrum_jpipe(); }
-		pipesLoaded = fulcrumPiper->IsLoaded();
+	if (pipesLoaded) { return; }
 
-		// Init and boot new instance
-		if (!pipesLoaded) { pipesLoaded = fulcrumPiper->Startup(); }
-	}
+	// Build pipe server and store the state of them
+	if (fulcrumPiper == nullptr) fulcrumPiper = new fulcrum_jpipe();
+	if (!pipesLoaded) { pipesLoaded = fulcrumPiper->Startup(); }
+	pipesLoaded = fulcrumPiper->IsLoaded();
 }

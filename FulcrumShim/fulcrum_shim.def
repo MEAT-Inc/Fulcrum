@@ -1,4 +1,4 @@
-; fulcrum_shim.def : Declares the module parameters for the DLL.
+; FulcrumShim.def : Declares the module parameters for the DLL.
 
 LIBRARY      "FulcrumShim"
 

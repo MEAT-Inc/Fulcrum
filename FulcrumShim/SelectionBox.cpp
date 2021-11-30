@@ -7,7 +7,7 @@
 #include <string>
 #include <tchar.h>
 
-#include "fulcrum_shim.h"
+#include "FulcrumShim.h"
 #include "SelectionBox.h"
 #include "fulcrum_output.h"
 
@@ -17,9 +17,9 @@ using namespace std;
 IMPLEMENT_DYNAMIC(CSelectionBox, CDialog)
 
 // Open and close events
-CSelectionBox::~CSelectionBox() { }
 CSelectionBox::CSelectionBox(std::set<cPassThruInfo>& connectedList, CWnd* pParent /*=NULL*/)
 	: CDialog(CSelectionBox::IDD, pParent), connectedList(connectedList), sel(NULL) { }
+CSelectionBox::~CSelectionBox() { }
 
 // On information registered into here
 void CSelectionBox::DoDataExchange(CDataExchange* pDX)
@@ -185,7 +185,7 @@ void CSelectionBox::OnBnClickedOk()
 	m_logfilename.GetWindowText(cstrDebugFile);
 
 	// Boot the pipes
-	fulcrum_dll* fulcrum_app = static_cast<fulcrum_dll*>(AfxGetApp());
+	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
 
 	// Return if you determine that the FunctionLibrary does not exist or

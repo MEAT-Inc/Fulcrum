@@ -195,7 +195,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fulcrum_bitconverter.cpp" />
-    <ClCompile Include="fulcrum_shim.cpp" />
+    <ClCompile Include="FulcrumShim.cpp" />
     <ClCompile Include="fulcrum_jpipe.cpp" />
     <ClCompile Include="fulcrum_output.cpp" />
     <ClCompile Include="fulcrum_pipe.cpp" />
@@ -211,9 +211,10 @@
     <None Include="res\fulcrum_shim.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="fulcrum_bitconverter.h" />
-    <ClInclude Include="fulcrum_shim.h" />
+    <ClInclude Include="FulcrumShim.h" />
     <ClInclude Include="fulcrum_jpipe.h" />
     <ClInclude Include="fulcrum_output.h" />
     <ClInclude Include="fulcrum_pipe.h" />
