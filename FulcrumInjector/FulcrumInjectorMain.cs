@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumConsoleGui;
+using FulcrumInjector.FulcrumConsoleGui.ConsoleSupport;
 using FulcrumInjector.FulcrumJsonHelpers;
 using FulcrumInjector.FulcrumLogging;
 using FulcrumInjector.FulcrumLogging.LoggerObjects;
@@ -31,8 +34,12 @@ namespace FulcrumInjector
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            // Build logging configurations.
-            ConfigureLogging();
+            // Build logging and console configurations
+            ConfigureLogging(); 
+            ConfigureConsoleOutput(); 
+            FulcrumLogBroker.Logger?.WriteLog("LOGGERS AND CONSOLE OUTPUT BUILT OK! GENERATING LOGGER FOR MAIN NOW...", LogType.InfoLog);
+
+            // Build instance logger for main method
             InjectorMainLogger = new SubServiceLogger("InjectorMainLogger");
             InjectorMainLogger.WriteLog("LOGGER CONFIGURED OK FOR MAIN FULCRUM INJECTOR!", LogType.InfoLog);
 
@@ -48,22 +55,38 @@ namespace FulcrumInjector
 
 
         /// <summary>
+        /// Builds a new console configuration based on values provided
+        /// </summary>
+        private static void ConfigureConsoleOutput()
+        {
+            // Setup Console Output and lock window location to what is set.
+            var ConsoleSizes = ValueLoaders.GetConfigValue<int[]>("FulcrumConsoleConfig.ConsoleWindowSize");
+            var RectShape = ConsoleShapeSetup.InitializeConsole(ConsoleSizes[0], ConsoleSizes[1]);
+            var ConsoleLocker = new ConsoleLocker(RectShape, IntPtr.Zero);
+            ConsoleLocker.LockWindowLocation();
+            InjectorMainLogger.WriteLog($"CONSOLE WINDOW LOCKING HAS BEEN STARTED OK!", LogType.WarnLog);
+
+            // Build new console view now.
+            FulcrumGuiConstructor GuiBuilder = new FulcrumGuiConstructor();
+            GuiBuilder.ToggleConsoleGuiView();
+            InjectorMainLogger.WriteLog("BUILT NEW CONSOLE CONFIGURATION AND OUTPUT CORRECTLY! GUI IS SHOWING UP ON TOP OF THE CONSOLE NOW", LogType.WarnLog);
+        }
+        /// <summary>
         /// Builds new logging information and instances for fulcrum logging output.
         /// </summary>
         /// <returns>True if done ok, false if not.</returns>
         private static void ConfigureLogging()
         {
             // Build our logging configurations
-            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumLogging.AppInstanceName");
+            string AppName = ValueLoaders.GetConfigValue<string>("AppInstanceName");
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumLogging.DefaultLoggingPath");
             FulcrumLoggingSetup LoggerInit = new FulcrumLoggingSetup(AppName, LoggingPath);
 
-            // Configure loggers here
+            // Configure loggers and their outputs here
             LoggerInit.ConfigureLogging();              // Make loggers
             LoggerInit.ConfigureLogCleanup();           // Build log cleanup routines
             FulcrumLogBroker.Logger?.WriteLog("BUILT NEW LOGGING INSTANCE CORRECTLY!", LogType.InfoLog);
         }
-
         /// <summary>
         /// Builds two new pipe server objects for us to configure during execution of this application
         /// </summary>
