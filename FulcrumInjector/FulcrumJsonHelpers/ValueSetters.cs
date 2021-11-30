@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FulcrumInjector.FulcrumJsonHelpers
 {

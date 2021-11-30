@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogging.LogArchiving;
 using FulcrumInjector.FulcrumLogging.LoggerObjects;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using Newtonsoft.Json;
+using NLog;
+using NLog.Config;
 
 namespace FulcrumInjector.FulcrumLogging
 {

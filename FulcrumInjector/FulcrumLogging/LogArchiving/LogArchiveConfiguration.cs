@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using Newtonsoft.Json;
 
 namespace FulcrumInjector.FulcrumLogging.LogArchiving
 {
