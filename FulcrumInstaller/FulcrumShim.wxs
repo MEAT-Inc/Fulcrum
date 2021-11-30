@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <?define RTMProductVersion="2.1.0" ?>
-  <?define ProductVersion="2.2.5" ?>
+  <?define ProductVersion="2.2.6" ?>
   <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
   <Product Id="*" Name="FulcrumShim" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
 
@@ -33,14 +33,14 @@
 
             <!-- SAE J2534-1 DLL -->
             <Component Id="FulcrumDLLComponent" Guid="{f22e3b6b-b056-458a-9ccc-1e88647ea58a}" Win64="no">
+              <File Id="FULCRUMSHIM.PDB" Name="FulcrumShim.pdb" Source="..\FulcrumShim\Debug\FulcrumShim.pdb"/>
               <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\Debug\FulcrumShim.dll" Checksum="yes" />
-              <File Id="FULCRUMSHIM.PDB" Name="FulcrumShim.dll" Source="..\FulcrumShim\Debug\FulcrumShim.pdb" Checksum="yes" />
               <RegistryKey Id="RegOmegaKey" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc. - FulcrumShim" Action="createAndRemoveOnUninstall">
                 
                 <!-- Add registry strings for the product -->
                 <RegistryValue Id="RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
                 <RegistryValue Id="RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
-                <RegistryValue Id="RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\\FulcrumInjector\\FulcrumInjector.exe" />
+                <RegistryValue Id="RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\FulcrumInjector\FulcrumInjector.exe" />
                 <RegistryValue Id="RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
                
                 <!-- Add registry dword flags for each network protocol -->
