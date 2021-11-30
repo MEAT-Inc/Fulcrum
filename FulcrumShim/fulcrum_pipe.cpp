@@ -34,7 +34,6 @@ bool fulcrum_pipe::ConnectPipe1()
 	}
 
 	dtDebug(_T("%.3fs :: FULCRUM PIPE 1 --> OPENED OK!\n"), GetTimeSinceInit());
-
 	return true;
 }
 bool fulcrum_pipe::ConnectPipe2()
@@ -53,7 +52,6 @@ bool fulcrum_pipe::ConnectPipe2()
 	}
 
 	dtDebug(_T("%.3fs :: FULCRUM PIPE 2 --> OPENED OK!\n"), GetTimeSinceInit());
-
 	return true;
 }
 
