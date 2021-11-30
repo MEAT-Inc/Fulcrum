@@ -1,81 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <?define RTMProductVersion="2.1.0" ?>
-    <?define ProductVersion="2.1.1" ?>
-    <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
-    <Product Id="*" Name="FulcrumShim - A J2534 Debugging Tool" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
-        <Package InstallerVersion="200" Compressed="yes" />
-        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
-        <Upgrade Id="$(var.UpgradeCode)">
-            <UpgradeVersion Minimum="$(var.ProductVersion)" IncludeMinimum="no" OnlyDetect="yes" Language="1033" Property="NEWPRODUCTFOUND" />
-            <UpgradeVersion Minimum="$(var.RTMProductVersion)" IncludeMinimum="yes" Maximum="$(var.ProductVersion)" IncludeMaximum="no" Language="1033" Property="UPGRADEFOUND" />
-        </Upgrade>
-        <!-- Prevent downgrading -->
-        <CustomAction Id="PreventDowngrading" Error="Newer version already installed." />
-        <!-- Sequences -->
-        <InstallExecuteSequence>
-            <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>
-            <RemoveExistingProducts After="InstallFinalize" />
-        </InstallExecuteSequence>
-        <InstallUISequence>
-            <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>
-        </InstallUISequence>
-        <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
-                <Directory Id="MeatIncFilesFolder" Name="MEAT Inc">
-                    <Directory Id="DriverComponent" Name="FulcrumShim">
-                        <!-- SAE J2534-1 DLL -->
-                        <Component Id="FulcrumDLLComponent" Guid="{f22e3b6b-b056-458a-9ccc-1e88647ea58a}" Win64="no">
-                            <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\Debug\FulcrumShim.dll" Checksum="yes" />
-                            <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe" />
-                            <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe.config" />
-                            <File Id="FULCRUMINJECTOR.PDB" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.pdb" />
-                            <RegistryKey Id="RegOmegaKey" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc. - FulcrumShim" Action="createAndRemoveOnUninstall">
-                                <!-- Add registry strings for the product -->
-                                <RegistryValue Id="RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
-                                <RegistryValue Id="RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
-                                <RegistryValue Id="RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]FulcrumInjector.exe" />
-                                <RegistryValue Id="RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
-                                <!-- Add registry dword flags for each network protocol -->
-                                <RegistryValue Id="RegFlagCAN" Name="CAN" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagISO15765" Name="ISO15765" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagJ1850PWM" Name="J1850PWM" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagJ1850VPW" Name="J1850VPW" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagISO9141" Name="ISO9141" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagISO14230" Name="ISO14230" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagSCIAENGINE" Name="SCI_A_ENGINE" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagSCIATRANS" Name="SCI_A_TRANS" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagSCIBENGINE" Name="SCI_B_ENGINE" Action="write" Type="integer" Value="1" />
-                                <RegistryValue Id="RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
-                            </RegistryKey>
-                        </Component>
-                        <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
-                          <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
-                            <CreateFolder />
-                          </Component>
-                        </Directory>
-                    </Directory>
-                </Directory>
-            </Directory>
-        </Directory>
-        <Feature Id="ProductFeature" Title="installer" Level="1">
-        <ComponentRef Id="FulcrumDLLComponent" />
-        <ComponentRef Id="CreateFulcrumLoggingFolder"/>
-      </Feature>
+  <?define RTMProductVersion="2.1.0" ?>
+  <?define ProductVersion="2.1.1" ?>
+  <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
+  <Product Id="*" Name="FulcrumShim" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
 
-        <!-- In Control Panel > Add or Remove Programs, applications can have various 
+    <!-- Package Metadata Configuration -->
+    <Package InstallerVersion="200" Compressed="yes" />
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <!-- Upgrade Information -->
+    <Upgrade Id="$(var.UpgradeCode)">
+      <UpgradeVersion Minimum="$(var.ProductVersion)" IncludeMinimum="yes" OnlyDetect="yes" Language="1033" Property="NEWPRODUCTFOUND" />
+      <UpgradeVersion Minimum="$(var.RTMProductVersion)" IncludeMinimum="yes" Maximum="$(var.ProductVersion)" IncludeMaximum="no" Language="1033" Property="UPGRADEFOUND" />
+    </Upgrade>
+
+    <!-- Downgrading and Upgrading Sequences-->
+    <CustomAction Id="PreventDowngrading" Error="Newer version already installed." />
+    <InstallExecuteSequence>
+      <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>
+      <RemoveExistingProducts After="InstallFinalize" />
+    </InstallExecuteSequence>
+    <InstallUISequence>
+      <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>
+    </InstallUISequence>
+    
+    <!-- Application Contents -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="MeatIncFilesFolder" Name="MEAT Inc">
+          <Directory Id="DriverComponent" Name="FulcrumShim">
+
+            <!-- SAE J2534-1 DLL -->
+            <Component Id="FulcrumDLLComponent" Guid="{f22e3b6b-b056-458a-9ccc-1e88647ea58a}" Win64="no">
+              <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source=".\Debug\FulcrumShim.dll" Checksum="yes" />
+              <RegistryKey Id="RegOmegaKey" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc. - FulcrumShim" Action="createAndRemoveOnUninstall">
+                
+                <!-- Add registry strings for the product -->
+                <RegistryValue Id="RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
+                <RegistryValue Id="RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
+                <RegistryValue Id="RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\\FulcrumInjector\\FulcrumInjector.exe" />
+                <RegistryValue Id="RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
+               
+                <!-- Add registry dword flags for each network protocol -->
+                <RegistryValue Id="RegFlagCAN" Name="CAN" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagISO15765" Name="ISO15765" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagJ1850PWM" Name="J1850PWM" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagJ1850VPW" Name="J1850VPW" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagISO9141" Name="ISO9141" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagISO14230" Name="ISO14230" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagSCIAENGINE" Name="SCI_A_ENGINE" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagSCIATRANS" Name="SCI_A_TRANS" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagSCIBENGINE" Name="SCI_B_ENGINE" Action="write" Type="integer" Value="1" />
+                <RegistryValue Id="RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
+              </RegistryKey>
+            </Component>
+
+            <!-- Injector App Files -->
+            <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
+              <Component Id="CreateFulcrumInjectorFolder" Guid="5604ef78-55f4-4dfe-874f-fb5e6cf724a4">
+                <CreateFolder />
+              </Component>
+
+              <!-- Injector Application -->
+              <Component Id="FulcrumInjectorComponent" Guid="{67863391-7718-42ed-be3f-71ef5cc2bf77}" Win64="no">
+                <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe" />
+                <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe.config" />
+                <File Id="FULCRUMINJECTOR.PDB" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.pdb" />
+              </Component>
+            </Directory>
+
+            <!-- Program Files Folders for Logging -->
+            <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
+              <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
+                <CreateFolder />
+              </Component>
+
+              <!-- J2534 Logging -->
+              <Directory Name="FulcrumJ2534" Id="FULCRUMJ2534LOGS">
+                <Component Id="CreateJ2534LoggingFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+                  <CreateFolder />
+                </Component>
+              </Directory>
+
+              <!-- Injector Logging -->
+              <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORLOGS">
+                <Component Id="CreateInjectorLoggingFolder" Guid="d424ef00-e895-4aaf-8a0d-dffc4dca62a8">
+                  <CreateFolder />
+                </Component>
+              </Directory>
+
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="installer" Level="1">
+      <ComponentRef Id="FulcrumDLLComponent" />
+      <ComponentRef Id="FulcrumInjectorComponent"/>
+      <ComponentRef Id="CreateFulcrumInjectorFolder"/>
+      <ComponentRef Id="CreateFulcrumLoggingFolder" />
+      <ComponentRef Id="CreateJ2534LoggingFolder" />
+      <ComponentRef Id="CreateInjectorLoggingFolder"/>
+    </Feature>
+
+    <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 
          here for support information entry -->
-        <Property Id="ARPCOMMENTS">The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs.</Property>
-        <Property Id="ARPCONTACT">
+    <Property Id="ARPCOMMENTS">The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs.</Property>
+    <Property Id="ARPCONTACT">
       Sales:   neo.smith@motorengineeringandtech.com
       Support: neo.smith@motorengineeringandtech.com
       Phone:   (516) 633-3356
       Fax:     (516) 633-3356
     </Property>
-        <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-        <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-        <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-        <Property Id="ARPHELPTELEPHONE">(516)633-3356</Property>
-    </Product>
+    <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+    <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+    <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+    <Property Id="ARPHELPTELEPHONE">(516)633-3356</Property>
+  </Product>
 </Wix>

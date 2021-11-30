@@ -58,9 +58,19 @@ BOOL CSelectionBox::OnInitDialog()
 	GetLocalTime(&LocalTime);
 
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\%s\\%s\\%s\\%s_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"), szPath, _T("MEAT Inc"), _T("FulcrumShim"), _T("FulcrumLogs"), _T("Fulcrum"),
-		LocalTime.wYear, LocalTime.wMonth, LocalTime.wDay,
-		LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
+	cstrPath.Format(_T("%s\\%s\\%s\\%s\\%s\\%s_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"), 
+		szPath, 
+		_T("MEAT Inc"),
+		_T("FulcrumShim"),
+		_T("FulcrumLogs")
+		_T("FulcrumJ2534"),
+		_T("Fulcrum"),
+		LocalTime.wYear,
+		LocalTime.wMonth,
+		LocalTime.wDay,
+		LocalTime.wHour, 
+		LocalTime.wMinute, 
+		LocalTime.wSecond,
 		LocalTime.wMilliseconds
 	);
 

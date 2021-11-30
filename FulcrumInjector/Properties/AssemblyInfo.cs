@@ -1,36 +1,25 @@
-﻿using System.Reflection;
+﻿// Using calls for Assembly Info updating
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Resources;
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
+// General Information
 [assembly: AssemblyTitle("FulcrumInjector")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A J2534 Diagnostic Wrapper with various debugging features.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("MEAT Inc")]
 [assembly: AssemblyProduct("FulcrumInjector")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyCopyright("Copyright ©MEAT Inc 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
+// Internal Visibility for testing
 [assembly: ComVisible(false)]
+[assembly: Guid("19b20276-75f8-4ed8-a700-5ba828389de5")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3c050f07-4f17-403e-ac20-f9fd7ed72d7c")]
+// Version information
+[assembly: AssemblyVersion("0.1.0.9")]
+[assembly: AssemblyFileVersion("0.1.0.9")]
+[assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
