@@ -7,6 +7,9 @@
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
 
+// Used to configure the defines
+#include "config.h"
+
 // Pointers to J2534 API functions in the loaded library
 PTOPEN _PassThruOpen = 0;
 PTCLOSE _PassThruClose = 0;
