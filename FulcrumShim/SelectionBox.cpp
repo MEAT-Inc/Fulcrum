@@ -59,13 +59,15 @@ BOOL CSelectionBox::OnInitDialog()
 	// Build the log filder dir.
 	CString logDir;
 	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
-	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
-		dtDebug(_T("Log file folder exists. Skipping creation for this directory...\n")); 
-	}
+	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) 
+		dtDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
+	else 
+		dtDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
+
 
 	// Build the log file path using the log dir above
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\Fulcrum_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
+	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
 		szPath,
 		LocalTime.wYear,
 		LocalTime.wMonth,
@@ -77,8 +79,7 @@ BOOL CSelectionBox::OnInitDialog()
 	);
 
 	// Log new file name output.
-	dtDebug(_T("Configured new log file named: " + cstrPath));
-	dtDebug(_T("\n"));
+	dtDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
 
 	// Set information about the new output file
 	m_logfilename.SetWindowText(cstrPath);
@@ -176,8 +177,7 @@ void CSelectionBox::OnBnClickedOk()
 {
 	// Find current PT Device
 	POSITION pos = m_listview.GetFirstSelectedItemPosition();
-	if (pos == NULL)
-		return;
+	if (pos == NULL) return;
 
 	// Select it here
 	int nItem = m_listview.GetNextSelectedItem(pos);
@@ -185,37 +185,32 @@ void CSelectionBox::OnBnClickedOk()
 	sel = (cPassThruInfo *) item_data;
 	m_logfilename.GetWindowText(cstrDebugFile);
 
-	// Boot the pipes
+	// Boot the pipes and start the fulcrum injector
 	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
 
-	// Return if you determine that the FunctionLibrary does not exist or
-	// is unusable for some reason
+	// Check if passed output. If so move on.
 	OnOK();
 }
 
 void CSelectionBox::OnHdnItemdblclickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
-
 	OnBnClickedOk();
-
 	*pResult = 0;
 }
 
 void CSelectionBox::OnBnClickedConfig()
 {
 	POSITION pos = m_listview.GetFirstSelectedItemPosition();
-	if (pos == NULL)
-		return;
+	if (pos == NULL) return;
 
 	int nItem = m_listview.GetNextSelectedItem(pos);
-
 	DWORD_PTR item_data = m_listview.GetItemData(nItem);
 	cPassThruInfo * iPassThruInfo = (cPassThruInfo *) item_data;
 
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
+	PROCESS_INFORMATION pi;
 
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
