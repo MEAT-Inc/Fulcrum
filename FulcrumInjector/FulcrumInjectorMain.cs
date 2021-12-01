@@ -10,7 +10,7 @@ using FulcrumInjector.FulcrumJsonHelpers;
 using FulcrumInjector.FulcrumLogging;
 using FulcrumInjector.FulcrumLogging.LoggerObjects;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
-using FulcrumInjector.FulcrumLogic;
+using FulcrumInjector.FulcrumPipeLogic;
 
 namespace FulcrumInjector
 {
@@ -23,8 +23,8 @@ namespace FulcrumInjector
         private static SubServiceLogger InjectorMainLogger;
 
         // Pipe objects used for building connections to our DLL
-        public static FulcrumPipeReader AlphaPipe;
-        public static FulcrumPipeReader BravoPipe;
+        public static FulcrumPipe AlphaPipe;
+        public static FulcrumPipe BravoPipe;
 
         // -------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("LOGGERS AND CONSOLE OUTPUT BUILT OK! GENERATING LOGGER FOR MAIN NOW...", LogType.InfoLog);
 
             // Build out new Pipe Servers.
-            if (!ConfigurePipes(out FulcrumPipeReader[] BuiltPipeReaders))
+            if (!ConfigurePipes(out FulcrumPipe[] BuiltPipeReaders))
             {
                 // Log this failure then exit the application
                 InjectorMainLogger.WriteLog("FAILED TO CONFIGURE ONE OR MORE OF THE PIPE OBJECTS FOR THIS SESSION!", LogType.FatalLog);
@@ -97,14 +97,14 @@ namespace FulcrumInjector
         /// Builds two new pipe server objects for us to configure during execution of this application
         /// </summary>
         /// <returns></returns>
-        private static bool ConfigurePipes(out FulcrumPipeReader[] OutputPipes)
+        private static bool ConfigurePipes(out FulcrumPipe[] OutputPipes)
         {
             // First up, configure our new pipe servers for reading information.
-            var PipeAlpha = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeAlpha);
-            var PipeBravo = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeBravo);
+            var PipeAlpha = new FulcrumPipeReader();    // Reading pipe client
+            var PipeBravo = new FulcrumPipeWriter();    // Sending pipe server
 
             // Return passed output
-            OutputPipes = new[] { PipeAlpha, PipeBravo };
+            OutputPipes = new FulcrumPipe[] { PipeAlpha, PipeBravo };
             bool OutputResult = OutputPipes.All(PipeObj => PipeObj.PipeState == FulcrumPipeState.Connected);
             if (OutputResult) InjectorMainLogger.WriteLog("BUILT NEW PIPE SERVERS FOR BOTH ALPHA AND BRAVO WITHOUT ISSUE!", LogType.InfoLog);
             else InjectorMainLogger.WriteLog("FAILED TO BUILD ONE OR BOTH PIPE SERVER READING CLIENTS!", LogType.FatalLog);
