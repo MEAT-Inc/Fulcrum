@@ -48,8 +48,8 @@ namespace FulcrumInjector.FulcrumLogic
         }
 
         // Pipe Configurations for the default values.
-        private static readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
-        private static readonly string FulcrumPipeBravo = "1D16333944F74A928A932417074DD2B3";
+        private static readonly string FulcrumPipeAlpha = "\\\\.\\pipe\\2CC3F0FB08354929BB453151BBAA5A15";
+        private static readonly string FulcrumPipeBravo = "\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3";
 
         // Pipe configuration information.
         public readonly string PipeLocation;
@@ -69,7 +69,7 @@ namespace FulcrumInjector.FulcrumLogic
         {
             // Configure logger object.
             this.PipeState = FulcrumPipeState.Faulted;
-            this.PipeLogger = new SubServiceLogger($"FulcrumPipeLogger_{PipeId}");
+            this.PipeLogger = new SubServiceLogger($"{PipeId}");
             this.PipeLogger.WriteLog($"BUILT NEW PIPE LOGGER FOR PIPE TYPE {PipeId} OK!", LogType.InfoLog);
 
             // Store information about the pipe being configured
@@ -91,7 +91,7 @@ namespace FulcrumInjector.FulcrumLogic
             // Log ready for connection and send it.
             this.PipeState = FulcrumPipeState.Open;
             this.PipeLogger.WriteLog("PIPE CLIENT STREAM HAS BEEN CONFIGURED! ATTEMPTING CONNECTION ON IT NOW...", LogType.WarnLog);
-            this.PipeLogger.WriteLog("WAITING A TOTAL OF 10 SECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
+            this.PipeLogger.WriteLog("WAITING FOR 10 SECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
 
             try
             {
@@ -109,8 +109,6 @@ namespace FulcrumInjector.FulcrumLogic
                 this.PipeLogger.WriteLog("EXCEPTION THROWN DURING CONNECTION OR STREAM OPERATIONS FOR THIS PIPE CONFIGURATION!", LogType.ErrorLog);
                 this.PipeLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW", PipeEx);
             }
-
-            Console.ReadLine();
         }
     }
 }

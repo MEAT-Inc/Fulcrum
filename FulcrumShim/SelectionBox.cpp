@@ -176,8 +176,7 @@ void CSelectionBox::OnBnClickedOk()
 {
 	// Find current PT Device
 	POSITION pos = m_listview.GetFirstSelectedItemPosition();
-	if (pos == NULL)
-		return;
+	if (pos == NULL) return;
 
 	// Select it here
 	int nItem = m_listview.GetNextSelectedItem(pos);
@@ -185,37 +184,34 @@ void CSelectionBox::OnBnClickedOk()
 	sel = (cPassThruInfo *) item_data;
 	m_logfilename.GetWindowText(cstrDebugFile);
 
-	// Boot the pipes
+	// Boot the pipes and start the fulcrum injector
 	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
 
-	// Return if you determine that the FunctionLibrary does not exist or
-	// is unusable for some reason
+	// Log information output and return based on function lib conditions
+	dtDebug(_T("Booted new pipe instances correctly!"));
+	dtDebug(_T("FulcrumInjector should now be running in the background!"));
 	OnOK();
 }
 
 void CSelectionBox::OnHdnItemdblclickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
-
 	OnBnClickedOk();
-
 	*pResult = 0;
 }
 
 void CSelectionBox::OnBnClickedConfig()
 {
 	POSITION pos = m_listview.GetFirstSelectedItemPosition();
-	if (pos == NULL)
-		return;
+	if (pos == NULL) return;
 
 	int nItem = m_listview.GetNextSelectedItem(pos);
-
 	DWORD_PTR item_data = m_listview.GetItemData(nItem);
 	cPassThruInfo * iPassThruInfo = (cPassThruInfo *) item_data;
 
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
+	PROCESS_INFORMATION pi;
 
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
