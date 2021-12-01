@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using FulcrumInjector.FulcrumJsonHelpers;
-using FulcrumInjector.FulcrumLogging;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic
+namespace FulcrumInjector.FulcrumLogging
 {
     /// <summary>
     /// Class used to configure new Fulcrum logging configurations

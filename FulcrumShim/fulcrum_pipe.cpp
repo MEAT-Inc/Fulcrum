@@ -8,123 +8,98 @@
 #include "fulcrum_debug.h"
 #include <tchar.h>
 
-fulcrum_pipe::fulcrum_pipe()
-{
-	Loaded = false;
-	Startup();
-}
-fulcrum_pipe::~fulcrum_pipe()
-{
-	ShutdownPipe();
-}
+// CTOR and DCTOR for pipe objects
+fulcrum_pipe::fulcrum_pipe() { }
+fulcrum_pipe::~fulcrum_pipe() {	ShutdownPipe();}
+bool fulcrum_pipe::IsLoaded() { return Loaded; }
 
-
-bool fulcrum_pipe::ConnectPipe1()
+// Connection methods and closing methods for our pipe objects
+bool fulcrum_pipe::ConnectOutputPipe()
 {
+	// Check if this pipe is loaded or not
+	if (Loaded)
+	{
+		// Log information, store state of pipes, and return it.
+		dtDebug(_T("%.3fs :: FULCRUM PIPE 1 (OUTPUT PIPE) WAS ALREADY OPEN!\n"), GetTimeSinceInit());
+		Loaded = true;
+		return true;
+	}
+	
+	// Configure new pipe name object output
 	LPTSTR lpszPipename1 = TEXT("\\\\.\\pipe\\2CC3F0FB08354929BB453151BBAA5A15");
-	hPipe1 = CreateFile(lpszPipename1, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+	hPipe1 = CreateNamedPipe(lpszPipename1, PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE, 1, 0, 0, 0, NULL);
 
+	// Check if the pipe was built or not.
 	if ((hPipe1 == NULL || hPipe1 == INVALID_HANDLE_VALUE))
 	{
-		dtDebug(_T("%.3fs :: FULCRUM PIPE 1 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
+		dtDebug(_T("%.3fs    ERROR: FULCRUM PIPE 1 (OUTPUT PIPE) COULD NOT BE OPENED!\n"), GetTimeSinceInit());
 		if (hPipe1 == NULL) { dtDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
 		else {dtDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
 		return false;
 	}
 
-	dtDebug(_T("%.3fs :: FULCRUM PIPE 1 --> OPENED OK!\n"), GetTimeSinceInit());
+	// Log information and return output
+	dtDebug(_T("%.3fs    FULCRUM PIPE 1 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
 	return true;
 }
-bool fulcrum_pipe::ConnectPipe2()
+bool fulcrum_pipe::ConnectInputPipe()
 {
+	// Configure new pipe name object output
 	LPTSTR lpszPipename2 = TEXT("\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3");
-	hPipe2 = CreateFile(lpszPipename2, GENERIC_READ, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+	hPipe2 = CreateFile(lpszPipename2, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
+	// Check if the pipe was built or not.
 	if ((hPipe2 == NULL || hPipe2 == INVALID_HANDLE_VALUE))
 	{
-		dtDebug(_T("%.3fs :: FULCRUM PIPE 2 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
+		dtDebug(_T("%.3fs    ERROR: FULCRUM PIPE 2 (INPUT PIPE) COULD NOT BE OPENED!\n"), GetTimeSinceInit());
 		if (hPipe2 == NULL) { dtDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
 		else { dtDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
 		return false;
 	}
 
-	dtDebug(_T("%.3fs :: FULCRUM PIPE 2 --> OPENED OK!\n"), GetTimeSinceInit());
+	// Log information and return output
+	dtDebug(_T("%.3fs    FULCRUM PIPE 2 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
 	return true;
 }
-
-
-bool fulcrum_pipe::Startup()
-{
-	// If pipes are open, return
-	if (Loaded) return Loaded;
-
-	// Boot pipe 1
-	bool res_pipe1 = ConnectPipe1();
-	if (!res_pipe1)
-	{
-		Loaded = false;
-		return Loaded;
-	}
-
-	// Boot pipe 2 
-	bool res_pipe2 = ConnectPipe2();
-	if (!res_pipe2)
-	{
-		Loaded = false;
-		return Loaded;
-	}
-
-	dtDebug(_T("%.3fs :: FULCRUM PIPES ARE LOOKIN GOOD LETS SEND THIS BITCH\n"), GetTimeSinceInit());
-	Loaded = true;
-	return Loaded;
-}
-
 void fulcrum_pipe::ShutdownPipe()
 {
-	if (hPipe1)
-	{
-		CloseHandle(hPipe1);
-		hPipe1 = nullptr;
-	}
+	// If not pipe one, don't close down
+	if (!hPipe1) { return; }
 
-	// (06/09/18 TAB)
+	// Close it out and log information.
+	CloseHandle(hPipe1); hPipe1 = nullptr;
+	dtDebug(_T("%.3fs    Closed output pipe for FulcrumShim Server correctly!\n", GetTimeSinceInit()));
 	Loaded = false;
 }
 
-
-bool fulcrum_pipe::IsLoaded()
-{
-	return Loaded;
-}
-
+// Writes data to our pipe streams
 void fulcrum_pipe::WriteStringOut(std::string str)
 {
 	DWORD written;
 	DWORD bytesToWrite = (DWORD)strlen(str.c_str());
 	BOOL res = WriteFile(hPipe1, str.c_str(), bytesToWrite, &written, NULL);
 }
-
 void fulcrum_pipe::WriteStringOut100(std::string str)
 {
 	byte ayPaddedArray[100];
-
 	memset(ayPaddedArray, 0, 100);
 
 	DWORD written;
 	DWORD bytesToWrite = (DWORD)strlen(str.c_str());
 
-	for (int i = 0; i < (int)bytesToWrite; i++)
-		ayPaddedArray[i] = str[i];
-
+	for (int i = 0; i < (int)bytesToWrite; i++) ayPaddedArray[i] = str[i];
 	BOOL res = WriteFile(hPipe1, ayPaddedArray, 100, &written, NULL);
 }
-
 void fulcrum_pipe::WriteBytesOut(byte b[], int b_len)
 {
 	DWORD written;
 	BOOL res = WriteFile(hPipe1, b, b_len, &written, NULL);
 }
+void fulcrum_pipe::WriteUint32(unsigned int num) { WriteBytesOut((byte*)&num, 4); }
+void fulcrum_pipe::WriteUint32(unsigned int* a, unsigned int len) { for (unsigned int i = 0; i < len; i++)	WriteUint32(a[i]); }
+void fulcrum_pipe::Writeint32(int num) { WriteBytesOut((byte*)&num, 4); }
 
+// Reads data from our pipe streams
 std::string fulcrum_pipe::ReadStringIn()
 {
 	char read_buffer[100] = { 0 };
@@ -135,19 +110,15 @@ std::string fulcrum_pipe::ReadStringIn()
 	std::string str(read_buffer, bytes_read);
 	return str;
 }
-
 void fulcrum_pipe::ReadBytesIn(byte b[], int* b_len)
 {
 	DWORD bytes_read = 0;
 	DWORD bytes_to_read = *b_len;
 
 	// (01/23/18 TAB) - don't try to read 0 bytes, it might block forever if nothing is added at the other end
-	if (bytes_to_read > 0)
-		BOOL res = ReadFile(hPipe2, b, bytes_to_read, &bytes_read, NULL);
-
+	if (bytes_to_read > 0) BOOL res = ReadFile(hPipe2, b, bytes_to_read, &bytes_read, NULL);
 	*b_len = bytes_read;
 }
-
 void fulcrum_pipe::ReadBytes(byte b[], int num)
 {
 	int bytesRead = num;
@@ -155,32 +126,15 @@ void fulcrum_pipe::ReadBytes(byte b[], int num)
 	if (bytesRead < num)
 		throw& CPipeException(std::string(("not enough bytes")));
 }
-
 unsigned int fulcrum_pipe::ReadUint32()
 {
 	unsigned int num;
 	ReadBytes((byte*)&num, 4);
 	return num;
 }
-
 int fulcrum_pipe::ReadInt32()
 {
 	int num;
 	ReadBytes((byte*)&num, 4);
 	return num;
-}
-
-void fulcrum_pipe::WriteUint32(unsigned int num)
-{
-	WriteBytesOut((byte*)&num, 4);
-}
-void fulcrum_pipe::WriteUint32(unsigned int* a, unsigned int len)
-{
-	for (unsigned int i = 0; i < len; i++)
-		WriteUint32(a[i]);
-}
-
-void fulcrum_pipe::Writeint32(int num)
-{
-	WriteBytesOut((byte*)&num, 4);
 }

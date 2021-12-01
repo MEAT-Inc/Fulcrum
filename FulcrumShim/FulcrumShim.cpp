@@ -60,8 +60,8 @@ void CFulcrumShim::InitPipes()
 
 	// Build pipe server and store the state of them
 	if (fulcrumPiper == nullptr) fulcrumPiper = new fulcrum_jpipe();
-	if (!pipesLoaded) { pipesLoaded = fulcrumPiper->Startup(); }
-	pipesLoaded = fulcrumPiper->IsLoaded();
+	dtDebug(_T("%.3fs    Connecting output pipe now...\n", GetTimeSinceInit()));
+	bool LoadedPipeOutput = fulcrumPiper->ConnectOutputPipe();
 
 	// Build config app path value here and run the injector application
 	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
@@ -74,8 +74,18 @@ void CFulcrumShim::InitPipes()
 	StartupInfos.cb = sizeof(StartupInfos);
 	ZeroMemory(&ProcessInfos, sizeof(ProcessInfos));
 
-	// Run the process here by booting a new instance
+	// Run the process here by booting a new instance. Once running connect the input pipe.
 	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
-	dtDebug(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
-	dtDebug(_T("%.3fs    FulcrumInjector should now be running in the background!\n", GetTimeSinceInit()));
+	dtDebug(_T("%.3fs    Connecting input pipe now...\n", GetTimeSinceInit()));
+	dtDebug(_T("%.3fs    NOTE: Waiting 2.5 seconds before this request is sent...\n", GetTimeSinceInit()));
+	Sleep(2500); bool LoadedPipeInput = fulcrumPiper->ConnectInputPipe();
+
+	// Now see if we're loaded correctly.
+	pipesLoaded = LoadedPipeInput && LoadedPipeOutput;
+	if (!pipesLoaded) dtDebug(_T("%.3fs    Failed to boot new pipe instances for our FulcrumShim Server!\n", GetTimeSinceInit()));
+	else 
+	{
+		dtDebug(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
+		dtDebug(_T("%.3fs    FulcrumInjector should now be running in the background\n", GetTimeSinceInit()));
+	}
 }

@@ -90,9 +90,11 @@
     <Compile Include="FulcrumLogging\LoggerSupport\LoggerConfiguration.cs" />
     <Compile Include="FulcrumLogging\LoggerSupport\LoggerEnums.cs" />
     <Compile Include="FulcrumLogging\FulcrumLogBroker.cs" />
-    <Compile Include="FulcrumLogic\FulcrumLoggingSetup.cs" />
-    <Compile Include="FulcrumLogic\FulcrumPipeReader.cs" />
+    <Compile Include="FulcrumLogging\FulcrumLoggingSetup.cs" />
+    <Compile Include="FulcrumPipeLogic\FulcrumPipe.cs" />
     <Compile Include="FulcrumInjectorMain.cs" />
+    <Compile Include="FulcrumPipeLogic\FulcrumPipeReader.cs" />
+    <Compile Include="FulcrumPipeLogic\FulcrumPipeWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
