@@ -2,7 +2,7 @@
   "AppInstanceName": "FulcrumInjector",
   "FulcrumConsole": {
     "EnableGuiConsole":  true, 
-    "ConsoleWindowSize": [ 1000, 600 ]
+    "ConsoleWindowSize": [ 1200, 700 ]
   },
   "FulcrumLogging": {
     "DefaultLoggingPath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumLogs",
