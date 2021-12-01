@@ -52,7 +52,7 @@ namespace FulcrumInjector
             BravoPipe = BuiltPipeReaders[1];
             InjectorMainLogger.WriteLog("PIPES ARE OPEN AND STORED CORRECTLY! READY TO PROCESS OR SEND DATA THROUGH THEM!", LogType.InfoLog);
 
-            // Add a final console readline output call
+            // Add a final console read line output call
             Console.ReadLine();
         }
 

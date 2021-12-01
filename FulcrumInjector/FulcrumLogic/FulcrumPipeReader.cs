@@ -108,9 +108,6 @@ namespace FulcrumInjector.FulcrumLogic
                 this.PipeLogger.WriteLog($"FAILED TO CONNECT TO OUR PIPE INSTANCE FOR PIPE ID {PipeId}!", LogType.ErrorLog);
                 this.PipeLogger.WriteLog("EXCEPTION THROWN DURING CONNECTION OR STREAM OPERATIONS FOR THIS PIPE CONFIGURATION!", LogType.ErrorLog);
                 this.PipeLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW", PipeEx);
-            }
-
-            Console.ReadLine();
-        }
+            } }
     }
 }
