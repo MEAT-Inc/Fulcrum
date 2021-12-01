@@ -6,10 +6,11 @@ using FulcrumInjector.FulcrumLogging.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumPipeLogic
 {
+    /// <summary>
+    /// Pipe reading instance for our fulcrum server
+    /// </summary>
     public class FulcrumPipeReader : FulcrumPipe
     {
-        // Pipe client object
-
         // Pipe and reader objects for data
         internal readonly StreamReader PipeReader;
         internal readonly NamedPipeClientStream FulcrumPipe;

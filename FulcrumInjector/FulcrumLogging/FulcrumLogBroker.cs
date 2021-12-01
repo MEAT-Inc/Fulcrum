@@ -124,7 +124,7 @@ namespace FulcrumInjector.FulcrumLogging
             if (FileNameFilter == "") { FileNameFilter = ValueLoaders.GetConfigValue<string>("AppInstanceName"); }
             Logger?.WriteLog("CLEANING UP OLD FILES IN THE LOG OUTPUT DIRECTORY NOW...", LogType.InfoLog);
             string[] LogFilesLocated = Directory.GetFiles(BaseOutputPath).OrderBy(FileObj => new FileInfo(FileObj).CreationTime)
-                .Where(FileObj => FileObj.Contains(".log") && FileObj.Contains(FileNameFilter))
+                .Where(FileObj => FileObj.Contains(FileNameFilter))
                 .ToArray();
 
             // Remove 5 files from this list to keep current log files out.

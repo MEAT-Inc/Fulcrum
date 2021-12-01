@@ -39,6 +39,10 @@ namespace FulcrumInjector
             InjectorMainLogger = new SubServiceLogger("InjectorMainLogger");
             InjectorMainLogger.WriteLog("LOGGER CONFIGURED OK FOR MAIN FULCRUM INJECTOR!", LogType.InfoLog);
 
+            // Kill other instances of this application
+            CheckForExisting();
+            InjectorMainLogger.WriteLog("KILLED ANY EXISTING PROCESSES FOR THE FULCRUM INJECTOR OK!", LogType.InfoLog);
+
             // Configure console output view contents
             ConfigureConsoleOutput();
             InjectorMainLogger.WriteLog("LOGGERS AND CONSOLE OUTPUT BUILT OK! GENERATING LOGGER FOR MAIN NOW...", LogType.InfoLog);
@@ -61,6 +65,14 @@ namespace FulcrumInjector
         }
 
 
+        /// <summary>
+        /// Checks for an existing fulcrum process object and kill all but the running one.
+        /// </summary>
+        private static void CheckForExisting()
+        {
+            // Find all the fulcrum process objects now.
+
+        }
         /// <summary>
         /// Builds a new console configuration based on values provided
         /// </summary>
