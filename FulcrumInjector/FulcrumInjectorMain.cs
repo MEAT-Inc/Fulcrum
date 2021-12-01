@@ -100,8 +100,8 @@ namespace FulcrumInjector
         private static bool ConfigurePipes(out FulcrumPipe[] OutputPipes)
         {
             // First up, configure our new pipe servers for reading information.
-            var PipeAlpha = new FulcrumPipeReader();    // Reading pipe client
             var PipeBravo = new FulcrumPipeWriter();    // Sending pipe server
+            var PipeAlpha = new FulcrumPipeReader();    // Reading pipe client
 
             // Return passed output
             OutputPipes = new FulcrumPipe[] { PipeAlpha, PipeBravo };
