@@ -45,13 +45,13 @@ namespace FulcrumInjector.FulcrumConsoleGui
         {
             _consoleWindow,      // Main window
             _consoleMenu,        // Menu bar
-            _consoleLeftMenu,    // Left hand pane
+            _consoleTopPane,     // Top view pane
         };
 
         // Console components
         private static Window _consoleWindow;
         private static MenuBar _consoleMenu;
-        private static FrameView _consoleLeftMenu;
+        private static FrameView _consoleTopPane;
 
         // -----------------------------------------------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumConsoleGui
             // Building new objects for the new console window output.
             _consoleWindow = this.ConfigureMainWindow();      // Main window view
             _consoleMenu = this.ConfigureMenuBar();           // Console Menu top bar
-            _consoleLeftMenu = this.ConfigureLeftSidePane();  // Left side output menu
+            _consoleTopPane = this.ConfigureTopInfoPane();    // Top output menu
 
             // Append all these objects in here.
             ConsoleLogger.WriteLog("ADDING CONSOLE OBJECTS INTO APP SESSION NOW!", LogType.WarnLog);
@@ -125,38 +125,6 @@ namespace FulcrumInjector.FulcrumConsoleGui
 
         #region View Generation Routines
         /// <summary>
-        /// Builds and returns a new console window object.
-        /// </summary>
-        /// <returns></returns>
-        private Window ConfigureMainWindow()
-        {
-            // Log starting to build window.
-            ConsoleLogger.WriteLog("--> CONFIGURING NEW CONSOLE WINDOW OBJECT NOW...", LogType.WarnLog);
-
-            // Pull the app title value here.
-            string CurrentAppVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            string AppName = ValueLoaders.GetConfigValue<string>("AppInstanceName");
-            string FullTitleString = $"{AppName} -- Version {CurrentAppVersion}";
-
-            // Set window title to contain the version of the application instance.
-            Console.Title = $"{AppName} -- Version {CurrentAppVersion}";
-            ConsoleLogger.WriteLog("    --> BUILT NEW TITLE VALUE FOR WINDOW INSTANCE OK!");
-            ConsoleLogger.WriteLog($"    --> NEW TITLE VALUE TO STORE: {FullTitleString}", LogType.InfoLog);
-            ConsoleLogger.WriteLog($"SET NEW TITLE VALUE FOR WINDOW OBJECT TO: {Console.Title}", LogType.InfoLog);
-
-            // Configure a new window object.
-            return _consoleWindow ?? new Window()
-            {
-                // Setup window location on the console.
-                X = 0,      // Set X and Y spot on the pane.
-                Y = 1,      // Set X and Y spot on the pane.
-
-                // Setup window shading
-                Width = Dim.Fill(),           // Window filling values
-                Height = Dim.Fill()           // Window filling values
-            };
-        }
-        /// <summary>
         /// Builds our new console menu object
         /// </summary>
         private MenuBar ConfigureMenuBar()
@@ -186,27 +154,58 @@ namespace FulcrumInjector.FulcrumConsoleGui
         /// Builds a new left hand pane for the frame view output
         /// </summary>
         /// <returns>Left hand pane object</returns>
-        private FrameView ConfigureLeftSidePane()
+        private FrameView ConfigureTopInfoPane()
         {
             // Log information and build new pane
             ConsoleLogger.WriteLog("--> CONFIGURING CONSOLE LEFT HAND PANE NOW...", LogType.WarnLog);
-            var LeftPaneView = new FrameView("FulcrumInjector")
+            var LeftPaneView = new FrameView("FulcrumInjector - Application Status")
             {
                 X = 0,                              // Starting at 0
                 Y = 1,                              // For Left Side Menu
-                Width = 25,                         // 25 Pixels wide
-                Height = Dim.Fill(1),               // Fill value
+                Width = Dim.Fill(),                 // Fill width
+                Height = 10,                        // 10 tall
                 CanFocus = false,                   // Not focusable
-                Shortcut = Key.CtrlMask | Key.C     // Keyboard shortcut to move into it
+                Shortcut = Key.CtrlMask | Key.C     // Focus shortcut
             };
 
             // Apply title value and shortcut values
-            LeftPaneView.Title = $"{LeftPaneView.Title} ({LeftPaneView.ShortcutTag})";
             LeftPaneView.ShortcutAction = () => LeftPaneView.SetFocus();
             ConsoleLogger.WriteLog("--> BUILT NEW PANE VIEW OK! SHORTCUT AND TITLE HAVE BEEN APPLIED TO IT WITHOUT ISSUES!", LogType.TraceLog);
 
             // Return new view built.
             return LeftPaneView;
+        }
+        /// <summary>
+        /// Builds and returns a new console window object.
+        /// </summary>
+        /// <returns></returns>
+        private Window ConfigureMainWindow()
+        {
+            // Log starting to build window.
+            ConsoleLogger.WriteLog("--> CONFIGURING NEW CONSOLE WINDOW OBJECT NOW...", LogType.WarnLog);
+
+            // Pull the app title value here.
+            string CurrentAppVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            string AppName = ValueLoaders.GetConfigValue<string>("AppInstanceName");
+            string FullTitleString = $"{AppName} -- Version {CurrentAppVersion}";
+
+            // Set window title to contain the version of the application instance.
+            Console.Title = $"{AppName} -- Version {CurrentAppVersion}";
+            ConsoleLogger.WriteLog("    --> BUILT NEW TITLE VALUE FOR WINDOW INSTANCE OK!");
+            ConsoleLogger.WriteLog($"    --> NEW TITLE VALUE TO STORE: {FullTitleString}", LogType.InfoLog);
+            ConsoleLogger.WriteLog($"SET NEW TITLE VALUE FOR WINDOW OBJECT TO: {Console.Title}", LogType.InfoLog);
+
+            // Configure a new window object.
+            return _consoleWindow ?? new Window()
+            {
+                // Setup window location on the console.
+                X = 0,     // Start X value at 0.
+                Y = 11,    // Start Y Value at 11 (One under the top menu pane value)
+
+                // Setup window shading
+                Width = Dim.Fill(),           // Window filling values
+                Height = Dim.Fill()           // Window filling values
+            };
         }
         #endregion
     }
