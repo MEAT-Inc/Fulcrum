@@ -22,14 +22,13 @@ fulcrum_pipe::~fulcrum_pipe()
 bool fulcrum_pipe::ConnectPipe1()
 {
 	LPTSTR lpszPipename1 = TEXT("\\\\.\\pipe\\2CC3F0FB08354929BB453151BBAA5A15");
-	hPipe1 = CreateFile(lpszPipename1, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+	hPipe1 = CreateFile(lpszPipename1, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if ((hPipe1 == NULL || hPipe1 == INVALID_HANDLE_VALUE))
 	{
 		dtDebug(_T("%.3fs :: FULCRUM PIPE 1 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
 		if (hPipe1 == NULL) { dtDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
 		else {dtDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
-
 		return false;
 	}
 
@@ -39,15 +38,13 @@ bool fulcrum_pipe::ConnectPipe1()
 bool fulcrum_pipe::ConnectPipe2()
 {
 	LPTSTR lpszPipename2 = TEXT("\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3");
-	hPipe2 = CreateFile(lpszPipename2, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+	hPipe2 = CreateFile(lpszPipename2, GENERIC_READ, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if ((hPipe2 == NULL || hPipe2 == INVALID_HANDLE_VALUE))
 	{
 		dtDebug(_T("%.3fs :: FULCRUM PIPE 2 COULD NOT BE OPENED!\n"), GetTimeSinceInit());
 		if (hPipe2 == NULL) { dtDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
 		else { dtDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
-
-		return false;
 		return false;
 	}
 
@@ -58,9 +55,10 @@ bool fulcrum_pipe::ConnectPipe2()
 
 bool fulcrum_pipe::Startup()
 {
-	if (Loaded)
-		return Loaded;
+	// If pipes are open, return
+	if (Loaded) return Loaded;
 
+	// Boot pipe 1
 	bool res_pipe1 = ConnectPipe1();
 	if (!res_pipe1)
 	{
@@ -68,6 +66,7 @@ bool fulcrum_pipe::Startup()
 		return Loaded;
 	}
 
+	// Boot pipe 2 
 	bool res_pipe2 = ConnectPipe2();
 	if (!res_pipe2)
 	{
@@ -76,7 +75,6 @@ bool fulcrum_pipe::Startup()
 	}
 
 	dtDebug(_T("%.3fs :: FULCRUM PIPES ARE LOOKIN GOOD LETS SEND THIS BITCH\n"), GetTimeSinceInit());
-
 	Loaded = true;
 	return Loaded;
 }

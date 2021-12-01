@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FulcrumInjector.FulcrumJsonHelpers;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
 using static FulcrumInjector.FulcrumLogging.FulcrumLogBroker;
 
@@ -30,7 +31,7 @@ namespace FulcrumInjector.FulcrumLogging.LogArchiving
         public static LogArchiveConfiguration ArchiveConfig;
 
         // Basic Reference values for this object
-        public static string AppName => AppInstanceName;
+        public static string AppName { get; private set; }
         public static string OutputPath => ArchiveConfig.LogArchivePath;
 
         // Archive object.
@@ -102,13 +103,14 @@ namespace FulcrumInjector.FulcrumLogging.LogArchiving
         /// Builds a new log archiving instance. 
         /// </summary>
         /// <param name="LogFilesToArchive">Files to archive</param>
-        public LogArchiver(string[] LogFilesToArchive)
+        public LogArchiver(string[] LogFilesToArchive, string ArchiveNameBase = null)
         {
             // Check config object.
+            AppName = ArchiveNameBase ?? AppInstanceName;
             ArchiveConfig ??= new LogArchiveConfiguration
             {
                 ProgressToConsole = false,
-                LogArchivePath = "C:\\OPUS-IVS\\Falcon\\FalconLogging\\FalconArchives",
+                LogArchivePath = ValueLoaders.GetConfigValue<string>("FulcrumLogging.LogArchiveSetup.LogArchivePath"),
                 ArchiveOnFileCount = 50,
                 ArchiveFileSetSize = 15,
                 CompressionLevel = CompressionLevel.Optimal,

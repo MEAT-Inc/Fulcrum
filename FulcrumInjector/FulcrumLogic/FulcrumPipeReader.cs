@@ -48,8 +48,8 @@ namespace FulcrumInjector.FulcrumLogic
         }
 
         // Pipe Configurations for the default values.
-        private static readonly string FulcrumPipeAlpha = "\\\\.\\pipe\\2CC3F0FB08354929BB453151BBAA5A15";
-        private static readonly string FulcrumPipeBravo = "\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3";
+        private static readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
+        private static readonly string FulcrumPipeBravo = "1D16333944F74A928A932417074DD2B3";
 
         // Pipe configuration information.
         public readonly string PipeLocation;
