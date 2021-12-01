@@ -109,7 +109,7 @@ namespace FulcrumInjector.FulcrumLogging
                 Config = new LogArchiveConfiguration
                 {
                     ProgressToConsole = false,
-                    LogArchivePath = "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumArchives",
+                    LogArchivePath = ValueLoaders.GetConfigValue<string>("FulcrumLogging.LogArchiveSetup.LogArchivePath"),
                     ArchiveOnFileCount = 50,
                     ArchiveFileSetSize = 15,
                     CompressionLevel = CompressionLevel.Optimal,
