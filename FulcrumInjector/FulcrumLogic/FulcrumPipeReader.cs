@@ -69,7 +69,7 @@ namespace FulcrumInjector.FulcrumLogic
         {
             // Configure logger object.
             this.PipeState = FulcrumPipeState.Faulted;
-            this.PipeLogger = new SubServiceLogger($"FulcrumPipeLogger_{PipeId}");
+            this.PipeLogger = new SubServiceLogger($"{PipeId}");
             this.PipeLogger.WriteLog($"BUILT NEW PIPE LOGGER FOR PIPE TYPE {PipeId} OK!", LogType.InfoLog);
 
             // Store information about the pipe being configured
@@ -91,7 +91,7 @@ namespace FulcrumInjector.FulcrumLogic
             // Log ready for connection and send it.
             this.PipeState = FulcrumPipeState.Open;
             this.PipeLogger.WriteLog("PIPE CLIENT STREAM HAS BEEN CONFIGURED! ATTEMPTING CONNECTION ON IT NOW...", LogType.WarnLog);
-            this.PipeLogger.WriteLog("WAITING A TOTAL OF 10 SECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
+            this.PipeLogger.WriteLog("WAITING FOR 10 SECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
 
             try
             {

@@ -74,7 +74,8 @@ namespace FulcrumInjector
             new FulcrumGuiConstructor().ToggleConsoleGuiView();
             new ConsoleLocker(RectShape, IntPtr.Zero).LockWindowLocation();
             InjectorMainLogger.WriteLog($"CONSOLE WINDOW LOCKING HAS BEEN STARTED OK!", LogType.WarnLog);
-            InjectorMainLogger.WriteLog("BUILT NEW CONSOLE CONFIGURATION AND OUTPUT CORRECTLY! GUI IS SHOWING UP ON TOP OF THE CONSOLE NOW", LogType.WarnLog);
+            InjectorMainLogger.WriteLog("BUILT NEW CONSOLE CONFIGURATION AND OUTPUT CORRECTLY!", LogType.WarnLog);
+            InjectorMainLogger.WriteLog("CONSOLE GUI IS SHOWING UP ON TOP OF THE CONSOLE NOW...", LogType.WarnLog);
         }
         /// <summary>
         /// Builds new logging information and instances for fulcrum logging output.
@@ -101,11 +102,15 @@ namespace FulcrumInjector
             // First up, configure our new pipe servers for reading information.
             var PipeAlpha = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeAlpha);
             var PipeBravo = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeBravo);
-            InjectorMainLogger.WriteLog("BUILT NEW PIPE SERVERS FOR BOTH ALPHA AND BRAVO WITHOUT ISSUE!", LogType.InfoLog);
 
-            // Return passed output/
+            // Return passed output
             OutputPipes = new[] { PipeAlpha, PipeBravo };
-            return OutputPipes.All(PipeObj => PipeObj.PipeState == FulcrumPipeState.Connected);
+            bool OutputResult = OutputPipes.All(PipeObj => PipeObj.PipeState == FulcrumPipeState.Connected);
+            if (OutputResult) InjectorMainLogger.WriteLog("BUILT NEW PIPE SERVERS FOR BOTH ALPHA AND BRAVO WITHOUT ISSUE!", LogType.InfoLog);
+            else InjectorMainLogger.WriteLog("FAILED TO BUILD ONE OR BOTH PIPE SERVER READING CLIENTS!", LogType.FatalLog);
+
+            // Return results
+            return OutputResult;
         }
     }
 }
