@@ -44,15 +44,19 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("LOGGERS AND CONSOLE OUTPUT BUILT OK! GENERATING LOGGER FOR MAIN NOW...", LogType.InfoLog);
 
             // Build out new Pipe Servers.
-            if (!ConfigurePipes(out FulcrumPipeReader[] BuiltPipeReaders)) 
-                throw new InvalidOperationException("PIPE CONFIGURATION FAILED! THIS IS A SHOWSTOPPING ISSUE!");
+            if (!ConfigurePipes(out FulcrumPipeReader[] BuiltPipeReaders))
+            {
+                // Log this failure then exit the application
+                InjectorMainLogger.WriteLog("FAILED TO CONFIGURE ONE OR MORE OF THE PIPE OBJECTS FOR THIS SESSION!", LogType.FatalLog);
+                Console.ReadLine();
+
+                // Exit application. -100 means failed to configure pipes
+                Environment.Exit(-100);
+            }
 
             // Store pipes from our connection routine
-            AlphaPipe = BuiltPipeReaders[0];
-            BravoPipe = BuiltPipeReaders[1];
+            AlphaPipe = BuiltPipeReaders[0]; BravoPipe = BuiltPipeReaders[1];
             InjectorMainLogger.WriteLog("PIPES ARE OPEN AND STORED CORRECTLY! READY TO PROCESS OR SEND DATA THROUGH THEM!", LogType.InfoLog);
-
-            // Add a final console read line output call
             Console.ReadLine();
         }
 
@@ -65,13 +69,11 @@ namespace FulcrumInjector
             // Setup Console Output and lock window location to what is set.
             var ConsoleSizes = ValueLoaders.GetConfigValue<int[]>("FulcrumConsole.ConsoleWindowSize");
             var RectShape = ConsoleShapeSetup.InitializeConsole(ConsoleSizes[0], ConsoleSizes[1]);
-            var ConsoleLocker = new ConsoleLocker(RectShape, IntPtr.Zero);
-            ConsoleLocker.LockWindowLocation();
-            InjectorMainLogger.WriteLog($"CONSOLE WINDOW LOCKING HAS BEEN STARTED OK!", LogType.WarnLog);
 
-            // Build new console view now.
-            FulcrumGuiConstructor GuiBuilder = new FulcrumGuiConstructor();
-            GuiBuilder.ToggleConsoleGuiView();
+            // Lock console location here and GUI builder
+            new FulcrumGuiConstructor().ToggleConsoleGuiView();
+            new ConsoleLocker(RectShape, IntPtr.Zero).LockWindowLocation();
+            InjectorMainLogger.WriteLog($"CONSOLE WINDOW LOCKING HAS BEEN STARTED OK!", LogType.WarnLog);
             InjectorMainLogger.WriteLog("BUILT NEW CONSOLE CONFIGURATION AND OUTPUT CORRECTLY! GUI IS SHOWING UP ON TOP OF THE CONSOLE NOW", LogType.WarnLog);
         }
         /// <summary>
@@ -96,27 +98,14 @@ namespace FulcrumInjector
         /// <returns></returns>
         private static bool ConfigurePipes(out FulcrumPipeReader[] OutputPipes)
         {
-            try
-            {
-                // First up, configure our new pipe servers for reading information.
-                var PipeAlpha = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeAlpha);
-                var PipeBravo = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeBravo);
-                InjectorMainLogger.WriteLog("BUILT NEW PIPE SERVERS FOR BOTH ALPHA AND BRAVO WITHOUT ISSUE!", LogType.InfoLog);
+            // First up, configure our new pipe servers for reading information.
+            var PipeAlpha = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeAlpha);
+            var PipeBravo = new FulcrumPipeReader(FulcrumPipeType.FulcrumPipeBravo);
+            InjectorMainLogger.WriteLog("BUILT NEW PIPE SERVERS FOR BOTH ALPHA AND BRAVO WITHOUT ISSUE!", LogType.InfoLog);
 
-                // Return passed output/
-                OutputPipes = new[] { PipeAlpha, PipeBravo };
-                return true;
-            }
-            catch (Exception Ex)
-            {
-                // Log failures and return false.
-                InjectorMainLogger.WriteLog("FAILED TO CONFIGURE NEW PIPE SERVERS! ERRORS ARE BEING LOGGED OUT BELOW", LogType.ErrorLog);
-                InjectorMainLogger.WriteLog("EXCEPTION THROWN DURING CONFIGURATION OF NEW PIPE SERVERS!", Ex);
-
-                // Store null pipes
-                OutputPipes = new FulcrumPipeReader[] { null, null };
-                return false;   
-            }
+            // Return passed output/
+            OutputPipes = new[] { PipeAlpha, PipeBravo };
+            return OutputPipes.All(PipeObj => PipeObj.PipeState == FulcrumPipeState.Connected);
         }
     }
 }

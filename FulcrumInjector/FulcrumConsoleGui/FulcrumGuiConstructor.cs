@@ -61,7 +61,6 @@ namespace FulcrumInjector.FulcrumConsoleGui
         public FulcrumGuiConstructor()
         {
             // Log info about booting session
-            Application.Init();
             ConsoleLogger.WriteLog("SETTING UP NEW CONSOLE CONFIGURATION OBJECTS NOW...", LogType.WarnLog);
 
             // Building new objects for the new console window output.
@@ -69,13 +68,6 @@ namespace FulcrumInjector.FulcrumConsoleGui
             _consoleMenu = this.ConfigureMenuBar();           // Console Menu top bar
             _consoleTopPane = this.ConfigureTopInfoPane();    // Top output menu
 
-            // Append all these objects in here.
-            ConsoleLogger.WriteLog("ADDING CONSOLE OBJECTS INTO APP SESSION NOW!", LogType.WarnLog);
-            Application.Top.Add(ConsoleViews);
-
-            // Log done building console objects correctly.
-            ConsoleLogger.WriteLog("DONE BUILDING CONSOLE WINDOW AND ALL CHILD OBJECTS!", LogType.InfoLog);
-            ConsoleLogger.WriteLog("READY TO RUN THE CONSOLE APPLICATION OBJECT AT ANY TIME TO SHOW FRIENDLY UI VALUES!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -97,6 +89,15 @@ namespace FulcrumInjector.FulcrumConsoleGui
                 ConsoleLogger.WriteLog("TOGGLING CONSOLE WINDOW APPLICATION STATE NOW...", LogType.WarnLog);
                 if (!ConsoleWindowOpen)
                 {
+                    // Build application
+                    Application.Init();
+                    ConsoleLogger.WriteLog("ADDING CONSOLE OBJECTS INTO APP SESSION NOW!", LogType.WarnLog);
+
+                    // Log done building console objects correctly.
+                    Application.Top.Add(ConsoleViews);
+                    ConsoleLogger.WriteLog("DONE BUILDING CONSOLE WINDOW AND ALL CHILD OBJECTS!", LogType.InfoLog);
+                    ConsoleLogger.WriteLog("READY TO RUN THE CONSOLE APPLICATION OBJECT AT ANY TIME TO SHOW FRIENDLY UI VALUES!", LogType.InfoLog);
+
                     // Run instance here.
                     Application.Run();
                     ConsoleLogger.WriteLog("BOOTED NEW CONSOLE APPLICATION INSTANCE OK!", LogType.InfoLog);
@@ -191,8 +192,8 @@ namespace FulcrumInjector.FulcrumConsoleGui
 
             // Set window title to contain the version of the application instance.
             Console.Title = $"{AppName} -- Version {CurrentAppVersion}";
-            ConsoleLogger.WriteLog("    --> BUILT NEW TITLE VALUE FOR WINDOW INSTANCE OK!");
-            ConsoleLogger.WriteLog($"    --> NEW TITLE VALUE TO STORE: {FullTitleString}", LogType.InfoLog);
+            ConsoleLogger.WriteLog("--> BUILT NEW TITLE VALUE FOR WINDOW INSTANCE OK!");
+            ConsoleLogger.WriteLog($"--> NEW TITLE VALUE TO STORE: {FullTitleString}", LogType.InfoLog);
             ConsoleLogger.WriteLog($"SET NEW TITLE VALUE FOR WINDOW OBJECT TO: {Console.Title}", LogType.InfoLog);
 
             // Configure a new window object.
