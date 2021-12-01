@@ -48,6 +48,17 @@ BOOL CFulcrumShim::InitInstance()
 {
 	// Build instance and show the window
 	CWinApp::InitInstance();
+
+	// Start the config app/the injector process here
+	TCHAR szPath[MAX_PATH];
+	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
+
+	// Build config app path value here.
+	CString ConfigAppPath;
+	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe", szPath));
+
+	// Run the injector application here
+	ShellExecute(NULL, _T("open"), ConfigAppPath, NULL, NULL, SW_SHOWDEFAULT);
 	return TRUE;
 }
 

@@ -1,7 +1,7 @@
 ﻿{
   "AppInstanceName": "FulcrumInjector",
   "FulcrumConsole": {
-    "EnableGuiConsole":  true, 
+    "EnableGuiConsole":  false, 
     "ConsoleWindowSize": [ 1200, 700 ]
   },
   "FulcrumLogging": {
