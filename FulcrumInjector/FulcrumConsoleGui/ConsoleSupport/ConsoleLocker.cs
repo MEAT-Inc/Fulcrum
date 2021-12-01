@@ -83,9 +83,6 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
                 default
             );
 
-            // Set Buffer Size here.
-            Console.SetBufferSize(Console.WindowWidth, 3000);
-
             // Compare results.
             var NewShape = new Rectangle();
             ConsoleWin32.GetWindowRect(ConsoleWin32.GetConsoleWindow(), ref NewShape);

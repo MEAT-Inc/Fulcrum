@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using FulcrumInjector.FulcrumJsonHelpers;
-using FulcrumInjector.FulcrumLogging;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic
+namespace FulcrumInjector.FulcrumLogging
 {
     /// <summary>
     /// Class used to configure new Fulcrum logging configurations
@@ -67,7 +61,10 @@ namespace FulcrumInjector.FulcrumLogic
             // Begin archive process 
             FulcrumLogBroker.Logger?.WriteLog($"ARCHIVE PROCESS IS NEEDED! PATH TO STORE FILES IS SET TO {ConfigObj.LogArchivePath}");
             FulcrumLogBroker.Logger?.WriteLog($"SETTING UP SETS OF {ConfigObj.ArchiveFileSetSize} FILES IN EACH ARCHIVE OBJECT!");
+
+            // Run cleanup for the main app files and the DLL Log files
             FulcrumLogBroker.CleanupLogHistory(ConfigObj.ToString());
+            FulcrumLogBroker.CleanupLogHistory(ConfigObj.ToString(), "FulcrumShim");
 
             // Log done.
             FulcrumLogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);

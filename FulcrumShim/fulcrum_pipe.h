@@ -5,40 +5,28 @@
 class CPipeException : public CSimpleException
 {
 public:
-	CPipeException(std::string err)
-		: CSimpleException(true)
-		, m_error(err)
-	{
-	}
+	CPipeException(std::string err) : CSimpleException(true), m_error(err) {}
 	virtual ~CPipeException() {}
+	std::string GetError() { return m_error; }
 
-	std::string GetError()
-	{
-		return m_error;
-	}
 protected:
 	std::string m_error;
 };
 
-class CPipExceptionNULLParameter : public CPipeException
-{
+class CPipExceptionNULLParameter : public CPipeException {
 public:
-	CPipExceptionNULLParameter()
-		: CPipeException(std::string("NULL input parameter"))
-	{
-	}
+	CPipExceptionNULLParameter() : CPipeException(std::string("NULL input parameter")) { }
 	virtual ~CPipExceptionNULLParameter() {}
 };
 
-
-class fulcrum_pipe
-{
+class fulcrum_pipe {
 public:
 	fulcrum_pipe();
 	~fulcrum_pipe();
 
 public:
-	bool Startup();
+	bool ConnectInputPipe();
+	bool ConnectOutputPipe();
 	bool IsLoaded();
 	void ShutdownPipe();
 	void WriteStringOut(std::string str);
@@ -55,10 +43,7 @@ public:
 	void Writeint32(int num);
 
 private:
-	bool Loaded;
+	bool Loaded = false;
 	HANDLE hPipe1, hPipe2;
-
-	bool ConnectPipe1();
-	bool ConnectPipe2();
 };
 
