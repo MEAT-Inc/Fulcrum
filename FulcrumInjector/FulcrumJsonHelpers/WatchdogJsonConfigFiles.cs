@@ -46,7 +46,8 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         // ---------------------------------- Input Located JSON Files ----------------------------------------
 
         // List of all the files found in the directory of this application
-        public static string AppConfigFile = "FulcrumInjectorConfig.json";
+        // TODO: MAKE THIS LESS STATIC! RIGHT NOW THIS DEPENDS ON HARD CODED INSTALL LOCATIONS!
+        public static string AppConfigFile = "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjectorConfig.json";
 
         // ------------------------------------ Combined Output JSON ------------------------------------------
 

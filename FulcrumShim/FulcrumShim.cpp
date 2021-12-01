@@ -48,17 +48,6 @@ BOOL CFulcrumShim::InitInstance()
 {
 	// Build instance and show the window
 	CWinApp::InitInstance();
-
-	// Start the config app/the injector process here
-	TCHAR szPath[MAX_PATH];
-	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
-
-	// Build config app path value here.
-	CString ConfigAppPath;
-	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe", szPath));
-
-	// Run the injector application here
-	ShellExecute(NULL, _T("open"), ConfigAppPath, NULL, NULL, SW_SHOWDEFAULT);
 	return TRUE;
 }
 
@@ -72,4 +61,18 @@ void CFulcrumShim::InitPipes()
 	if (fulcrumPiper == nullptr) fulcrumPiper = new fulcrum_jpipe();
 	if (!pipesLoaded) { pipesLoaded = fulcrumPiper->Startup(); }
 	pipesLoaded = fulcrumPiper->IsLoaded();
+
+	// Build config app path value here and run the injector application
+	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
+	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
+	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe"), szPath);
+
+	// Build config app path value here and run the injector application
+	STARTUPINFO StartupInfos; PROCESS_INFORMATION ProcessInfos;
+	ZeroMemory(&StartupInfos, sizeof(StartupInfos));
+	StartupInfos.cb = sizeof(StartupInfos);
+	ZeroMemory(&ProcessInfos, sizeof(ProcessInfos));
+
+	// Run the process here by booting a new instance
+	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
 }

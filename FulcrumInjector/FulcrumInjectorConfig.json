@@ -1,5 +1,6 @@
 ﻿{
   "AppInstanceName": "FulcrumInjector",
+  "FulcrumWorkingPath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumInjector", 
   "FulcrumConsole": {
     "EnableGuiConsole":  false, 
     "ConsoleWindowSize": [ 1250, 750 ]
