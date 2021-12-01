@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FulcrumConsoleGui\ConsoleButtonLogic\ConsoleButtonActions.cs" />
     <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleLocker.cs" />
     <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleScreenConfiguration.cs" />
     <Compile Include="FulcrumConsoleGui\ConsoleSupport\ConsoleShape.cs" />

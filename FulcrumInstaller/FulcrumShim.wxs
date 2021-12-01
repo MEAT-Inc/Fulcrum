@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <?define RTMProductVersion="2.5.0" ?>
-    <?define ProductVersion="3.5.14" ?>
+    <?define ProductVersion="4.6.15" ?>
     <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
     <Product Id="*" Name="FulcrumShim" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
         <!-- Package Metadata Configuration -->
@@ -54,9 +54,6 @@
                                 <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe" />
                                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe.config" />
                                 <File Id="FULCRUMINJECTOR.PDB" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.pdb" />
-                                <File Id="FULCRUMINJECTOR.EXE_1" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe" />
-                                <File Id="FULCRUMINJECTOR.EXE.CONFIG_1" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe.config" />
-                                <File Id="FULCRUMINJECTOR.PDB_1" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.pdb" />
                                 <File Id="FULCRUMINJECTORCONFIG.JSON" Name="FulcrumInjectorConfig.json" Source="..\FulcrumInjector\bin\Debug\FulcrumInjectorConfig.json" />
                                 <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\Debug\Newtonsoft.Json.dll" />
                                 <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\Debug\Newtonsoft.Json.xml" />
