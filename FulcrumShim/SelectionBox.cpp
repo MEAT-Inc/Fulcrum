@@ -65,7 +65,7 @@ BOOL CSelectionBox::OnInitDialog()
 
 	// Build the log file path using the log dir above
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\Fulcrum_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
+	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_%04d-%02d-%02d_%02d-%02d-%02d_%04d.txt"),
 		szPath,
 		LocalTime.wYear,
 		LocalTime.wMonth,
@@ -188,9 +188,7 @@ void CSelectionBox::OnBnClickedOk()
 	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
 
-	// Log information output and return based on function lib conditions
-	dtDebug(_T("Booted new pipe instances correctly!"));
-	dtDebug(_T("FulcrumInjector should now be running in the background!"));
+	// Check if passed output. If so move on.
 	OnOK();
 }
 

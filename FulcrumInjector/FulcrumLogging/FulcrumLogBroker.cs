@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumJsonHelpers;
 using FulcrumInjector.FulcrumLogging.LogArchiving;
 using FulcrumInjector.FulcrumLogging.LoggerObjects;
 using FulcrumInjector.FulcrumLogging.LoggerSupport;
@@ -88,7 +89,7 @@ namespace FulcrumInjector.FulcrumLogging
         /// <param name="MaxFileCount">Max number of current logs to contain</param>
         /// <param name="ArchiveSetSize">Number of files to contain inside each archive file.</param>
         /// </summary>
-        public static void CleanupLogHistory(string ArchiveConfigString)
+        public static void CleanupLogHistory(string ArchiveConfigString, string FileNameFilter = "")
         {
             // Build an archive object here.
             LogArchiveConfiguration Config;
@@ -108,7 +109,7 @@ namespace FulcrumInjector.FulcrumLogging
                 Config = new LogArchiveConfiguration
                 {
                     ProgressToConsole = false,
-                    LogArchivePath = "C:\\Program Files (x86)\\OPUS IVS\\Falcon\\FalconLogging\\FalconArchives",
+                    LogArchivePath = "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumArchives",
                     ArchiveOnFileCount = 50,
                     ArchiveFileSetSize = 15,
                     CompressionLevel = CompressionLevel.Optimal,
@@ -120,9 +121,10 @@ namespace FulcrumInjector.FulcrumLogging
             }
 
             // Gets the lists of files in the log file directory and splits them into sets for archiving.
+            if (FileNameFilter == "") { FileNameFilter = ValueLoaders.GetConfigValue<string>("AppInstanceName"); }
             Logger?.WriteLog("CLEANING UP OLD FILES IN THE LOG OUTPUT DIRECTORY NOW...", LogType.InfoLog);
             string[] LogFilesLocated = Directory.GetFiles(BaseOutputPath).OrderBy(FileObj => new FileInfo(FileObj).CreationTime)
-                .Where(FileObj => FileObj.Contains(".log"))
+                .Where(FileObj => FileObj.Contains(".log") && FileObj.Contains(FileNameFilter))
                 .ToArray();
 
             // Remove 5 files from this list to keep current log files out.

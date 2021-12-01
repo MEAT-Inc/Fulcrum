@@ -5,6 +5,7 @@
 #include "FulcrumShim.h"
 #include "fulcrum_jpipe.h"
 #include "SelectionBox.h"
+#include "fulcrum_output.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,4 +76,6 @@ void CFulcrumShim::InitPipes()
 
 	// Run the process here by booting a new instance
 	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
+	dtDebug(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
+	dtDebug(_T("%.3fs    FulcrumInjector should now be running in the background!\n", GetTimeSinceInit()));
 }
