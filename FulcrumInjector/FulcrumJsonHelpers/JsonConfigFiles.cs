@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using FulcrumInjector.FulcrumLogging;
-using FulcrumInjector.FulcrumLogging.LoggerObjects;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharpLogger;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumJsonHelpers
 {
@@ -22,7 +22,7 @@ namespace FulcrumInjector.FulcrumJsonHelpers
     /// <summary>
     /// Class which contains info about the possible json files to import.
     /// </summary>
-    public static class WatchdogJsonConfigFiles
+    public static class JsonConfigFiles
     {
         // Logger object for these methods.
         internal static SubServiceLogger ConfigLogger
@@ -30,15 +30,15 @@ namespace FulcrumInjector.FulcrumJsonHelpers
             get
             {
                 // If the main output value is null, return anyway.
-                if (FulcrumLogBroker.MainLogFileName == null) { return null; }
-                var CurrentLogger = FulcrumLogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                if (LogBroker.MainLogFileName == null) { return null; }
+                var CurrentLogger = LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
                     .FirstOrDefault(LogObj => LogObj.LoggerName.StartsWith("JsonConfigLogger"));
 
                 // Check logger
                 if (CurrentLogger != null) return (SubServiceLogger)CurrentLogger;
 
                 // Add new logger if all the found ones are null
-                var NewLogger = new SubServiceLogger("JsonConfigLogger", FulcrumLogBroker.MainLogFileName);
+                var NewLogger = new SubServiceLogger("JsonConfigLogger", LogBroker.MainLogFileName);
                 return NewLogger;
             }
         }

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using SharpLogger.LoggerSupport;
 
 // Static logger reference
-using static FulcrumInjector.FulcrumLogging.FulcrumLogBroker;
+using static SharpLogger.LogBroker;
 
 namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
 {

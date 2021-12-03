@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumJsonHelpers
 {
@@ -21,17 +21,17 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         {
             // Get the token first.
             JsonPath = JsonPath.Replace("FulcrumInjectorConfig", "");
-            WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"TRYING TO PULL VALUE AT: {JsonPath}", LogType.TraceLog);
-            var ValueObject = WatchdogJsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
+            JsonConfigFiles.ConfigLogger?.WriteLog($"TRYING TO PULL VALUE AT: {JsonPath}", LogType.TraceLog);
+            var ValueObject = JsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
             if (ValueObject == null)
             {
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
                 return (TValueType)new object();
             }
 
             // If not null, convert and return.
             var ConvertedValue = ValueObject.ToObject<TValueType>();
-            WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
+            JsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
             return ConvertedValue;
         }
 
@@ -44,20 +44,20 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         {
             // Check for full config.
             string ConfigKeyString = JObjectKey.ToString();
-            WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {ConfigKeyString}", LogType.TraceLog);
+            JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {ConfigKeyString}", LogType.TraceLog);
             try
             {
                 // Try and get the current object. If failed, return null
                 string ConfigSection = ConfigKeyString.ToString();
-                var PulledObject = JObject.FromObject(WatchdogJsonConfigFiles.ApplicationConfig[ConfigSection]);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {ConfigKeyString} OK!", LogType.TraceLog);
+                var PulledObject = JObject.FromObject(JsonConfigFiles.ApplicationConfig[ConfigSection]);
+                JsonConfigFiles.ConfigLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {ConfigKeyString} OK!", LogType.TraceLog);
                 return PulledObject;
             }
             catch (Exception PullEx)
             {
                 // Catch failure, log it, and return null
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"FAILED TO PULL CONFIG FOR SECTION {ConfigKeyString}!", LogType.TraceLog);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL!", PullEx, new[] { LogType.TraceLog });
+                JsonConfigFiles.ConfigLogger?.WriteLog($"FAILED TO PULL CONFIG FOR SECTION {ConfigKeyString}!", LogType.TraceLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL!", PullEx, new[] { LogType.TraceLog });
                 return null;
             }
         }
@@ -70,12 +70,12 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         {
             // Check for full config.
             string ConfigKeyString = JObjectKey.ToString();
-            WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FILE PATH FOR TYPE {ConfigKeyString}", LogType.TraceLog);
+            JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FILE PATH FOR TYPE {ConfigKeyString}", LogType.TraceLog);
             string OutputPath = Path.Combine(Directory.GetCurrentDirectory(), "JsonConfiguration", JObjectKey.ToString() + ".json");
-            WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"GENERATED JSON CONFIG PATH: {OutputPath}", LogType.TraceLog);
+            JsonConfigFiles.ConfigLogger?.WriteLog($"GENERATED JSON CONFIG PATH: {OutputPath}", LogType.TraceLog);
 
             // Check if real.
-            if (!File.Exists(OutputPath)) WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("DESIRED JSON CONFIG FILE DOES NOT EXIST!", LogType.WarnLog);
+            if (!File.Exists(OutputPath)) JsonConfigFiles.ConfigLogger?.WriteLog("DESIRED JSON CONFIG FILE DOES NOT EXIST!", LogType.WarnLog);
             return File.Exists(OutputPath) ? OutputPath : "";
         }
     }
