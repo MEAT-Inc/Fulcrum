@@ -65,33 +65,25 @@ namespace FulcrumInjector.FulcrumPipeLogic
         /// <returns>True if the file is locked. False if not.</returns>
         public bool FulcrumDllLoaded()
         {
-            // Find if the file is locked or not. Get path to validate 
-            bool Locked = false;
             try
             {
-                // Try open request here.
+                // Find if the file is locked or not. Get path to validate 
                 FileStream DllStream = File.Open(FulcrumDLLPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 DllStream.Close();
+
+                // Return not locked here.
+                return false;
             }
             catch (Exception ex)
             {
-                if (ex is IOException) Locked = true;
-                if (ex is FileNotFoundException)
-                {
-                    // Throw a file not located Ex here.
-                    PipeLogger.WriteLog("EXCEPTION THROWN DURING DLL IN USE CHECK!", LogType.ErrorLog);
-                    PipeLogger.WriteLog($"DLL FILE PROVIDED AT LOCATION {FulcrumDLLPath} COULD NOT BE FOUND!", ex);
-                    throw ex;
-                }
+                // Set locked value to true and return it here.
+                if (ex is not FileNotFoundException) return true;
 
-                // Throw generic Ex
-                PipeLogger.WriteLog("FAILED TO CHECK STATE OF OUR DLL FILE!", LogType.ErrorLog);
-                PipeLogger.WriteLog("A GENERIC EXCEPTION WAS THROWN DURING THIS CHECK!", ex);
+                // Throw a file not located Ex here.
+                PipeLogger.WriteLog("EXCEPTION THROWN DURING DLL IN USE CHECK!", LogType.ErrorLog);
+                PipeLogger.WriteLog($"DLL FILE PROVIDED AT LOCATION {FulcrumDLLPath} COULD NOT BE FOUND!", ex);
                 throw ex;
             }
-
-            // Return the locked status value of our DLL
-            return Locked;
         }
         /// <summary>
         /// This method rechecks to see if a new pipe instance can be booted or not.
