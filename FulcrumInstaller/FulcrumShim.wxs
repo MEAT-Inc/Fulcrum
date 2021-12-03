@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <?define RTMProductVersion="5.7.0" ?>
-    <?define ProductVersion="5.7.18" ?>
+    <?define ProductVersion="5.7.21" ?>
     <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
     <Product Id="*" Name="FulcrumShim" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
         <!-- Package Metadata Configuration -->
@@ -60,6 +60,7 @@
                                 <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\Debug\NLog.dll" />
                                 <File Id="NLOG.XML" Name="NLog.xml" Source="..\FulcrumInjector\bin\Debug\NLog.xml" />
                                 <File Id="NSTACK.DLL" Name="NStack.dll" Source="..\FulcrumInjector\bin\Debug\NStack.dll" />
+                                <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\Debug\SharpLogger.dll" />
                                 <File Id="SYSTEM.VALUETUPLE.DLL" Name="System.ValueTuple.dll" Source="..\FulcrumInjector\bin\Debug\System.ValueTuple.dll" />
                                 <File Id="SYSTEM.VALUETUPLE.XML" Name="System.ValueTuple.xml" Source="..\FulcrumInjector\bin\Debug\System.ValueTuple.xml" />
                                 <File Id="TERMINAL.GUI.DLL" Name="Terminal.Gui.dll" Source="..\FulcrumInjector\bin\Debug\Terminal.Gui.dll" />

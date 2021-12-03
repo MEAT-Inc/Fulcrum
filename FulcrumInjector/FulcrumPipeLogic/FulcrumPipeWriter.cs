@@ -5,7 +5,7 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumPipeLogic
 {
@@ -15,8 +15,8 @@ namespace FulcrumInjector.FulcrumPipeLogic
     public class FulcrumPipeWriter : FulcrumPipe
     {
         // Pipe writer and stream objects
-        internal readonly StreamWriter PipeWriter;
-        internal readonly NamedPipeServerStream FulcrumPipe;
+        internal StreamWriter PipeWriter;
+        internal NamedPipeServerStream FulcrumPipe;
 
         // ------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,11 +31,30 @@ namespace FulcrumInjector.FulcrumPipeLogic
                 PipeDirection.Out         // Direction of the pipe host      
             );
 
+            // Build our new pipe instance here.
+            if (!this.ConfigureNewPipe()) this.PipeLogger.WriteLog("FAILED TO CONFIGURE NEW OUTPUT WRITER PIPE!", LogType.ErrorLog);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Configures a new pipe instance for our type provided.
+        /// </summary>
+        /// <returns></returns>
+        internal sealed override bool ConfigureNewPipe()
+        {
+            // Check if our DLL is open
+            if (!FulcrumDllLoaded())
+            {
+                this.PipeLogger.WriteLog("WARNING: OUR FULCRUM DLL WAS NOT IN USE! THIS MEANS WE WON'T BE BOOTING OUR PIPE INSTANCES!", LogType.WarnLog);
+                return false;
+            }
+
             // Log ready for connection and send it.
             this.PipeState = FulcrumPipeState.Open;
             this.PipeLogger.WriteLog("PIPE SERVER STREAM HAS BEEN CONFIGURED! ATTEMPTING CONNECTION ON IT NOW...", LogType.WarnLog);
             this.PipeLogger.WriteLog("WAITING FOR 10 SECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
-           
+
             try
             {
                 // Build pipe reading stream object
@@ -43,6 +62,7 @@ namespace FulcrumInjector.FulcrumPipeLogic
                 this.PipeState = FulcrumPipeState.Connected;
                 this.PipeWriter = new StreamWriter(this.FulcrumPipe) { AutoFlush = true };
                 this.PipeLogger.WriteLog("CONNECTED TO PIPE SERVER ON FULCRUM DLL CORRECTLY AND PULLED IN NEW STREAM FOR IT OK!", LogType.InfoLog);
+                return true;
             }
             catch (Exception PipeEx)
             {
@@ -51,7 +71,10 @@ namespace FulcrumInjector.FulcrumPipeLogic
                 this.PipeLogger.WriteLog($"FAILED TO CONNECT TO OUR PIPE INSTANCE FOR PIPE ID {this.PipeType}!", LogType.ErrorLog);
                 this.PipeLogger.WriteLog("EXCEPTION THROWN DURING CONNECTION OR STREAM OPERATIONS FOR THIS PIPE CONFIGURATION!", LogType.ErrorLog);
                 this.PipeLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW", PipeEx);
+                return false;
             }
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------
     }
 }
