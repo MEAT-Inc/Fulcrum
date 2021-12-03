@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumConsoleGui.ConsoleButtonLogic;
 using FulcrumInjector.FulcrumJsonHelpers;
-using FulcrumInjector.FulcrumLogging;
-using FulcrumInjector.FulcrumLogging.LoggerObjects;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using SharpLogger;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
 using Terminal.Gui;
 
 namespace FulcrumInjector.FulcrumConsoleGui
@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumConsoleGui
     public class FulcrumGuiConstructor
     {
         // Logger object 
-        private static SubServiceLogger ConsoleLogger => (SubServiceLogger)FulcrumLogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+        private static SubServiceLogger ConsoleLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("FulcrumGuiLogger")) ?? new SubServiceLogger("FulcrumGuiLogger");
 
         // Bool to set if the window is open or not.

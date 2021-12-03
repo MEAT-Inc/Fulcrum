@@ -1,5 +1,8 @@
-﻿using FulcrumInjector.FulcrumLogging.LoggerObjects;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
+﻿using System;
+using System.IO;
+using FulcrumInjector.FulcrumJsonHelpers;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumPipeLogic
 {
@@ -43,6 +46,9 @@ namespace FulcrumInjector.FulcrumPipeLogic
             }
         }
 
+        // Location of the FulcrumShim DLL. THIS MUST BE CORRECT!
+        public readonly string FulcrumDLLPath = ValueLoaders.GetConfigValue<string>("FulcrumDllPath");
+
         // Pipe Configurations for the default values.
         public readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
         public readonly string FulcrumPipeBravo = "1D16333944F74A928A932417074DD2B3";
@@ -50,6 +56,55 @@ namespace FulcrumInjector.FulcrumPipeLogic
         // Pipe configuration information.
         public readonly string PipeLocation;
         public readonly FulcrumPipeType PipeType;
+
+        // ---------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Checks if the fulcrum DLL Path is locked or not.
+        /// </summary>
+        /// <returns>True if the file is locked. False if not.</returns>
+        public bool FulcrumDllLoaded()
+        {
+            // Find if the file is locked or not. Get path to validate 
+            bool Locked = false;
+            try
+            {
+                // Try open request here.
+                FileStream DllStream = File.Open(FulcrumDLLPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+                DllStream.Close();
+            }
+            catch (Exception ex)
+            {
+                if (ex is IOException) Locked = true;
+                if (ex is FileNotFoundException)
+                {
+                    // Throw a file not located Ex here.
+                    PipeLogger.WriteLog("EXCEPTION THROWN DURING DLL IN USE CHECK!", LogType.ErrorLog);
+                    PipeLogger.WriteLog($"DLL FILE PROVIDED AT LOCATION {FulcrumDLLPath} COULD NOT BE FOUND!", ex);
+                    throw ex;
+                }
+
+                // Throw generic Ex
+                PipeLogger.WriteLog("FAILED TO CHECK STATE OF OUR DLL FILE!", LogType.ErrorLog);
+                PipeLogger.WriteLog("A GENERIC EXCEPTION WAS THROWN DURING THIS CHECK!", ex);
+                throw ex;
+            }
+
+            // Return the locked status value of our DLL
+            return Locked;
+        }
+        /// <summary>
+        /// This method rechecks to see if a new pipe instance can be booted or not.
+        /// </summary>
+        public void RecheckForNewPipe()
+        {
+            // Check if the DLL is loaded or not. If it is, then run the new pipe booting instance.
+            if (!FulcrumDllLoaded()) { return; }
+
+            // Log starting new pipe and run the init method.
+            PipeLogger.WriteLog("FOUND NEW USE CONSUMER OF THE DLL INSTANCE! BOOTING NEW PIPES NOW...", LogType.WarnLog);
+            this.ConfigureNewPipe();
+        }
 
         // ---------------------------------------------------------------------------------------------------------------
 
@@ -68,6 +123,19 @@ namespace FulcrumInjector.FulcrumPipeLogic
             this.PipeType = PipeId;
             this.PipeLocation = this.PipeType == FulcrumPipeType.FulcrumPipeAlpha ? FulcrumPipeAlpha : FulcrumPipeBravo;
             this.PipeLogger.WriteLog("STORED NEW PIPE DIRECTIONAL INFO AND TYPE ON THIS INSTANCE CORRECTLY!", LogType.InfoLog);
+        }
+
+        // ---------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Base method for new pipe init configuration
+        /// </summary>
+        /// <returns>Always true.</returns>
+        internal virtual bool ConfigureNewPipe()
+        {
+            // Log information about building new pipe.
+            this.PipeLogger.WriteLog($"BUILDING NEW PIPE OBJECT FROM MAIN PIPE TYPE FOR PIPE ID {this.PipeType}", LogType.WarnLog);
+            return true;
         }
     }
 }
