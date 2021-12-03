@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogging;
-using FulcrumInjector.FulcrumLogging.LoggerObjects;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using SharpLogger;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumConsoleGui.ConsoleButtonLogic
 {
@@ -21,7 +21,7 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleButtonLogic
         public static void ConsoleAppExit(int ExitCode = 0)
         {
             // Built a logger object for this action
-            var ExitLogger = (SubServiceLogger)FulcrumLogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            var ExitLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("ExitLogger")) ?? new SubServiceLogger("ExitLogger");
 
             // Log exiting and quit.
@@ -36,7 +36,7 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleButtonLogic
         public static void ShowLogFilesPopup()
         {
             // Built a logger object for this action
-            var LogFilesPopupLogger = (SubServiceLogger)FulcrumLogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            var LogFilesPopupLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("LogFilesPopupLogger")) ?? new SubServiceLogger("LogFilesPopupLogger");
 
             // Now show the popup object here for the help window
@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleButtonLogic
         public static void ShowHelpPopup()
         {
             // Built a logger object for this action
-            var HelpPopupLogger = (SubServiceLogger)FulcrumLogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            var HelpPopupLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("HelpPopupLogger")) ?? new SubServiceLogger("HelpPopupLogger");
 
             // Now show the popup object here for the help window
@@ -60,7 +60,7 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleButtonLogic
         public static void ShowVersionPopup()
         {
             // Built a logger object for this action
-            var VersionPopupLogger = (SubServiceLogger)FulcrumLogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            var VersionPopupLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("VersionPopupLogger")) ?? new SubServiceLogger("VersionPopupLogger");
 
             // Now show the popup object here with version information

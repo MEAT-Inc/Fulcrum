@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Drawing;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
+using FulcrumInjector.FulcrumJsonHelpers;
+using NLog.Fluent;
+using SharpLogger.LoggerSupport;
 
 // Static broker for logging.
-using static FulcrumInjector.FulcrumLogging.FulcrumLogBroker;
+using static SharpLogger.LogBroker;
 
 namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
 {
@@ -43,6 +45,23 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
         {
             // Build display info and set new values.
             ScreenLayout = new ConsoleScreenConfiguration();
+
+            // Find current display size and make sure we're not larger then the current output.
+            var OverSizeScaleBack = ValueLoaders.GetConfigValue<int>("FulcrumConsole.OverSizeScaleBack");
+            if (ScreenLayout.WorkingDisplayBounds.Width <= (NewWidth - OverSizeScaleBack))
+            {
+                NewWidth = ScreenLayout.WorkingDisplayBounds.Width - OverSizeScaleBack;
+                Logger.WriteLog($"OVERSIZE SCALEBACK IS SET TO {OverSizeScaleBack}", LogType.TraceLog);
+                Logger.WriteLog("WIDTH OF NEW CONSOLE WINDOW WAS LARGER THAN THE NEW WIDTH VALUE! SHRINKING IT TO FIT!", LogType.WarnLog);
+            }
+            if (ScreenLayout.WorkingDisplayBounds.Height <= (NewHeight - OverSizeScaleBack))
+            {
+                NewHeight = ScreenLayout.WorkingDisplayBounds.Height - OverSizeScaleBack;
+                Logger.WriteLog($"OVERSIZE SCALEBACK IS SET TO {OverSizeScaleBack}", LogType.TraceLog);
+                Logger.WriteLog("HEIGHT OF NEW CONSOLE WINDOW WAS LARGER THAN THE NEW WIDTH VALUE! SHRINKING IT TO FIT!", LogType.WarnLog);
+            }
+
+            // Build new console shape output
             var GeneratedShape = GenerateConsoleShape(NewWidth, NewHeight);
             Logger.WriteLog("CONFIGURING CONSOLE FOR STATIC LOCATION NOW...");
             Logger.WriteLog($"SETUP NEW CONSOLE SHAPE TO LOCK INTO: {GeneratedShape}", LogType.DebugLog);

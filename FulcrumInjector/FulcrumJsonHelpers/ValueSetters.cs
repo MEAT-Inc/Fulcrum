@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
-using FulcrumInjector.FulcrumLogging.LoggerSupport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumJsonHelpers
 {
@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         {
             // Build content and log information.
             string NewContent = JsonConvert.SerializeObject(ValueObject, Formatting.Indented);
-            WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"STORING NEW VALUE INTO JSON CONFIG KEY {PropertyKey} NOW...");
+            JsonConfigFiles.ConfigLogger?.WriteLog($"STORING NEW VALUE INTO JSON CONFIG KEY {PropertyKey} NOW...");
 
             // Select the config item first.
             string OutputPath;
@@ -40,8 +40,8 @@ namespace FulcrumInjector.FulcrumJsonHelpers
             catch (Exception SetEx)
             {
                 // Log failure and return false.
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO GET CURRENT CONFIG OBJECT TYPE FOR OUR JSON CONFIG!", LogType.ErrorLog);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL CONFIG ROUTINE: ", SetEx);
+                JsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO GET CURRENT CONFIG OBJECT TYPE FOR OUR JSON CONFIG!", LogType.ErrorLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL CONFIG ROUTINE: ", SetEx);
                 return false;
             }
 
@@ -53,43 +53,43 @@ namespace FulcrumInjector.FulcrumJsonHelpers
                 {
                     // Set the value here for full object.
                     File.WriteAllText(OutputPath, NewContent);
-                    WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
+                    JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
                     return true;
                 }
 
                 // For a key value item object
                 string[] SplitContentPath = PropertyKey.Split('.').Skip(1).ToArray();
                 JObject ConfigObjectLocated = ValueLoaders.GetJObjectConfig(TypeOfConfig);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("PULLED CONTENT FOR CONFIG FILE TO MODIFY OK!", LogType.TraceLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog("PULLED CONTENT FOR CONFIG FILE TO MODIFY OK!", LogType.TraceLog);
 
                 // Check missing value here now.
                 if (ConfigObjectLocated[SplitContentPath.FirstOrDefault()] == null && !AppendMissing)
                 {
                     // Log missing and return false.
-                    WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! MISSING CONFIG FILE VALUE FOR OBJECT KEY NAME: {PropertyKey}!", LogType.ErrorLog);
-                    WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"NEW JSON VALUE WILL NOT BE SET!", LogType.ErrorLog);
+                    JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! MISSING CONFIG FILE VALUE FOR OBJECT KEY NAME: {PropertyKey}!", LogType.ErrorLog);
+                    JsonConfigFiles.ConfigLogger?.WriteLog($"NEW JSON VALUE WILL NOT BE SET!", LogType.ErrorLog);
                     return false;
                 }
 
                 // Log info and loop values here.
                 ConfigObjectLocated[SplitContentPath.FirstOrDefault()] = JToken.FromObject(ValueObject);
                 string NewFileJson = ConfigObjectLocated.ToString(Formatting.Indented);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!");
+                JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!");
 
                 // Set value into config file now.
                 File.WriteAllText(OutputPath, NewFileJson);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog($"NEW FILE JSON VALUE:\n{NewFileJson}", LogType.TraceLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog($"NEW FILE JSON VALUE:\n{NewFileJson}", LogType.TraceLog);
 
                 // Refresh the Config Main object now.
-                _ = WatchdogJsonConfigFiles.ApplicationConfig;
+                _ = JsonConfigFiles.ApplicationConfig;
                 return true;
             }
             catch (Exception SetEx)
             {
                 // Log failure and return false.
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO STORE NEW VALUE FOR OUR JSON CONFIG!", LogType.ErrorLog);
-                WatchdogJsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING SET ROUTINE: ", SetEx);
+                JsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO STORE NEW VALUE FOR OUR JSON CONFIG!", LogType.ErrorLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING SET ROUTINE: ", SetEx);
                 return false;
             }
         }
