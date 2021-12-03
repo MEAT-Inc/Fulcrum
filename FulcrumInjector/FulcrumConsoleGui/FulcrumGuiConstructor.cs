@@ -64,10 +64,9 @@ namespace FulcrumInjector.FulcrumConsoleGui
             ConsoleLogger.WriteLog("SETTING UP NEW CONSOLE CONFIGURATION OBJECTS NOW...", LogType.WarnLog);
 
             // Building new objects for the new console window output.
-            _consoleWindow = this.ConfigureMainWindow();      // Main window view
-            _consoleMenu = this.ConfigureMenuBar();           // Console Menu top bar
-            _consoleTopPane = this.ConfigureTopInfoPane();    // Top output menu
-
+            _consoleWindow ??= this.ConfigureMainWindow();      // Main window view
+            _consoleMenu ??= this.ConfigureMenuBar();           // Console Menu top bar
+            _consoleTopPane ??= this.ConfigureTopInfoPane();    // Top output menu
         }
 
         /// <summary>
@@ -75,14 +74,6 @@ namespace FulcrumInjector.FulcrumConsoleGui
         /// </summary>
         public bool ToggleConsoleGuiView()
         {
-            // See if we want to toggle or not.
-            if (!ValueLoaders.GetConfigValue<bool>("FulcrumConsole.EnableGuiConsole"))
-            {
-                // Log this output and return false. This should only really happen if debugging is on or something is broken.
-                ConsoleLogger.WriteLog("NOT SETTING CONSOLE STATE TO A VALUE! THIS IS BECAUSE OUR BOOLEAN TO ALLOW GUI IS FALSE!", LogType.WarnLog);
-                return false;
-            }
-
             try
             {
                 // Log info and boot the application
@@ -164,7 +155,7 @@ namespace FulcrumInjector.FulcrumConsoleGui
                 X = 0,                              // Starting at 0
                 Y = 1,                              // For Left Side Menu
                 Width = Dim.Fill(),                 // Fill width
-                Height = 10,                        // 10 tall
+                Height = 8,                         // 7 tall
                 CanFocus = false,                   // Not focusable
                 Shortcut = Key.CtrlMask | Key.C     // Focus shortcut
             };
@@ -197,11 +188,11 @@ namespace FulcrumInjector.FulcrumConsoleGui
             ConsoleLogger.WriteLog($"SET NEW TITLE VALUE FOR WINDOW OBJECT TO: {Console.Title}", LogType.InfoLog);
 
             // Configure a new window object.
-            return _consoleWindow ?? new Window()
+            return new Window()
             {
                 // Setup window location on the console.
                 X = 0,     // Start X value at 0.
-                Y = 11,    // Start Y Value at 11 (One under the top menu pane value)
+                Y = 9,     // Start Y Value at 11 (One under the top menu pane value)
 
                 // Setup window shading
                 Width = Dim.Fill(),           // Window filling values

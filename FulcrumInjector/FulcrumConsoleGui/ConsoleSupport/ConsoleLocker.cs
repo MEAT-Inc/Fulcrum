@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumJsonHelpers;
 using SharpLogger.LoggerSupport;
 
 // Static logger reference
@@ -24,6 +25,7 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
 
         // Cancelation token for locking config.
         private CancellationTokenSource TokenSource;
+        public static readonly bool ForceOnTop = ValueLoaders.GetConfigValue<bool>("FulcrumConsole.ForceConsoleOnTop");
 
         // -----------------------------------------------------------------------------
 
@@ -80,7 +82,9 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
                 this.WindowPointer, IntPtr.Zero,
                 RegionsToSet.X, RegionsToSet.Y,
                 RegionsToSet.Width, RegionsToSet.Height,
-                default
+                ForceOnTop ?
+                    ConsoleWin32.SetWindowPosFlags.ShowWindow : // If forced on, show it.
+                    default                                     // If not default value.
             );
 
             // Compare results.
