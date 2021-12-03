@@ -48,13 +48,22 @@ namespace FulcrumInjector
 
             // Run the Setup Methods for Logging and console output locking
             InjectorMainLogger.WriteLog("RUNNING OUR FULCRUM INJECTOR INIT LOGIC METHODS NOW...", LogType.InfoLog);
-            if (!MethodSetInvoker(typeof(FulcrumInjectorInit), BindingFlags.Static | BindingFlags.NonPublic, false, "Init"))
-                throw new InvalidOperationException("FAILED TO SETUP ONE OR MORE ACTIONS FOR FULCRUM!");
+            if (MethodSetInvoker(typeof(FulcrumInjectorInit), BindingFlags.Static | BindingFlags.NonPublic, false, "Init"))
+            {
+                // Now log info and build out new logger object for main instance.
+                InjectorMainLogger.WriteLog(string.Concat(Enumerable.Repeat("=", 75)), LogType.WarnLog);
+                InjectorMainLogger.WriteLog("INVOKED ALL CONFIG METHODS FOR THE NEW FULCRUM INSTANCE OK!", LogType.InfoLog);
+                InjectorMainLogger.WriteLog("READY TO PROCESS NEW PT COMMANDS!", LogType.InfoLog);
+                InjectorMainLogger.WriteLog(string.Concat(Enumerable.Repeat("=", 75)), LogType.WarnLog);
+            }
+            else
+            {
+                // Log something failed during build init.
+                InjectorMainLogger.WriteLog("FAILED TO SETUP ONE OR MORE ACTIONS FOR FULCRUM!", LogType.FatalLog);
+            }
 
-            // Now log info and build out new logger object for main instance.
-            InjectorMainLogger.WriteLog(string.Concat(Enumerable.Repeat("=", 95)), LogType.WarnLog);
-            InjectorMainLogger.WriteLog("INVOKED ALL CONFIG METHODS FOR THE NEW FULCRUM INSTANCE OK! READY TO PROCESS NEW PT COMMANDS!", LogType.InfoLog);
-            InjectorMainLogger.WriteLog(string.Concat(Enumerable.Repeat("=", 95)), LogType.WarnLog);
+            // Ending ReadLine
+            Console.ReadLine();
         }
 
         // -------------------------------------------------------------------------------------------------------
@@ -116,7 +125,7 @@ namespace FulcrumInjector
             }
 
             // Return passed.
-            InjectorMainLogger.WriteLog("DONE CONFIGURING METHODS FOR SETUP TYPE OK!", LogType.WarnLog);
+            InjectorMainLogger.WriteLog("DONE CONFIGURING METHODS FOR SETUP TYPE OK!");
             return true;
         }
     }

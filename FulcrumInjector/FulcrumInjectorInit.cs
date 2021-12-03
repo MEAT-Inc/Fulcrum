@@ -44,6 +44,9 @@ namespace FulcrumInjector
                                   || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
                 .ToList();
 
+            // THIS IS A POTENTIAL ISSUE!
+            // BUG: KILLING NEW CAN DROP COMMANDS TO OUR PIPE! WE NEED TO BUILD THIS SO THAT THE OLDEST INSTANCE REMAINS ALIVE!
+
             // Now kill any existing instances
             InjectorConfigLogger.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
             InjectorConfigLogger.WriteLog("KILLING THESE PROCESS OBJECTS NOW...", LogType.InfoLog);
@@ -65,8 +68,11 @@ namespace FulcrumInjector
             var ConsoleSizes = ValueLoaders.GetConfigValue<int[]>("FulcrumConsole.ConsoleWindowSize");
             var RectShape = ConsoleShapeSetup.InitializeConsole(ConsoleSizes[0], ConsoleSizes[1]);
 
-            // Lock console location here and GUI builder
-            new FulcrumGuiConstructor().ToggleConsoleGuiView();
+            // Check if we want to show the console GUI
+            if (ValueLoaders.GetConfigValue<bool>("FulcrumConsole.EnableGuiConsole")) new FulcrumGuiConstructor().ToggleConsoleGuiView();
+            else InjectorConfigLogger.WriteLog("NOT SETTING CONSOLE STATE TO A VALUE! THIS IS BECAUSE OUR BOOLEAN TO ALLOW GUI IS FALSE!", LogType.WarnLog);
+
+            // Lock console window location
             new ConsoleLocker(RectShape, IntPtr.Zero).LockWindowLocation();
             InjectorConfigLogger.WriteLog($"CONSOLE WINDOW LOCKING HAS BEEN STARTED OK!", LogType.WarnLog);
             InjectorConfigLogger.WriteLog("BUILT NEW CONSOLE CONFIGURATION AND OUTPUT CORRECTLY!", LogType.WarnLog);
@@ -79,8 +85,13 @@ namespace FulcrumInjector
         /// <returns>True if pipes are built. False if not.</returns>
         private static bool InitConfigureFulcrumPipes_3()
         {
-            // Return passed output
-            var OutputPipes = new FulcrumPipe[] { FulcrumInjectorMain.AlphaPipe, FulcrumInjectorMain.BravoPipe };
+            // Main pipes for the fulcrum application
+            InjectorConfigLogger.WriteLog("BUILDING NEW PIPE OBJECTS NOW...", LogType.InfoLog);
+            FulcrumInjectorMain.AlphaPipe = new FulcrumPipeReader();
+            FulcrumInjectorMain.BravoPipe = new FulcrumPipeWriter();
+
+            // Output Pipe objects built.
+            var OutputPipes = new[] { FulcrumInjectorMain.AlphaPipe, FulcrumInjectorMain.BravoPipe };
             bool OutputResult = OutputPipes.All(PipeObj => PipeObj.PipeState == FulcrumPipeState.Connected);
             if (OutputResult)
             {
@@ -93,10 +104,6 @@ namespace FulcrumInjector
             // Log this failure then exit the application
             InjectorConfigLogger.WriteLog("FAILED TO BUILD ONE OR BOTH PIPE SERVER READING CLIENTS!", LogType.FatalLog);
             InjectorConfigLogger.WriteLog("FAILED TO CONFIGURE ONE OR MORE OF THE PIPE OBJECTS FOR THIS SESSION!", LogType.FatalLog);
-            Console.ReadLine();
-
-            // Exit application. -100 means failed to configure pipes
-            Environment.Exit(-100);
             return false;
         }
     }

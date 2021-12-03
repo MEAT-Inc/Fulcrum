@@ -3,9 +3,10 @@
   "FulcrumDllPath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumShim.dll",
   "FulcrumWorkingPath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumInjector",
   "FulcrumConsole": {
-    "EnableGuiConsole": true,
+    "ForceConsoleOnTop": false, 
+    "EnableGuiConsole": false,
     "OverSizeScaleBack": 30,
-    "ConsoleWindowSize": [ 1250, 750 ]
+    "ConsoleWindowSize": [ 1600, 900 ]
   },
   "FulcrumLogging": {
     "DefaultLoggingPath": "C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumLogs",

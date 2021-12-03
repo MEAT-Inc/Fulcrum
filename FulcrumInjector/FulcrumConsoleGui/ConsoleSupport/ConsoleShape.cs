@@ -34,6 +34,9 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
         public static int ConsolePixelWidth => ConsolePixelSizes[0];
         public static int ConsolePixelHeight => ConsolePixelSizes[1];
 
+        // Force Console On Top Value
+        public static readonly bool ForceOnTop = ValueLoaders.GetConfigValue<bool>("FulcrumConsole.ForceConsoleOnTop");
+
         // ----------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -71,7 +74,9 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
                 ConsoleWin32.GetConsoleWindow(), IntPtr.Zero,
                 GeneratedShape.X, GeneratedShape.Y,
                 GeneratedShape.Width, GeneratedShape.Height,
-                ConsoleWin32.SetWindowPosFlags.ShowWindow
+                ForceOnTop ?
+                    ConsoleWin32.SetWindowPosFlags.ShowWindow : // If forced on, show it.
+                    default                                     // If not default value.
             );
 
             // Return the built Rectangle.
@@ -122,7 +127,9 @@ namespace FulcrumInjector.FulcrumConsoleGui.ConsoleSupport
                 ScreenLayout.WorkingDisplayBounds.Location.X,
                 ScreenLayout.WorkingDisplayBounds.Location.Y,
                 ConsolePixelWidth, ConsolePixelHeight,
-                ConsoleWin32.SetWindowPosFlags.ShowWindow
+                ForceOnTop ?
+                    ConsoleWin32.SetWindowPosFlags.ShowWindow : // If forced on, show it.
+                    default                                     // If not default value.
             );
 
             // Get the current box, and compare to the middle.
