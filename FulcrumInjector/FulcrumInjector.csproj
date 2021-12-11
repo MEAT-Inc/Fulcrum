@@ -82,6 +82,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppLogic\InjectorPipeSetup.cs" />
+    <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
+    <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
+    <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
     <Compile Include="AppStyles\AppStyleLogic\AppColorSetter.cs" />
     <Compile Include="AppStyles\AppStyleLogic\ColorMatchingHelper.cs" />
     <Compile Include="AppStyles\AppStyleLogic\CustomColorShader.cs" />
@@ -103,7 +107,7 @@
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewControl\InjectorConstants.cs" />
-    <Page Include="MainWindow.xaml">
+    <Page Include="InjectorMainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -111,8 +115,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="InjectorMainWindow.xaml.cs">
+      <DependentUpon>InjectorMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="AppStyles\AppStyleSheets\AppColorTheme.xaml">
@@ -172,7 +176,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
+    <PreBuildEvent>py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
+"$(DevEnvDir)devenv" "$(SolutionDir)FulcrumShim.sln" /Build $(Configuration) /project "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"
+
+copy /Y "$(SolutionDir)FulcrumShim\$(Configuration)" "$(TargetDir)"
+"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)$(ProjectName)Settings.json"</PostBuildEvent>

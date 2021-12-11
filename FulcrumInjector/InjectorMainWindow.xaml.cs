@@ -41,10 +41,22 @@ namespace FulcrumInjector
             App.WindowBlurHelper = new WindowBlurSetup(this);
             App.WindowBlurHelper.ShowBlurEffect();
             InjectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE OK!", LogType.InfoLog);
+        }
+
+        /// <summary>
+        /// Executes the logic setup for this app once our window instance is opened.
+        /// </summary>
+        private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // Log info about this method
+            InjectorMainLogger.WriteLog("WINDOW OBJECT HAS BEEN LOADED AND OPENED! SETTING UP LOGIC NOW...", LogType.InfoLog);
+            InjectorMainLogger.WriteLog("ONCE UI CONTENT IS STATIC, PIPE LOGIC AND OTHER BUILT OBJECTS WILL POPULATE...");
 
             // Store constants in here.
             InjectorConstants.ConfigureViewControls(this);
-            InjectorMainLogger.WriteLog("WATCHDOG CONSTANTS STORED OK! APP SHOULD BE VISIBLE AND OPERATIONAL NOW", LogType.InfoLog);
+            Task.Run(InjectorConstants.ConfigureFulcrumPipes);
+            InjectorMainLogger.WriteLog("WATCHDOG CONSTANTS STORED OK! APP SHOULD BE VISIBLE AND OPERATIONAL NOW");
+            InjectorMainLogger.WriteLog("REMAINING LOGIC CONFIGURATION IS BEING EXECUTED ON A BACKGROUND THREAD NOW...", LogType.WarnLog);
         }
     }
 }

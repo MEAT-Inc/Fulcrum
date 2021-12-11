@@ -40,7 +40,7 @@ namespace FulcrumInjector.JsonHelpers
         public static string AppConfigFile
         {
             // Set value based on config entry or by the previously defined value.
-            get => $"{_appConfigFile ??= Assembly.GetExecutingAssembly().GetName().Name}Settings.json"; 
+            get => _appConfigFile ?? Path.Combine(Directory.GetCurrentDirectory(), $"{Assembly.GetExecutingAssembly().GetName().Name}Settings.json"); 
             private set => _appConfigFile = value;
         }
 
@@ -51,14 +51,13 @@ namespace FulcrumInjector.JsonHelpers
         public static void SetNewAppConfigFile(string NewConfigFile)
         {
             // Log info. Set file state
-            AppConfigFile = NewConfigFile;
+            AppConfigFile = Path.Combine(Directory.GetCurrentDirectory(), NewConfigFile);
             ConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
             ConfigLogger?.WriteLog($"JSON CONFIG FILE LOADED: {NewConfigFile}", LogType.TraceLog);
 
             // Check existing
-            bool ConfigFileReady = File.Exists(AppConfigFile);
-            if (ConfigFileReady) ConfigLogger?.WriteLog("CONFIG FILE LOADED OK!", LogType.InfoLog);
-            else { ConfigLogger?.WriteLog("CONFIG FILE COULD NOT BE FOUND!", LogType.ErrorLog); }
+            if (File.Exists(AppConfigFile)) ConfigLogger?.WriteLog("CONFIG FILE LOADED OK!", LogType.InfoLog);
+            else throw new FileNotFoundException($"FAILED TO FIND OUR JSON CONFIG FILE!\nFILE: {AppConfigFile}");
         }
 
         // ------------------------------------ Combined Output JSON ------------------------------------------

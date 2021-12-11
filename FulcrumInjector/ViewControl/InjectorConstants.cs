@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using FulcrumInjector.AppLogic;
+using FulcrumInjector.AppLogic.InjectorPipes;
 using FulcrumInjector.ViewControl.ViewModels;
 using FulcrumInjector.ViewControl.Views;
 using SharpLogger;
@@ -35,6 +38,12 @@ namespace FulcrumInjector.ViewControl
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        // Object Constants for our application
+        public static FulcrumPipeReader AlphaPipe;      // Pipe objects for talking to our DLL
+        public static FulcrumPipeWriter BravoPipe;      // Pipe objects for talking to our DLL
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Builds a static set of control objects for view use
         /// </summary>
@@ -45,6 +54,18 @@ namespace FulcrumInjector.ViewControl
             InjectorMainWindow = WindowBase;
             ConstantsLogger.WriteLog("STORED NEW MAIN WINDOW VIEW FOR CONSTANTS OBJECT OK!", LogType.InfoLog);
             ConstantsLogger.WriteLog($"MAIN WINDOW WAS PASSED AS TYPE {WindowBase.GetType().Name}");
+        }
+        /// <summary>
+        /// Builds our new pipe instances out for this session
+        /// </summary>
+        public static void ConfigureFulcrumPipes()
+        {
+            // Configure pipes here.
+            ConstantsLogger.WriteLog("SETTING UP FULCRUM PIPES NOW...", LogType.WarnLog);
+            InjectorPipeSetup.KillExistingFulcrumInstances();
+            if (!InjectorPipeSetup.ValidateFulcrumPipeConfiguration())
+                throw new InvalidOperationException("FAILED TO CONFIGURE FULCRUM PIPE INSTANCES!");
+            ConstantsLogger.WriteLog("FULCRUM PIPE INSTANCES HAVE BEEN BOOTED CORRECTLY!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -37,7 +37,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
 
             // Store title and version string values now.
             this.TitleVersionString = $"Version: {Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
-            this.TitleTextString = ValueLoaders.GetConfigValue<string>("WatchdogLogging.AppInstanceName");
+            this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.AppInstanceName");
             ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"TITLE:    {TitleTextString}");
             ViewModelLogger.WriteLog($"VERSION:  {TitleVersionString}");

@@ -52,7 +52,7 @@ namespace FulcrumInjector
         private void ConfigureLogging()
         {
             // Start by building a new logging configuration object and init the broker.
-            JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorConfig.json");
+            JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorSettings.json");
             string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.AppInstanceName");
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorLogging.DefaultLoggingPath");
 
