@@ -71,7 +71,7 @@ namespace FulcrumInjector.AppStyles.AppStyleLogic
         /// Builds a new object ot modify and stores it on this object.
         /// </summary>
         /// <param name="WindowToModify"></param>
-        public WindowBlurSetup(Window WindowToModify, double OpacityValue = 75.00, Color ColorToSet = default)
+        public WindowBlurSetup(Window WindowToModify, double OpacityValue = 75.00, Color ColorToSet = default, bool ShowBlur = false)
         {
             // Store value
             this.WindowMain = WindowToModify;
@@ -83,6 +83,7 @@ namespace FulcrumInjector.AppStyles.AppStyleLogic
 
             // Store window helper
             this.BlurWindowHelper = new WindowInteropHelper(WindowMain);
+            if (ShowBlur) { this.ShowBlurEffect(); }
         }
 
         /// <summary>

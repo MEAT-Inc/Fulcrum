@@ -25,12 +25,12 @@ namespace FulcrumInjector.ViewControl
         public static InjectorMainWindow InjectorMainWindow { get; private set; }     // Main window component    
 
         // Title View and ViewModel
-        public static FulcrumTitleView TitleView 
+        public static FulcrumTitleView TitleView
         {
             get => InjectorMainWindow.FulcrumTitleViewContent;
             set => InjectorMainWindow.FulcrumTitleViewContent = value;
         }
-        public static FulcrumTitleViewModel TitleViewModel 
+        public static FulcrumTitleViewModel TitleViewModel
         {
             get => TitleView.ViewModel;
             set => TitleView.ViewModel = value;
@@ -62,13 +62,14 @@ namespace FulcrumInjector.ViewControl
         {
             // Configure pipes here.
             ConstantsLogger.WriteLog("SETTING UP FULCRUM PIPES NOW...", LogType.WarnLog);
+
+            // Kill old, boot new pipe instances.
             InjectorPipeSetup.KillExistingFulcrumInstances();
             if (!InjectorPipeSetup.ValidateFulcrumPipeConfiguration())
-                throw new InvalidOperationException("FAILED TO CONFIGURE FULCRUM PIPE INSTANCES!");
-            ConstantsLogger.WriteLog("FULCRUM PIPE INSTANCES HAVE BEEN BOOTED CORRECTLY!", LogType.InfoLog);
+                ConstantsLogger.WriteLog("FAILED TO CONFIGURE FULCRUM PIPE INSTANCES!", LogType.FatalLog);
+            else ConstantsLogger.WriteLog("FULCRUM PIPE INSTANCES HAVE BEEN BOOTED CORRECTLY!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
-
     }
 }

@@ -38,10 +38,11 @@ namespace FulcrumInjector
         {
             // Init main component and blur background of the main window.
             InitializeComponent();
-            App.WindowBlurHelper = new WindowBlurSetup(this);
-            App.WindowBlurHelper.ShowBlurEffect();
+            App.WindowBlurHelper = new WindowBlurSetup(this, ShowBlur: true);
             InjectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE OK!", LogType.InfoLog);
+            InjectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
         }
+
 
         /// <summary>
         /// Executes the logic setup for this app once our window instance is opened.
@@ -49,14 +50,17 @@ namespace FulcrumInjector
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Log info about this method
+            InjectorConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("WINDOW OBJECT HAS BEEN LOADED AND OPENED! SETTING UP LOGIC NOW...", LogType.InfoLog);
             InjectorMainLogger.WriteLog("ONCE UI CONTENT IS STATIC, PIPE LOGIC AND OTHER BUILT OBJECTS WILL POPULATE...");
 
             // Store constants in here.
-            InjectorConstants.ConfigureViewControls(this);
-            Task.Run(InjectorConstants.ConfigureFulcrumPipes);
-            InjectorMainLogger.WriteLog("WATCHDOG CONSTANTS STORED OK! APP SHOULD BE VISIBLE AND OPERATIONAL NOW");
-            InjectorMainLogger.WriteLog("REMAINING LOGIC CONFIGURATION IS BEING EXECUTED ON A BACKGROUND THREAD NOW...", LogType.WarnLog);
+            Task.Run(() =>
+            {
+                InjectorConstants.ConfigureFulcrumPipes();
+                InjectorMainLogger.WriteLog("FULCRUM PIPE CONFIGURATION HAS BEEN COMPLETED. CHECK THE UI AND LOG FILES FOR RESULTS", LogType.WarnLog);
+                InjectorMainLogger.WriteLog("AT THIS POINT IF THE CALLS PASSED, OUR APP IS READY TO PROCESS J2534 SHIMMED CALLS!", LogType.InfoLog);
+            });
         }
     }
 }

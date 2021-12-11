@@ -8,7 +8,10 @@
         xmlns:views="clr-namespace:FulcrumInjector.ViewControl.Views"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
-        Height="450" Width="800"
+        Height="600" Width="1000" 
+        MaxHeight="650" MaxWidth="1125"
+        MinHeight="550" MinWidth="875"
+        AllowsTransparency="True"
         Loaded="InjectorMainWindow_OnLoaded">
     
     <!-- Dark Semi Transparent Background -->
