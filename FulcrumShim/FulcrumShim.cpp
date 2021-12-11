@@ -77,8 +77,8 @@ void CFulcrumShim::InitPipes()
 	// Run the process here by booting a new instance. Once running connect the input pipe.
 	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
 	dtDebug(_T("%.3fs    Connecting input pipe now...\n", GetTimeSinceInit()));
-	dtDebug(_T("%.3fs    NOTE: Waiting 1000 miliseconds before this request is sent...\n", GetTimeSinceInit()));
-	Sleep(1000); bool LoadedPipeInput = fulcrumPiper->ConnectInputPipe();
+	dtDebug(_T("%.3fs    NOTE: Waiting 2000 miliseconds before this request is sent...\n", GetTimeSinceInit()));
+	Sleep(2000); bool LoadedPipeInput = fulcrumPiper->ConnectInputPipe();
 
 	// Now see if we're loaded correctly.
 	pipesLoaded = LoadedPipeInput && LoadedPipeOutput;

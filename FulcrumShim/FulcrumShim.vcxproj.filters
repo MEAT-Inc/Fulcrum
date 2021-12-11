@@ -50,9 +50,6 @@
     <None Include="fulcrum_shim.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="res\fulcrum_shim.rc2">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="FulcrumVersionTick.py" />
   </ItemGroup>
   <ItemGroup>

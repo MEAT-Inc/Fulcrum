@@ -208,7 +208,6 @@
   <ItemGroup>
     <None Include="FulcrumVersionTick.py" />
     <None Include="fulcrum_shim.def" />
-    <None Include="res\fulcrum_shim.rc2" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />

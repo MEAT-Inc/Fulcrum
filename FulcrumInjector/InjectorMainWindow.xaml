@@ -19,7 +19,7 @@
         <SolidColorBrush Color="#020202" Opacity=".85"/>
     </Window.Background>
 
-    <Grid Margin="5">
+    <Grid Margin="0">
         <!-- Row Layout for content -->
         <Grid.RowDefinitions>
             <RowDefinition Height=".15*"/>

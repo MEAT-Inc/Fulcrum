@@ -36,13 +36,7 @@ namespace FulcrumInjector.JsonHelpers
         // ---------------------------------- Input Located JSON Files ----------------------------------------
 
         // List of all the files found in the directory of this application
-        private static string _appConfigFile;
-        public static string AppConfigFile
-        {
-            // Set value based on config entry or by the previously defined value.
-            get => _appConfigFile ?? Path.Combine(Directory.GetCurrentDirectory(), $"{Assembly.GetExecutingAssembly().GetName().Name}Settings.json"); 
-            private set => _appConfigFile = value;
-        }
+        public static string AppConfigFile;
 
         /// <summary>
         /// Loads a new config file, sets the access bool to true if the file exists
@@ -51,9 +45,12 @@ namespace FulcrumInjector.JsonHelpers
         public static void SetNewAppConfigFile(string NewConfigFile)
         {
             // Log info. Set file state
-            AppConfigFile = Path.Combine(Directory.GetCurrentDirectory(), NewConfigFile);
+            var InstallPath = @"C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumInjector";
+            AppConfigFile = NewConfigFile.Contains(Path.DirectorySeparatorChar) ? NewConfigFile : Path.Combine(InstallPath, NewConfigFile);
+
+            // Log info about the file object
             ConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
-            ConfigLogger?.WriteLog($"JSON CONFIG FILE LOADED: {NewConfigFile}", LogType.TraceLog);
+            ConfigLogger?.WriteLog($"EXPECTED TO LOAD JSON CONFIG FILE AT: {AppConfigFile}");
 
             // Check existing
             if (File.Exists(AppConfigFile)) ConfigLogger?.WriteLog("CONFIG FILE LOADED OK!", LogType.InfoLog);

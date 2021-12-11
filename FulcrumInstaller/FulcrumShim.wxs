@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
+  <?define ProductVersion="!(bind.fileVersion.FULCRUMINJECTOR.EXE)"?>
+
+  <!-- Product Definitions -->
   <Product
     Id="*"
     Name="FulcrumInjector"
     Language="1033"
-    Version="!(bind.FileVersion.FULCRUMSHIM.DLL)"
+    Version="$(var.ProductVersion)"
     Manufacturer="MEAT Inc."
-    UpgradeCode="b2555316-acc2-49b4-9e78-980025cfb8d8">
+    UpgradeCode="$(var.UpgradeCode)">
 
     <!-- Package Metadata Configuration -->
     <Package InstallerVersion="200" Compressed="yes" />
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
     <!-- Upgrade Information -->
-    <Upgrade Id="b2555316-acc2-49b4-9e78-980025cfb8d8">
+    <Upgrade Id="$(var.UpgradeCode)">
       <UpgradeVersion Property="PREVIOUSVERSIONINSTALLED"
-                      Minimum="1.0.0.0"
-                      Maximum="!(bind.fileVersion.FULCRUMSHIM.DLL)"
+                      Minimum="0.0.0.0"
+                      Maximum="$(var.ProductVersion)"
                       IncludeMinimum="yes"
-                      IncludeMaximum="no"
+                      IncludeMaximum="yes"
                       MigrateFeatures="yes">
       </UpgradeVersion>
       <UpgradeVersion Property="NEWERVERSIONINSTALLED"
-                    Minimum="!(bind.fileVersion.FULCRUMSHIM.DLL)"
+                    Minimum="$(var.ProductVersion)"
                     Maximum="99.0.0.0"
                     IncludeMinimum="no"
                     IncludeMaximum="yes">
@@ -31,8 +35,7 @@
 
     <!-- Downgrading and Upgrading Sequences-->
     <InstallExecuteSequence>
-      <LaunchConditions After="AppSearch" />
-      <RemoveExistingProducts After="InstallInitialize">PREVIOUSVERSIONINSTALLED&lt;&gt;""</RemoveExistingProducts>
+      <RemoveExistingProducts Before="InstallInitialize">PREVIOUSVERSIONINSTALLED&lt;&gt;""</RemoveExistingProducts>
       <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWERVERSIONINSTALLED&lt;&gt;"" AND NOT Installed</Custom>
     </InstallExecuteSequence>
     <CustomAction Id="PreventDowngrading" Error="A newer version of the FulcrumInjector is already installed!" />
@@ -47,32 +50,19 @@
             <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
               <Component Id="FulcrumInjectorFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
                 <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
-                <File Id="CONTROLZEX.PDB" Name="ControlzEx.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.pdb" />
                 <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
                 <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe" />
                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
-                <File Id="FULCRUMINJECTOR.PDB" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.pdb" />
                 <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjectorSettings.json" />
                 <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.dll" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.BOOTSTRAPICONS.DLL" Name="MahApps.Metro.IconPacks.BootstrapIcons.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.BootstrapIcons.dll" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.BOOTSTRAPICONS.PDB" Name="MahApps.Metro.IconPacks.BootstrapIcons.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.BootstrapIcons.pdb" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.BOOTSTRAPICONS.XML" Name="MahApps.Metro.IconPacks.BootstrapIcons.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.BootstrapIcons.xml" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.CORE.DLL" Name="MahApps.Metro.IconPacks.Core.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.Core.dll" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.CORE.PDB" Name="MahApps.Metro.IconPacks.Core.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.Core.pdb" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.CORE.XML" Name="MahApps.Metro.IconPacks.Core.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.Core.xml" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.DLL" Name="MahApps.Metro.IconPacks.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.dll" />
-                <File Id="MAHAPPS.METRO.ICONPACKS.PDB" Name="MahApps.Metro.IconPacks.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.IconPacks.pdb" />
-                <File Id="MAHAPPS.METRO.PDB" Name="MahApps.Metro.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.pdb" />
                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                 <File Id="MICROSOFT.XAML.BEHAVIORS.DLL" Name="Microsoft.Xaml.Behaviors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.dll" />
-                <File Id="MICROSOFT.XAML.BEHAVIORS.PDB" Name="Microsoft.Xaml.Behaviors.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.pdb" />
                 <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
                 <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
                 <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
                 <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
                 <File Id="NLOG.XML" Name="NLog.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.xml" />
                 <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
-                <File Id="SHARPLOGGER.PDB" Name="SharpLogger.pdb" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.pdb" />
               </Component>
               <Directory Id="METRORESOURCEDIR" Name="de">
                 <Component Id="MetroResourceFiles" DiskId="1" Guid="108C1A36-5198-4FB1-890A-A9AD7B21C09C">
@@ -85,7 +75,6 @@
             <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
               <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\$(var.Configuration)\FulcrumShim.dll" />
               <File Id="FULCRUMSHIM.LIB" Name="FulcrumShim.lib" Source="..\FulcrumShim\$(var.Configuration)\FulcrumShim.lib" />
-              <File Id="FULCRUMSHIM.PDB" Name="FulcrumShim.pdb" Source="..\FulcrumShim\$(var.Configuration)\FulcrumShim.pdb" />
               <RegistryKey Id="RegOmegaKey" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc. - FulcrumShim" Action="createAndRemoveOnUninstall">
 
                 <!-- Add registry strings for the product -->
@@ -107,19 +96,19 @@
                 <RegistryValue Id="RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
               </RegistryKey>
             </Component>
-          </Directory>
 
-          <!-- Program Files Folders for Logging -->
-          <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
-            <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
-              <CreateFolder />
-            </Component>
-
-            <!-- J2534 Logging Archives -->
-            <Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
-              <Component Id="CreateFulcrumArchivesFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+            <!-- Program Files Folders for Logging -->
+            <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
+              <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
                 <CreateFolder />
               </Component>
+
+              <!-- J2534 Logging Archives -->
+              <Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
+                <Component Id="CreateFulcrumArchivesFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+                  <CreateFolder />
+                </Component>
+              </Directory>
             </Directory>
           </Directory>
         </Directory>
@@ -174,5 +163,9 @@
 
     <!-- UI Type -->
     <UIRef Id="WixUI_Common" />
+
+    <!-- Icon Values -->
+    <Icon Id="AppIcon" SourceFile="..\FulcrumInjector\ShimIconProject.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
   </Product>
 </Wix>
