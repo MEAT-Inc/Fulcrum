@@ -1,0 +1,36 @@
+﻿<mah:MetroWindow x:Class="FulcrumInjector.InjectorMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FulcrumInjector"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:views="clr-namespace:FulcrumInjector.ViewControl.Views"
+        mc:Ignorable="d"
+        Title="Fulcrum Injector" Height="450" Width="800">
+    
+    <!-- Dark Semi Transparent Background -->
+    <Window.Background>
+        <SolidColorBrush Color="#020202" Opacity=".85"/>
+    </Window.Background>
+
+    <Grid Margin="5">
+        <!-- Row Layout for content -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".15*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!-- Top border and the title information for this app -->
+        <Border Grid.Row="0" Grid.RowSpan="2" BorderBrush="White" Style="{StaticResource TransparentBackgroundBorder}"/>
+        <Grid Grid.Row="0">
+            <views:FulcrumTitleView x:Name="FulcrumTitleViewContent"/>
+            <Border BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+        </Grid>
+
+        <!-- All Other App Content Goes Down Here -->
+        <Grid Grid.Row="1">
+
+        </Grid>
+    </Grid>
+</mah:MetroWindow>

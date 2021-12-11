@@ -22,9 +22,15 @@
     <Compile Include="FulcrumShim.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FulcrumInjector\FulcrumInjector.csproj">
       <Name>FulcrumInjector</Name>
-      <Project>{3c050f07-4f17-403e-ac20-f9fd7ed72d7c}</Project>
+      <Project>{7b268cc3-bb60-4ed8-8564-9fe49d43e8e7}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
@@ -38,12 +44,6 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WixExtension Include="WixUIExtension">
-      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
-      <Name>WixUIExtension</Name>
-    </WixExtension>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumJsonHelpers
+namespace FulcrumInjector.JsonHelpers
 {
     /// <summary>
     /// Contains methods for loading config values.
@@ -19,8 +19,12 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         /// <returns></returns>
         public static TValueType GetConfigValue<TValueType>(string JsonPath)
         {
+            // See if our config file is missing.
+            if (!File.Exists(JsonConfigFiles.AppConfigFile))
+                throw new InvalidOperationException("CAN NOT PULL CONFIG VALUES SINCE THE CONFIG FILE IS NOT YET BUILT!");
+
             // Get the token first.
-            JsonPath = JsonPath.Replace("FulcrumInjectorConfig", "");
+            JsonPath = JsonPath.Replace("PassThruLogWatchdogConfig", "");
             JsonConfigFiles.ConfigLogger?.WriteLog($"TRYING TO PULL VALUE AT: {JsonPath}", LogType.TraceLog);
             var ValueObject = JsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
             if (ValueObject == null)
@@ -40,8 +44,12 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         /// </summary>
         /// <param name="JObjectKey">Base Type of a json key</param>
         /// <returns></returns>
-        public static JObject GetJObjectConfig(JConfigType JObjectKey)
+        public static JObject GetJObjectConfig(string JObjectKey)
         {
+            // See if our config file is missing.
+            if (!File.Exists(JsonConfigFiles.AppConfigFile))
+                throw new InvalidOperationException("CAN NOT PULL CONFIG VALUES SINCE THE CONFIG FILE IS NOT YET BUILT!");
+
             // Check for full config.
             string ConfigKeyString = JObjectKey.ToString();
             JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {ConfigKeyString}", LogType.TraceLog);
@@ -66,7 +74,7 @@ namespace FulcrumInjector.FulcrumJsonHelpers
         /// </summary>
         /// <param name="JObjectKey">Type of json file to pull</param>
         /// <returns>Path to new json file</returns>
-        public static string GetJObjectConfigFile(JConfigType JObjectKey)
+        public static string GetJObjectConfigFile(string JObjectKey)
         {
             // Check for full config.
             string ConfigKeyString = JObjectKey.ToString();

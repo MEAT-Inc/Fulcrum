@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31911.196
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FulcrumInjector", "FulcrumInjector\FulcrumInjector.csproj", "{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FulcrumShim", "FulcrumShim\FulcrumShim.vcxproj", "{25DE901C-9939-4B98-A2A0-58090B7375FD}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "FulcrumInstaller", "FulcrumInstaller\FulcrumInstaller.wixproj", "{46915009-6E9B-410C-B2BF-0C5E92D556B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FulcrumInjector", "FulcrumInjector\FulcrumInjector.csproj", "{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InjectorApps", "InjectorApps", "{58E5FCD5-281D-4CA0-AE50-D916429B71FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,18 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Debug|x64.Build.0 = Debug|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Debug|x86.Build.0 = Debug|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Release|x64.ActiveCfg = Release|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Release|x64.Build.0 = Release|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Release|x86.ActiveCfg = Release|Any CPU
-		{3C050F07-4F17-403E-AC20-F9FD7ED72D7C}.Release|x86.Build.0 = Release|Any CPU
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Debug|Any CPU.Build.0 = Debug|Win32
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Debug|x64.ActiveCfg = Debug|x64
@@ -51,9 +41,25 @@ Global
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release|x64.ActiveCfg = Release|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release|x86.ActiveCfg = Release|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release|x86.Build.0 = Release|x86
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x64.Build.0 = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x86.Build.0 = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x64.ActiveCfg = Release|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x64.Build.0 = Release|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5} = {58E5FCD5-281D-4CA0-AE50-D916429B71FE}
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7} = {58E5FCD5-281D-4CA0-AE50-D916429B71FE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1546852D-0441-4435-AAAD-B4BAF4D43FD6}

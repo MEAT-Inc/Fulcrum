@@ -1,150 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <?define RTMProductVersion="6.8.0" ?>
-    <?define ProductVersion="6.8.3" ?>
-    <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
-  <Product Id="*" Name="FulcrumShim" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
-   
-    <!-- Package Metadata Configuration -->
-    <Package InstallerVersion="200" Compressed="yes" />
-    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+  <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
 
-    <!-- Upgrade Information -->
-    <Upgrade Id="$(var.UpgradeCode)">
-      <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" OnlyDetect="no" Maximum="$(var.ProductVersion)" IncludeMaximum="no" Property="NEWPRODUCTFOUND"></UpgradeVersion>
-    </Upgrade>
+  <Product
+    Id="*" 
+    Name="FulcrumInjector"
+    Language="1033" 
+    Version="!(bind.fileVersion.FULCRUMINJECTOR.EXE)"
+    Manufacturer="MEAT Inc." 
+    UpgradeCode="$(var.UpgradeCode)">
 
-    <!-- Downgrading and Upgrading Sequences-->
-    <InstallExecuteSequence>
-      <LaunchConditions After="AppSearch" />
-      <RemoveExistingProducts After="InstallValidate" />
-    </InstallExecuteSequence>
+      <!-- Package Metadata Configuration -->
+        <Package InstallerVersion="200" Compressed="yes" />
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+       
+      <!-- Upgrade Information -->
+        <Upgrade Id="$(var.UpgradeCode)">
+            <UpgradeVersion Minimum="0.0.0" 
+                            IncludeMinimum="yes"
+                            OnlyDetect="no" 
+                            Maximum="$(var.ProductVersion)"
+                            IncludeMaximum="no" 
+                            Property="NEWPRODUCTFOUND">
+            </UpgradeVersion>
+        </Upgrade>
+       
+      <!-- Downgrading and Upgrading Sequences-->
+        <InstallExecuteSequence>
+            <LaunchConditions After="AppSearch" />
+            <RemoveExistingProducts After="InstallValidate" />
+        </InstallExecuteSequence>
+      
+      <!-- Application Contents -->
+      <Directory Id="TARGETDIR" Name="SourceDir">
+        <Directory Id="ProgramFilesFolder">
+          <Directory Id="MeatIncFilesFolder" Name="MEAT Inc">
+            <Directory Id="DriverComponent" Name="FulcrumShim">
+              <!-- Injector App Files -->
+              <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
+                <!-- Injector Application -->
+                <Component Id="FulcrumInjectorApp" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
+                  <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\Debug\ControlzEx.dll" />
+                  <File Id="CONTROLZEX.PDB" Name="ControlzEx.pdb" Source="..\FulcrumInjector\bin\Debug\ControlzEx.pdb" />
+                  <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\Debug\ControlzEx.xml" />
+                  <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe" />
+                  <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe.config" />
+                  <File Id="FULCRUMINJECTOR.PDB" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.pdb" />
+                  <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\Debug\FulcrumInjectorSettings.json" />
+                  <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.dll" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.BOOTSTRAPICONS.DLL" Name="MahApps.Metro.IconPacks.BootstrapIcons.dll" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.BootstrapIcons.dll" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.BOOTSTRAPICONS.PDB" Name="MahApps.Metro.IconPacks.BootstrapIcons.pdb" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.BootstrapIcons.pdb" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.BOOTSTRAPICONS.XML" Name="MahApps.Metro.IconPacks.BootstrapIcons.xml" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.BootstrapIcons.xml" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.CORE.DLL" Name="MahApps.Metro.IconPacks.Core.dll" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.Core.dll" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.CORE.PDB" Name="MahApps.Metro.IconPacks.Core.pdb" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.Core.pdb" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.CORE.XML" Name="MahApps.Metro.IconPacks.Core.xml" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.Core.xml" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.DLL" Name="MahApps.Metro.IconPacks.dll" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.dll" />
+                  <File Id="MAHAPPS.METRO.ICONPACKS.PDB" Name="MahApps.Metro.IconPacks.pdb" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.IconPacks.pdb" />
+                  <File Id="MAHAPPS.METRO.PDB" Name="MahApps.Metro.pdb" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.pdb" />
+                  <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\Debug\MahApps.Metro.xml" />
+                  <File Id="MICROSOFT.XAML.BEHAVIORS.DLL" Name="Microsoft.Xaml.Behaviors.dll" Source="..\FulcrumInjector\bin\Debug\Microsoft.Xaml.Behaviors.dll" />
+                  <File Id="MICROSOFT.XAML.BEHAVIORS.PDB" Name="Microsoft.Xaml.Behaviors.pdb" Source="..\FulcrumInjector\bin\Debug\Microsoft.Xaml.Behaviors.pdb" />
+                  <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\Debug\Microsoft.Xaml.Behaviors.xml" />
+                  <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\Debug\Newtonsoft.Json.dll" />
+                  <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\Debug\Newtonsoft.Json.xml" />
+                  <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\Debug\NLog.dll" />
+                  <File Id="NLOG.XML" Name="NLog.xml" Source="..\FulcrumInjector\bin\Debug\NLog.xml" />
+                  <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\Debug\SharpLogger.dll" />
+                  <File Id="SHARPLOGGER.PDB" Name="SharpLogger.pdb" Source="..\FulcrumInjector\bin\Debug\SharpLogger.pdb" />
+                </Component>
+                <Directory Id="de">
+                  <Component Id="MetroResourcesFolder" DiskId="1" Guid="108C1A36-5198-4FB1-890A-A9AD7B21C09C">
+                    <File Id="MAHAPPS.METRO.RESOURCES.DLL" Name="MahApps.Metro.resources.dll" Source="..\FulcrumInjector\bin\Debug\de\MahApps.Metro.resources.dll" />
+                  </Component>
+                </Directory>
+              </Directory>
 
-    <!-- Application Contents -->
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="MeatIncFilesFolder" Name="MEAT Inc">
-          <Directory Id="DriverComponent" Name="FulcrumShim">
-
-            <!-- SAE J2534-1 DLL -->
-            <Component Id="FulcrumDLLComponent" Guid="{f22e3b6b-b056-458a-9ccc-1e88647ea58a}" Win64="no">
-              <File Id="FULCRUMSHIM.PDB" Name="FulcrumShim.pdb" Source="..\FulcrumShim\Debug\FulcrumShim.pdb" />
-              <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\Debug\FulcrumShim.dll" Checksum="yes" />
-              <RegistryKey Id="RegOmegaKey" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc. - FulcrumShim" Action="createAndRemoveOnUninstall">
-               
-                <!-- Add registry strings for the product -->
-                <RegistryValue Id="RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
-                <RegistryValue Id="RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
-                <RegistryValue Id="RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\FulcrumInjector\FulcrumInjector.exe" />
-                <RegistryValue Id="RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
-              
-                <!-- Add registry dword flags for each network protocol -->
-                <RegistryValue Id="RegFlagCAN" Name="CAN" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagISO15765" Name="ISO15765" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagJ1850PWM" Name="J1850PWM" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagJ1850VPW" Name="J1850VPW" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagISO9141" Name="ISO9141" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagISO14230" Name="ISO14230" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagSCIAENGINE" Name="SCI_A_ENGINE" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagSCIATRANS" Name="SCI_A_TRANS" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagSCIBENGINE" Name="SCI_B_ENGINE" Action="write" Type="integer" Value="1" />
-                <RegistryValue Id="RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
-              </RegistryKey>
-            </Component>
-            
-            <!-- Injector App Files -->
-            <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
-              <Component Id="CreateFulcrumInjectorFolder" Guid="5604ef78-55f4-4dfe-874f-fb5e6cf724a4">
-                <CreateFolder />
-              </Component>
-             
-              <!-- Injector Application -->
-              <Component Id="FulcrumInjectorComponent" Guid="{67863391-7718-42ed-be3f-71ef5cc2bf77}" Win64="no">
-                <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe" />
-                <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.exe.config" />
-                <File Id="FULCRUMINJECTOR.PDB" Name="FulcrumInjector.pdb" Source="..\FulcrumInjector\bin\Debug\FulcrumInjector.pdb" />
-                <File Id="FULCRUMINJECTORCONFIG.JSON" Name="FulcrumInjectorConfig.json" Source="..\FulcrumInjector\bin\Debug\FulcrumInjectorConfig.json" />
-                <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\Debug\Newtonsoft.Json.dll" />
-                <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\Debug\Newtonsoft.Json.xml" />
-                <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\Debug\NLog.dll" />
-                <File Id="NLOG.XML" Name="NLog.xml" Source="..\FulcrumInjector\bin\Debug\NLog.xml" />
-                <File Id="NSTACK.DLL" Name="NStack.dll" Source="..\FulcrumInjector\bin\Debug\NStack.dll" />
-                <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\Debug\SharpLogger.dll" />
-                <File Id="SYSTEM.VALUETUPLE.DLL" Name="System.ValueTuple.dll" Source="..\FulcrumInjector\bin\Debug\System.ValueTuple.dll" />
-                <File Id="SYSTEM.VALUETUPLE.XML" Name="System.ValueTuple.xml" Source="..\FulcrumInjector\bin\Debug\System.ValueTuple.xml" />
-                <File Id="TERMINAL.GUI.DLL" Name="Terminal.Gui.dll" Source="..\FulcrumInjector\bin\Debug\Terminal.Gui.dll" />
-                <File Id="TERMINAL.GUI.XML" Name="Terminal.Gui.xml" Source="..\FulcrumInjector\bin\Debug\Terminal.Gui.xml" />
-              </Component>
-            </Directory>
-           
-            <!-- Program Files Folders for Logging -->
-            <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
-              <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
-                <CreateFolder />
-              </Component>
-           
-              <!-- J2534 Logging -->
-              <Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
-                <Component Id="CreateArchivesFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+              <!-- Program Files Folders for Logging -->
+              <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
+                <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
                   <CreateFolder />
                 </Component>
+
+                <!-- J2534 Logging Archives -->
+                <Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
+                  <Component Id="CreateArchivesFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+                    <CreateFolder />
+                  </Component>
+                </Directory>
               </Directory>
+
+              <!-- DLL Files for the Fulcrum -->
+              <Component Id="FulcrumDllFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
+                <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\Debug\FulcrumShim.dll" />
+                <File Id="FULCRUMSHIM.LIB" Name="FulcrumShim.lib" Source="..\FulcrumShim\Debug\FulcrumShim.lib" />
+                <File Id="FULCRUMSHIM.PDB" Name="FulcrumShim.pdb" Source="..\FulcrumShim\Debug\FulcrumShim.pdb" />
+                <RegistryKey Id="RegOmegaKey" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc. - FulcrumShim" Action="createAndRemoveOnUninstall">
+                  <!-- Add registry strings for the product -->
+                  <RegistryValue Id="RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
+                  <RegistryValue Id="RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
+                  <RegistryValue Id="RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\FulcrumInjector\FulcrumInjector.exe" />
+                  <RegistryValue Id="RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
+                  <!-- Add registry dword flags for each network protocol -->
+                  <RegistryValue Id="RegFlagCAN" Name="CAN" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagISO15765" Name="ISO15765" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagJ1850PWM" Name="J1850PWM" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagJ1850VPW" Name="J1850VPW" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagISO9141" Name="ISO9141" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagISO14230" Name="ISO14230" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagSCIAENGINE" Name="SCI_A_ENGINE" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagSCIATRANS" Name="SCI_A_TRANS" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagSCIBENGINE" Name="SCI_B_ENGINE" Action="write" Type="integer" Value="1" />
+                  <RegistryValue Id="RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
+                </RegistryKey>
+              </Component>
             </Directory>
+
           </Directory>
         </Directory>
       </Directory>
-    </Directory>
 
-    <!-- Features -->
-    <Feature Id="ProductFeature" Title="installer" Level="1">
-      <ComponentRef Id="FulcrumDLLComponent" />
-      <ComponentRef Id="FulcrumInjectorComponent" />
-      <ComponentRef Id="CreateFulcrumInjectorFolder" />
-      <ComponentRef Id="CreateFulcrumLoggingFolder" />
-      <ComponentRef Id="CreateArchivesFolder" />
-    </Feature>
+        <!-- Features -->
+        <Feature Id="ProductFeature" Title="installer" Level="1">
+            <ComponentRef Id="FulcrumDLLComponent" />
+            <ComponentRef Id="CreateFulcrumInjectorFolder" />
+            <ComponentRef Id="CreateFulcrumLoggingFolder" />
+            <ComponentRef Id="CreateArchivesFolder" />
+        </Feature>
 
-    <!-- In Control Panel > Add or Remove Programs, applications can have various 
+        <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 
          here for support information entry -->
-    <Property Id="ARPCOMMENTS">The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs.</Property>
-    <Property Id="ARPCONTACT">
+        <Property Id="ARPCOMMENTS">The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs.</Property>
+        <Property Id="ARPCONTACT">
       Sales:   neo.smith@motorengineeringandtech.com
       Support: neo.smith@motorengineeringandtech.com
       Phone:   (516) 633-3356
       Fax:     (516) 633-3356
-    </Property>
+        </Property>
 
-    <!-- Component Refs for App Files And Links -->
-    <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-    <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-    <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-    <Property Id="ARPHELPTELEPHONE">(516)633-3356</Property>
+        <!-- Component Refs for App Files And Links -->
+        <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+        <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+        <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+        <Property Id="ARPHELPTELEPHONE">(516)633-3356</Property>
 
-    <!-- UI Configuration -->
-    <UI Id="UserInterface">
-      <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
-      <Property Id="WixUI_Mode" Value="Custom" />
-      
-      <!-- Text Setup -->
-      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
-      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
-      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
-      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+        <!-- UI Configuration -->
+        <UI Id="UserInterface">
+            <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+            <Property Id="WixUI_Mode" Value="Custom" />
+            <!-- Text Setup -->
+            <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+            <!-- Dialogs In Use -->
+            <DialogRef Id="ProgressDlg" />
+            <DialogRef Id="ErrorDlg" />
+            <DialogRef Id="FilesInUse" />
+            <DialogRef Id="FatalError" />
+            <DialogRef Id="UserExit" />
+            <!-- Type of Dialog to show -->
+            <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+        </UI>
 
-      <!-- Dialogs In Use -->
-      <DialogRef Id="ProgressDlg" />
-      <DialogRef Id="ErrorDlg" />
-      <DialogRef Id="FilesInUse" />
-      <DialogRef Id="FatalError" />
-      <DialogRef Id="UserExit" />
-
-      <!-- Type of Dialog to show -->
-      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
-    </UI>
-
-    <!-- UI Type -->
-    <UIRef Id="WixUI_Common" />
-  </Product>
+        <!-- UI Type -->
+        <UIRef Id="WixUI_Common" />
+    </Product>
 </Wix>
