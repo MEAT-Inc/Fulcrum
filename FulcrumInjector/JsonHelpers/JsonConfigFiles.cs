@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger;
@@ -41,12 +43,18 @@ namespace FulcrumInjector.JsonHelpers
         /// <summary>
         /// Loads a new config file, sets the access bool to true if the file exists
         /// </summary>
-        /// <param name="NewConfigFile"></param>
-        public static void SetNewAppConfigFile(string NewConfigFile)
+        /// <param name="NewConfigFileName"></param>
+        public static void SetNewAppConfigFile(string NewConfigFileName)
         {
+            // Pull location of the configuration application
+            var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim");
+            var PathToInjector = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString());
+
             // Log info. Set file state
-            var InstallPath = @"C:\\Program Files (x86)\\MEAT Inc\\FulcrumShim\\FulcrumInjector";
-            AppConfigFile = NewConfigFile.Contains(Path.DirectorySeparatorChar) ? NewConfigFile : Path.Combine(InstallPath, NewConfigFile);
+            NewConfigFileName = Path.GetFileName(NewConfigFileName);
+            AppConfigFile = Debugger.IsAttached ?
+                NewConfigFileName : 
+                Path.Combine(PathToInjector, NewConfigFileName);
 
             // Log info about the file object
             ConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
@@ -69,13 +77,12 @@ namespace FulcrumInjector.JsonHelpers
                 bool FirstConfig = _applicationConfig == null;
 
                 // Build new here for the desired input file object.
-                _applicationConfig = new JObject();
-                if (FirstConfig) ConfigLogger?.WriteLog($"BUILDING NEW JCONFIG OBJECT NOW...", LogType.TraceLog);
-                _applicationConfig = JObject.Parse(File.ReadAllText(AppConfigFile));
-
-                // Write content.
-                File.WriteAllText(AppConfigFile, JsonConvert.SerializeObject(_applicationConfig, Formatting.Indented));
-                ConfigLogger?.WriteLog($"GENERATED JSON CONFIG FILE OBJECT OK AND WROTE CONTENT TO {AppConfigFile} OK! RETURNED CONTENTS NOW...", LogType.TraceLog);
+                if (FirstConfig)
+                {
+                    ConfigLogger?.WriteLog($"BUILDING NEW JCONFIG OBJECT NOW...", LogType.TraceLog);
+                    _applicationConfig = JObject.Parse(File.ReadAllText(AppConfigFile));
+                    ConfigLogger?.WriteLog($"GENERATED JSON CONFIG FILE OBJECT OK AND WROTE CONTENT TO {AppConfigFile} OK! RETURNED CONTENTS NOW...", LogType.TraceLog);
+                }
 
                 // Return the object.
                 return _applicationConfig;

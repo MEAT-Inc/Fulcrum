@@ -24,7 +24,6 @@ namespace FulcrumInjector.JsonHelpers
                 throw new InvalidOperationException("CAN NOT PULL CONFIG VALUES SINCE THE CONFIG FILE IS NOT YET BUILT!");
 
             // Get the token first.
-            JsonPath = JsonPath.Replace("PassThruLogWatchdogConfig", "");
             JsonConfigFiles.ConfigLogger?.WriteLog($"TRYING TO PULL VALUE AT: {JsonPath}", LogType.TraceLog);
             var ValueObject = JsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
             if (ValueObject == null)

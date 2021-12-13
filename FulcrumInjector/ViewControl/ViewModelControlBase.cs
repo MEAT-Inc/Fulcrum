@@ -14,7 +14,7 @@ namespace FulcrumInjector.ViewControl
     /// <summary>
     /// Base class for Model objects on the UI
     /// </summary>
-    public class ViewModelControlBase
+    public class ViewModelControlBase : INotifyPropertyChanged
     {
         // Logger object.
         private static SubServiceLogger ViewModelPropLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -30,8 +30,7 @@ namespace FulcrumInjector.ViewControl
 
         // Property Changed event.
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string PropertyName = null)
-        {
+        protected virtual void OnPropertyChanged([CallerMemberName] string PropertyName = null) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
         }
 
@@ -125,7 +124,7 @@ namespace FulcrumInjector.ViewControl
                 string ComponentTypeRemoved = ViewModelTypeName.Name.Replace("ViewModel", string.Empty);
                 return MemberObj.Name.StartsWith(ComponentTypeRemoved) && MemberObj.Name.Contains("ViewModel");
             });
-            if (MemberToUpdate == null) { throw new NullReferenceException($"THE MEMBER {nameof(ViewModelTypeName.Name)} COULD NOT BE FOUND!"); }
+            if (MemberToUpdate == null) { throw new NullReferenceException($"THE MEMBER {ViewModelTypeName.Name} COULD NOT BE FOUND!"); }
 
             // Set the value here
             string NewJson = "";

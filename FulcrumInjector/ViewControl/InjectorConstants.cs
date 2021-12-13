@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using FulcrumInjector.AppLogic;
 using FulcrumInjector.AppLogic.InjectorPipes;
 using FulcrumInjector.ViewControl.ViewModels;
@@ -25,15 +26,27 @@ namespace FulcrumInjector.ViewControl
         public static InjectorMainWindow InjectorMainWindow { get; private set; }     // Main window component    
 
         // Title View and ViewModel
-        public static FulcrumTitleView TitleView
+        public static FulcrumTitleView FulcrumTitleView
         {
-            get => InjectorMainWindow.FulcrumTitleViewContent;
-            set => InjectorMainWindow.FulcrumTitleViewContent = value;
+            get => InjectorMainWindow.FulcrumTitle;
+            set => InjectorMainWindow.FulcrumTitle = value;
         }
-        public static FulcrumTitleViewModel TitleViewModel
+        public static FulcrumTitleViewModel FulcrumTitleViewModel
         {
-            get => TitleView.ViewModel;
-            set => TitleView.ViewModel = value;
+            get => FulcrumTitleView.ViewModel;
+            set => FulcrumTitleView.ViewModel = value;
+        }
+
+        // Test DLL Injector View and ViewModel
+        public static FulcrumDllInjectionTestView FulcrumDllInjectionTestView
+        {
+            get => InjectorMainWindow.FulcrumDllInjectionTest;
+            set => InjectorMainWindow.FulcrumDllInjectionTest = value;
+        }
+        public static FulcrumDllInjectionTestViewModel FulcrumDllInjectionTestViewModel
+        {
+            get => FulcrumDllInjectionTestView.ViewModel;
+            set => FulcrumDllInjectionTestView.ViewModel = value;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -54,20 +67,31 @@ namespace FulcrumInjector.ViewControl
             InjectorMainWindow = WindowBase;
             ConstantsLogger.WriteLog("STORED NEW MAIN WINDOW VIEW FOR CONSTANTS OBJECT OK!", LogType.InfoLog);
             ConstantsLogger.WriteLog($"MAIN WINDOW WAS PASSED AS TYPE {WindowBase.GetType().Name}");
+
+            // Set the flyouts for our debugging configuration and settings pane
+            ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
+            if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.SettingsViewFlyout, InjectorMainWindow.DebugViewFlyout))
+                ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
+            else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
         }
+
         /// <summary>
         /// Builds our new pipe instances out for this session
         /// </summary>
-        public static void ConfigureFulcrumPipes()
+        public static bool ConfigureFulcrumPipes()
         {
             // Configure pipes here.
             ConstantsLogger.WriteLog("SETTING UP FULCRUM PIPES NOW...", LogType.WarnLog);
 
             // Kill old, boot new pipe instances.
             InjectorPipeSetup.KillExistingFulcrumInstances();
-            if (!InjectorPipeSetup.ValidateFulcrumPipeConfiguration())
-                ConstantsLogger.WriteLog("FAILED TO CONFIGURE FULCRUM PIPE INSTANCES!", LogType.FatalLog);
+            bool PipeConfig = InjectorPipeSetup.ValidateFulcrumPipeConfiguration();
+            if (!PipeConfig) ConstantsLogger.WriteLog("FAILED TO CONFIGURE FULCRUM PIPE INSTANCES!", LogType.FatalLog);
             else ConstantsLogger.WriteLog("FULCRUM PIPE INSTANCES HAVE BEEN BOOTED CORRECTLY!", LogType.InfoLog);
+
+            // Log done. Results are variable here.
+            ConstantsLogger.WriteLog("FULCRUM PIPE CONFIGURATION HAS BEEN COMPLETED. CHECK THE UI AND LOG FILES FOR RESULTS", LogType.WarnLog);
+            return PipeConfig;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

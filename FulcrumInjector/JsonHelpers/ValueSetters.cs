@@ -29,17 +29,14 @@ namespace FulcrumInjector.JsonHelpers
             string NewContent = JsonConvert.SerializeObject(ValueObject, Formatting.Indented);
             JsonConfigFiles.ConfigLogger?.WriteLog($"STORING NEW VALUE INTO JSON CONFIG KEY {PropertyKey} NOW...");
 
-            // Select the config item first.
-            string OutputPath;
+            // Select the config item first\
             string TypeOfConfig;
+            string OutputPath = JsonConfigFiles.AppConfigFile;
             try
             {
                 TypeOfConfig = PropertyKey.Contains('.') ?
                     PropertyKey.Split('.').FirstOrDefault() :
                     PropertyKey;
-
-                // Pull the config value and set the value on it.
-                OutputPath = Path.Combine(Directory.GetCurrentDirectory(), "JsonConfiguration", TypeOfConfig.ToString() + ".json");
             }
             catch (Exception SetEx)
             {
@@ -52,15 +49,6 @@ namespace FulcrumInjector.JsonHelpers
             // Store the new content value here.
             try
             {
-                // For a single item type/base config.
-                if (!PropertyKey.Contains('.'))
-                {
-                    // Set the value here for full object.
-                    File.WriteAllText(OutputPath, NewContent);
-                    JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
-                    return true;
-                }
-
                 // For a key value item object
                 string[] SplitContentPath = PropertyKey.Split('.').Skip(1).ToArray();
                 JObject ConfigObjectLocated = ValueLoaders.GetJObjectConfig(TypeOfConfig);
@@ -77,12 +65,16 @@ namespace FulcrumInjector.JsonHelpers
 
                 // Log info and loop values here.
                 ConfigObjectLocated[SplitContentPath.FirstOrDefault()] = JToken.FromObject(ValueObject);
-                string NewFileJson = ConfigObjectLocated.ToString(Formatting.Indented);
                 JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!");
 
                 // Set value into config file now.
-                File.WriteAllText(OutputPath, NewFileJson);
+                JsonConfigFiles.ApplicationConfig.Remove(TypeOfConfig);
+                JsonConfigFiles.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated);
+                File.WriteAllText(OutputPath, JsonConfigFiles.ApplicationConfig.ToString(Formatting.Indented));
                 JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
+
+                // Log wrote out ok
+                string NewFileJson = ConfigObjectLocated.ToString(Formatting.Indented);
                 JsonConfigFiles.ConfigLogger?.WriteLog($"NEW FILE JSON VALUE:\n{NewFileJson}", LogType.TraceLog);
 
                 // Refresh the Config Main object now.
