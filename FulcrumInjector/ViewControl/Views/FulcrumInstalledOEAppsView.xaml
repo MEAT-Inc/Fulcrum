@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="FulcrumInjector.ViewControl.Views.FulcrumInstalledOeAppsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FulcrumInjector.ViewControl.Views"
+             xmlns:viewModels="clr-namespace:FulcrumInjector.ViewControl.ViewModels"
+             mc:Ignorable="d" 
+             Width="400" Height="435"
+             Loaded="FulcrumInstalledOeAppsView_OnLoaded">
+
+    <!-- DataContext Binding -->
+    <UserControl.DataContext>
+        <viewModels:FulcrumInstalledOeAppsViewModel/>
+    </UserControl.DataContext>
+
+    <!-- Style Sheets -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../AppStyles/AppStyleSheets/InstalledOeAppsStyles.xaml"/>
+                <ResourceDictionary Source="../../AppStyles/AppStyleSheets/CommonControlStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Margin="0,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".15*"/>
+            <RowDefinition/>
+            <RowDefinition Height=".20*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Title Value -->
+        <TextBlock
+            Text="Installed OE Applications"
+            VerticalAlignment="Bottom" 
+            Margin="0,5"
+            Style="{StaticResource TitleStringText}"/>
+
+        <!-- List of OE Apps -->
+        <ListView Grid.Row="1" 
+                  Name="InstalledAppsListView"
+                  Style="{StaticResource ListViewOeAppsStyle}" 
+                  ItemsSource="{Binding InstalledOeApps}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="1" CornerRadius="5">
+                        <Grid ToolTip="{Binding Path=OEAppPath}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Padding="5" Grid.Column="0" Style="{StaticResource OeAppPropertyBox}" Text="{Binding OEAppName}"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource IsAppReadyBoxStyle}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Control Buttons For Apps -->
+        <Grid Grid.Row="2" Margin="5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Margin="5,10" FontSize="18" Content="Add App" Style="{StaticResource ActionButtonStyle}"/>
+            <Button Grid.Column="1" Margin="5,10" FontSize="18" Content="Remove App" Style="{StaticResource ActionButtonStyle}"/>
+            <Button Grid.Column="2" Margin="5,10" FontSize="18" Content="Modify App" Style="{StaticResource ActionButtonStyle}"/>
+        </Grid>
+    </Grid>
+</UserControl>

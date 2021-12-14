@@ -6,7 +6,7 @@ using System.Resources;
 
 // General Information
 [assembly: AssemblyTitle("FulcrumInjector")]
-[assembly: AssemblyDescription("A J2534 Diagnostic Wrapper with various debugging features.")]
+[assembly: AssemblyDescription("The Injector is an app which boots an OE Software (or any diag software for that matter), shims it, and sniffs the shit outta it")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MEAT Inc")]
 [assembly: AssemblyProduct("FulcrumInjector")]
@@ -16,10 +16,10 @@ using System.Resources;
 
 // Internal Visibility for testing
 [assembly: ComVisible(false)]
-[assembly: Guid("19b20276-75f8-4ed8-a700-5ba828389de5")]
+[assembly: Guid("8cb7e832-9e90-4820-b225-0a4d59e6c0a2")]
 
 // Version information
-[assembly: AssemblyVersion("1.6.20.198")]
-[assembly: AssemblyFileVersion("1.6.20.198")]
+[assembly: AssemblyVersion("1.10.16.158")]
+[assembly: AssemblyFileVersion("1.10.16.158")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
