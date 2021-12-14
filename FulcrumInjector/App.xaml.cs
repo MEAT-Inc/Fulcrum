@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -38,6 +39,7 @@ namespace FulcrumInjector
             // Logging config and app theme config.
             this.ConfigureLogging();
             this.ConfigureLogCleanup();
+            this.ConfigureSingleInstance();
             this.ConfigureCurrentAppTheme();
 
             // Log passed and ready to run.
@@ -89,6 +91,40 @@ namespace FulcrumInjector
 
             // Log done.
             LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Checks for an existing fulcrum process object and kill all but the running one.
+        /// </summary>
+        private bool ConfigureSingleInstance()
+        {
+            // Find all the fulcrum process objects now.
+            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
+            var CurrentInjector = Process.GetCurrentProcess();
+            LogBroker.Logger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
+
+            // Find the process values here.
+            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.AppInstanceName");
+            LogBroker.Logger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
+            var InjectorsTotal = Process.GetProcesses()
+                .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
+                .Where(ProcObj => ProcObj.ProcessName.ToUpper().Contains(CurrentInstanceName)
+                                  || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
+                .ToList();
+
+            // THIS IS A POTENTIAL ISSUE!
+            // BUG: KILLING NEW CAN DROP COMMANDS TO OUR PIPE! WE NEED TO BUILD THIS SO THAT THE OLDEST INSTANCE REMAINS ALIVE!
+
+            // Now kill any existing instances
+            LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
+            LogBroker.Logger?.WriteLog("KILLING THESE PROCESS OBJECTS NOW...", LogType.InfoLog);
+            foreach (var InjectorProc in InjectorsTotal)
+            {
+                InjectorProc.Kill();
+                LogBroker.Logger?.WriteLog($"--> KILLED PROCESS {InjectorProc.Id} OK!", LogType.TraceLog);
+            }
+
+            // Return passed output.
+            return true;
         }
         /// <summary>
         /// Configure new theme setup for instance objects.

@@ -9,8 +9,14 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
     /// <summary>
     /// Pipe reading instance for our fulcrum server
     /// </summary>
-    public class FulcrumPipeReader : FulcrumPipe
+    public sealed class FulcrumPipeReader : FulcrumPipe
     {
+        // Singleton configuration
+        public static FulcrumPipeReader PipeInstance => _lazyReader.Value;
+        private static readonly Lazy<FulcrumPipeReader> _lazyReader = new Lazy<FulcrumPipeReader>(() => new FulcrumPipeReader());
+
+        // -------------------------------------------------------------------------------------------------------
+
         // Pipe and reader objects for data
         internal StreamReader PipeReader;
         internal NamedPipeClientStream FulcrumPipe;
@@ -20,7 +26,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         /// <summary>
         /// Builds a new reading pipe instance for Fulcrum
         /// </summary>
-        public FulcrumPipeReader() : base(FulcrumPipeType.FulcrumPipeAlpha)
+        private FulcrumPipeReader() : base(FulcrumPipeType.FulcrumPipeAlpha)
         {
             // Build the pipe object here.
             this.FulcrumPipe = new NamedPipeClientStream(
@@ -41,7 +47,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         /// Configures a new pipe instance for our type provided.
         /// </summary>
         /// <returns>True if the pipe was built OK. False if not.</returns>
-        internal sealed override bool ConfigureNewPipe()
+        internal override bool ConfigureNewPipe()
         {
             // Check if our DLL is open
             if (!FulcrumDllLoaded())

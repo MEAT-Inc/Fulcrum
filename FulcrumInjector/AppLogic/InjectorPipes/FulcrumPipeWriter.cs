@@ -8,8 +8,14 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
     /// <summary>
     /// Fulcrum pipe writing class. Sends data out to our DLLs
     /// </summary>
-    public class FulcrumPipeWriter : FulcrumPipe
+    public sealed class FulcrumPipeWriter : FulcrumPipe
     {
+        // Singleton configuration
+        public static FulcrumPipeWriter PipeInstance => _lazyWriter.Value;
+        private static readonly Lazy<FulcrumPipeWriter> _lazyWriter = new Lazy<FulcrumPipeWriter>(() => new FulcrumPipeWriter());
+
+        // ------------------------------------------------------------------------------------------------------------------------------
+
         // Pipe writer and stream objects
         internal StreamWriter PipeWriter;
         internal NamedPipeServerStream FulcrumPipe;
@@ -19,7 +25,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         /// <summary>
         /// Builds a new outbound pipe sender
         /// </summary>
-        public FulcrumPipeWriter() : base(FulcrumPipeType.FulcrumPipeBravo)
+        private FulcrumPipeWriter() : base(FulcrumPipeType.FulcrumPipeBravo)
         {
             // Build the pipe object here.
             this.FulcrumPipe = new NamedPipeServerStream(
@@ -37,7 +43,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         /// Configures a new pipe instance for our type provided.
         /// </summary>
         /// <returns></returns>
-        internal sealed override bool ConfigureNewPipe()
+        internal override bool ConfigureNewPipe()
         {
             // Check if our DLL is open
             if (!FulcrumDllLoaded())

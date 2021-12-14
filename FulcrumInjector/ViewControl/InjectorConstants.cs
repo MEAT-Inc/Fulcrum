@@ -23,7 +23,7 @@ namespace FulcrumInjector.ViewControl
         // --------------------------------------------------------------------------------------------------------------------------
 
         // View Constants for help with property bindings
-        public static InjectorMainWindow InjectorMainWindow { get; private set; }     // Main window component    
+        public static InjectorMainWindow InjectorMainWindow { get; private set; }    
 
         // Title View and ViewModel
         public static FulcrumTitleView FulcrumTitleView
@@ -49,11 +49,44 @@ namespace FulcrumInjector.ViewControl
             set => FulcrumDllInjectionTestView.ViewModel = value;
         }
 
+        // Pipe Status View and ViewModel
+        public static FulcrumPipeStatusView FulcrumPipeStatusView
+        {
+            get => InjectorMainWindow.FulcrumPipeStatus;
+            set => InjectorMainWindow.FulcrumPipeStatus = value;
+        }
+        public static FulcrumPipeStatusViewModel FulcrumPipeStatusViewModel
+        {
+            get => FulcrumPipeStatusView.ViewModel;
+            set => FulcrumPipeStatusView.ViewModel = value;
+        }
+
+        // OE Applications Installed View and ViewModel
+        public static FulcrumInstalledOeAppsView FulcrumInstalledOeAppsView
+        {
+            get => InjectorMainWindow.FulcrumInstalledOeApps;
+            set => InjectorMainWindow.FulcrumInstalledOeApps = value;
+        }
+        public static FulcrumInstalledOeAppsViewModel FulcrumInstalledOeAppsViewModel
+        {
+            get => FulcrumInstalledOeAppsView.ViewModel;
+            set => FulcrumInstalledOeAppsView.ViewModel = value;
+        }
+
+
         // --------------------------------------------------------------------------------------------------------------------------
 
-        // Object Constants for our application
-        public static FulcrumPipeReader AlphaPipe;      // Pipe objects for talking to our DLL
-        public static FulcrumPipeWriter BravoPipe;      // Pipe objects for talking to our DLL
+        // Debug Logging Flyout View and View Model
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView
+        {
+            get => InjectorMainWindow.FulcrumDebugLogging;
+            set => InjectorMainWindow.FulcrumDebugLogging = value;
+        }
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel
+        {
+            get => FulcrumDebugLoggingView.ViewModel;
+            set => FulcrumDebugLoggingView.ViewModel = value;
+        }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -73,25 +106,6 @@ namespace FulcrumInjector.ViewControl
             if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.SettingsViewFlyout, InjectorMainWindow.DebugViewFlyout))
                 ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
-        }
-
-        /// <summary>
-        /// Builds our new pipe instances out for this session
-        /// </summary>
-        public static bool ConfigureFulcrumPipes()
-        {
-            // Configure pipes here.
-            ConstantsLogger.WriteLog("SETTING UP FULCRUM PIPES NOW...", LogType.WarnLog);
-
-            // Kill old, boot new pipe instances.
-            InjectorPipeSetup.KillExistingFulcrumInstances();
-            bool PipeConfig = InjectorPipeSetup.ValidateFulcrumPipeConfiguration();
-            if (!PipeConfig) ConstantsLogger.WriteLog("FAILED TO CONFIGURE FULCRUM PIPE INSTANCES!", LogType.FatalLog);
-            else ConstantsLogger.WriteLog("FULCRUM PIPE INSTANCES HAVE BEEN BOOTED CORRECTLY!", LogType.InfoLog);
-
-            // Log done. Results are variable here.
-            ConstantsLogger.WriteLog("FULCRUM PIPE CONFIGURATION HAS BEEN COMPLETED. CHECK THE UI AND LOG FILES FOR RESULTS", LogType.WarnLog);
-            return PipeConfig;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

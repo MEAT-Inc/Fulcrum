@@ -91,7 +91,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AppLogic\InjectorPipeSetup.cs" />
+    <Compile Include="AppLogic\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
+    <Compile Include="AppLogic\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
+    <Compile Include="AppLogic\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
+    <Compile Include="AppLogic\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
+    <Compile Include="AppLogic\FulcrumWin32Invokers.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
@@ -111,10 +115,25 @@
     <Compile Include="AppLogic\ExtensionClasses\EnumLibExtensions.cs" />
     <Compile Include="AppLogic\ExtensionClasses\LongToStringSize.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="ViewControl\Models\FulcrumDllInjectionTestModel.cs" />
+    <Compile Include="ViewControl\Models\DebugLoggingRedirectTarget.cs" />
+    <Compile Include="ViewControl\Models\OEApplicationModel.cs" />
+    <Compile Include="ViewControl\Models\FulcrumPipeSystemModel.cs" />
+    <Compile Include="ViewControl\PropertyWatchdog.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumDebugLoggingViewModel.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumPipeStatusViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumTitleViewModel.cs" />
     <Compile Include="ViewControl\ViewModelControlBase.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
+    <Compile Include="ViewControl\Views\FulcrumDebugLoggingView.xaml.cs">
+      <DependentUpon>FulcrumDebugLoggingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewControl\Views\FulcrumInstalledOeAppsView.xaml.cs">
+      <DependentUpon>FulcrumInstalledOeAppsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewControl\Views\FulcrumPipeStatusView.xaml.cs">
+      <DependentUpon>FulcrumPipeStatusView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewControl\Views\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
@@ -126,7 +145,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="AppStyles\AppStyleSheets\DebuggingViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AppStyles\AppStyleSheets\InjectDllTestStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppStyles\AppStyleSheets\InstalledOeAppsStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppStyles\AppStyleSheets\PipeStatusViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,6 +180,18 @@
     <Page Include="AppStyles\AppStyleSheets\TitleViewStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumDebugLoggingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumInstalledOeAppsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumPipeStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewControl\Views\FulcrumTitleView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -190,9 +233,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewControl\Views\FlyoutViews\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

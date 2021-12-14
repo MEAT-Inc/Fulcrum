@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.AppLogic;
 using FulcrumInjector.JsonHelpers;
 using FulcrumInjector.ViewControl.Models;
 using FulcrumInjector.ViewControl.Views;
@@ -14,6 +15,9 @@ using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.ViewControl.ViewModels
 {
+    /// <summary>
+    /// View Model for Injection Test View
+    /// </summary>
     public class FulcrumDllInjectionTestViewModel : ViewModelControlBase
     {
         // Logger object.
@@ -25,7 +29,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         private string _injectorDllPath;        // Private value for title view title text
         private string _injectorTestResult;     // Private value for title view version text
 
-        // Title string and the title view version bound values
+        // Public values for our view to bind onto 
         public string InjectorDllPath { get => _injectorDllPath; set => PropertyUpdated(value); }
         public string InjectorTestResult { get => _injectorTestResult; set => PropertyUpdated(value); }
         public bool InjectionLoadPassed { get => _injectionLoadPassed; set => PropertyUpdated(value); }
@@ -39,7 +43,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         {
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Store title and version string values now.
             this.InjectorDllPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
@@ -60,11 +64,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         internal void WriteToLogBox(string LogText)
         {
             // Build the current View object into our output and then log into it.
-            FulcrumDllInjectionTestView TestView = this.BaseViewControl as FulcrumDllInjectionTestView;
-
-            // Now append text
-            TestView.InjectorTestOutput.Text += LogText.Trim() + "\n";
-            ViewModelLogger.WriteLog($"[DEBUG OUTPUT BOX] ::: {LogText}", LogType.TraceLog);
+            ViewModelLogger.WriteLog($"[INJECTION TEST OUTPUT] ::: {LogText}", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -79,14 +79,14 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Begin by loading the DLL Object
             this.InjectorTestResult = "Testing...";
             WriteToLogBox($"PULLING IN FULCRUM DLL NOW");
-            IntPtr LoadResult = FulcrumDllInjectionTestModel.LoadLibrary(this.InjectorDllPath);
+            IntPtr LoadResult = FulcrumWin32Invokers.LoadLibrary(this.InjectorDllPath);
             WriteToLogBox($"RESULT FROM LOADING DLL: {LoadResult}");
 
             // Make sure the pointer is not 0s. 
             if (LoadResult == IntPtr.Zero)
             {
                 // Log failure, set output value and return false
-                var ErrorCode = FulcrumDllInjectionTestModel.GetLastError();
+                var ErrorCode = FulcrumWin32Invokers.GetLastError();
                 WriteToLogBox("FAILED TO LOAD OUR NEW DLL INSTANCE FOR OUR APPLICATION!");
                 WriteToLogBox($"ERROR CODE PROCESSED FROM LOADING REQUEST WAS: {ErrorCode}");
 
@@ -99,10 +99,10 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Log Passed and then unload our DLL
             WriteToLogBox($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}");
             WriteToLogBox("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
-            if (!FulcrumDllInjectionTestModel.FreeLibrary(LoadResult))
+            if (!FulcrumWin32Invokers.FreeLibrary(LoadResult))
             {
                 // Get Error code and build message
-                var ErrorCode = FulcrumDllInjectionTestModel.GetLastError();
+                var ErrorCode = FulcrumWin32Invokers.GetLastError();
                 this.InjectorTestResult = $"Unload Error! ({ErrorCode})";
                 ResultString = this.InjectorTestResult;
 
