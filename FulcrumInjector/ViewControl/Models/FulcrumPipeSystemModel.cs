@@ -15,7 +15,7 @@ namespace FulcrumInjector.ViewControl.Models
     /// <summary>
     /// Model object for our pipe controls and status values
     /// </summary>
-    public class FulcrumPipeStatusModel
+    public class FulcrumPipeSystemModel
     {
         // Logger object for the pipe injection application
         private static SubServiceLogger PipeStatusModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)

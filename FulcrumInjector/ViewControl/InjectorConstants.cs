@@ -62,7 +62,31 @@ namespace FulcrumInjector.ViewControl
         }
 
         // OE Applications Installed View and ViewModel
+        public static FulcrumInstalledOeAppsView FulcrumInstalledOeAppsView
+        {
+            get => InjectorMainWindow.FulcrumInstalledOeApps;
+            set => InjectorMainWindow.FulcrumInstalledOeApps = value;
+        }
+        public static FulcrumInstalledOeAppsViewModel FulcrumInstalledOeAppsViewModel
+        {
+            get => FulcrumInstalledOeAppsView.ViewModel;
+            set => FulcrumInstalledOeAppsView.ViewModel = value;
+        }
 
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        // Debug Logging Flyout View and View Model
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView
+        {
+            get => InjectorMainWindow.FulcrumDebugLogging;
+            set => InjectorMainWindow.FulcrumDebugLogging = value;
+        }
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel
+        {
+            get => FulcrumDebugLoggingView.ViewModel;
+            set => FulcrumDebugLoggingView.ViewModel = value;
+        }
 
         // --------------------------------------------------------------------------------------------------------------------------
 

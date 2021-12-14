@@ -27,12 +27,12 @@ namespace FulcrumInjector.ViewControl.ViewModels
         private string _writerPipeState;
         private PropertyWatchdog _readerPipeStateWatchdog;
         private PropertyWatchdog _writerPipeStateWatchdog;
-        private readonly FulcrumPipeStatusModel _pipeStatusModel;
+        private readonly FulcrumPipeSystemModel _pipeSystemModel;
 
         // Public values for our view to bind onto 
         public string ReaderPipeState { get => _readerPipeState; set => PropertyUpdated(value); }
         public string WriterPipeState { get => _writerPipeState; set => PropertyUpdated(value); }
-        public FulcrumPipeStatusModel PipeStatusModel { get => _pipeStatusModel; set => PropertyUpdated(value); }
+        public FulcrumPipeSystemModel PipeSystemModel { get => _pipeSystemModel; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build new pipe model object and watchdogs.
-            this._pipeStatusModel = new FulcrumPipeStatusModel();
+            this._pipeSystemModel = new FulcrumPipeSystemModel();
             this._readerPipeStateWatchdog = new PropertyWatchdog();
             this._writerPipeStateWatchdog = new PropertyWatchdog();
             ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
@@ -59,10 +59,10 @@ namespace FulcrumInjector.ViewControl.ViewModels
         /// <summary>
         /// Builds our new fulcrum state watchdog values here.
         /// </summary>
-        public void SetupPipeModelStates()
+        internal void SetupPipeModelStates()
         {
             // Once model objects are built, we can then validate our pipes.
-            this.PipeStatusModel.ValidateFulcrumPipeConfiguration();
+            this.PipeSystemModel.ValidateFulcrumPipeConfiguration();
             ViewModelLogger.WriteLog("PIPE VALIDATION COMPLETE! READY TO SHOW OUR PROCESS INFORMATION ON THIS VIEW COMPONENT");
             ViewModelLogger.WriteLog("CONFIGURING NEW WATCHDOG INSTANCES FOR OUR PIPE STATE PROPERTY MONITORS NOW...", LogType.InfoLog);
 
@@ -70,20 +70,20 @@ namespace FulcrumInjector.ViewControl.ViewModels
             this._readerPipeStateWatchdog.StartUpdateTimer((_, _) =>
             {
                 // Check current value.
-                if (this.ReaderPipeState != this.PipeStatusModel.AlphaPipe.PipeState.ToString())
+                if (this.ReaderPipeState != this.PipeSystemModel.AlphaPipe.PipeState.ToString())
                     ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: READER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {this.ReaderPipeState}", LogType.TraceLog);
 
                 // Store value
-                this.ReaderPipeState = this.PipeStatusModel.AlphaPipe.PipeState.ToString();
+                this.ReaderPipeState = this.PipeSystemModel.AlphaPipe.PipeState.ToString();
             });
             this._writerPipeStateWatchdog.StartUpdateTimer((_, _) =>
             {
                 // Check current value.
-                if (this.WriterPipeState != this.PipeStatusModel.BravoPipe.PipeState.ToString()) 
+                if (this.WriterPipeState != this.PipeSystemModel.BravoPipe.PipeState.ToString()) 
                     ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: WRITER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {this.WriterPipeState}", LogType.TraceLog);
                 
                 // Store value
-                this.WriterPipeState = this.PipeStatusModel.BravoPipe.PipeState.ToString();
+                this.WriterPipeState = this.PipeSystemModel.BravoPipe.PipeState.ToString();
             });
 
             // Log built and output information.

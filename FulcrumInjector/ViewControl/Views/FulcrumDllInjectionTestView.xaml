@@ -5,9 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FulcrumInjector.ViewControl.Views"
              xmlns:viewModels="clr-namespace:FulcrumInjector.ViewControl.ViewModels"
-             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"  
              mc:Ignorable="d" 
-             Width="400" Height="110"
+             Width="400" Height="100"
              Loaded="FulcrumInjectorTestView_OnLoaded">
 
     <!-- DataContext Binding -->

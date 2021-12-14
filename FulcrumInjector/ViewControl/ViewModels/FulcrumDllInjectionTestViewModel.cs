@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.AppLogic;
 using FulcrumInjector.JsonHelpers;
 using FulcrumInjector.ViewControl.Models;
 using FulcrumInjector.ViewControl.Views;
@@ -78,14 +79,14 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Begin by loading the DLL Object
             this.InjectorTestResult = "Testing...";
             WriteToLogBox($"PULLING IN FULCRUM DLL NOW");
-            IntPtr LoadResult = FulcrumDllInjectionTestModel.LoadLibrary(this.InjectorDllPath);
+            IntPtr LoadResult = FulcrumWin32Invokers.LoadLibrary(this.InjectorDllPath);
             WriteToLogBox($"RESULT FROM LOADING DLL: {LoadResult}");
 
             // Make sure the pointer is not 0s. 
             if (LoadResult == IntPtr.Zero)
             {
                 // Log failure, set output value and return false
-                var ErrorCode = FulcrumDllInjectionTestModel.GetLastError();
+                var ErrorCode = FulcrumWin32Invokers.GetLastError();
                 WriteToLogBox("FAILED TO LOAD OUR NEW DLL INSTANCE FOR OUR APPLICATION!");
                 WriteToLogBox($"ERROR CODE PROCESSED FROM LOADING REQUEST WAS: {ErrorCode}");
 
@@ -98,10 +99,10 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Log Passed and then unload our DLL
             WriteToLogBox($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}");
             WriteToLogBox("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
-            if (!FulcrumDllInjectionTestModel.FreeLibrary(LoadResult))
+            if (!FulcrumWin32Invokers.FreeLibrary(LoadResult))
             {
                 // Get Error code and build message
-                var ErrorCode = FulcrumDllInjectionTestModel.GetLastError();
+                var ErrorCode = FulcrumWin32Invokers.GetLastError();
                 this.InjectorTestResult = $"Unload Error! ({ErrorCode})";
                 ResultString = this.InjectorTestResult;
 
