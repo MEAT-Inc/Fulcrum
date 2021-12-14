@@ -55,6 +55,7 @@ void PASSTHRU_MSG_ToVOIDPointer(PASSTHRU_MSG* pMsgIn, void* pMsgOut)
 	memcpy_s(ptmOut->Data, 4128, pMsgIn->Data, pMsgIn->DataSize);
 }
 
+// Load And Unload Commands
 extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -84,7 +85,6 @@ extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
 	dbug_printretval(STATUS_NOERROR);
 	return STATUS_NOERROR;
 }
-
 extern "C" long J2534_API PassThruUnloadLibrary()
 {
 	// Store app state
@@ -132,6 +132,7 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 	return STATUS_NOERROR;
 }
 
+// Logging commands
 extern "C" long J2534_API PassThruWriteToLogA(char *szMsg)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -140,14 +141,12 @@ extern "C" long J2534_API PassThruWriteToLogA(char *szMsg)
 	dtDebug(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), cstrMsg);
 	return STATUS_NOERROR;
 }
-
 extern "C" long J2534_API PassThruWriteToLogW(wchar_t *szMsg)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	dtDebug(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), szMsg);
 	return STATUS_NOERROR;
 }
-
 extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -162,6 +161,7 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 	return STATUS_NOERROR;
 }
 
+// Standard PT Command methods. This will be built out to V0500 soon
 extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -178,7 +178,6 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -194,7 +193,6 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long ProtocolID, unsigned long Flags, unsigned long Baudrate, unsigned long *pChannelID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -214,7 +212,6 @@ extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long 
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -230,7 +227,6 @@ extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG *pMsg, unsigned long *pNumMsgs, unsigned long Timeout)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -251,7 +247,6 @@ extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruWriteMsgs(unsigned long ChannelID, PASSTHRU_MSG *pMsg, unsigned long *pNumMsgs, unsigned long Timeout)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -272,7 +267,6 @@ extern "C" long J2534_API PassThruWriteMsgs(unsigned long ChannelID, PASSTHRU_MS
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruStartPeriodicMsg(unsigned long ChannelID, PASSTHRU_MSG *pMsg,
                       unsigned long *pMsgID, unsigned long TimeInterval)
 {
@@ -292,7 +286,6 @@ extern "C" long J2534_API PassThruStartPeriodicMsg(unsigned long ChannelID, PASS
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsigned long MsgID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -308,7 +301,6 @@ extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsig
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
                       unsigned long FilterType, PASSTHRU_MSG *pMaskMsg, PASSTHRU_MSG *pPatternMsg,
 					  PASSTHRU_MSG *pFlowControlMsg, unsigned long *pMsgID)
@@ -332,7 +324,6 @@ extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigned long MsgID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -348,7 +339,6 @@ extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigne
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruSetProgrammingVoltage(unsigned long DeviceID, unsigned long Pin, unsigned long Voltage)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -377,7 +367,6 @@ extern "C" long J2534_API PassThruSetProgrammingVoltage(unsigned long DeviceID, 
 	dbug_printretval(retval);
 	return retval;
 }
-
 extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFirmwareVersion, char *pDllVersion, char *pApiVersion)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -403,7 +392,8 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 	return retval;
 }
 
-long fulcrum_PassThruGetLastError(char *pErrorDescription)
+// Error helper for pulling error definition from the J2534 error object
+long fulcrum_PassThruGetLastError(char* pErrorDescription)
 {
 	if (fulcrum_hadInternalError())
 	{
@@ -411,7 +401,7 @@ long fulcrum_PassThruGetLastError(char *pErrorDescription)
 			return ERR_NULL_PARAMETER;
 
 		// We'll intercept GetLastError if we're reporting something about the shim
-		CStringA cstrInternalLastError((LPCTSTR) fulcrum_getInternalError());
+		CStringA cstrInternalLastError((LPCTSTR)fulcrum_getInternalError());
 		strncpy_s(pErrorDescription, 80, cstrInternalLastError, _TRUNCATE);
 		return STATUS_NOERROR;
 	}
@@ -427,8 +417,7 @@ long fulcrum_PassThruGetLastError(char *pErrorDescription)
 		return _PassThruGetLastError(pErrorDescription);
 	}
 }
-
-extern "C" long J2534_API PassThruGetLastError(char *pErrorDescription)
+extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
@@ -451,7 +440,7 @@ extern "C" long J2534_API PassThruGetLastError(char *pErrorDescription)
 	{
 #ifdef UNICODE
 		CStringW cstrErrorDescriptionW(pErrorDescription);
-		dtDebug(_T("  %s\n"), (LPCWSTR) cstrErrorDescriptionW);
+		dtDebug(_T("  %s\n"), (LPCWSTR)cstrErrorDescriptionW);
 #else
 		dtDebug(_T("  %s\n"), pErrorDescription);
 #endif
@@ -463,8 +452,7 @@ extern "C" long J2534_API PassThruGetLastError(char *pErrorDescription)
 	dtDebug(_T("  %s\n"), dbug_return(retval).c_str());
 	return retval;
 }
-
-extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long IoctlID, void *pInput, void *pOutput)
+extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long IoctlID, void* pInput, void* pOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
@@ -478,29 +466,29 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 	// Print any relevant info before making the call
 	switch (IoctlID)
 	{
-	// Do nothing for GET_CONFIG input
+		// Do nothing for GET_CONFIG input
 	case SET_CONFIG:
-		dbug_printsconfig((SCONFIG_LIST *) pInput);
+		dbug_printsconfig((SCONFIG_LIST*)pInput);
 		break;
-	// Do nothing for READ_VBATT input
+		// Do nothing for READ_VBATT input
 	case FIVE_BAUD_INIT:
-		dbug_printsbyte((SBYTE_ARRAY *) pInput, _T("Input"));
+		dbug_printsbyte((SBYTE_ARRAY*)pInput, _T("Input"));
 		break;
 	case FAST_INIT:
-		dbug_printmsg((PASSTHRU_MSG *) pInput, _T("Input"), 1, true);
+		dbug_printmsg((PASSTHRU_MSG*)pInput, _T("Input"), 1, true);
 		break;
-	// Do nothing for CLEAR_TX_BUFFER
-	// Do nothing for CLEAR_RX_BUFFER
-	// Do nothing for CLEAR_PERIODIC_MSGS
-	// Do nothing for CLEAR_MSG_FILTERS
-	// Do nothing for CLEAR_FUNCT_MSG_LOOKUP_TABLE
+		// Do nothing for CLEAR_TX_BUFFER
+		// Do nothing for CLEAR_RX_BUFFER
+		// Do nothing for CLEAR_PERIODIC_MSGS
+		// Do nothing for CLEAR_MSG_FILTERS
+		// Do nothing for CLEAR_FUNCT_MSG_LOOKUP_TABLE
 	case ADD_TO_FUNCT_MSG_LOOKUP_TABLE:
-		dbug_printsbyte((SBYTE_ARRAY *) pInput, _T("Add"));
+		dbug_printsbyte((SBYTE_ARRAY*)pInput, _T("Add"));
 		break;
 	case DELETE_FROM_FUNCT_MSG_LOOKUP_TABLE:
-		dbug_printsbyte((SBYTE_ARRAY *) pInput, _T("Delete"));
+		dbug_printsbyte((SBYTE_ARRAY*)pInput, _T("Delete"));
 		break;
-	// Do nothing for READ_PROG_VOLTAGE
+		// Do nothing for READ_PROG_VOLTAGE
 	}
 
 	retval = _PassThruIoctl(ChannelID, IoctlID, pInput, pOutput);
@@ -509,29 +497,29 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 	switch (IoctlID)
 	{
 	case GET_CONFIG:
-		dbug_printsconfig((SCONFIG_LIST *) pInput);
+		dbug_printsconfig((SCONFIG_LIST*)pInput);
 		break;
-	// Do nothing for SET_CONFIG
+		// Do nothing for SET_CONFIG
 	case READ_VBATT:
 		if (pOutput != NULL)
-			dtDebug(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float) 1000);
+			dtDebug(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float)1000);
 		break;
 	case FIVE_BAUD_INIT:
-		dbug_printsbyte((SBYTE_ARRAY *) pInput, _T("Output"));
+		dbug_printsbyte((SBYTE_ARRAY*)pInput, _T("Output"));
 		break;
 	case FAST_INIT:
-		dbug_printmsg((PASSTHRU_MSG *) pOutput, _T("Input"), 1, false);
+		dbug_printmsg((PASSTHRU_MSG*)pOutput, _T("Input"), 1, false);
 		break;
-	// Do nothing for CLEAR_TX_BUFFER
-	// Do nothing for CLEAR_RX_BUFFER
-	// Do nothing for CLEAR_PERIODIC_MSGS
-	// Do nothing for CLEAR_MSG_FILTERS
-	// Do nothing for CLEAR_FUNCT_MSG_LOOKUP_TABLE
-	// Do nothing for ADD_TO_FUNCT_MSG_LOOKUP_TABLE:
-	// Do nothing for DELETE_FROM_FUNCT_MSG_LOOKUP_TABLE:
+		// Do nothing for CLEAR_TX_BUFFER
+		// Do nothing for CLEAR_RX_BUFFER
+		// Do nothing for CLEAR_PERIODIC_MSGS
+		// Do nothing for CLEAR_MSG_FILTERS
+		// Do nothing for CLEAR_FUNCT_MSG_LOOKUP_TABLE
+		// Do nothing for ADD_TO_FUNCT_MSG_LOOKUP_TABLE:
+		// Do nothing for DELETE_FROM_FUNCT_MSG_LOOKUP_TABLE:
 	case READ_PROG_VOLTAGE:
 		if (pOutput != NULL)
-			dtDebug(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float) 1000);
+			dtDebug(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float)1000);
 		break;
 	}
 

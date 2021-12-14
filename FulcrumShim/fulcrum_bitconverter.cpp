@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "fulcrum_bitconverter.h"
+#include <vcruntime_string.h>
 
 
 int fulcrum_bitconverter::bytes_to_int32(byte b[], int offset)
