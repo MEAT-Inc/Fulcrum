@@ -109,7 +109,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         /// Builds a new fulcrum pipe listener
         /// </summary>
         /// <param name="PipeId">ID Of the pipe in use for this object</param>
-        protected FulcrumPipe(FulcrumPipeType PipeId)
+        private protected FulcrumPipe(FulcrumPipeType PipeId)
         {
             // Configure logger object.
             this.PipeState = FulcrumPipeState.Faulted;

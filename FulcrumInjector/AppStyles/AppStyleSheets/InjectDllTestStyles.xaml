@@ -11,6 +11,7 @@
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="FontSize" Value="26"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontStyle" Value="Italic"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="TextAlignment" Value="Center"/>
                 <Setter Property="TextWrapping" Value="Wrap"/>

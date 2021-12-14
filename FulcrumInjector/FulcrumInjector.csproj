@@ -91,7 +91,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AppLogic\InjectorPipeSetup.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
@@ -112,9 +111,19 @@
     <Compile Include="AppLogic\ExtensionClasses\LongToStringSize.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewControl\Models\FulcrumDllInjectionTestModel.cs" />
+    <Compile Include="ViewControl\Models\FulcrumPipeStatusModel.cs" />
+    <Compile Include="ViewControl\PropertyWatchdog.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumInstalledOEAppsViewModel.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumPipeStatusViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumTitleViewModel.cs" />
     <Compile Include="ViewControl\ViewModelControlBase.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
+    <Compile Include="ViewControl\Views\FulcrumInstalledOEAppsView.xaml.cs">
+      <DependentUpon>FulcrumInstalledOEAppsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewControl\Views\FulcrumPipeStatusView.xaml.cs">
+      <DependentUpon>FulcrumPipeStatusView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewControl\Views\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
@@ -127,6 +136,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AppStyles\AppStyleSheets\InjectDllTestStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppStyles\AppStyleSheets\PipeStatusViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,6 +162,14 @@
     <Page Include="AppStyles\AppStyleSheets\TitleViewStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumInstalledOEAppsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumPipeStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewControl\Views\FulcrumTitleView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -190,9 +211,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewControl\Views\FlyoutViews\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

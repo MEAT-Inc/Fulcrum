@@ -43,10 +43,7 @@ namespace FulcrumInjector.ViewControl.Views
         {
             // Build new view model object
             InitializeComponent();
-            this.ViewModel = new FulcrumDllInjectionTestViewModel();    
-
-            // Clear output box. Set base output of just our DLL Path string.
-            this.ResetOutputTextContent();                              
+            this.ViewModel = new FulcrumDllInjectionTestViewModel();
         }
 
         /// <summary>
@@ -64,21 +61,6 @@ namespace FulcrumInjector.ViewControl.Views
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Clears out the output content text values
-        /// </summary>
-        private void ResetOutputTextContent()
-        {
-            // Clear output values.
-            this.InjectorTestOutput.Text = String.Empty;
-            string DllPath = $"DLL PATH: {this.ViewModel.InjectorDllPath}\n";
-
-            // Write splitting strings, the DLL Path, and another closing split string
-            this.InjectorTestOutput.Text += string.Join(string.Empty, Enumerable.Repeat('-', DllPath.Length)) + "\n";
-            this.InjectorTestOutput.Text += DllPath;
-            this.InjectorTestOutput.Text += string.Join(string.Empty, Enumerable.Repeat('-', DllPath.Length)) + "\n";
-        }
-
-        /// <summary>
         /// Tests the injection for the DLL on this application
         /// </summary>
         /// <param name="sender"></param>
@@ -88,7 +70,6 @@ namespace FulcrumInjector.ViewControl.Views
             try
             {
                 // Clear out text box, run the test, and log the output
-                this.ResetOutputTextContent();
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Run the injection test here on a Dispatched thread 

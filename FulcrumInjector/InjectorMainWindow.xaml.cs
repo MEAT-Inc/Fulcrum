@@ -44,24 +44,19 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
         }
 
-
         /// <summary>
-        /// Executes the logic setup for this app once our window instance is opened.
+        /// Configures specific control values when the window is loaded
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Log info about this method
+            // Store view objects for the UI
             InjectorConstants.ConfigureViewControls(this);
-            InjectorMainLogger.WriteLog("WINDOW OBJECT HAS BEEN LOADED AND OPENED! SETTING UP LOGIC NOW...", LogType.InfoLog);
-            InjectorMainLogger.WriteLog("ONCE UI CONTENT IS STATIC, PIPE LOGIC AND OTHER BUILT OBJECTS WILL POPULATE...");
-
-            // Store constants in here.
-            Task.Run(() =>
-            {
-                InjectorConstants.ConfigureFulcrumPipes();
-                InjectorMainLogger.WriteLog("FULCRUM PIPE CONFIGURATION HAS BEEN COMPLETED. CHECK THE UI AND LOG FILES FOR RESULTS", LogType.WarnLog);
-                InjectorMainLogger.WriteLog("AT THIS POINT IF THE CALLS PASSED, OUR APP IS READY TO PROCESS J2534 SHIMMED CALLS!", LogType.InfoLog);
-            });
+            InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
         }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
     }
 }

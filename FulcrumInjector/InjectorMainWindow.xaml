@@ -49,21 +49,34 @@
             <Border Grid.Column="1" Margin="0,0" Opacity=".50" BorderThickness="5,0" BorderBrush="{StaticResource PrimaryColor_Lighter_35}"/>
 
             <!-- Left Side Pane View -->
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1.25*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                
-                 <Border Grid.Row="0" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
-                 <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+            <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".5*"/>
+                        <RowDefinition Height=".5*"/>
+                        <RowDefinition Height="450"/>
+                    </Grid.RowDefinitions>
 
-                 <!-- DLL Loading Test Pane -->
-                 <Viewbox Grid.Row="0" Stretch="Fill" Margin="0,5">
-                    <views:FulcrumDllInjectionTestView x:Name="FulcrumDllInjectionTest"/>
-                </Viewbox>
-            </Grid>
+                    <!-- Splitting Borders -->
+                    <Border Grid.Row="0" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+                    <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+
+                    <!-- DLL Loading Test Pane -->
+                    <views:FulcrumDllInjectionTestView
+                        Grid.Row="0" 
+                        Height="110"
+                        x:Name="FulcrumDllInjectionTest"/>
+
+                    <!-- Pipe State And Information Pane -->
+                    <views:FulcrumPipeStatusView 
+                        Grid.Row="1" 
+                        Height="150"
+                        x:Name="FulcrumPipeStatus"/>
+
+                    <!-- OE Apps Installed -->
+
+                </Grid>
+            </Viewbox>
         </Grid>
 
         <!-- Flyouts for Main Window -->
@@ -71,21 +84,37 @@
             <mah:Flyout
                 IsOpen="False"
                 x:Name="SettingsViewFlyout" 
+                VerticalContentAlignment="Stretch" 
                 HorizontalContentAlignment="Stretch" 
+                Header="FulcrumInjector Settings"
+                mah:HeaderedControlHelper.HeaderFontSize="26"
+                mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
                 BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
                 
                 <!-- Content for Settings -->
-
+                <Grid>
+                    <Border 
+                        BorderBrush="{StaticResource SecondaryColor_Lighter_35}"
+                        BorderThickness="0,3,0,0"/>
+                </Grid>
             </mah:Flyout>
             <mah:Flyout
                 IsOpen="False" 
                 x:Name="DebugViewFlyout"
+                VerticalContentAlignment="Stretch" 
                 HorizontalContentAlignment="Stretch" 
+                Header="FulcrumInjector Debugging"
+                mah:HeaderedControlHelper.HeaderFontSize="26"
+                mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
                 BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
 
                 <!-- Content for Debugging -->
+                <Grid>
+                    <Border 
+                        BorderBrush="{StaticResource SecondaryColor_Lighter_35}"
+                        BorderThickness="0,3,0,0"/>
+                </Grid>
             </mah:Flyout>
-
         </mah:FlyoutsControl>
     </Grid>
 </mah:MetroWindow>

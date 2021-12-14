@@ -7,7 +7,7 @@
              xmlns:viewModels="clr-namespace:FulcrumInjector.ViewControl.ViewModels"
              xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"  
              mc:Ignorable="d" 
-             Width="400" Height="300"
+             Width="400" Height="110"
              Loaded="FulcrumInjectorTestView_OnLoaded">
 
     <!-- DataContext Binding -->
@@ -28,7 +28,7 @@
     <!-- Content For Testing -->
     <Grid Margin="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".135*"/>
+            <RowDefinition Height=".5*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -38,9 +38,8 @@
         <!-- Testing Content -->
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height=".40*"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="5"/>
-                <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
             <!-- Info Grids -->
@@ -68,21 +67,6 @@
                         Style="{StaticResource TestResultBoxStyle}"
                         Margin="5"/>
                 </Grid>
-            </Grid>
-
-            <!-- Splitting Border -->
-            <Border 
-                BorderBrush="{StaticResource PrimaryColor_Lighter_35}"
-                BorderThickness="3" 
-                Grid.Row="1"
-                Margin="15,0"/>
-
-            <!-- Logging Grid -->
-            <Grid Grid.Row="2" Margin="10">
-                <avalonEdit:TextEditor 
-                    IsReadOnly="True"
-                    Name="InjectorTestOutput" 
-                    Style="{StaticResource TestOutputLoggingBoxStyle}"/>
             </Grid>
         </Grid>
     </Grid>

@@ -14,6 +14,9 @@ using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.ViewControl.ViewModels
 {
+    /// <summary>
+    /// View Model for Injection Test View
+    /// </summary>
     public class FulcrumDllInjectionTestViewModel : ViewModelControlBase
     {
         // Logger object.
@@ -25,7 +28,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         private string _injectorDllPath;        // Private value for title view title text
         private string _injectorTestResult;     // Private value for title view version text
 
-        // Title string and the title view version bound values
+        // Public values for our view to bind onto 
         public string InjectorDllPath { get => _injectorDllPath; set => PropertyUpdated(value); }
         public string InjectorTestResult { get => _injectorTestResult; set => PropertyUpdated(value); }
         public bool InjectionLoadPassed { get => _injectionLoadPassed; set => PropertyUpdated(value); }
@@ -39,7 +42,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         {
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Store title and version string values now.
             this.InjectorDllPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
@@ -60,11 +63,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         internal void WriteToLogBox(string LogText)
         {
             // Build the current View object into our output and then log into it.
-            FulcrumDllInjectionTestView TestView = this.BaseViewControl as FulcrumDllInjectionTestView;
-
-            // Now append text
-            TestView.InjectorTestOutput.Text += LogText.Trim() + "\n";
-            ViewModelLogger.WriteLog($"[DEBUG OUTPUT BOX] ::: {LogText}", LogType.TraceLog);
+            ViewModelLogger.WriteLog($"[INJECTION TEST OUTPUT] ::: {LogText}", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
