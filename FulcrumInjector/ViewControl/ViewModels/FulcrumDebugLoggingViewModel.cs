@@ -53,22 +53,23 @@ namespace FulcrumInjector.ViewControl.ViewModels
         internal void SearchForText(string TextToFind, TextEditor EditObject)
         {
             // Remove existing search objects and add in new ones.
-            int RemovedTransformers = EditObject.TextArea.TextView.LineTransformers.ToList()
-                .RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
-            if (RemovedTransformers != 0)
-                ViewModelLogger.WriteLog($"REMOVED A TOTAL OF {RemovedTransformers} SEARCH TRANSFORMERS OK!", LogType.InfoLog);
+            var TransformerList = EditObject.TextArea.TextView.LineTransformers.ToList();
+            TransformerList.RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
+
+            // Clear out transformers and append them in again
+            EditObject.TextArea.TextView.LineTransformers.Clear();
+            foreach (var TransformerObject in TransformerList) 
+                EditObject.TextArea.TextView.LineTransformers.Add(TransformerObject);
 
             // Build new searching helper and apply it onto the view
-            if (TextToFind == string.Empty)
+            if (TextToFind == string.Empty) { EditObject.TextArea.TextView.Redraw(); }
+            else
             {
-                ViewModelLogger.WriteLog("NOT BUILDING SEARCH HELPER FOR EMPTY STRING!", LogType.WarnLog);
-                return;
+                // Apply Searcher. Store if using Regex or not.
+                var NewSearcher = new DebugLogSelectMatchesColorFormatter(TextToFind);
+                EditObject.TextArea.TextView.LineTransformers.Add(NewSearcher);
+                this.UsingRegex = NewSearcher.UseRegex;
             }
-
-            // Apply Searcher. Store if using Regex or not.
-            var NewSearcher = new DebugLogSelectMatchesColorFormatter(TextToFind);
-            EditObject.TextArea.TextView.LineTransformers.Add(NewSearcher);
-            this.UsingRegex = NewSearcher.UseRegex;
         }
     }
 }

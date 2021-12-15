@@ -67,7 +67,9 @@ namespace FulcrumInjector.AppLogic.DebugLogFormatters
                 }
 
                 // Search the string value
-                while ((CurrentIndex = LineText.IndexOf(FindThis, StartIndex)) >= 0 && RegexPassed)
+                while ((CurrentIndex = UseRegex ? 
+                    LineText.IndexOf(FindThis, StartIndex) : 
+                    LineText.IndexOf(FindThis, StartIndex, StringComparison.CurrentCultureIgnoreCase)) >= 0 && RegexPassed)
                 {
                     // Change line part call here.
                     int StartOffset = LineStartOffset + CurrentIndex;

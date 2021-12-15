@@ -73,7 +73,7 @@ namespace FulcrumInjector.ViewControl.Views
             string TextToFilter = FilteringTextBox.Text;
 
             // Run the search and show method on the view model
-            ViewModel.SearchForText(TextToFilter, DebugRedirectOutputEdit);
+            ViewModel.SearchForText(TextToFilter, DebugRedirectOutputEdit); 
         }
     }
 }
