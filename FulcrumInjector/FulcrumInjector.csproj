@@ -28,10 +28,10 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>portable</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
@@ -92,6 +92,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
+    <Compile Include="AppLogic\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
