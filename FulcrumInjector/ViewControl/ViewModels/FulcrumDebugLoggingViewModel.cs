@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.AppLogic.DebugLogFormatters;
 using FulcrumInjector.JsonHelpers;
+using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -44,5 +46,30 @@ namespace FulcrumInjector.ViewControl.ViewModels
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Searches the AvalonEdit object for text matching what we want.
+        /// </summary>
+        /// <param name="TextToFind"></param>
+        internal void SearchForText(string TextToFind, TextEditor EditObject)
+        {
+            // Remove existing search objects and add in new ones.
+            var TransformerList = EditObject.TextArea.TextView.LineTransformers.ToList();
+            TransformerList.RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
+
+            // Clear out transformers and append them in again
+            EditObject.TextArea.TextView.LineTransformers.Clear();
+            foreach (var TransformerObject in TransformerList) 
+                EditObject.TextArea.TextView.LineTransformers.Add(TransformerObject);
+
+            // Build new searching helper and apply it onto the view
+            if (TextToFind == string.Empty) { EditObject.TextArea.TextView.Redraw(); }
+            else
+            {
+                // Apply Searcher. Store if using Regex or not.
+                var NewSearcher = new DebugLogSelectMatchesColorFormatter(TextToFind);
+                EditObject.TextArea.TextView.LineTransformers.Add(NewSearcher);
+                this.UsingRegex = NewSearcher.UseRegex;
+            }
+        }
     }
 }

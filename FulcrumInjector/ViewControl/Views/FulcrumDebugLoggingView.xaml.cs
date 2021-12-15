@@ -33,6 +33,7 @@ namespace FulcrumInjector.ViewControl.Views
         public FulcrumDebugLoggingViewModel ViewModel { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Builds a new pipe status view object
         /// </summary>
@@ -60,9 +61,19 @@ namespace FulcrumInjector.ViewControl.Views
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Searches for the provided text values
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LogFilteringTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            // TODO: WRITE LOGIC TO PROCESS FILTERING AND SEARCHING RESULTS!
+            // Get the current text entry value and pass it over to the VM for actions.
+            var FilteringTextBox = (TextBox)sender;
+            string TextToFilter = FilteringTextBox.Text;
+
+            // Run the search and show method on the view model
+            ViewModel.SearchForText(TextToFilter, DebugRedirectOutputEdit); 
         }
     }
 }
