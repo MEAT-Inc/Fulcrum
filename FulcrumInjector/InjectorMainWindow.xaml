@@ -64,20 +64,19 @@
                     <!-- DLL Loading Test Pane -->
                     <views:FulcrumDllInjectionTestView
                         Grid.Row="0" 
-                        Height="100"
+                        Height="105"
                         x:Name="FulcrumDllInjectionTest"/>
 
                     <!-- Pipe State And Information Pane -->
                     <views:FulcrumPipeStatusView 
                         Grid.Row="1" 
-                        Height="140"
+                        Height="150"
                         x:Name="FulcrumPipeStatus"/>
 
                     <!-- OE Apps Installed -->
                     <views:FulcrumInstalledOeAppsView
                         Grid.Row="2"
                         x:Name="FulcrumInstalledOeApps"/>
-
                 </Grid>
             </Viewbox>
 

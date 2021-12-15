@@ -35,7 +35,8 @@
             <TextBox 
                 Style="{StaticResource SearchBoxStyle}"
                 Tag="Enter text to find or type '@r' plus a regex"
-                Margin="0,5,0,-5"
+                Margin="0,6,0,-4"
+                VerticalAlignment="Stretch"
                 TextChanged="LogFilteringTextBox_OnTextChanged"/>
             <ComboBox
                 IsEnabled="False"

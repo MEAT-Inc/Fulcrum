@@ -47,7 +47,7 @@ namespace FulcrumInjector.JsonHelpers
         public static void SetNewAppConfigFile(string NewConfigFileName)
         {
             // Pull location of the configuration application
-            var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim");
+            var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
             var PathToInjector = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString());
 
             // Log info. Set file state
