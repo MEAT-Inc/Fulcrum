@@ -55,7 +55,8 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Remove existing search objects and add in new ones.
             int RemovedTransformers = EditObject.TextArea.TextView.LineTransformers.ToList()
                 .RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
-            if (RemovedTransformers != 0) { ViewModelLogger.WriteLog($"REMOVED A TOTAL OF {RemovedTransformers} SEARCH TRANSFORMERS OK!", LogType.InfoLog); }
+            if (RemovedTransformers != 0)
+                ViewModelLogger.WriteLog($"REMOVED A TOTAL OF {RemovedTransformers} SEARCH TRANSFORMERS OK!", LogType.InfoLog);
 
             // Build new searching helper and apply it onto the view
             if (TextToFind == string.Empty)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
@@ -50,17 +51,32 @@ namespace FulcrumInjector.AppLogic.DebugLogFormatters
             // Find our logger name segment.
             try
             {
-                string LoggerName = LineText.Split(']')[3].Trim('[', ']');
-                while ((CurrentIndex = LineText.IndexOf(LoggerName, StartIndex)) >= 0)
+                // Temp values for search passed and the found value
+                bool RegexPassed = true;
+                string FindThis = this.MatchString;
+
+                // If using regex, find values
+                if (this.UseRegex)
+                { 
+                    // Run our regex matching process here
+                    var RegexOutput = Regex.Match(LineText, this.MatchString);
+
+                    // Set if the regex passed and the value found.
+                    FindThis = RegexOutput.Value;
+                    RegexPassed = RegexOutput.Success;
+                }
+
+                // Search the string value
+                while ((CurrentIndex = LineText.IndexOf(FindThis, StartIndex)) >= 0 && RegexPassed)
                 {
                     // Change line part call here.
                     int StartOffset = LineStartOffset + CurrentIndex;
-                    int EndOffset = StartOffset + LoggerName.Length;
+                    int EndOffset = StartOffset + FindThis.Length;
                     base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                     {
                         // Colorize our logger name here.
-                        NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
-                        NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.DarkCyan);
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Yellow);
+                        NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.Black);
                     });
 
                     // Tick our index and move on
