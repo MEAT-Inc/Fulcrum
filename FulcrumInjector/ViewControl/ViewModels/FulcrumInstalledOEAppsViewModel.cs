@@ -75,7 +75,14 @@ namespace FulcrumInjector.ViewControl.ViewModels
                 catch { ViewModelLogger.WriteLog("FAILED TO CAST CURRENT OBJECT INTO A NEW OE APP MODEL! MOVING ON", LogType.WarnLog); }
             }
 
-            // Now log info about conversion rate and return output objects
+            // Put our usable apps first and soft those A-Z. Append the not usable ones and sort them A-Z
+            OutputApps = OutputApps.OrderBy(AppObj => AppObj.IsAppUsable).Reverse().ToList();
+            OutputApps = new[] {
+                OutputApps.Where(AppObj => AppObj.IsAppUsable).OrderBy(AppObj => AppObj.OEAppName).ToList(),
+                OutputApps.Where(AppObj => !AppObj.IsAppUsable).OrderBy(AppObj => AppObj.OEAppName).ToList()    
+            }.SelectMany(AppSet => AppSet).ToList();
+
+            // Log output information here.
             ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {PulledAppsObject.Length} OBJECTS AND CREATED {OutputApps.Count} CAST APP OBJECTS!", LogType.WarnLog);
             ViewModelLogger.WriteLog("RETURNING BUILT APP OBJECT INSTANCES NOW...");
             return OutputApps;

@@ -37,6 +37,10 @@
     <LangVersion>latest</LangVersion>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+    <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
@@ -92,6 +96,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
+    <Compile Include="AppLogic\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
@@ -100,7 +105,8 @@
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
-    <Compile Include="AppLogic\OeApplicationJsonConverter.cs" />
+    <Compile Include="AppLogic\JsonConverters\OeApplicationJsonConverter.cs" />
+    <Compile Include="AppLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="AppStyles\AppStyleLogic\AppColorSetter.cs" />
     <Compile Include="AppStyles\AppStyleLogic\ColorMatchingHelper.cs" />
     <Compile Include="AppStyles\AppStyleLogic\CustomColorShader.cs" />
@@ -118,12 +124,15 @@
     <Compile Include="AppLogic\ExtensionClasses\LongToStringSize.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewControl\Models\DebugLoggingRedirectTarget.cs" />
-    <Compile Include="ViewControl\Models\OEApplicationModel.cs" />
+    <Compile Include="ViewControl\Models\OeApplicationModel.cs" />
     <Compile Include="ViewControl\Models\FulcrumPipeSystemModel.cs" />
+    <Compile Include="ViewControl\Models\SettingsEntryModel.cs" />
+    <Compile Include="ViewControl\Models\SettingsEntryModelCollection.cs" />
     <Compile Include="ViewControl\PropertyWatchdog.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumDebugLoggingViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumPipeStatusViewModel.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumSettingsPaneViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumTitleViewModel.cs" />
     <Compile Include="ViewControl\ViewModelControlBase.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
@@ -135,6 +144,9 @@
     </Compile>
     <Compile Include="ViewControl\Views\FulcrumPipeStatusView.xaml.cs">
       <DependentUpon>FulcrumPipeStatusView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewControl\Views\FulcrumSettingsPaneView.xaml.cs">
+      <DependentUpon>FulcrumSettingsPaneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewControl\Views\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
@@ -160,6 +172,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AppStyles\AppStyleSheets\PipeStatusViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppStyles\AppStyleSheets\SettingsPaneViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -192,6 +208,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewControl\Views\FulcrumPipeStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumSettingsPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

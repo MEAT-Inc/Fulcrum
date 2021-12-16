@@ -24,7 +24,7 @@
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="Margin" Value="10,5"/>
                 <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="5,10"/>
+                <Setter Property="Padding" Value="5,5,5,10"/>
                 <Setter Property="ShowLineNumbers" Value="True"/>
             </Style>
 

@@ -10,6 +10,11 @@
              d:DesignHeight="450" d:DesignWidth="800" 
              Loaded="FulcrumInjectorDebugLoggingView_OnLoaded">
 
+    <!-- DataContext Binding -->
+    <UserControl.DataContext>
+        <viewModels:FulcrumDebugLoggingViewModel/>
+    </UserControl.DataContext>
+
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>
@@ -20,6 +25,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Log Viewing Content -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height=".15*"/>
@@ -27,7 +33,7 @@
         </Grid.RowDefinitions>
         
         <!-- Log Filter and Search Controls -->
-        <Grid Grid.Row="0" Margin="10">
+        <Grid Grid.Row="0" Margin="10,15,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width=".5*"/>
@@ -35,15 +41,20 @@
             <TextBox 
                 Style="{StaticResource SearchBoxStyle}"
                 Tag="Enter text to find or type '@r' plus a regex"
-                Margin="0,6,0,-4"
                 VerticalAlignment="Stretch"
                 TextChanged="LogFilteringTextBox_OnTextChanged"/>
             <ComboBox
-                IsEnabled="False"
+                IsEnabled="True"
                 Grid.Column="1" 
-                Margin="10,6,0,-4"
-                FontSize="18" 
-                Text="Select A Logger"/>
+                FontSize="13" 
+                SelectedIndex="0"
+                HorizontalContentAlignment="Center" 
+                VerticalContentAlignment="Top"
+                Margin="10,0"
+                DropDownOpened="LoggerNameComboBox_OnDropDownOpened"
+                SelectionChanged="LoggerNameComboBox_OnSelectionChanged"
+                Style="{StaticResource MahApps.Styles.ComboBox}"
+                ItemsSource="{Binding Path=LoggerNamesFound}"/>
         </Grid>
 
         <!-- Logging Content Output -->

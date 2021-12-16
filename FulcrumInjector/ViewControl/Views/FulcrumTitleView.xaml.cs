@@ -95,6 +95,10 @@ namespace FulcrumInjector.ViewControl.Views
             if (this.SettingsFlyout == null) { ViewLogger.WriteLog("ERROR! SETTINGS FLYOUT IS NULL!", LogType.ErrorLog); } 
             else
             {
+                // Check if the debug flyout can be closed out
+                if (this.DebuggingFlyout != null) this.DebuggingFlyout.IsOpen = false;
+
+                // Toggle the settings pane
                 this.SettingsFlyout.IsOpen = !this.SettingsFlyout.IsOpen;
                 ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR SETTINGS FLYOUT OK!", LogType.InfoLog);
             }
@@ -111,6 +115,10 @@ namespace FulcrumInjector.ViewControl.Views
             if (this.DebuggingFlyout == null) { ViewLogger.WriteLog("ERROR! DEBUGGIN FLYOUT IS NULL!", LogType.ErrorLog); }
             else
             {
+                // Check if the settings flyout can be closed out
+                if (this.SettingsFlyout != null) this.SettingsFlyout.IsOpen = false;
+
+                // Toggle the debug pane
                 this.DebuggingFlyout.IsOpen = !this.DebuggingFlyout.IsOpen;
                 ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR DEBUGGING FLYOUT OK!", LogType.InfoLog);
             }

@@ -13,7 +13,16 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
     {
         // Singleton configuration
         public static FulcrumPipeReader PipeInstance => _lazyReader.Value;
-        private static readonly Lazy<FulcrumPipeReader> _lazyReader = new Lazy<FulcrumPipeReader>(() => new FulcrumPipeReader());
+        private static readonly Lazy<FulcrumPipeReader> _lazyReader = new(() => new FulcrumPipeReader());
+
+        // Reset Pipe Object method
+        public static void ResetPipeInstance()
+        {
+            // Reset Pipe here
+            if (PipeInstance == null) return;
+            PipeInstance.PipeLogger.WriteLog($"RESETTING FULCRUM PIPE {PipeInstance.PipeType} NOW...", LogType.WarnLog);
+            PipeInstance.ConfigureNewPipe();
+        }
 
         // -------------------------------------------------------------------------------------------------------
 
