@@ -48,14 +48,14 @@ void dbug_printretval(unsigned long retval)
 		retval == ERR_TIMEOUT ||
 		retval == ERR_BUFFER_EMPTY)
 	{
-		dtDebug(_T("  %.3fs %s\n"), GetTimeSinceInit(), dbug_return(retval).c_str());
+		appendToLog(_T("  %.3fs %s\n"), GetTimeSinceInit(), dbug_return(retval).c_str());
 	}
 	else
 	{
 		char szErrorDescription[80];
 		fulcrum_PassThruGetLastError(szErrorDescription);
 		CStringW cstrErrorDescription(szErrorDescription);
-		dtDebug(_T("  %.3fs %s '%s'\n"), GetTimeSinceInit(), dbug_return(retval).c_str(), cstrErrorDescription);
+		appendToLog(_T("  %.3fs %s '%s'\n"), GetTimeSinceInit(), dbug_return(retval).c_str(), cstrErrorDescription);
 	}
 }
 
@@ -407,7 +407,7 @@ void dbug_printcflag(unsigned long ConnectFlags)
 	}
 	ssConnectFlags << std::endl;
 
-	dtDebug(ssConnectFlags.str().c_str());
+	appendToLog(ssConnectFlags.str().c_str());
 }
 
 static LPCTSTR dbug_rxstatus2str(unsigned long RxStatus)
@@ -469,7 +469,7 @@ void dbug_printrxstatus(unsigned long RxStatus)
 	}
 	ssRxStatus << std::endl;
 
-	dtDebug(ssRxStatus.str().c_str());
+	appendToLog(ssRxStatus.str().c_str());
 }
 
 static LPCTSTR dbug_txflag2str(unsigned long TxFlags)
@@ -528,22 +528,22 @@ void dbug_printtxflags(unsigned long TxFlags)
 	}
 	ssTxFlags << std::endl;
 
-	dtDebug(ssTxFlags.str().c_str());
+	appendToLog(ssTxFlags.str().c_str());
 }
 
 void dbug_printsbyte(SBYTE_ARRAY *inAry, LPCTSTR s)
 {
 	if (inAry == NULL)
 	{
-		dtDebug(_T("  %s is NULL\n"), s);
+		appendToLog(_T("  %s is NULL\n"), s);
 		return;
 	}
 
-	dtDebug(_T("  %s: %lu bytes at 0x%08X\n"), s, inAry->NumOfBytes, inAry->BytePtr);
+	appendToLog(_T("  %s: %lu bytes at 0x%08X\n"), s, inAry->NumOfBytes, inAry->BytePtr);
 
 	if (inAry->BytePtr == NULL)
 	{
-		dtDebug(_T("  %s->BytePtr is NULL\n"), inAry);
+		appendToLog(_T("  %s->BytePtr is NULL\n"), inAry);
 		return;
 	}
 
@@ -558,7 +558,7 @@ void dbug_printsbyte(SBYTE_ARRAY *inAry, LPCTSTR s)
 		}
 		ssData << std::endl;
 
-		dtDebug(ssData.str().c_str());
+		appendToLog(ssData.str().c_str());
 	}
 }
 
@@ -566,29 +566,29 @@ void dbug_printsconfig(SCONFIG_LIST *pList)
 {
 	if (pList == NULL)
 	{
-		dtDebug(_T("  pList is NULL\n"));
+		appendToLog(_T("  pList is NULL\n"));
 		return;
 	}
 
-	dtDebug(_T("  %ld parameter(s) at 0x%08X:\n"), pList->NumOfParams, pList->ConfigPtr);
+	appendToLog(_T("  %ld parameter(s) at 0x%08X:\n"), pList->NumOfParams, pList->ConfigPtr);
 	if (pList->ConfigPtr == NULL)
 	{
-		dtDebug(_T("  pList->ConfigPtr is NULL\n"));
+		appendToLog(_T("  pList->ConfigPtr is NULL\n"));
 		return;
 	}
 
 	for (unsigned long i=0; i < pList->NumOfParams; i++)
 	{
-		dtDebug(_T("    %s = %ld\n"), dbug_param(pList->ConfigPtr[i].Parameter).c_str(), pList->ConfigPtr[i].Value);
+		appendToLog(_T("    %s = %ld\n"), dbug_param(pList->ConfigPtr[i].Parameter).c_str(), pList->ConfigPtr[i].Value);
 	}
 }
 
 void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long * numMsgs, bool isWrite)
 {
 	if (mm == NULL)
-		dtDebug(_T("  %s is NULL\n"), s);
+		appendToLog(_T("  %s is NULL\n"), s);
 	if (numMsgs == NULL)
-		dtDebug(_T("  numMsgs is NULL\n"), s);
+		appendToLog(_T("  numMsgs is NULL\n"), s);
 
 	if (mm == NULL || numMsgs == NULL)
 		return;
@@ -600,7 +600,7 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 {
 	if (mm == NULL)
 	{
-		dtDebug(_T("  %s is NULL\n"), s);
+		appendToLog(_T("  %s is NULL\n"), s);
 		return;
 	}
 
@@ -608,7 +608,7 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 	{
 		if (isWrite == true)
 		{
-			dtDebug(_T("  %s[%2ld] %s. %lu bytes. TxF=0x%08lx\n"),
+			appendToLog(_T("  %s[%2ld] %s. %lu bytes. TxF=0x%08lx\n"),
 				s,
 				i,
 				//numMsgs,
@@ -618,7 +618,7 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 		}
 		else
 		{
-			dtDebug(_T("  %s[%2ld] %fs. %s. Actual data %lu of %lu bytes. RxS=0x%08lx\n"),
+			appendToLog(_T("  %s[%2ld] %fs. %s. Actual data %lu of %lu bytes. RxS=0x%08lx\n"),
 				s,
 				i,
 				//numMsgs,
@@ -661,7 +661,7 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 			}
 			ssData << std::endl;
 
-			dtDebug(ssData.str().c_str());
+			appendToLog(ssData.str().c_str());
 		}
 	}
 }

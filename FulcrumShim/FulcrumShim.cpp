@@ -60,7 +60,7 @@ void CFulcrumShim::InitPipes()
 
 	// Build pipe server and store the state of them
 	if (fulcrumPiper == nullptr) fulcrumPiper = new fulcrum_jpipe();
-	dtDebug(_T("%.3fs    Connecting output pipe now...\n", GetTimeSinceInit()));
+	appendToLog(_T("%.3fs    Connecting output pipe now...\n", GetTimeSinceInit()));
 	bool LoadedPipeOutput = fulcrumPiper->ConnectOutputPipe();
 
 	// Build config app path value here and run the injector application
@@ -76,17 +76,17 @@ void CFulcrumShim::InitPipes()
 
 	// Run the process here by booting a new instance. Once running connect the input pipe.
 	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
-	dtDebug(_T("%.3fs    Connecting input pipe now...\n", GetTimeSinceInit()));
-	dtDebug(_T("%.3fs    NOTE: Waiting 2000 miliseconds before this request is sent...\n", GetTimeSinceInit()));
+	appendToLog(_T("%.3fs    Connecting input pipe now...\n", GetTimeSinceInit()));
+	appendToLog(_T("%.3fs    NOTE: Waiting 2000 miliseconds before this request is sent...\n", GetTimeSinceInit()));
 	Sleep(2000); bool LoadedPipeInput = fulcrumPiper->ConnectInputPipe();
 
 	// Now see if we're loaded correctly.
 	pipesLoaded = LoadedPipeInput && LoadedPipeOutput;
-	if (!pipesLoaded) dtDebug(_T("%.3fs    Failed to boot new pipe instances for our FulcrumShim Server!\n", GetTimeSinceInit()));
+	if (!pipesLoaded) appendToLog(_T("%.3fs    Failed to boot new pipe instances for our FulcrumShim Server!\n", GetTimeSinceInit()));
 	else 
 	{
-		dtDebug(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
-		dtDebug(_T("%.3fs    FulcrumInjector should now be running in the background\n", GetTimeSinceInit()));
+		appendToLog(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
+		appendToLog(_T("%.3fs    FulcrumInjector should now be running in the background\n", GetTimeSinceInit()));
 	}
 }
 void CFulcrumShim::ShutdownPipes()
@@ -94,12 +94,12 @@ void CFulcrumShim::ShutdownPipes()
 	// Build pipe server and store the state of them
 	if (fulcrumPiper == nullptr)
 	{
-		dtDebug(_T("%.3fs    Building Piper to force shut down now...\n", GetTimeSinceInit()));
+		appendToLog(_T("%.3fs    Building Piper to force shut down now...\n", GetTimeSinceInit()));
 		fulcrumPiper = new fulcrum_jpipe();
 	}
 
 	// Run the shutdown method
-	dtDebug(_T("%.3fs    Calling pipe shutdown methods now...\n", GetTimeSinceInit()));
+	appendToLog(_T("%.3fs    Calling pipe shutdown methods now...\n", GetTimeSinceInit()));
 	fulcrumPiper->ShutdownPipe();
-	dtDebug(_T("%.3fs    Pipe instances have been released OK!\n", GetTimeSinceInit()));
+	appendToLog(_T("%.3fs    Pipe instances have been released OK!\n", GetTimeSinceInit()));
 }

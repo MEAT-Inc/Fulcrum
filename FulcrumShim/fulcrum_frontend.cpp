@@ -64,7 +64,7 @@ extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
 	auto_lock lock;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTLoadLibrary(%s)\n"), GetTimeSinceInit(), (szFunctionLibrary==NULL)?_T("*NULL*"):_T("test")/*szLibrary*/);
+	appendToLog(_T("%.3fs ++ PTLoadLibrary(%s)\n"), GetTimeSinceInit(), (szFunctionLibrary==NULL)?_T("*NULL*"):_T("test")/*szLibrary*/);
 
 	if (szFunctionLibrary == NULL)
 	{
@@ -95,7 +95,7 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 
 	// Unload our library here
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTUnloadLibrary()\n"), GetTimeSinceInit());
+	appendToLog(_T("%.3fs ++ PTUnloadLibrary()\n"), GetTimeSinceInit());
 	fulcrum_unloadLibrary();
 	dbug_printretval(STATUS_NOERROR);
 	return STATUS_NOERROR;
@@ -107,13 +107,13 @@ extern "C" long J2534_API PassThruWriteToLogA(char *szMsg)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	CStringW cstrMsg(szMsg);
 
-	dtDebug(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), cstrMsg);
+	appendToLog(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), cstrMsg);
 	return STATUS_NOERROR;
 }
 extern "C" long J2534_API PassThruWriteToLogW(wchar_t *szMsg)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	dtDebug(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), szMsg);
+	appendToLog(_T("%.3fs ** '%s'\n"), GetTimeSinceInit(), szMsg);
 	return STATUS_NOERROR;
 }
 extern "C" long J2534_API PassThruSaveLog(char *szFilename)
@@ -122,9 +122,9 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 	auto_lock lock;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTSaveLog(%s)\n"), GetTimeSinceInit(), (szFilename==NULL)?_T("*NULL*"):_T("")/*pName*/);
+	appendToLog(_T("%.3fs ++ PTSaveLog(%s)\n"), GetTimeSinceInit(), (szFilename==NULL)?_T("*NULL*"):_T("")/*pName*/);
 	CStringW cstrFilename(szFilename);
-	fulcrum_writeLogfile(cstrFilename, false);
+	writeLogfile(cstrFilename, false);
 
 	dbug_printretval(STATUS_NOERROR);
 	return STATUS_NOERROR;
@@ -138,12 +138,12 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	unsigned long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTOpen(%s, 0x%08X)\n"), GetTimeSinceInit(), (pName==NULL)?_T("*NULL*"):_T("")/*pName*/, pDeviceID);
+	appendToLog(_T("%.3fs ++ PTOpen(%s, 0x%08X)\n"), GetTimeSinceInit(), (pName==NULL)?_T("*NULL*"):_T("")/*pName*/, pDeviceID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruOpen);
 
 	retval = _PassThruOpen(pName, pDeviceID);
-	dtDebug(_T("  returning DeviceID: %ld\n"), *pDeviceID);
+	appendToLog(_T("  returning DeviceID: %ld\n"), *pDeviceID);
 	dbug_printretval(retval);
 	return retval;
 }
@@ -154,7 +154,7 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs -- PTClose(%ld)\n"), GetTimeSinceInit(), DeviceID);
+	appendToLog(_T("%.3fs -- PTClose(%ld)\n"), GetTimeSinceInit(), DeviceID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruClose);
 
@@ -164,7 +164,7 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	// Shut off pipes
 	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 	if (!fulcrum_app->pipesLoaded) { fulcrum_app->ShutdownPipes(); }
-	dtDebug(_T("%.3fs    FulcrumInjector has closed all pipe instances OK!\n"), GetTimeSinceInit());
+	appendToLog(_T("%.3fs    FulcrumInjector has closed all pipe instances OK!\n"), GetTimeSinceInit());
 
 	// Return output value
 	return retval;
@@ -176,14 +176,14 @@ extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long 
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTConnect(%ld, %s, 0x%08X, %ld, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, dbug_prot(ProtocolID).c_str(), Flags, Baudrate, pChannelID);
+	appendToLog(_T("%.3fs ++ PTConnect(%ld, %s, 0x%08X, %ld, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, dbug_prot(ProtocolID).c_str(), Flags, Baudrate, pChannelID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruConnect);
 
 	dbug_printcflag(Flags);
 	retval = _PassThruConnect(DeviceID, ProtocolID, Flags, Baudrate, pChannelID);
-	if (pChannelID == NULL) dtDebug(_T("  pChannelID was NULL\n"));
-	else dtDebug(_T("  returning ChannelID: %ld\n"), *pChannelID);
+	if (pChannelID == NULL) appendToLog(_T("  pChannelID was NULL\n"));
+	else appendToLog(_T("  returning ChannelID: %ld\n"), *pChannelID);
 
 	dbug_printretval(retval);
 	return retval;
@@ -195,7 +195,7 @@ extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs -- PTDisconnect(%ld)\n"), GetTimeSinceInit(), ChannelID);
+	appendToLog(_T("%.3fs -- PTDisconnect(%ld)\n"), GetTimeSinceInit(), ChannelID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruDisconnect);
 
@@ -211,13 +211,13 @@ extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG
 	unsigned long reqNumMsgs;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs << PTReadMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
+	appendToLog(_T("%.3fs << PTReadMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruReadMsgs);
 
 	if (pNumMsgs != NULL) reqNumMsgs = *pNumMsgs;
 	retval = _PassThruReadMsgs(ChannelID, pMsg, pNumMsgs, Timeout);
-	if (pNumMsgs != NULL) dtDebug(_T("  read %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
+	if (pNumMsgs != NULL) appendToLog(_T("  read %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
 	dbug_printmsg(pMsg, _T("Msg"), pNumMsgs, FALSE);
 
 	dbug_printretval(retval);
@@ -231,14 +231,14 @@ extern "C" long J2534_API PassThruWriteMsgs(unsigned long ChannelID, PASSTHRU_MS
 	unsigned long reqNumMsgs = *pNumMsgs;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs >> PTWriteMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
+	appendToLog(_T("%.3fs >> PTWriteMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruWriteMsgs);
 
 	if (pNumMsgs != NULL) reqNumMsgs = *pNumMsgs;
 	dbug_printmsg(pMsg, _T("Msg"), pNumMsgs, true);
 	retval = _PassThruWriteMsgs(ChannelID, pMsg, pNumMsgs, Timeout);
-	if (pNumMsgs != NULL) dtDebug(_T("  sent %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
+	if (pNumMsgs != NULL) appendToLog(_T("  sent %ld of %ld messages\n"), *pNumMsgs, reqNumMsgs);
 
 	dbug_printretval(retval);
 	return retval;
@@ -251,13 +251,13 @@ extern "C" long J2534_API PassThruStartPeriodicMsg(unsigned long ChannelID, PASS
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTStartPeriodicMsg(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pMsgID, TimeInterval);
+	appendToLog(_T("%.3fs ++ PTStartPeriodicMsg(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pMsgID, TimeInterval);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruStartPeriodicMsg);
 	
 	dbug_printmsg(pMsg, _T("Msg"), 1, true);
 	retval = _PassThruStartPeriodicMsg(ChannelID, pMsg, pMsgID, TimeInterval);
-	if (pMsgID != NULL)	dtDebug(_T("  returning PeriodicID: %ld\n"), *pMsgID);
+	if (pMsgID != NULL)	appendToLog(_T("  returning PeriodicID: %ld\n"), *pMsgID);
 
 	dbug_printretval(retval);
 	return retval;
@@ -269,7 +269,7 @@ extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsig
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs -- PTStopPeriodicMsg(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
+	appendToLog(_T("%.3fs -- PTStopPeriodicMsg(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruStopPeriodicMsg);
 
@@ -286,7 +286,7 @@ extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ++ PTStartMsgFilter(%ld, %s, 0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, dbug_filter(FilterType).c_str(),
+	appendToLog(_T("%.3fs ++ PTStartMsgFilter(%ld, %s, 0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, dbug_filter(FilterType).c_str(),
 		pMaskMsg, pPatternMsg, pFlowControlMsg, pMsgID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruStartMsgFilter);
@@ -295,7 +295,7 @@ extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
 	dbug_printmsg(pPatternMsg, _T("Pattern"), 1, true);
 	dbug_printmsg(pFlowControlMsg, _T("FlowControl"), 1, true);
 	retval = _PassThruStartMsgFilter(ChannelID, FilterType, pMaskMsg, pPatternMsg, pFlowControlMsg, pMsgID);
-	if (pMsgID != NULL) dtDebug(_T("  returning FilterID: %ld\n"), *pMsgID);
+	if (pMsgID != NULL) appendToLog(_T("  returning FilterID: %ld\n"), *pMsgID);
 
 	dbug_printretval(retval);
 	return retval;
@@ -307,7 +307,7 @@ extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigne
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs -- PTStopMsgFilter(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
+	appendToLog(_T("%.3fs -- PTStopMsgFilter(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruStopMsgFilter);
 
@@ -322,20 +322,20 @@ extern "C" long J2534_API PassThruSetProgrammingVoltage(unsigned long DeviceID, 
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ** PTSetProgrammingVoltage(%ld, %ld, %ld)\n"), GetTimeSinceInit(), DeviceID, Pin, Voltage);
+	appendToLog(_T("%.3fs ** PTSetProgrammingVoltage(%ld, %ld, %ld)\n"), GetTimeSinceInit(), DeviceID, Pin, Voltage);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruSetProgrammingVoltage);
 
 	switch (Voltage)
 	{
 	case VOLTAGE_OFF:
-		dtDebug(_T("  Pin %ld remove voltage\n"), Pin);
+		appendToLog(_T("  Pin %ld remove voltage\n"), Pin);
 		break;
 	case SHORT_TO_GROUND:
-		dtDebug(_T("  Pin %ld short to ground\n"), Pin);
+		appendToLog(_T("  Pin %ld short to ground\n"), Pin);
 		break;
 	default:
-		dtDebug(_T("  Pin %ld at %f Volts\n"), Pin, Voltage / (float) 1000);
+		appendToLog(_T("  Pin %ld at %f Volts\n"), Pin, Voltage / (float) 1000);
 		break;
 	}
 	retval = _PassThruSetProgrammingVoltage(DeviceID, Pin, Voltage);
@@ -350,7 +350,7 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ** PTReadVersion(%ld, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, pFirmwareVersion, pDllVersion, pApiVersion);
+	appendToLog(_T("%.3fs ** PTReadVersion(%ld, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, pFirmwareVersion, pDllVersion, pApiVersion);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruReadVersion);
 
@@ -360,9 +360,9 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 	CStringW cstrDllVersion(pDllVersion);
 	CStringW cstrApiVersion(pApiVersion);
 
-	dtDebug(_T("  Firmware: %s\n"), cstrFirmwareVersion);
-	dtDebug(_T("  DLL:      %s\n"), cstrDllVersion);
-	dtDebug(_T("  API:      %s\n"), cstrApiVersion);
+	appendToLog(_T("  Firmware: %s\n"), cstrFirmwareVersion);
+	appendToLog(_T("  DLL:      %s\n"), cstrDllVersion);
+	appendToLog(_T("  API:      %s\n"), cstrApiVersion);
 
 	dbug_printretval(retval);
 	return retval;
@@ -403,11 +403,11 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 	// during the last function call (EXCEPT PassThruGetLastError). This
 	// function should not modify the last internal error
 
-	dtDebug(_T("%.3fs ** PTGetLastError(0x%08X)\n"), GetTimeSinceInit(), pErrorDescription);
+	appendToLog(_T("%.3fs ** PTGetLastError(0x%08X)\n"), GetTimeSinceInit(), pErrorDescription);
 
 	if (pErrorDescription == NULL)
 	{
-		dtDebug(_T("  pErrorDescription is NULL\n"));
+		appendToLog(_T("  pErrorDescription is NULL\n"));
 	}
 
 	retval = fulcrum_PassThruGetLastError(pErrorDescription);
@@ -416,7 +416,7 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 	{
 #ifdef UNICODE
 		CStringW cstrErrorDescriptionW(pErrorDescription);
-		dtDebug(_T("  %s\n"), (LPCWSTR)cstrErrorDescriptionW);
+		appendToLog(_T("  %s\n"), (LPCWSTR)cstrErrorDescriptionW);
 #else
 		dtDebug(_T("  %s\n"), pErrorDescription);
 #endif
@@ -425,7 +425,7 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 	// Log the return value for this function without using dbg_printretval().
 	// Even if an error occured inside this function, the error text was not
 	// updated to describe the error.
-	dtDebug(_T("  %s\n"), dbug_return(retval).c_str());
+	appendToLog(_T("  %s\n"), dbug_return(retval).c_str());
 	return retval;
 }
 extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long IoctlID, void* pInput, void* pOutput)
@@ -435,7 +435,7 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 	long retval;
 
 	fulcrum_clearInternalError();
-	dtDebug(_T("%.3fs ** PTIoctl(%ld, %s, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, dbug_ioctl(IoctlID).c_str(), pInput, pOutput);
+	appendToLog(_T("%.3fs ** PTIoctl(%ld, %s, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, dbug_ioctl(IoctlID).c_str(), pInput, pOutput);
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruIoctl);
 
@@ -478,7 +478,7 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 		// Do nothing for SET_CONFIG
 	case READ_VBATT:
 		if (pOutput != NULL)
-			dtDebug(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float)1000);
+			appendToLog(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float)1000);
 		break;
 	case FIVE_BAUD_INIT:
 		dbug_printsbyte((SBYTE_ARRAY*)pInput, _T("Output"));
@@ -495,7 +495,7 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 		// Do nothing for DELETE_FROM_FUNCT_MSG_LOOKUP_TABLE:
 	case READ_PROG_VOLTAGE:
 		if (pOutput != NULL)
-			dtDebug(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float)1000);
+			appendToLog(_T("  %f Volts\n"), ((*(unsigned long*)pOutput)) / (float)1000);
 		break;
 	}
 

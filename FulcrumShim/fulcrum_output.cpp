@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include <tchar.h>
 #include <varargs.h>
+#include "FulcrumShim.h"
+#include <memory>
 
 // Implementation of a circular buffer. Two simple interfaces:
 //   Put(): Add a string to the log
 //   Get(): Write the entire log to a file
 // Based on DSP Goodies by Alessandro Gallo (http://ag-works.net/)
 class cFifo {
-    public:
-	cFifo()
+    public: cFifo()
 	    : m_nSize(sizeof(data) / sizeof(data[0]))
 	    , m_nItems(0)
 	    , m_iWriteNext(0)
@@ -34,8 +35,7 @@ FILE *fp;
 static bool fInitialized = false;
 static bool fLogToFile = false;
 
-void
-cFifo::Put(LPCTSTR szMsg)
+void cFifo::Put(LPCTSTR szMsg)
 {
 	size_t nSize = _tcslen(szMsg);
 
@@ -78,9 +78,7 @@ cFifo::Put(LPCTSTR szMsg)
 	// More items in the buffer
 	m_nItems = m_nItems + nSize < m_nSize ? m_nItems + nSize : m_nSize;
 }
-
-void
-cFifo::Get(FILE *fp)
+void cFifo::Get(FILE *fp)
 {
 	size_t n = m_nItems;
 
@@ -99,38 +97,54 @@ cFifo::Get(FILE *fp)
 
 	m_nItems -= n;
 }
-
-void
-fulcrum_writeLogfile(LPCTSTR szFilename, bool in_fLogToFile)
+void writeLogfile(LPCTSTR szFilename, bool in_fLogToFile)
 {
 	// Write the memory-buffer to a file. Then either close the file, or keep the file open
 	// and set a flag that redirects all future log messages directly to the file
-	if (in_fLogToFile) {
+	if (in_fLogToFile) 
+	{
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
 		logFifo.Get(fp);
 		fLogToFile = true;
-	} else {
+	}
+	else 
+	{
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
 		logFifo.Get(fp);
 		fclose(fp);
 	}
 }
-
-void
-dtDebug(LPCTSTR format, ...)
+void appendToLog(LPCTSTR format, ...)
 {
-	va_list args;
-	va_start(args, format);
+	// Args formating for log output
+	va_list args; va_start(args, format);
+	
+	// Build converted string for writing into our pipe host
+	std::string fmt_str = CT2A(format);
+	int final_n, n = ((int)fmt_str.size()) * 2;
+	std::unique_ptr<char[]> formatted;
+	while (1) {
+		formatted.reset(new char[n]); 
+		strcpy(&fmt_str[0], fmt_str.c_str());
+		final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
+		if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
+		else break;
+	}
 
-	if (fLogToFile) {
-		// Send this directly to the file
-		_vftprintf_s(fp, format, args);
-	} else {
+	// If logging directly to file
+	if (fLogToFile) { _vftprintf_s(fp, format, args); }
+	else
+	{
 		// Send this to the circular memory-buffer
 		TCHAR temp[100];
 		_vsntprintf_s(temp, sizeof(temp) / sizeof(temp[0]), _TRUNCATE, format, args);
 		logFifo.Put(temp);
 	}
-
+	
+	// Stop arg logging session
 	va_end(args);
+
+	// Send to pipe server only if our pipe instances are currently open and connected
+	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
+	if (fulcrum_app->pipesLoaded) { fulcrum_app->fulcrumPiper->WriteStringOut(std::string(formatted.get())); }
 }
