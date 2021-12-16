@@ -73,7 +73,7 @@ namespace FulcrumInjector.ViewControl.Views
             string TextToFilter = FilteringTextBox.Text;
 
             // Run the search and show method on the view model
-            ViewModel.SearchForText(TextToFilter, DebugRedirectOutputEdit); 
+            ViewModel.SearchForText(TextToFilter); 
         }
 
 
@@ -101,7 +101,7 @@ namespace FulcrumInjector.ViewControl.Views
             // Check for zero or no selection
             if (CastSendingBox.SelectedIndex <= 0)
             {
-                ViewModel?.FilterByLoggerName(null, DebugRedirectOutputEdit);
+                ViewModel?.FilterByLoggerName(null);
                 ViewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
                 return;
             }
@@ -109,7 +109,7 @@ namespace FulcrumInjector.ViewControl.Views
             // Now setup new filtering rule.
             string SelectedLoggerName = CastSendingBox.SelectedItem?.ToString();
             ViewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
-            ViewModel.FilterByLoggerName(SelectedLoggerName, DebugRedirectOutputEdit);
+            ViewModel.FilterByLoggerName(SelectedLoggerName);
         }
     }
 }

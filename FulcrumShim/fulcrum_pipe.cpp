@@ -19,7 +19,7 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	if (Loaded)
 	{
 		// Log information, store state of pipes, and return it.
-		appendToLog(_T("%.3fs :: FULCRUM PIPE 1 (OUTPUT PIPE) WAS ALREADY OPEN!\n"), GetTimeSinceInit());
+		fulcrum_output::fulcrumDebug(_T("%.3fs :: FULCRUM PIPE 1 (OUTPUT PIPE) WAS ALREADY OPEN!\n"), GetTimeSinceInit());
 		Loaded = true;
 		return true;
 	}
@@ -31,14 +31,14 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	// Check if the pipe was built or not.
 	if ((hPipe1 == NULL || hPipe1 == INVALID_HANDLE_VALUE))
 	{
-		appendToLog(_T("%.3fs    ERROR: FULCRUM PIPE 1 (OUTPUT PIPE) COULD NOT BE OPENED!\n"), GetTimeSinceInit());
-		if (hPipe1 == NULL) { appendToLog(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
-		else {appendToLog(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
+		fulcrum_output::fulcrumDebug(_T("%.3fs    ERROR: FULCRUM PIPE 1 (OUTPUT PIPE) COULD NOT BE OPENED!\n"), GetTimeSinceInit());
+		if (hPipe1 == NULL) { fulcrum_output::fulcrumDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
+		else {fulcrum_output::fulcrumDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
 		return false;
 	}
 
 	// Log information and return output
-	appendToLog(_T("%.3fs    FULCRUM PIPE 1 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    FULCRUM PIPE 1 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
 	return true;
 }
 bool fulcrum_pipe::ConnectInputPipe()
@@ -50,14 +50,14 @@ bool fulcrum_pipe::ConnectInputPipe()
 	// Check if the pipe was built or not.
 	if ((hPipe2 == NULL || hPipe2 == INVALID_HANDLE_VALUE))
 	{
-		appendToLog(_T("%.3fs    ERROR: FULCRUM PIPE 2 (INPUT PIPE) COULD NOT BE OPENED!\n"), GetTimeSinceInit());
-		if (hPipe2 == NULL) { appendToLog(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
-		else { appendToLog(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
+		fulcrum_output::fulcrumDebug(_T("%.3fs    ERROR: FULCRUM PIPE 2 (INPUT PIPE) COULD NOT BE OPENED!\n"), GetTimeSinceInit());
+		if (hPipe2 == NULL) { fulcrum_output::fulcrumDebug(_T("%.3fs    \\__ PIPE WAS NULL! (error % d)\n"), GetTimeSinceInit(), GetLastError()); }
+		else { fulcrum_output::fulcrumDebug(_T("%.3fs    \\__ PIPE HANDLE WAS INVALID! (error %d)\n"), GetTimeSinceInit(), GetLastError()); }
 		return false;
 	}
 
 	// Log information and return output
-	appendToLog(_T("%.3fs    FULCRUM PIPE 2 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    FULCRUM PIPE 2 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
 	return true;
 }
 void fulcrum_pipe::ShutdownPipe()
@@ -67,7 +67,7 @@ void fulcrum_pipe::ShutdownPipe()
 
 	// Close it out and log information.
 	CloseHandle(hPipe1); hPipe1 = nullptr;
-	appendToLog(_T("%.3fs    Closed output pipe for FulcrumShim Server correctly!\n", GetTimeSinceInit()));
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Closed output pipe for FulcrumShim Server correctly!\n", GetTimeSinceInit()));
 	Loaded = false;
 }
 

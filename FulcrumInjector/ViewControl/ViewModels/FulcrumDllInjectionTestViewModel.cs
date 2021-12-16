@@ -70,35 +70,25 @@ namespace FulcrumInjector.ViewControl.ViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Writes text to our output logging box for the debugging of the injection process
-        /// </summary>
-        /// <param name="LogText"></param>
-        internal void WriteToLogBox(string LogText)
-        {
-            // Build the current View object into our output and then log into it.
-            ViewModelLogger.WriteLog($"[INJECTION TEST OUTPUT] ::: {LogText}", LogType.TraceLog);
-        }
-
-        /// <summary>
         /// Test the loading process of the fulcrum DLL Injection objects
         /// </summary>
         /// <param name="InjectionResult">Result String of the injection</param>
         /// <returns>True if the DLL Injects OK. False if not.</returns>
-        internal bool PerformDllInjectionTest(out string ResultString)
+        internal bool TestInjectorDllLoading(out string ResultString, bool SkipSelectionBox = false)
         {
             // Begin by loading the DLL Object
             this.InjectorTestResult = "Testing...";
-            WriteToLogBox($"PULLING IN FULCRUM DLL NOW");
+            ViewModelLogger.WriteLog($"PULLING IN FULCRUM DLL NOW", LogType.InfoLog);
             IntPtr LoadResult = FulcrumWin32Invokers.LoadLibrary(this.InjectorDllPath);
-            WriteToLogBox($"RESULT FROM LOADING DLL: {LoadResult}");
+            ViewModelLogger.WriteLog($"RESULT FROM LOADING DLL: {LoadResult}", LogType.InfoLog);
 
             // Make sure the pointer is not 0s. 
             if (LoadResult == IntPtr.Zero)
             {
                 // Log failure, set output value and return false
                 var ErrorCode = FulcrumWin32Invokers.GetLastError();
-                WriteToLogBox("FAILED TO LOAD OUR NEW DLL INSTANCE FOR OUR APPLICATION!");
-                WriteToLogBox($"ERROR CODE PROCESSED FROM LOADING REQUEST WAS: {ErrorCode}");
+                ViewModelLogger.WriteLog("FAILED TO LOAD OUR NEW DLL INSTANCE FOR OUR APPLICATION!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog($"ERROR CODE PROCESSED FROM LOADING REQUEST WAS: {ErrorCode}", LogType.ErrorLog);
 
                 // Store failure message output
                 this.InjectorTestResult = $"Failed! IntPtr.Zero! ({ErrorCode})";
@@ -106,41 +96,15 @@ namespace FulcrumInjector.ViewControl.ViewModels
                 return false;
             }
 
-            // If Pipes are open, don't try test injection methods
-            if (InjectorConstants.FulcrumPipeStatusViewModel.ReaderPipeState != "Connected" &&
-                InjectorConstants.FulcrumPipeStatusViewModel.WriterPipeState != "Connected")
-            {
-
-                try
-                {
-                    // Now try and open the selection box view 
-                    WriteToLogBox("IMPORTING PT OPEN METHOD AND ATTEMPTING TO INVOKE IT NOW...");
-                    IntPtr PassThruOpenCommand = FulcrumWin32Invokers.GetProcAddress(LoadResult, "PassThruOpen");
-                    PTOpen = (DelegatePassThruOpen)Marshal.GetDelegateForFunctionPointer(PassThruOpenCommand, typeof(DelegatePassThruOpen));
-                    WriteToLogBox("IMPORTED METHOD OK! CALLING IT NOW...");
-
-                    // Invoke method now.
-                    PTOpen.Invoke(LoadResult, out uint DeviceId);
-                    WriteToLogBox("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW");
-                    WriteToLogBox($"DEVICE ID RETURNED: {DeviceId}");
-                }
-                catch (Exception ImportEx)
-                {
-                    // Log failed to connect to our pipe.
-                    WriteToLogBox($"FAILED TO ISSUE A PASSTHRU OPEN METHOD USING OUR INJECTED DLL!");
-                    WriteToLogBox("EXCEPTION THROWN DURING DYNAMIC CALL OF THE UNMANAGED PT OPEN COMMAND!");
-                    ViewModelLogger.WriteLog("EXCEPTION THROWN", ImportEx);
-
-                    // Store output values and fail
-                    ResultString = "PTOpen Failed!";
-                    return false;
-                }
-            }
-            else { WriteToLogBox("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!"); }
-
             // Log Passed and then unload our DLL
-            WriteToLogBox($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}");
-            WriteToLogBox("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
+            ViewModelLogger.WriteLog($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}", LogType.InfoLog);
+            ViewModelLogger.WriteLog("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
+            
+            // If Pipes are open, don't try test injection methods
+            if (!SkipSelectionBox) { this.TestInjectorDllSelectionBox(LoadResult, out ResultString); }
+            else { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
+
+            // Run our unload calls here
             if (!FulcrumWin32Invokers.FreeLibrary(LoadResult))
             {
                 // Get Error code and build message
@@ -149,22 +113,87 @@ namespace FulcrumInjector.ViewControl.ViewModels
                 ResultString = this.InjectorTestResult;
 
                 // Write log output
-                WriteToLogBox("FAILED TO UNLOAD DLL! THIS IS FATAL!");
-                WriteToLogBox($"ERROR CODE PROCESSED FROM UNLOADING REQUEST WAS: {ErrorCode}");
+                ViewModelLogger.WriteLog("FAILED TO UNLOAD DLL! THIS IS FATAL!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog($"ERROR CODE PROCESSED FROM UNLOADING REQUEST WAS: {ErrorCode}", LogType.ErrorLog);
                 return false;
             }
 
             // Return passed and set results.
-            WriteToLogBox("UNLOADED DLL OK!");
+            ViewModelLogger.WriteLog("UNLOADED DLL OK!", LogType.InfoLog);
             this.InjectorTestResult = "Injection Passed!";
             ResultString = this.InjectorTestResult;
 
             // Log information output
-            WriteToLogBox("----------------------------------------------");
-            WriteToLogBox("IMPORT PROCESS SHOULD NOT HAVE ISSUES GOING FORWARD!");
-            WriteToLogBox("THIS MEANS THE FULCRUM APP SHOULD WORK AS EXPECTED!");
-            WriteToLogBox("----------------------------------------------");
+            ViewModelLogger.WriteLog("----------------------------------------------", LogType.WarnLog);
+            ViewModelLogger.WriteLog("IMPORT PROCESS SHOULD NOT HAVE ISSUES GOING FORWARD!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("THIS MEANS THE FULCRUM APP SHOULD WORK AS EXPECTED!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("----------------------------------------------", LogType.WarnLog);
             return true;
+        }
+
+        /// <summary>
+        /// Tests the use of the injector selection box when new instances are made
+        /// </summary>
+        internal bool TestInjectorDllSelectionBox(IntPtr InjectorDllPtr, out string ResultString)
+        {
+            try
+            {
+                // Import our PTOpen command
+                ViewModelLogger.WriteLog("IMPORTING PT OPEN METHOD AND NOW...", LogType.WarnLog);
+                IntPtr PassThruOpenCommand = FulcrumWin32Invokers.GetProcAddress(InjectorDllPtr, "PassThruOpen");
+                PTOpen = (DelegatePassThruOpen)Marshal.GetDelegateForFunctionPointer(PassThruOpenCommand, typeof(DelegatePassThruOpen));
+                ViewModelLogger.WriteLog("IMPORTED PTOPEN METHOD OK!", LogType.InfoLog);
+
+                // Import our PTClose command
+                ViewModelLogger.WriteLog("IMPORTING PT CLOSE METHOD NOW...", LogType.WarnLog);
+                IntPtr PassThruCloseCommand = FulcrumWin32Invokers.GetProcAddress(InjectorDllPtr, "PassThruClose");
+                PTClose = (DelegatePassThruClose)Marshal.GetDelegateForFunctionPointer(PassThruCloseCommand, typeof(DelegatePassThruClose));
+                ViewModelLogger.WriteLog("IMPORTED PTCLOSE METHOD OK!", LogType.InfoLog);
+
+                // Log importing passed so far
+                ViewModelLogger.WriteLog("IMPORTED PT OPEN AND CLOSE COMMANDS WITHOUT ISSUES!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"PTOPEN POINTER: {PassThruOpenCommand}", LogType.TraceLog);
+                ViewModelLogger.WriteLog($"PTCLOSE POINTER: {PassThruCloseCommand}", LogType.TraceLog);
+            }
+            catch (Exception ImportEx)
+            {
+                // Log failed to connect to our pipe.
+                ViewModelLogger.WriteLog($"FAILED TO IMPORT A PASSTHRU METHOD USING OUR INJECTED DLL!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN DURING DYNAMIC CALL OF THE UNMANAGED PT COMMAND!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN", ImportEx);
+
+                // Store output values and fail
+                ResultString = "DLL Import Failed!";
+                return false;
+            }
+
+            try
+            {
+                // Invoke PTOpen now then run our PT Close method
+                PTOpen.Invoke(InjectorDllPtr, out uint DeviceId);
+                ViewModelLogger.WriteLog("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"DEVICE ID RETURNED: {DeviceId}");
+
+                // Now issue the close command
+                ViewModelLogger.WriteLog("TRYING TO CLOSE OPENED DEVICE INSTANCE NOW...", LogType.WarnLog);
+                PTClose.Invoke(DeviceId);
+                ViewModelLogger.WriteLog("INJECTED METHOD EXECUTION COMPLETED OK!", LogType.InfoLog);
+
+                // Set output, return values.
+                ResultString = "DLL Execution Passed!";
+                return true;
+            }
+            catch (Exception ImportEx)
+            {
+                // Log failed to connect to our pipe.
+                ViewModelLogger.WriteLog($"FAILED TO EXECUTE A PASSTHRU METHOD USING OUR INJECTED DLL!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN DURING DYNAMIC CALL OF THE UNMANAGED PT COMMAND!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN", ImportEx);
+
+                // Store output values and fail
+                ResultString = "DLL Execution Failed!";
+                return false;
+            }
         }
     }
 }

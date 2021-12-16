@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include <tchar.h>
 #include <varargs.h>
-#include "FulcrumShim.h"
 #include <memory>
+#include <stdexcept>
+
+// For the pipes
+#include "FulcrumShim.h"
+#include "fulcrum_output.h"
 
 // Implementation of a circular buffer. Two simple interfaces:
 //   Put(): Add a string to the log
@@ -35,6 +39,7 @@ FILE *fp;
 static bool fInitialized = false;
 static bool fLogToFile = false;
 
+// FIFO Buffer Methods
 void cFifo::Put(LPCTSTR szMsg)
 {
 	size_t nSize = _tcslen(szMsg);
@@ -97,39 +102,35 @@ void cFifo::Get(FILE *fp)
 
 	m_nItems -= n;
 }
-void writeLogfile(LPCTSTR szFilename, bool in_fLogToFile)
+
+// Logging Methods Appends are for single targets
+void fulcrum_output::writeNewLogFile(LPCTSTR szFilename, bool in_fLogToFile)
 {
 	// Write the memory-buffer to a file. Then either close the file, or keep the file open
 	// and set a flag that redirects all future log messages directly to the file
-	if (in_fLogToFile) 
+	if (in_fLogToFile)
 	{
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
 		logFifo.Get(fp);
 		fLogToFile = true;
 	}
-	else 
+	else
 	{
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
 		logFifo.Get(fp);
 		fclose(fp);
 	}
 }
-void appendToLog(LPCTSTR format, ...)
+void fulcrum_output::fulcrumDebug(LPCTSTR format, ...)
 {
+	// Split this up into two different methods. One for the file and one for the pipes
+	appendToLog(format);    // Write file 
+	appendToPipes(format);	// Write Pipes
+}
+void fulcrum_output::appendToLog(LPCTSTR format, ...) {
+
 	// Args formating for log output
 	va_list args; va_start(args, format);
-	
-	// Build converted string for writing into our pipe host
-	std::string fmt_str = CT2A(format);
-	int final_n, n = ((int)fmt_str.size()) * 2;
-	std::unique_ptr<char[]> formatted;
-	while (1) {
-		formatted.reset(new char[n]); 
-		strcpy(&fmt_str[0], fmt_str.c_str());
-		final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
-		if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
-		else break;
-	}
 
 	// If logging directly to file
 	if (fLogToFile) { _vftprintf_s(fp, format, args); }
@@ -140,11 +141,45 @@ void appendToLog(LPCTSTR format, ...)
 		_vsntprintf_s(temp, sizeof(temp) / sizeof(temp[0]), _TRUNCATE, format, args);
 		logFifo.Put(temp);
 	}
-	
-	// Stop arg logging session
-	va_end(args);
 
-	// Send to pipe server only if our pipe instances are currently open and connected
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (fulcrum_app->pipesLoaded) { fulcrum_app->fulcrumPiper->WriteStringOut(std::string(formatted.get())); }
+	// Stop arg fprmatting session
+	va_end(args);
+}
+// Writes directly to our pipes
+void fulcrum_output::appendToPipes(LPCTSTR format, ...) {
+
+	try 
+	{
+		// Convert our input string to a std::string and buffer of char[]
+		std::string fmt_str = CT2A(format);	
+		std::unique_ptr<char[]> formatted;
+		int final_n, n = ((int)fmt_str.size()) * 2;
+
+		// Setup args list and init formatting helpers
+		va_list args; va_start(args, format);
+
+		// Now run thru each char object and find where the arguments are. 
+		while (1) {
+			// Format new output for this argument object
+			formatted.reset(new char[n]);
+			strcpy(&fmt_str[0], fmt_str.c_str());
+			final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
+
+			// If we're at the end of the line or no more args appear, return
+			if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
+			else break;
+		}
+
+		// Stop argument formatting
+		va_end(args);
+
+		// Send to pipe server only if our pipe instances are currently open and connected
+		CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
+		if (fulcrum_app->pipesLoaded) { fulcrum_app->fulcrumPiper->WriteStringOut(std::string(formatted.get())); }
+		else { appendToLog(_T("WARNING: FULCRUM PIPE SERVERS ARE NOT SHOWING AN ACTIVE CONNECTION TO A CLIENT!")); }
+	}
+	// Catch all the possible exception types. Define runtime and standard. If it's not one of those print something else
+	catch (const std::runtime_error& re) { appendToLog(_T("!!!    RUNTIME EX ON TRANSMISSION: %s\n", re.what())); }
+	catch (const std::exception& ex) { appendToLog(_T("!!!    STANDARD EX ON TRANSMISSION: %s\n", ex.what())); }
+	catch (...) { appendToLog(_T("!!!    UNKNOWN ERROR ON TRANSMISSION! MEMORY CORRUPTION?\n")); }
 }
