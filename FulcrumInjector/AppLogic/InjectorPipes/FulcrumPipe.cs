@@ -52,7 +52,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Changed this for debugging mode. THis way the DLL is pulled local if debugging or live if in release
         public readonly string FulcrumDLLPath =
             Debugger.IsAttached ?
-                Path.Combine(Directory.GetCurrentDirectory(), "FulcrumShim.dll") :
+                "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll" :
                 ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
 
         // Pipe Configurations for the default values.

@@ -19,19 +19,23 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	if (Loaded)
 	{
 		// Log information, store state of pipes, and return it.
-		fulcrum_output::fulcrumDebug(_T("%.3fs :: FULCRUM PIPE 1 (OUTPUT PIPE) WAS ALREADY OPEN!\n"), GetTimeSinceInit());
+		fulcrum_output::fulcrumDebug(_T("%.3fs    FULCRUM PIPE 1 (OUTPUT PIPE) WAS ALREADY OPEN!\n"), GetTimeSinceInit());
 		Loaded = true;
 		return true;
 	}
 	
 	// Configure new pipe name object output
 	LPTSTR lpszPipename1 = TEXT("\\\\.\\pipe\\2CC3F0FB08354929BB453151BBAA5A15");
-	hFulcrumWriter = CreateNamedPipe(lpszPipename1, PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,  
-		1,
-		1024 * 16,
-		1024 * 16,
-		NMPWAIT_USE_DEFAULT_WAIT,
-		NULL);
+	hFulcrumWriter = CreateNamedPipe(
+		lpszPipename1,						// Name of the pipe
+		PIPE_ACCESS_OUTBOUND,				// Pipe direction
+		PIPE_TYPE_BYTE | PIPE_WAIT,			// Pipe types
+		1,									// Number of instances
+		1024 * 16,							// Output buffer size
+		1024 * 16,							// Input buffer size
+		NMPWAIT_USE_DEFAULT_WAIT,			// Timeout Time value
+		NULL								// Default security wait
+	);
 
 	// Check if the pipe was built or not.
 	if ((hFulcrumWriter == NULL || hFulcrumWriter == INVALID_HANDLE_VALUE))
@@ -61,7 +65,7 @@ bool fulcrum_pipe::ConnectInputPipe()
 		return false;
 	}
 
-	// Log information and return output
+	// Log information and return output then close our handle output
 	fulcrum_output::fulcrumDebug(_T("%.3fs    FULCRUM PIPE 2 (INPUT PIPE) HAS BEEN OPENED OK!\n"), GetTimeSinceInit());
 	return true;
 }
@@ -83,7 +87,9 @@ void fulcrum_pipe::WriteStringOut(std::string str)
 	DWORD written;
 	DWORD bytesToWrite = (DWORD)strlen(str.c_str());
 	BOOL res = WriteFile(hFulcrumWriter, str.c_str(), bytesToWrite, &written, NULL);
-	CloseHandle(hFulcrumWriter);
+
+	// Removing this for testing purposes
+	// CloseHandle(hFulcrumWriter);
 }
 void fulcrum_pipe::WriteStringOut100(std::string str)
 {
@@ -95,25 +101,35 @@ void fulcrum_pipe::WriteStringOut100(std::string str)
 
 	for (int i = 0; i < (int)bytesToWrite; i++) ayPaddedArray[i] = str[i];
 	BOOL res = WriteFile(hFulcrumWriter, ayPaddedArray, 100, &written, NULL);
-	CloseHandle(hFulcrumWriter);
+
+	// Removing this for testing purposes
+	// CloseHandle(hFulcrumWriter);
 }
 void fulcrum_pipe::WriteBytesOut(byte b[], int b_len)
 {
 	DWORD written;
 	BOOL res = WriteFile(hFulcrumWriter, b, b_len, &written, NULL);
-	CloseHandle(hFulcrumWriter);
+
+	// Removing this for testing purposes
+	// CloseHandle(hFulcrumWriter);
 }
 void fulcrum_pipe::WriteUint32(unsigned int num) {
 	WriteBytesOut((byte*)&num, 4);
-	CloseHandle(hFulcrumWriter);
+
+	// Removing this for testing purposes
+	// CloseHandle(hFulcrumWriter);
 }
 void fulcrum_pipe::WriteUint32(unsigned int* a, unsigned int len) {
 	for (unsigned int i = 0; i < len; i++) WriteUint32(a[i]);
-	CloseHandle(hFulcrumWriter);
+
+	// Removing this for testing purposes
+	// CloseHandle(hFulcrumWriter);
 }
 void fulcrum_pipe::Writeint32(int num) {
 	WriteBytesOut((byte*)&num, 4); 
-	CloseHandle(hFulcrumWriter); 
+
+	// Removing this for testing purposes
+	// CloseHandle(hFulcrumWriter);
 }
 
 // Reads data from our pipe streams

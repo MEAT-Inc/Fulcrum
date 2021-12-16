@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -46,8 +47,15 @@ namespace FulcrumInjector.ViewControl.ViewModels
             ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Store title and version string values now.
-            this.InjectorDllPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
             this.InjectorTestResult = "Not Yet Tested";
+            this.InjectorDllPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+            if (Debugger.IsAttached)
+            {
+                ViewModelLogger.WriteLog("DEFAULTING TO DEBUGGING DLL FOR TESTING PURPOSES!", LogType.WarnLog);
+                this.InjectorDllPath = "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
+            } 
+
+            // Log information about the DLL Path values
             ViewModelLogger.WriteLog("LOCATED NEW DLL PATH VALUE OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"DLL PATH VALUE PULLED: {this.InjectorDllPath}");
             

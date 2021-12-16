@@ -153,17 +153,17 @@ void fulcrum_output::appendToPipes(LPCTSTR format, ...) {
 		// Convert our input string to a std::string and buffer of char[]
 		std::string fmt_str = CT2A(format);	
 		std::unique_ptr<char[]> formatted;
-		int final_n, n = ((int)fmt_str.size()) * 2;
-
-		// Setup args list and init formatting helpers
+		
+		// Build format args list and store arrays
 		va_list args; va_start(args, format);
+		int final_n, n = ((int)fmt_str.size()) * 2;
 
 		// Now run thru each char object and find where the arguments are. 
 		while (1) {
 			// Format new output for this argument object
 			formatted.reset(new char[n]);
 			strcpy(&fmt_str[0], fmt_str.c_str());
-			final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
+			final_n = _vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
 
 			// If we're at the end of the line or no more args appear, return
 			if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
