@@ -91,5 +91,21 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
 
             // -------------------------------------------------------------------------------------------------------
         }
+
+        /// <summary>
+        /// Attempts to read data from our pipe server instance.
+        /// </summary>
+        /// <param name="ReadDataContents">Data processed</param>
+        /// <returns>True if content comes back. False if not.</returns>
+        internal bool ReadPipeData(out string ReadDataContents)
+        {
+            // Start by making sure we're open
+            if (this.PipeState != FulcrumPipeState.Connected) 
+                if (!this.ConfigureNewPipe()) { ReadDataContents = "FAILED TO CONFIGURE READER PIPE!"; return false; }
+
+            // Now read in some data from the pipe.
+
+            this.FulcrumPipe.BeginRead()
+        }
     }
 }

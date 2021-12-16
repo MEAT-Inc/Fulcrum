@@ -3,6 +3,8 @@
                     xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="CommonControlStyles.xaml"/>
+      
+        <!-- Base Style Layouts -->
         <ResourceDictionary>
             <!-- AVEdit Output Box Style -->
             <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">
@@ -50,6 +52,8 @@
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
             </Style>
         </ResourceDictionary>
+
+        <!-- DataTemplates for User Settings -->
         <ResourceDictionary>
             <!-- Setting Name Style -->
             <Style x:Key="SettingSectionTitleStyle" TargetType="TextBlock">
