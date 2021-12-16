@@ -9,6 +9,8 @@
 #include <string.h>
 #include <comdef.h>  
 
+#include "FulcrumShim.h"
+#include "fulcrum_jpipe.h"
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
@@ -96,39 +98,6 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 	dtDebug(_T("%.3fs ++ PTUnloadLibrary()\n"), GetTimeSinceInit());
 	fulcrum_unloadLibrary();
 	dbug_printretval(STATUS_NOERROR);
-
-	// Kill the fulcrum server app here
-	dtDebug(_T("%.3fs    FulcrumInjector is getting ready to shut down since we've been unloaded!\n"), GetTimeSinceInit());
-	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
-	PROCESSENTRY32 pEntry;	pEntry.dwSize = sizeof(pEntry);
-	BOOL hRes = Process32First(hSnapShot, &pEntry);
-
-	// While we've got new info to check
-	while (hRes)
-	{
-		// Check if the app found is the process in question
-		_bstr_t b(pEntry.szExeFile); const char* fileEntryChar = b;
-		if (strcmp(fileEntryChar, "FulcrumInjector") != 0) continue;
-
-		// Store process handle for it. If null, move on.
-		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, (DWORD)pEntry.th32ProcessID);
-		if (hProcess != NULL && pEntry.th32ProcessID != GetCurrentProcessId())
-		{
-			// Kill the process now
-			dtDebug(_T("%.3fs    FulcrumInjector is being requested to shut down now...\n"), GetTimeSinceInit());
-			TerminateProcess(hProcess, 9);
-			CloseHandle(hProcess);
-			hRes = Process32Next(hSnapShot, &pEntry);
-
-			// Log killed and move out.
-			dtDebug(_T("%.3fs    FulcrumInjector application instance has been shut down OK!\n"), GetTimeSinceInit());
-			break;
-		}
-	}
-
-	// Close the handle of the process snapshot here and return passed
-	CloseHandle(hSnapShot);
-	dtDebug(_T("%.3fs    FulcrumInjector application is closed and library has been unloaded OK!\n"), GetTimeSinceInit());
 	return STATUS_NOERROR;
 }
 
@@ -191,6 +160,13 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 
 	retval = _PassThruClose(DeviceID);
 	dbug_printretval(retval);
+
+	// Shut off pipes
+	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
+	if (!fulcrum_app->pipesLoaded) { fulcrum_app->ShutdownPipes(); }
+	dtDebug(_T("%.3fs    FulcrumInjector has closed all pipe instances OK!\n"), GetTimeSinceInit());
+
+	// Return output value
 	return retval;
 }
 extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long ProtocolID, unsigned long Flags, unsigned long Baudrate, unsigned long *pChannelID)

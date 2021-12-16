@@ -23,8 +23,6 @@ class fulcrum_pipe {
 public:
 	fulcrum_pipe();
 	~fulcrum_pipe();
-
-public:
 	bool ConnectInputPipe();
 	bool ConnectOutputPipe();
 	bool IsLoaded();

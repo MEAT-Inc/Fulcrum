@@ -85,12 +85,18 @@ namespace FulcrumInjector
             }
 
             // Begin archive process 
+            var ShimFileFilterName = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorSettings.ShimInstanceName"); ;
             LogBroker.Logger?.WriteLog($"ARCHIVE PROCESS IS NEEDED! PATH TO STORE FILES IS SET TO {ConfigObj.LogArchivePath}");
             LogBroker.Logger?.WriteLog($"SETTING UP SETS OF {ConfigObj.ArchiveFileSetSize} FILES IN EACH ARCHIVE OBJECT!");
-            LogBroker.CleanupLogHistory(ConfigObj.ToString());
+            Task.Run(() =>
+            {
+                // Run on different thread to avoid clogging up UI
+                LogBroker.CleanupLogHistory(ConfigObj.ToString());
+                LogBroker.CleanupLogHistory(ConfigObj.ToString(), ShimFileFilterName);
 
-            // Log done.
-            LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);
+                // Log done.
+                LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.
@@ -98,8 +104,8 @@ namespace FulcrumInjector
         private bool ConfigureSingleInstance()
         {
             // Find all the fulcrum process objects now.
-            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
             var CurrentInjector = Process.GetCurrentProcess();
+            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
             LogBroker.Logger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
 
             // Find the process values here.
@@ -107,7 +113,7 @@ namespace FulcrumInjector
             LogBroker.Logger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
             var InjectorsTotal = Process.GetProcesses()
                 .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
-                .Where(ProcObj => ProcObj.ProcessName.ToUpper().Contains(CurrentInstanceName)
+                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName)
                                   || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
                 .ToList();
 
@@ -117,11 +123,7 @@ namespace FulcrumInjector
             // Now kill any existing instances
             LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
             LogBroker.Logger?.WriteLog("KILLING THESE PROCESS OBJECTS NOW...", LogType.InfoLog);
-            foreach (var InjectorProc in InjectorsTotal)
-            {
-                InjectorProc.Kill();
-                LogBroker.Logger?.WriteLog($"--> KILLED PROCESS {InjectorProc.Id} OK!", LogType.TraceLog);
-            }
+            if (InjectorsTotal.Count > 0) { Environment.Exit(0); }
 
             // Return passed output.
             return true;
