@@ -37,7 +37,7 @@
     <LangVersion>latest</LangVersion>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-    <PropertyGroup>
+  <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
@@ -107,6 +107,7 @@
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
     <Compile Include="AppLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="AppLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
+    <Compile Include="AppLogic\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="AppStyles\AppStyleLogic\AppColorSetter.cs" />
     <Compile Include="AppStyles\AppStyleLogic\ColorMatchingHelper.cs" />
     <Compile Include="AppStyles\AppStyleLogic\CustomColorShader.cs" />

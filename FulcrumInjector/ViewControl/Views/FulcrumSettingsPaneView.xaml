@@ -8,6 +8,7 @@
              xmlns:viewModels="clr-namespace:FulcrumInjector.ViewControl.ViewModels"
              xmlns:models="clr-namespace:FulcrumInjector.ViewControl.Models"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:appLogic="clr-namespace:FulcrumInjector.AppLogic"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
              Loaded="FulcrumSettingsPaneView_OnLoaded">
@@ -53,7 +54,9 @@
         <!-- Content for the settings objects goes in here -->
         <ListBox Grid.Row="1"
                  Margin="10,10"
-                 Width="{Binding Path=ActualWidth, ElementName=WidthHelperBorder}"
+                 Width="660"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
                  Style="{StaticResource ListBoxSettingsStyle}"
                  ItemsSource="{Binding Path=SettingsEntrySets}">
             <ListBox.ItemTemplate>
@@ -73,15 +76,18 @@
                                     Margin="10,5,10,0"
                                     Style="{StaticResource SettingSectionTitleStyle}"
                                     Text="{Binding Path=SettingSectionTitle}"/>
-                                <ListBox
+                            <ListBox
                                     Grid.Row="1" 
                                     Margin="5"
                                     BorderThickness="0"
                                     ItemsSource="{Binding}"
                                     Style="{StaticResource ListBoxSettingsStyle}"
-                                    DataContext="{Binding Path=SettingsEntries}"
-                                    ItemTemplate="{StaticResource CheckboxSettingEntryDataTemplate}">
-                                </ListBox>
+                                    Width="599"
+                                    DataContext="{Binding Path=SettingsEntries}">
+                                <ListBox.ItemTemplateSelector>
+                                    <appLogic:UserSettingsDataTemplateSelector/>
+                                </ListBox.ItemTemplateSelector>
+                            </ListBox>
                             </Grid>
                         </Border>
                 </DataTemplate>
