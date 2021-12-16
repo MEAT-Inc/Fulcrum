@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.AppLogic;
+using FulcrumInjector.AppLogic.JsonConverters;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;

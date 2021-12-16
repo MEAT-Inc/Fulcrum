@@ -24,6 +24,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Content for showing OE Apps -->
     <Grid Margin="0,5">
         <Grid.RowDefinitions>
             <RowDefinition Height=".15*"/>

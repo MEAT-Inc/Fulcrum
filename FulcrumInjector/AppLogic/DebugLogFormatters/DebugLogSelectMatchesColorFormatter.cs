@@ -15,6 +15,9 @@ namespace FulcrumInjector.AppLogic.DebugLogFormatters
     /// </summary>
     public class DebugLogSelectMatchesColorFormatter : DocumentColorizingTransformer
     {
+        // No matches bool value
+        public bool NoMatches { get; private set; }
+
         // String to use for searching and Regex Toggle
         public readonly bool UseRegex;
         public readonly string MatchString;
@@ -83,6 +86,7 @@ namespace FulcrumInjector.AppLogic.DebugLogFormatters
 
                     // Tick our index and move on
                     StartIndex = CurrentIndex + 1;
+                    NoMatches = false;
                 }
             }
             catch { return; }
