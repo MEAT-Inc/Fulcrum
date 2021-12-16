@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.AppLogic.DebugLogFormatters
+namespace FulcrumInjector.AppLogic.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
     /// Selects the text matching the given input pattern.

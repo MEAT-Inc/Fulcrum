@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.AppLogic.DebugLogFormatters
+namespace FulcrumInjector.AppLogic.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
     /// Colors the stacktrace on the log line

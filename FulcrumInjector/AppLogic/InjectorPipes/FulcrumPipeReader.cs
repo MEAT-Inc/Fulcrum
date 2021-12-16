@@ -101,7 +101,6 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
             // -------------------------------------------------------------------------------------------------------
         }
 
-
         /// <summary>
         /// Attempts to read data from our pipe server instance.
         /// </summary>
