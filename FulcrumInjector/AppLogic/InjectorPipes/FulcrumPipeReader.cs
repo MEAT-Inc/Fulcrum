@@ -47,7 +47,16 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
             );
 
             // Build our new pipe instance here.
-            if (!this.ConfigureNewPipe()) this.PipeLogger.WriteLog("FAILED TO CONFIGURE NEW OUTPUT WRITER PIPE!", LogType.ErrorLog);
+            if (!this.ConfigureNewPipe())
+            {
+                // Log failed to open and return
+                this.PipeLogger.WriteLog("FAILED TO CONFIGURE NEW OUTPUT WRITER PIPE!", LogType.ErrorLog);
+                this.PipeLogger.WriteLog("PIPE FAILURE WILL BE MONITORED AND CONNECTIONS WILL BE RETRIED ON A PRESET INTERVAL...", LogType.WarnLog);
+                return;
+            }
+
+            // If the pipe opened ok, begin our reading routine.
+
         }
 
         // -------------------------------------------------------------------------------------------------------
@@ -91,6 +100,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
 
             // -------------------------------------------------------------------------------------------------------
         }
+
 
         /// <summary>
         /// Attempts to read data from our pipe server instance.

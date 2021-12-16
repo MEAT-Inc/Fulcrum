@@ -91,7 +91,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
             {
                 // Run the injection method setup
                 ViewModelLogger.WriteLog("PIPE SOCKETS HAVE BEEN OPENED OK! TESTING INJECTION ROUTINE FOR CONFIDENCE NOW...");
-                InjectorConstants.FulcrumDllInjectionTestViewModel.PerformDllInjectionTest(out string InjectionResultString);
+                InjectorConstants.FulcrumDllInjectionTestViewModel.TestInjectorDllLoading(out string InjectionResultString, true);
 
                 // Build output view contents and log them
                 InjectorConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult = InjectionResultString;

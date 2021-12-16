@@ -95,6 +95,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppLogic\AvalonEditFilteringHelpers.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
     <Compile Include="AppLogic\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="ViewControl\Models\SettingsEntryModelCollection.cs" />
     <Compile Include="ViewControl\PropertyWatchdog.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumDebugLoggingViewModel.cs" />
+    <Compile Include="ViewControl\ViewModels\FulcrumDllOutputLogViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumPipeStatusViewModel.cs" />
     <Compile Include="ViewControl\ViewModels\FulcrumSettingsPaneViewModel.cs" />
@@ -156,6 +158,9 @@
     <Compile Include="ViewControl\Views\FulcrumDllInjectionTestView.xaml.cs">
       <DependentUpon>FulcrumDllInjectionTestView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewControl\Views\FulcrumDllOutputLogView.xaml.cs">
+      <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
+    </Compile>
     <Page Include="AppStyles\AppStyleSheets\CommonControlStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -169,6 +174,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AppStyles\AppStyleSheets\InstalledOeAppsStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppStyles\AppStyleSheets\OutputLoggingDllStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -221,6 +230,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewControl\Views\FulcrumDllInjectionTestView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewControl\Views\FulcrumDllOutputLogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
