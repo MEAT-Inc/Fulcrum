@@ -89,3 +89,17 @@ void CFulcrumShim::InitPipes()
 		dtDebug(_T("%.3fs    FulcrumInjector should now be running in the background\n", GetTimeSinceInit()));
 	}
 }
+void CFulcrumShim::ShutdownPipes()
+{
+	// Build pipe server and store the state of them
+	if (fulcrumPiper == nullptr)
+	{
+		dtDebug(_T("%.3fs    Building Piper to force shut down now...\n", GetTimeSinceInit()));
+		fulcrumPiper = new fulcrum_jpipe();
+	}
+
+	// Run the shutdown method
+	dtDebug(_T("%.3fs    Calling pipe shutdown methods now...\n", GetTimeSinceInit()));
+	fulcrumPiper->ShutdownPipe();
+	dtDebug(_T("%.3fs    Pipe instances have been released OK!\n", GetTimeSinceInit()));
+}
