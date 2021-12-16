@@ -75,5 +75,41 @@ namespace FulcrumInjector.ViewControl.Views
             // Run the search and show method on the view model
             ViewModel.SearchForText(TextToFilter, DebugRedirectOutputEdit); 
         }
+
+
+        /// <summary>
+        /// Pulls in new loggers and shows them here.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LoggerNameComboBox_OnDropDownOpened(object sender, EventArgs e)
+        {
+            // Trigger refresh logger list
+            this.ViewModel.BuildLoggerNamesList();
+            ViewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Takes the selected logger object and filters log lines to only contain those from the given logger
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LoggerNameComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Build filtering helper using the provided selection object
+            ComboBox CastSendingBox = (ComboBox)sender;
+
+            // Check for zero or no selection
+            if (CastSendingBox.SelectedIndex <= 0)
+            {
+                ViewModel?.FilterByLoggerName(null, DebugRedirectOutputEdit);
+                ViewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
+                return;
+            }
+
+            // Now setup new filtering rule.
+            string SelectedLoggerName = CastSendingBox.SelectedItem?.ToString();
+            ViewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
+            ViewModel.FilterByLoggerName(SelectedLoggerName, DebugRedirectOutputEdit);
+        }
     }
 }

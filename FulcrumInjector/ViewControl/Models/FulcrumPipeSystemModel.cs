@@ -43,6 +43,8 @@ namespace FulcrumInjector.ViewControl.Models
             if (OutputResult)
             {
                 // Store pipes from our connection routine
+                InjectorConstants.FulcrumDllInjectionTestViewModel.PerformDllInjectionTest(out string injectionResultString);
+                PipeStatusModelLogger.WriteLog($"INJECTION RESULT STRING: {injectionResultString}", LogType.InfoLog);
                 PipeStatusModelLogger.WriteLog("BUILT NEW PIPE SERVERS FOR BOTH ALPHA AND BRAVO WITHOUT ISSUE!", LogType.InfoLog);
                 PipeStatusModelLogger.WriteLog("PIPES ARE OPEN AND STORED CORRECTLY! READY TO PROCESS OR SEND DATA THROUGH THEM!", LogType.InfoLog);
                 return true;
