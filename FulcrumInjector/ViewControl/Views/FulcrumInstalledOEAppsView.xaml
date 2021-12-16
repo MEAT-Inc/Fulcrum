@@ -67,9 +67,9 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="5,10" FontSize="18" Content="Add App" Style="{StaticResource ActionButtonStyle}"/>
-            <Button Grid.Column="1" Margin="5,10" FontSize="18" Content="Remove App" Style="{StaticResource ActionButtonStyle}"/>
-            <Button Grid.Column="2" Margin="5,10" FontSize="18" Content="Modify App" Style="{StaticResource ActionButtonStyle}"/>
+            <Button Grid.Column="0" IsEnabled="False" Margin="5,10" FontSize="18" Content="Add App" Style="{StaticResource ActionButtonStyle}"/>
+            <Button Grid.Column="1" IsEnabled="False" Margin="5,10" FontSize="18" Content="Remove App" Style="{StaticResource ActionButtonStyle}"/>
+            <Button Grid.Column="2" IsEnabled="False" Margin="5,10" FontSize="18" Content="Modify App" Style="{StaticResource ActionButtonStyle}"/>
         </Grid>
     </Grid>
 </UserControl>

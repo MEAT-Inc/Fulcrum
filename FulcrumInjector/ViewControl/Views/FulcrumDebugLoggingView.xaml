@@ -46,7 +46,10 @@
             <ComboBox
                 IsEnabled="True"
                 Grid.Column="1" 
-                FontSize="14" 
+                FontSize="13" 
+                SelectedIndex="0"
+                HorizontalContentAlignment="Center" 
+                VerticalContentAlignment="Top"
                 Margin="10,0"
                 DropDownOpened="LoggerNameComboBox_OnDropDownOpened"
                 SelectionChanged="LoggerNameComboBox_OnSelectionChanged"

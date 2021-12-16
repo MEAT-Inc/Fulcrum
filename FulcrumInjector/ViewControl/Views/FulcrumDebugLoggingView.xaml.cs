@@ -101,7 +101,7 @@ namespace FulcrumInjector.ViewControl.Views
             // Check for zero or no selection
             if (CastSendingBox.SelectedIndex <= 0)
             {
-                ViewModel.FilterByLoggerName(null, DebugRedirectOutputEdit);
+                ViewModel?.FilterByLoggerName(null, DebugRedirectOutputEdit);
                 ViewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
                 return;
             }
