@@ -104,8 +104,8 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
                 if (!this.ConfigureNewPipe()) { ReadDataContents = "FAILED TO CONFIGURE READER PIPE!"; return false; }
 
             // Now read in some data from the pipe.
-
-            this.FulcrumPipe.BeginRead()
+            ReadDataContents = "EMPTY_OUTPUT";
+            return true;
         }
     }
 }
