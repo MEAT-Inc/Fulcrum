@@ -44,25 +44,28 @@ namespace FulcrumInjector.AppLogic.AvalonEditHelpers
             try
             {
                 // Remove existing search objects and add in new ones.
-                var TransformerList = SessionEditor.TextArea.TextView.LineTransformers.ToList();
-                TransformerList.RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
-
-                // Clear out transformers and append them in again
-                SessionEditor.TextArea.TextView.LineTransformers.Clear();
-                foreach (var TransformerObject in TransformerList)
-                    SessionEditor.TextArea.TextView.LineTransformers.Add(TransformerObject);
-
-                // Build new searching helper and apply it onto the view
-                if (string.IsNullOrEmpty(TextToFind))
+                return SessionEditor.Dispatcher.Invoke(() =>
                 {
-                    SessionEditor.TextArea.TextView.Redraw();
-                    return null;
-                }
+                    var TransformerList = SessionEditor.TextArea.TextView.LineTransformers.ToList();
+                    TransformerList.RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
 
-                // Apply Searcher. Store if using Regex or not.
-                var NewSearcher = new DebugLogSelectMatchesColorFormatter(TextToFind);
-                SessionEditor.TextArea.TextView.LineTransformers.Add(NewSearcher);
-                return NewSearcher;
+                    // Clear out transformers and append them in again
+                    SessionEditor.TextArea.TextView.LineTransformers.Clear();
+                    foreach (var TransformerObject in TransformerList)
+                        SessionEditor.TextArea.TextView.LineTransformers.Add(TransformerObject);
+
+                    // Build new searching helper and apply it onto the view
+                    if (string.IsNullOrEmpty(TextToFind))
+                    {
+                        SessionEditor.TextArea.TextView.Redraw();
+                        return null;
+                    }
+
+                    // Apply Searcher. Store if using Regex or not.
+                    var NewSearcher = new DebugLogSelectMatchesColorFormatter(TextToFind);
+                    SessionEditor.TextArea.TextView.LineTransformers.Add(NewSearcher);
+                    return NewSearcher;
+                });
             }
             catch (Exception Ex)
             {
@@ -83,31 +86,34 @@ namespace FulcrumInjector.AppLogic.AvalonEditHelpers
             try
             {
                 // Remove existing filtering transformers 
-                var TransformerList = SessionEditor.TextArea.TextView.LineTransformers.ToList();
-                TransformerList.RemoveAll(TransformerObj =>
+                return SessionEditor.Dispatcher.Invoke(() =>
                 {
-                    // If not a filtering type, return false to not remove
-                    if (TransformerObj.GetType() != typeof(DebugLogLineFilteringColorFormatter))
-                        return false;
+                    var TransformerList = SessionEditor.TextArea.TextView.LineTransformers.ToList();
+                    TransformerList.RemoveAll(TransformerObj =>
+                    {
+                        // If not a filtering type, return false to not remove
+                        if (TransformerObj.GetType() != typeof(DebugLogLineFilteringColorFormatter))
+                            return false;
 
-                    // Cast and run the reset command here then remove
-                    var FilteringObj = TransformerObj as DebugLogLineFilteringColorFormatter;
-                    FilteringObj.ResetDocumentContent();
-                    return true;
+                        // Cast and run the reset command here then remove
+                        var FilteringObj = TransformerObj as DebugLogLineFilteringColorFormatter;
+                        FilteringObj.ResetDocumentContent();
+                        return true;
+                    });
+
+                    // Clear out transformers and append them in again
+                    SessionEditor.TextArea.TextView.LineTransformers.Clear();
+                    foreach (var TransformerObject in TransformerList)
+                        SessionEditor.TextArea.TextView.LineTransformers.Add(TransformerObject);
+
+                    // Build new searching helper and apply it onto the view
+                    if (string.IsNullOrEmpty(FilteringText)) { SessionEditor.TextArea.TextView.Redraw(); return null; }
+
+                    // Apply Searcher. Store if using Regex or not.
+                    var NewSearcher = new DebugLogLineFilteringColorFormatter(SessionEditor, FilteringText);
+                    SessionEditor.TextArea.TextView.LineTransformers.Add(NewSearcher);
+                    return NewSearcher;
                 });
-
-                // Clear out transformers and append them in again
-                SessionEditor.TextArea.TextView.LineTransformers.Clear();
-                foreach (var TransformerObject in TransformerList)
-                    SessionEditor.TextArea.TextView.LineTransformers.Add(TransformerObject);
-
-                // Build new searching helper and apply it onto the view
-                if (string.IsNullOrEmpty(FilteringText)) { SessionEditor.TextArea.TextView.Redraw(); return null; }
-
-                // Apply Searcher. Store if using Regex or not.
-                var NewSearcher = new DebugLogLineFilteringColorFormatter(SessionEditor, FilteringText);
-                SessionEditor.TextArea.TextView.LineTransformers.Add(NewSearcher);
-                return NewSearcher;
             }
             catch (Exception Ex)
             {

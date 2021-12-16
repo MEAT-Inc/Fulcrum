@@ -81,13 +81,14 @@ namespace FulcrumInjector.ViewControl.ViewModels
         /// <param name="TextToFind"></param>
         internal void SearchForText(string TextToFind)
         {
-            // Setup new transformer helper
-            if (this.LogContentHelper == null) return;
+            // Make sure transformer is built
+            if (LogContentHelper == null) return;
             var OutputTransformer = this.LogContentHelper.SearchForText(TextToFind);
 
             // Store values here
-            this.UsingRegex = OutputTransformer.UseRegex;
-            this.NoResultsOnSearch = OutputTransformer.NoMatches;
+            if (string.IsNullOrEmpty(TextToFind)) return;
+            this.UsingRegex = OutputTransformer?.UseRegex ?? false;
+            this.NoResultsOnSearch = OutputTransformer?.NoMatches ?? false;
         }
         /// <summary>
         /// Filters log lines by logger name

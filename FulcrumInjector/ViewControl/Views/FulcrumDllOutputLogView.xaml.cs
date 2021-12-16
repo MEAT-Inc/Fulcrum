@@ -66,14 +66,20 @@ namespace FulcrumInjector.ViewControl.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DllLogFilteringTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        private async void DllLogFilteringTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             // Get the current text entry value and pass it over to the VM for actions.
             var FilteringTextBox = (TextBox)sender;
             string TextToFilter = FilteringTextBox.Text;
 
             // Run the search and show method on the view model
-            ViewModel.SearchForText(TextToFilter);
+            await Task.Run(() =>
+            {
+                // Disable textbox for the duration of the task
+                Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = false);
+                ViewModel.SearchForText(TextToFilter);
+                Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
+            });
         }
     }
 }

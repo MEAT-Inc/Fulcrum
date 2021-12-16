@@ -7,6 +7,8 @@
              xmlns:viewModels="clr-namespace:FulcrumInjector.ViewControl.ViewModels"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
+             d:DesignHeight="500" 
+             d:DesignWidth="650"
              Loaded="FulcrumDLLOutputLogView_OnLoaded">
 
     <!-- DataContext Binding -->
@@ -39,7 +41,7 @@
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".55*"/>
+                    <ColumnDefinition Width=".65*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
@@ -49,9 +51,9 @@
                     HorizontalAlignment="Left"
                     Style="{StaticResource TitleStringText}"/>
                 <TextBox Grid.Column="1" 
-                         Margin="10,0,15,0"
+                         Margin="0,0,15,0"
                          Style="{StaticResource SearchBoxStyle}"
-                         Tag="Enter text to find or type '@r' plus a regex"
+                         Tag="Enter a filter or @r regex"
                          TextChanged="DllLogFilteringTextBox_OnTextChanged"/>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
