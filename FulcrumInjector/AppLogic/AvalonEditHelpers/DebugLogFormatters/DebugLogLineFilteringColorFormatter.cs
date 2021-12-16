@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.AppLogic.DebugLogFormatters
+namespace FulcrumInjector.AppLogic.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
     /// Shows or hides line objects based on the filtering methods

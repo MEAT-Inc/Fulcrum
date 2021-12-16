@@ -14,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.Annotations;
 using FulcrumInjector.ViewControl.ViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;

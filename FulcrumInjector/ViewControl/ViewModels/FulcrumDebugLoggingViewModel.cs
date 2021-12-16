@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.AppLogic;
-using FulcrumInjector.AppLogic.DebugLogFormatters;
+using FulcrumInjector.AppLogic.AvalonEditHelpers;
 using FulcrumInjector.JsonHelpers;
 using FulcrumInjector.ViewControl.Views;
 using ICSharpCode.AvalonEdit;

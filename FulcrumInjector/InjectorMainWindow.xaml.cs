@@ -11,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.AppLogic.DebugLogFormatters;
 using FulcrumInjector.AppStyles.AppStyleLogic;
 using FulcrumInjector.ViewControl;
 using FulcrumInjector.ViewControl.Models;

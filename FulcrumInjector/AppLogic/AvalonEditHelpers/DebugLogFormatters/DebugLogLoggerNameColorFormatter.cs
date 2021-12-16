@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
-using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.AppLogic.DebugLogFormatters
+namespace FulcrumInjector.AppLogic.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
     /// Colorizes the logger names on the log output view

@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FulcrumInjector.AppLogic.DebugLogFormatters;
+using FulcrumInjector.AppLogic.AvalonEditHelpers.DebugLogFormatters;
 using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.AppLogic
+namespace FulcrumInjector.AppLogic.AvalonEditHelpers
 {
     /// <summary>
     /// Contains a set of methods which are able to help us modify avEdit objects by filtering

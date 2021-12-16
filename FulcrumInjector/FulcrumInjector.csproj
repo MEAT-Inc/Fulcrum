@@ -95,17 +95,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AppLogic\AvalonEditFilteringHelpers.cs" />
-    <Compile Include="AppLogic\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
-    <Compile Include="AppLogic\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
-    <Compile Include="AppLogic\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
-    <Compile Include="AppLogic\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
-    <Compile Include="AppLogic\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
-    <Compile Include="AppLogic\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
+    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
     <Compile Include="AppLogic\FulcrumWin32Invokers.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
+    <Compile Include="AppLogic\InjectorPipes\PipeEvents\FulcrumPipeDataReadEventArgs.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
+    <Compile Include="AppLogic\InjectorPipes\PipeEvents\FulcrumPipeStateChangedEventArgs.cs" />
     <Compile Include="AppLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="AppLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="AppLogic\UserSettingsDataTemplateSelector.cs" />
