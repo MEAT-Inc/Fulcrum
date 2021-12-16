@@ -33,9 +33,12 @@ namespace FulcrumInjector
         /// <param name="e">Event args</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            // Startup override.
+            // Startup override
             base.OnStartup(e);
-            
+
+            // Force the working directory to the running location of the application or set to the debug directory
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
             // Logging config and app theme config.
             this.ConfigureLogging();
             this.ConfigureLogCleanup();

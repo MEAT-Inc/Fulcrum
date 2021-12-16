@@ -50,10 +50,11 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
 
         // Location of the FulcrumShim DLL. THIS MUST BE CORRECT!
         // Changed this for debugging mode. THis way the DLL is pulled local if debugging or live if in release
+        // If we're not inside the program files dir, then use our local debug fallback path value
         public readonly string FulcrumDLLPath =
-            Debugger.IsAttached ?
-                "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll" :
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+                !Directory.GetCurrentDirectory().Contains("Program Files (x86)") ?
+                    "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll" :
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
 
         // Pipe Configurations for the default values.
         public readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
