@@ -15,8 +15,7 @@ namespace FulcrumInjector.AppLogic
 
         // Get Method location
         [DllImport("kernel32.dll", EntryPoint = "GetProcAddress", SetLastError = true)]
-        internal static extern IntPtr GetProcAddress(int hModule,
-            [MarshalAs(UnmanagedType.LPStr)] string lpProcName);
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string lpProcName);
 
         // Free the library/unload it
         [DllImport("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true)]
