@@ -104,8 +104,10 @@
     <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
     <Compile Include="AppLogic\FulcrumWin32Invokers.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
+    <Compile Include="AppLogic\InjectorPipes\PipeEvents\FulcrumPipeDataReadEventArgs.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
     <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
+    <Compile Include="AppLogic\InjectorPipes\PipeEvents\FulcrumPipeStateChangedEventArgs.cs" />
     <Compile Include="AppLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="AppLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="AppLogic\UserSettingsDataTemplateSelector.cs" />

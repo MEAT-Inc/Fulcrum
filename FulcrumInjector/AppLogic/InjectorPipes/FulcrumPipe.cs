@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using FulcrumInjector.AppLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.JsonHelpers;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -61,6 +62,12 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Pipe configuration information.
         public readonly string PipeLocation;
         public readonly FulcrumPipeType PipeType;
+
+        // ---------------------------------------------------------------------------------------------------------------
+
+        // Event triggers for pipe data input
+        public event EventHandler<FulcrumPipeStateChangedEventArgs> PipeStateChanged;
+        protected void OnPipeStateChanged(FulcrumPipeStateChangedEventArgs EventArgs) { PipeStateChanged?.Invoke(this, EventArgs); }
 
         // ---------------------------------------------------------------------------------------------------------------
 

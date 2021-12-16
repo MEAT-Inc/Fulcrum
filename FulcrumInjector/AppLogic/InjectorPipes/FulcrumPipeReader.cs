@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Pipes;
 using System.Security.Principal;
+using FulcrumInjector.AppLogic.InjectorPipes.PipeEvents;
 using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.AppLogic.InjectorPipes
@@ -30,6 +31,10 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         internal StreamReader PipeReader;
         internal NamedPipeClientStream FulcrumPipe;
 
+        // Event triggers for pipe data input
+        public event EventHandler<FulcrumPipeDataReadEventArgs> PipeDataProcessed;
+        protected void OnPipeDataProcessed(FulcrumPipeDataReadEventArgs EventArgs) { PipeDataProcessed?.Invoke(this, EventArgs); }
+
         // -------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -54,9 +59,6 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
                 this.PipeLogger.WriteLog("PIPE FAILURE WILL BE MONITORED AND CONNECTIONS WILL BE RETRIED ON A PRESET INTERVAL...", LogType.WarnLog);
                 return;
             }
-
-            // If the pipe opened ok, begin our reading routine.
-
         }
 
         // -------------------------------------------------------------------------------------------------------
