@@ -57,6 +57,18 @@ namespace FulcrumInjector.ViewControl.ViewModels
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        // PT Open Method object
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate int DelegatePassThruOpen(IntPtr DllPointer, out uint DeviceId);
+        public DelegatePassThruOpen PTOpen;
+
+        // PT Open Method object
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate int DelegatePassThruClose(uint DeviceId);
+        public DelegatePassThruClose PTClose;
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Writes text to our output logging box for the debugging of the injection process
         /// </summary>
@@ -66,8 +78,6 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Build the current View object into our output and then log into it.
             ViewModelLogger.WriteLog($"[INJECTION TEST OUTPUT] ::: {LogText}", LogType.TraceLog);
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Test the loading process of the fulcrum DLL Injection objects
@@ -95,6 +105,38 @@ namespace FulcrumInjector.ViewControl.ViewModels
                 ResultString = this.InjectorTestResult;
                 return false;
             }
+
+            // If Pipes are open, don't try test injection methods
+            if (InjectorConstants.FulcrumPipeStatusViewModel.ReaderPipeState != "Connected" &&
+                InjectorConstants.FulcrumPipeStatusViewModel.WriterPipeState != "Connected")
+            {
+
+                try
+                {
+                    // Now try and open the selection box view 
+                    WriteToLogBox("IMPORTING PT OPEN METHOD AND ATTEMPTING TO INVOKE IT NOW...");
+                    IntPtr PassThruOpenCommand = FulcrumWin32Invokers.GetProcAddress(LoadResult, "PassThruOpen");
+                    PTOpen = (DelegatePassThruOpen)Marshal.GetDelegateForFunctionPointer(PassThruOpenCommand, typeof(DelegatePassThruOpen));
+                    WriteToLogBox("IMPORTED METHOD OK! CALLING IT NOW...");
+
+                    // Invoke method now.
+                    PTOpen.Invoke(LoadResult, out uint DeviceId);
+                    WriteToLogBox("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW");
+                    WriteToLogBox($"DEVICE ID RETURNED: {DeviceId}");
+                }
+                catch (Exception ImportEx)
+                {
+                    // Log failed to connect to our pipe.
+                    WriteToLogBox($"FAILED TO ISSUE A PASSTHRU OPEN METHOD USING OUR INJECTED DLL!");
+                    WriteToLogBox("EXCEPTION THROWN DURING DYNAMIC CALL OF THE UNMANAGED PT OPEN COMMAND!");
+                    ViewModelLogger.WriteLog("EXCEPTION THROWN", ImportEx);
+
+                    // Store output values and fail
+                    ResultString = "PTOpen Failed!";
+                    return false;
+                }
+            }
+            else { WriteToLogBox("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!"); }
 
             // Log Passed and then unload our DLL
             WriteToLogBox($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}");
