@@ -62,7 +62,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         internal void SetupPipeModelStates()
         {
             // Once model objects are built, we can then validate our pipes.
-            this.PipeSystemModel.ValidateFulcrumPipeConfiguration();
+            bool PipeSetupResult = this.PipeSystemModel.ValidateFulcrumPipeConfiguration();
             ViewModelLogger.WriteLog("PIPE VALIDATION COMPLETE! READY TO SHOW OUR PROCESS INFORMATION ON THIS VIEW COMPONENT");
             ViewModelLogger.WriteLog("CONFIGURING NEW WATCHDOG INSTANCES FOR OUR PIPE STATE PROPERTY MONITORS NOW...", LogType.InfoLog);
 
@@ -85,6 +85,14 @@ namespace FulcrumInjector.ViewControl.ViewModels
                 // Store value
                 this.WriterPipeState = this.PipeSystemModel.BravoPipe.PipeState.ToString();
             });
+
+            // If pipe setup passed, run injection test
+            if (PipeSetupResult)
+            {
+                ViewModelLogger.WriteLog("PIPE SOCKETS HAVE BEEN OPENED OK! TESTING INJECTION ROUTINE FOR CONFIDENCE NOW...");
+                InjectorConstants.FulcrumDllInjectionTestViewModel.PerformDllInjectionTest(out string injectionResultString);
+                ViewModelLogger.WriteLog($"INJECTION RESULT STRING: {injectionResultString}", LogType.InfoLog);
+            }
 
             // Log built and output information.
             ViewModelLogger.WriteLog("CONFIGURED AND STARTED NEW WATCHDOGS FOR THE READER AND WRITER PIPE STATE VALUES!", LogType.InfoLog);
