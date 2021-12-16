@@ -73,7 +73,7 @@ namespace FulcrumInjector
         private void ConfigureLogCleanup()
         {
             // Pull values for log archive trigger and set values
-            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorLogging.LogArchiveSetup"); ;
+            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorLogging.LogArchiveSetup");
 
             // Check to see if we need to archive or not.
             LogBroker.Logger?.WriteLog($"CLEANUP ARCHIVE FILE SETUP STARTED! CHECKING FOR {ConfigObj.ArchiveOnFileCount} OR MORE LOG FILES...");
@@ -93,6 +93,23 @@ namespace FulcrumInjector
                 // Run on different thread to avoid clogging up UI
                 LogBroker.CleanupLogHistory(ConfigObj.ToString());
                 LogBroker.CleanupLogHistory(ConfigObj.ToString(), ShimFileFilterName);
+
+                // See if we have too many archives
+                string[] ArchivesFound = Directory.GetFiles(ConfigObj.LogArchivePath);
+                int ArchiveSetCount = ConfigObj.ArchiveFileSetSize is int ? (int)ConfigObj.ArchiveFileSetSize : 0;
+                if (ArchivesFound.Length >= ArchiveSetCount * 2)
+                {
+                    // List of files to remove now.
+                    LogBroker.Logger?.WriteLog("REMOVING OVERFLOW OF ARCHIVE VALUES NOW...", LogType.WarnLog);
+                    var RemoveThese = ArchivesFound
+                        .OrderByDescending(FileObj => new FileInfo(FileObj).LastWriteTime)
+                        .Skip(ArchiveSetCount * 2);
+
+                    // Remove the remainder now.
+                    LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {RemoveThese.Count()} FILES TO PRUNE");
+                    foreach (var FileObject in RemoveThese) { File.Delete(FileObject); }
+                    LogBroker.Logger?.WriteLog($"REMOVED ALL THE REQUIRED ARCHIVES OK! LEFT A TOTAL OF {ArchiveSetCount * 2} ARCHIVES BEHIND!", LogType.InfoLog);
+                }
 
                 // Log done.
                 LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);

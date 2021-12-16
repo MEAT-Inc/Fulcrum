@@ -8,10 +8,9 @@
         xmlns:views="clr-namespace:FulcrumInjector.ViewControl.Views"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
-        Height="600" Width="1000" 
-        MaxHeight="650" MaxWidth="1125"
-        MinHeight="550" MinWidth="875"
+        Height="650" Width="1100" 
         AllowsTransparency="True"
+        ResizeMode="CanMinimize"
         Loaded="InjectorMainWindow_OnLoaded">
     
     <!-- Dark Semi Transparent Background -->
@@ -26,7 +25,7 @@
     <Grid Margin="0">
         <!-- Row Layout for content -->
         <Grid.RowDefinitions>
-            <RowDefinition Height=".175*"/>
+            <RowDefinition Height=".15*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -46,7 +45,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Splitting Border -->
-            <Border Grid.Column="1" Margin="0,0" Opacity=".50" BorderThickness="5,0" BorderBrush="{StaticResource PrimaryColor_Lighter_35}"/>
+            <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
 
             <!-- Left Side Pane View -->
             <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,5">
@@ -81,29 +80,52 @@
             </Viewbox>
 
             <!-- Main Content View Box -->
-            <Viewbox Grid.Column="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition MinWidth="150"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition MinWidth="500"/>
-                    </Grid.ColumnDefinitions>
+            <Grid Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- TODO: PUT SOMETHING IN THIS LEFT PANE? NOT SURE WHAT BUT SOMETHIN HAS TO AT SOME POINT -->
-                    <!-- A Thing -->
+                <!-- TODO: PUT SOMETHING IN THIS LEFT PANE? NOT SURE WHAT BUT SOMETHIN HAS TO AT SOME POINT -->
+                <Border 
+                    Margin="10,5"
+                    BorderBrush="{StaticResource TextColorBase}"
+                    BorderThickness="3" CornerRadius="5">
+                    <Border
+                        CornerRadius="5"
+                        BorderBrush="{StaticResource TextColorBase}"
+                        Background="{StaticResource PrimaryColor_Darker_65}">
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            FontSize="16"
+                            Margin="10"
+                            FontWeight="Bold"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            TextAlignment="Center"
+                            Foreground="{StaticResource TextColorBase}">
+                            <Run FontSize="28" Text="A Mystical Placeholder TextBlock!"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Foreground="Yellow" FontSize="20" Text="Something wicked this way comes..."/>
+                        </TextBlock>
+                    </Border>
+                </Border>
 
-                    <!-- Splitting Border Output object -->
-                    <GridSplitter Grid.Column="1"/>
+                <!-- Splitting Border Output object -->
+                <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
 
-                    <!-- Content for the injector output -->
-                    <views:FulcrumDllOutputLogView 
-                        Grid.Column="1"
+                <!-- Content for the injector output -->
+                <views:FulcrumDllOutputLogView 
+                        Grid.Column="2"
+                        Margin="0,0,-3,0"
                         x:Name="FulcrumDllOutputLog"/>
-                </Grid>
-            </Viewbox>
+            </Grid>
 
             <!-- Flyouts for Main Window -->
-            <mah:FlyoutsControl Grid.Column="2" Margin="10,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <mah:FlyoutsControl Grid.Column="2" Margin="10,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <mah:Flyout
                     IsOpen="False"
                     x:Name="SettingsViewFlyout" 

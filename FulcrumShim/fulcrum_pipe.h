@@ -46,6 +46,6 @@ public:
 
 private:
 	bool Loaded = false;
-	HANDLE hPipe1, hPipe2;
+	HANDLE hFulcrumWriter, hFulcrumReader;
 };
 
