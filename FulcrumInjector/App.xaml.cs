@@ -122,10 +122,16 @@ namespace FulcrumInjector
 
             // Now kill any existing instances
             LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
-            LogBroker.Logger?.WriteLog("KILLING THESE PROCESS OBJECTS NOW...", LogType.InfoLog);
-            if (InjectorsTotal.Count > 0) { Environment.Exit(0); }
+            if (InjectorsTotal.Count > 0)
+            {
+                // Log removing files and delete the log output
+                LogBroker.Logger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
+                File.Delete(LogBroker.MainLogFileName);
+                Environment.Exit(100);
+            }
 
             // Return passed output.
+            LogBroker.Logger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
             return true;
         }
         /// <summary>

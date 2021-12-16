@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.AppLogic.AvalonEditHelpers;
 using FulcrumInjector.ViewControl.ViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -54,6 +55,7 @@ namespace FulcrumInjector.ViewControl.Views
             this.DataContext = this.ViewModel;
 
             // Configure pipe instances here.
+            this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
         }
 

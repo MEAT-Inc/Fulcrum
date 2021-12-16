@@ -34,7 +34,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         public List<string> LoggerNamesFound { get => _loggerNamesFound; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public readonly AvalonEditFilteringHelpers LogContentHelper;
+        public AvalonEditFilteringHelpers LogContentHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -47,14 +47,8 @@ namespace FulcrumInjector.ViewControl.ViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
 
-            // Pull editor off the view base
-            var DebugViewCast = this.BaseViewControl as FulcrumDebugLoggingView;
-            var PulledEditBox = DebugViewCast.DebugRedirectOutputEdit;
-            ViewModelLogger.WriteLog("CAST VIEW TO TYPE OF DEBUG LOG VIEWER AND EXTRACTED TEXTEDIT OK!", LogType.InfoLog);
-
             // Store logger names here
             this.LoggerNamesFound = this.BuildLoggerNamesList();
-            this.LogContentHelper = new AvalonEditFilteringHelpers(PulledEditBox);
             ViewModelLogger.WriteLog("DONE CONFIGURING VIEW BINDING VALUES!", LogType.InfoLog);
 
             // Log completed setup.
@@ -88,6 +82,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         internal void SearchForText(string TextToFind)
         {
             // Setup new transformer helper
+            if (this.LogContentHelper == null) return;
             var OutputTransformer = this.LogContentHelper.SearchForText(TextToFind);
 
             // Store values here
@@ -99,6 +94,6 @@ namespace FulcrumInjector.ViewControl.ViewModels
         /// </summary>
         /// <param name="LoggerName"></param>
         /// <param name="EditorObject"></param>
-        internal void FilterByLoggerName(string LoggerName) { this.LogContentHelper.FilterByText(LoggerName); }
+        internal void FilterByLoggerName(string LoggerName) { this.LogContentHelper?.FilterByText(LoggerName); }
     }
 }

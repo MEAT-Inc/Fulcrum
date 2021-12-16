@@ -7,6 +7,7 @@ using FulcrumInjector.AppLogic;
 using FulcrumInjector.AppLogic.AvalonEditHelpers;
 using FulcrumInjector.JsonHelpers;
 using FulcrumInjector.ViewControl.Views;
+using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -28,7 +29,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public readonly AvalonEditFilteringHelpers LogContentHelper;
+        public AvalonEditFilteringHelpers LogContentHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -40,14 +41,8 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
-         
-            // Pull editor off the view base
-            var DebugViewCast = this.BaseViewControl as FulcrumDebugLoggingView;
-            var PulledEditBox = DebugViewCast.DebugRedirectOutputEdit;
-            ViewModelLogger.WriteLog("CAST VIEW TO TYPE OF DEBUG LOG VIEWER AND EXTRACTED TEXTEDIT OK!", LogType.InfoLog);
-
+            
             // Build log content helper and return
-            this.LogContentHelper = new AvalonEditFilteringHelpers(PulledEditBox);
             ViewModelLogger.WriteLog("SETUP NEW DLL INJECTION OUTPUT LOG VALUES OK!", LogType.InfoLog);
         }
 
@@ -60,6 +55,7 @@ namespace FulcrumInjector.ViewControl.ViewModels
         internal void SearchForText(string TextToFind)
         {
             // Setup new transformer helper
+            if (LogContentHelper == null) return;
             var OutputTransformer = this.LogContentHelper.SearchForText(TextToFind);
 
             // Store values here

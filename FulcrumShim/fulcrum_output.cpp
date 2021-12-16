@@ -176,7 +176,6 @@ void fulcrum_output::appendToPipes(LPCTSTR format, ...) {
 		// Send to pipe server only if our pipe instances are currently open and connected
 		CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 		if (fulcrum_app->pipesLoaded) { fulcrum_app->fulcrumPiper->WriteStringOut(std::string(formatted.get())); }
-		else { appendToLog(_T("WARNING: FULCRUM PIPE SERVERS ARE NOT SHOWING AN ACTIVE CONNECTION TO A CLIENT!")); }
 	}
 	// Catch all the possible exception types. Define runtime and standard. If it's not one of those print something else
 	catch (const std::runtime_error& re) { appendToLog(_T("!!!    RUNTIME EX ON TRANSMISSION: %s\n", re.what())); }

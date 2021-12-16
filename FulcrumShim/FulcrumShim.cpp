@@ -53,7 +53,7 @@ BOOL CFulcrumShim::InitInstance()
 }
 
 // Build a new init method sequence.
-void CFulcrumShim::InitPipes()
+void CFulcrumShim::StartupPipes()
 {
 	// Check if pipes need to be configured
 	if (pipesLoaded) { return; }
