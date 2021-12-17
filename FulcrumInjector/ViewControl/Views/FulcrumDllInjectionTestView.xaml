@@ -49,6 +49,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Button
+                        x:Name="TestInjectionButton"
                         Style="{StaticResource ActionButtonStyle}"
                         Content="Test Injection"
                         Margin="5"
