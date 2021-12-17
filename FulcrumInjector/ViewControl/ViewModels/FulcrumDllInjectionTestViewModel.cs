@@ -86,6 +86,19 @@ namespace FulcrumInjector.ViewControl.ViewModels
         /// <returns>True if the DLL Injects OK. False if not.</returns>
         internal bool TestInjectorDllLoading(out string ResultString, bool SkipSelectionBox = false)
         {
+            // Make sure we need to be rerunning this.
+            if (InjectionLoadPassed || InjectorTestResult == "Injection Passed!")
+            {
+                // Log info and build return values
+                ViewModelLogger.WriteLog("PREVIOUS TEST WAS SUCCESSFUL! RETURNING VALUES ACCORDINGLY NOW...", LogType.InfoLog);
+                InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+                InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.ToolTip = "To retry injection, please restart this application";
+
+                // Return output values
+                ResultString = this.InjectorTestResult;
+                return this.InjectionLoadPassed;
+            }
+
             // Begin by loading the DLL Object
             this.InjectorTestResult = "Testing...";
             ViewModelLogger.WriteLog($"PULLING IN FULCRUM DLL NOW", LogType.InfoLog);
@@ -151,6 +164,10 @@ namespace FulcrumInjector.ViewControl.ViewModels
             ViewModelLogger.WriteLog("UNLOADED DLL OK!", LogType.InfoLog);
             this.InjectorTestResult = "Injection Passed!";
             ResultString = this.InjectorTestResult;
+
+            // Set test button to disabled
+            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.ToolTip = "To retry injection, please restart this application";
 
             // Log information output
             ViewModelLogger.WriteLog("----------------------------------------------", LogType.WarnLog);
