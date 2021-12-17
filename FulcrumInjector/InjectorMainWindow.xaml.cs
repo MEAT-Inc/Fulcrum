@@ -74,8 +74,9 @@ namespace FulcrumInjector
             // Set title to DEBUG if the app is inside our debug directory
             if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
 #if DEBUG
-            if (!this.Title.Contains("(")) this.Title += "("; 
-            this.Title += " - DEBUG_BUILD)";
+            if (!this.Title.Contains("(")) this.Title += " (";
+            if (!this.Title.EndsWith("(")) this.Title += "-";
+            this.Title += "DEBUG_BUILD)";
 #else
             if (this.Title.Contains("(")) this.Title += ")";
 #endif

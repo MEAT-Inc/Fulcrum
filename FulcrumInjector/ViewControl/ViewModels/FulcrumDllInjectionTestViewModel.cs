@@ -86,6 +86,14 @@ namespace FulcrumInjector.ViewControl.ViewModels
         /// <returns>True if the DLL Injects OK. False if not.</returns>
         internal bool TestInjectorDllLoading(out string ResultString, bool SkipSelectionBox = false)
         {
+            // Make sure we need to be rerunning this.
+            if (InjectionLoadPassed || InjectorTestResult == "Injection Passed!")
+            {
+                ViewModelLogger.WriteLog("PREVIOUS TEST WAS SUCCESSFUL! RETURNING VALUES ACCORDINGLY NOW...", LogType.InfoLog);
+                ResultString = this.InjectorTestResult;
+                return this.InjectionLoadPassed;
+            }
+
             // Begin by loading the DLL Object
             this.InjectorTestResult = "Testing...";
             ViewModelLogger.WriteLog($"PULLING IN FULCRUM DLL NOW", LogType.InfoLog);
