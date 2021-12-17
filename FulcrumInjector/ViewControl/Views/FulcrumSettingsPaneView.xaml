@@ -8,6 +8,7 @@
              xmlns:viewModels="clr-namespace:FulcrumInjector.ViewControl.ViewModels"
              xmlns:models="clr-namespace:FulcrumInjector.ViewControl.Models"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:appLogic="clr-namespace:FulcrumInjector.AppLogic"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
              Loaded="FulcrumSettingsPaneView_OnLoaded">
@@ -30,14 +31,17 @@
         <!-- Settings items -->
     <Grid Margin="10,-10,10,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".125*"/>
+            <RowDefinition Height=".15*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <!-- Title View Block -->
-        <TextBlock Text="Injector Settings (Work In Progress)" Margin="0,0,35,0" Style="{StaticResource TitleStringText}"/>
+        <TextBlock Margin="0,0,60,0" Style="{StaticResource TitleStringText}">
+            <Run Text="Injector Settings"/>
+            <Run Foreground="Yellow" FontWeight="Bold" FontStyle="Normal" Text="(Work In Progress)"/>
+        </TextBlock>
         <Button
-            Margin="10,10"
+            Margin="10,15"
             HorizontalAlignment="Right"
             HorizontalContentAlignment="Right"
             Style="{StaticResource ActionButtonStyle}"
@@ -53,7 +57,9 @@
         <!-- Content for the settings objects goes in here -->
         <ListBox Grid.Row="1"
                  Margin="10,10"
-                 Width="{Binding Path=ActualWidth, ElementName=WidthHelperBorder}"
+                 Width="740"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
                  Style="{StaticResource ListBoxSettingsStyle}"
                  ItemsSource="{Binding Path=SettingsEntrySets}">
             <ListBox.ItemTemplate>
@@ -61,7 +67,7 @@
                     <Border Background="{StaticResource SecondaryColor_Darker_35}"
                             BorderBrush="{StaticResource PrimaryColor_Lighter_35}"
                             BorderThickness="2" CornerRadius="3" Margin="8,10,10,10">
-                            <Grid Width="{Binding Path=Width, ElementName=WidthHelperBorder}">
+                            <Grid Width="690" HorizontalAlignment="Stretch">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height=".25*"/>
                                     <RowDefinition/>
@@ -73,15 +79,18 @@
                                     Margin="10,5,10,0"
                                     Style="{StaticResource SettingSectionTitleStyle}"
                                     Text="{Binding Path=SettingSectionTitle}"/>
-                                <ListBox
+                            <ListBox
                                     Grid.Row="1" 
-                                    Margin="5"
+                                    Margin="10"
                                     BorderThickness="0"
                                     ItemsSource="{Binding}"
                                     Style="{StaticResource ListBoxSettingsStyle}"
-                                    DataContext="{Binding Path=SettingsEntries}"
-                                    ItemTemplate="{StaticResource CheckboxSettingEntryDataTemplate}">
-                                </ListBox>
+                                    Width="670"
+                                    DataContext="{Binding Path=SettingsEntries}">
+                                <ListBox.ItemTemplateSelector>
+                                    <appLogic:UserSettingsDataTemplateSelector/>
+                                </ListBox.ItemTemplateSelector>
+                            </ListBox>
                             </Grid>
                         </Border>
                 </DataTemplate>

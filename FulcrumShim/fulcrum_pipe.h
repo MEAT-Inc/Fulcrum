@@ -23,17 +23,21 @@ class fulcrum_pipe {
 public:
 	fulcrum_pipe();
 	~fulcrum_pipe();
+	bool IsLoaded();
 	bool ConnectInputPipe();
 	bool ConnectOutputPipe();
-	bool IsLoaded();
 	void ShutdownPipe();
+
+	// Writing operations
 	void WriteStringOut(std::string str);
+	void WriteFormattedStringOut(LPCSTR format, ...);
 	void WriteStringOut100(std::string str);
 	void WriteBytesOut(byte b[], int b_len);
+
+	// Reading Operations
 	std::string ReadStringIn();
 	void ReadBytesIn(byte b[], int* b_len);
-	void ReadBytes(byte b[], int num);				// with length check
-
+	void ReadBytes(byte b[], int num);			
 	unsigned int ReadUint32();
 	int ReadInt32();
 	void WriteUint32(unsigned int num);
@@ -42,6 +46,6 @@ public:
 
 private:
 	bool Loaded = false;
-	HANDLE hPipe1, hPipe2;
+	HANDLE hFulcrumWriter, hFulcrumReader;
 };
 

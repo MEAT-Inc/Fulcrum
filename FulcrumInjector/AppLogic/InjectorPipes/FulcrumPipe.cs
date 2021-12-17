@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using FulcrumInjector.AppLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.JsonHelpers;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -49,10 +50,13 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
 
         // Location of the FulcrumShim DLL. THIS MUST BE CORRECT!
         // Changed this for debugging mode. THis way the DLL is pulled local if debugging or live if in release
+        // If we're not inside the program files dir, then use our local debug fallback path value
         public readonly string FulcrumDLLPath =
-            Debugger.IsAttached ?
-                Path.Combine(Directory.GetCurrentDirectory(), "FulcrumShim.dll") :
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+#if DEBUG
+            "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
+#else
+            ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+#endif
 
         // Pipe Configurations for the default values.
         public readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
@@ -61,6 +65,12 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Pipe configuration information.
         public readonly string PipeLocation;
         public readonly FulcrumPipeType PipeType;
+
+        // ---------------------------------------------------------------------------------------------------------------
+
+        // Event triggers for pipe data input
+        public event EventHandler<FulcrumPipeStateChangedEventArgs> PipeStateChanged;
+        protected void OnPipeStateChanged(FulcrumPipeStateChangedEventArgs EventArgs) { PipeStateChanged?.Invoke(this, EventArgs); }
 
         // ---------------------------------------------------------------------------------------------------------------
 
@@ -73,6 +83,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
             try
             {
                 // Find if the file is locked or not. Get path to validate 
+                if (!File.Exists(FulcrumDLLPath)) { PipeLogger.WriteLog("WARNING! DLL FILE WAS NOT FOUND!", LogType.WarnLog); }
                 FileStream DllStream = File.Open(FulcrumDLLPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 DllStream.Close();
 

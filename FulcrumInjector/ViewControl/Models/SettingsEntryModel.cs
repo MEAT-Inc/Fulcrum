@@ -19,6 +19,7 @@ namespace FulcrumInjector.ViewControl.Models
     {
         NOT_DEFINED,        // Bad enum type parse
         CHECKBOX_CONTROL,   // Checkbox
+        TEXTBOX_CONTROL,    // Textbox
     }
 
     // --------------------------------------------------------------------------------------------------------------------------
@@ -67,14 +68,21 @@ namespace FulcrumInjector.ViewControl.Models
                     this.SettingControlType = typeof(CheckBox);
                     break;
 
+                // TextBox
+                case ControlTypes.TEXTBOX_CONTROL:
+                    this.SettingControlType = typeof(TextBox);
+                    break;
+
                 // Not Valid
                 case ControlTypes.NOT_DEFINED:
+                    this.SettingControlType = null;
                     ModelLogger.WriteLog($"FAILED TO BUILD NEW CONTROL INSTANCE FOR SETTING {SettingName}!", LogType.ErrorLog);
                     break;
             }
 
             // Log information about the built setting
             ModelLogger.WriteLog($"BUILT NEW SETTING OBJECT NAMED {this.SettingName} OK!");
+            ModelLogger.WriteLog($"SETTING CONTROL TYPE IS {(this.SettingControlType == null ? "FAILED_BINDING" : this.SettingControlType.Name)}");
             ModelLogger.WriteLog($"SETTING DESCRIPTION: {this.SettingDescription}", LogType.TraceLog);
         }
     }

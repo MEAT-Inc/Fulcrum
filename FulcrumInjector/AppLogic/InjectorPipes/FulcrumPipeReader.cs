@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Pipes;
 using System.Security.Principal;
+using FulcrumInjector.AppLogic.InjectorPipes.PipeEvents;
 using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.AppLogic.InjectorPipes
@@ -18,10 +19,10 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Reset Pipe Object method
         public static void ResetPipeInstance()
         {
-            // Reset Pipe here
-            if (PipeInstance == null) return;
-            PipeInstance.PipeLogger.WriteLog($"RESETTING FULCRUM PIPE {PipeInstance.PipeType} NOW...", LogType.WarnLog);
-            PipeInstance.ConfigureNewPipe();
+            // Reset Pipe here if needed and can
+            if (PipeInstance == null) { return; }
+            if (PipeInstance.PipeState != FulcrumPipeState.Connected) PipeInstance.ConfigureNewPipe();
+            else { PipeInstance.PipeLogger.WriteLog("READER PIPE WAS ALREADY CONNECTED! NOT RECONFIGURING IT!", LogType.WarnLog); }
         }
 
         // -------------------------------------------------------------------------------------------------------
@@ -29,6 +30,10 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Pipe and reader objects for data
         internal StreamReader PipeReader;
         internal NamedPipeClientStream FulcrumPipe;
+
+        // Event triggers for pipe data input
+        public event EventHandler<FulcrumPipeDataReadEventArgs> PipeDataProcessed;
+        protected void OnPipeDataProcessed(FulcrumPipeDataReadEventArgs EventArgs) { PipeDataProcessed?.Invoke(this, EventArgs); }
 
         // -------------------------------------------------------------------------------------------------------
 
@@ -47,7 +52,13 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
             );
 
             // Build our new pipe instance here.
-            if (!this.ConfigureNewPipe()) this.PipeLogger.WriteLog("FAILED TO CONFIGURE NEW OUTPUT WRITER PIPE!", LogType.ErrorLog);
+            if (!this.ConfigureNewPipe())
+            {
+                // Log failed to open and return
+                this.PipeLogger.WriteLog("FAILED TO CONFIGURE NEW OUTPUT WRITER PIPE!", LogType.ErrorLog);
+                this.PipeLogger.WriteLog("PIPE FAILURE WILL BE MONITORED AND CONNECTIONS WILL BE RETRIED ON A PRESET INTERVAL...", LogType.WarnLog);
+                return;
+            }
         }
 
         // -------------------------------------------------------------------------------------------------------
@@ -90,6 +101,22 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
             }
 
             // -------------------------------------------------------------------------------------------------------
+        }
+
+        /// <summary>
+        /// Attempts to read data from our pipe server instance.
+        /// </summary>
+        /// <param name="ReadDataContents">Data processed</param>
+        /// <returns>True if content comes back. False if not.</returns>
+        internal bool ReadPipeData(out string ReadDataContents)
+        {
+            // Start by making sure we're open
+            if (this.PipeState != FulcrumPipeState.Connected) 
+                if (!this.ConfigureNewPipe()) { ReadDataContents = "FAILED TO CONFIGURE READER PIPE!"; return false; }
+
+            // Now read in some data from the pipe.
+            ReadDataContents = "EMPTY_OUTPUT";
+            return true;
         }
     }
 }
