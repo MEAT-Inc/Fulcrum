@@ -109,25 +109,27 @@ namespace FulcrumInjector.ViewControl.ViewModels
             // Log Passed and then unload our DLL
             ViewModelLogger.WriteLog($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}", LogType.InfoLog);
             ViewModelLogger.WriteLog("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
-            
+
             // If Pipes are open, don't try test injection methods
             if (!SkipSelectionBox)
             {
-                // If the pipes aren't built out, then open them here and configure everything.
-                if (FulcrumPipeReader.PipeInstance.PipeState != FulcrumPipeState.Connected || 
-                    FulcrumPipeWriter.PipeInstance.PipeState != FulcrumPipeState.Connected) {
-                    Task.Run(() =>
-                    {
-                        ViewModelLogger.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
-                        InjectorConstants.FulcrumPipeStatusView.Dispatcher.Invoke(() => {
-                            InjectorConstants.FulcrumPipeStatusViewModel.SetupPipeModelStates();
-                        });
-                    });
-                }
-
                 // Log information and run the injector test
                 ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
-                this.TestInjectorDllSelectionBox(LoadResult, out ResultString);
+                if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString))
+                {
+                    // Log the result of this test method
+                    ViewModelLogger.WriteLog($"RESULT FROM INJECTION: {ResultString}", LogType.InfoLog);
+
+                    // Now that our pipes are reset, we connect on them. Using the watchdogs, pipe state values SHOULD auto populate
+                    ViewModelLogger.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
+                    FulcrumPipeReader.ResetPipeInstance(); FulcrumPipeWriter.ResetPipeInstance();
+                }
+                else
+                {
+                    // Log injection via selection box failed and then setup a new call
+                    ViewModelLogger.WriteLog("FAILED TO INJECT USING SELECTION BOX!", LogType.ErrorLog);
+                    return false;
+                }
             }
             else { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
 
