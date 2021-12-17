@@ -22,6 +22,7 @@ using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using Path = System.IO.Path;
 
 namespace FulcrumInjector
 {
@@ -71,7 +72,7 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
 
             // Set title to DEBUG if the app is inside our debug directory
-            if (!Directory.GetCurrentDirectory().Contains("C:\\Program Files (x86)\\MEAT Inc")) this.Title += " (SOURCE_BINARY";
+            if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
 #if DEBUG
             if (!this.Title.Contains("(")) this.Title += "("; 
             this.Title += " - DEBUG_BUILD)";
