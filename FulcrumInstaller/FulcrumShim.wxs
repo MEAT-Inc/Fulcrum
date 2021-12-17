@@ -30,7 +30,6 @@
                                 <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
                                 <File Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe" />
                                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
-                                <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjectorSettings.json" />
                                 <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.dll" />
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                                 <File Id="MICROSOFT.XAML.BEHAVIORS.DLL" Name="Microsoft.Xaml.Behaviors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.dll" />
@@ -44,6 +43,20 @@
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
                                 <File Id="MAHAPPS.METRO.RESOURCES.DLL" Name="MahApps.Metro.resources.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\de\MahApps.Metro.resources.dll" />
                             </Component>
+                            <Directory Name="FulcrumResources" Id="FULCRUMRESOURCESFOLDER">
+                                <Component Id="FulcrumResourcesComponent" Guid="">
+                                    <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
+                                    <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\AppColorTheme.xaml" />
+                                    <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumControlStyles.xaml" />
+                                    <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumDebugLoggingViewStyles.xaml" />
+                                    <File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumDllInjectionTestViewStyles.xaml" />
+                                    <File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumDllOutputLogViewStyles.xaml" />
+                                    <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInstalledOeAppsViewStyles.xaml" />
+                                    <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumPipeStatusViewStyles.xaml" />
+                                    <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumSettingsPaneViewStyles.xaml" />
+                                    <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumTitleViewStyles.xaml" />
+                                </Component>
+                            </Directory>
                         </Directory>
                         <!-- DLL Files for the Fulcrum -->
                         <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
@@ -137,6 +150,7 @@
             <ComponentRef Id="V0500RegKey" />
             <ComponentRef Id="FulcrumShimFiles" />
             <ComponentRef Id="FulcrumInjectorFiles" />
+            <ComponentRef Id="FulcrumResourcesComponent"/>
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
         </Feature>

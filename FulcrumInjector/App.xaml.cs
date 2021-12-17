@@ -8,9 +8,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using ControlzEx.Theming;
-using FulcrumInjector.AppStyles;
-using FulcrumInjector.AppStyles.AppStyleLogic;
-using FulcrumInjector.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogger;
 using SharpLogger.LoggerSupport;
 

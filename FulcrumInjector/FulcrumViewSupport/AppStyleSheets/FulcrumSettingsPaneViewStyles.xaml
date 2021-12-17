@@ -1,0 +1,184 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
+      
+        <!-- Base Style Layouts -->
+        <ResourceDictionary>
+            <!-- AVEdit Output Box Style -->
+            <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="5,10"/>
+                <Setter Property="ShowLineNumbers" Value="True"/>
+            </Style>
+
+            <!--Main Settings Info Text-->
+            <Style x:Key="TitleStringText" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="FontSize" Value="26"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
+            <!-- Setting Name Style -->
+            <Style x:Key="SettingNameTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
+            <!-- Description Setting Style -->
+            <Style x:Key="DescriptionTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Padding" Value="5,0"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+        </ResourceDictionary>
+
+        <!-- DataTemplates for User Settings -->
+        <ResourceDictionary>
+            <!-- Setting Name Style -->
+            <Style x:Key="SettingSectionTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
+            <!-- Scroll Viewer to hold settings style -->
+            <Style x:Key="ListBoxSettingsStyle" TargetType="ListBox">
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+            </Style>
+
+            <!-- DataTemplate for a Checkbox Setting -->
+            <DataTemplate x:Key="CheckboxSettingEntryDataTemplate">
+                <Border Margin="0,5,5,5" 
+                        Width="658"
+                        HorizontalAlignment="Center"
+                        BorderBrush="{StaticResource SecondaryColor}"
+                        BorderThickness="1.5" 
+                        CornerRadius="3"
+                        Background="{StaticResource SecondaryColor_Darker_65}">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height=".5*"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width=".25*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock 
+                                Grid.Row="0" 
+                                Grid.Column="0" 
+                                Style="{StaticResource SettingNameTextBlockStyle}"
+                                Text="{Binding Path=SettingName}"/>
+                        <Border 
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"                    
+                                Margin="5,0"
+                                BorderThickness="0,1,0,0"
+                                VerticalAlignment="Center"
+                                BorderBrush="{StaticResource DarkGreyThemeColor}"/>
+
+                        <!-- TODO: BUILD LOGIC FOR BINDING THIS TO A CONFIG VALUE -->
+                        <CheckBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                IsEnabled="False"
+                                HorizontalAlignment="Right"
+                                IsChecked="{Binding Path=SettingValue}"/>
+
+                        <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Width="650"
+                                Text="{Binding Path=SettingDescription}"
+                                Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+            <!-- DataTemplate for a TextBox Setting -->
+            <DataTemplate x:Key="TextBoxSettingEntryDataTemplate">
+                <Border Margin="0,5,5,5" 
+                        HorizontalAlignment="Center"
+                        Width="658"
+                        BorderBrush="{StaticResource SecondaryColor}"
+                        BorderThickness="1.5" 
+                        CornerRadius="3"
+                        Background="{StaticResource SecondaryColor_Darker_65}">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height=".5*"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width=".375*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock 
+                                Grid.Row="0" 
+                                Grid.Column="0" 
+                                Style="{StaticResource SettingNameTextBlockStyle}"
+                                Text="{Binding Path=SettingName}"/>
+                        <Border 
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"                    
+                                Margin="5,0,5,-2"
+                                BorderThickness="0,1,0,0"
+                                VerticalAlignment="Center"
+                                BorderBrush="{StaticResource DarkGreyThemeColor}"/>
+
+                        <!-- TODO: BUILD LOGIC FOR BINDING THIS TO A CONFIG VALUE -->
+                        <TextBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Margin="0,0,5,0"
+                                Padding="25,0,25,0"
+                                IsEnabled="False"
+                                HorizontalAlignment="Right"
+                                Text="{Binding Path=SettingValue}"
+                                Style="{StaticResource StaticBackgroundInputTextBox}"/>
+
+                        <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Width="650"
+                                Text="{Binding Path=SettingDescription}"
+                                Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
