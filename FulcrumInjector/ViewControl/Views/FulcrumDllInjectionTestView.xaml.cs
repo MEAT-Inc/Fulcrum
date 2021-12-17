@@ -69,12 +69,20 @@ namespace FulcrumInjector.ViewControl.Views
             try
             {
                 // Clear out text box, run the test, and log the output
+                this.ViewModel.InjectorTestResult = "Testing...";
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Run the injection test here on a Dispatched thread 
                 this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out string ResultOutput);
-                if (this.ViewModel.InjectionLoadPassed) ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
-                else ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog);
+                if (!this.ViewModel.InjectionLoadPassed) { ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog); }
+                else 
+                {
+                    // Turn off the injection button now and set tooltip values for it.
+                    ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
+                    Button SendButton = (Button)sender;
+                    SendButton.IsEnabled = false;
+                    SendButton.ToolTip = "To retest injection, please restart this application";
+                }
 
                 // Set Value on the View now.
                 this.ViewModel.InjectorTestResult = ResultOutput;
