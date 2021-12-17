@@ -19,7 +19,8 @@ class CFulcrumShim : public CWinApp
 		CFulcrumShim();
 
 		// Pipe configuration
-		void InitPipes();
+		void StartupPipes();
+		void ShutdownPipes();
 		bool pipesLoaded;
 		fulcrum_jpipe* fulcrumPiper;
 

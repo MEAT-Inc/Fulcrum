@@ -14,7 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FulcrumInjector.AppLogic.AvalonEditHelpers;
 using FulcrumInjector.ViewControl.ViewModels;
-using NLog;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -22,27 +21,26 @@ using SharpLogger.LoggerSupport;
 namespace FulcrumInjector.ViewControl.Views
 {
     /// <summary>
-    /// Interaction logic for FulcrumInjectorDebugLoggingView.xaml
+    /// Interaction logic for InjectorDllOutputLogView.xaml
     /// </summary>
-    public partial class FulcrumDebugLoggingView : UserControl
-    {
+    public partial class FulcrumDllOutputLogView : UserControl
+    {  
         // Logger object.
         private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("DebugLoggingViewLogger")) ?? new SubServiceLogger("DebugLoggingViewLogger");
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorDllOutputViewLogger")) ?? new SubServiceLogger("InjectorDllOutputViewLogger");
 
         // ViewModel object to bind onto
-        public FulcrumDebugLoggingViewModel ViewModel { get; set; }
+        public FulcrumDllOutputLogViewModel ViewModel { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Builds a new pipe status view object
+        /// Builds new logic for DLL Logging output view
         /// </summary>
-        public FulcrumDebugLoggingView()
+        public FulcrumDllOutputLogView()
         {
-            // Init component. Build new VM object
             InitializeComponent();
-            this.ViewModel = new FulcrumDebugLoggingViewModel();
+            this.ViewModel = new FulcrumDllOutputLogViewModel();
         }
 
         /// <summary>
@@ -50,7 +48,7 @@ namespace FulcrumInjector.ViewControl.Views
         /// </summary>
         /// <param name="sender">Sending object</param>
         /// <param name="e">Events attached to it.</param>
-        private void FulcrumInjectorDebugLoggingView_OnLoaded(object sender, RoutedEventArgs e)
+        private void FulcrumDLLOutputLogView_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
@@ -58,7 +56,7 @@ namespace FulcrumInjector.ViewControl.Views
 
             // Configure pipe instances here.
             this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -68,7 +66,7 @@ namespace FulcrumInjector.ViewControl.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void LogFilteringTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        private async void DllLogFilteringTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             // Get the current text entry value and pass it over to the VM for actions.
             var FilteringTextBox = (TextBox)sender;
@@ -82,42 +80,6 @@ namespace FulcrumInjector.ViewControl.Views
                 ViewModel.SearchForText(TextToFilter);
                 Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
             });
-        }
-
-
-        /// <summary>
-        /// Pulls in new loggers and shows them here.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LoggerNameComboBox_OnDropDownOpened(object sender, EventArgs e)
-        {
-            // Trigger refresh logger list
-            this.ViewModel.BuildLoggerNamesList();
-            ViewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
-        }
-        /// <summary>
-        /// Takes the selected logger object and filters log lines to only contain those from the given logger
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LoggerNameComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Build filtering helper using the provided selection object
-            ComboBox CastSendingBox = (ComboBox)sender;
-
-            // Check for zero or no selection
-            if (CastSendingBox.SelectedIndex <= 0)
-            {
-                ViewModel?.FilterByLoggerName(null);
-                ViewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
-                return;
-            }
-
-            // Now setup new filtering rule.
-            string SelectedLoggerName = CastSendingBox.SelectedItem?.ToString();
-            ViewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
-            ViewModel.FilterByLoggerName(SelectedLoggerName);
         }
     }
 }

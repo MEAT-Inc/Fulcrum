@@ -60,9 +60,9 @@ BOOL CSelectionBox::OnInitDialog()
 	CString logDir;
 	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
 	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) 
-		dtDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
 	else 
-		dtDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
 
 
 	// Build the log file path using the log dir above
@@ -78,13 +78,17 @@ BOOL CSelectionBox::OnInitDialog()
 	);
 
 	// Log new file name output.
-	dtDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
 
 	// Set information about the new output file
 	m_logfilename.SetWindowText(cstrPath);
 	DoPopulateRegistryListbox();
 	ShowWindow(SW_SHOW);
 	BringWindowToTop();
+
+	// Boot the pipes and start the fulcrum injector
+	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
+	fulcrum_app->StartupPipes();
 
 	// Return TRUE unless you set focus to a control
 	return TRUE;
@@ -183,10 +187,6 @@ void CSelectionBox::OnBnClickedOk()
 	DWORD_PTR item_data = m_listview.GetItemData(nItem);
 	sel = (cPassThruInfo *) item_data;
 	m_logfilename.GetWindowText(cstrDebugFile);
-
-	// Boot the pipes and start the fulcrum injector
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
 
 	// Check if passed output. If so move on.
 	OnOK();

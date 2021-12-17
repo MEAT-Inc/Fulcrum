@@ -12,7 +12,16 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
     {
         // Singleton configuration
         public static FulcrumPipeWriter PipeInstance => _lazyWriter.Value;
-        private static readonly Lazy<FulcrumPipeWriter> _lazyWriter = new Lazy<FulcrumPipeWriter>(() => new FulcrumPipeWriter());
+        private static readonly Lazy<FulcrumPipeWriter> _lazyWriter = new(() => new FulcrumPipeWriter());
+
+        // Reset Pipe Object method
+        public static void ResetPipeInstance()
+        {
+            // Reset Pipe here if needed and can
+            if (PipeInstance == null) { return; }
+            if (PipeInstance.PipeState != FulcrumPipeState.Connected) PipeInstance.ConfigureNewPipe();
+            else { PipeInstance.PipeLogger.WriteLog("WRITER PIPE WAS ALREADY CONNECTED! NOT RECONFIGURING IT!", LogType.WarnLog); }
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------
 

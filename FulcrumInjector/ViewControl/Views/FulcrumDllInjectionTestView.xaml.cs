@@ -14,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.Annotations;
 using FulcrumInjector.ViewControl.ViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -73,7 +72,7 @@ namespace FulcrumInjector.ViewControl.Views
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Run the injection test here on a Dispatched thread 
-                this.ViewModel.InjectionLoadPassed = this.ViewModel.PerformDllInjectionTest(out string ResultOutput);
+                this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out string ResultOutput);
                 if (this.ViewModel.InjectionLoadPassed) ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
                 else ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog);
 
@@ -83,11 +82,11 @@ namespace FulcrumInjector.ViewControl.Views
             catch (Exception Ex)
             {
                 // Log the failure here.
-                this.ViewModel.WriteToLogBox("----------------------------------------------");
-                this.ViewModel.WriteToLogBox("FAILED TO LOAD OUR DLL!");
-                this.ViewModel.WriteToLogBox($"EXCEPTION THROWN: {Ex.Message}");
-                this.ViewModel.WriteToLogBox("THIS IS A FATAL ISSUE!");
-                this.ViewModel.WriteToLogBox("----------------------------------------------");
+                ViewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
+                ViewLogger.WriteLog("FAILED TO LOAD OUR DLL!", LogType.ErrorLog);
+                ViewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
+                ViewLogger.WriteLog("THIS IS A FATAL ISSUE!", LogType.ErrorLog);
+                ViewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
 
                 // Store output
                 this.ViewModel.InjectorTestResult = "Load Failure!";

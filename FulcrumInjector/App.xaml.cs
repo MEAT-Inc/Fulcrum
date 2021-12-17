@@ -33,9 +33,12 @@ namespace FulcrumInjector
         /// <param name="e">Event args</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            // Startup override.
+            // Startup override
             base.OnStartup(e);
-            
+
+            // Force the working directory to the running location of the application or set to the debug directory
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
             // Logging config and app theme config.
             this.ConfigureLogging();
             this.ConfigureLogCleanup();
@@ -73,7 +76,7 @@ namespace FulcrumInjector
         private void ConfigureLogCleanup()
         {
             // Pull values for log archive trigger and set values
-            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorLogging.LogArchiveSetup"); ;
+            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorLogging.LogArchiveSetup");
 
             // Check to see if we need to archive or not.
             LogBroker.Logger?.WriteLog($"CLEANUP ARCHIVE FILE SETUP STARTED! CHECKING FOR {ConfigObj.ArchiveOnFileCount} OR MORE LOG FILES...");
@@ -85,12 +88,35 @@ namespace FulcrumInjector
             }
 
             // Begin archive process 
+            var ShimFileFilterName = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorSettings.ShimInstanceName"); ;
             LogBroker.Logger?.WriteLog($"ARCHIVE PROCESS IS NEEDED! PATH TO STORE FILES IS SET TO {ConfigObj.LogArchivePath}");
             LogBroker.Logger?.WriteLog($"SETTING UP SETS OF {ConfigObj.ArchiveFileSetSize} FILES IN EACH ARCHIVE OBJECT!");
-            LogBroker.CleanupLogHistory(ConfigObj.ToString());
+            Task.Run(() =>
+            {
+                // Run on different thread to avoid clogging up UI
+                LogBroker.CleanupLogHistory(ConfigObj.ToString());
+                LogBroker.CleanupLogHistory(ConfigObj.ToString(), ShimFileFilterName);
 
-            // Log done.
-            LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);
+                // See if we have too many archives
+                string[] ArchivesFound = Directory.GetFiles(ConfigObj.LogArchivePath);
+                int ArchiveSetCount = ConfigObj.ArchiveFileSetSize is int ? (int)ConfigObj.ArchiveFileSetSize : 0;
+                if (ArchivesFound.Length >= ArchiveSetCount * 2)
+                {
+                    // List of files to remove now.
+                    LogBroker.Logger?.WriteLog("REMOVING OVERFLOW OF ARCHIVE VALUES NOW...", LogType.WarnLog);
+                    var RemoveThese = ArchivesFound
+                        .OrderByDescending(FileObj => new FileInfo(FileObj).LastWriteTime)
+                        .Skip(ArchiveSetCount * 2);
+
+                    // Remove the remainder now.
+                    LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {RemoveThese.Count()} FILES TO PRUNE");
+                    foreach (var FileObject in RemoveThese) { File.Delete(FileObject); }
+                    LogBroker.Logger?.WriteLog($"REMOVED ALL THE REQUIRED ARCHIVES OK! LEFT A TOTAL OF {ArchiveSetCount * 2} ARCHIVES BEHIND!", LogType.InfoLog);
+                }
+
+                // Log done.
+                LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.
@@ -98,8 +124,8 @@ namespace FulcrumInjector
         private bool ConfigureSingleInstance()
         {
             // Find all the fulcrum process objects now.
-            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
             var CurrentInjector = Process.GetCurrentProcess();
+            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
             LogBroker.Logger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
 
             // Find the process values here.
@@ -107,7 +133,7 @@ namespace FulcrumInjector
             LogBroker.Logger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
             var InjectorsTotal = Process.GetProcesses()
                 .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
-                .Where(ProcObj => ProcObj.ProcessName.ToUpper().Contains(CurrentInstanceName)
+                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName)
                                   || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
                 .ToList();
 
@@ -116,14 +142,16 @@ namespace FulcrumInjector
 
             // Now kill any existing instances
             LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
-            LogBroker.Logger?.WriteLog("KILLING THESE PROCESS OBJECTS NOW...", LogType.InfoLog);
-            foreach (var InjectorProc in InjectorsTotal)
+            if (InjectorsTotal.Count > 0)
             {
-                InjectorProc.Kill();
-                LogBroker.Logger?.WriteLog($"--> KILLED PROCESS {InjectorProc.Id} OK!", LogType.TraceLog);
+                // Log removing files and delete the log output
+                LogBroker.Logger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
+                File.Delete(LogBroker.MainLogFileName);
+                Environment.Exit(100);
             }
 
             // Return passed output.
+            LogBroker.Logger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
             return true;
         }
         /// <summary>

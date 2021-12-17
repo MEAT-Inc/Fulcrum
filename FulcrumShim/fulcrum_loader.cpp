@@ -56,7 +56,7 @@ auto_lock::auto_lock()
 
 	if (! TryEnterCriticalSection(&mAutoLock))
 	{
-		dtDebug(_T("Multi-threading error"));
+		fulcrum_output::fulcrum_output::fulcrumDebug(_T("Multi-threading error"));
 		EnterCriticalSection(&mAutoLock);
 	}
 }
@@ -261,7 +261,7 @@ bool fulcrum_checkAndAutoload(void)
 
 		// The user specified a debug output file in the dialog. Write any buffered text to this file
 		// and start using it from now on
-		fulcrum_writeLogfile(Dlg.GetDebugFilename(), true);
+		fulcrum_output::writeNewLogFile(Dlg.GetDebugFilename(), true);
 
 		return true;
 	}

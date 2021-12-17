@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using FulcrumInjector.AppLogic;
 using FulcrumInjector.AppLogic.InjectorPipes;
 using FulcrumInjector.ViewControl.ViewModels;
 using FulcrumInjector.ViewControl.Views;
+using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -73,6 +75,18 @@ namespace FulcrumInjector.ViewControl
             set => FulcrumInstalledOeAppsView.ViewModel = value;
         }
 
+        // Injector DLL Output View Contents
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView
+        {
+            get => InjectorMainWindow.FulcrumDllOutputLog;
+            set => InjectorMainWindow.FulcrumDllOutputLog = value;
+        }
+        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel
+        {
+            get => FulcrumDllOutputLogView.ViewModel;
+            set => FulcrumDllOutputLogView.ViewModel = value;
+        }
+
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -86,6 +100,19 @@ namespace FulcrumInjector.ViewControl
         {
             get => FulcrumDebugLoggingView.ViewModel;
             set => FulcrumDebugLoggingView.ViewModel = value;
+        }
+
+
+        // Setting Flyout View and View Model
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView
+        {
+            get => InjectorMainWindow.FulcrumSettingsPane;
+            set => InjectorMainWindow.FulcrumSettingsPane = value;
+        }
+        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel
+        {
+            get => FulcrumSettingsPaneView.ViewModel;
+            set => FulcrumSettingsPaneView.ViewModel = value;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -106,6 +133,79 @@ namespace FulcrumInjector.ViewControl
             if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.SettingsViewFlyout, InjectorMainWindow.DebugViewFlyout))
                 ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
+        }
+
+        /// <summary>
+        /// Sets a value on one of the global UI Control values here
+        /// </summary>
+        /// <param name="ViewOrViewModelType"></param>
+        /// <param name="PropertyName"></param>
+        /// <param name="PropertyValue"></param>
+        /// <returns></returns>
+        public static bool SetConstantVariable(Type ViewOrViewModelType, string PropertyName, object PropertyValue)
+        {
+            // Start by finding the control with the type given
+            ConstantsLogger.WriteLog($"ATTEMPTING TO SET VAR {PropertyName} ON OBJECT TYPED {ViewOrViewModelType.Name}....");
+            var DesiredPropertyObject = ViewOrViewModelType.GetMembers(BindingFlags.Public | BindingFlags.Static)
+                .Where(MemberObj => MemberObj.MemberType == MemberTypes.Property)
+                .Select(MemberObj =>
+                {
+                    // Pull value object and cast into property info
+                    PropertyInfo CastInfo = MemberObj as PropertyInfo;
+                    object ValuePulled = CastInfo.GetValue(null);
+
+                    // Return built tuple
+                    return new Tuple<PropertyInfo, string, object>(CastInfo, CastInfo.PropertyType.Name, ValuePulled);
+                }).ToList()
+                .FirstOrDefault(ValueSet => ValueSet.Item2 == ViewOrViewModelType.Name);
+
+            // Make sure it's not null
+            if (DesiredPropertyObject == null) {
+                ConstantsLogger.WriteLog("FAILED TO FIND A USABLE PROPERTY OBJECT VALUE ON THE CONSTANTS OBJECT!", LogType.ErrorLog);
+                return false;
+            }
+
+            // Now apply our new value
+            ConstantsLogger.WriteLog("LOCATED NEW PROPERTY OBJECT TO MODIFY OK!", LogType.InfoLog);
+            try
+            {
+                // Pull the member info and store the best one for us
+                var DesiredMember = DesiredPropertyObject.Item3.GetType()
+                    .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                    .FirstOrDefault(MemberObj => MemberObj.Name == PropertyName);
+                if (DesiredMember == null) throw new InvalidOperationException("FAILED TO LOCATE MEMBER ON REFLECTED INSTANCE");
+                ConstantsLogger.WriteLog("PULLED NEW MEMBER INSTANCE OBJECT OK! SETTING IT NOW...", LogType.InfoLog);
+
+                // Now set the value on our new member info
+                switch (DesiredMember.MemberType)
+                {
+                    // Sets the value on the class into the current invoking object
+                    case MemberTypes.Field:
+                        FieldInfo InvokerField = (FieldInfo)DesiredMember;
+                        InvokerField.SetValue(DesiredPropertyObject.Item3, PropertyValue);
+                        break;
+
+                    // PropertyInfo
+                    case MemberTypes.Property:
+                        PropertyInfo InvokerProperty = (PropertyInfo)DesiredMember;
+                        InvokerProperty.SetValue(DesiredPropertyObject.Item3, PropertyValue);
+                        break;
+
+                    // Not found
+                    default: throw new NotImplementedException($"THE INVOKED MEMBER {PropertyName} COULD NOT BE FOUND!");
+                }
+
+                // Set new value correctly! Log and return passed
+                ConstantsLogger.WriteLog("SET NEW VALUE OBJECT TO OUR DESIRED PROPERTY OK!", LogType.InfoLog);
+                return true;
+            }
+            catch (Exception Ex)
+            {
+                // Catch failure, log it, and return failed
+                ConstantsLogger.WriteLog($"FAILED TO SET NEW PROPERTY VALUE NAMED {PropertyName}!", LogType.TraceLog);
+                ConstantsLogger.WriteLog("EXCEPTION THROWN DURING PULL!", Ex);
+                return false;
+            }
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

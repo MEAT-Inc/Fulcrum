@@ -42,24 +42,24 @@ bool fulcrum_hadInternalError()
 	return fUseLastInternalError;
 }
 
-void dbug_printretval(unsigned long retval)
+void fulcrum_printretval(unsigned long retval)
 {
 	if (retval == STATUS_NOERROR ||
 		retval == ERR_TIMEOUT ||
 		retval == ERR_BUFFER_EMPTY)
 	{
-		dtDebug(_T("  %.3fs %s\n"), GetTimeSinceInit(), dbug_return(retval).c_str());
+		fulcrum_output::fulcrumDebug(_T("  %.3fs %s\n"), GetTimeSinceInit(), fulcrumDebug_return(retval).c_str());
 	}
 	else
 	{
 		char szErrorDescription[80];
 		fulcrum_PassThruGetLastError(szErrorDescription);
 		CStringW cstrErrorDescription(szErrorDescription);
-		dtDebug(_T("  %.3fs %s '%s'\n"), GetTimeSinceInit(), dbug_return(retval).c_str(), cstrErrorDescription);
+		fulcrum_output::fulcrumDebug(_T("  %.3fs %s '%s'\n"), GetTimeSinceInit(), fulcrumDebug_return(retval).c_str(), cstrErrorDescription);
 	}
 }
 
-static LPCTSTR dbug_retval2str(unsigned long RetVal)
+static LPCTSTR fulcrumDebug_retval2str(unsigned long RetVal)
 {
 	switch (RetVal)
 	{
@@ -105,16 +105,16 @@ static LPCTSTR dbug_retval2str(unsigned long RetVal)
 	return _T("?retval?");
 }
 
-tstring dbug_return(unsigned long RetVal)
+tstring fulcrumDebug_return(unsigned long RetVal)
 {
 	std::basic_ostringstream<wchar_t> ssRetVal;
 
-	ssRetVal << RetVal << _T(":") << dbug_retval2str(RetVal);
+	ssRetVal << RetVal << _T(":") << fulcrumDebug_retval2str(RetVal);
 
 	return ssRetVal.str();
 }
 
-static LPCTSTR dbug_filter2str(unsigned long FilterType)
+static LPCTSTR fulcrumDebug_filter2str(unsigned long FilterType)
 {
 	switch (FilterType)
 	{
@@ -139,16 +139,16 @@ static LPCTSTR dbug_filter2str(unsigned long FilterType)
 	return _T("?filter?");
 }
 
-tstring dbug_filter(unsigned long FilterType)
+tstring fulcrumDebug_filter(unsigned long FilterType)
 {
 	std::basic_ostringstream<wchar_t> ssFilterType;
 
-	ssFilterType << FilterType << _T(":") << dbug_filter2str(FilterType);
+	ssFilterType << FilterType << _T(":") << fulcrumDebug_filter2str(FilterType);
 
 	return ssFilterType.str();
 }
 
-static LPCTSTR dbug_ioctl2str(unsigned long IoctlID)
+static LPCTSTR fulcrumDebug_ioctl2str(unsigned long IoctlID)
 {
 	switch (IoctlID)
 	{
@@ -205,16 +205,16 @@ static LPCTSTR dbug_ioctl2str(unsigned long IoctlID)
 	return _T("?ioctl?");
 }
 
-tstring dbug_ioctl(unsigned long IoctlID)
+tstring fulcrumDebug_ioctl(unsigned long IoctlID)
 {
 	std::basic_ostringstream<wchar_t> ssIoctlID;
 
-	ssIoctlID << IoctlID << _T(":") << dbug_ioctl2str(IoctlID);
+	ssIoctlID << IoctlID << _T(":") << fulcrumDebug_ioctl2str(IoctlID);
 
 	return ssIoctlID.str();
 }
 
-static LPCTSTR dbug_param2str(unsigned long ParamID)
+static LPCTSTR fulcrumDebug_param2str(unsigned long ParamID)
 {
 	switch (ParamID)
 	{
@@ -296,17 +296,17 @@ static LPCTSTR dbug_param2str(unsigned long ParamID)
 	return _T("?param?");
 }
 
-tstring dbug_param(unsigned long ParamID)
+tstring fulcrumDebug_param(unsigned long ParamID)
 {
 	std::basic_ostringstream<wchar_t> ssParamID;
 
 	//ssParamID << _T("0x") << std::hex << std::setw(2) << std::setfill(_T('0')) << ParamID << _T(":") << dbug_param2str(ParamID);
-	ssParamID << ParamID << _T(":") << dbug_param2str(ParamID);
+	ssParamID << ParamID << _T(":") << fulcrumDebug_param2str(ParamID);
 
 	return ssParamID.str();
 }
 
-static LPCTSTR dbug_prot2str(unsigned long ProtocolID)
+static LPCTSTR fulcrumDebug_prot2str(unsigned long ProtocolID)
 {
 	switch (ProtocolID)
 	{
@@ -349,16 +349,16 @@ static LPCTSTR dbug_prot2str(unsigned long ProtocolID)
 	return _T("?protocol?");
 }
 
-tstring dbug_prot(unsigned long ProtocolID)
+tstring fulcrumDebug_prot(unsigned long ProtocolID)
 {
 	std::basic_ostringstream<wchar_t> ssProtocolID;
 
-	ssProtocolID << ProtocolID << _T(":") << dbug_prot2str(ProtocolID);
+	ssProtocolID << ProtocolID << _T(":") << fulcrumDebug_prot2str(ProtocolID);
 
 	return ssProtocolID.str();
 }
 
-static LPCTSTR dbug_cflag2str(unsigned long ConnectFlag)
+static LPCTSTR fulcrumDebug_cflag2str(unsigned long ConnectFlag)
 {
 	switch (ConnectFlag)
 	{
@@ -384,7 +384,7 @@ static LPCTSTR dbug_cflag2str(unsigned long ConnectFlag)
 	return _T("?cflag?");
 }
 
-void dbug_printcflag(unsigned long ConnectFlags)
+void fulcrumDebug_printcflag(unsigned long ConnectFlags)
 {
 	std::basic_ostringstream<wchar_t> ssConnectFlags;
 
@@ -402,15 +402,15 @@ void dbug_printcflag(unsigned long ConnectFlags)
 		}
 		else
 		{
-			ssConnectFlags << _T(" ") << i << _T(":") << dbug_cflag2str(mask & ConnectFlags);
+			ssConnectFlags << _T(" ") << i << _T(":") << fulcrumDebug_cflag2str(mask & ConnectFlags);
 		}
 	}
 	ssConnectFlags << std::endl;
 
-	dtDebug(ssConnectFlags.str().c_str());
+	fulcrum_output::fulcrumDebug(ssConnectFlags.str().c_str());
 }
 
-static LPCTSTR dbug_rxstatus2str(unsigned long RxStatus)
+static LPCTSTR fulcrumDebug_rxstatus2str(unsigned long RxStatus)
 {
 	switch (RxStatus)
 	{
@@ -446,7 +446,7 @@ static LPCTSTR dbug_rxstatus2str(unsigned long RxStatus)
 	return _T("?rxstatus?");
 }
 
-void dbug_printrxstatus(unsigned long RxStatus)
+void fulcrumDebug_printrxstatus(unsigned long RxStatus)
 {
 	std::basic_ostringstream<wchar_t> ssRxStatus;
 
@@ -464,15 +464,15 @@ void dbug_printrxstatus(unsigned long RxStatus)
 		}
 		else
 		{
-			ssRxStatus << _T(" ") << i << _T(":") << dbug_rxstatus2str(mask & RxStatus);
+			ssRxStatus << _T(" ") << i << _T(":") << fulcrumDebug_rxstatus2str(mask & RxStatus);
 		}
 	}
 	ssRxStatus << std::endl;
 
-	dtDebug(ssRxStatus.str().c_str());
+	fulcrum_output::fulcrumDebug(ssRxStatus.str().c_str());
 }
 
-static LPCTSTR dbug_txflag2str(unsigned long TxFlags)
+static LPCTSTR fulcrumDebug_txflag2str(unsigned long TxFlags)
 {
 	switch (TxFlags)
 	{
@@ -505,7 +505,7 @@ static LPCTSTR dbug_txflag2str(unsigned long TxFlags)
 	return _T("?txflag?");
 }
 
-void dbug_printtxflags(unsigned long TxFlags)
+void fulcrumDebug_printtxflags(unsigned long TxFlags)
 {
 	std::basic_ostringstream<wchar_t> ssTxFlags;
 
@@ -523,27 +523,27 @@ void dbug_printtxflags(unsigned long TxFlags)
 		}
 		else
 		{
-			ssTxFlags << _T(" ") << i << _T(":") << dbug_txflag2str(mask & TxFlags);
+			ssTxFlags << _T(" ") << i << _T(":") << fulcrumDebug_txflag2str(mask & TxFlags);
 		}
 	}
 	ssTxFlags << std::endl;
 
-	dtDebug(ssTxFlags.str().c_str());
+	fulcrum_output::fulcrumDebug(ssTxFlags.str().c_str());
 }
 
-void dbug_printsbyte(SBYTE_ARRAY *inAry, LPCTSTR s)
+void fulcrumDebug_printsbyte(SBYTE_ARRAY *inAry, LPCTSTR s)
 {
 	if (inAry == NULL)
 	{
-		dtDebug(_T("  %s is NULL\n"), s);
+		fulcrum_output::fulcrumDebug(_T("  %s is NULL\n"), s);
 		return;
 	}
 
-	dtDebug(_T("  %s: %lu bytes at 0x%08X\n"), s, inAry->NumOfBytes, inAry->BytePtr);
+	fulcrum_output::fulcrumDebug(_T("  %s: %lu bytes at 0x%08X\n"), s, inAry->NumOfBytes, inAry->BytePtr);
 
 	if (inAry->BytePtr == NULL)
 	{
-		dtDebug(_T("  %s->BytePtr is NULL\n"), inAry);
+		fulcrum_output::fulcrumDebug(_T("  %s->BytePtr is NULL\n"), inAry);
 		return;
 	}
 
@@ -558,7 +558,7 @@ void dbug_printsbyte(SBYTE_ARRAY *inAry, LPCTSTR s)
 		}
 		ssData << std::endl;
 
-		dtDebug(ssData.str().c_str());
+		fulcrum_output::fulcrumDebug(ssData.str().c_str());
 	}
 }
 
@@ -566,41 +566,41 @@ void dbug_printsconfig(SCONFIG_LIST *pList)
 {
 	if (pList == NULL)
 	{
-		dtDebug(_T("  pList is NULL\n"));
+		fulcrum_output::fulcrumDebug(_T("  pList is NULL\n"));
 		return;
 	}
 
-	dtDebug(_T("  %ld parameter(s) at 0x%08X:\n"), pList->NumOfParams, pList->ConfigPtr);
+	fulcrum_output::fulcrumDebug(_T("  %ld parameter(s) at 0x%08X:\n"), pList->NumOfParams, pList->ConfigPtr);
 	if (pList->ConfigPtr == NULL)
 	{
-		dtDebug(_T("  pList->ConfigPtr is NULL\n"));
+		fulcrum_output::fulcrumDebug(_T("  pList->ConfigPtr is NULL\n"));
 		return;
 	}
 
 	for (unsigned long i=0; i < pList->NumOfParams; i++)
 	{
-		dtDebug(_T("    %s = %ld\n"), dbug_param(pList->ConfigPtr[i].Parameter).c_str(), pList->ConfigPtr[i].Value);
+		fulcrum_output::fulcrumDebug(_T("    %s = %ld\n"), fulcrumDebug_param(pList->ConfigPtr[i].Parameter).c_str(), pList->ConfigPtr[i].Value);
 	}
 }
 
-void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long * numMsgs, bool isWrite)
+void fulcrumDebug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long * numMsgs, bool isWrite)
 {
 	if (mm == NULL)
-		dtDebug(_T("  %s is NULL\n"), s);
+		fulcrum_output::fulcrumDebug(_T("  %s is NULL\n"), s);
 	if (numMsgs == NULL)
-		dtDebug(_T("  numMsgs is NULL\n"), s);
+		fulcrum_output::fulcrumDebug(_T("  numMsgs is NULL\n"), s);
 
 	if (mm == NULL || numMsgs == NULL)
 		return;
 
-	dbug_printmsg(mm, s, *numMsgs, isWrite);
+	fulcrumDebug_printmsg(mm, s, *numMsgs, isWrite);
 }
 
-void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isWrite)
+void fulcrumDebug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isWrite)
 {
 	if (mm == NULL)
 	{
-		dtDebug(_T("  %s is NULL\n"), s);
+		fulcrum_output::fulcrumDebug(_T("  %s is NULL\n"), s);
 		return;
 	}
 
@@ -608,22 +608,22 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 	{
 		if (isWrite == true)
 		{
-			dtDebug(_T("  %s[%2ld] %s. %lu bytes. TxF=0x%08lx\n"),
+			fulcrum_output::fulcrumDebug(_T("  %s[%2ld] %s. %lu bytes. TxF=0x%08lx\n"),
 				s,
 				i,
 				//numMsgs,
-				dbug_prot(mm[i].ProtocolID).c_str(),
+				fulcrumDebug_prot(mm[i].ProtocolID).c_str(),
 				mm[i].DataSize,
 				mm[i].TxFlags);
 		}
 		else
 		{
-			dtDebug(_T("  %s[%2ld] %fs. %s. Actual data %lu of %lu bytes. RxS=0x%08lx\n"),
+			fulcrum_output::fulcrumDebug(_T("  %s[%2ld] %fs. %s. Actual data %lu of %lu bytes. RxS=0x%08lx\n"),
 				s,
 				i,
 				//numMsgs,
 				mm[i].Timestamp / (float) 1000000,
-				dbug_prot(mm[i].ProtocolID).c_str(),
+				fulcrumDebug_prot(mm[i].ProtocolID).c_str(),
 				mm[i].ExtraDataIndex,
 				mm[i].DataSize,
 				mm[i].RxStatus);
@@ -632,13 +632,13 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 		// Display TxFlags if this is an outgoing message
 		if (mm[i].TxFlags != 0 && isWrite == true)
 		{
-			dbug_printtxflags(mm[i].TxFlags);
+			fulcrumDebug_printtxflags(mm[i].TxFlags);
 		}
 
 		// Display RxStatus if this is an incoming message
 		if (mm[i].RxStatus != 0 && isWrite == false)
 		{
-			dbug_printrxstatus(mm[i].RxStatus);
+			fulcrumDebug_printrxstatus(mm[i].RxStatus);
 		}
 
 		// Display Data[] except for frames containing neither data nor extradata
@@ -661,7 +661,7 @@ void dbug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, bool isW
 			}
 			ssData << std::endl;
 
-			dtDebug(ssData.str().c_str());
+			fulcrum_output::fulcrumDebug(ssData.str().c_str());
 		}
 	}
 }

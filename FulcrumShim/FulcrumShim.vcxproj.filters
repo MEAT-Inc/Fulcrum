@@ -51,6 +51,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="FulcrumVersionTick.py" />
+    <None Include="MEAT_FulcrumInjector_DEBUG.reg" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">

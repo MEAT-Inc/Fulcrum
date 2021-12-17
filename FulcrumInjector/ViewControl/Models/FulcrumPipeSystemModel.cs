@@ -33,6 +33,11 @@ namespace FulcrumInjector.ViewControl.Models
         /// <returns>True if pipes are built. False if not.</returns>
         public bool ValidateFulcrumPipeConfiguration()
         {
+            // Reset pipe configuration if needed
+            PipeStatusModelLogger.WriteLog("RESETTING PIPE CONFIGURATION VALUES NOW...", LogType.InfoLog);
+            FulcrumPipeReader.ResetPipeInstance(); 
+            FulcrumPipeWriter.ResetPipeInstance();
+
             // Main pipes for the fulcrum application
             PipeStatusModelLogger.WriteLog("BUILDING NEW PIPE OBJECTS NOW...", LogType.InfoLog);
             this.AlphaPipe = FulcrumPipeReader.PipeInstance;

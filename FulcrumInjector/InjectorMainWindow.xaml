@@ -8,10 +8,9 @@
         xmlns:views="clr-namespace:FulcrumInjector.ViewControl.Views"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
-        Height="600" Width="1000" 
-        MaxHeight="650" MaxWidth="1125"
-        MinHeight="550" MinWidth="875"
+        Height="650" Width="1100" 
         AllowsTransparency="True"
+        ResizeMode="CanMinimize"
         Loaded="InjectorMainWindow_OnLoaded">
     
     <!-- Dark Semi Transparent Background -->
@@ -46,7 +45,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Splitting Border -->
-            <Border Grid.Column="1" Margin="0,0" Opacity=".50" BorderThickness="5,0" BorderBrush="{StaticResource PrimaryColor_Lighter_35}"/>
+            <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
 
             <!-- Left Side Pane View -->
             <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,5">
@@ -80,32 +79,83 @@
                 </Grid>
             </Viewbox>
 
-            <!-- Flyouts for Main Window -->
-            <mah:FlyoutsControl Grid.Column="2" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <mah:Flyout
-                IsOpen="False"
-                x:Name="SettingsViewFlyout" 
-                VerticalContentAlignment="Stretch" 
-                HorizontalContentAlignment="Stretch" 
-                Header="FulcrumInjector Settings"
-                mah:HeaderedControlHelper.HeaderFontSize="24"
-                mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
-                BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
-                    <!-- Content for Settings -->
-                    <Grid>
-                        <Border BorderBrush="{StaticResource SecondaryColor_Lighter_35}" BorderThickness="0,3,0,0"/>
+            <!-- Main Content View Box -->
+            <Grid Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                    </Grid>
+                <!-- TODO: PUT SOMETHING IN THIS LEFT PANE? NOT SURE WHAT BUT SOMETHIN HAS TO AT SOME POINT -->
+                <Border 
+                    Margin="10,5"
+                    BorderBrush="{StaticResource TextColorBase}"
+                    BorderThickness="3" CornerRadius="5">
+                    <Border
+                        CornerRadius="5"
+                        BorderBrush="{StaticResource TextColorBase}"
+                        Background="{StaticResource PrimaryColor_Darker_65}">
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            FontSize="16"
+                            Margin="10"
+                            FontWeight="Bold"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            TextAlignment="Center"
+                            Foreground="{StaticResource TextColorBase}">
+                            <Run FontSize="28" Text="A Mystical Placeholder TextBlock!"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Foreground="Yellow" FontSize="20" Text="Something wicked this way comes..."/>
+                        </TextBlock>
+                    </Border>
+                </Border>
+
+                <!-- Splitting Border Output object -->
+                <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
+
+                <!-- Content for the injector output -->
+                <views:FulcrumDllOutputLogView 
+                        Grid.Column="2"
+                        Margin="0,0,-3,0"
+                        x:Name="FulcrumDllOutputLog"/>
+            </Grid>
+
+            <!-- Flyouts for Main Window -->
+            <mah:FlyoutsControl Grid.Column="2" Margin="10,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <mah:Flyout
+                    IsOpen="False"
+                    x:Name="SettingsViewFlyout" 
+                    VerticalContentAlignment="Stretch" 
+                    HorizontalContentAlignment="Stretch" 
+                    Header="FulcrumInjector Settings"
+                    mah:HeaderedControlHelper.HeaderFontSize="22"
+                    mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
+                    mah:HeaderedControlHelper.HeaderMargin="5"
+                    TitleVisibility="Collapsed"
+                    BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
+                    
+                    <!-- Empty header content -->
+                    <mah:Flyout.HeaderTemplate>
+                        <DataTemplate></DataTemplate>
+                    </mah:Flyout.HeaderTemplate>
+    
+                    <!-- Content for Settings -->
+                    <views:FulcrumSettingsPaneView x:Name="FulcrumSettingsPane"/>
                 </mah:Flyout>
                 <mah:Flyout
-                IsOpen="False" 
-                x:Name="DebugViewFlyout"
-                VerticalContentAlignment="Stretch" 
-                HorizontalContentAlignment="Stretch" 
-                Header="FulcrumInjector Debugging"
-                mah:HeaderedControlHelper.HeaderFontSize="24"
-                mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
-                BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
+                    IsOpen="False" 
+                    x:Name="DebugViewFlyout"
+                    VerticalContentAlignment="Stretch" 
+                    HorizontalContentAlignment="Stretch" 
+                    Header="FulcrumInjector Debugging"
+                    mah:HeaderedControlHelper.HeaderFontSize="22"
+                    mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
+                    mah:HeaderedControlHelper.HeaderMargin="5"
+                    BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
                     <!-- Content for Debugging -->
                     <Grid>
                         <Border BorderBrush="{StaticResource SecondaryColor_Lighter_35}" BorderThickness="0,3,0,0"/>

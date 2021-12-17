@@ -14,24 +14,19 @@ using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.ViewControl.ViewModels
 {
-    /// <summary>
-    /// View model used to help render and register logging redirects
-    /// </summary>
-    public class FulcrumDebugLoggingViewModel : ViewModelControlBase
+    public class FulcrumDllOutputLogViewModel : ViewModelControlBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("DebugLoggingViewModelLogger")) ?? new SubServiceLogger("DebugLoggingViewModelLogger");
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorDllOutputViewModelLogger")) ?? new SubServiceLogger("InjectorDllOutputViewModelLogger");
 
         // Private control values
         private bool _usingRegex;
         private bool _noResultsOnSearch;
-        private List<string> _loggerNamesFound;
 
         // Public values for our view to bind onto 
         public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
         public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
-        public List<string> LoggerNamesFound { get => _loggerNamesFound; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
         public AvalonEditFilteringHelpers LogContentHelper;
@@ -41,39 +36,17 @@ namespace FulcrumInjector.ViewControl.ViewModels
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        public FulcrumDebugLoggingViewModel()
+        public FulcrumDllOutputLogViewModel()
         {
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
-
-            // Store logger names here
-            this.LoggerNamesFound = this.BuildLoggerNamesList();
-            ViewModelLogger.WriteLog("DONE CONFIGURING VIEW BINDING VALUES!", LogType.InfoLog);
-
-            // Log completed setup.
-            ViewModelLogger.WriteLog("SETUP NEW LOGGING VIEW AND MODIFICATION VALUES OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            
+            // Build log content helper and return
+            ViewModelLogger.WriteLog("SETUP NEW DLL INJECTION OUTPUT LOG VALUES OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Generates a list of logger names from the log broker object
-        /// </summary>
-        /// <returns>Names of all loggers</returns>
-        internal List<string> BuildLoggerNamesList()
-        {
-            // Pull the names and return them here.
-            ViewModelLogger.WriteLog("PULLING LOGGER NAMES FROM QUEUE NOW TO POPULATE DEBUG DROPDOWN...");
-
-            // Build filtering list and return them
-            var PulledNames = new List<string>() { "--- Select A Logger ---" };
-            PulledNames.AddRange(LogBroker.LoggerQueue.GetLoggers().Select(LoggerObj => LoggerObj.LoggerName).ToList());
-
-            // Return them here
-            ViewModelLogger.WriteLog($"PULLED A TOTAL OF {PulledNames.Count} LOGGER NAMES OK!", LogType.InfoLog);
-            return PulledNames;
-        }
 
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.
@@ -90,11 +63,5 @@ namespace FulcrumInjector.ViewControl.ViewModels
             this.UsingRegex = OutputTransformer?.UseRegex ?? false;
             this.NoResultsOnSearch = OutputTransformer?.NoMatches ?? false;
         }
-        /// <summary>
-        /// Filters log lines by logger name
-        /// </summary>
-        /// <param name="LoggerName"></param>
-        /// <param name="EditorObject"></param>
-        internal void FilterByLoggerName(string LoggerName) { this.LogContentHelper?.FilterByText(LoggerName); }
     }
 }

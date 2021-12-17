@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +13,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.AppLogic.DebugLogFormatters;
 using FulcrumInjector.AppStyles.AppStyleLogic;
 using FulcrumInjector.ViewControl;
 using FulcrumInjector.ViewControl.Models;
@@ -21,6 +22,7 @@ using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using Path = System.IO.Path;
 
 namespace FulcrumInjector
 {
@@ -68,6 +70,18 @@ namespace FulcrumInjector
             // Store view objects for the UI
             InjectorConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
+
+            // Set title to DEBUG if the app is inside our debug directory
+            if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
+#if DEBUG
+            if (!this.Title.Contains("(")) this.Title += "("; 
+            this.Title += " - DEBUG_BUILD)";
+#else
+            if (this.Title.Contains("(")) this.Title += ")";
+#endif
+            // Log information output
+            InjectorMainLogger.WriteLog("CONFIGURED NEW TITLE VALUE BASED ON OPERATIONAL CONDITIONS OK!", LogType.InfoLog);
+            InjectorMainLogger.WriteLog($"NEW TITLE VALUE CONFIGURED: {this.Title}", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FulcrumInjector.ViewControl.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace FulcrumInjector.AppLogic
+namespace FulcrumInjector.AppLogic.JsonConverters
 {
     /// <summary>
     /// JSON Converter for converting input OE Scan App Path objects
