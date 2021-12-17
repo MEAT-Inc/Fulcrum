@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -67,6 +69,18 @@ namespace FulcrumInjector
             // Store view objects for the UI
             InjectorConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
+
+            // Set title to DEBUG if the app is inside our debug directory
+            if (!Directory.GetCurrentDirectory().Contains("C:\\Program Files (x86)\\MEAT Inc")) this.Title += " (SOURCE_BINARY";
+#if DEBUG
+            if (!this.Title.Contains("(")) this.Title += "("; 
+            this.Title += " - DEBUG_BUILD)";
+#else
+            if (this.Title.Contains("(")) this.Title += ")";
+#endif
+            // Log information output
+            InjectorMainLogger.WriteLog("CONFIGURED NEW TITLE VALUE BASED ON OPERATIONAL CONDITIONS OK!", LogType.InfoLog);
+            InjectorMainLogger.WriteLog($"NEW TITLE VALUE CONFIGURED: {this.Title}", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.AppLogic;
+using FulcrumInjector.AppLogic.InjectorPipes;
 using FulcrumInjector.JsonHelpers;
 using FulcrumInjector.ViewControl.Models;
 using FulcrumInjector.ViewControl.Views;
@@ -48,12 +50,12 @@ namespace FulcrumInjector.ViewControl.ViewModels
 
             // Store title and version string values now.
             this.InjectorTestResult = "Not Yet Tested";
-            this.InjectorDllPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
-            if (Debugger.IsAttached)
-            {
-                ViewModelLogger.WriteLog("DEFAULTING TO DEBUGGING DLL FOR TESTING PURPOSES!", LogType.WarnLog);
-                this.InjectorDllPath = "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
-            } 
+            this.InjectorDllPath =
+#if DEBUG
+               "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
+#else
+                ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");  
+#endif
 
             // Log information about the DLL Path values
             ViewModelLogger.WriteLog("LOCATED NEW DLL PATH VALUE OK!", LogType.InfoLog);
@@ -109,7 +111,24 @@ namespace FulcrumInjector.ViewControl.ViewModels
             ViewModelLogger.WriteLog("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
             
             // If Pipes are open, don't try test injection methods
-            if (!SkipSelectionBox) { this.TestInjectorDllSelectionBox(LoadResult, out ResultString); }
+            if (!SkipSelectionBox)
+            {
+                // If the pipes aren't built out, then open them here and configure everything.
+                if (FulcrumPipeReader.PipeInstance.PipeState != FulcrumPipeState.Connected || 
+                    FulcrumPipeWriter.PipeInstance.PipeState != FulcrumPipeState.Connected) {
+                    Task.Run(() =>
+                    {
+                        ViewModelLogger.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
+                        InjectorConstants.FulcrumPipeStatusView.Dispatcher.Invoke(() => {
+                            InjectorConstants.FulcrumPipeStatusViewModel.SetupPipeModelStates();
+                        });
+                    });
+                }
+
+                // Log information and run the injector test
+                ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
+                this.TestInjectorDllSelectionBox(LoadResult, out ResultString);
+            }
             else { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
 
             // Run our unload calls here

@@ -17,10 +17,10 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Reset Pipe Object method
         public static void ResetPipeInstance()
         {
-            // Reset Pipe here
-            if (PipeInstance == null) return;
-            PipeInstance.PipeLogger.WriteLog($"RESETTING FULCRUM PIPE {PipeInstance.PipeType} NOW...", LogType.WarnLog);
-            PipeInstance.ConfigureNewPipe();
+            // Reset Pipe here if needed and can
+            if (PipeInstance == null) { return; }
+            if (PipeInstance.PipeState != FulcrumPipeState.Connected) PipeInstance.ConfigureNewPipe();
+            else { PipeInstance.PipeLogger.WriteLog("WRITER PIPE WAS ALREADY CONNECTED! NOT RECONFIGURING IT!", LogType.WarnLog); }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------

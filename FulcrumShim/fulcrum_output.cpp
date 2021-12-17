@@ -123,12 +123,6 @@ void fulcrum_output::writeNewLogFile(LPCTSTR szFilename, bool in_fLogToFile)
 }
 void fulcrum_output::fulcrumDebug(LPCTSTR format, ...)
 {
-	// Split this up into two different methods. One for the file and one for the pipes
-	appendToLog(format);    // Write file 
-	appendToPipes(format);	// Write Pipes
-}
-void fulcrum_output::appendToLog(LPCTSTR format, ...) {
-
 	// Args formating for log output
 	va_list args; va_start(args, format);
 
@@ -142,43 +136,32 @@ void fulcrum_output::appendToLog(LPCTSTR format, ...) {
 		logFifo.Put(temp);
 	}
 
+	// Convert our input string to a std::string and buffer of char[]
+	std::string fmt_str = CT2A(format);
+	std::unique_ptr<char[]> formatted;
+	int final_n, n = ((int)fmt_str.size()) * 2;
+
+	// Now run thru each char object and find where the arguments are. 
+	while (1) {
+		// Format new output for this argument object
+		formatted.reset(new char[n]);
+		strcpy(&fmt_str[0], fmt_str.c_str());
+		final_n = _vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
+
+		// If we're at the end of the line or no more args appear, return
+		if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
+		else break;
+	}
+
+	// Send to pipe server only if our pipe instances are currently open and connected
+	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
+	if (fulcrum_app->pipesLoaded)
+	{
+		// Convert into a string object and write to pipes
+		std::string built_string = std::string(formatted.get());
+		fulcrum_app->fulcrumPiper->WriteStringOut(built_string);
+	}
+
 	// Stop arg fprmatting session
 	va_end(args);
-}
-// Writes directly to our pipes
-void fulcrum_output::appendToPipes(LPCTSTR format, ...) {
-
-	try 
-	{
-		// Convert our input string to a std::string and buffer of char[]
-		std::string fmt_str = CT2A(format);	
-		std::unique_ptr<char[]> formatted;
-		
-		// Build format args list and store arrays
-		va_list args; va_start(args, format);
-		int final_n, n = ((int)fmt_str.size()) * 2;
-
-		// Now run thru each char object and find where the arguments are. 
-		while (1) {
-			// Format new output for this argument object
-			formatted.reset(new char[n]);
-			strcpy(&fmt_str[0], fmt_str.c_str());
-			final_n = _vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
-
-			// If we're at the end of the line or no more args appear, return
-			if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
-			else break;
-		}
-
-		// Stop argument formatting
-		va_end(args);
-
-		// Send to pipe server only if our pipe instances are currently open and connected
-		CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-		if (fulcrum_app->pipesLoaded) { fulcrum_app->fulcrumPiper->WriteStringOut(std::string(formatted.get())); }
-	}
-	// Catch all the possible exception types. Define runtime and standard. If it's not one of those print something else
-	catch (const std::runtime_error& re) { appendToLog(_T("!!!    RUNTIME EX ON TRANSMISSION: %s\n", re.what())); }
-	catch (const std::exception& ex) { appendToLog(_T("!!!    STANDARD EX ON TRANSMISSION: %s\n", ex.what())); }
-	catch (...) { appendToLog(_T("!!!    UNKNOWN ERROR ON TRANSMISSION! MEMORY CORRUPTION?\n")); }
 }

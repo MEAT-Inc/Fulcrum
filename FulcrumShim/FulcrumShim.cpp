@@ -64,9 +64,15 @@ void CFulcrumShim::StartupPipes()
 	bool LoadedPipeOutput = fulcrumPiper->ConnectOutputPipe();
 
 	// Build config app path value here and run the injector application
+#if _DEBUG
+	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
+	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, szPath);
+	ConfigAppPath.Format(_T("%s\\source\\repos\\MEAT-Inc\\FulcrumShim\\FulcrumInjector\\bin\\Debug\\FulcrumInjector.exe"), szPath);
+#else 
 	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
 	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
 	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe"), szPath);
+#endif
 
 	// Build config app path value here and run the injector application
 	STARTUPINFO StartupInfos; PROCESS_INFORMATION ProcessInfos;

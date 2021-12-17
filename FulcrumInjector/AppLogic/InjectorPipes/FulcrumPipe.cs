@@ -52,9 +52,11 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
         // Changed this for debugging mode. THis way the DLL is pulled local if debugging or live if in release
         // If we're not inside the program files dir, then use our local debug fallback path value
         public readonly string FulcrumDLLPath =
-                !Directory.GetCurrentDirectory().Contains("Program Files (x86)") ?
-                    "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll" :
-                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+#if DEBUG
+            "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
+#else
+            ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+#endif
 
         // Pipe Configurations for the default values.
         public readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
@@ -81,6 +83,7 @@ namespace FulcrumInjector.AppLogic.InjectorPipes
             try
             {
                 // Find if the file is locked or not. Get path to validate 
+                if (!File.Exists(FulcrumDLLPath)) { PipeLogger.WriteLog("WARNING! DLL FILE WAS NOT FOUND!", LogType.WarnLog); }
                 FileStream DllStream = File.Open(FulcrumDLLPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 DllStream.Close();
 
