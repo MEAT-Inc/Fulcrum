@@ -25,7 +25,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // --------------------------------------------------------------------------------------------------------------------------
 
         // View Constants for help with property bindings
-        public static InjectorMainWindow InjectorMainWindow { get; private set; }    
+        public static InjectorMainWindow InjectorMainWindow { get; private set; }
 
         // Title View and ViewModel
         public static FulcrumTitleView FulcrumTitleView
@@ -75,17 +75,31 @@ namespace FulcrumInjector.FulcrumViewContent
             set => FulcrumInstalledOeAppsView.ViewModel = value;
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        // Injector Hamburger Output Views
+        public static FulcrumHamburgerCoreView FulcrumHamburgerCoreView
+        {
+            get => InjectorMainWindow.FulcrumHamburgerCore;
+            set => InjectorMainWindow.FulcrumHamburgerCore = value;
+        }
+        public static FulcrumHamburgerCoreViewModel FulcrumHamburgerCoreViewModel
+        {
+            get => FulcrumHamburgerCoreView.ViewModel;
+            set => FulcrumHamburgerCoreView.ViewModel = value;
+        }
+
         // Injector DLL Output View Contents
-        public static FulcrumDllOutputLogView FulcrumDllOutputLogView
-        {
-            get => InjectorMainWindow.FulcrumDllOutputLog;
-            set => InjectorMainWindow.FulcrumDllOutputLog = value;
-        }
-        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel
-        {
-            get => FulcrumDllOutputLogView.ViewModel;
-            set => FulcrumDllOutputLogView.ViewModel = value;
-        }
+        // public static FulcrumDllOutputLogView FulcrumDllOutputLogView
+        // {
+        //     get => InjectorMainWindow.FulcrumDllOutputLog;
+        //     set => InjectorMainWindow.FulcrumDllOutputLog = value;
+        // }
+        // public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel
+        // {
+        //     get => FulcrumDllOutputLogView.ViewModel;
+        //     set => FulcrumDllOutputLogView.ViewModel = value;
+        // }
 
 
         // --------------------------------------------------------------------------------------------------------------------------

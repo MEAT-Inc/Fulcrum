@@ -53,7 +53,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         {
             // Log info. Pull app objects in from the settings file, and begin to import them.
             ViewModelLogger.WriteLog("PULLING IN LIST OF PREDEFINED OE APPLICATIONS AND STORING THEM ONTO OUR VIEW OBJECT NOW...", LogType.WarnLog);
-            var PulledAppsObject = ValueLoaders.GetConfigValue<object[]>("FulcrumInjectorSettings.OeApplicationNames");
+            var PulledAppsObject = ValueLoaders.GetConfigValue<object[]>("OeApplicationNames");
 
             // Store output in this list.
             List<OeApplicationModel> OutputApps = new List<OeApplicationModel>();

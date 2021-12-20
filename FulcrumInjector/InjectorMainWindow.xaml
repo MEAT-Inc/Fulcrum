@@ -48,9 +48,6 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <!-- Splitting Border -->
-            <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
-
             <!-- Left Side Pane View -->
             <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,5">
                 <Grid>
@@ -83,15 +80,24 @@
                 </Grid>
             </Viewbox>
 
+            <!-- Splitting Border -->
+            <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
+
             <!-- Main Content View Box -->
-            <Grid Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Viewbox Stretch="Fill" Grid.Column="2" Margin="0,5">
+                <injectorCoreViews:FulcrumHamburgerCoreView x:Name="FulcrumHamburgerCore"/>
+            </Viewbox>
+
+            <!-- OLD GRID CONTENT
+            <Grid Grid.Column="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                TODO: PUT SOMETHING IN THIS LEFT PANE? NOT SURE WHAT BUT SOMETHIN HAS TO AT SOME POINT 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="250"/>
                     <ColumnDefinition Width="5"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- TODO: PUT SOMETHING IN THIS LEFT PANE? NOT SURE WHAT BUT SOMETHIN HAS TO AT SOME POINT -->
+                
                 <Border 
                     Margin="10,5"
                     BorderBrush="{StaticResource TextColorBase}"
@@ -116,17 +122,14 @@
                             <Run Foreground="Yellow" FontSize="20" Text="Something wicked this way comes..."/>
                         </TextBlock>
                     </Border>
-                </Border>
-
-                <!-- Splitting Border Output object -->
-                <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
-
-                <!-- Content for the injector output -->
+                </Border> 
+                <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/> 
                 <injectorCoreViews:FulcrumDllOutputLogView 
                         Grid.Column="2"
                         Margin="0,0,-3,0"
                         x:Name="FulcrumDllOutputLog"/>
             </Grid>
+            -->
 
             <!-- Flyouts for Main Window -->
             <mah:FlyoutsControl Grid.Column="2" Margin="10,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -144,7 +147,7 @@
                     
                     <!-- Empty header content -->
                     <mah:Flyout.HeaderTemplate>
-                        <DataTemplate></DataTemplate>
+                        <DataTemplate/>
                     </mah:Flyout.HeaderTemplate>
     
                     <!-- Content for Settings -->

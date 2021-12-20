@@ -58,7 +58,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // List of colors to setup as themes
             this.PresetThemes ??= Array.Empty<AppTheme>();
-            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.AppInstanceName");
+            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
             var ThemeDefines = new List<(string, string, string, ThemeType)>() { };
 
             // Try and add forced user themes here.

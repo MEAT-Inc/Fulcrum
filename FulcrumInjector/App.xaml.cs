@@ -57,7 +57,7 @@ namespace FulcrumInjector
         {
             // Start by building a new logging configuration object and init the broker.
             JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorSettings.json");
-            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.AppInstanceName");
+            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorLogging.DefaultLoggingPath");
 
             // Make logger and build global logger object.
@@ -87,7 +87,7 @@ namespace FulcrumInjector
             }
 
             // Begin archive process 
-            var ShimFileFilterName = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorSettings.ShimInstanceName"); ;
+            var ShimFileFilterName = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.ShimInstanceName"); ;
             LogBroker.Logger?.WriteLog($"ARCHIVE PROCESS IS NEEDED! PATH TO STORE FILES IS SET TO {ConfigObj.LogArchivePath}");
             LogBroker.Logger?.WriteLog($"SETTING UP SETS OF {ConfigObj.ArchiveFileSetSize} FILES IN EACH ARCHIVE OBJECT!");
             Task.Run(() =>
@@ -128,7 +128,7 @@ namespace FulcrumInjector
             LogBroker.Logger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
 
             // Find the process values here.
-            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.AppInstanceName");
+            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
             LogBroker.Logger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
             var InjectorsTotal = Process.GetProcesses()
                 .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)

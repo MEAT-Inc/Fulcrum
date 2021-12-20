@@ -54,7 +54,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 #if DEBUG
             "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
 #else
-            ValueLoaders.GetConfigValue<string>("FulcrumInjectorSettings.FulcrumDLL");
+            ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumDLL");
 #endif
 
         // Pipe Configurations for the default values.

@@ -44,17 +44,27 @@
                                 <File Id="MAHAPPS.METRO.RESOURCES.DLL" Name="MahApps.Metro.resources.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\de\MahApps.Metro.resources.dll" />
                             </Component>
                             <Directory Name="FulcrumResources" Id="FULCRUMRESOURCESFOLDER">
-                                <Component Id="FulcrumResourcesComponent" Guid="">
+                                <Directory Id="FulcrumXaml">
+                                    <Component Id="FULCRUMXAMLFILES" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
+                                        <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\AppColorTheme.xaml" />
+                                        <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumControlStyles.xaml" />
+                                        <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
+                                        <File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml" />
+                                        <File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml" />
+                                        <File Id="FULCRUMHAMBURGERCOREVIEWSTYLES.XAML" Name="FulcrumHamburgerCoreViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml" />
+                                        <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
+                                        <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
+                                        <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
+                                        <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumTitleViewStyles.xaml" />
+                                    </Component>
+                                </Directory>
+                              <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
+                                <Component Id="CreateFulcrumIconsFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+                                  <CreateFolder />
+                                </Component>
+                              </Directory>
+                                <Component Id="APPSETTINGS_JSON" DiskId="1" Guid="96D9BF82-7C1D-407C-9900-140940934C25">
                                     <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
-                                    <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\AppColorTheme.xaml" />
-                                    <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumControlStyles.xaml" />
-                                    <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumDebugLoggingViewStyles.xaml" />
-                                    <File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumDllInjectionTestViewStyles.xaml" />
-                                    <File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumDllOutputLogViewStyles.xaml" />
-                                    <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInstalledOeAppsViewStyles.xaml" />
-                                    <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumPipeStatusViewStyles.xaml" />
-                                    <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumSettingsPaneViewStyles.xaml" />
-                                    <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumTitleViewStyles.xaml" />
                                 </Component>
                             </Directory>
                         </Directory>
@@ -150,7 +160,8 @@
             <ComponentRef Id="V0500RegKey" />
             <ComponentRef Id="FulcrumShimFiles" />
             <ComponentRef Id="FulcrumInjectorFiles" />
-            <ComponentRef Id="FulcrumResourcesComponent"/>
+            <ComponentRef Id="FulcrumResourcesComponent" />
+            <ComponentRef Id="CreateFulcrumIconsFolder"/>
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
         </Feature>

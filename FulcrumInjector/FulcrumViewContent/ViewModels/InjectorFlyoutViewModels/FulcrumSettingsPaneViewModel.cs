@@ -54,7 +54,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels
         {
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>(
-                "FulcrumInjectorSettings.FulcrumUserSettings"
+                "FulcrumUserSettings"
             );
        
             // Log information and build UI content view outputs

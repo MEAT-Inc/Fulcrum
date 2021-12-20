@@ -94,6 +94,9 @@
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
+    <Reference Include="Fizzler, Version=1.2.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fizzler.1.2.1\lib\netstandard2.0\Fizzler.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.2.30, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.6.1.2.30\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
@@ -112,9 +115,27 @@
     <Reference Include="SharpLogger, Version=1.3.5.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpLogger.1.3.5.6\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
+    <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -131,6 +152,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
+      <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
@@ -199,6 +224,10 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumControlStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -208,6 +237,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -338,14 +371,14 @@ py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
-      <!-- Build a new resources folder -->
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
+cmd.exe /C mkdir "$(TargetDir)FulcrumResources\FulcrumXaml"
+cmd.exe /C mkdir "$(TargetDir)FulcrumResources\FulcrumIcons"
 
-<!-- Remove unwanted symbol values and DE from metro -->
 cmd.exe /C rmdir -r "$(ProjectDir)bin\**\de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
-<!-- Copy the resource files into it and remove symbols from release builds -->
+
 copy /Y "$(ProjectDir)FulcrumViewSupport\AppStyleSheets\*" $(TargetDir)FulcrumResources"
 copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)FulcrumResources\$(ProjectName)Settings.json"</PostBuildEvent>
   </PropertyGroup>

@@ -45,14 +45,21 @@ namespace FulcrumInjector.FulcrumLogic.JsonHelpers
         public static void SetNewAppConfigFile(string NewConfigFileName)
         {
             // Pull location of the configuration application
+            string FulcrumInjectorDir;
             var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
-            var PathToInjector = Path.Combine(Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()), "FulcrumResources");
+            if (FulcrumKey != null) { FulcrumInjectorDir = Path.Combine(Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()), "FulcrumResources"); } 
+            else 
+            {
+                ConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
+                FulcrumInjectorDir = @"C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumInjector\FulcrumResources";
+            }
 
             // Log info. Set file state
+            ConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorDir}", LogType.InfoLog);
             NewConfigFileName = Path.GetFileName(NewConfigFileName);
             AppConfigFile = Debugger.IsAttached ?
-                NewConfigFileName : 
-                Path.Combine(PathToInjector, NewConfigFileName);
+                Path.Combine("FulcrumResources", NewConfigFileName) : 
+                Path.Combine(FulcrumInjectorDir, NewConfigFileName);
 
             // Log info about the file object
             ConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
