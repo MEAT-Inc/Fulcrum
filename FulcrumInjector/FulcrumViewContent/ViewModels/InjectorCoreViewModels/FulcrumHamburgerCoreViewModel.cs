@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -165,17 +166,21 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"       --> ICON PATH VALUE LOCATED WAS: {MenuIconSvgPaths}", LogType.TraceLog);
 
             // Read in the content of the SVG object, store it in a temp file, then convert to a PNG and store as a resource
-            string OutputFileName = $"{MenuEntryName.Replace(' ', '-') }_Icon.png";
-            string OutputFile = Path.Combine(this.FulcrumIconPath, OutputFileName);
+            string IconName = $"{MenuEntryName.Replace(' ', '-') }_Icon.png";
+            string OutputIconFileName = Path.Combine(this.FulcrumIconPath, IconName);
             using (var SvgContentStream = new MemoryStream(Encoding.ASCII.GetBytes(MenuIconSvgPaths)))
             {
                 // Read the SVG content input and store it as a stream object. Then draw it to a Bitmap
-                var OpenedDocument = SvgDocument.Open<SvgDocument>(SvgContentStream);
-                var SvgDocAsBitmap = OpenedDocument.Draw();
+                var SvgDocAsBitmap = SvgDocument.Open<SvgDocument>(SvgContentStream).Draw();
+
+                // BUG: THIS IS NOT SCALING CORRECTLY! AS A RESULT WE'RE JUST SCALING INPUT SVG FILES UP
+                // Resize bitmap by 200% to prevent scaling distortion on the output
+                // var ScaledSvgDoc = new Bitmap(SvgDocAsBitmap.Width * 2, SvgDocAsBitmap.Height * 2);
+                // using (Graphics SvgScaleGfx = Graphics.FromImage(SvgDocAsBitmap)) 
+                //     SvgScaleGfx.DrawImage(SvgDocAsBitmap, 0, 0, ScaledSvgDoc.Width, ScaledSvgDoc.Height);
 
                 // Overwrite the file object if needed and write new bitmap output to file
-                if (File.Exists(OutputFile)) { File.Delete(OutputFile); }
-                SvgDocAsBitmap.Save(OutputFile, ImageFormat.Png);
+                SvgDocAsBitmap.Save(OutputIconFileName, ImageFormat.Png);
             }
 
             // Build and store our new icon object
@@ -183,7 +188,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Configure the label and the name of the menu entry
                 Label = MenuEntryName,
-                Glyph = new Uri(Path.GetFullPath(Path.Combine(this.FulcrumIconPath, OutputFileName)), UriKind.Absolute).ToString(),
+                Glyph = new Uri(Path.GetFullPath(Path.Combine(this.FulcrumIconPath, IconName)), UriKind.Absolute).ToString(),
 
                 // Store the content of the view each time we open
                 NavigationType = Type.GetType(MenuEntryType),

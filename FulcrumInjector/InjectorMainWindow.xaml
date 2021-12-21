@@ -89,5 +89,64 @@
                 Grid.Column="2" Margin="5,5"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Grid>
+
+        <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2">
+            <mah:Flyout 
+                Margin="0,50,0,0"
+                IsOpen="False"
+                Position="Top"
+                x:Name="InformationFlyout"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="600"
+                Height="520"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+
+                <!-- Content View -->
+                <Grid Margin="15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="210"/>
+                        <RowDefinition/>
+                        <RowDefinition Height=".30*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Meat INC turbo logo goes here -->
+                    <Image Grid.Row="0">
+                        <Image.Source>
+                            <BitmapImage UriSource="MeatIncTurboLogo.jpg" />
+                        </Image.Source>
+                    </Image>
+                    <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryColor}" BorderThickness="5" Width="220" CornerRadius="3"/>
+
+                    <!-- Information about this app goes here -->
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center" TextWrapping="Wrap" Width="500" FontSize="15">
+                        <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
+                        <LineBreak/>
+                        <Run Text="Any questions, comments, or concerns with this application can be directed to either neo.smith@motorengineeringandtech.com or by submitting a bug or issue report on the repository for this application."/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software..."/>
+                    </TextBlock>
+
+                    <!-- Close out button -->
+                    <Button Grid.Row="2" 
+                            FontSize="18"
+                            x:Name="CloseInfoFlyoutButton"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource ActionButtonStyle}"
+                            Content="Close Information" Width="250" Height="35" />
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
     </Grid>
 </mah:MetroWindow>

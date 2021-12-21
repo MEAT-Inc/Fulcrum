@@ -57,14 +57,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         internal SettingsEntryCollectionModel[] GenerateSettingsModels()
         {
             // Pull our settings objects out from the settings file.
-            var SettingsLoaded = Task.Run(() => 
-                ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings")).Result;
-       
+            var SettingsLoaded = 
+                ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");
+                
             // Log information and build UI content view outputs
             ViewModelLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
-            foreach (var SettingSet in SettingsLoaded) 
-                Task.Run(() => ViewModelLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet}"));
+            foreach (var SettingSet in SettingsLoaded) ViewModelLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet}");
 
             // Log passed and return output
             ViewModelLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");

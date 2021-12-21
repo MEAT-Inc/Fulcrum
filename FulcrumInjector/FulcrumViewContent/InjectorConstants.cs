@@ -113,6 +113,13 @@ namespace FulcrumInjector.FulcrumViewContent
             InjectorMainWindow = WindowBase;
             ConstantsLogger.WriteLog("STORED NEW MAIN WINDOW VIEW FOR CONSTANTS OBJECT OK!", LogType.InfoLog);
             ConstantsLogger.WriteLog($"MAIN WINDOW WAS PASSED AS TYPE {WindowBase.GetType().Name}");
+
+            // Set the flyouts for our debugging configuration and settings pane
+            ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
+            if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.InformationFlyout, InjectorMainWindow.CloseInfoFlyoutButton))
+                ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
+            else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
+
         }
 
         /// <summary>
