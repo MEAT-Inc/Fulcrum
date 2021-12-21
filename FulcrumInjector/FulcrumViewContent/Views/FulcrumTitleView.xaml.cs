@@ -23,43 +23,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        // Flyout Models for the settings and debugging views
-        public Flyout SettingsFlyout { get; private set; }
-        public Flyout DebuggingFlyout { get; private set;}
-
-        /// <summary>
-        /// Configures flyouts for our view controls. 
-        /// </summary>
-        /// <param name="Settings">View for settings</param>
-        /// <param name="Debug">View for debugging</param>
-        public bool SetFlyoutBindings(Flyout Settings = null, Flyout Debug = null)
-        {
-            // Check if they're both null. If so log warning and return. 
-            if (Settings == null && Debug == null)
-            {
-                ViewLogger.WriteLog("WARNING: BOTH FLYOUT OBJECTS WERE NULL! NOT SETTING THEM!", LogType.WarnLog);
-                return false;
-            }
-
-            // Set flyouts here.
-            if (Settings != null)
-            {
-                this.SettingsFlyout = Settings;
-                ViewLogger.WriteLog("STORED NEW SETTINGS FLYOUT VALUE OK!", LogType.InfoLog);
-            }
-            if (Debug != null)
-            {
-                this.DebuggingFlyout = Debug;
-                ViewLogger.WriteLog("STORED NEW DEBUG FLYOUT VALUE OK!", LogType.InfoLog);
-            }
-
-            // Log and return 
-            ViewLogger.WriteLog("DEBUGGING AND SETTINGS FLYOUT VALUES PROCESSED FROM METHOD ARGS AND STORED IF NEEDED OK!");
-            return true;
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Builds new logic for a view showing title information and the text for the version
         /// </summary>
@@ -79,6 +42,32 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Setup a new ViewModel
             ViewModel.SetupViewControl(this);
             DataContext = ViewModel;
+
+            // Log booted title view
+            this.ViewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        // Flyout Models for the settings and debugging views
+        public Flyout InformationFlyout { get; private set; }
+
+        /// <summary>
+        /// Configures flyouts for our view controls. 
+        /// </summary>
+        /// <param name="Settings">View for settings</param>
+        /// <param name="Debug">View for debugging</param>
+        public bool SetFlyoutBindings(Flyout InformationFlyout, Button CloseButton)
+        {
+            // Store the flyout here and apply the button actions to it
+            this.InformationFlyout = InformationFlyout;
+            CloseButton.Click += AboutThisApplicationButton_OnClick;
+            ViewLogger.WriteLog("STORED NEW APP INFORMATION FLYOUT VALUE OK!", LogType.InfoLog);
+            ViewLogger.WriteLog("STORED NEW APP INFORMATION CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
+
+            // Log and return 
+            ViewLogger.WriteLog("INFORMATION FLYOUT AND CONTROL BUTTONS HAVE BEEN SETUP AND BOUND OK!");
+            return true;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -88,39 +77,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void SettingsGearButton_Click(object Sender, RoutedEventArgs E)
+        private void AboutThisApplicationButton_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
-            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR SETTINGS ICON CORRECTLY!", LogType.WarnLog);
-            if (this.SettingsFlyout == null) { ViewLogger.WriteLog("ERROR! SETTINGS FLYOUT IS NULL!", LogType.ErrorLog); } 
+            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR ABOUT THIS APPLICATION ICON CORRECTLY!", LogType.WarnLog);
+            if (this.InformationFlyout == null) { ViewLogger.WriteLog("ERROR! INFORMATION FLYOUT IS NULL!", LogType.ErrorLog); }
             else
             {
-                // Check if the debug flyout can be closed out
-                if (this.DebuggingFlyout != null) this.DebuggingFlyout.IsOpen = false;
-
-                // Toggle the settings pane
-                this.SettingsFlyout.IsOpen = !this.SettingsFlyout.IsOpen;
-                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR SETTINGS FLYOUT OK!", LogType.InfoLog);
-            }
-        }
-        /// <summary>
-        /// Button click event for the debug/feedback button hit. This will show the debug pane
-        /// </summary>
-        /// <param name="Sender"></param>
-        /// <param name="E"></param>
-        private void BugFeedbackButton_Click(object Sender, RoutedEventArgs E)
-        {
-            // Log processed and show if we have to.
-            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR DEBUG/FEEDBACK ICON CORRECTLY!", LogType.WarnLog);
-            if (this.DebuggingFlyout == null) { ViewLogger.WriteLog("ERROR! DEBUGGIN FLYOUT IS NULL!", LogType.ErrorLog); }
-            else
-            {
-                // Check if the settings flyout can be closed out
-                if (this.SettingsFlyout != null) this.SettingsFlyout.IsOpen = false;
-
-                // Toggle the debug pane
-                this.DebuggingFlyout.IsOpen = !this.DebuggingFlyout.IsOpen;
-                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR DEBUGGING FLYOUT OK!", LogType.InfoLog);
+                // Toggle the information pane
+                this.InformationFlyout.IsOpen = !this.InformationFlyout.IsOpen;
+                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR ABOUT THIS APP FLYOUT OK!", LogType.InfoLog);
             }
         }
     }

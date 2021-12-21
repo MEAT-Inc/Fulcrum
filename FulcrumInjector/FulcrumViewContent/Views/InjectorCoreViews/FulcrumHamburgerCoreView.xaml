@@ -34,6 +34,9 @@
                 x:Name="InjectorHamburgerMenu" 
                 ItemInvoked="InjectorHamburgerMenu_OnItemInvoked"
                 ItemTemplate="{StaticResource HamburgerMenuItem}"
+                OptionsItemTemplate="{StaticResource HamburgerMenuItem}"
+                ItemsSource="{Binding InjectorMenuEntries}"
+                OptionsItemsSource="{Binding InjectorMenuOptions}"
                 HamburgerMenuHeaderTemplate="{StaticResource HamburgerHeaderTemplate}">
             </mahApps:HamburgerMenu>
         </Border>

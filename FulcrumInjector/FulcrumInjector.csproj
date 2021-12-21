@@ -197,15 +197,15 @@
     <Compile Include="FulcrumViewContent\Models\SettingsEntryModel.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsEntryModelCollection.cs" />
     <Compile Include="FulcrumViewContent\PropertyWatchdog.cs" />
-    <Compile Include="FulcrumViewContent\ViewModels\InjectorFlyoutViewModels\FulcrumDebugLoggingViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumDebugLoggingViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumDllOutputLogViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumPipeStatusViewModel.cs" />
-    <Compile Include="FulcrumViewContent\ViewModels\InjectorFlyoutViewModels\FulcrumSettingsPaneViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSettingsPaneViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumTitleViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModelControlBase.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
-    <Compile Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumDebugLoggingView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumDebugLoggingView.xaml.cs">
       <DependentUpon>FulcrumDebugLoggingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\Views\FulcrumInstalledOeAppsView.xaml.cs">
@@ -214,7 +214,7 @@
     <Compile Include="FulcrumViewContent\Views\FulcrumPipeStatusView.xaml.cs">
       <DependentUpon>FulcrumPipeStatusView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumSettingsPaneView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSettingsPaneView.xaml.cs">
       <DependentUpon>FulcrumSettingsPaneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\Views\FulcrumTitleView.xaml.cs">
@@ -283,7 +283,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumDebugLoggingView.xaml">
+    <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumDebugLoggingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -295,7 +295,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumSettingsPaneView.xaml">
+    <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSettingsPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -356,6 +356,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="MeatIncTurboLogo.jpg" />
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>

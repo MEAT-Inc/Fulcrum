@@ -32,6 +32,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             InitializeComponent();
             this.ViewModel = new FulcrumDllOutputLogViewModel();
+
+            // Store self onto injector constants.
+            InjectorConstants.FulcrumDllOutputLogView = this;
+            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>

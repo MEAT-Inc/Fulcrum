@@ -3,10 +3,10 @@ using System.Linq;
 using System.Reflection;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels;
+using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewContent.Views;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorFlyoutViews;
+using FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -90,44 +90,16 @@ namespace FulcrumInjector.FulcrumViewContent
         }
 
         // Injector DLL Output View Contents
-        // public static FulcrumDllOutputLogView FulcrumDllOutputLogView
-        // {
-        //     get => InjectorMainWindow.FulcrumDllOutputLog;
-        //     set => InjectorMainWindow.FulcrumDllOutputLog = value;
-        // }
-        // public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel
-        // {
-        //     get => FulcrumDllOutputLogView.ViewModel;
-        //     set => FulcrumDllOutputLogView.ViewModel = value;
-        // }
-
-
-        // --------------------------------------------------------------------------------------------------------------------------
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView;
+        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel;
 
         // Debug Logging Flyout View and View Model
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView
-        {
-            get => InjectorMainWindow.FulcrumDebugLogging;
-            set => InjectorMainWindow.FulcrumDebugLogging = value;
-        }
-        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel
-        {
-            get => FulcrumDebugLoggingView.ViewModel;
-            set => FulcrumDebugLoggingView.ViewModel = value;
-        }
-
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView;
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel;
 
         // Setting Flyout View and View Model
-        public static FulcrumSettingsPaneView FulcrumSettingsPaneView
-        {
-            get => InjectorMainWindow.FulcrumSettingsPane;
-            set => InjectorMainWindow.FulcrumSettingsPane = value;
-        }
-        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel
-        {
-            get => FulcrumSettingsPaneView.ViewModel;
-            set => FulcrumSettingsPaneView.ViewModel = value;
-        }
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView;
+        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -144,9 +116,10 @@ namespace FulcrumInjector.FulcrumViewContent
 
             // Set the flyouts for our debugging configuration and settings pane
             ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
-            if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.SettingsViewFlyout, InjectorMainWindow.DebugViewFlyout))
+            if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.InformationFlyout, InjectorMainWindow.CloseInfoFlyoutButton))
                 ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
+
         }
 
         /// <summary>

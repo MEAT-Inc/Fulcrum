@@ -35,12 +35,12 @@
         <!-- Title and information -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height=".35*"/>
+                <RowDefinition Height=".50*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".45*"/>
+                    <ColumnDefinition Width=".60*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
@@ -50,13 +50,13 @@
                     HorizontalAlignment="Left"
                     Style="{StaticResource TitleStringText}"/>
                 <TextBox Grid.Column="1" 
-                         Margin="0,0,15,0"
                          Style="{StaticResource SearchBoxStyle}"
                          Tag="Enter a filter or @r regex"
                          TextChanged="DllLogFilteringTextBox_OnTextChanged"/>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
                 <Run Foreground="{StaticResource TextColorBase}" Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to this vehicle."/>
+                <LineBreak/>
                 <Run Foreground="Yellow" Text="Syntax Highlighting is in the works for this viewer! When complete, auto simulations will be ready!"/>
             </TextBlock>
         </Grid>

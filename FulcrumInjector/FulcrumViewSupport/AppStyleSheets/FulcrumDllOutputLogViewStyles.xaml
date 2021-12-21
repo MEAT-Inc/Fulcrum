@@ -10,7 +10,8 @@
                 <Setter Property="FontFamily" Value="Consolas"/>
                 <Setter Property="FontSize" Value="18"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="Margin" Value="0,5,15,0"/>
                 <Setter Property="Foreground" Value="{StaticResource SecondaryColor_Lighter_35}"/>
             </Style>
 
@@ -30,8 +31,8 @@
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="FontSize" Value="20"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
                 <Setter Property="FontStyle" Value="Italic"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="TextAlignment" Value="Center"/>
