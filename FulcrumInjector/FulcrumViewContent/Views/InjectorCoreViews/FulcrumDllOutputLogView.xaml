@@ -26,7 +26,7 @@
     </UserControl.Resources>
 
     <!-- Logging Output Content View -->
-    <Grid Margin="0,10,0,0">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="110"/>
             <RowDefinition Height="*"/>
@@ -35,12 +35,12 @@
         <!-- Title and information -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height=".385*"/>
+                <RowDefinition Height=".35*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".65*"/>
+                    <ColumnDefinition Width=".45*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
@@ -55,8 +55,8 @@
                          Tag="Enter a filter or @r regex"
                          TextChanged="DllLogFilteringTextBox_OnTextChanged"/>
             </Grid>
-            <TextBlock Grid.Row="1" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
-                <Run Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to this vehicle."/>
+            <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
+                <Run Foreground="{StaticResource TextColorBase}" Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to this vehicle."/>
                 <Run Foreground="Yellow" Text="Syntax Highlighting is in the works for this viewer! When complete, auto simulations will be ready!"/>
             </TextBlock>
         </Grid>

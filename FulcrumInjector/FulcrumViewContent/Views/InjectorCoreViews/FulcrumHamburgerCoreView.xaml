@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews"
              xmlns:injectorCoreViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels"
+             xmlns:injectorCoreModels="clr-namespace:FulcrumInjector.FulcrumViewContent.Models"
              mc:Ignorable="d" 
              Loaded="FulcrumHamburgerCoreView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -26,20 +27,15 @@
     </UserControl.Resources>
 
     <!-- Content for the Hamburger View -->
-    <Grid>
-        <mahApps:HamburgerMenu x:Name="InjectorHamburgerMenu" DisplayMode="CompactOverlay">
-
-            <!-- Items for Menu -->
-            <mahApps:HamburgerMenu.ItemsSource>
-                <mahApps:HamburgerMenuItemCollection>
-                    <mahApps:HamburgerMenuGlyphItem Label="Option Item 1"/>
-                    <mahApps:HamburgerMenuGlyphItem Label="Option Item 2"/>
-                    <mahApps:HamburgerMenuGlyphItem Label="Option Item 3"/>
-                    <mahApps:HamburgerMenuGlyphItem Label="Option Item 4"/>
-                    <mahApps:HamburgerMenuGlyphItem Label="Option Item 5"/>
-                </mahApps:HamburgerMenuItemCollection>
-            </mahApps:HamburgerMenu.ItemsSource>
-
-        </mahApps:HamburgerMenu>
+    <Grid Margin="5,0">
+        <Border BorderBrush="{StaticResource PrimaryColor_Lighter_35}" BorderThickness="3" CornerRadius="3">
+            <mahApps:HamburgerMenu 
+                DisplayMode="CompactOverlay" 
+                x:Name="InjectorHamburgerMenu" 
+                ItemInvoked="InjectorHamburgerMenu_OnItemInvoked"
+                ItemTemplate="{StaticResource HamburgerMenuItem}"
+                HamburgerMenuHeaderTemplate="{StaticResource HamburgerHeaderTemplate}">
+            </mahApps:HamburgerMenu>
+        </Border>
     </Grid>
 </UserControl>

@@ -13,6 +13,10 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using System.IO;
+using System.Web.UI.WebControls;
+using System.Windows;
+using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using Svg;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
@@ -46,46 +50,66 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Applies new hamburger menu items here
         /// </summary>
-        internal HamburgerMenuItemCollection SetupHamburgerMenuItems(HamburgerMenu InputMenu)
+        internal List<HamburgerNavMenuItem> SetupHamburgerMenuItems()
         {
-            // Draw our icon objects
+            // Ensure output icon path exists
+            string IconBasePath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumIconsPath");
+            if (!Directory.Exists(IconBasePath)) { Directory.CreateDirectory(IconBasePath); }
+           
+            // Pull icon objects, store menu entries into a list
+            List<HamburgerNavMenuItem> OutputMenuItems = new List<HamburgerNavMenuItem>();
             var IconObjects = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumCoreIcons");
-            HamburgerMenuItemCollection MenuItemsSource = (HamburgerMenuItemCollection)InputMenu.ItemsSource;
-            foreach (var MenuObject in MenuItemsSource)
+            ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OBJECTS NOW...", LogType.InfoLog);
+            foreach (var IconObjectEntry in IconObjects)
             {
-                // Cast the menu object to a type of HamburgerMenuImageItem
-                HamburgerMenuGlyphItem MenuCast = MenuObject as HamburgerMenuGlyphItem;
-                if (MenuCast == null) { ViewModelLogger.WriteLog("--> CASTING TO ICON OBJECT FAILED! MOVING ON...", LogType.ErrorLog); continue; }
-
                 // Pull values out of icon objects
-                string IconPath = IconObjects[0].IconPath;
-                string IconName = IconObjects[0].IconName;
-                ViewModelLogger.WriteLog($"   --> PULLED NEW ICON OBJECT NAMED: {IconName}", LogType.TraceLog);
-                ViewModelLogger.WriteLog($"   --> ICON PATH VALUE LOCATED WAS: {IconPath}", LogType.TraceLog);
+                string MenuEntryName = IconObjectEntry.MenuEntry;
+                string MenuEntryType = IconObjectEntry.MenuEntryType;
+                string MenuEntryContent = IconObjectEntry.MenuEntryContent;
+                string MenuIconSvgPaths = IconObjectEntry.IconContentSvgPath;
 
-                // Ensure output icon path exists
-                string IconBasePath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumIconsPath");
-                if (!Directory.Exists(IconBasePath)) { Directory.CreateDirectory(IconBasePath); }
+                // Replace Icon path with current text color value
+                var CurrentMerged = Application.Current.Resources.MergedDictionaries;
+                var ColorResources = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
+                MenuIconSvgPaths = MenuIconSvgPaths.Replace("currentColor", ColorResources["TextColorBase"].ToString());
+
+                // Log information about imported values
+                ViewModelLogger.WriteLog($"   --> PULLED NEW MENU OBJECT NAMED: {MenuEntryName}", LogType.TraceLog);
+                ViewModelLogger.WriteLog($"       --> MENU OBJECT CONTENT PATH: {MenuEntryContent}", LogType.TraceLog);
+                ViewModelLogger.WriteLog($"       --> ICON PATH VALUE LOCATED WAS: {MenuIconSvgPaths}", LogType.TraceLog);
 
                 // Read in the content of the SVG object, store it in a temp file, then convert to a PNG and store as a resource
-                string OutputFile = Path.Combine(IconBasePath, IconName);
-                using (var SvgContentStream = new MemoryStream(Encoding.ASCII.GetBytes(IconPath)))
+                string OutputFileName = $"{MenuEntryName.Replace(' ', '-') }_Icon.png";
+                string OutputFile = Path.Combine(IconBasePath, OutputFileName); 
+                using (var SvgContentStream = new MemoryStream(Encoding.ASCII.GetBytes(MenuIconSvgPaths)))
                 {
+                    // Read the SVG content input and store it as a stream object. Then draw it to a Bitmap
                     var OpenedDocument = SvgDocument.Open<SvgDocument>(SvgContentStream);
                     var SvgDocAsBitmap = OpenedDocument.Draw();
 
-                    // Overwrite the file object if needed.
+                    // Overwrite the file object if needed and write new bitmap output to file
                     if (File.Exists(OutputFile)) { File.Delete(OutputFile); }
                     SvgDocAsBitmap.Save(OutputFile, ImageFormat.Png);
                 }
 
-                // Store our new icon object
-                MenuCast.Glyph = OutputFile;
-                ViewModelLogger.WriteLog($"--> CAST NEW OBJECT AND STORED NEW CONTENTS FOR ICON {IconName} OK!", LogType.InfoLog);
+                // Build and store our new icon object
+                OutputMenuItems.Add(new HamburgerNavMenuItem()
+                {
+                    // Configure the label and the name of the menu entry
+                    Label = MenuEntryName,
+                    Glyph = new Uri(Path.GetFullPath(Path.Combine(IconBasePath, OutputFileName)), UriKind.Absolute).ToString(),
+
+                    // Store the content of the view each time we open
+                    NavigationType = Type.GetType(MenuEntryType),
+                    NavigationDestination = new Uri(MenuEntryContent)
+                });
+
+                // Log the result of the binding actions
+                ViewModelLogger.WriteLog($"   --> CAST NEW OBJECT AND STORED NEW CONTENTS FOR ENTRY {MenuEntryName} OK!", LogType.InfoLog);
             }
 
             // Return built output object values
-            return MenuItemsSource;
+            return OutputMenuItems;
         }
     }
 }

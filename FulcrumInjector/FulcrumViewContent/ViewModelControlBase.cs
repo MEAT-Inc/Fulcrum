@@ -20,8 +20,15 @@ namespace FulcrumInjector.FulcrumViewContent
         private static SubServiceLogger ViewModelPropLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("ViewModelPropLogger")) ?? new SubServiceLogger("ViewModelPropLogger");
 
+        // --------------------------------------------------------------------------------------------------------------------------
+
         // View object to setup and custom setter
+        internal Page BasePageControl;
         internal UserControl BaseViewControl;
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        public virtual void SetupViewControl(Page ContentView) { BasePageControl = ContentView; }
         public virtual void SetupViewControl(UserControl ContentView) { BaseViewControl = ContentView; }
 
         // --------------------------------------------------------------------------------------------------------------------------

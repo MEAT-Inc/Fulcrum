@@ -84,9 +84,10 @@
             <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
 
             <!-- Main Content View Box -->
-            <Viewbox Stretch="Fill" Grid.Column="2" Margin="0,5">
-                <injectorCoreViews:FulcrumHamburgerCoreView x:Name="FulcrumHamburgerCore"/>
-            </Viewbox>
+            <injectorCoreViews:FulcrumHamburgerCoreView 
+                x:Name="FulcrumHamburgerCore"  
+                Grid.Column="2" Margin="5,5"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
             <!-- OLD GRID CONTENT
             <Grid Grid.Column="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

@@ -15,7 +15,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using MahApps.Metro.Controls;
 using SharpLogger;
@@ -37,6 +39,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         // ViewModel object to bind onto
         public FulcrumHamburgerCoreViewModel ViewModel { get; set; }
 
+        // Navigation Helpers. Used to control moving around the menu
+        private readonly HamburgerNavService NavService;
+
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -45,7 +50,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         public FulcrumHamburgerCoreView()
         {
             InitializeComponent();
+
+            // Build new ViewModel
             this.ViewModel = new FulcrumHamburgerCoreViewModel();
+
+            // Configure new Naviagation Service helper
+            this.NavService = new HamburgerNavService();
+            this.InjectorHamburgerMenu.Content = this.NavService.Frame;
+            this.NavService.Navigated += this.NavigationServiceEx_OnNavigated;
         }
 
         /// <summary>
@@ -60,11 +72,40 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Setup Menu icon objects here.
-            InjectorHamburgerMenu.ItemsSource = this.ViewModel.SetupHamburgerMenuItems(InjectorHamburgerMenu);
+            InjectorHamburgerMenu.ItemsSource = this.ViewModel.SetupHamburgerMenuItems();
             this.ViewLogger.WriteLog("SETUP AND STORED NEW MENU ENTRIES ON THE VIEW OK!", LogType.InfoLog);
 
             // Log built view contents ok
+            InjectorHamburgerMenu.SelectedIndex = 0;
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM HAMBURGER CORE OK!", LogType.InfoLog);
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// When a view is updated, run this method. Check the type of the menu objct, and then if possible, invoke changed view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void InjectorHamburgerMenu_OnItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs e)
+        {
+            // Navigate assuming it's a type of nav menu item and the menu item can navigate
+            if (e.InvokedItem is HamburgerNavMenuItem menuItemBuilt && menuItemBuilt.IsNavigation)
+                this.NavService.Navigate(menuItemBuilt.NavigationDestination);
+        }
+
+        /// <summary>
+        /// Event when view content is updated
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NavigationServiceEx_OnNavigated(object sender, NavigationEventArgs e)
+        {
+            // Select the menu item
+            this.InjectorHamburgerMenu.SelectedItem = this.InjectorHamburgerMenu
+              .Items
+              .OfType<HamburgerNavMenuItem>()
+              .FirstOrDefault(x => x.NavigationType == e.Content?.GetType());
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
