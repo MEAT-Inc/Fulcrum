@@ -76,7 +76,6 @@
             <!-- DataTemplate for a Checkbox Setting -->
             <DataTemplate x:Key="CheckboxSettingEntryDataTemplate">
                 <Border Margin="0,5,5,5" 
-                        Width="658"
                         HorizontalAlignment="Center"
                         BorderBrush="{StaticResource SecondaryColor}"
                         BorderThickness="1.5" 
@@ -118,7 +117,7 @@
                                 Grid.Row="2"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
-                                Width="650"
+                                Width="610"
                                 Text="{Binding Path=SettingDescription}"
                                 Style="{StaticResource DescriptionTextBlockStyle}"/>
                     </Grid>
@@ -129,7 +128,6 @@
             <DataTemplate x:Key="TextBoxSettingEntryDataTemplate">
                 <Border Margin="0,5,5,5" 
                         HorizontalAlignment="Center"
-                        Width="658"
                         BorderBrush="{StaticResource SecondaryColor}"
                         BorderThickness="1.5" 
                         CornerRadius="3"
@@ -173,7 +171,7 @@
                                 Grid.Row="2"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
-                                Width="650"
+                                Width="610"
                                 Text="{Binding Path=SettingDescription}"
                                 Style="{StaticResource DescriptionTextBlockStyle}"/>
                     </Grid>

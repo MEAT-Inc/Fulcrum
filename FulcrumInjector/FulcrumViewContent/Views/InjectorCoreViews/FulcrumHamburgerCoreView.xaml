@@ -11,11 +11,6 @@
              Loaded="FulcrumHamburgerCoreView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorCoreViewModels:FulcrumHamburgerCoreViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>
@@ -34,6 +29,9 @@
                 x:Name="InjectorHamburgerMenu" 
                 ItemInvoked="InjectorHamburgerMenu_OnItemInvoked"
                 ItemTemplate="{StaticResource HamburgerMenuItem}"
+                OptionsItemTemplate="{StaticResource HamburgerMenuItem}"
+                ItemsSource="{Binding InjectorMenuEntries}"
+                OptionsItemsSource="{Binding InjectorMenuOptions}"
                 HamburgerMenuHeaderTemplate="{StaticResource HamburgerHeaderTemplate}">
             </mahApps:HamburgerMenu>
         </Border>

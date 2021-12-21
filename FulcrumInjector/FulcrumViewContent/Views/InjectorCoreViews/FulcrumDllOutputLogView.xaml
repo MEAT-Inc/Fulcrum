@@ -35,12 +35,12 @@
         <!-- Title and information -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height=".35*"/>
+                <RowDefinition Height=".50*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".45*"/>
+                    <ColumnDefinition Width=".60*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
@@ -50,7 +50,6 @@
                     HorizontalAlignment="Left"
                     Style="{StaticResource TitleStringText}"/>
                 <TextBox Grid.Column="1" 
-                         Margin="0,0,15,0"
                          Style="{StaticResource SearchBoxStyle}"
                          Tag="Enter a filter or @r regex"
                          TextChanged="DllLogFilteringTextBox_OnTextChanged"/>

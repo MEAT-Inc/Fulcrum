@@ -5,7 +5,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels
+namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {
     /// <summary>
     /// View model used to help render and register logging redirects
@@ -45,7 +45,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels
             ViewModelLogger.WriteLog("DONE CONFIGURING VIEW BINDING VALUES!", LogType.InfoLog);
 
             // Log completed setup.
+            InjectorConstants.FulcrumDebugLoggingViewModel = this;
             ViewModelLogger.WriteLog("SETUP NEW LOGGING VIEW AND MODIFICATION VALUES OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -3,14 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels;
+using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
+using NLog;
+using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Views.InjectorFlyoutViews
+namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 {
     /// <summary>
     /// Interaction logic for FulcrumInjectorDebugLoggingView.xaml
@@ -34,6 +36,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorFlyoutViews
             // Init component. Build new VM object
             InitializeComponent();
             this.ViewModel = new FulcrumDebugLoggingViewModel();
+
+            // Store self onto injector constants.
+            InjectorConstants.FulcrumDebugLoggingView = this;
+            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -46,6 +52,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorFlyoutViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+
+            // Configure the new Logging Output Target.
+            var CurrentConfig = LogManager.Configuration;
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
+            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
+            LogManager.ReconfigExistingLoggers();
+
+            // Log Added new target output ok
+            this.ViewLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
+            this.ViewLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
 
             // Configure pipe instances here.
             this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
