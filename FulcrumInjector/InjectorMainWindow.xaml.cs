@@ -57,16 +57,6 @@ namespace FulcrumInjector
         /// <param name="e"></param>
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Configure the new Logging Output Target.
-            var CurrentConfig = LogManager.Configuration;
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
-            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(FulcrumDebugLogging, FulcrumDebugLogging.DebugRedirectOutputEdit));
-            LogManager.ReconfigExistingLoggers();
-
-            // Log Added new target output ok
-            InjectorMainLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
-            InjectorMainLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
-
             // Store view objects for the UI
             InjectorConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);

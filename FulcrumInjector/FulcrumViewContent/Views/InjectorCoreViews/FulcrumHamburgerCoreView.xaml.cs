@@ -36,11 +36,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorHamburgerViewLogger")) ?? new SubServiceLogger("InjectorHamburgerViewLogger");
 
-        // ViewModel object to bind onto
-        public FulcrumHamburgerCoreViewModel ViewModel { get; set; }
-
-        // Navigation Helpers. Used to control moving around the menu
-        private readonly HamburgerNavService NavService;
+        // Class helper values. VM And Nav animator
+        public FulcrumHamburgerCoreViewModel ViewModel { get; set; }     // ViewModel object to bind onto
+        private readonly HamburgerNavService NavService;                 // Navigation Helpers. Used to control moving around the menu
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -50,8 +48,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         public FulcrumHamburgerCoreView()
         {
             InitializeComponent();
-
-            // Build new ViewModel
             this.ViewModel = new FulcrumHamburgerCoreViewModel();
 
             // Configure new Naviagation Service helper
@@ -72,7 +68,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Setup Menu icon objects here.
-            InjectorHamburgerMenu.ItemsSource = this.ViewModel.SetupHamburgerMenuItems();
+            this.InjectorHamburgerMenu.ItemsSource = this.ViewModel.SetupHamburgerMenuItems();
+            this.InjectorHamburgerMenu.OptionsItemsSource =  this.ViewModel.SetupHamburgerOptionItems();
             this.ViewLogger.WriteLog("SETUP AND STORED NEW MENU ENTRIES ON THE VIEW OK!", LogType.InfoLog);
 
             // Log built view contents ok
@@ -90,8 +87,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void InjectorHamburgerMenu_OnItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs e)
         {
             // Navigate assuming it's a type of nav menu item and the menu item can navigate
-            if (e.InvokedItem is HamburgerNavMenuItem menuItemBuilt && menuItemBuilt.IsNavigation)
-                this.NavService.Navigate(menuItemBuilt.NavigationDestination);
+            if (e.InvokedItem is not HamburgerNavMenuItem menuItemBuilt || !menuItemBuilt.IsNavigation) return;
+
+            // Navigate here and 
+            this.NavService.Navigate(menuItemBuilt.NavigationDestination);
+            this.ViewLogger.WriteLog($"NAVIGATED FROM SELECTED MENU ITEM CORRECTLY!", LogType.TraceLog);
         }
 
         /// <summary>
@@ -101,11 +101,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <param name="e"></param>
         private void NavigationServiceEx_OnNavigated(object sender, NavigationEventArgs e)
         {
-            // Select the menu item
+            // Select the menu item and the option item here
             this.InjectorHamburgerMenu.SelectedItem = this.InjectorHamburgerMenu
-              .Items
-              .OfType<HamburgerNavMenuItem>()
-              .FirstOrDefault(x => x.NavigationType == e.Content?.GetType());
+                .Items
+                .OfType<HamburgerNavMenuItem>()
+                .FirstOrDefault(x => x.NavigationType == e.Content?.GetType());
+            this.ViewLogger.WriteLog($"BOUND SELECTED MENU ITEM TO {this.InjectorHamburgerMenu.SelectedIndex}", LogType.TraceLog);
+            this.InjectorHamburgerMenu.SelectedOptionsItem = this.InjectorHamburgerMenu
+                .OptionsItems
+                .OfType<HamburgerNavMenuItem>()
+                .FirstOrDefault(x => x.NavigationType == e.Content?.GetType());
+            this.ViewLogger.WriteLog($"BOUND SELECTED OPTIONS ITEM TO {this.InjectorHamburgerMenu.SelectedOptionsIndex}", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels
+namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {
     /// <summary>
     /// ViewModel for settings pane binding values
@@ -41,7 +41,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels
             ViewModelLogger.WriteLog("GENERATED NEW SETTINGS FOR VIEW MODEL CORRECTLY!", LogType.InfoLog);
 
             // Log completed setup.
+            // Store this instance onto our injector constants
+            InjectorConstants.FulcrumSettingsPaneViewModel = this;
             ViewModelLogger.WriteLog("SETUP NEW SETTINGS CONFIGURATION VALUES OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

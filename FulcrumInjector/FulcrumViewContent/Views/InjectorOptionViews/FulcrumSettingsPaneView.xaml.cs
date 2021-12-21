@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorFlyoutViewModels;
+using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Views.InjectorFlyoutViews
+namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 {
     /// <summary>
     /// Interaction logic for FulcrumSettingsPaneView.xaml
@@ -31,6 +30,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorFlyoutViews
             // Init component. Build new VM object
             InitializeComponent();
             this.ViewModel = new FulcrumSettingsPaneViewModel();
+
+            // Store this instance onto our injector constants
+            InjectorConstants.FulcrumSettingsPaneView = this;
+            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>
