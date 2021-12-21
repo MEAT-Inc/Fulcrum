@@ -145,11 +145,11 @@
 
                     <!-- Logging Content Output -->
                     <avalonedit:TextEditor 
-                            Grid.Row="1" 
-                            SyntaxHighlighting="JSON"
-                            x:Name="JsonSettingsViewEditor"
-                            Margin="0,10,0,5"
-                            Style="{StaticResource LoggingOutputBoxStyle}"/>
+                        Grid.Row="1" 
+                        SyntaxHighlighting="Json"
+                        x:Name="JsonSettingsViewEditor"
+                        Margin="0,10,0,5"
+                        Style="{StaticResource LoggingOutputBoxStyle}"/>
 
                     <!-- Control Buttons -->
                     <Grid Grid.Row="2" Margin="-5,5,-5,10">

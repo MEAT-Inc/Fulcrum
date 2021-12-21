@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.DataContext = this.ViewModel;
 
             // Configure pipe instances here.
-            this.ViewModel.PopulateAppSettingJsonViewer(JsonSettingsViewEditor);
+            Dispatcher.Invoke(() => this.ViewModel.PopulateAppSettingJsonViewer(JsonSettingsViewEditor));
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
         }
 

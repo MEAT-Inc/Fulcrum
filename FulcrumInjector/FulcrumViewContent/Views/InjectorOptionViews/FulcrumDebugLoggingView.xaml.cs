@@ -40,6 +40,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Store self onto injector constants.
             InjectorConstants.FulcrumDebugLoggingView = this;
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Configure the new Logging Output Target.
+            var CurrentConfig = LogManager.Configuration;
+            try { CurrentConfig.RemoveTarget("DebugToAvEditRedirect"); }
+            catch { ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog); }
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
+            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
+            LogManager.ReconfigExistingLoggers();
         }
 
         /// <summary>
@@ -52,12 +60,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
-
-            // Configure the new Logging Output Target.
-            var CurrentConfig = LogManager.Configuration;
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
-            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
-            LogManager.ReconfigExistingLoggers();
 
             // Log Added new target output ok
             this.ViewLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);

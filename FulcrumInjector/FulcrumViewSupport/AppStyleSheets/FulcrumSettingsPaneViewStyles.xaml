@@ -9,11 +9,12 @@
             <!-- AVEdit Output Box Style -->
             <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">
                 <Setter Property="FontFamily" Value="Consolas"/>
-                <Setter Property="Background" Value="Black"/>
+                <Setter Property="Background" Value="WhiteSmoke"/>
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
                 <Setter Property="Padding" Value="5,10"/>
                 <Setter Property="ShowLineNumbers" Value="True"/>
             </Style>
