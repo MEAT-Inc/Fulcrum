@@ -43,7 +43,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>
@@ -70,9 +70,32 @@
   <PropertyGroup>
     <ApplicationIcon>ShimIconProject.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28No Events%29|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug %28No Events%29\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28No Events%29|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release %28No Events%29\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Fizzler, Version=1.2.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fizzler.1.2.1\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.2.30, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.6.1.2.30\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
@@ -92,9 +115,27 @@
     <Reference Include="SharpLogger, Version=1.3.5.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpLogger.1.3.5.6\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
+    <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -111,99 +152,114 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AppLogic\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
-    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
-    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
-    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
-    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
-    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
-    <Compile Include="AppLogic\AvalonEditHelpers\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
-    <Compile Include="AppLogic\FulcrumWin32Invokers.cs" />
-    <Compile Include="AppLogic\InjectorPipes\FulcrumPipe.cs" />
-    <Compile Include="AppLogic\InjectorPipes\PipeEvents\FulcrumPipeDataReadEventArgs.cs" />
-    <Compile Include="AppLogic\InjectorPipes\FulcrumPipeReader.cs" />
-    <Compile Include="AppLogic\InjectorPipes\FulcrumPipeWriter.cs" />
-    <Compile Include="AppLogic\InjectorPipes\PipeEvents\FulcrumPipeStateChangedEventArgs.cs" />
-    <Compile Include="AppLogic\JsonConverters\OeApplicationJsonConverter.cs" />
-    <Compile Include="AppLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
-    <Compile Include="AppLogic\UserSettingsDataTemplateSelector.cs" />
-    <Compile Include="AppStyles\AppStyleLogic\AppColorSetter.cs" />
-    <Compile Include="AppStyles\AppStyleLogic\ColorMatchingHelper.cs" />
-    <Compile Include="AppStyles\AppStyleLogic\CustomColorShader.cs" />
-    <Compile Include="AppStyles\AppStyleLogic\WindowBlurSetup.cs" />
-    <Compile Include="AppStyles\AppThemeConfiguration.cs" />
-    <Compile Include="AppStyles\DataConverters\CustomColorConverter.cs" />
-    <Compile Include="AppStyles\DataConverters\CustomColorValueJsonConverter.cs" />
-    <Compile Include="AppStyles\DataConverters\CustomFilePathJsonConverters.cs" />
-    <Compile Include="AppStyles\StyleModels\AppThemeColorSet.cs" />
-    <Compile Include="AppStyles\StyleModels\AppThemeModel.cs" />
-    <Compile Include="JsonHelpers\ValueLoaders.cs" />
-    <Compile Include="JsonHelpers\ValueSetters.cs" />
-    <Compile Include="JsonHelpers\JsonConfigFiles.cs" />
-    <Compile Include="AppLogic\ExtensionClasses\EnumLibExtensions.cs" />
-    <Compile Include="AppLogic\ExtensionClasses\LongToStringSize.cs" />
+    <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
+      <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
+    <Compile Include="FulcrumLogic\FulcrumWin32Invokers.cs" />
+    <Compile Include="FulcrumLogic\InjectorPipes\FulcrumPipe.cs" />
+    <Compile Include="FulcrumLogic\InjectorPipes\PipeEvents\FulcrumPipeDataReadEventArgs.cs" />
+    <Compile Include="FulcrumLogic\InjectorPipes\FulcrumPipeReader.cs" />
+    <Compile Include="FulcrumLogic\InjectorPipes\FulcrumPipeWriter.cs" />
+    <Compile Include="FulcrumLogic\InjectorPipes\PipeEvents\FulcrumPipeStateChangedEventArgs.cs" />
+    <Compile Include="FulcrumLogic\JsonConverters\OeApplicationJsonConverter.cs" />
+    <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\UserSettingsDataTemplateSelector.cs" />
+    <Compile Include="FulcrumViewSupport\AppColorSetter.cs" />
+    <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
+    <Compile Include="FulcrumViewSupport\HamburgerNavService.cs" />
+    <Compile Include="FulcrumViewSupport\ColorMatchingHelper.cs" />
+    <Compile Include="FulcrumViewSupport\CustomColorShader.cs" />
+    <Compile Include="FulcrumViewSupport\WindowBlurSetup.cs" />
+    <Compile Include="FulcrumViewSupport\AppThemeConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\DataConverters\CustomColorConverter.cs" />
+    <Compile Include="FulcrumViewSupport\DataConverters\CustomColorValueJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\DataConverters\CustomFilePathJsonConverters.cs" />
+    <Compile Include="FulcrumViewSupport\StyleModels\AppThemeColorSet.cs" />
+    <Compile Include="FulcrumViewSupport\StyleModels\AppThemeModel.cs" />
+    <Compile Include="FulcrumLogic\JsonHelpers\ValueLoaders.cs" />
+    <Compile Include="FulcrumLogic\JsonHelpers\ValueSetters.cs" />
+    <Compile Include="FulcrumLogic\JsonHelpers\JsonConfigFiles.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\EnumLibExtensions.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\LongToStringSize.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="ViewControl\Models\DebugLoggingRedirectTarget.cs" />
-    <Compile Include="ViewControl\Models\OeApplicationModel.cs" />
-    <Compile Include="ViewControl\Models\FulcrumPipeSystemModel.cs" />
-    <Compile Include="ViewControl\Models\SettingsEntryModel.cs" />
-    <Compile Include="ViewControl\Models\SettingsEntryModelCollection.cs" />
-    <Compile Include="ViewControl\PropertyWatchdog.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumDebugLoggingViewModel.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumDllOutputLogViewModel.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumPipeStatusViewModel.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumSettingsPaneViewModel.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumTitleViewModel.cs" />
-    <Compile Include="ViewControl\ViewModelControlBase.cs" />
-    <Compile Include="ViewControl\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
-    <Compile Include="ViewControl\Views\FulcrumDebugLoggingView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Models\DebugLoggingRedirectTarget.cs" />
+    <Compile Include="FulcrumViewContent\Models\OeApplicationModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\FulcrumPipeSystemModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsEntryModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsEntryModelCollection.cs" />
+    <Compile Include="FulcrumViewContent\PropertyWatchdog.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorFlyoutViewModels\FulcrumDebugLoggingViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumDllOutputLogViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumPipeStatusViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorFlyoutViewModels\FulcrumSettingsPaneViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumTitleViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModelControlBase.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumDebugLoggingView.xaml.cs">
       <DependentUpon>FulcrumDebugLoggingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewControl\Views\FulcrumInstalledOeAppsView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\FulcrumInstalledOeAppsView.xaml.cs">
       <DependentUpon>FulcrumInstalledOeAppsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewControl\Views\FulcrumPipeStatusView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\FulcrumPipeStatusView.xaml.cs">
       <DependentUpon>FulcrumPipeStatusView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewControl\Views\FulcrumSettingsPaneView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumSettingsPaneView.xaml.cs">
       <DependentUpon>FulcrumSettingsPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewControl\Views\FulcrumTitleView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewControl\InjectorConstants.cs" />
-    <Compile Include="ViewControl\Views\FulcrumDllInjectionTestView.xaml.cs">
+    <Compile Include="FulcrumViewContent\InjectorConstants.cs" />
+    <Compile Include="FulcrumViewContent\Views\FulcrumDllInjectionTestView.xaml.cs">
       <DependentUpon>FulcrumDllInjectionTestView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewControl\Views\FulcrumDllOutputLogView.xaml.cs">
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
-    <Page Include="AppStyles\AppStyleSheets\CommonControlStyles.xaml">
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\DebuggingViewStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumControlStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\InjectDllTestStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\InstalledOeAppsStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\OutputLoggingDllStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\PipeStatusViewStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\SettingsPaneViewStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -219,39 +275,39 @@
       <DependentUpon>InjectorMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="AppStyles\AppStyleSheets\AppColorTheme.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\AppColorTheme.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="AppStyles\AppStyleSheets\TitleViewStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumTitleViewStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumDebugLoggingView.xaml">
+    <Page Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumDebugLoggingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumInstalledOeAppsView.xaml">
+    <Page Include="FulcrumViewContent\Views\FulcrumInstalledOeAppsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumPipeStatusView.xaml">
+    <Page Include="FulcrumViewContent\Views\FulcrumPipeStatusView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumSettingsPaneView.xaml">
+    <Page Include="FulcrumViewContent\Views\InjectorFlyoutViews\FulcrumSettingsPaneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumTitleView.xaml">
+    <Page Include="FulcrumViewContent\Views\FulcrumTitleView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumDllInjectionTestView.xaml">
+    <Page Include="FulcrumViewContent\Views\FulcrumDllInjectionTestView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ViewControl\Views\FulcrumDllOutputLogView.xaml">
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumDllOutputLogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -309,13 +365,22 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
-"$(DevEnvDir)devenv" "$(SolutionDir)FulcrumShim.sln" /Build $(Configuration) /project "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"
-"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
+    <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"
+py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
+"$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)$(ProjectName)Settings.json"</PostBuildEvent>
+    <PostBuildEvent>
+cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
+cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
+
+cmd.exe /C rmdir -r "$(ProjectDir)bin\**\de"
+cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
+
+copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)$(ProjectName)Settings.json"
+copy /Y "$(ProjectDir)FulcrumViewSupport\AppStyleSheets\*" $(TargetDir)FulcrumStyles"</PostBuildEvent>
   </PropertyGroup>
 </Project>
