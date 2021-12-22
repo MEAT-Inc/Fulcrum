@@ -83,6 +83,26 @@ namespace FulcrumInjector
             {
                 // Log not cleaning up and return.
                 LogBroker.Logger?.WriteLog("NO NEED TO ARCHIVE FILES AT THIS TIME! MOVING ON", LogType.WarnLog);
+                if (Directory.GetFiles(ConfigObj.LogArchivePath).Length < (int)ConfigObj.ArchiveCleanupFileCount)
+                {
+                    LogBroker.Logger?.WriteLog("NOT CONFIGURING ARCHIVE CLEANUP AT THIS TIME EITHER!", LogType.WarnLog);
+                    return;
+                }
+
+                // Configure cleanup for archive entries
+                LogBroker.Logger?.WriteLog("CLEANING UP ARCHIVE FILE ENTRIES NOW...", LogType.InfoLog);
+                LogBroker.CleanupArchiveHistory(ConfigObj.LogArchivePath, "", (int)ConfigObj.ArchiveOnFileCount);
+
+                // Cleanup the shim entries now
+                LogBroker.Logger?.WriteLog("CLEANING UP SHIM ENTRIES AND ARCHIVES NOW...", LogType.InfoLog);
+                LogBroker.CleanupArchiveHistory(
+                    ConfigObj.ToString(),
+                    ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.ShimInstanceName"),
+                    (int)ConfigObj.ArchiveOnFileCount
+                );
+
+                // Log complete
+                LogBroker.Logger?.WriteLog("DONE CLEANING UP ARCHIVE SETS FOR BOTH THE SHIM AND INJECTOR!", LogType.InfoLog);
                 return;
             }
 
@@ -93,7 +113,7 @@ namespace FulcrumInjector
             Task.Run(() =>
             {
                 // Run on different thread to avoid clogging up UI
-                LogBroker.CleanupLogHistory(ConfigObj.ToString());
+                LogBroker.CleanupLogHistory(ConfigObj.ToString(), "");
                 LogBroker.CleanupLogHistory(ConfigObj.ToString(), ShimFileFilterName);
 
                 // See if we have too many archives

@@ -68,7 +68,7 @@
     <ApplicationManifest>FulcrumInjector.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>ShimIconProject.ico</ApplicationIcon>
+    <ApplicationIcon>FulcrumResources\ShimIconProject.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28No Events%29|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -112,8 +112,8 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.7.12\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.3.5.5, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.3.5.6\lib\net472\SharpLogger.dll</HintPath>
+    <Reference Include="SharpLogger, Version=1.4.8.107, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.1.4.8.107\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
@@ -339,6 +339,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="FulcrumResources\ShimIconProject.xcf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -356,12 +357,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="MeatIncTurboLogo.jpg" />
+    <Resource Include="FulcrumResources\UnicornSoftwareList.txt" />
+    <Resource Include="FulcrumResources\MeatIncTurboLogo.jpg" />
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
     </Content>
-    <Resource Include="ShimIconProject.ico" />
+    <Resource Include="FulcrumResources\ShimIconProject.ico" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -374,14 +376,19 @@ py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
 "$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
-cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
-
-cmd.exe /C rmdir -r "$(ProjectDir)bin\**\de"
+    <PostBuildEvent>cmd.exe /C rmdir /s /q "$(TargetDir)de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
-copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)$(ProjectName)Settings.json"
-copy /Y "$(ProjectDir)FulcrumViewSupport\AppStyleSheets\*" $(TargetDir)FulcrumStyles"</PostBuildEvent>
+cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
+cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
+cmd.exe /C mkdir "$(TargetDir)FulcrumImages"
+cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
+
+copy /Y "$(ProjectDir)FulcrumViewSupport\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
+copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"
+copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.xcf" $(TargetDir)FulcrumImages"
+copy /Y "$(ProjectDir)FulcrumResources\MeatIncTurboLogo.jpg" $(TargetDir)FulcrumImages"
+copy /Y "$(ProjectDir)FulcrumResources\UnicornSoftwareList.txt" $(TargetDir)FulcrumResources"
+copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)FulcrumResources\$(ProjectName)Settings.json"</PostBuildEvent>
   </PropertyGroup>
 </Project>

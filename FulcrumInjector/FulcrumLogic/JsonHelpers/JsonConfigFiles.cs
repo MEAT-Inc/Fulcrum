@@ -58,12 +58,20 @@ namespace FulcrumInjector.FulcrumLogic.JsonHelpers
 #endif
             }
 
-            // Log info. Set file state
+            // List all the files in the directory we've located now and then find our settings file by name
             ConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorDir}", LogType.InfoLog);
-            NewConfigFileName = Path.GetFileName(NewConfigFileName);
-            AppConfigFile = Path.Combine(FulcrumInjectorDir, NewConfigFileName);
+            string[] LocatedFilesInDirectory = Directory.GetFiles(FulcrumInjectorDir, "*.json", SearchOption.AllDirectories);
+            ConfigLogger?.WriteLog($"LOCATED A TOTAL OF {LocatedFilesInDirectory.Length} FILES IN OUR APP FOLDER WITH A JSON EXTENSION");
+            string MatchedConfigFile = LocatedFilesInDirectory
+                .OrderBy(FileObj => FileObj.Length)
+                .FirstOrDefault(FileObj => FileObj.Contains(NewConfigFileName));
 
-            // Log info about the file object
+            // Check if the file is null or not found first
+            if (MatchedConfigFile == null) throw new FileNotFoundException($"FAILED TO FIND OUR JSON CONFIG FILE!\nFILE: {NewConfigFileName}");
+            ConfigLogger?.WriteLog($"LOCATED CONFIG FILE NAME IS: {MatchedConfigFile}", LogType.InfoLog);
+
+            // Log info. Set file state
+            AppConfigFile = Path.GetFullPath(MatchedConfigFile);
             ConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
             ConfigLogger?.WriteLog($"EXPECTED TO LOAD JSON CONFIG FILE AT: {AppConfigFile}");
 
