@@ -200,12 +200,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             try
             {
                 // Start pipe instance reading
-                Task.Run(() =>
-                {
-                    ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
-                    FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
-                    ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
-                });
+                // Task.Run(() =>
+                // {
+                //     ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
+                //     FulcrumPipeReader.PipeInstance.AttemptPipeConnection();
+                //     ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
+                // });
 
                 // Invoke PTOpen now then run our PT Close method
                 PTOpen.Invoke(InjectorDllPtr, out uint DeviceId);
