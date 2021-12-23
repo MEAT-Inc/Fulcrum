@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
@@ -116,18 +118,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
 
             // If Pipes are open, don't try test injection methods
-            if (!SkipSelectionBox)
+            if (SkipSelectionBox) { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
+            else 
             {
                 // Log information and run the injector test
                 ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
-                if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString))
-                {
-                    // Log the result of this test method
+                if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString)) {
                     ViewModelLogger.WriteLog($"RESULT FROM INJECTION: {ResultString}", LogType.InfoLog);
-
-                    // Now that our pipes are reset, we connect on them. Using the watchdogs, pipe state values SHOULD auto populate
-                    ViewModelLogger.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
-                    FulcrumPipeReader.ResetPipeInstance(); FulcrumPipeWriter.ResetPipeInstance();
                 }
                 else
                 {
@@ -136,7 +133,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     return false;
                 }
             }
-            else { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
 
             // Run our unload calls here
             if (!FulcrumWin32Invokers.FreeLibrary(LoadResult))
@@ -207,6 +203,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             try
             {
+                // Start pipe instance reading
+                // ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
+                // FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
+                // ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
+
                 // Invoke PTOpen now then run our PT Close method
                 PTOpen.Invoke(InjectorDllPtr, out uint DeviceId);
                 ViewModelLogger.WriteLog("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW", LogType.InfoLog);
@@ -215,10 +216,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 // Now issue the close command
                 ViewModelLogger.WriteLog("TRYING TO CLOSE OPENED DEVICE INSTANCE NOW...", LogType.WarnLog);
                 PTClose.Invoke(DeviceId);
-                ViewModelLogger.WriteLog("INJECTED METHOD EXECUTION COMPLETED OK!", LogType.InfoLog);
 
                 // Set output, return values.
                 ResultString = "DLL Execution Passed!";
+                ViewModelLogger.WriteLog("INJECTED METHOD EXECUTION COMPLETED OK!", LogType.InfoLog);
                 return true;
             }
             catch (Exception ImportEx)

@@ -183,6 +183,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 SvgDocAsBitmap.Save(OutputIconFileName, ImageFormat.Png);
             }
 
+            // Build a new instance of each type quickly to store something in our view configuration
+            Type TypeOfView = Type.GetType(MenuEntryType);
+            object BuiltTypeObject = Activator.CreateInstance(TypeOfView);
+            ViewModelLogger.WriteLog($"   --> BUILT INSTANCE OF TYPE OBJECT {TypeOfView.Name} CORRECTLY!");
+
             // Build and store our new icon object
             var NewResult = new HamburgerNavMenuItem()
             {
@@ -191,7 +196,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 Glyph = new Uri(Path.GetFullPath(Path.Combine(this.FulcrumIconPath, IconName)), UriKind.Absolute).ToString(),
 
                 // Store the content of the view each time we open
-                NavigationType = Type.GetType(MenuEntryType),
+                NavigationType = BuiltTypeObject.GetType(),
                 NavigationDestination = new Uri(MenuEntryContent)
             };
 

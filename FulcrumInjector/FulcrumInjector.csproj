@@ -112,8 +112,8 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.7.12\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.4.8.107, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.4.8.107\lib\net472\SharpLogger.dll</HintPath>
+    <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.1.4.9.108\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
@@ -193,7 +193,6 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="FulcrumViewContent\Models\DebugLoggingRedirectTarget.cs" />
     <Compile Include="FulcrumViewContent\Models\OeApplicationModel.cs" />
-    <Compile Include="FulcrumViewContent\Models\FulcrumPipeSystemModel.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsEntryModel.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsEntryModelCollection.cs" />
     <Compile Include="FulcrumViewContent\PropertyWatchdog.cs" />

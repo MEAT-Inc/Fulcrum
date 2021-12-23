@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
@@ -100,6 +101,23 @@ namespace FulcrumInjector.FulcrumViewContent
         // Setting Flyout View and View Model
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView;
         public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel;
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        // All Setting entries
+        public static SettingsEntryCollectionModel[] SettingsEntrySets;
+
+        // Settings for Debug log viewing (Or an empty settings model if null)
+        public static SettingsEntryCollectionModel DebugLogViewerSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Settings")
+            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Settings", Array.Empty<SettingsEntryModel>());
+
+        // Settings for pipe configuration (Or an empty settings model if null)
+        public static SettingsEntryCollectionModel InjectorPipeConfigSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
+            ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
 
         // --------------------------------------------------------------------------------------------------------------------------
 

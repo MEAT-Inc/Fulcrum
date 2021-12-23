@@ -110,7 +110,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 
             // Log starting new pipe and run the init method.
             PipeLogger.WriteLog("FOUND NEW USE CONSUMER OF THE DLL INSTANCE! BOOTING NEW PIPES NOW...", LogType.WarnLog);
-            this.ConfigureNewPipe();
+            this.AttemptPipeConnection();
         }
 
         // ---------------------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// Base method for new pipe init configuration
         /// </summary>
         /// <returns>Always true.</returns>
-        internal virtual bool ConfigureNewPipe()
+        internal virtual bool AttemptPipeConnection()
         {
             // Log information about building new pipe.
             this.PipeLogger.WriteLog($"BUILDING NEW PIPE OBJECT FROM MAIN PIPE TYPE FOR PIPE ID {this.PipeType}", LogType.WarnLog);

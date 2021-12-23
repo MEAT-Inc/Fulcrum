@@ -88,7 +88,11 @@ BOOL CSelectionBox::OnInitDialog()
 
 	// Boot the pipes and start the fulcrum injector
 	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	fulcrum_app->StartupPipes();
+	if (!fulcrum_app->pipesLoaded)
+	{
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Booting new pipe instances from SelectionBox now...\n"), GetTimeSinceInit());
+		fulcrum_app->StartupPipes();
+	}
 
 	// Return TRUE unless you set focus to a control
 	return TRUE;

@@ -56,7 +56,7 @@ auto_lock::auto_lock()
 
 	if (! TryEnterCriticalSection(&mAutoLock))
 	{
-		fulcrum_output::fulcrum_output::fulcrumDebug(_T("Multi-threading error"));
+		fulcrum_output::fulcrumDebug(_T("Multi-threading error"));
 		EnterCriticalSection(&mAutoLock);
 	}
 }
