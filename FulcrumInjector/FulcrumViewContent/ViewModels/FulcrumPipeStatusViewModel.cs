@@ -20,6 +20,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // Private Control Values
         private string _readerPipeState;
         private string _writerPipeState;
+        private PropertyWatchdog _testInjectionButtonWatchdog;
         private PropertyWatchdog _readerPipeStateWatchdog;
         private PropertyWatchdog _writerPipeStateWatchdog;
 
@@ -39,8 +40,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build new pipe model object and watchdogs.
-            this._readerPipeStateWatchdog = new PropertyWatchdog();
-            this._writerPipeStateWatchdog = new PropertyWatchdog();
+            this._readerPipeStateWatchdog = new PropertyWatchdog(500);
+            this._writerPipeStateWatchdog = new PropertyWatchdog(500);
+            this._testInjectionButtonWatchdog = new PropertyWatchdog(500);
             ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
 
             // Log completed setup.
@@ -58,32 +60,46 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this._readerPipeStateWatchdog.StartUpdateTimer((_, _) =>
             {
                 // Check current value. If unchanged, drop out
-                if (this.ReaderPipeState == FulcrumPipeReader.PipeInstance.PipeState.ToString()) {
-                    this.ReaderPipeState = FulcrumPipeReader.PipeInstance.PipeState.ToString();
-                    return;
-                }
+                string NewStateValue = FulcrumPipeReader.PipeInstance.PipeState.ToString();
+                if (this.ReaderPipeState != FulcrumPipeReader.PipeInstance.PipeState.ToString()) 
+                    ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: READER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {NewStateValue}", LogType.TraceLog);
 
                 // Log new value output and store it
-                this.ReaderPipeState = FulcrumPipeReader.PipeInstance.PipeState.ToString();
-                ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: READER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {this.ReaderPipeState}", LogType.TraceLog);
+                this.ReaderPipeState = NewStateValue;
             });
             this._writerPipeStateWatchdog.StartUpdateTimer((_, _) =>
             {
                 // Check current value. If unchanged, drop out
-                if (this.WriterPipeState == FulcrumPipeWriter.PipeInstance.PipeState.ToString()) {
-                    this.WriterPipeState = FulcrumPipeWriter.PipeInstance.PipeState.ToString();
+                string NewStateValue = FulcrumPipeWriter.PipeInstance.PipeState.ToString();
+                if (this.WriterPipeState != FulcrumPipeWriter.PipeInstance.PipeState.ToString()) 
+                    ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: WRITER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {NewStateValue}", LogType.TraceLog);
+
+                // Log new value output and store it.
+                this.WriterPipeState = NewStateValue;
+            });
+            this._testInjectionButtonWatchdog.StartUpdateTimer((_,_) =>
+            {
+                // Check Values of connecting
+                if (InjectorConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult != "Not Yet Tested") 
+                    return;
+
+                // Check if both loading
+                if (this.WriterPipeState == "Loading..." || this.ReaderPipeState == "Loading...")
+                {
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
                     return;
                 }
 
-                // Log new value output and store it.
-                this.WriterPipeState = FulcrumPipeWriter.PipeInstance.PipeState.ToString();
-                ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: WRITER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {this.WriterPipeState}", LogType.TraceLog);
+                // Set button contents here
+                InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
+                InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
             });
 
             // Log built and output information.
             ViewModelLogger.WriteLog("CONFIGURED AND STARTED NEW WATCHDOGS FOR THE READER AND WRITER PIPE STATE VALUES!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"READER IS UPDATING AT A RATE OF {this._readerPipeStateWatchdog.UpdateInterval.Milliseconds}");
             ViewModelLogger.WriteLog($"WRITER IS UPDATING AT A RATE OF {this._writerPipeStateWatchdog.UpdateInterval.Milliseconds}");
+            ViewModelLogger.WriteLog($"TESTER IS UPDATING AT A RATE OF {this._testInjectionButtonWatchdog.UpdateInterval.Milliseconds}");
         }
     }
 }

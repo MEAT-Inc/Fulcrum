@@ -47,12 +47,8 @@ namespace FulcrumInjector
             this.ConfigureLogCleanup();
             this.ConfigureSingleInstance();
             this.ConfigureCurrentAppTheme();
-            LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
-
-            // Configure pipe output here
             this.ConfigureUserSettings();
-            Task.Run(this.ConfigurePipeServers);
-            LogBroker.Logger?.WriteLog("USER SETTINGS AND PIPE SERVER OBJECTS ARE DONE BEING CONFIGURED! INJECTOR IS NOW BOOTING...", LogType.WarnLog);
+            LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION, USER SETTINGS, AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------
@@ -194,9 +190,6 @@ namespace FulcrumInjector
             ThemeConfiguration.CurrentAppTheme = ThemeConfiguration.PresetThemes[0];
             LogBroker.Logger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
         }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
         /// </summary>
@@ -217,28 +210,6 @@ namespace FulcrumInjector
 
             // Log passed and return output
             SettingsLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
-        }
-        /// <summary>
-        /// Boots the reader and writer pipe instances and prepares them for use
-        /// </summary>
-        private void ConfigurePipeServers()
-        {
-            // Build a logger for this method
-            var PipeLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("PipeSetupLogger")) ?? new SubServiceLogger("PipeSetupLogger");
-
-            // Log information
-            PipeLogger?.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
-            PipeLogger?.WriteLog("SETTING UP READER AND WRITER PIPES IN AN ASYNC OPERATION MODE NOW...", LogType.InfoLog);
-
-            // Start our reading operation here
-            FulcrumPipeReader.ResetPipeInstance();
-            FulcrumPipeWriter.ResetPipeInstance();
-            PipeLogger?.WriteLog("BUILT NEW INSTANCE FOR PIPE READER AND WRITER OBJECTS OK!", LogType.InfoLog);
-
-            // Once done, log done and return
-            PipeLogger?.WriteLog("SETUP ROUTINES ARE COMPLETE FOR BOTH THE READER AND WRITER PIPE OBJECTS!", LogType.InfoLog);
-            PipeLogger?.WriteLog("PIPES ARE NOW USABLE IN FUTURE CALLS AS THEY CURRENTLY STAND", LogType.WarnLog);
         }
     }
 }

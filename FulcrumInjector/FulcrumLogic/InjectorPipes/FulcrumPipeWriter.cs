@@ -31,7 +31,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         // ------------------------------------------------------------------------------------------------------------------------------
 
         // Sets if we can run a new connection or not
-        private static bool _isConnecting;
+        public static bool IsConnecting { get; private set; }
 
         // Pipe writer and stream objects
         internal NamedPipeServerStream FulcrumPipe;
@@ -99,11 +99,11 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         private void StartAsyncConnectClient()
         {
             // Check if connected already or not
-            if (this.FulcrumPipe.IsConnected || _isConnecting)
+            if (this.FulcrumPipe.IsConnected || IsConnecting)
             {
                 // Check what condition we hit
                 this.PipeLogger.WriteLog(
-                    _isConnecting
+                    IsConnecting
                         ? "CAN NOT FORCE A NEW CONNECTION ATTEMPT WHILE A PREVIOUS ONE IS ACTIVE!"
                         : "PIPE WAS ALREADY CONNECTED! RETURNING OUT NOW...", LogType.WarnLog);
                 
@@ -117,7 +117,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             Task.Run(() =>
             {
                 // Run a task while the connected value is false
-                _isConnecting = true;
+                IsConnecting = true;
                 ConnectionTimeStopwatch.Start();
                 this.FulcrumPipe.WaitForConnection();
 
@@ -126,7 +126,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 this.PipeLogger.WriteLog("CONNECTED NEW CLIENT INSTANCE!", LogType.WarnLog);
                 this.PipeLogger.WriteLog($"PIPE CLIENT CONNECTED TO FULCRUM PIPER {this.PipeType} OK!", LogType.InfoLog);
                 this.PipeLogger.WriteLog($"ESTIMATED {ConnectionTimeStopwatch.ElapsedMilliseconds} MILLISECONDS ELAPSED FOR CLIENT CONNECTION!", LogType.WarnLog);
-                _isConnecting = false;
+                IsConnecting = false;
             });
         }
     }

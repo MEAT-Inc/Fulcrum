@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace FulcrumInjector.FulcrumViewContent
@@ -46,7 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent
 
             // Start Timer and Trigger Prop Changed
             OnPropertyChanged();
-            PropertyUpdateTimer.Start();
+            Task.Run(() => PropertyUpdateTimer.Start());
         }
     }
 }

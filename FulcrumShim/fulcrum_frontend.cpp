@@ -141,6 +141,7 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
 	if (!fulcrum_app->pipesLoaded)
 	{
+		fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
 		fulcrum_output::fulcrumDebug(_T("%.3fs    Booting new pipe instances from fulcrum_frontend now...\n"), GetTimeSinceInit());
 		fulcrum_app->StartupPipes();
 	}

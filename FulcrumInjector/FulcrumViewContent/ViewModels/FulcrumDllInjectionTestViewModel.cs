@@ -153,10 +153,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.InjectorTestResult = "Injection Passed!";
             ResultString = this.InjectorTestResult;
 
-            // Set test button to disabled
-            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
-            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.ToolTip = "To retry injection, please restart this application";
-
             // Log information output
             ViewModelLogger.WriteLog("----------------------------------------------", LogType.WarnLog);
             ViewModelLogger.WriteLog("IMPORT PROCESS SHOULD NOT HAVE ISSUES GOING FORWARD!", LogType.InfoLog);
@@ -204,9 +200,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             try
             {
                 // Start pipe instance reading
-                // ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
-                // FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
-                // ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
+                Task.Run(() =>
+                {
+                    ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
+                    FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
+                    ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
+                });
 
                 // Invoke PTOpen now then run our PT Close method
                 PTOpen.Invoke(InjectorDllPtr, out uint DeviceId);

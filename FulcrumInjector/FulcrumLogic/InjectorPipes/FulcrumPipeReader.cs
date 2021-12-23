@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -36,6 +37,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         // Default value for pipe processing buffer
         private static int DefaultBufferValue = 10240;
         private static int DefaultReadTimeout = 5000;
+        public static bool IsConnecting { get; private set; }
 
         // Task objects for monitoring background readers
         private CancellationToken BackgroundRefreshToken;
@@ -80,37 +82,20 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// <returns>True if the pipe was built OK. False if not.</returns>
         internal override bool AttemptPipeConnection()
         {
-            // Check if our DLL is open
-            if (!FulcrumDllLoaded())
-            {
-                this.PipeLogger.WriteLog("WARNING: OUR FULCRUM DLL WAS NOT IN USE! THIS MEANS WE WON'T BE BOOTING OUR PIPE INSTANCES!", LogType.WarnLog);
-                return false;
-            }
-
-            // Find our read timeout setting value now
+            // Find our read timeout setting value now then apply it based on how our settings objects look
             var ReadTimeoutSetting = InjectorConstants.InjectorPipeConfigSettings.SettingsEntries
                 .FirstOrDefault(SettingObj => SettingObj.SettingName == "Reader Pipe Timeout");
             if (ReadTimeoutSetting == null)
                 this.PipeLogger.WriteLog($"WARNING: SETTING FOR READ TIMEOUT WAS NULL! DEFAULTING TO {DefaultReadTimeout}", LogType.TraceLog);
-
-            // Apply it based on values pulled
             DefaultReadTimeout = ReadTimeoutSetting?.SettingValue as int? ?? DefaultReadTimeout;
-
-            // Log ready for connection and send it.
-            this.PipeState = FulcrumPipeState.Open;
-            this.PipeLogger.WriteLog("PIPE CLIENT STREAM HAS BEEN CONFIGURED! ATTEMPTING CONNECTION ON IT NOW...", LogType.WarnLog);
-            this.PipeLogger.WriteLog($"WAITING FOR {DefaultReadTimeout} MILLISECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
 
             try
             {
-                // Build pipe reading stream object
-                this.FulcrumPipe.Connect(DefaultReadTimeout);
-                this.PipeState = FulcrumPipeState.Connected;
-                this.PipeLogger.WriteLog("CONNECTED TO PIPE SERVER ON FULCRUM DLL CORRECTLY AND PULLED IN NEW STREAM FOR IT OK!", LogType.InfoLog);
-                
-                // Setup new background reader process
-                this.PipeLogger.WriteLog("STARTING BACKGROUND PIPE DATA READING METHODS NOW...", LogType.WarnLog);
-                this.StartBackgroundReadProcess();
+                // Log ready for connection and send it.
+                this.PipeState = FulcrumPipeState.Open;
+                this.StartAsyncHostConnect();
+                this.PipeLogger.WriteLog("PIPE CLIENT STREAM HAS BEEN CONFIGURED! ATTEMPTING CONNECTION ON IT NOW...", LogType.WarnLog);
+                this.PipeLogger.WriteLog($"WAITING FOR {DefaultReadTimeout} MILLISECONDS BEFORE THE PIPES WILL TIMEOUT DURING THE CONNECTION ROUTINE", LogType.TraceLog);
                 return true;
             }
             catch (Exception PipeEx)
@@ -122,6 +107,98 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 this.PipeLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW", PipeEx);
                 return false;
             }
+        }
+
+        // -------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Async connects to our client on the reader side of operations
+        /// </summary>
+        private void StartAsyncHostConnect()
+        {
+            // Check if connected already or not
+            if (this.FulcrumPipe.IsConnected || IsConnecting)
+            {
+                // Check what condition we hit
+                this.PipeLogger.WriteLog(
+                    IsConnecting
+                        ? "CAN NOT FORCE A NEW CONNECTION ATTEMPT WHILE A PREVIOUS ONE IS ACTIVE!"
+                        : "PIPE WAS ALREADY CONNECTED! RETURNING OUT NOW...", LogType.WarnLog);
+
+                // Exit this method
+                return;
+            }
+
+            // Set connection building bool value and update view if possible
+            IsConnecting = true;
+            if (InjectorConstants.InjectorMainWindow != null) {
+                InjectorConstants.InjectorMainWindow.Dispatcher.Invoke(() =>
+                {
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Working...";
+                });
+            }
+
+            // Run our connection routine
+            this.PipeLogger.WriteLog("STARTING READER PIPE CONNECTION ROUTINE NOW...", LogType.WarnLog);
+            Task.Run(() =>
+            {
+                // Build pipe reading stream object
+                try { this.FulcrumPipe.Connect(DefaultReadTimeout); }
+                catch (Exception ConnectEx)
+                {
+                    // Connecting to false
+                    IsConnecting = false;
+                    if (ConnectEx is not TimeoutException)
+                    {
+                        // Throw our exception if it's not timeout based
+                        this.PipeState = FulcrumPipeState.Faulted;
+                        if (InjectorConstants.InjectorMainWindow == null) throw ConnectEx;
+
+                        // Reset button state and content
+                        InjectorConstants.InjectorMainWindow.Dispatcher.Invoke(() =>
+                        {
+                            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
+                        });
+
+                        // Throw exception and return
+                        throw ConnectEx;
+                    }
+
+                    // Set state to disconnected. Log failure
+                    this.PipeState = FulcrumPipeState.Disconnected;
+                    this.PipeLogger.WriteLog("FAILED TO CONNECT TO HOST PIPE SERVER AFTER GIVEN TIMEOUT VALUE!", LogType.WarnLog);
+
+                    // Reset button state and content
+                    if (InjectorConstants.InjectorMainWindow == null) { IsConnecting = false; return; }
+                    InjectorConstants.InjectorMainWindow.Dispatcher.Invoke(() =>
+                    {
+                        InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                        InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
+                        IsConnecting = false;
+                    });
+
+                    // Exit method
+                    return;
+                }
+
+                // If we're connected, log that information and break out
+                this.PipeState = FulcrumPipeState.Connected;
+                this.PipeLogger.WriteLog("CONNECTED NEW SERVER INSTANCE TO OUR READER!", LogType.WarnLog);
+                this.PipeLogger.WriteLog($"PIPE SERVER CONNECTED TO FULCRUM PIPER {this.PipeType} OK!", LogType.InfoLog);
+
+                // Reset button state and content
+                if (InjectorConstants.InjectorMainWindow == null) { IsConnecting = false; return; }
+                InjectorConstants.InjectorMainWindow.Dispatcher.Invoke(() =>
+                {
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
+                });
+
+                // Set connecting to false 
+                IsConnecting = false;
+            });
         }
 
         // -------------------------------------------------------------------------------------------------------
@@ -147,14 +224,6 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 this.PipeLogger.WriteLog("PREPARING TO READ INPUT PIPE DATA ON REPEAT NOW...", LogType.InfoLog);
                 while (!BackgroundRefreshToken.IsCancellationRequested)
                 {
-                    // Ensure we're connected
-                    if (this.PipeState != FulcrumPipeState.Connected) if (!this.AttemptPipeConnection())
-                    {
-                        this.PipeLogger.WriteLog("FAILED TO VALIDATE PIPE CONNECTION STATE!", LogType.ErrorLog);
-                        this.StopBackgroundReadProcess();
-                        break;
-                    }
-
                     // Find if the read attempt truly fails or not
                     bool PipeResult = this.ReadPipeData(out string NextPipeData);
                     if (PipeResult) continue;
@@ -166,7 +235,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                     // Cancel the tasks, break out.
                     this.StopBackgroundReadProcess();
                     this.PipeLogger.WriteLog("STOPPED EXECUTION OF BACKGROUND READING FROM INTERNAL THREAD!", LogType.WarnLog);
-                    break;  
+                    break;
                 }
 
                 // Null out our cancel token and source

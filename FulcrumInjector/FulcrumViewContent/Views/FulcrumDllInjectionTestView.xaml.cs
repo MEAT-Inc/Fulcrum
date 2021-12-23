@@ -57,13 +57,20 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             try
             {
                 // Clear out text box, run the test, and log the output
-                this.ViewModel.InjectorTestResult = "Testing...";
+                TestInjectionButton.IsEnabled = false;
+                this.ViewModel.InjectorTestResult = "Working...";
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Run the injection test here on a Dispatched thread 
                 this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out string ResultOutput);
                 if (!this.ViewModel.InjectionLoadPassed) { ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog); }
-                else { ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog); }
+                else
+                {
+                    // Set test button to disabled
+                    ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
+                    TestInjectionButton.IsEnabled = false;
+                    TestInjectionButton.ToolTip = "To retry injection, please restart this application";
+                }
 
                 // Set Value on the View now.
                 this.ViewModel.InjectorTestResult = ResultOutput;
@@ -71,6 +78,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             catch (Exception Ex)
             {
                 // Log the failure here.
+                TestInjectionButton.IsEnabled = true;
+                TestInjectionButton.Content = "Test Injection";
                 ViewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
                 ViewLogger.WriteLog("FAILED TO LOAD OUR DLL!", LogType.ErrorLog);
                 ViewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
