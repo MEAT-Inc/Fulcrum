@@ -30,6 +30,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Init component. Build new VM object
             InitializeComponent();
             this.ViewModel = new FulcrumPipeStatusViewModel();
+
+            // Store default values for our pipe states
+            this.ViewModel.ReaderPipeState = "Loading...";
+            this.ViewModel.WriterPipeState = "Loading...";
         }
 
         /// <summary>
@@ -44,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             this.DataContext = this.ViewModel;
 
             // Configure pipe instances here.
-            this.ViewModel.SetupPipeModelStates();
+            this.ViewModel.SetupPipeStateWatchdogs(); 
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
         }
 

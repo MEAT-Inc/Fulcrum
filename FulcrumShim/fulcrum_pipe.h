@@ -26,7 +26,9 @@ public:
 	bool IsLoaded();
 	bool ConnectInputPipe();
 	bool ConnectOutputPipe();
-	void ShutdownPipe();
+	void ShutdownPipes();
+	void ShutdownInputPipe();
+	void ShutdownOutputPipe();
 
 	// Writing operations
 	void WriteStringOut(std::string str);
@@ -45,7 +47,9 @@ public:
 	void Writeint32(int num);
 
 private:
-	bool Loaded = false;
+	bool PipesConnected = false;
+	bool InputConnected = false;
+	bool OutputConnected = false;
 	HANDLE hFulcrumWriter, hFulcrumReader;
 };
 

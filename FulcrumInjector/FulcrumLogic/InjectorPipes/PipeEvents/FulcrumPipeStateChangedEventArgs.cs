@@ -15,6 +15,10 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents
         /// <summary>
         /// Builds our new instance of the event args
         /// </summary>
-        public FulcrumPipeStateChangedEventArgs() { }
+        public FulcrumPipeStateChangedEventArgs()
+        {
+            // Store time of event changed
+            this.TimeChanged = DateTime.Now; 
+        }
     }
 }

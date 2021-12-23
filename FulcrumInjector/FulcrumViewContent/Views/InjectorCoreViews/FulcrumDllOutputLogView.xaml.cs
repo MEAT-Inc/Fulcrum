@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumLogic.InjectorPipes;
+using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
@@ -52,6 +55,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Configure pipe instances here.
             this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
+
+            // Build event for our pipe objects to process new pipe content into our output box
+            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => { this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; };
+            this.ViewLogger.WriteLog("SETUP A NEW PIPE READING EVENT OBJECT TO PROCESS OUR OUTPUT PIPE CONTENTS INTO THE DLL OUTPUT BOX OK!", LogType.WarnLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

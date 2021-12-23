@@ -8,14 +8,19 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents
     public class FulcrumPipeDataReadEventArgs : EventArgs
     {
         // Properties of the pipe data we processed in.
-        public DateTime TimeProcessed;
+        public readonly DateTime TimeProcessed;
         public uint ByteDataLength;
         public byte[] PipeByteData;
         public string PipeDataString;
+        public uint PipeDataStringLength;
 
         /// <summary>
         /// Builds new event arguments for a pipe reader processing state
         /// </summary>
-        public FulcrumPipeDataReadEventArgs() { }
+        public FulcrumPipeDataReadEventArgs()
+        {
+            // Store time of pipe data processed
+            this.TimeProcessed = DateTime.Now; ;
+        }
     }
 }

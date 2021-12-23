@@ -8,9 +8,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using ControlzEx.Theming;
+using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewSupport;
+using NLog;
 using SharpLogger;
+using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector
@@ -43,12 +47,15 @@ namespace FulcrumInjector
             this.ConfigureLogCleanup();
             this.ConfigureSingleInstance();
             this.ConfigureCurrentAppTheme();
-
-            // Log passed and ready to run.
             LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
+
+            // Configure pipe output here
+            this.ConfigureUserSettings();
+            Task.Run(this.ConfigurePipeServers);
+            LogBroker.Logger?.WriteLog("USER SETTINGS AND PIPE SERVER OBJECTS ARE DONE BEING CONFIGURED! INJECTOR IS NOW BOOTING...", LogType.WarnLog);
         }
 
-        // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Configure new logging instance setup for configurations.
@@ -83,17 +90,38 @@ namespace FulcrumInjector
             {
                 // Log not cleaning up and return.
                 LogBroker.Logger?.WriteLog("NO NEED TO ARCHIVE FILES AT THIS TIME! MOVING ON", LogType.WarnLog);
+                if (Directory.GetFiles((string)ConfigObj.LogArchivePath).Length < (int)ConfigObj.ArchiveCleanupFileCount)
+                {
+                    // Log not cleaning anything up since all values are under thresholds
+                    LogBroker.Logger?.WriteLog("NOT CONFIGURING ARCHIVE CLEANUP AT THIS TIME EITHER!", LogType.WarnLog);
+                    return;
+                }
+
+                // Configure cleanup for archive entries
+                LogBroker.Logger?.WriteLog("CLEANING UP ARCHIVE FILE ENTRIES NOW...", LogType.InfoLog);
+                LogBroker.CleanupArchiveHistory((string)ConfigObj.LogArchivePath, "", (int)ConfigObj.ArchiveOnFileCount);
+
+                // Cleanup the shim entries now
+                LogBroker.Logger?.WriteLog("CLEANING UP SHIM ENTRIES AND ARCHIVES NOW...", LogType.InfoLog);
+                LogBroker.CleanupArchiveHistory(
+                    (string)ConfigObj.LogArchivePath,
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.ShimInstanceName"),
+                    (int)ConfigObj.ArchiveOnFileCount
+                );
+
+                // Log complete
+                LogBroker.Logger?.WriteLog("DONE CLEANING UP ARCHIVE SETS FOR BOTH THE SHIM AND INJECTOR!", LogType.InfoLog);
                 return;
             }
 
             // Begin archive process 
-            var ShimFileFilterName = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.ShimInstanceName"); ;
+            var ShimFileFilterName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.ShimInstanceName"); ;
             LogBroker.Logger?.WriteLog($"ARCHIVE PROCESS IS NEEDED! PATH TO STORE FILES IS SET TO {ConfigObj.LogArchivePath}");
             LogBroker.Logger?.WriteLog($"SETTING UP SETS OF {ConfigObj.ArchiveFileSetSize} FILES IN EACH ARCHIVE OBJECT!");
             Task.Run(() =>
             {
                 // Run on different thread to avoid clogging up UI
-                LogBroker.CleanupLogHistory(ConfigObj.ToString());
+                LogBroker.CleanupLogHistory(ConfigObj.ToString(), "");
                 LogBroker.CleanupLogHistory(ConfigObj.ToString(), ShimFileFilterName);
 
                 // See if we have too many archives
@@ -120,7 +148,7 @@ namespace FulcrumInjector
         /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.
         /// </summary>
-        private bool ConfigureSingleInstance()
+        private void ConfigureSingleInstance()
         {
             // Find all the fulcrum process objects now.
             var CurrentInjector = Process.GetCurrentProcess();
@@ -151,7 +179,6 @@ namespace FulcrumInjector
 
             // Return passed output.
             LogBroker.Logger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
-            return true;
         }
         /// <summary>
         /// Configure new theme setup for instance objects.
@@ -166,6 +193,52 @@ namespace FulcrumInjector
             ThemeConfiguration = new AppThemeConfiguration();
             ThemeConfiguration.CurrentAppTheme = ThemeConfiguration.PresetThemes[0];
             LogBroker.Logger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
+        /// </summary>
+        private void ConfigureUserSettings()
+        {
+            // Build a logger for this method
+            var SettingsLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("UserSettingConfigLogger")) ?? new SubServiceLogger("UserSettingConfigLogger");
+
+            // Pull our settings objects out from the settings file.
+            var SettingsLoaded =
+                ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");
+
+            // Log information and build UI content view outputs
+            SettingsLogger?.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
+            SettingsLogger?.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
+            foreach (var SettingSet in SettingsLoaded) SettingsLogger?.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet}");
+
+            // Log passed and return output
+            SettingsLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
+        }
+        /// <summary>
+        /// Boots the reader and writer pipe instances and prepares them for use
+        /// </summary>
+        private void ConfigurePipeServers()
+        {
+            // Build a logger for this method
+            var PipeLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("PipeSetupLogger")) ?? new SubServiceLogger("PipeSetupLogger");
+
+            // Log information
+            PipeLogger?.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
+            PipeLogger?.WriteLog("SETTING UP READER AND WRITER PIPES IN AN ASYNC OPERATION MODE NOW...", LogType.InfoLog);
+
+            // Start our reading operation here
+            FulcrumPipeReader.ResetPipeInstance();
+            FulcrumPipeWriter.ResetPipeInstance();
+            PipeLogger?.WriteLog("BUILT NEW INSTANCE FOR PIPE READER AND WRITER OBJECTS OK!", LogType.InfoLog);
+
+            // Once done, log done and return
+            PipeLogger?.WriteLog("SETUP ROUTINES ARE COMPLETE FOR BOTH THE READER AND WRITER PIPE OBJECTS!", LogType.InfoLog);
+            PipeLogger?.WriteLog("PIPES ARE NOW USABLE IN FUTURE CALLS AS THEY CURRENTLY STAND", LogType.WarnLog);
         }
     }
 }
