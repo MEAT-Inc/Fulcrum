@@ -63,7 +63,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
         // PT Open Method object
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        public delegate int DelegatePassThruOpen(IntPtr DllPointer, out uint DeviceId);
+        public delegate int DelegatePassThruOpen(string DeviceName, out ulong DeviceId);
         public DelegatePassThruOpen PTOpen;
 
         // PT Open Method object
@@ -200,21 +200,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             try
             {
                 // Start pipe instance reading
-                // Task.Run(() =>
-                // {
-                //     ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
-                //     FulcrumPipeReader.PipeInstance.AttemptPipeConnection();
-                //     ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
-                // });
+                ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
+                FulcrumPipeReader.PipeInstance.AttemptPipeConnection(out _);
+                // FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
+                //ConnectionTask.ContinueWith((_) => FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess());
+                ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
 
                 // Invoke PTOpen now then run our PT Close method
-                PTOpen.Invoke(InjectorDllPtr, out uint DeviceId);
+                PTOpen.Invoke(null, out ulong DeviceId);
                 ViewModelLogger.WriteLog("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICE ID RETURNED: {DeviceId}");
 
                 // Now issue the close command
                 ViewModelLogger.WriteLog("TRYING TO CLOSE OPENED DEVICE INSTANCE NOW...", LogType.WarnLog);
-                PTClose.Invoke(DeviceId);
+                PTClose.Invoke((uint)DeviceId);
 
                 // Set output, return values.
                 ResultString = "DLL Execution Passed!";

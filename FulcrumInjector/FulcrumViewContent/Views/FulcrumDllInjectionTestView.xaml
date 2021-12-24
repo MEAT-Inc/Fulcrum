@@ -50,7 +50,8 @@
                     <Button
                         x:Name="TestInjectionButton"
                         Style="{StaticResource ActionButtonStyle}"
-                        Content="Test Injection"
+                        Content="Starting..."
+                        IsEnabled="False"
                         Margin="5"
                         FontSize="18"
                         Click="TestInjectionButton_Click"/>

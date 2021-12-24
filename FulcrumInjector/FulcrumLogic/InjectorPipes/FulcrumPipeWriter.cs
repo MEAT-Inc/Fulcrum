@@ -20,12 +20,15 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         private static readonly Lazy<FulcrumPipeWriter> _lazyWriter = new(() => new FulcrumPipeWriter());
 
         // Reset Pipe Object method
-        public static void ResetPipeInstance()
+        public static bool InitializePipeInstance(out Task<bool> ConnectionTask)
         {
+            // Store default Task value
+            ConnectionTask = null;
+
             // Reset Pipe here if needed and can
-            if (PipeInstance == null) { return; }
-            if (PipeInstance.PipeState != FulcrumPipeState.Connected) PipeInstance.AttemptPipeConnection();
-            else { PipeInstance.PipeLogger.WriteLog("WRITER PIPE WAS ALREADY CONNECTED! NOT RECONFIGURING IT!", LogType.WarnLog); }
+            if (PipeInstance == null) { return false; }
+            if (PipeInstance.PipeState != FulcrumPipeState.Connected) { PipeInstance.AttemptPipeConnection(out ConnectionTask); return true; } 
+            else { PipeInstance.PipeLogger.WriteLog("WRITER PIPE WAS ALREADY CONNECTED! NOT RECONFIGURING IT!", LogType.WarnLog); return false; }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +53,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             );
 
             // Build our new pipe instance here.
-            if (this.AttemptPipeConnection()) return;
+            if (this.AttemptPipeConnection(out _)) return;
 
             // Log failures and return output
             this.PipeLogger.WriteLog("FAILED TO CONFIGURE NEW OUTPUT WRITER PIPE!", LogType.ErrorLog);
@@ -63,7 +66,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// Configures a new pipe instance for our type provided.
         /// </summary>
         /// <returns></returns>
-        internal override bool AttemptPipeConnection()
+        internal override bool AttemptPipeConnection(out Task<bool> ConnectionTask)
         {
             try
             {
@@ -72,7 +75,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 this.PipeLogger.WriteLog("STARTING WRITER PIPE CONNECTION ROUTINE NOW. THIS MAY TAKE A BIT...", LogType.WarnLog);
                 
                 // Run the routine here and log information for setup
-                this.StartAsyncConnectClient();
+                ConnectionTask = this.StartAsyncConnectClient();
                 this.PipeLogger.WriteLog("PIPE HOST WRITER STREAM HAS BEEN CONFIGURED! ATTEMPTING TO FIND CLIENTS FOR IT NOW...", LogType.WarnLog);
                 this.PipeLogger.WriteLog($"WAITING FOR NEW CLIENT ENDLESSLY BEFORE BREAKING OUT OF SETUP METHODS!", LogType.WarnLog);
                 return true;
@@ -80,6 +83,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             catch (Exception PipeEx)
             {
                 // Log failed to connect to our pipe.
+                ConnectionTask = null;
                 this.PipeState = FulcrumPipeState.Faulted;
                 this.PipeLogger.WriteLog($"FAILED TO CONNECT TO OUR PIPE INSTANCE FOR PIPE ID {this.PipeType}!", LogType.ErrorLog);
                 this.PipeLogger.WriteLog("EXCEPTION THROWN DURING CONNECTION OR STREAM OPERATIONS FOR THIS PIPE CONFIGURATION!", LogType.ErrorLog);
@@ -96,7 +100,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// <summary>
         /// Async connects to our client on the reader side of operations
         /// </summary>
-        private void StartAsyncConnectClient()
+        private Task<bool> StartAsyncConnectClient()
         {
             // Check if connected already or not
             if (this.FulcrumPipe.IsConnected || IsConnecting)
@@ -108,13 +112,13 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                         : "PIPE WAS ALREADY CONNECTED! RETURNING OUT NOW...", LogType.WarnLog);
                 
                 // Exit this method
-                return;
+                return null;
             }
 
             // Apply it based on values pulled and try to open a new client
             Stopwatch ConnectionTimeStopwatch = new Stopwatch();
             this.PipeLogger.WriteLog("STARTING WRITER PIPE CONNECTION ROUTINE NOW...", LogType.WarnLog);
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 // Run a task while the connected value is false
                 IsConnecting = true;
@@ -127,6 +131,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 this.PipeLogger.WriteLog($"PIPE CLIENT CONNECTED TO FULCRUM PIPER {this.PipeType} OK!", LogType.InfoLog);
                 this.PipeLogger.WriteLog($"ESTIMATED {ConnectionTimeStopwatch.ElapsedMilliseconds} MILLISECONDS ELAPSED FOR CLIENT CONNECTION!", LogType.WarnLog);
                 IsConnecting = false;
+                return true;
             });
         }
     }

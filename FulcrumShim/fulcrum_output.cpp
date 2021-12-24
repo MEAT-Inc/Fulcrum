@@ -154,12 +154,11 @@ void fulcrum_output::fulcrumDebug(LPCTSTR format, ...)
 	}
 
 	// Send to pipe server only if our pipe instances are currently open and connected
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (fulcrum_app->pipesLoaded)
+	if (CFulcrumShim::fulcrumPiper->OutputConnected)
 	{
 		// Convert into a string object and write to pipes
 		std::string built_string = std::string(formatted.get());
-		fulcrum_app->fulcrumPiper->WriteStringOut(built_string);
+		CFulcrumShim::fulcrumPiper->WriteStringOut(built_string);
 	}
 
 	// Stop arg fprmatting session

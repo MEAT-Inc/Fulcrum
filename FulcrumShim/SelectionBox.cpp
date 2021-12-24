@@ -85,17 +85,6 @@ BOOL CSelectionBox::OnInitDialog()
 	DoPopulateRegistryListbox();
 	ShowWindow(SW_SHOW);
 	BringWindowToTop();
-
-	// Boot the pipes and start the fulcrum injector
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (!fulcrum_app->pipesLoaded)
-	{
-		fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Booting new pipe instances from SelectionBox now...\n"), GetTimeSinceInit());
-		fulcrum_app->StartupPipes();
-	}
-
-	// Return TRUE unless you set focus to a control
 	return TRUE;
 }
 
@@ -192,8 +181,6 @@ void CSelectionBox::OnBnClickedOk()
 	DWORD_PTR item_data = m_listview.GetItemData(nItem);
 	sel = (cPassThruInfo *) item_data;
 	m_logfilename.GetWindowText(cstrDebugFile);
-
-	// Check if passed output. If so move on.
 	OnOK();
 }
 

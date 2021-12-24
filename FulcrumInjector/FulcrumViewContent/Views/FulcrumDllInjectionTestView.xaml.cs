@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
@@ -30,7 +31,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         {
             // Build new view model object
             InitializeComponent();
-            this.ViewModel = new FulcrumDllInjectionTestViewModel();
+            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumDllInjectionTestViewModel());
         }
 
         /// <summary>
@@ -62,17 +63,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Run the injection test here on a Dispatched thread 
-                this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out string ResultOutput);
+                string ResultOutput = string.Empty;
+                this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out ResultOutput);
                 if (!this.ViewModel.InjectionLoadPassed) { ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog); }
-                else
-                {
-                    // Set test button to disabled
-                    ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
-                    TestInjectionButton.IsEnabled = false;
-                    TestInjectionButton.ToolTip = "To retry injection, please restart this application";
-                }
+                else ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
 
                 // Set Value on the View now.
+                TestInjectionButton.IsEnabled = false;
+                TestInjectionButton.Content = "Test Injection";
                 this.ViewModel.InjectorTestResult = ResultOutput;
             }
             catch (Exception Ex)

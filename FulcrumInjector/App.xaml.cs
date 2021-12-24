@@ -39,16 +39,59 @@ namespace FulcrumInjector
             // Startup override
             base.OnStartup(e);
 
-            // Force the working directory to the running location of the application or set to the debug directory
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            // Force the working directory. Build JSON settings objects
+            string RunningLocation = Assembly.GetExecutingAssembly().Location;
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(RunningLocation));
+            JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorSettings.json");
+
+            // Run single instance configuration first
+            this.ConfigureSingleInstance();
 
             // Logging config and app theme config.
             this.ConfigureLogging();
             this.ConfigureLogCleanup();
-            this.ConfigureSingleInstance();
-            this.ConfigureCurrentAppTheme();
+            LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION ROUTINE HAS BEEN COMPLETED OK!", LogType.InfoLog);
+
+            // Configure settings and app theme
+            this.ConfigureMergedDicts();
+            this.ConfigureCurrentTheme();
             this.ConfigureUserSettings();
-            LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION, USER SETTINGS, AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
+            LogBroker.Logger?.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Checks for an existing fulcrum process object and kill all but the running one.
+        /// </summary>
+        private void ConfigureSingleInstance()
+        {
+            // Find all the fulcrum process objects now.
+            var CurrentInjector = Process.GetCurrentProcess();
+            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
+            LogBroker.Logger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
+
+            // Find the process values here.
+            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+            LogBroker.Logger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
+            var InjectorsTotal = Process.GetProcesses()
+                .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
+                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName)
+                                  || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
+                .ToList();
+
+            // Now kill any existing instances
+            LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
+            if (InjectorsTotal.Count > 0)
+            {
+                // Log removing files and delete the log output
+                LogBroker.Logger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
+                File.Delete(LogBroker.MainLogFileName);
+                Environment.Exit(100);
+            }
+
+            // Return passed output.
+            LogBroker.Logger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------
@@ -59,7 +102,6 @@ namespace FulcrumInjector
         private void ConfigureLogging()
         {
             // Start by building a new logging configuration object and init the broker.
-            JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorSettings.json");
             string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorLogging.DefaultLoggingPath");
 
@@ -141,45 +183,22 @@ namespace FulcrumInjector
                 LogBroker.Logger?.WriteLog($"DONE CLEANING UP LOG FILES! CHECK {ConfigObj.LogArchivePath} FOR NEWLY BUILT ARCHIVE FILES", LogType.InfoLog);
             });
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
-        /// Checks for an existing fulcrum process object and kill all but the running one.
+        /// Pulls in the resource dictionaries from the given resource path and stores them in the app
         /// </summary>
-        private void ConfigureSingleInstance()
+        private void ConfigureMergedDicts()
         {
-            // Find all the fulcrum process objects now.
-            var CurrentInjector = Process.GetCurrentProcess();
-            LogBroker.Logger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
-            LogBroker.Logger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
-
-            // Find the process values here.
-            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
-            LogBroker.Logger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
-            var InjectorsTotal = Process.GetProcesses()
-                .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
-                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName)
-                                  || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
-                .ToList();
-
-            // THIS IS A POTENTIAL ISSUE!
-            // BUG: KILLING NEW CAN DROP COMMANDS TO OUR PIPE! WE NEED TO BUILD THIS SO THAT THE OLDEST INSTANCE REMAINS ALIVE!
-
-            // Now kill any existing instances
-            LogBroker.Logger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
-            if (InjectorsTotal.Count > 0)
-            {
-                // Log removing files and delete the log output
-                LogBroker.Logger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
-                File.Delete(LogBroker.MainLogFileName);
-                Environment.Exit(100);
-            }
-
-            // Return passed output.
-            LogBroker.Logger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
+            // Log information. Pull files in and store them all
+            LogBroker.Logger?.WriteLog("IMPORTING RESOURCE DICTIONARIES FROM XAML OUTPUT DIRECTORY NOW...", LogType.WarnLog);
         }
+
         /// <summary>
         /// Configure new theme setup for instance objects.
         /// </summary>
-        private void ConfigureCurrentAppTheme()
+        private void ConfigureCurrentTheme()
         {
             // Log infos and set values.
             LogBroker.Logger?.WriteLog("SETTING UP MAIN APPLICATION THEME VALUES NOW...", LogType.InfoLog);

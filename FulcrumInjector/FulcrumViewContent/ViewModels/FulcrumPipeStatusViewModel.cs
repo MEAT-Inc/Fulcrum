@@ -40,9 +40,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build new pipe model object and watchdogs.
-            this._readerPipeStateWatchdog = new PropertyWatchdog(500);
-            this._writerPipeStateWatchdog = new PropertyWatchdog(500);
-            this._testInjectionButtonWatchdog = new PropertyWatchdog(500);
+            this._readerPipeStateWatchdog = new PropertyWatchdog(250);
+            this._writerPipeStateWatchdog = new PropertyWatchdog(250);
+            this._testInjectionButtonWatchdog = new PropertyWatchdog(250);
             ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
 
             // Log completed setup.
@@ -77,22 +77,43 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 // Log new value output and store it.
                 this.WriterPipeState = NewStateValue;
             });
+
+            // Injector button state watchdog
             this._testInjectionButtonWatchdog.StartUpdateTimer((_,_) =>
             {
-                // Check Values of connecting
-                if (InjectorConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult != "Not Yet Tested") 
-                    return;
+                // For app setup and loading values
+                if (this.WriterPipeState == "Connected" && this.ReaderPipeState == "Connected")
+                    InjectorConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed = true;
 
-                // Check if both loading
-                if (this.WriterPipeState == "Loading..." || this.ReaderPipeState == "Loading...")
-                {
+                // Check Values of pipe states and build UI content accordingly
+                if (InjectorConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed) {
                     InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
-                    return;
+                    InjectorConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult = "Injection Passed!";
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                    return; 
+                }
+                
+                // For app setup and loading values
+                if (this.WriterPipeState == "Loading..." || this.ReaderPipeState == "Loading...") {
+                    InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;                    
+                    return; 
                 }
 
-                // Set button contents here
-                InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
-                InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                // Set content based on injector state values
+                switch (FulcrumPipeReader.IsConnecting)
+                {
+                    // If injector is connecting
+                    case true:
+                        InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+                        InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Working...";
+                        break;
+
+                    // If not connected and not run yet
+                    case false when InjectorConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed == false:
+                        InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
+                        InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                        break;
+                }
             });
 
             // Log built and output information.

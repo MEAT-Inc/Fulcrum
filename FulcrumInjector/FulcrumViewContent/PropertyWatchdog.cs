@@ -46,8 +46,11 @@ namespace FulcrumInjector.FulcrumViewContent
             PropertyUpdateTimer.Tick += EventTrigger;
 
             // Start Timer and Trigger Prop Changed
-            OnPropertyChanged();
-            Task.Run(() => PropertyUpdateTimer.Start());
+            Task.Run(() =>
+            {
+                OnPropertyChanged();
+                PropertyUpdateTimer.Start();
+            });
         }
     }
 }
