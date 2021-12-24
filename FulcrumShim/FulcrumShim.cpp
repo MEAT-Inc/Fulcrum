@@ -63,7 +63,24 @@ BOOL CFulcrumShim::InitInstance()
 	// std::thread([this] { CFulcrumShim::StartupPipes(); });
 
 	// Build our pipes and return passed
-	// CFulcrumShim::StartupPipes();
+		// Build config app path value here and run the injector application
+#if _DEBUG
+	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
+	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, szPath);
+	ConfigAppPath.Format(_T("%s\\source\\repos\\MEAT-Inc\\FulcrumShim\\FulcrumInjector\\bin\\Debug\\FulcrumInjector.exe"), szPath);
+#else 
+	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
+	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
+	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe"), szPath);
+#endif
+
+	// Run the process here by booting a new instance. Once running connect the input pipe.
+	STARTUPINFO StartupInfos; PROCESS_INFORMATION ProcessInfos;
+	ZeroMemory(&StartupInfos, sizeof(StartupInfos));
+	StartupInfos.cb = sizeof(StartupInfos);
+	ZeroMemory(&ProcessInfos, sizeof(ProcessInfos));
+	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
+	CloseHandle(ProcessInfos.hProcess);	CloseHandle(ProcessInfos.hThread);
 	return TRUE;
 }
 
@@ -87,25 +104,6 @@ void CFulcrumShim::StartupPipes()
 	PipesConnecting = true;
 	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
 	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Booting pipes at the last possible second...\n"), GetTimeSinceInit());
-
-	// Build config app path value here and run the injector application
-#if _DEBUG
-	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
-	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, szPath);
-	ConfigAppPath.Format(_T("%s\\source\\repos\\MEAT-Inc\\FulcrumShim\\FulcrumInjector\\bin\\Debug\\FulcrumInjector.exe"), szPath);
-#else 
-	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
-	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
-	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe"), szPath);
-#endif
-
-	// Run the process here by booting a new instance. Once running connect the input pipe.
-	STARTUPINFO StartupInfos; PROCESS_INFORMATION ProcessInfos;
-	ZeroMemory(&StartupInfos, sizeof(StartupInfos));
-	StartupInfos.cb = sizeof(StartupInfos);
-	ZeroMemory(&ProcessInfos, sizeof(ProcessInfos));
-	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
-	CloseHandle(ProcessInfos.hProcess);	CloseHandle(ProcessInfos.hThread);
 
 	// Connect our pipe instances for the reader and writer objects now
 	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting output pipe now...\n", GetTimeSinceInit()));

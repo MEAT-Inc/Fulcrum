@@ -197,9 +197,9 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 this.PipeLogger.WriteLog("PREPARING TO READ INPUT PIPE DATA ON REPEAT NOW...", LogType.InfoLog);
                 while (!BackgroundRefreshToken.IsCancellationRequested)
                 {
-                    // Find if the read attempt truly fails or not
-                    bool PipeResult = this.ReadPipeData(out string NextPipeData);
-                    if (PipeResult) continue;
+                    // If not connected, continue on
+                    if (!this.FulcrumPipe.IsConnected) continue;
+                    if (this.ReadPipeData(out string NextPipeData)) continue; 
 
                     // If failed, then break this loop here
                     this.PipeLogger.WriteLog("FAILED TO READ NEW DATA DUE TO A FATAL ERROR OF SOME TYPE!", LogType.ErrorLog);

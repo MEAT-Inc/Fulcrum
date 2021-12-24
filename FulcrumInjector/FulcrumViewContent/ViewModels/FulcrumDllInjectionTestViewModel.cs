@@ -202,7 +202,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 // Start pipe instance reading
                 ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
                 FulcrumPipeReader.PipeInstance.AttemptPipeConnection(out _);
-                // FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
+                FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
                 //ConnectionTask.ContinueWith((_) => FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess());
                 ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
 

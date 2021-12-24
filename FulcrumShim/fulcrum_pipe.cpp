@@ -23,11 +23,11 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	if (_pipesConnected || OutputConnected)
 	{
 		// Log information, store state of pipes, and return it.
-		fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 1 (Output Pipe) was already open!\n"));
+		fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) was already open!\n"));
 		_pipesConnected = InputConnected;
 
 		// Check if loaded now
-		if (_pipesConnected) fulcrum_output::fulcrumDebug(_T("-->      Both Fulcrum Pipes are already open!\n"));
+		if (_pipesConnected) fulcrum_output::fulcrumDebug(_T("-->       Both Fulcrum Pipes are already open!\n"));
 		return true;
 	}
 	
@@ -47,14 +47,14 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	// Check if the pipe was built or not.
 	if ((hFulcrumWriter == NULL || hFulcrumWriter == INVALID_HANDLE_VALUE))
 	{
-		fulcrum_output::fulcrumDebug(_T("-->      ERROR: Fulcrum Pipe 1 (Output Pipe) could not be opened!\n"));
-		if (hFulcrumWriter == NULL) { fulcrum_output::fulcrumDebug(_T("-->          \\__ Pipe was NULL! (error % d)\n"), GetLastError()); }
-		else {fulcrum_output::fulcrumDebug(_T("-->      \\__ Pipe handle was invalid!(error % d)\n"), GetLastError()); }
+		fulcrum_output::fulcrumDebug(_T("-->       ERROR: Fulcrum Pipe 1 (Output Pipe) could not be opened!\n"));
+		if (hFulcrumWriter == NULL) { fulcrum_output::fulcrumDebug(_T("-->           \\__ Pipe was NULL! (error % d)\n"), GetLastError()); }
+		else {fulcrum_output::fulcrumDebug(_T("-->       \\__ Pipe handle was invalid!(error % d)\n"), GetLastError()); }
 		return false;
 	}
 
 	// Log information and return output
-	fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 1 (Output Pipe) has been opened OK!\n"));
+	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) has been opened OK!\n"));
 	return true;
 }
 bool fulcrum_pipe::ConnectInputPipe()
@@ -67,25 +67,25 @@ bool fulcrum_pipe::ConnectInputPipe()
 	if (_pipesConnected || InputConnected)
 	{
 		// Log information, store state of pipes, and return it.
-		fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 2 (Input Pipe) was already open!\n"));
+		fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) was already open!\n"));
 		_pipesConnected = OutputConnected;
 
 		// Check if loaded now
-		if (_pipesConnected) fulcrum_output::fulcrumDebug(_T("-->      Both Fulcrum Pipes are already open!\n"));
+		if (_pipesConnected) fulcrum_output::fulcrumDebug(_T("-->       Both Fulcrum Pipes are already open!\n"));
 		return true;
 	}
 
 	// Check if the pipe was built or not.
 	if ((hFulcrumReader == NULL || hFulcrumReader == INVALID_HANDLE_VALUE))
 	{
-		fulcrum_output::fulcrumDebug(_T("-->      ERROR: Fulcrum Pipe 2 (Input Pipe) could not be opened!\n"));
-		if (hFulcrumReader == NULL) { fulcrum_output::fulcrumDebug(_T("-->      \\__ Pipe was NULL! (error % d)\n"), GetLastError()); }
-		else { fulcrum_output::fulcrumDebug(_T("-->      \\__ Pipe handle was invalid! (error %d)\n"), GetLastError()); }
+		fulcrum_output::fulcrumDebug(_T("-->       ERROR: Fulcrum Pipe 2 (Input Pipe) could not be opened!\n"));
+		if (hFulcrumReader == NULL) { fulcrum_output::fulcrumDebug(_T("-->       \\__ Pipe was NULL! (error % d)\n"), GetLastError()); }
+		else { fulcrum_output::fulcrumDebug(_T("-->       \\__ Pipe handle was invalid! (error %d)\n"), GetLastError()); }
 		return false;
 	}
 
 	// Log information and return output then close our handle output
-	fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 2 (Input Pipe) has been opened OK!\n"));
+	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) has been opened OK!\n"));
 	return true;
 }
 
@@ -95,34 +95,34 @@ void fulcrum_pipe::ShutdownPipes()
 	// Close out both pipes here
 	fulcrum_pipe::ShutdownInputPipe();
 	fulcrum_pipe::ShutdownOutputPipe();
-	fulcrum_output::fulcrumDebug(_T("-->      Closed output pipe for FulcrumShim Server correctly!\n"));
+	fulcrum_output::fulcrumDebug(_T("-->       Closed output pipe for FulcrumShim Server correctly!\n"));
 }
 void fulcrum_pipe::ShutdownOutputPipe()
 {
 	// Check if already closed or not
 	if (hFulcrumReader == NULL) {
-		fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 1 (Output Pipe) was already closed!\n"));
+		fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) was already closed!\n"));
 		InputConnected = false;	_pipesConnected = false;
 		return;
 	}
 
 	// Close it out now
 	CloseHandle(hFulcrumWriter); hFulcrumWriter = nullptr;
-	fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 1 (Output Pipe) has been closed! Pipe handle is now NULL!\n"));
+	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) has been closed! Pipe handle is now NULL!\n"));
 	InputConnected = false; _pipesConnected = false;
 }
 void fulcrum_pipe::ShutdownInputPipe()
 {
 	// Check if already closed or not
 	if (hFulcrumReader == NULL) {
-		fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 2 (Input Pipe) was already closed!\n"));
+		fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) was already closed!\n"));
 		OutputConnected = false; _pipesConnected = false;
 		return;
 	}
 
 	// Close it out now
 	CloseHandle(hFulcrumReader); hFulcrumReader = nullptr;
-	fulcrum_output::fulcrumDebug(_T("-->      Fulcrum Pipe 2 (Input Pipe) has been closed! Pipe handle is now NULL!\n"));
+	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) has been closed! Pipe handle is now NULL!\n"));
 	OutputConnected = false; _pipesConnected = false;
 }
 
