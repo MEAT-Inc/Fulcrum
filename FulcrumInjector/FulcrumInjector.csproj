@@ -158,6 +158,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewContent\SingletonContentControl.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
@@ -196,7 +197,7 @@
     <Compile Include="FulcrumViewContent\Models\OeApplicationModel.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsEntryModel.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsEntryModelCollection.cs" />
-    <Compile Include="FulcrumViewContent\PropertyWatchdog.cs" />
+    <Compile Include="FulcrumViewSupport\PropertyWatchdog.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumDebugLoggingViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumDllOutputLogViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumInstalledOeAppsViewModel.cs" />

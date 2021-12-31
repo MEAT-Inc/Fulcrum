@@ -23,12 +23,14 @@ namespace FulcrumInjector.FulcrumViewContent
         // --------------------------------------------------------------------------------------------------------------------------
 
         // View object to setup and custom setter
-        internal Page BasePageControl;
         internal UserControl BaseViewControl;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        public virtual void SetupViewControl(Page ContentView) { BasePageControl = ContentView; }
+        /// <summary>
+        /// Configures a new instance of our view model control methods
+        /// </summary>
+        /// <param name="ContentView"></param>
         public virtual void SetupViewControl(UserControl ContentView) { BaseViewControl = ContentView; }
 
         // --------------------------------------------------------------------------------------------------------------------------
