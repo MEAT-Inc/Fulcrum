@@ -104,8 +104,9 @@ void CFulcrumShim::StartupPipes()
 	PipesConnecting = true;
 
 	// Connect our pipe instances for the reader and writer objects now
-	bool LoadedPipeOutput = CFulcrumShim::fulcrumPiper->ConnectOutputPipe();
+	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
 	bool LoadedPipeInput = CFulcrumShim::fulcrumPiper->ConnectInputPipe();
+	bool LoadedPipeOutput = CFulcrumShim::fulcrumPiper->ConnectOutputPipe();
 
 	// Log heading information so we see this on boot
 	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));

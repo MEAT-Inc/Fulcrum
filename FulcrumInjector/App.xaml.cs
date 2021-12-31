@@ -86,7 +86,10 @@ namespace FulcrumInjector
             {
                 // Log removing files and delete the log output
                 LogBroker.Logger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
-                File.Delete(LogBroker.MainLogFileName);
+                try { File.Delete(LogBroker.MainLogFileName); }
+                catch { LogBroker.Logger?.WriteLog("CAN NOT DELETE NON EXISTENT FILES!", LogType.ErrorLog); }
+
+                // Exit the application
                 Environment.Exit(100);
             }
 
