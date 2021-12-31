@@ -108,7 +108,6 @@ void CFulcrumShim::StartupPipes()
 	bool LoadedPipeInput = CFulcrumShim::fulcrumPiper->ConnectInputPipe();
 
 	// Log heading information so we see this on boot
-	Sleep(1000);
 	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
 	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"), GetTimeSinceInit());
 
