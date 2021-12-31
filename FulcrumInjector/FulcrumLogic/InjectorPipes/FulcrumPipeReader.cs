@@ -294,34 +294,34 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 try
                 {
                     // Read input content and check how many bytes we've pulled in
-                    int CurrentBuffer = BytesRead;
-                    BytesRead = this.FulcrumPipe.Read(OutputBuffer, CurrentBuffer, OutputBuffer.Length - CurrentBuffer);
-                    if (BytesRead == 0) { ReadDataContents = "FAILED_PIPE_READ__NO_PIPE_DATA"; return true; }
-
-                    // Trim off the excess byte values here if needed
-                    if (BytesRead == OutputBuffer.Length) continue;
-                    OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
-
+                    BytesRead = this.FulcrumPipe.Read(OutputBuffer, 0, OutputBuffer.Length);
+                    
                     // Now convert our bytes into a string object, and print them to our log files.
+                    if (BytesRead != OutputBuffer.Length) OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
                     string NextPipeString = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
-                    this.PipeLogger.WriteLog($"--> [PIPE DATA - MSG #{AllProcessedMessages.Count}] ::: {NextPipeString}", LogType.TraceLog);
+                    string[] SplitPipeContent = NextPipeString.Split('\n');
 
-                    // Add this into our list of app pipe content
-                    if (AllProcessedMessages.Contains(NextPipeString)) break;
-                    AllProcessedMessages.Add(NextPipeString);
-
-                    // Now fire off a pipe data read event if possible. Otherwise return
-                    if (this.PipeDataProcessed == null) continue;   
-                    this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
+                    // Log new message pulled and write contents of it to our log file
+                    this.PipeLogger.WriteLog($"[PIPE DATA - MSG #{AllProcessedMessages.Count}] NEW PIPE DATA PROCESSED!", LogType.TraceLog);
+                    foreach (var PipeStringPart in SplitPipeContent)
                     {
-                        // Store byte values
-                        PipeByteData = OutputBuffer,
-                        ByteDataLength = (uint)OutputBuffer.Length,
+                        // Add this into our list of app pipe content
+                        AllProcessedMessages.Add(PipeStringPart);
+                        this.PipeLogger.WriteLog($"\t{PipeStringPart}", LogType.TraceLog);
 
-                        // Store string values
-                        PipeDataString = NextPipeString,
-                        PipeDataStringLength = (uint)NextPipeString.Length
-                    });
+                        // Now fire off a pipe data read event if possible. Otherwise return
+                        if (this.PipeDataProcessed == null) continue;
+                        this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
+                        {
+                            // Store byte values
+                            PipeByteData = OutputBuffer,
+                            ByteDataLength = (uint)OutputBuffer.Length,
+
+                            // Store string values
+                            PipeDataString = NextPipeString,
+                            PipeDataStringLength = (uint)NextPipeString.Length
+                        });
+                    }
                 }
                 catch (Exception ReadEx)
                 {
