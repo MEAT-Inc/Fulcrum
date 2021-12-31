@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
@@ -89,17 +90,44 @@ namespace FulcrumInjector.FulcrumViewContent
             set => FulcrumHamburgerCoreView.ViewModel = value;
         }
 
-        // Injector DLL Output View Contents
-        public static FulcrumDllOutputLogView FulcrumDllOutputLogView;
-        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel;
+        // --------------------------------------------------------------------------------------------------------------------------
 
-        // Debug Logging Flyout View and View Model
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView;
-        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel;
+        // Singleton Injector DLL Output View Contents. These get set to control view contents on the Main window
+        public static SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel> FulcrumDllOutputSingleton =>
+            SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
+        public static SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel> FulcrumDebugLoggingSingleton =>
+            SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
+        public static SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel> FulcrumSettingsPaneSingleton =>
+            SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
 
-        // Setting Flyout View and View Model
-        public static FulcrumSettingsPaneView FulcrumSettingsPaneView;
-        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel;
+        // DLL Output viewing user control and view model object
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => FulcrumDllOutputSingleton?.SingletonUserControl;
+        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => FulcrumDllOutputSingleton?.SingletonViewModel;
+
+        // Debug logging output user control and view model object
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => FulcrumDebugLoggingSingleton?.SingletonUserControl;
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => FulcrumDebugLoggingSingleton?.SingletonViewModel;
+
+        // User settings and configuration user control and view model object
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => FulcrumSettingsPaneSingleton?.SingletonUserControl;
+        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => FulcrumSettingsPaneSingleton?.SingletonViewModel;
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        // All Setting entries
+        public static SettingsEntryCollectionModel[] SettingsEntrySets;
+
+        // Settings for Debug log viewing (Or an empty settings model if null)
+        public static SettingsEntryCollectionModel DebugLogViewerSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Settings")
+            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Settings", Array.Empty<SettingsEntryModel>());
+
+        // Settings for pipe configuration (Or an empty settings model if null)
+        public static SettingsEntryCollectionModel InjectorPipeConfigSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
+            ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -121,7 +149,6 @@ namespace FulcrumInjector.FulcrumViewContent
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
 
         }
-
         /// <summary>
         /// Sets a value on one of the global UI Control values here
         /// </summary>

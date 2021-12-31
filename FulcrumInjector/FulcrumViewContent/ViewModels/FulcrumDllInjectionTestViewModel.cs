@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
@@ -44,7 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.InjectorTestResult = "Not Yet Tested";
             this.InjectorDllPath =
 #if DEBUG
-               "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
+               Path.GetFullPath("..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll");
 #else
                 ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumDLL");  
 #endif
@@ -61,7 +64,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
         // PT Open Method object
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        public delegate int DelegatePassThruOpen(IntPtr DllPointer, out uint DeviceId);
+        public delegate int DelegatePassThruOpen(string DeviceName, out ulong DeviceId);
         public DelegatePassThruOpen PTOpen;
 
         // PT Open Method object
@@ -115,28 +118,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}", LogType.InfoLog);
             ViewModelLogger.WriteLog("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
 
-            // If Pipes are open, don't try test injection methods
-            if (!SkipSelectionBox)
-            {
-                // Log information and run the injector test
-                ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
-                if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString))
-                {
-                    // Log the result of this test method
-                    ViewModelLogger.WriteLog($"RESULT FROM INJECTION: {ResultString}", LogType.InfoLog);
-
-                    // Now that our pipes are reset, we connect on them. Using the watchdogs, pipe state values SHOULD auto populate
-                    ViewModelLogger.WriteLog("OPENING PIPE CONNECTION ROUTINES NOW...", LogType.InfoLog);
-                    FulcrumPipeReader.ResetPipeInstance(); FulcrumPipeWriter.ResetPipeInstance();
-                }
-                else
-                {
-                    // Log injection via selection box failed and then setup a new call
-                    ViewModelLogger.WriteLog("FAILED TO INJECT USING SELECTION BOX!", LogType.ErrorLog);
-                    return false;
-                }
+            // Log information and run the injector test
+            ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
+            if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString)) {
+                ViewModelLogger.WriteLog($"RESULT FROM INJECTION: {ResultString}", LogType.InfoLog);
             }
-            else { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
+            else
+            {
+                // Log injection via selection box failed and then setup a new call
+                ViewModelLogger.WriteLog("FAILED TO INJECT USING SELECTION BOX!", LogType.ErrorLog);
+                return false;
+            }
 
             // Run our unload calls here
             if (!FulcrumWin32Invokers.FreeLibrary(LoadResult))
@@ -156,10 +148,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("UNLOADED DLL OK!", LogType.InfoLog);
             this.InjectorTestResult = "Injection Passed!";
             ResultString = this.InjectorTestResult;
-
-            // Set test button to disabled
-            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
-            InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.ToolTip = "To retry injection, please restart this application";
 
             // Log information output
             ViewModelLogger.WriteLog("----------------------------------------------", LogType.WarnLog);
@@ -208,17 +196,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             try
             {
                 // Invoke PTOpen now then run our PT Close method
-                PTOpen.Invoke(InjectorDllPtr, out uint DeviceId);
+                PTOpen.Invoke(null, out ulong DeviceId);
                 ViewModelLogger.WriteLog("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICE ID RETURNED: {DeviceId}");
 
                 // Now issue the close command
                 ViewModelLogger.WriteLog("TRYING TO CLOSE OPENED DEVICE INSTANCE NOW...", LogType.WarnLog);
-                PTClose.Invoke(DeviceId);
-                ViewModelLogger.WriteLog("INJECTED METHOD EXECUTION COMPLETED OK!", LogType.InfoLog);
+                PTClose.Invoke((uint)DeviceId);
 
                 // Set output, return values.
                 ResultString = "DLL Execution Passed!";
+                ViewModelLogger.WriteLog("INJECTED METHOD EXECUTION COMPLETED OK!", LogType.InfoLog);
                 return true;
             }
             catch (Exception ImportEx)

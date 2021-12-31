@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewSupport;
@@ -76,6 +77,5 @@ namespace FulcrumInjector
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
-
     }
 }

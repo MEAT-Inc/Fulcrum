@@ -20,11 +20,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsViewModelLogger")) ?? new SubServiceLogger("SettingsViewModelLogger");
 
-        // Private control values
-        private SettingsEntryCollectionModel[] _settingsEntrySets;
-
         // Public values for our view to bind onto 
-        public SettingsEntryCollectionModel[] SettingsEntrySets { get => _settingsEntrySets; set => PropertyUpdated(value); }
+        public SettingsEntryCollectionModel[] SettingsEntrySets
+        {
+            get => InjectorConstants.SettingsEntrySets; 
+            set
+            {
+                // Update the local value and store it onto the injector constants
+                OnPropertyChanged();
+                InjectorConstants.SettingsEntrySets = value;
+            }
+        }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +49,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
             // Log completed setup.
             // Store this instance onto our injector constants
-            InjectorConstants.FulcrumSettingsPaneViewModel = this;
             ViewModelLogger.WriteLog("SETUP NEW SETTINGS CONFIGURATION VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
@@ -56,6 +61,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         /// <returns></returns>
         internal SettingsEntryCollectionModel[] GenerateSettingsModels()
         {
+            // Check if the constants value is null or not.
+            if (InjectorConstants.SettingsEntrySets != null)
+            {
+                ViewModelLogger.WriteLog("USING SETTINGS VALUES FROM INJECTOR CONSTANTS!", LogType.WarnLog);
+                return InjectorConstants.SettingsEntrySets;
+            }
+
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = 
                 ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");

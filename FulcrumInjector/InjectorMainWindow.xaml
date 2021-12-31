@@ -90,6 +90,7 @@
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Grid>
 
+        <!-- About this application flyout -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2">
             <mah:Flyout 
                 Margin="0,50,0,0"
@@ -123,7 +124,7 @@
                     <!-- Meat INC turbo logo goes here -->
                     <Image Grid.Row="0">
                         <Image.Source>
-                            <BitmapImage UriSource="MeatIncTurboLogo.jpg" />
+                            <BitmapImage UriSource="FulcrumResources/MeatIncTurboLogo.jpg" />
                         </Image.Source>
                     </Image>
                     <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryColor}" BorderThickness="5" Width="220" CornerRadius="3"/>
@@ -135,7 +136,7 @@
                         <Run Text="Any questions, comments, or concerns with this application can be directed to either neo.smith@motorengineeringandtech.com or by submitting a bug or issue report on the repository for this application."/>
                         <LineBreak/>
                         <LineBreak/>
-                        <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software..."/>
+                        <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software."/>
                     </TextBlock>
 
                     <!-- Close out button -->

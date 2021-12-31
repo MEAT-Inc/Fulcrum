@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace FulcrumInjector.FulcrumViewContent.Models
 {
@@ -65,6 +67,26 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             // Convert to array, store and return
             this.SettingsEntries = TempList.ToArray();
             return this.SettingsEntries;
+        }
+
+        /// <summary>
+        /// Pulls in a setting value from the given name and returns it
+        /// </summary>
+        /// <typeparam name="TResultType">Type of value</typeparam>
+        /// <param name="SettingName">Name of the setting to pull</param>
+        /// <param name="DefaultValue">Default value of the setting</param>
+        /// <returns>Setting value or the default value</returns>
+        public TResultType GetSettingValue<TResultType>(string SettingName, TResultType DefaultValue)
+        {
+            // Pull the value object here.
+            var LocatedSettingValue = this.SettingsEntries
+                .FirstOrDefault(SettingObj => SettingObj.SettingName == SettingName)?
+                .SettingValue;
+
+            // Check if the located value is null. If so, return the default. Otherwise return cast value
+            return LocatedSettingValue != null ?
+                (TResultType)Convert.ChangeType(LocatedSettingValue, typeof(TResultType)) :
+                DefaultValue;
         }
     }
 }

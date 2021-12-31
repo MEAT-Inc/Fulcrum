@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using MahApps.Metro.Controls;
 
 namespace FulcrumInjector.FulcrumViewContent.Models
@@ -13,24 +14,34 @@ namespace FulcrumInjector.FulcrumViewContent.Models
     /// </summary>
     public class HamburgerNavMenuItem : HamburgerMenuGlyphItem
     {
-        public static readonly DependencyProperty NavigationDestinationProperty = DependencyProperty.Register(
-                nameof(NavigationDestination), typeof(Uri), typeof(HamburgerNavMenuItem), new PropertyMetadata(default(Uri)));
+        // Sets if we can navigate on this object or not.
+        public bool IsNavigation => this.NavUserControlType != null && this.NavViewModelType != null;
 
-        public Uri NavigationDestination
+        // Destination property based on Type
+        public static readonly DependencyProperty NavUserControlTypeProperty = DependencyProperty.Register(
+            nameof(NavUserControlType), typeof(Type), typeof(HamburgerNavMenuItem), new PropertyMetadata(default(Type)));
+
+        // Destination property based on Type
+        public static readonly DependencyProperty NavViewModelTypeProperty = DependencyProperty.Register(
+            nameof(NavViewModelType), typeof(Type), typeof(HamburgerNavMenuItem), new PropertyMetadata(default(Type)));
+
+        // --------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Publicly controlled type for destination
+        /// </summary>
+        public Type NavUserControlType
         {
-            get => (Uri)this.GetValue(NavigationDestinationProperty);
-            set => this.SetValue(NavigationDestinationProperty, value);
+            get => (Type)this.GetValue(NavUserControlTypeProperty);
+            set => this.SetValue(NavUserControlTypeProperty, value);
         }
-
-        public static readonly DependencyProperty NavigationTypeProperty = DependencyProperty.Register(
-            nameof(NavigationType), typeof(Type), typeof(HamburgerNavMenuItem), new PropertyMetadata(default(Type)));
-
-        public Type NavigationType
+        /// <summary>
+        /// Publicly controlled type for destination view model
+        /// </summary>
+        public Type NavViewModelType
         {
-            get => (Type)this.GetValue(NavigationTypeProperty);
-            set => this.SetValue(NavigationTypeProperty, value);
+            get => (Type)this.GetValue(NavViewModelTypeProperty);
+            set => this.SetValue(NavViewModelTypeProperty, value);
         }
-
-        public bool IsNavigation => this.NavigationDestination != null;
     }
 }

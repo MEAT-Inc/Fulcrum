@@ -38,10 +38,9 @@
                     <DataTrigger Binding="{Binding}" Value="Faulted">
                         <Setter Property="Background" Value="DarkRed"/>
                         <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="FontWeight" Value="DemiBold"/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding}" Value="Open">
-                        <Setter Property="Background" Value="DarkGreen"/>
+                        <Setter Property="Background" Value="DarkGoldenrod"/>
                         <Setter Property="Foreground" Value="White"/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding}" Value="Connected">
@@ -49,12 +48,16 @@
                         <Setter Property="Foreground" Value="White"/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding}" Value="Disconnected">
-                        <Setter Property="Background" Value="Yellow"/>
-                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="Background" Value="Tomato"/>
+                        <Setter Property="Foreground" Value="White"/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding}" Value="Closed">
-                        <Setter Property="Background" Value="Black"/>
-                        <Setter Property="Foreground" Value="DarkGray"/>
+                        <Setter Property="Background" Value="DarkGray"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding}" Value="Loading...">
+                        <Setter Property="Background" Value="DarkGray"/>
+                        <Setter Property="Foreground" Value="White"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

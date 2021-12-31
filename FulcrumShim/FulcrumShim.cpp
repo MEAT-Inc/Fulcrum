@@ -7,6 +7,7 @@
 #include "SelectionBox.h"
 #include "fulcrum_output.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -44,26 +45,25 @@ END_MESSAGE_MAP()
 CFulcrumShim::CFulcrumShim() { }	// Builds a new fulcrum app
 CFulcrumShim fulcrum_instance;		// Standalone fulcrum instance
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+// Init our static members here
+bool CFulcrumShim::PipesConnecting;			// Bool to track connection state
+fulcrum_jpipe* CFulcrumShim::fulcrumPiper;	// Pipe injection sending logic helper
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 // Init override for app startup
 BOOL CFulcrumShim::InitInstance()
 {
-	// Build instance and show the window
+	// Build instance object
 	CWinApp::InitInstance();
-	return TRUE;
-}
+	
+	// THREAD BASED STARTUP
+	// std::thread([this] { CFulcrumShim::StartupPipes(); });
 
-// Build a new init method sequence.
-void CFulcrumShim::StartupPipes()
-{
-	// Check if pipes need to be configured
-	if (pipesLoaded) { return; }
-
-	// Build pipe server and store the state of them
-	if (fulcrumPiper == nullptr) fulcrumPiper = new fulcrum_jpipe();
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting output pipe now...\n", GetTimeSinceInit()));
-	bool LoadedPipeOutput = fulcrumPiper->ConnectOutputPipe();
-
-	// Build config app path value here and run the injector application
+	// Build our pipes and return passed
+		// Build config app path value here and run the injector application
 #if _DEBUG
 	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
 	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, szPath);
@@ -74,38 +74,65 @@ void CFulcrumShim::StartupPipes()
 	ConfigAppPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumInjector.exe"), szPath);
 #endif
 
-	// Build config app path value here and run the injector application
+	// Run the process here by booting a new instance. Once running connect the input pipe.
 	STARTUPINFO StartupInfos; PROCESS_INFORMATION ProcessInfos;
 	ZeroMemory(&StartupInfos, sizeof(StartupInfos));
 	StartupInfos.cb = sizeof(StartupInfos);
 	ZeroMemory(&ProcessInfos, sizeof(ProcessInfos));
-
-	// Run the process here by booting a new instance. Once running connect the input pipe.
 	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting input pipe now...\n", GetTimeSinceInit()));
-	fulcrum_output::fulcrumDebug(_T("%.3fs    NOTE: Waiting 2000 miliseconds before this request is sent...\n", GetTimeSinceInit()));
-	Sleep(2000); bool LoadedPipeInput = fulcrumPiper->ConnectInputPipe();
+	CloseHandle(ProcessInfos.hProcess);	CloseHandle(ProcessInfos.hThread);
+	return TRUE;
+}
+
+// Build a new init method sequence.
+void CFulcrumShim::StartupPipes()
+{
+	// Check if pipes need to be configured
+	if (CFulcrumShim::fulcrumPiper == NULL) CFulcrumShim::fulcrumPiper = new fulcrum_jpipe();
+
+	// If they're connected, drop out and stop working on connection routines
+	if (CFulcrumShim::fulcrumPiper->PipesConnected()) { return; }
+	if (PipesConnecting) 
+	{
+		// Join the thread to finish setup and return
+		fulcrum_output::fulcrumDebug(_T("%.3fs    WARNING: Pipes were already connecting!\n", GetTimeSinceInit()));
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Forcing execution of the setup thread to synchronize now...\n", GetTimeSinceInit()));
+		return;
+	}
+
+	// Set connecting to true
+	PipesConnecting = true;
+
+	// Connect our pipe instances for the reader and writer objects now
+	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
+	bool LoadedPipeInput = CFulcrumShim::fulcrumPiper->ConnectInputPipe();
+	bool LoadedPipeOutput = CFulcrumShim::fulcrumPiper->ConnectOutputPipe();
+
+	// Log heading information so we see this on boot
+	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
+	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"), GetTimeSinceInit());
 
 	// Now see if we're loaded correctly.
-	pipesLoaded = LoadedPipeInput && LoadedPipeOutput;
-	if (!pipesLoaded) fulcrum_output::fulcrumDebug(_T("%.3fs    Failed to boot new pipe instances for our FulcrumShim Server!\n", GetTimeSinceInit()));
+	LoadedPipeInput && LoadedPipeOutput;
+	if (!LoadedPipeInput || !LoadedPipeOutput) fulcrum_output::fulcrumDebug(_T("%.3fs    Failed to boot new pipe instances for our FulcrumShim Server!\n", GetTimeSinceInit()));
 	else 
 	{
 		fulcrum_output::fulcrumDebug(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
 		fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumInjector should now be running in the background\n", GetTimeSinceInit()));
 	}
+
+	// Log closing line output
+	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
+	PipesConnecting = false;
 }
 void CFulcrumShim::ShutdownPipes()
 {
-	// Build pipe server and store the state of them
-	if (fulcrumPiper == nullptr)
-	{
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Building Piper to force shut down now...\n", GetTimeSinceInit()));
-		fulcrumPiper = new fulcrum_jpipe();
-	}
-
 	// Run the shutdown method
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Calling pipe shutdown methods now...\n", GetTimeSinceInit()));
-	fulcrumPiper->ShutdownPipe();
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Pipe instances have been released OK!\n", GetTimeSinceInit()));
+	if (CFulcrumShim::fulcrumPiper->PipesConnected())
+	{
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Calling pipe shutdown methods now...\n", GetTimeSinceInit()));
+		CFulcrumShim::fulcrumPiper->ShutdownPipes();
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Pipe instances have been released OK!\n", GetTimeSinceInit()));
+	}
+	else { fulcrum_output::fulcrumDebug(_T("%.3fs    Pipe instances were already closed!\n", GetTimeSinceInit())); }
 }

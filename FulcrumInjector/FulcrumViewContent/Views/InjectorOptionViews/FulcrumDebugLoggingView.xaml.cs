@@ -35,11 +35,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Init component. Build new VM object
             InitializeComponent();
-            this.ViewModel = new FulcrumDebugLoggingViewModel();
+            this.ViewModel = InjectorConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
 
-            // Store self onto injector constants.
-            InjectorConstants.FulcrumDebugLoggingView = this;
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+            // Store into injector
+            // SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.CreateSingletonInstance(this, this.ViewModel);
+            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
