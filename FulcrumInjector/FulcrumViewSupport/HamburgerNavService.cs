@@ -10,7 +10,6 @@ using FulcrumInjector.FulcrumViewContent;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using UserControl = System.Windows.Forms.UserControl;
 
 namespace FulcrumInjector.FulcrumViewSupport
 {
@@ -63,7 +62,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// </summary>
         /// <param name="UserControlType">Type of view content</param>
         /// <returns>True if view is changed</returns>
-        public bool Navigate(Type UserControlType)
+        public bool Navigate(Type UserControlType, Type ViewModelType)
         {
             // If not type of view model control base, then dump out.
             if (UserControlType.BaseType != typeof(UserControl)) {
@@ -82,13 +81,11 @@ namespace FulcrumInjector.FulcrumViewSupport
                 this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILDING NEW VIEW CONTENT AND STORING NEW VALUES ON INJECTOR CONSTANTS FOR IT NOW...", LogType.WarnLog);
 
                 // Build instance of the type passed in and have it store into the injector constants
-                SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(
-                    UserControlType, 
-                    Type.GetType(UserControlType.Name + "Model"));
-
-                // Try again now.
-                this.NavLogger.WriteLog($"BUILT NEW OUTPUT CONTENT FOR THE CONTROL TYPE {UserControlType.Name} OK!", LogType.InfoLog);
-                return false;
+                var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(UserControlType, ViewModelType);
+                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILT NEW OUTPUT CONTENT FOR THE CONTROL TYPE {UserControlType.Name} OK!", LogType.InfoLog);
+                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: NAVIGATING TO NEW TYPE: {UserControlType.Name}", LogType.TraceLog);
+                return this.NavigationFrame.NavigationService?.Content?.GetType() != UserControlType &&
+                       this.NavigationFrame.Navigate(BuiltSingleton.SingletonUserControl);
             }
 
             // Return true if navigation passed correctly

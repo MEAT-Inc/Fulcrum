@@ -15,8 +15,10 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using System.IO;
+using System.Reflection;
 using System.Web.UI.WebControls;
 using System.Windows;
+using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using Svg;
@@ -98,11 +100,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
 
                 // If not an option entry, pull our other values and run the builder
-                string MenuEntryType = IconObjectEntry.MenuEntryType;
+                string MenuViewType = IconObjectEntry.MenuViewType;
+                string MenuModelType = IconObjectEntry.MenuModelType;
                 string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;
 
                 // Build new menu entry and add to our collection
-                OutputMenuItems = OutputMenuItems.Append(this.BuildHamburgerNavItem(MenuEntryName, MenuEntryType, MenuIconSvgPaths)).ToArray();
+                OutputMenuItems = OutputMenuItems.Append(this.BuildHamburgerNavItem(MenuEntryName, MenuViewType,  MenuModelType, MenuIconSvgPaths)).ToArray();
                 ViewModelLogger.WriteLog($"   --> STORED NEW MENU ENTRY NAMED {MenuEntryName} OK!", LogType.InfoLog);
             }
 
@@ -131,11 +134,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
 
                 // If not an option entry, pull our other values and run the builder
-                string MenuEntryType = IconObjectEntry.MenuEntryType;
+                string MenuViewType = IconObjectEntry.MenuViewType;
+                string MenuModelType = IconObjectEntry.MenuModelType;
                 string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;
 
                 // Build new menu entry and add to our collection
-                OutputOptionEntries = OutputOptionEntries.Append(this.BuildHamburgerNavItem(MenuEntryName, MenuEntryType, MenuIconSvgPaths)).ToArray();
+                OutputOptionEntries = OutputOptionEntries.Append(this.BuildHamburgerNavItem(MenuEntryName, MenuViewType, MenuModelType, MenuIconSvgPaths)).ToArray();
                 ViewModelLogger.WriteLog($"   --> STORED NEW OPTION ENTRY NAMED {MenuEntryName} OK!", LogType.InfoLog);
             }
 
@@ -151,7 +155,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <param name="IconPath">Path to icons folder</param>
         /// <param name="IconObjectEntry">Icon object to use for set</param>
         /// <returns></returns>
-        private HamburgerNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuEntryType, string MenuIconSvgPaths)
+        private HamburgerNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
         {
             // Replace Icon path with current text color value
             var CurrentMerged = Application.Current.Resources.MergedDictionaries;
@@ -181,10 +185,23 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Build a new instance of each type quickly to store something in our view configuration
+            Type MenuContentType = Type.GetType(MenuViewTypeName); 
+            Type MenuViewModelType = Type.GetType(MenuModelTypeName);
+            ViewModelLogger.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"   --> VIEW TYPE:       {MenuViewTypeName}", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"   --> VIEW MODEL TYPE: {MenuModelTypeName}", LogType.InfoLog);
+
+            // Generate our singleton object here.
+            var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(MenuContentType, MenuViewModelType);
+            ViewModelLogger.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().Name}", LogType.TraceLog);
+
+            // Generate output result object.
             var NewResult = new HamburgerNavMenuItem()
             {
                 // Stores the content type for view and view model
-                NavUserControlType = Type.GetType(MenuEntryType),
+                NavUserControlType = MenuContentType,
+                NavViewModelType = MenuViewModelType,
 
                 // Configure the label and the name of the menu entry
                 Label = MenuEntryName,
