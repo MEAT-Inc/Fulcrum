@@ -50,9 +50,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             InitializeComponent();
             this.ViewModel = new FulcrumHamburgerCoreViewModel();
 
-            // Configure new Naviagation Service helper
+            // Configure new Navigation Service helper
             this.NavService = new HamburgerNavService();
-            this.InjectorHamburgerMenu.Content = this.NavService.Frame;
+            this.InjectorHamburgerMenu.Content = NavService.NavigationFrame;
             this.NavService.Navigated += this.NavigationServiceEx_OnNavigated;
         }
 
@@ -87,11 +87,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void InjectorHamburgerMenu_OnItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs e)
         {
             // Navigate assuming it's a type of nav menu item and the menu item can navigate
-            if (e.InvokedItem is not HamburgerNavMenuItem menuItemBuilt || !menuItemBuilt.IsNavigation) return;
+            if (e.InvokedItem is not HamburgerNavMenuItem BuiltItemObject || !BuiltItemObject.IsNavigation) return;
 
             // Navigate here and 
-            this.NavService.Navigate(menuItemBuilt.NavigationDestination);
-            this.ViewLogger.WriteLog($"NAVIGATED FROM SELECTED MENU ITEM CORRECTLY!", LogType.TraceLog);
+            this.NavService.Navigate(BuiltItemObject.NavUserControlType);
+            this.ViewLogger.WriteLog($"NAVIGATED FROM SELECTED MENU ITEM TO A NEW CONTROL VIEW CORRECTLY!", LogType.TraceLog);
         }
 
         /// <summary>
@@ -105,12 +105,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.InjectorHamburgerMenu.SelectedItem = this.InjectorHamburgerMenu
                 .Items
                 .OfType<HamburgerNavMenuItem>()
-                .FirstOrDefault(x => x.NavigationType == e.Content?.GetType());
+                .FirstOrDefault(MenuObj => MenuObj.NavUserControlType == e.Content?.GetType());
             this.ViewLogger.WriteLog($"BOUND SELECTED MENU ITEM TO {this.InjectorHamburgerMenu.SelectedIndex}", LogType.TraceLog);
+ 
+            // Set options items
             this.InjectorHamburgerMenu.SelectedOptionsItem = this.InjectorHamburgerMenu
                 .OptionsItems
                 .OfType<HamburgerNavMenuItem>()
-                .FirstOrDefault(x => x.NavigationType == e.Content?.GetType());
+                .FirstOrDefault(MenuObj => MenuObj.NavUserControlType == e.Content?.GetType());
             this.ViewLogger.WriteLog($"BOUND SELECTED OPTIONS ITEM TO {this.InjectorHamburgerMenu.SelectedOptionsIndex}", LogType.TraceLog);
         }
 

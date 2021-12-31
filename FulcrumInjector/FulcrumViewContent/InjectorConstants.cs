@@ -90,17 +90,27 @@ namespace FulcrumInjector.FulcrumViewContent
             set => FulcrumHamburgerCoreView.ViewModel = value;
         }
 
-        // Injector DLL Output View Contents
-        public static FulcrumDllOutputLogView FulcrumDllOutputLogView;
-        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel;
+        // --------------------------------------------------------------------------------------------------------------------------
 
-        // Debug Logging Flyout View and View Model
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView;
-        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel;
+        // Singleton Injector DLL Output View Contents. These get set to control view contents on the Main window
+        public static SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel> FulcrumDllOutputSingleton =>
+            SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel>.LocateSingletonInstance(typeof(FulcrumDllOutputLogView));
+        public static SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel> FulcrumDebugLoggingSingleton =>
+            SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.LocateSingletonInstance(typeof(FulcrumDebugLoggingView));
+        public static SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel> FulcrumSettingsPaneSingleton =>
+            SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel>.LocateSingletonInstance(typeof(FulcrumSettingsPaneView));
 
-        // Setting Flyout View and View Model
-        public static FulcrumSettingsPaneView FulcrumSettingsPaneView;
-        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel;
+        // DLL Output viewing user control and view model object
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => FulcrumDllOutputSingleton.SingletonUserControl;
+        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => FulcrumDllOutputSingleton.SingletonViewModel;
+
+        // Debug logging output user control and view model object
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => FulcrumDebugLoggingSingleton.SingletonUserControl;
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => FulcrumDebugLoggingSingleton.SingletonViewModel;
+
+        // User settings and configuration user control and view model object
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => FulcrumSettingsPaneSingleton.SingletonUserControl;
+        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => FulcrumSettingsPaneSingleton.SingletonViewModel;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -139,7 +149,6 @@ namespace FulcrumInjector.FulcrumViewContent
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
 
         }
-
         /// <summary>
         /// Sets a value on one of the global UI Control values here
         /// </summary>

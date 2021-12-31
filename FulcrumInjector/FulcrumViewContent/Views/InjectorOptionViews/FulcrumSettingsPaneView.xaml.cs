@@ -29,10 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Init component. Build new VM object
             InitializeComponent();
-            this.ViewModel = new FulcrumSettingsPaneViewModel();
-
-            // Store this instance onto our injector constants
-            InjectorConstants.FulcrumSettingsPaneView = this;
+            this.ViewModel = InjectorConstants.FulcrumSettingsPaneViewModel ?? new FulcrumSettingsPaneViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
