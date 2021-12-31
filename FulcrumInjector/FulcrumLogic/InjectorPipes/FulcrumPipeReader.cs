@@ -100,6 +100,11 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// <returns>True if the pipe was built OK. False if not.</returns>
         internal override bool AttemptPipeConnection(out Task<bool> ConnectionTask)
         {
+            // Make sure the pipes aren't open
+            if (this.FulcrumPipe.IsConnected) {
+                ConnectionTask = null; return true;
+            }
+
             try
             {
                 // Log ready for connection and send it.
@@ -148,39 +153,43 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 
             // Set connection building bool value and update view if possible
             IsConnecting = true;
+            this.PipeState = FulcrumPipeState.Open;
             this.PipeLogger.WriteLog("STARTING READER PIPE CONNECTION ROUTINE NOW...", LogType.WarnLog);
             return Task.Run(() =>
             {
                 // Build pipe reading stream object
-                try { this.FulcrumPipe.Connect(DefaultConnectionTimeout); }
-                catch (Exception ConnectEx)
+                while (!this.FulcrumPipe.IsConnected)
                 {
-                    // Connecting to false
-                    IsConnecting = false;
-                    if (ConnectEx is not TimeoutException)
+                    try { this.FulcrumPipe.Connect(DefaultConnectionTimeout); }
+                    catch (Exception ConnectEx)
                     {
-                        // Throw exception and return out assuming window content has been built now
-                        this.PipeState = FulcrumPipeState.Faulted;
-                        if (InjectorConstants.InjectorMainWindow != null) throw ConnectEx;
-                        throw new Exception("FAILED TO CONFIGURE PIPE READER DUE TO NULL MAIN WINDOW INSTANCE! IS THE APP RUNNING?", ConnectEx);
+                        // Connecting to false
+                        IsConnecting = false;
+                        if (ConnectEx is not TimeoutException)
+                        {
+                            // Throw exception and return out assuming window content has been built now
+                            this.PipeState = FulcrumPipeState.Faulted;
+                            if (InjectorConstants.InjectorMainWindow != null) throw ConnectEx;
+                            throw new Exception("FAILED TO CONFIGURE PIPE READER DUE TO NULL MAIN WINDOW INSTANCE! IS THE APP RUNNING?", ConnectEx);
+                        }
+
+                        // Set state to disconnected. Log failure
+                        this.PipeState = FulcrumPipeState.Disconnected;
+                        this.PipeLogger.WriteLog("FAILED TO CONNECT TO HOST PIPE SERVER AFTER GIVEN TIMEOUT VALUE!", LogType.WarnLog);
+                        continue;
                     }
 
-                    // Set state to disconnected. Log failure
-                    this.PipeState = FulcrumPipeState.Disconnected;
-                    this.PipeLogger.WriteLog("FAILED TO CONNECT TO HOST PIPE SERVER AFTER GIVEN TIMEOUT VALUE!", LogType.WarnLog);
-
-                    // Reset button state and content
+                    // If we're connected, log that information and break out
                     IsConnecting = false;
-                    return false;
+                    this.PipeState = FulcrumPipeState.Connected;
+                    this.PipeLogger.WriteLog("CONNECTED NEW SERVER INSTANCE TO OUR READER!", LogType.WarnLog);
+                    this.PipeLogger.WriteLog($"PIPE SERVER CONNECTED TO FULCRUM PIPER {this.PipeType} OK!", LogType.InfoLog);
+
+                    // Now boot the reader process.
+                    this.StartBackgroundReadProcess();
                 }
 
-                // If we're connected, log that information and break out
-                this.PipeState = FulcrumPipeState.Connected;
-                this.PipeLogger.WriteLog("CONNECTED NEW SERVER INSTANCE TO OUR READER!", LogType.WarnLog);
-                this.PipeLogger.WriteLog($"PIPE SERVER CONNECTED TO FULCRUM PIPER {this.PipeType} OK!", LogType.InfoLog);
-
-                // Set connecting to false 
-                IsConnecting = false;
+                // Return passed once done
                 return true;
             }, this.AsyncConnectionTokenSource.Token);
         }
@@ -216,7 +225,8 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             {
                 // Log information and throw if auto connection is false
                 this.PipeLogger.WriteLog("WARNING! A READ ROUTINE WAS CALLED WITHOUT ENSURING A PIPE CONNECTION WAS BUILT!", LogType.WarnLog);
-                this.PipeLogger.WriteLog("CALLING A CONNECTION METHOD BEFORE INVOKING THIS READING ROUTINE TO ENSURE DATA WILL BE READ...", LogType.WarnLog);
+                this.PipeLogger.WriteLog("CALLING A CONNECTION METHOD BEFORE INVOKING THIS READING ROUTINE TO ENSURE DATA WILL BE READ...", LogType.WarnLog); 
+                throw new InvalidOperationException("FAILED TO CONNECT TO OUR PIPE SERVER BEFORE READING OUTPUT FROM SHIM DLL!");
             }
 
             // Build token, build source and then log information
@@ -285,15 +295,6 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             byte[] OutputBuffer = new byte[DefaultBufferValue];
             List<string> AllProcessedMessages = new List<string>();
             this.AsyncReadingOperationsTokenSource = new CancellationTokenSource(DefaultReadingTimeout);
-
-            // Try connecting here. If this fails, throw out our exception
-            this.AttemptPipeConnection(out var ConnectionAttempt);
-            ConnectionAttempt.ContinueWith((TaskOutput) =>
-            {
-                // Check if connected or not. If failed, throw an exception out
-                if (!TaskOutput.Result)
-                    throw new InvalidOperationException("PIPE READER MUST BE CONNECTED TO HOST PIPE SERVER BEFORE READING OPERATIONS CAN TAKE PLACE!");
-            });
 
             try
             {

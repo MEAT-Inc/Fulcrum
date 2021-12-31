@@ -133,12 +133,12 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 // Standard PT Command methods. This will be built out to V0500 soon
 extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 {
-	// Boot pipes
-	CFulcrumShim::StartupPipes();
-
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
 	unsigned long retval;
+
+	// Boot pipes
+	CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("%.3fs ++ PTOpen(%s, 0x%08X)\n"), GetTimeSinceInit(), (pName==NULL)?_T("*NULL*"):_T("")/*pName*/, pDeviceID);

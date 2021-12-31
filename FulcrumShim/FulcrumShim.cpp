@@ -102,14 +102,15 @@ void CFulcrumShim::StartupPipes()
 
 	// Set connecting to true
 	PipesConnecting = true;
-	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
-	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"), GetTimeSinceInit());
 
 	// Connect our pipe instances for the reader and writer objects now
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting Output Pipe Instance now...!\n", GetTimeSinceInit()));
 	bool LoadedPipeOutput = CFulcrumShim::fulcrumPiper->ConnectOutputPipe();
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting Input Pipe Instance now...!\n", GetTimeSinceInit()));
 	bool LoadedPipeInput = CFulcrumShim::fulcrumPiper->ConnectInputPipe();
+
+	// Log heading information so we see this on boot
+	Sleep(1000);
+	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
+	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"), GetTimeSinceInit());
 
 	// Now see if we're loaded correctly.
 	LoadedPipeInput && LoadedPipeOutput;

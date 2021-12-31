@@ -118,21 +118,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog($"DLL LOADING WAS SUCCESSFUL! POINTER ASSIGNED: {LoadResult}", LogType.InfoLog);
             ViewModelLogger.WriteLog("UNLOADING DLL FOR USE BY THE OE APPS LATER ON...");
 
-            // If Pipes are open, don't try test injection methods
-            if (SkipSelectionBox) { ViewModelLogger.WriteLog("PIPES ARE SEEN TO BE OPEN! NOT TESTING INJECTION SELECTION BOX ROUTINE!", LogType.WarnLog); }
-            else 
+            // Log information and run the injector test
+            ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
+            if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString)) {
+                ViewModelLogger.WriteLog($"RESULT FROM INJECTION: {ResultString}", LogType.InfoLog);
+            }
+            else
             {
-                // Log information and run the injector test
-                ViewModelLogger.WriteLog("RUNNING INJECTION TEST NOW...", LogType.WarnLog);
-                if (this.TestInjectorDllSelectionBox(LoadResult, out ResultString)) {
-                    ViewModelLogger.WriteLog($"RESULT FROM INJECTION: {ResultString}", LogType.InfoLog);
-                }
-                else
-                {
-                    // Log injection via selection box failed and then setup a new call
-                    ViewModelLogger.WriteLog("FAILED TO INJECT USING SELECTION BOX!", LogType.ErrorLog);
-                    return false;
-                }
+                // Log injection via selection box failed and then setup a new call
+                ViewModelLogger.WriteLog("FAILED TO INJECT USING SELECTION BOX!", LogType.ErrorLog);
+                return false;
             }
 
             // Run our unload calls here
@@ -200,12 +195,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             try
             {
-                // Start pipe instance reading
-                ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
-                FulcrumPipeReader.PipeInstance.AttemptPipeConnection(out var AsyncConnection);
-                AsyncConnection.ContinueWith((_) => FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess());
-                ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
-
                 // Invoke PTOpen now then run our PT Close method
                 PTOpen.Invoke(null, out ulong DeviceId);
                 ViewModelLogger.WriteLog("INVOKE METHOD PASSED! OUTPUT IS BEING LOGGED CORRECTLY AND ALL SELECTION BOX ENTRIES NEEDED ARE POPULATING NOW", LogType.InfoLog);
