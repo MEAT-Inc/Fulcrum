@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 
         // Default value for pipe processing buffer
         private static int DefaultBufferValue = 10240;
-        private static int DefaultReadingTimeout = 2500;
+        private static int DefaultReadingTimeout = 100;
         private static int DefaultConnectionTimeout = 10000;
 
         // Booleans to trigger operations
@@ -278,41 +278,44 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// <returns>True if content comes back. False if not.</returns>
         internal bool ReadPipeData(out string ReadDataContents)
         {
-            // See if we're currently reading or not. If so, return false.
-            if (IsReading) {
-                ReadDataContents = "FAILED_PIPE_READ__IN_PROGRESS";
-                return false;
-            }
-
             // Store our new settings for the pipe buffer and timeout
             DefaultBufferValue = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Buffer Size", DefaultBufferValue);
             DefaultReadingTimeout = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Processing Timeout", DefaultReadingTimeout);
 
             // Build new timeout token values for reading operation and read now
-            IsReading = true; byte[] OutputBuffer = new byte[DefaultBufferValue];
+            int BytesRead = 0;
+            byte[] OutputBuffer = new byte[DefaultBufferValue];
             this.AsyncReadingOperationsTokenSource = new CancellationTokenSource(DefaultReadingTimeout);
-            var ReadingTask = this.FulcrumPipe.ReadAsync(OutputBuffer, 0, OutputBuffer.Length);
-            try { ReadingTask.Wait(this.AsyncReadingOperationsTokenSource.Token); }
-            catch (Exception TaskAbortedEx) { if (TaskAbortedEx is not OperationCanceledException) throw TaskAbortedEx; }
-            IsReading = false;
 
-            // Check to see what was read here or not.
-            int BytesRead = ReadingTask.Result;
-            if (ReadingTask.IsCanceled || BytesRead == 0)
+            do
             {
-                // Store result values
-                ReadDataContents = ReadingTask.IsCanceled ? 
-                    "FAILED_PIPE_READ__TIMEOUT" :
-                    "FAILED_PIPE_READ__NO_DATA";
+                try
+                {
+                    // Read input content and check how many bytes we've pulled in
+                    int CurrentBuffer = BytesRead;
+                    BytesRead = this.FulcrumPipe.Read(OutputBuffer, CurrentBuffer, OutputBuffer.Length - CurrentBuffer);
+                    if (BytesRead == 0) { ReadDataContents = "FAILED_PIPE_READ__NO_PIPE_DATA"; return true; }
 
-                // Return false and show failed
-                return !ReadingTask.IsCanceled;
-            }
-            
+                    // Trim off the excess byte values here if needed
+                    if (BytesRead == OutputBuffer.Length) continue;
+                    OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
+                }
+                catch (Exception ReadEx)
+                {
+                    // Log our failures and return failed output
+                    this.PipeLogger.WriteLog("FAILED TO READ NEW PIPE INPUT DATA!", LogType.ErrorLog);
+                    this.PipeLogger.WriteLog("EXCEPTION THROWN DURING READING OPERATIONS OF OUR INPUT PIPE DATA PROCESSING!", LogType.ErrorLog);
+                    this.PipeLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ReadEx);
+
+                    // Return failed
+                    ReadDataContents = $"FAILED_PIPE_READ__{ReadEx.GetType().Name.ToUpper()}";
+                    return false;
+                }
+            } while (BytesRead > 0);
+
             // Now convert our bytes into a string object, and print them to our log files.
-            if (BytesRead != OutputBuffer.Length) OutputBuffer = OutputBuffer.Take(BytesRead).ToArray(); 
             ReadDataContents = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
-            this.PipeLogger.WriteLog($"--> [PIPE INPUT] ::: {ReadDataContents}", LogType.TraceLog);
+            this.PipeLogger.WriteLog($"--> [PIPE DATA] ::: {ReadDataContents}", LogType.TraceLog);
 
             // Now fire off a pipe data read event if possible. Otherwise return
             if (this.PipeDataProcessed == null) return true;
