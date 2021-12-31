@@ -309,7 +309,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 string NextPipeString = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
                 string[] SplitPipeContent = NextPipeString.Split('\n')
                     .ToList().Where(StringObj => !string.IsNullOrWhiteSpace(StringObj))
-                    .Select(StringPart => StringPart.Trim()).ToArray();
+                    .Select(StringPart => StringPart.TrimEnd()).ToArray();
 
                 // Log new message pulled and write contents of it to our log file
                 this.PipeLogger.WriteLog($"[PIPE DATA] ::: NEW PIPE DATA PROCESSED!", LogType.TraceLog);
@@ -334,7 +334,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 }
 
                 // Return passed and build output string values
-                ReadDataContents = string.Join("\n", AllProcessedMessages).Trim();
+                ReadDataContents = string.Join("\n", AllProcessedMessages);
                 return true;
             }
             catch (Exception ReadEx)
