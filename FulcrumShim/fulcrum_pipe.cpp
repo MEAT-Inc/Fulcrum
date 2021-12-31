@@ -36,7 +36,7 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	hFulcrumWriter = CreateNamedPipe(
 		OutputPipeLocation,					// Name of the pipe
 		PIPE_ACCESS_OUTBOUND,				// Pipe direction (In and Out)
-		PIPE_TYPE_MESSAGE,					// Pipe types for sending output
+		PIPE_TYPE_BYTE | PIPE_WAIT,			// Pipe types for sending output
 		1,								    // Number of instances
 		1024 * 16,							// Output buffer size
 		1024 * 16,							// Input buffer size

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -46,7 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.InjectorTestResult = "Not Yet Tested";
             this.InjectorDllPath =
 #if DEBUG
-               "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
+               Path.GetFullPath("..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll");
 #else
                 ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumDLL");  
 #endif
@@ -201,9 +202,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // Start pipe instance reading
                 ViewModelLogger.WriteLog("STARTING PIPE READER NOW...");
-                FulcrumPipeReader.PipeInstance.AttemptPipeConnection(out _);
-                FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess();
-                //ConnectionTask.ContinueWith((_) => FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess());
+                FulcrumPipeReader.PipeInstance.AttemptPipeConnection(out var AsyncConnection);
+                AsyncConnection.ContinueWith((_) => FulcrumPipeReader.PipeInstance.StartBackgroundReadProcess());
                 ViewModelLogger.WriteLog("STARTED READER BACKGROUND READING OPERATIONS OK!", LogType.InfoLog);
 
                 // Invoke PTOpen now then run our PT Close method

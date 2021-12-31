@@ -41,10 +41,10 @@
                       <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
                       <File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
                       <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
-                      <File Id="MAHAPPS.METRO.RESOURCES.DLL" Name="MahApps.Metro.resources.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\de\MahApps.Metro.resources.dll" />
+                      <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
                     </Component>
                     <Directory Id="FulcrumXaml">
-                      <Component Id="FULCRUMXAMLFILES" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
+                      <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
                         <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\AppColorTheme.xaml" />
                         <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumControlStyles.xaml" />
                         <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
@@ -58,13 +58,10 @@
                       </Component>
                     </Directory>
                     <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
-                      <Component Id="CreateFulcrumIconsFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+                      <Component Id="CreateFulcrumIconsFolder" Guid="471E54A8-8BEC-47B0-BC6B-7B7E3A7426BB">
                         <CreateFolder />
                       </Component>
                     </Directory>
-                    <Component Id="APPSETTINGS_JSON" DiskId="1" Guid="96D9BF82-7C1D-407C-9900-140940934C25">
-                      <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
-                    </Component>
                   </Directory>
                   <!-- DLL Files for the Fulcrum -->
                   <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
@@ -138,12 +135,12 @@
                   </Component>
                   <!-- Program Files Folders for Logging -->
                   <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
-                    <Component Id="CreateFulcrumLoggingFolder" Guid="9190060a-e98f-432e-91fb-de4a42ff605f">
+                    <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
                       <CreateFolder />
                     </Component>
                     <!-- J2534 Logging Archives -->
                     <Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
-                      <Component Id="CreateFulcrumArchivesFolder" Guid="f5a187c4-dfa4-4186-b5db-0e2e3c455940">
+                      <Component Id="CreateFulcrumArchivesFolder" Guid="CD71C6E7-D573-4A21-8DBF-628557CC1DA1">
                         <CreateFolder />
                       </Component>
                     </Directory>
@@ -156,9 +153,9 @@
         <Feature Id="ProductFeature" Title="installer" Level="1">
             <ComponentRef Id="V0404RegKey" />
             <ComponentRef Id="V0500RegKey" />
+			<ComponentRef Id="FulcrumXamlFiles"/>
             <ComponentRef Id="FulcrumShimFiles" />
             <ComponentRef Id="FulcrumInjectorFiles" />
-            <ComponentRef Id="FulcrumResourcesComponent" />
             <ComponentRef Id="CreateFulcrumIconsFolder"/>
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
@@ -200,7 +197,7 @@
         <!-- UI Type -->
         <UIRef Id="WixUI_Common" />
         <!-- Icon Values -->
-        <Icon Id="AppIcon" SourceFile="..\FulcrumInjector\ShimIconProject.ico" />
         <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+        <Icon Id="AppIcon" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
     </Product>
 </Wix>

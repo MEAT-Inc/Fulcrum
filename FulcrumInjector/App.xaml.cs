@@ -163,7 +163,7 @@ namespace FulcrumInjector
                 LogBroker.CleanupLogHistory(ConfigObj.ToString(), ShimFileFilterName);
 
                 // See if we have too many archives
-                string[] ArchivesFound = Directory.GetFiles(ConfigObj.LogArchivePath);
+                string[] ArchivesFound = Directory.GetFiles(ConfigObj.LogArchivePath.ToString());
                 int ArchiveSetCount = ConfigObj.ArchiveFileSetSize is int ? (int)ConfigObj.ArchiveFileSetSize : 0;
                 if (ArchivesFound.Length >= ArchiveSetCount * 2)
                 {
@@ -191,6 +191,10 @@ namespace FulcrumInjector
         /// </summary>
         private void ConfigureMergedDicts()
         {
+            // TODO: BUILT THIS METHOD OUT!
+            // This method should pull all the XAML From our local running directory and configure itself so that all XAML is pulled at runtime for styles 
+            // This way we can make changes to styles or output quickly at runtime
+
             // Log information. Pull files in and store them all
             LogBroker.Logger?.WriteLog("IMPORTING RESOURCE DICTIONARIES FROM XAML OUTPUT DIRECTORY NOW...", LogType.WarnLog);
         }
