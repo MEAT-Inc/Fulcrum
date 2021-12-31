@@ -90,7 +90,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (e.InvokedItem is not HamburgerNavMenuItem BuiltItemObject || !BuiltItemObject.IsNavigation) return;
 
             // Navigate here and 
-            this.NavService.Navigate(BuiltItemObject.NavUserControlType);
+            this.NavService.Navigate(BuiltItemObject.NavUserControlType, BuiltItemObject.NavViewModelType);
             this.ViewLogger.WriteLog($"NAVIGATED FROM SELECTED MENU ITEM TO A NEW CONTROL VIEW CORRECTLY!", LogType.TraceLog);
         }
 

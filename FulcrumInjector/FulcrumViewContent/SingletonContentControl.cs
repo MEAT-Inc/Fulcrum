@@ -19,8 +19,11 @@ namespace FulcrumInjector.FulcrumViewContent
         private static SubServiceLogger SingletonLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SingletonContentLogger")) ?? new SubServiceLogger("SingletonContentLogger");
 
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
         // List of currently open objects for our singleton types and methods for finding existing ones.
         public static SingletonContentControl<TViewType, TViewModelType>[] BuiltSingletonInstances = Array.Empty<SingletonContentControl<TViewType, TViewModelType>>();
+
         /// <summary>
         /// Builds a new lazy instance based on the values provided in the input args
         /// </summary>
@@ -32,7 +35,7 @@ namespace FulcrumInjector.FulcrumViewContent
             // Build new instance of this singleton helper and return it
             SingletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewType.GetType().Name}...", LogType.WarnLog);
             SingletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelType.GetType().Name}", LogType.InfoLog);
-            var LocatedSingleton = LocateSingletonInstance(ViewType);
+            var LocatedSingleton = LocateSingletonViewInstance(ViewType);
             if (LocatedSingleton != null)
             {
                 // Log found existing instance and return it out
@@ -44,10 +47,8 @@ namespace FulcrumInjector.FulcrumViewContent
             }
 
             // Build a new instance object type here and store values.
-            TViewType ViewContent = Activator.CreateInstance<TViewType>();
-            TViewModelType ViewModelContent = (TViewModelType)ViewContent.GetType()
-                .GetProperty("ViewModel")
-                ?.GetValue(ViewContent);
+            TViewType ViewContent = (TViewType)Activator.CreateInstance(ViewType);
+            TViewModelType ViewModelContent = (TViewModelType)ViewContent.GetType().GetProperty("ViewModel")?.GetValue(ViewContent);
 
             SingletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
             var NewSingletonInstance = new SingletonContentControl<TViewType, TViewModelType>(ViewContent, ViewModelContent);
@@ -58,15 +59,72 @@ namespace FulcrumInjector.FulcrumViewContent
             return NewSingletonInstance;
         }
         /// <summary>
+        /// Builds a new lazy instance based on the values provided in the input args
+        /// </summary>
+        /// <typeparam name="TViewType">Type of user control for the view model content</typeparam>
+        /// <param name="ViewObject">View content to show</param>
+        /// <returns>True if built ok. False if not.</returns>
+        internal static SingletonContentControl<TViewType, TViewModelType> RegisterAsSingleton(TViewType ViewObject, TViewModelType ViewModelObject)
+        {
+            // Build new instance of this singleton helper and return it
+            SingletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewObject.GetType().Name}...", LogType.WarnLog);
+            SingletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelObject.GetType().Name}", LogType.InfoLog);
+            var LocatedSingleton = LocateSingletonViewInstance(ViewObject.GetType());
+            if (LocatedSingleton != null)
+            {
+                // Log found existing instance and return it out
+                SingletonLogger.WriteLog("FOUND EXISTING INSTANCE OBJECT ENTRY! RETURNING IT NOW...", LogType.InfoLog);
+                SingletonLogger.WriteLog($"EXISTING INSTANCE HAS BEEN BUILT AND DEFINED SINCE: {LocatedSingleton.TimeCreated:s}", LogType.TraceLog);
+
+                // Return current instance.
+                return LocatedSingleton;
+            }
+
+            SingletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
+            var NewSingletonInstance = new SingletonContentControl<TViewType, TViewModelType>(ViewObject, ViewModelObject);
+            BuiltSingletonInstances = BuiltSingletonInstances.Append(NewSingletonInstance).ToArray();
+
+            // Log information and return.
+            SingletonLogger.WriteLog("STORED NEW SINGLETON INSTANCE ON STATIC LIST OK!", LogType.InfoLog);
+            return NewSingletonInstance;
+        }
+        
+        /// <summary>
         /// Returns the first or only instance object for our current instances of singletons
         /// </summary>
         /// <param name="ViewModelControl"></param>
         /// <returns></returns>
-        public static SingletonContentControl<TViewType, TViewModelType> LocateSingletonInstance(Type TypeToLocate)
+        public static SingletonContentControl<TViewType, TViewModelType> LocateSingletonViewInstance(Type ViewTypeToLocate)
         {
             // If not type of view model control base, then dump out.
-            if (TypeToLocate.BaseType != typeof(TViewType) && TypeToLocate.BaseType != typeof(TViewModelType))
-                throw new InvalidCastException($"CAN NOT USE A NON VIEW MODEL CONTROL BASE TYPE FOR SINGLETON LOOKUPS!");
+            if (ViewTypeToLocate != typeof(TViewType) && ViewTypeToLocate.BaseType != typeof(TViewType))
+            {
+                // IF this failed, try using VMs before failing out.
+                var ViewModelFallbackValue = LocateSingletonViewModelInstance(ViewTypeToLocate);
+                if (ViewModelFallbackValue != null) return ViewModelFallbackValue;
+                throw new InvalidCastException($"CAN NOT USE A NON USER CONTROL BASE TYPE FOR SINGLETON LOOKUPS!");
+            }
+            
+            // Find first object with the type matching the given viewmodel type
+            var PulledSingleton = BuiltSingletonInstances.FirstOrDefault(ViewObj => ViewObj.SingletonViewModel.GetType() == typeof(TViewType));
+            if (PulledSingleton == null) SingletonLogger.WriteLog("FAILED TO LOCATE VALID SINGLETON INSTANCE!", LogType.ErrorLog);
+            return PulledSingleton;
+        }
+        /// <summary>
+        /// Returns the first or only instance object for our current instances of singletons
+        /// </summary>
+        /// <param name="ViewModelTypeToLocate"></param>
+        /// <returns></returns>
+        public static SingletonContentControl<TViewType, TViewModelType> LocateSingletonViewModelInstance(Type ViewModelTypeToLocate)
+        {
+            // If not type of view model control base, then dump out.
+            if (ViewModelTypeToLocate != typeof(TViewModelType) && ViewModelTypeToLocate.BaseType != typeof(TViewModelType))
+            { 
+                // IF this failed, try using view objects before failing out.
+                var UserControlFallbackValue = LocateSingletonViewInstance(ViewModelTypeToLocate);
+                if (UserControlFallbackValue != null) return UserControlFallbackValue;
+                throw new InvalidCastException($"FAILED TO LOCATE A USER CONTROL OR VIEW MODEL MATCHING TYPE: {ViewModelTypeToLocate.Name}!");
+            }
 
             // Find first object with the type matching the given viewmodel type
             var PulledSingleton = BuiltSingletonInstances.FirstOrDefault(ViewObj => ViewObj.SingletonViewModel.GetType() == typeof(TViewType));
@@ -74,7 +132,7 @@ namespace FulcrumInjector.FulcrumViewContent
             return PulledSingleton;
         }
 
-        // -------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
         // Generic time information about the instance.
         protected DateTime TimeCreated;                         // Time the instance was built.
@@ -84,26 +142,26 @@ namespace FulcrumInjector.FulcrumViewContent
         public readonly TViewType SingletonUserControl;         // User control content for this control input.
         public readonly TViewModelType SingletonViewModel;      // Base view model control object used to build this singleton
 
-        // -------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new instance of a singleton object helper type.
         /// </summary>
-        private SingletonContentControl(TViewType singletonUserControlContent, TViewModelType singletonViewModelContent)
+        private SingletonContentControl(TViewType SingletonUserControlContent, TViewModelType SingletonViewModelContent)
         {
             // Store time information.
             this.TimeCreated = DateTime.Now;
 
             // Build new logger instance for singleton object
-            string TypeName = singletonUserControlContent.GetType().Name;
+            string TypeName = SingletonUserControlContent.GetType().Name;
             this.InstanceLogger = (SubServiceLogger)(LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"Singleton_{TypeName}_InstanceLogger")) ?? 
                                                      new SubServiceLogger($"Singleton_{TypeName}_InstanceLogger"));
             this.InstanceLogger.WriteLog($"INSTANCE HAS BEEN CREATED AND TIMESTAMPED! TIME BUILT: {this.TimeCreated:s}", LogType.TraceLog);
 
             // Log building new singleton instance object
-            this.SingletonUserControl = singletonUserControlContent;
-            this.SingletonViewModel = singletonViewModelContent;
+            this.SingletonUserControl = SingletonUserControlContent;
+            this.SingletonViewModel = SingletonViewModelContent;
             this.InstanceLogger.WriteLog($"STORED NEW SINGLETON INSTANCE OBJECT FOR TYPE {typeof(TViewType)}!", LogType.InfoLog);
         }
 
