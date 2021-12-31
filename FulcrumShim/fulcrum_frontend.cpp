@@ -137,13 +137,8 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	auto_lock lock;
 	unsigned long retval;
 
-	// Boot the pipes and start the fulcrum injector
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (!fulcrum_app->pipesLoaded)
-	{
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Booting new pipe instances from fulcrum_frontend now...\n"), GetTimeSinceInit());
-		fulcrum_app->StartupPipes();
-	}
+	// Boot pipes
+	CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("%.3fs ++ PTOpen(%s, 0x%08X)\n"), GetTimeSinceInit(), (pName==NULL)?_T("*NULL*"):_T("")/*pName*/, pDeviceID);
@@ -153,6 +148,8 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	retval = _PassThruOpen(pName, pDeviceID);
 	fulcrum_output::fulcrumDebug(_T("  returning DeviceID: %ld\n"), *pDeviceID);
 	fulcrum_printretval(retval);
+
+	// Print splitter and return value
 	return retval;
 }
 extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
@@ -170,8 +167,7 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	fulcrum_printretval(retval);
 
 	// Shut off pipes
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (!fulcrum_app->pipesLoaded) { fulcrum_app->ShutdownPipes(); }
+	CFulcrumShim::ShutdownPipes(); 
 	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumInjector has closed all pipe instances OK!\n"), GetTimeSinceInit());
 
 	// Return output value

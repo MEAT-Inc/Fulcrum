@@ -57,7 +57,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
             // Build event for our pipe objects to process new pipe content into our output box
-            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => { this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; };
+            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => {
+                Dispatcher.Invoke(() => this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n");
+            };
+
+            // Log completed setup values ok
             this.ViewLogger.WriteLog("SETUP A NEW PIPE READING EVENT OBJECT TO PROCESS OUR OUTPUT PIPE CONTENTS INTO THE DLL OUTPUT BOX OK!", LogType.WarnLog);
         }
 

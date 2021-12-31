@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger.LoggerObjects;
@@ -100,18 +101,6 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 throw ex;
             }
         }
-        /// <summary>
-        /// This method rechecks to see if a new pipe instance can be booted or not.
-        /// </summary>
-        public void RecheckForNewPipe()
-        {
-            // Check if the DLL is loaded or not. If it is, then run the new pipe booting instance.
-            if (!FulcrumDllLoaded()) { return; }
-
-            // Log starting new pipe and run the init method.
-            PipeLogger.WriteLog("FOUND NEW USE CONSUMER OF THE DLL INSTANCE! BOOTING NEW PIPES NOW...", LogType.WarnLog);
-            this.AttemptPipeConnection();
-        }
 
         // ---------------------------------------------------------------------------------------------------------------
 
@@ -138,9 +127,10 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// Base method for new pipe init configuration
         /// </summary>
         /// <returns>Always true.</returns>
-        internal virtual bool AttemptPipeConnection()
+        internal virtual bool AttemptPipeConnection(out Task<bool> ConnectionTask)
         {
             // Log information about building new pipe.
+            ConnectionTask = null;
             this.PipeLogger.WriteLog($"BUILDING NEW PIPE OBJECT FROM MAIN PIPE TYPE FOR PIPE ID {this.PipeType}", LogType.WarnLog);
             return true;
         }

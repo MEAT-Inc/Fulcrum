@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
@@ -30,7 +31,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         {
             // Build new view model object
             InitializeComponent();
-            this.ViewModel = new FulcrumDllInjectionTestViewModel();
+            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumDllInjectionTestViewModel());
         }
 
         /// <summary>
@@ -57,20 +58,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             try
             {
                 // Clear out text box, run the test, and log the output
-                this.ViewModel.InjectorTestResult = "Testing...";
+                TestInjectionButton.IsEnabled = false;
+                this.ViewModel.InjectorTestResult = "Working...";
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Run the injection test here on a Dispatched thread 
-                this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out string ResultOutput);
+                string ResultOutput = string.Empty;
+                this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out ResultOutput);
                 if (!this.ViewModel.InjectionLoadPassed) { ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog); }
-                else { ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog); }
+                else ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
 
                 // Set Value on the View now.
+                TestInjectionButton.IsEnabled = false;
+                TestInjectionButton.Content = "Test Injection";
                 this.ViewModel.InjectorTestResult = ResultOutput;
             }
             catch (Exception Ex)
             {
                 // Log the failure here.
+                TestInjectionButton.IsEnabled = true;
+                TestInjectionButton.Content = "Test Injection";
                 ViewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
                 ViewLogger.WriteLog("FAILED TO LOAD OUR DLL!", LogType.ErrorLog);
                 ViewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
