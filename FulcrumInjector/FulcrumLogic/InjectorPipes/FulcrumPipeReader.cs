@@ -285,8 +285,10 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             // Build new timeout token values for reading operation and read now
             int BytesRead = 0;
             byte[] OutputBuffer = new byte[DefaultBufferValue];
+            List<string> AllProcessedMessages = new List<string>();
             this.AsyncReadingOperationsTokenSource = new CancellationTokenSource(DefaultReadingTimeout);
 
+            // While new content is being shot back to this loop, keep doing it.
             do
             {
                 try
@@ -299,6 +301,27 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                     // Trim off the excess byte values here if needed
                     if (BytesRead == OutputBuffer.Length) continue;
                     OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
+
+                    // Now convert our bytes into a string object, and print them to our log files.
+                    string NextPipeString = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
+                    this.PipeLogger.WriteLog($"--> [PIPE DATA - MSG #{AllProcessedMessages.Count}] ::: {NextPipeString}", LogType.TraceLog);
+
+                    // Add this into our list of app pipe content
+                    if (AllProcessedMessages.Contains(NextPipeString)) break;
+                    AllProcessedMessages.Add(NextPipeString);
+
+                    // Now fire off a pipe data read event if possible. Otherwise return
+                    if (this.PipeDataProcessed == null) continue;   
+                    this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
+                    {
+                        // Store byte values
+                        PipeByteData = OutputBuffer,
+                        ByteDataLength = (uint)OutputBuffer.Length,
+
+                        // Store string values
+                        PipeDataString = NextPipeString,
+                        PipeDataStringLength = (uint)NextPipeString.Length
+                    });
                 }
                 catch (Exception ReadEx)
                 {
@@ -313,24 +336,8 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 }
             } while (BytesRead > 0);
 
-            // Now convert our bytes into a string object, and print them to our log files.
-            ReadDataContents = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
-            this.PipeLogger.WriteLog($"--> [PIPE DATA] ::: {ReadDataContents}", LogType.TraceLog);
-
-            // Now fire off a pipe data read event if possible. Otherwise return
-            if (this.PipeDataProcessed == null) return true;
-            this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
-            {
-                // Store byte values
-                PipeByteData = OutputBuffer,
-                ByteDataLength = (uint)OutputBuffer.Length,
-
-                // Store string values
-                PipeDataString = ReadDataContents,
-                PipeDataStringLength = (uint)ReadDataContents.Length
-            });
-
             // Once we get here return passed.
+            ReadDataContents = string.Join("\n", AllProcessedMessages);
             return true;
         }
     }

@@ -36,7 +36,7 @@ bool fulcrum_pipe::ConnectOutputPipe()
 	hFulcrumWriter = CreateNamedPipe(
 		OutputPipeLocation,					// Name of the pipe
 		PIPE_ACCESS_OUTBOUND,				// Pipe direction (In and Out)
-		PIPE_TYPE_MESSAGE | PIPE_WAIT,		// Pipe types for sending output
+		PIPE_TYPE_MESSAGE,					// Pipe types for sending output
 		1,								    // Number of instances
 		1024 * 16,							// Output buffer size
 		1024 * 16,							// Input buffer size
@@ -55,6 +55,7 @@ bool fulcrum_pipe::ConnectOutputPipe()
 
 	// Log information and return output
 	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) has been opened OK!\n"));
+	OutputConnected = true;
 	return true;
 }
 bool fulcrum_pipe::ConnectInputPipe()
@@ -86,6 +87,7 @@ bool fulcrum_pipe::ConnectInputPipe()
 
 	// Log information and return output then close our handle output
 	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) has been opened OK!\n"));
+	InputConnected = true;
 	return true;
 }
 
@@ -135,7 +137,7 @@ void fulcrum_pipe::WriteStringOut(std::string str)
 	BOOL res = WriteFile(hFulcrumWriter, str.c_str(), bytesToWrite, &written, NULL);
 
 	// Removing this for testing purposes
-	CloseHandle(hFulcrumWriter);
+	// CloseHandle(hFulcrumWriter);
 }
 void fulcrum_pipe::WriteBytesOut(byte b[], int b_len)
 {
