@@ -216,8 +216,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             {
                 // Log information and throw if auto connection is false
                 this.PipeLogger.WriteLog("WARNING! A READ ROUTINE WAS CALLED WITHOUT ENSURING A PIPE CONNECTION WAS BUILT!", LogType.WarnLog);
-                this.PipeLogger.WriteLog("CALL A CONNECTION METHOD BEFORE INVOKING THIS READING ROUTINE TO ENSURE DATA WILL BE READ...", LogType.WarnLog);
-                throw new InvalidOperationException("PIPE READER MUST BE CONNECTED TO HOST PIPE SERVER BEFORE READING OPERATIONS CAN TAKE PLACE!");
+                this.PipeLogger.WriteLog("CALLING A CONNECTION METHOD BEFORE INVOKING THIS READING ROUTINE TO ENSURE DATA WILL BE READ...", LogType.WarnLog);
             }
 
             // Build token, build source and then log information
@@ -283,62 +282,71 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             DefaultReadingTimeout = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Processing Timeout", DefaultReadingTimeout);
 
             // Build new timeout token values for reading operation and read now
-            int BytesRead = 0;
             byte[] OutputBuffer = new byte[DefaultBufferValue];
             List<string> AllProcessedMessages = new List<string>();
             this.AsyncReadingOperationsTokenSource = new CancellationTokenSource(DefaultReadingTimeout);
 
-            // While new content is being shot back to this loop, keep doing it.
-            do
+            // Try connecting here. If this fails, throw out our exception
+            this.AttemptPipeConnection(out var ConnectionAttempt);
+            ConnectionAttempt.ContinueWith((TaskOutput) =>
             {
-                try
-                {
-                    // Read input content and check how many bytes we've pulled in
-                    BytesRead = this.FulcrumPipe.Read(OutputBuffer, 0, OutputBuffer.Length);
-                    
-                    // Now convert our bytes into a string object, and print them to our log files.
-                    if (BytesRead != OutputBuffer.Length) OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
-                    string NextPipeString = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
-                    string[] SplitPipeContent = NextPipeString.Split('\n');
+                // Check if connected or not. If failed, throw an exception out
+                if (!TaskOutput.Result)
+                    throw new InvalidOperationException("PIPE READER MUST BE CONNECTED TO HOST PIPE SERVER BEFORE READING OPERATIONS CAN TAKE PLACE!");
+            });
 
-                    // Log new message pulled and write contents of it to our log file
-                    this.PipeLogger.WriteLog($"[PIPE DATA - MSG #{AllProcessedMessages.Count}] NEW PIPE DATA PROCESSED!", LogType.TraceLog);
-                    foreach (var PipeStringPart in SplitPipeContent)
+            try
+            {
+                // Read input content and check how many bytes we've pulled in
+                var ReadingTask = this.FulcrumPipe.ReadAsync(OutputBuffer, 0, OutputBuffer.Length);
+                try { ReadingTask.Wait(this.AsyncReadingOperationsTokenSource.Token); }
+                catch (Exception AbortEx) { if (AbortEx is not OperationCanceledException) throw AbortEx; }
+
+                // Now convert our bytes into a string object, and print them to our log files.
+                int BytesRead = ReadingTask.Result;
+                if (BytesRead != OutputBuffer.Length) OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
+                string NextPipeString = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
+                string[] SplitPipeContent = NextPipeString.Split('\n')
+                    .ToList().Where(StringObj => !string.IsNullOrWhiteSpace(StringObj))
+                    .Select(StringPart => StringPart.Trim()).ToArray();
+
+                // Log new message pulled and write contents of it to our log file
+                this.PipeLogger.WriteLog($"[PIPE DATA] ::: NEW PIPE DATA PROCESSED!", LogType.TraceLog);
+                foreach (var PipeStringPart in SplitPipeContent)
+                {
+                    // Add this into our list of app pipe content
+                    AllProcessedMessages.Add(PipeStringPart);
+                    this.PipeLogger.WriteLog($"--> {PipeStringPart}", LogType.TraceLog);
+
+                    // Now fire off a pipe data read event if possible. Otherwise return
+                    if (this.PipeDataProcessed == null) continue;
+                    this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
                     {
-                        // Add this into our list of app pipe content
-                        AllProcessedMessages.Add(PipeStringPart);
-                        this.PipeLogger.WriteLog($"\t{PipeStringPart}", LogType.TraceLog);
+                        // Store byte values
+                        PipeByteData = OutputBuffer,
+                        ByteDataLength = (uint)OutputBuffer.Length,
 
-                        // Now fire off a pipe data read event if possible. Otherwise return
-                        if (this.PipeDataProcessed == null) continue;
-                        this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
-                        {
-                            // Store byte values
-                            PipeByteData = OutputBuffer,
-                            ByteDataLength = (uint)OutputBuffer.Length,
-
-                            // Store string values
-                            PipeDataString = NextPipeString,
-                            PipeDataStringLength = (uint)NextPipeString.Length
-                        });
-                    }
+                        // Store string values
+                        PipeDataString = PipeStringPart,
+                        PipeDataStringLength = (uint)PipeStringPart.Length
+                    });
                 }
-                catch (Exception ReadEx)
-                {
-                    // Log our failures and return failed output
-                    this.PipeLogger.WriteLog("FAILED TO READ NEW PIPE INPUT DATA!", LogType.ErrorLog);
-                    this.PipeLogger.WriteLog("EXCEPTION THROWN DURING READING OPERATIONS OF OUR INPUT PIPE DATA PROCESSING!", LogType.ErrorLog);
-                    this.PipeLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ReadEx);
 
-                    // Return failed
-                    ReadDataContents = $"FAILED_PIPE_READ__{ReadEx.GetType().Name.ToUpper()}";
-                    return false;
-                }
-            } while (BytesRead > 0);
+                // Return passed and build output string values
+                ReadDataContents = string.Join("\n", AllProcessedMessages).Trim();
+                return true;
+            }
+            catch (Exception ReadEx)
+            {
+                // Log our failures and return failed output
+                this.PipeLogger.WriteLog("FAILED TO READ NEW PIPE INPUT DATA!", LogType.ErrorLog);
+                this.PipeLogger.WriteLog("EXCEPTION THROWN DURING READING OPERATIONS OF OUR INPUT PIPE DATA PROCESSING!", LogType.ErrorLog);
+                this.PipeLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ReadEx);
 
-            // Once we get here return passed.
-            ReadDataContents = string.Join("\n", AllProcessedMessages);
-            return true;
+                // Return failed
+                ReadDataContents = $"FAILED_PIPE_READ__{ReadEx.GetType().Name.ToUpper()}";
+                return false;
+            }
         }
     }
 }

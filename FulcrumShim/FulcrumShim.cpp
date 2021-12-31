@@ -91,7 +91,7 @@ void CFulcrumShim::StartupPipes()
 	if (CFulcrumShim::fulcrumPiper == NULL) CFulcrumShim::fulcrumPiper = new fulcrum_jpipe();
 
 	// If they're connected, drop out and stop working on connection routines
-	if (CFulcrumShim::fulcrumPiper->OutputConnected && CFulcrumShim::fulcrumPiper->InputConnected) { return; }
+	if (CFulcrumShim::fulcrumPiper->PipesConnected()) { return; }
 	if (PipesConnecting) 
 	{
 		// Join the thread to finish setup and return
@@ -103,12 +103,12 @@ void CFulcrumShim::StartupPipes()
 	// Set connecting to true
 	PipesConnecting = true;
 	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
-	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Booting pipes at the last possible second...\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"), GetTimeSinceInit());
 
 	// Connect our pipe instances for the reader and writer objects now
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting output pipe now...\n", GetTimeSinceInit()));
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting Output Pipe Instance now...!\n", GetTimeSinceInit()));
 	bool LoadedPipeOutput = CFulcrumShim::fulcrumPiper->ConnectOutputPipe();
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting input pipe now...\n", GetTimeSinceInit()));
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Connecting Input Pipe Instance now...!\n", GetTimeSinceInit()));
 	bool LoadedPipeInput = CFulcrumShim::fulcrumPiper->ConnectInputPipe();
 
 	// Now see if we're loaded correctly.

@@ -56,6 +56,9 @@ BOOL CSelectionBox::OnInitDialog()
 	SYSTEMTIME LocalTime;
 	GetLocalTime(&LocalTime);
 
+	// Start logging information
+	CFulcrumShim::StartupPipes();
+
 	// Build the log filder dir.
 	CString logDir;
 	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
