@@ -1,0 +1,44 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
+        <ResourceDictionary>
+            <!-- Search Box Style -->
+            <Style x:Key="SearchBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="Margin" Value="0,5,15,0"/>
+                <Setter Property="Foreground" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+            </Style>
+
+            <!-- AVEdit Output Box Style -->
+            <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="Margin" Value="10,5"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="5,5,5,10"/>
+                <Setter Property="ShowLineNumbers" Value="True"/>
+            </Style>
+
+            <!--Main Title Text-->
+            <Style x:Key="TitleStringText" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

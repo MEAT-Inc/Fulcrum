@@ -8,6 +8,7 @@
 
 #include "resource.h"	
 #include "fulcrum_jpipe.h"
+#include <thread>   
 
 // CFulcrumDLL.h
 // See FulcrumShim.cpp for the implementation of this class
@@ -19,13 +20,13 @@ class CFulcrumShim : public CWinApp
 		CFulcrumShim();
 
 		// Pipe configuration
-		void StartupPipes();
-		void ShutdownPipes();
-		bool pipesLoaded;
-		fulcrum_jpipe* fulcrumPiper;
-
+		static void StartupPipes();
+		static void ShutdownPipes();
+		static bool PipesConnecting;
+		static fulcrum_jpipe* fulcrumPiper;
+		
 	// Overrides for starting
     public: 
-		virtual BOOL InitInstance();		
 		DECLARE_MESSAGE_MAP()
+		virtual BOOL InitInstance();		
 };

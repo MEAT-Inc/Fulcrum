@@ -23,15 +23,15 @@ class fulcrum_pipe {
 public:
 	fulcrum_pipe();
 	~fulcrum_pipe();
-	bool IsLoaded();
+	bool PipesConnected();
 	bool ConnectInputPipe();
 	bool ConnectOutputPipe();
-	void ShutdownPipe();
+	void ShutdownPipes();
+	void ShutdownInputPipe();
+	void ShutdownOutputPipe();
 
 	// Writing operations
 	void WriteStringOut(std::string str);
-	void WriteFormattedStringOut(LPCSTR format, ...);
-	void WriteStringOut100(std::string str);
 	void WriteBytesOut(byte b[], int b_len);
 
 	// Reading Operations
@@ -44,8 +44,13 @@ public:
 	void WriteUint32(unsigned int* a, unsigned int len);
 	void Writeint32(int num);
 
+	// Bools for states
+	bool InputConnected = false;
+	bool OutputConnected = false;
+
 private:
-	bool Loaded = false;
+	bool _pipesConnected = false;
 	HANDLE hFulcrumWriter, hFulcrumReader;
 };
+
 
