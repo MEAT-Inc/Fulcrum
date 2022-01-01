@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
