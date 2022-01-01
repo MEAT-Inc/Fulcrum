@@ -93,7 +93,7 @@
         <!-- About this application flyout -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2">
             <mah:Flyout 
-                Margin="0,50,0,0"
+                Margin="0,60,0,0"
                 IsOpen="False"
                 Position="Top"
                 x:Name="InformationFlyout"
