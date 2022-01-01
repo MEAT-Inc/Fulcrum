@@ -7,12 +7,15 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using ControlzEx.Theming;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewSupport;
 using NLog;
+using NLog.Fluent;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -53,7 +56,7 @@ namespace FulcrumInjector
             LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION ROUTINE HAS BEEN COMPLETED OK!", LogType.InfoLog);
 
             // Configure settings and app theme
-            this.ConfigureMergedDicts();
+            this.ConfigureStaticViews();
             this.ConfigureCurrentTheme();
             this.ConfigureUserSettings();
             LogBroker.Logger?.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
@@ -192,14 +195,41 @@ namespace FulcrumInjector
         /// <summary>
         /// Pulls in the resource dictionaries from the given resource path and stores them in the app
         /// </summary>
-        private void ConfigureMergedDicts()
+        private void ConfigureStaticViews()
         {
-            // TODO: BUILT THIS METHOD OUT!
-            // This method should pull all the XAML From our local running directory and configure itself so that all XAML is pulled at runtime for styles 
-            // This way we can make changes to styles or output quickly at runtime
+            // Log information. Pull files in and store them all. This tuple create call pulls types for views then types for view models
+            LogBroker.Logger?.WriteLog("GENERATING STATIC VIEW CONTENTS FOR HAMBURGER CORE CONTENTS NOW...", LogType.WarnLog);
+            var LoopResultCast = Assembly.GetExecutingAssembly().GetTypes().Where(TypePulled =>
+                    TypePulled.Namespace != null && !TypePulled.Name.Contains("HamburgerCore") && 
+                    (TypePulled.Namespace.Contains("InjectorCoreView") || TypePulled.Namespace.Contains("InjectorOptionView")))
+                .ToLookup(TypePulled => TypePulled.Name.EndsWith("View") || TypePulled.Name.EndsWith("ViewModel"));
 
-            // Log information. Pull files in and store them all
-            LogBroker.Logger?.WriteLog("IMPORTING RESOURCE DICTIONARIES FROM XAML OUTPUT DIRECTORY NOW...", LogType.WarnLog);
+            // Now build singleton instances for the types required.
+            var ViewTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("View")).ToArray();
+            var ViewModelTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("ViewModel")).ToArray();
+            if (ViewTypes.Length != ViewModelTypes.Length) LogBroker.Logger?.WriteLog("WARNING! TYPE OUTPUT LISTS ARE NOT EQUAL SIZES!", LogType.ErrorLog);
+
+            // Loop operation here
+            int MaxLoopIndex = Math.Min(ViewTypes.Length, ViewModelTypes.Length);
+            LogBroker.Logger?.WriteLog($"BUILDING TYPE INSTANCES NOW...", LogType.InfoLog);
+            LogBroker.Logger?.WriteLog($"A TOTAL OF {MaxLoopIndex} BASE ASSEMBLY TYPES ARE BEING SPLIT AND PROCESSED...", LogType.InfoLog);
+            for (int IndexValue = 0; IndexValue < MaxLoopIndex; IndexValue += 1)
+            {
+                // Pull type values here
+                Type ViewType = ViewTypes[IndexValue]; Type ViewModelType = ViewModelTypes[IndexValue];
+                LogBroker.Logger?.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Namespace}", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Namespace}", LogType.InfoLog);
+
+                // Generate our singleton object here.
+                var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(ViewType, ViewModelType);
+                LogBroker.Logger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().Name} WAS BUILT OK!", LogType.TraceLog);
+            }
+
+            // Log completed building and exit routine
+            LogBroker.Logger?.WriteLog("BUILT OUTPUT TYPE CONTENTS OK! THESE VALUES ARE NOW STORED ON OUR MAIN WINDOW INSTANCE!", LogType.WarnLog);
+            LogBroker.Logger?.WriteLog("THE TYPE OUTPUT BUILT IS BEING PROJECTED ONTO THE FULCRUM INJECTOR CONSTANTS STORE OBJECT!", LogType.WarnLog);
         }
 
         /// <summary>
