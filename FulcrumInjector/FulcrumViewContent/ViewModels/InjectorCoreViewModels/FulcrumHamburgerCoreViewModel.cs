@@ -191,10 +191,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"   --> VIEW TYPE:       {MenuViewTypeName}", LogType.InfoLog);
             ViewModelLogger.WriteLog($"   --> VIEW MODEL TYPE: {MenuModelTypeName}", LogType.InfoLog);
 
-            // Generate our singleton object here.
-            var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(MenuContentType, MenuViewModelType);
-            ViewModelLogger.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().Name}", LogType.TraceLog);
 
             // Generate output result object.
             var NewResult = new HamburgerNavMenuItem()
