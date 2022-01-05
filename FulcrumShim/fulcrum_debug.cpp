@@ -28,10 +28,10 @@
 #include <tchar.h>
 #include <windows.h>
 
+#include "fulcrum_output.h"
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_frontend.h"
-#include "fulcrum_output.h"
 
 // In case of some internal errors we'll return ERR_FAILED, set our own internal string,
 // and return that until the app makes another PassThru function call

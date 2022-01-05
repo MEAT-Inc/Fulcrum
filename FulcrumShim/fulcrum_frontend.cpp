@@ -33,12 +33,12 @@
 
 // Includes for fulcrum libs and methods
 #include "FulcrumShim.h"
+#include "SelectionBox.h"
 #include "fulcrum_jpipe.h"
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
-#include "SelectionBox.h"
 #include "fulcrum_debug.cpp"
 
 // Check if the DLL is loaded and usable or not
