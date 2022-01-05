@@ -17,6 +17,8 @@ EXPORTS
 	PassThruReadVersion				@12
 	PassThruGetLastError			@13
 	PassThruIoctl					@14
+	PassThruGetNextCarDaq			@15
+	PassThruReadDetails				@16
 	PassThruLoadLibrary
 	PassThruUnloadLibrary
 	PassThruSaveLog

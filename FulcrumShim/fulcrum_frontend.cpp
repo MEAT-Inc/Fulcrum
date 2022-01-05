@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+// Headers for imported commands
 #include <tchar.h>
 #include <windows.h> 
 #include <chrono>
@@ -17,6 +18,7 @@
 #include "fulcrum_output.h"
 #include "SelectionBox.h"
 
+// Check if the DLL is loaded and usable or not
 #define fulcrum_CHECK_DLL() \
 { \
 	if (! fulcrum_checkAndAutoload()) \
@@ -27,6 +29,7 @@
 	} \
 }
 
+// Checks if a function is usable for this given DLL
 #define fulcrum_CHECK_FUNCTION(fcn) \
 { \
 	if (__FUNCTION__ == NULL) \
@@ -37,6 +40,7 @@
 	} \
 }
 
+// ------------------------------------------------------------------------------------------------
 
 // Used to pulling infor staticly from commands.
 static unsigned int lastVBATTVal = 0;
@@ -44,6 +48,9 @@ static auto lastVBATTReadTime = std::chrono::steady_clock::now();
 using lastVBATTReadResolution = std::chrono::seconds;
 static int lastVBATTReadThreshold = 10; // seconds
 
+// ------------------------------------------------------------------------------------------------
+// 
+// Converts a message into a void pointer object
 void PASSTHRU_MSG_ToVOIDPointer(PASSTHRU_MSG* pMsgIn, void* pMsgOut)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -56,6 +63,8 @@ void PASSTHRU_MSG_ToVOIDPointer(PASSTHRU_MSG* pMsgIn, void* pMsgOut)
 	ptmOut->ExtraDataIndex = pMsgIn->ExtraDataIndex;
 	memcpy_s(ptmOut->Data, 4128, pMsgIn->Data, pMsgIn->DataSize);
 }
+
+// ------------------------------------------------------------------------------------------------
 
 // Load And Unload Commands
 extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
@@ -130,7 +139,19 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 	return STATUS_NOERROR;
 }
 
-// Standard PT Command methods. This will be built out to V0500 soon
+// Commands built out for getting the next possible passthru interface
+extern "C" long J2534_API PassThruGetNextCarDaq(unsigned long* pDeviceName, unsigned long* pDeviceAddr, unsigned long* pDeviceVersion)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	auto_lock lock;
+	unsigned long retval;
+
+
+}
+
+// extern "C" long J2534_API PTReadDetails()
+
+// Standard PTOpen and PTClose commands
 extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -167,12 +188,14 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	fulcrum_printretval(retval);
 
 	// Shut off pipes
-	CFulcrumShim::ShutdownPipes(); 
-	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumInjector has closed all pipe instances OK!\n"), GetTimeSinceInit());
+	// CFulcrumShim::ShutdownPipes(); 
+	// fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumInjector has closed all pipe instances OK!\n"), GetTimeSinceInit());
 
 	// Return output value
 	return retval;
 }
+
+// Standard PT Connect and Disconnect Methods
 extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long ProtocolID, unsigned long Flags, unsigned long Baudrate, unsigned long *pChannelID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -207,6 +230,8 @@ extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 	fulcrum_printretval(retval);
 	return retval;
 }
+
+// Reading and Writing Messages/Periodic messages
 extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG *pMsg, unsigned long *pNumMsgs, unsigned long Timeout)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -281,6 +306,8 @@ extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsig
 	fulcrum_printretval(retval);
 	return retval;
 }
+
+// Message Filtering Start/Stop commands
 extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
                       unsigned long FilterType, PASSTHRU_MSG *pMaskMsg, PASSTHRU_MSG *pPatternMsg,
 					  PASSTHRU_MSG *pFlowControlMsg, unsigned long *pMsgID)
@@ -319,6 +346,8 @@ extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigne
 	fulcrum_printretval(retval);
 	return retval;
 }
+
+// Programming Voltage, Errors, and IOCTls
 extern "C" long J2534_API PassThruSetProgrammingVoltage(unsigned long DeviceID, unsigned long Pin, unsigned long Voltage)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -369,67 +398,6 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 	fulcrum_output::fulcrumDebug(_T("  API:      %s\n"), cstrApiVersion);
 
 	fulcrum_printretval(retval);
-	return retval;
-}
-
-// Error helper for pulling error definition from the J2534 error object
-long fulcrum_PassThruGetLastError(char* pErrorDescription)
-{
-	if (fulcrum_hadInternalError())
-	{
-		if (pErrorDescription == NULL)
-			return ERR_NULL_PARAMETER;
-
-		// We'll intercept GetLastError if we're reporting something about the shim
-		CStringA cstrInternalLastError((LPCTSTR)fulcrum_getInternalError());
-		strncpy_s(pErrorDescription, 80, cstrInternalLastError, _TRUNCATE);
-		return STATUS_NOERROR;
-	}
-	else
-	{
-		// These macros call fulcrum_setInternalError() which does not work the way
-		// this function is documented. They should be replaced with code that
-		// prints an error to the debug log and copies the text to pErrorDescription
-		// if the pointer is non-NULL
-		fulcrum_CHECK_DLL();
-		fulcrum_CHECK_FUNCTION(_PassThruGetLastError);
-
-		return _PassThruGetLastError(pErrorDescription);
-	}
-}
-extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
-
-	// pErrorDescription returns the text description for an error detected
-	// during the last function call (EXCEPT PassThruGetLastError). This
-	// function should not modify the last internal error
-
-	fulcrum_output::fulcrumDebug(_T("%.3fs ** PTGetLastError(0x%08X)\n"), GetTimeSinceInit(), pErrorDescription);
-
-	if (pErrorDescription == NULL)
-	{
-		fulcrum_output::fulcrumDebug(_T("  pErrorDescription is NULL\n"));
-	}
-
-	retval = fulcrum_PassThruGetLastError(pErrorDescription);
-
-	if (pErrorDescription != NULL)
-	{
-#ifdef UNICODE
-		CStringW cstrErrorDescriptionW(pErrorDescription);
-		fulcrum_output::fulcrumDebug(_T("  %s\n"), (LPCWSTR)cstrErrorDescriptionW);
-#else
-		dtDebug(_T("  %s\n"), pErrorDescription);
-#endif
-	}
-
-	// Log the return value for this function without using dbg_printretval().
-	// Even if an error occured inside this function, the error text was not
-	// updated to describe the error.
-	fulcrum_output::fulcrumDebug(_T("  %s\n"), fulcrumDebug_return(retval).c_str());
 	return retval;
 }
 extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long IoctlID, void* pInput, void* pOutput)
@@ -504,5 +472,64 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 	}
 
 	fulcrum_printretval(retval);
+	return retval;
+}
+long fulcrum_PassThruGetLastError(char* pErrorDescription)
+{
+	if (fulcrum_hadInternalError())
+	{
+		if (pErrorDescription == NULL)
+			return ERR_NULL_PARAMETER;
+
+		// We'll intercept GetLastError if we're reporting something about the shim
+		CStringA cstrInternalLastError((LPCTSTR)fulcrum_getInternalError());
+		strncpy_s(pErrorDescription, 80, cstrInternalLastError, _TRUNCATE);
+		return STATUS_NOERROR;
+	}
+	else
+	{
+		// These macros call fulcrum_setInternalError() which does not work the way
+		// this function is documented. They should be replaced with code that
+		// prints an error to the debug log and copies the text to pErrorDescription
+		// if the pointer is non-NULL
+		fulcrum_CHECK_DLL();
+		fulcrum_CHECK_FUNCTION(_PassThruGetLastError);
+
+		return _PassThruGetLastError(pErrorDescription);
+	}
+}
+extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	auto_lock lock;
+	long retval;
+
+	// pErrorDescription returns the text description for an error detected
+	// during the last function call (EXCEPT PassThruGetLastError). This
+	// function should not modify the last internal error
+
+	fulcrum_output::fulcrumDebug(_T("%.3fs ** PTGetLastError(0x%08X)\n"), GetTimeSinceInit(), pErrorDescription);
+
+	if (pErrorDescription == NULL)
+	{
+		fulcrum_output::fulcrumDebug(_T("  pErrorDescription is NULL\n"));
+	}
+
+	retval = fulcrum_PassThruGetLastError(pErrorDescription);
+
+	if (pErrorDescription != NULL)
+	{
+#ifdef UNICODE
+		CStringW cstrErrorDescriptionW(pErrorDescription);
+		fulcrum_output::fulcrumDebug(_T("  %s\n"), (LPCWSTR)cstrErrorDescriptionW);
+#else
+		dtDebug(_T("  %s\n"), pErrorDescription);
+#endif
+	}
+
+	// Log the return value for this function without using dbg_printretval().
+	// Even if an error occured inside this function, the error text was not
+	// updated to describe the error.
+	fulcrum_output::fulcrumDebug(_T("  %s\n"), fulcrumDebug_return(retval).c_str());
 	return retval;
 }
