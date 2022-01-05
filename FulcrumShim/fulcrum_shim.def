@@ -5,20 +5,20 @@ LIBRARY      "FulcrumShim"
 EXPORTS
 	PassThruOpen					@1
 	PassThruClose					@2
-	PassThruConnect					@3
-	PassThruDisconnect				@4
-	PassThruReadMsgs				@5
-	PassThruWriteMsgs				@6
-	PassThruStartPeriodicMsg		@7
-	PassThruStopPeriodicMsg			@8
-	PassThruStartMsgFilter			@9
-	PassThruStopMsgFilter			@10
-	PassThruSetProgrammingVoltage	@11
-	PassThruReadVersion				@12
-	PassThruGetLastError			@13
-	PassThruIoctl					@14
-	PassThruGetNextCarDaq			@15
-	PassThruReadDetails				@16
+	PassThruGetNextCarDAQ			@3
+	PassThruReadDetails				@4
+	PassThruConnect					@5
+	PassThruDisconnect				@6
+	PassThruReadMsgs				@7
+	PassThruWriteMsgs				@8
+	PassThruStartPeriodicMsg		@9
+	PassThruStopPeriodicMsg			@10
+	PassThruStartMsgFilter			@11
+	PassThruStopMsgFilter			@12
+	PassThruSetProgrammingVoltage	@13
+	PassThruReadVersion				@14
+	PassThruGetLastError			@15
+	PassThruIoctl					@16
 	PassThruLoadLibrary
 	PassThruUnloadLibrary
 	PassThruSaveLog

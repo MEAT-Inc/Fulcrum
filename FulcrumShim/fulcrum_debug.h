@@ -1,7 +1,7 @@
 /*
 **
-** Copyright (C) 2009 Drew Technologies Inc.
-** Author: Joey Oravec <joravec@drewtech.com>
+** Copyright (C) 2022 MEAT Inc
+** Author: Zack Walsh <neo.smith@motorengineeringandtech.com>
 **
 ** This library is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published
@@ -17,7 +17,6 @@
 ** License along with this library; if not, <http://www.gnu.org/licenses/>.
 **
 */
-
 
 #pragma once
 
