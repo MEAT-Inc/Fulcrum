@@ -66,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         {
             // If not type of view model control base, then dump out.
             if (UserControlType.BaseType != typeof(UserControl)) {
-                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] :::CAN NOT USE A NON USERCONTROL BASE TYPE FOR SINGLETON LOOKUPS!", LogType.ErrorLog);
+                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: CAN NOT USE A NON USERCONTROL BASE TYPE FOR SINGLETON LOOKUPS!", LogType.ErrorLog);
                 return false;
             }
 
