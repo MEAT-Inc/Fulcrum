@@ -33,7 +33,8 @@
 //   Get(): Write the entire log to a file
 // Based on DSP Goodies by Alessandro Gallo (http://ag-works.net/)
 class fulcrum_cfifo {
-public: fulcrum_cfifo()
+public: 
+	fulcrum_cfifo()
 	: m_nSize(sizeof(data) / sizeof(data[0]))
 	, m_nItems(0)
 	, m_iWriteNext(0)
@@ -55,4 +56,4 @@ private:
 FILE* fp;
 fulcrum_cfifo logFifo;
 static bool fLogToFile = false;
-static bool fLogToFile = false;
+static bool fInitalized = false;
