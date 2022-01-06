@@ -313,25 +313,29 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 
                 // Log new message pulled and write contents of it to our log file
                 this.PipeLogger.WriteLog($"[PIPE DATA] ::: NEW PIPE DATA PROCESSED!", LogType.TraceLog);
-                foreach (var PipeStringPart in SplitPipeContent)
+                Task.Run(() =>
                 {
-                    // Add this into our list of app pipe content
-                    AllProcessedMessages.Add(PipeStringPart);
-                    this.PipeLogger.WriteLog($"--> {PipeStringPart}", LogType.TraceLog);
-
-                    // Now fire off a pipe data read event if possible. Otherwise return
-                    if (this.PipeDataProcessed == null) continue;
-                    this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
+                    // Loop each split part output and show it on our debug output box 
+                    foreach (var PipeStringPart in SplitPipeContent)
                     {
-                        // Store byte values
-                        PipeByteData = OutputBuffer,
-                        ByteDataLength = (uint)OutputBuffer.Length,
+                        // Add this into our list of app pipe content
+                        AllProcessedMessages.Add(PipeStringPart);
+                        this.PipeLogger.WriteLog($"--> {PipeStringPart}", LogType.TraceLog);
 
-                        // Store string values
-                        PipeDataString = PipeStringPart,
-                        PipeDataStringLength = (uint)PipeStringPart.Length
-                    });
-                }
+                        // Now fire off a pipe data read event if possible. Otherwise return
+                        if (this.PipeDataProcessed == null) continue;
+                        this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
+                        {
+                            // Store byte values
+                            PipeByteData = OutputBuffer,
+                            ByteDataLength = (uint)OutputBuffer.Length,
+
+                            // Store string values
+                            PipeDataString = PipeStringPart,
+                            PipeDataStringLength = (uint)PipeStringPart.Length
+                        });
+                    }
+                });
 
                 // Return passed and build output string values
                 ReadDataContents = string.Join("\n", AllProcessedMessages);
