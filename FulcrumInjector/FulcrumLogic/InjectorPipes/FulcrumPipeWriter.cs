@@ -5,6 +5,7 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent;
 using SharpLogger.LoggerSupport;
 
@@ -51,6 +52,18 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 base.FulcrumPipeBravo,    // Name of the pipe host
                 PipeDirection.Out         // Direction of the pipe host      
             );
+
+            // Build event helper for state changed.
+            this.PipeStateChanged += (PipeObj, SendingArgs) =>
+            {
+                // Check if currently connecting or not.
+                if (IsConnecting) return;
+                if (IsConnecting || SendingArgs.NewState != FulcrumPipeState.Open) return;
+                
+                // Now run the connection routine and wait for results
+                this.PipeLogger.WriteLog("DETECTED A NEW STATE OF OPEN FOR OUR PIPE WRITER! TRYING TO CONNECT IT NOW...", LogType.WarnLog);
+                this.StartAsyncConnectClient();
+            };
 
             // Build our new pipe instance here.
             if (this.AttemptPipeConnection(out _)) return;
