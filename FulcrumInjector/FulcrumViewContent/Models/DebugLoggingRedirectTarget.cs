@@ -50,12 +50,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         protected override void Write(LogEventInfo LogEvent)
         {
             // Write output using dispatcher to avoid threading issues.
-            this.ParentUserControl.Dispatcher.Invoke(() => 
-            {
-                // Format the message and write it out into our text box.
-                string RenderedText = this.Layout.Render(LogEvent);
-                DebugEditor.Text += RenderedText + "\n";
-            });
+            string RenderedText = this.Layout.Render(LogEvent);
+            this.ParentUserControl.Dispatcher.Invoke(() => DebugEditor.Text += RenderedText + "\n");
         }
     }
 }
