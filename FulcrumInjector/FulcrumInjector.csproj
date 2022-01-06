@@ -176,6 +176,8 @@
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\AppColorSetter.cs" />
+    <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />
+    <Compile Include="FulcrumViewSupport\DataConverters\BoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\HamburgerNavService.cs" />
     <Compile Include="FulcrumViewSupport\ColorMatchingHelper.cs" />
