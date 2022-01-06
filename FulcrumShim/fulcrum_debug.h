@@ -1,7 +1,7 @@
 /*
 **
-** Copyright (C) 2009 Drew Technologies Inc.
-** Author: Joey Oravec <joravec@drewtech.com>
+** Copyright (C) 2022 MEAT Inc
+** Author: Zack Walsh <neo.smith@motorengineeringandtech.com>
 **
 ** This library is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published
@@ -18,11 +18,11 @@
 **
 */
 
-
 #pragma once
 
+// Fulcrum Resource Imports
 #include "fulcrum_j2534.h"
-#include "fulcrum_loader.h" // for tstring
+#include "fulcrum_loader.h"		// for TSTRING
 
 void fulcrum_setInternalError(LPCTSTR szError, ...);
 LPCTSTR fulcrum_getInternalError();
