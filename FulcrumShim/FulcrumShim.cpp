@@ -19,12 +19,15 @@
 */
 
 // Fulcrum_shim.cpp : Defines the initialization routines for the DLL.
-#include "stdafx.h"
-#include "FulcrumShim.h"
-#include "fulcrum_jpipe.h"
-#include "SelectionBox.h"
-#include "fulcrum_output.h"
 
+// Standard Imports
+#include "stdafx.h"
+
+// Fulcrum Resource Imports
+#include "FulcrumShim.h"
+#include "SelectionBox.h"
+#include "fulcrum_jpipe.h"
+#include "fulcrum_output.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

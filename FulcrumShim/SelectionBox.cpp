@@ -19,18 +19,19 @@
 */
 
 // SelectionBox.cpp : implementation file
-#include "stdafx.h"
+using namespace std;
 
+// Standard Imports
+#include "stdafx.h"
 #include <set>
 #include <sstream>
 #include <string>
 #include <tchar.h>
 
+// Fulcrum Resource Imports
 #include "FulcrumShim.h"
 #include "SelectionBox.h"
 #include "fulcrum_output.h"
-
-using namespace std;
 
 // SelectionBox dialog
 IMPLEMENT_DYNAMIC(CSelectionBox, CDialog)

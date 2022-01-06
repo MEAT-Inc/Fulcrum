@@ -18,6 +18,9 @@
 **
 */
 
+#pragma once
+
+// Standard Imports
 #include <tchar.h>
 
 class fulcrum_output {

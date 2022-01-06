@@ -18,8 +18,8 @@
 **
 */
 
+// Standard Imports
 #include "stdafx.h"
-
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -28,9 +28,10 @@
 #include <tchar.h>
 #include <windows.h>
 
-#include "fulcrum_output.h"
+// Fulcrum Resource Imports
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
+#include "fulcrum_output.h"
 #include "fulcrum_frontend.h"
 
 // In case of some internal errors we'll return ERR_FAILED, set our own internal string,

@@ -18,15 +18,13 @@
 **
 */
 
-#include "stdafx.h"
+#pragma once
+
+// Standard Imports
+#include <memory>
 #include <tchar.h>
 #include <varargs.h>
-#include <memory>
 #include <stdexcept>
-
-// For the pipes
-#include "FulcrumShim.h"
-#include "fulcrum_output.h"
 
 // Implementation of a circular buffer. Two simple interfaces:
 //   Put(): Add a string to the log
@@ -49,11 +47,5 @@ private:
 	size_t m_iWriteNext;
 	size_t m_iReadNext;
 	LPTSTR m_pBuffer;
-	TCHAR data[1024 * 128]; // circular buffer for debug log
+	TCHAR data[1024 * 128]; // Circular buffer for debug log
 };
-
-// Public FIFO members. Used to trigger when to write to file or not.
-FILE* fp;
-fulcrum_cfifo logFifo;
-static bool fLogToFile = false;
-static bool fInitalized = false;

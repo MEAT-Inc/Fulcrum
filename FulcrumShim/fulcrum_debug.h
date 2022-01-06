@@ -20,8 +20,9 @@
 
 #pragma once
 
+// Fulcrum Resource Imports
 #include "fulcrum_j2534.h"
-#include "fulcrum_loader.h" // for tstring
+#include "fulcrum_loader.h"		// for TSTRING
 
 void fulcrum_setInternalError(LPCTSTR szError, ...);
 LPCTSTR fulcrum_getInternalError();

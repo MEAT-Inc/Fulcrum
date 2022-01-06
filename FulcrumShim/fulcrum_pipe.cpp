@@ -18,14 +18,16 @@
 **
 */
 
+// Standard Imports
 #include "stdafx.h"
 #include <stdio.h>
 #include <windows.h>
-
-#include "fulcrum_pipe.h"
-#include "fulcrum_output.h"
-#include "fulcrum_debug.h"
 #include <tchar.h>
+
+// Fulcrum Resource Imports
+#include "fulcrum_pipe.h"
+#include "fulcrum_debug.h"
+#include "fulcrum_output.h"
 
 // CTOR and DCTOR for pipe objects
 fulcrum_pipe::fulcrum_pipe() { }

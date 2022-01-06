@@ -19,16 +19,18 @@
 */
 
 #pragma once
+
+// Standard Imports
 #include "afxwin.h"
 #include "afxcmn.h"
-
-#include "resource.h"
-#include "fulcrum_loader.h"
 #include <set>
 #include <string>
 
-// SelectionBox dialog
+// Fulcrum Resource Imports
+#include "resource.h"
+#include "fulcrum_loader.h"
 
+// SelectionBox dialog
 class CSelectionBox : public CDialog
 {
 	DECLARE_DYNAMIC(CSelectionBox)

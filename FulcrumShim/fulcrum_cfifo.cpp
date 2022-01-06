@@ -17,22 +17,17 @@
 **
 */
 
-// Standard includes
+// Standard Imports
 #include "stdafx.h"
+#include <memory>
 #include <tchar.h>
 #include <varargs.h>
-#include <memory>
 #include <stdexcept>
 
-// For the pipes
+// Fulcrum Resource Imports
 #include "fulcrum_cfifo.h"
-#include "FulcrumShim.h"
-#include "fulcrum_output.h"
 
-/// <summary>
-/// Puts a new entry into our log output file
-/// </summary>
-/// <param name="szMsg"></param>
+// Puts a new entry into our log output file
 void fulcrum_cfifo::Put(LPCTSTR szMsg)
 {
 	// Build size string
@@ -72,10 +67,7 @@ void fulcrum_cfifo::Put(LPCTSTR szMsg)
 	m_nItems = m_nItems + nSize < m_nSize ? m_nItems + nSize : m_nSize;
 }
 
-/// <summary>
-/// Gets a file object to write into
-/// </summary>
-/// <param name="fp"></param>
+// Gets a file object to write into
 void fulcrum_cfifo::Get(FILE* fp)
 {
 	// Build size string value

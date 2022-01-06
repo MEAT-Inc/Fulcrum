@@ -18,20 +18,22 @@
 **
 */
 
-// FulcrumShim.h : main header file for the Wombat DLL
+// FulcrumShim.h : main header file for the FulcrumShim DLL
 #pragma once
 
 #ifndef __AFXWIN_H__
 	#error "include 'stdafx.h' before including this file for PCH"
 #endif
 
+// Standard Imports
+#include <thread>   
+
+// Fulcrum Resource Imports
 #include "resource.h"	
 #include "fulcrum_jpipe.h"
-#include <thread>   
 
 // CFulcrumDLL.h
 // See FulcrumShim.cpp for the implementation of this class
-
 class CFulcrumShim : public CWinApp 
 {	
 	// CTOR and base pipe configuration

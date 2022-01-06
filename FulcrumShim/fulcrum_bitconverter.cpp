@@ -18,10 +18,12 @@
 **
 */
 
+// Standard Imports
 #include "stdafx.h"
-#include "fulcrum_bitconverter.h"
 #include <vcruntime_string.h>
 
+// Fulcurm Resource Imports
+#include "fulcrum_bitconverter.h"
 
 int fulcrum_bitconverter::bytes_to_int32(byte b[], int offset)
 {

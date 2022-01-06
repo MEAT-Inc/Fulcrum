@@ -20,6 +20,7 @@
 
 #pragma once
 
+// Fulcrum Resource Imports
 #include "fulcrum_j2534.h"
 
 extern "C"

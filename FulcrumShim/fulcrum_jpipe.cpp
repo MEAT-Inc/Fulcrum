@@ -18,12 +18,13 @@
 **
 */
 
+// Standard Imports
 #include "stdafx.h"
 
+// Fulcrum Resource Imports
 #include "fulcrum_pipe.h"
 #include "fulcrum_jpipe.h"
 #include "fulcrum_bitconverter.h"
-
 
 void fulcrum_jpipe::WriteSByteArray(SBYTE_ARRAY* ary)
 {

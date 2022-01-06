@@ -18,10 +18,8 @@
 **
 */
 
-// STD imports
+// Standard Imports
 #include "stdafx.h"
-
-// Headers for imported commands
 #include <tchar.h>
 #include <windows.h> 
 #include <chrono>
@@ -31,15 +29,15 @@
 #include <string.h>
 #include <comdef.h>  
 
-// Includes for fulcrum libs and methods
+// Fulcrum Resource Imports
 #include "FulcrumShim.h"
 #include "SelectionBox.h"
+#include "fulcrum_debug.h"
 #include "fulcrum_jpipe.h"
 #include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
-#include "fulcrum_debug.cpp"
 
 // Check if the DLL is loaded and usable or not
 #define fulcrum_CHECK_DLL() \

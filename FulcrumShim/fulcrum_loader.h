@@ -20,10 +20,13 @@
 
 #pragma once
 
-#include "fulcrum_j2534.h"
+// Standard Imports
 #include <set>
 #include <string>
 #include <wtypes.h>
+
+// Fulcrum Resource Imports
+#include "fulcrum_j2534.h"
 
 #ifdef _UNICODE
 typedef std::wstring tstring;

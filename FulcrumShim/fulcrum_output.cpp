@@ -18,16 +18,23 @@
 **
 */
 
+// Standard Imports
 #include "stdafx.h"
 #include <tchar.h>
 #include <varargs.h>
 #include <memory>
 #include <stdexcept>
 
-// For the pipes
-#include "fulcrum_cFifo.h"
+// Fulcrum Resource Imports
 #include "FulcrumShim.h"
+#include "fulcrum_cfifo.h"
 #include "fulcrum_output.h"
+
+// Public FIFO members. Used to trigger when to write to file or not.
+FILE* fp;
+fulcrum_cfifo logFifo;
+static bool fLogToFile = false;
+static bool fInitalized = false;
 
 // Logging Methods Appends are for single targets
 void fulcrum_output::writeNewLogFile(LPCTSTR szFilename, bool in_fLogToFile)
@@ -36,12 +43,13 @@ void fulcrum_output::writeNewLogFile(LPCTSTR szFilename, bool in_fLogToFile)
 	// and set a flag that redirects all future log messages directly to the file
 	if (in_fLogToFile)
 	{
+		// Open the file object here and get the handle from it
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
-		logFifo.Get(fp);
-		fLogToFile = true;
+		logFifo.Get(fp); fLogToFile = true;
 	}
 	else
 	{
+		// Open the file object handle here and close the stream to it.
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
 		logFifo.Get(fp);
 		fclose(fp);
