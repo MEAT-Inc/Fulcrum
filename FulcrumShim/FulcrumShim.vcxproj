@@ -420,6 +420,7 @@
   <ItemGroup>
     <ClCompile Include="fulcrum_bitconverter.cpp" />
     <ClCompile Include="FulcrumShim.cpp" />
+    <ClCompile Include="fulcrum_cfifo.cpp" />
     <ClCompile Include="fulcrum_jpipe.cpp" />
     <ClCompile Include="fulcrum_output.cpp" />
     <ClCompile Include="fulcrum_pipe.cpp" />
@@ -435,6 +436,7 @@
     <None Include="MEAT_FulcrumInjector_DEBUG.reg" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fulcrum_cfifo.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="fulcrum_bitconverter.h" />
