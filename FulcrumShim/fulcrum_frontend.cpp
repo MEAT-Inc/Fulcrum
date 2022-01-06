@@ -260,6 +260,9 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	// Get output value and return it here
 	retval = _PassThruClose(DeviceID);
 	fulcrum_printretval(retval);
+
+	// Close pipes
+	CFulcrumShim::ShutdownPipes();
 	return retval;
 }
 

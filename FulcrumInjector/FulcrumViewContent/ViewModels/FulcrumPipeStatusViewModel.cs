@@ -91,6 +91,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
                     InjectorConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult = "Injection Passed!";
                     InjectorConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+
+                    // Stop updating values here once we get a good injection test to run.
+                    this._testInjectionButtonWatchdog.PropertyUpdateTimer.Stop();
                     return; 
                 }
                 
