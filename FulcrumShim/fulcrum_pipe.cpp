@@ -82,10 +82,6 @@ bool fulcrum_pipe::ConnectOutputPipe()
 }
 bool fulcrum_pipe::ConnectInputPipe()
 {
-	// Configure new pipe name object output
-	LPTSTR InputPipeLocation = TEXT("\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3");
-	hFulcrumReader = CreateFile(InputPipeLocation, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-
 	// Check if this pipe is loaded or not
 	if (_pipesConnected || InputConnected)
 	{
@@ -97,6 +93,10 @@ bool fulcrum_pipe::ConnectInputPipe()
 		if (_pipesConnected) fulcrum_output::fulcrumDebug(_T("-->       Both Fulcrum Pipes are already open!\n"));
 		return true;
 	}
+
+	// Configure new pipe name object output
+	LPTSTR InputPipeLocation = TEXT("\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3");
+	hFulcrumReader = CreateFile(InputPipeLocation, GENERIC_READ, 0, NULL, CREATE_ALWAYS, 0, NULL);
 
 	// Check if the pipe was built or not.
 	if ((hFulcrumReader == NULL || hFulcrumReader == INVALID_HANDLE_VALUE))
