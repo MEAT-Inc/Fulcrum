@@ -43,6 +43,15 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             get => _pipeState;
             protected set
             {
+                // Fire new event state args
+                this.OnPipeStateChanged(new FulcrumPipeStateChangedEventArgs()
+                {
+                    NewState = value,
+                    OldState = this._pipeState,
+                    TimeChanged = DateTime.Now
+                });
+
+                // Store new value objects
                 this._pipeState = value;
                 PipeLogger?.WriteLog($"PIPE {this.PipeType} STATE IS NOW: {this._pipeState}", LogType.TraceLog);
             }
