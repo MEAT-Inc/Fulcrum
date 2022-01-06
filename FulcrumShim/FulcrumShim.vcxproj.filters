@@ -45,6 +45,9 @@
     <ClCompile Include="FulcrumShim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fulcrum_cfifo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fulcrum_shim.def">
@@ -97,6 +100,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fulcrum_cfifo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,18 +1,40 @@
+/*
+**
+** Copyright (C) 2022 MEAT Inc
+** Author: Zack Walsh <neo.smith@motorengineeringandtech.com>
+**
+** This library is free software; you can redistribute it and/or modify
+** it under the terms of the GNU Lesser General Public License as published
+** by the Free Software Foundation, either version 3 of the License, or (at
+** your option) any later version.
+**
+** This library is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Lesser General Public License for more details.
+**
+** You should have received a copy of the GNU Lesser General Public
+** License along with this library; if not, <http://www.gnu.org/licenses/>.
+**
+*/
+
+// Standard Imports
 #include "stdafx.h"
+#include "config.h"
 #include <afxmt.h>
 
-#include "fulcrum_j2534.h"
+// Fulcrum Resource Imports
 #include "SelectionBox.h"
+#include "fulcrum_j2534.h"
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
 
-// Used to configure the defines
-#include "config.h"
-
 // Pointers to J2534 API functions in the loaded library
 PTOPEN _PassThruOpen = 0;
 PTCLOSE _PassThruClose = 0;
+PTGETNEXTCARDAQ _PassThruGetNextCarDAQ = 0;
+PTREADDETAILS _PassThruReadDetails = 0;
 PTCONNECT _PassThruConnect = 0;
 PTDISCONNECT _PassThruDisconnect = 0;
 PTREADMSGS _PassThruReadMsgs = 0;
@@ -293,6 +315,8 @@ bool fulcrum_loadLibrary(LPCTSTR szDLL)
 
 	_PassThruOpen = (PTOPEN)GetProcAddress(hDLL, "PassThruOpen");
 	_PassThruClose = (PTCLOSE)GetProcAddress(hDLL, "PassThruClose");
+	_PassThruGetNextCarDAQ = (PTGETNEXTCARDAQ)GetProcAddress(hDLL, "PassThruGetNextCarDAQ");
+	_PassThruReadDetails = (PTREADDETAILS)GetProcAddress(hDLL, "PassThruReadDetails");
 	_PassThruConnect = (PTCONNECT)GetProcAddress(hDLL, "PassThruConnect");
 	_PassThruDisconnect = (PTDISCONNECT)GetProcAddress(hDLL, "PassThruDisconnect");
 	_PassThruReadMsgs = (PTREADMSGS)GetProcAddress(hDLL, "PassThruReadMsgs");
@@ -320,6 +344,8 @@ void fulcrum_unloadLibrary()
 	// Invalidate the function pointers
 	_PassThruOpen = NULL;
 	_PassThruClose = NULL;
+	_PassThruGetNextCarDAQ = NULL;
+	_PassThruReadDetails = NULL;
 	_PassThruConnect = NULL;
 	_PassThruDisconnect = NULL;
 	_PassThruReadMsgs = NULL;
