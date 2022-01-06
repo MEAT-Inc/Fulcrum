@@ -248,14 +248,22 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                     this.PipeLogger.WriteLog("FAILED TO READ NEW DATA DUE TO A FATAL ERROR OF SOME TYPE!", LogType.ErrorLog);
                     this.PipeLogger.WriteLog($"EXCEPTION GENERATED FROM READER: {NextPipeData}", LogType.ErrorLog);
 
-                    // Cancel the tasks, break out.
-                    this.StopBackgroundReadProcess();
-                    this.PipeLogger.WriteLog("STOPPED EXECUTION OF BACKGROUND READING FROM INTERNAL THREAD!", LogType.WarnLog);
+                    // REMOVED: This cancel operation call has been cut out so we keep reading at all times.
+                    //  Cancel the tasks, break out.
+                    //  this.StopBackgroundReadProcess();
+                    //  this.PipeLogger.WriteLog("STOPPED EXECUTION OF BACKGROUND READING FROM INTERNAL THREAD!", LogType.WarnLog);
+                    //  break;
+
+                    // Try running a reconnect method here.
+                    this.PipeLogger.WriteLog("TRYING TO RECONNECT TO OUR PIPE HOST NOW...", LogType.WarnLog);
+                    this.PipeLogger.WriteLog("TRYING CONNECTION A TOTAL OF 5 TIMES BEFORE FAILING THIS ROUTINE!", LogType.WarnLog);
+                    if (this.StartAsyncHostConnect().Wait(DefaultConnectionTimeout * 5)) continue;
+                   
+                    // Stop the reading operation if we can't get back into our host
+                    this.StartBackgroundReadProcess();
+                    this.PipeLogger.WriteLog("FAILED TO LOCATE OUR PIPE HOST AGAIN! STOPPING READING PROCESS AND EXITING THIS LOOP", LogType.ErrorLog);
                     break;
                 }
-
-                // Null out our cancel token and source
-                this.PipeLogger.WriteLog("RESET CANCELLATION TOKEN SOURCE OBJECT TO A NULL STATE! READY TO RETRY READING WHEN INVOKED...", LogType.InfoLog);
             }, this.BackgroundRefreshSource.Token);
             return true;
         }

@@ -59,7 +59,7 @@ bool fulcrum_pipe::ConnectOutputPipe()
 		OutputPipeLocation,					// Name of the pipe
 		PIPE_ACCESS_OUTBOUND,				// Pipe direction (In and Out)
 		PIPE_TYPE_MESSAGE | PIPE_WAIT,		// Pipe types for sending output
-		1,								    // Number of instances
+		100,							    // Number of instances (Set to 100 since we need to be aware of open and closes)
 		1024 * 16,							// Output buffer size
 		1024 * 16,							// Input buffer size
 		NMPWAIT_USE_DEFAULT_WAIT,			// Timeout Time value
@@ -84,7 +84,7 @@ bool fulcrum_pipe::ConnectInputPipe()
 {
 	// Configure new pipe name object output
 	LPTSTR InputPipeLocation = TEXT("\\\\.\\pipe\\1D16333944F74A928A932417074DD2B3");
-	hFulcrumReader = CreateFile(InputPipeLocation, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	hFulcrumReader = CreateFile(InputPipeLocation, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 
 	// Check if this pipe is loaded or not
 	if (_pipesConnected || InputConnected)
@@ -124,30 +124,30 @@ void fulcrum_pipe::ShutdownPipes()
 void fulcrum_pipe::ShutdownOutputPipe()
 {
 	// Check if already closed or not
-	if (hFulcrumReader == NULL) {
+	if (hFulcrumWriter == NULL) {
 		fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) was already closed!\n"));
-		InputConnected = false;	_pipesConnected = false;
+		OutputConnected = false; _pipesConnected = false;
 		return;
 	}
 
 	// Close it out now
 	CloseHandle(hFulcrumWriter); hFulcrumWriter = nullptr;
 	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 1 (Output Pipe) has been closed! Pipe handle is now NULL!\n"));
-	InputConnected = false; _pipesConnected = false;
+	OutputConnected = false; _pipesConnected = false;
 }
 void fulcrum_pipe::ShutdownInputPipe()
 {
 	// Check if already closed or not
 	if (hFulcrumReader == NULL) {
 		fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) was already closed!\n"));
-		OutputConnected = false; _pipesConnected = false;
+		InputConnected = false; _pipesConnected = false;
 		return;
 	}
 
 	// Close it out now
 	CloseHandle(hFulcrumReader); hFulcrumReader = nullptr;
 	fulcrum_output::fulcrumDebug(_T("-->       Fulcrum Pipe 2 (Input Pipe) has been closed! Pipe handle is now NULL!\n"));
-	OutputConnected = false; _pipesConnected = false;
+	InputConnected = false; _pipesConnected = false;
 }
 
 

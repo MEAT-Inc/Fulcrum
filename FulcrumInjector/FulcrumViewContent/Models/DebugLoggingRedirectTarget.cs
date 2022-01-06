@@ -51,7 +51,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         {
             // Write output using dispatcher to avoid threading issues.
             string RenderedText = this.Layout.Render(LogEvent);
-            this.ParentUserControl.Dispatcher.Invoke(() => DebugEditor.Text += RenderedText + "\n");
+            this.ParentUserControl.Dispatcher.Invoke(() =>
+            {
+                // Append new text content and scroll to the end of the document
+                DebugEditor.Text += RenderedText + "\n";
+                DebugEditor.ScrollToEnd();
+            });
         }
     }
 }
