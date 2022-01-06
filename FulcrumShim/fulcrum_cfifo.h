@@ -18,36 +18,34 @@
 **
 */
 
-// FulcrumShim.h : main header file for the FulcrumShim DLL
 #pragma once
 
-#ifndef __AFXWIN_H__
-	#error "include 'stdafx.h' before including this file for PCH"
-#endif
-
 // Standard Imports
-#include <thread>   
+#include <memory>
+#include <tchar.h>
+#include <varargs.h>
+#include <stdexcept>
 
-// Fulcrum Resource Imports
-#include "resource.h"	
-#include "fulcrum_jpipe.h"
+// Implementation of a circular buffer. Two simple interfaces:
+//   Put(): Add a string to the log
+//   Get(): Write the entire log to a file
+// Based on DSP Goodies by Alessandro Gallo (http://ag-works.net/)
+class fulcrum_cfifo {
+public: 
+	fulcrum_cfifo()
+	: m_nSize(sizeof(data) / sizeof(data[0]))
+	, m_nItems(0)
+	, m_iWriteNext(0)
+	, m_iReadNext(0)
+	, m_pBuffer(data) { }
+	  void Put(LPCTSTR szMsg);
+	  void Get(FILE* fp);
 
-// CFulcrumDLL.h
-// See FulcrumShim.cpp for the implementation of this class
-class CFulcrumShim : public CWinApp 
-{	
-	// CTOR and base pipe configuration
-    public:
-		CFulcrumShim();
-
-		// Pipe configuration
-		static void StartupPipes();
-		static void ShutdownPipes();
-		static bool PipesConnecting;
-		static fulcrum_jpipe* fulcrumPiper;
-		
-	// Overrides for starting
-    public: 
-		DECLARE_MESSAGE_MAP()
-		virtual BOOL InitInstance();		
+private:
+	size_t m_nSize;
+	size_t m_nItems;
+	size_t m_iWriteNext;
+	size_t m_iReadNext;
+	LPTSTR m_pBuffer;
+	TCHAR data[1024 * 128]; // Circular buffer for debug log
 };

@@ -293,7 +293,6 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 
             // Build new timeout token values for reading operation and read now
             byte[] OutputBuffer = new byte[DefaultBufferValue];
-            List<string> AllProcessedMessages = new List<string>();
             this.AsyncReadingOperationsTokenSource = new CancellationTokenSource(DefaultReadingTimeout);
 
             try
@@ -306,35 +305,22 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
                 // Now convert our bytes into a string object, and print them to our log files.
                 int BytesRead = ReadingTask.Result;
                 if (BytesRead != OutputBuffer.Length) OutputBuffer = OutputBuffer.Take(BytesRead).ToArray();
-                string NextPipeString = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length);
-                string[] SplitPipeContent = NextPipeString.Split('\n')
-                    .ToList().Where(StringObj => !string.IsNullOrWhiteSpace(StringObj))
-                    .Select(StringPart => StringPart.TrimEnd()).ToArray();
+                ReadDataContents = Encoding.Default.GetString(OutputBuffer, 0, OutputBuffer.Length).TrimEnd();
 
-                // Log new message pulled and write contents of it to our log file
-                this.PipeLogger.WriteLog($"[PIPE DATA] ::: NEW PIPE DATA PROCESSED!", LogType.TraceLog);
-                foreach (var PipeStringPart in SplitPipeContent)
+                // Now fire off a pipe data read event if possible. Otherwise return
+                if (this.PipeDataProcessed == null) return true;
+                this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
                 {
-                    // Add this into our list of app pipe content
-                    AllProcessedMessages.Add(PipeStringPart);
-                    this.PipeLogger.WriteLog($"--> {PipeStringPart}", LogType.TraceLog);
+                    // Store byte values
+                    PipeByteData = OutputBuffer,
+                    ByteDataLength = (uint)OutputBuffer.Length,
 
-                    // Now fire off a pipe data read event if possible. Otherwise return
-                    if (this.PipeDataProcessed == null) continue;
-                    this.OnPipeDataProcessed(new FulcrumPipeDataReadEventArgs()
-                    {
-                        // Store byte values
-                        PipeByteData = OutputBuffer,
-                        ByteDataLength = (uint)OutputBuffer.Length,
-
-                        // Store string values
-                        PipeDataString = PipeStringPart,
-                        PipeDataStringLength = (uint)PipeStringPart.Length
-                    });
-                }
+                    // Store string values
+                    PipeDataString = ReadDataContents,
+                    PipeDataStringLength = (uint)ReadDataContents.Length
+                });
 
                 // Return passed and build output string values
-                ReadDataContents = string.Join("\n", AllProcessedMessages);
                 return true;
             }
             catch (Exception ReadEx)

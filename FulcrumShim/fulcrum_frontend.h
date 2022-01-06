@@ -1,7 +1,7 @@
 /*
 **
-** Copyright (C) 2009 Drew Technologies Inc.
-** Author: Joey Oravec <joravec@drewtech.com>
+** Copyright (C) 2022 MEAT Inc
+** Author: Zack Walsh <neo.smith@motorengineeringandtech.com>
 **
 ** This library is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published
@@ -20,10 +20,16 @@
 
 #pragma once
 
+// Fulcrum Resource Imports
 #include "fulcrum_j2534.h"
 
 extern "C"
 {
+	// Details and init methods
+	long J2534_API PassThruGetNextCarDAQ(unsigned long* pName, unsigned long* pAddr, unsigned long* pVersion);
+	long J2534_API PassThruReadDetails(unsigned long* pName);
+
+	// Standard PTCommands
 	long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID);
 	long J2534_API PassThruClose(unsigned long DeviceID);
 	long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long ProtocolID, unsigned long Flags, unsigned long Baudrate, unsigned long *pChannelID);
@@ -39,6 +45,7 @@ extern "C"
 	long J2534_API PassThruGetLastError(char *pErrorDescription);
 	long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long IoctlID, void *pInput, void *pOutput);
 
+	// Lib loaders and logging methods
 	long J2534_API PassThruLoadLibrary(char *szFunctionLibrary);
 	long J2534_API PassThruWriteToLogA(char *szMsg);
 	long J2534_API PassThruWriteToLogW(wchar_t *szMsg);
@@ -46,4 +53,5 @@ extern "C"
 	long J2534_API PassThruUnloadLibrary();
 }
 
+// Error helper for error descriptions to codes
 long fulcrum_PassThruGetLastError(char *pErrorDescription);
