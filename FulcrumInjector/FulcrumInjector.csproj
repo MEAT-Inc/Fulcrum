@@ -110,10 +110,16 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.7.12\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.4.9.108\lib\net472\SharpLogger.dll</HintPath>
+    <Reference Include="SharpLogger, Version=1.4.10.109, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpLogger.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpWrap2534, Version=2.1.5.109, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpWrap2534.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpWrap2534-UI, Version=1.2.1.16, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpWrap2534-UI.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
