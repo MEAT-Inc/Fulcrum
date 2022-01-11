@@ -49,7 +49,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.DataContext = this.ViewModel;
 
             // Store temp text into our email body.
-            this.EmailBodyTextContent.Text = "Dearest Neo,\nPlease fix your broken software. I thought this was supposed to make my life easier?.\n\nWith Love,\nA Pissed Off Tech";
+            this.EmailBodyTextContent.Text = "Dearest Neo,\nPlease fix your broken software. I thought this was supposed to make my life easier?\n\nWith Love,\nA Pissed Off Tech";
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
