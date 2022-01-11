@@ -61,7 +61,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Get text of TextBox object and try to add address.
             TextBox BoxObject = (TextBox)SendingTextBox;
-            bool AddedCorrectly = this.ViewModel.AppendNewAddress(BoxObject.Text.Trim());
+            if (this.ViewModel.AppendNewAddress(BoxObject.Text.Trim()))
 
             // If Added, Set text to empty. The listbox of address values will auto update
 
