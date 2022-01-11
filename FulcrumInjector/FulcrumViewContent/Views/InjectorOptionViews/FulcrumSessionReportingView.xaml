@@ -88,8 +88,8 @@
                         <RowDefinition Height=".215*"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBox Style="{StaticResource  InputTextWithHolder}" Margin="0,10,0,10" Tag="Enter A Subject For This Report"/>
-                    <avEdit:TextEditor Grid.Row="1" Style="{StaticResource EmailContentBoxStyle}"/>
+                    <TextBox x:Name="EmailSubjectText" Style="{StaticResource  InputTextWithHolder}" Margin="0,10,0,10" Tag="Enter A Subject For This Report"/>
+                    <avEdit:TextEditor x:Name="EmailBodyTextContent" Grid.Row="1" Style="{StaticResource EmailContentBoxStyle}"/>
                 </Grid>
 
                 <!-- Splitting Border -->
@@ -122,9 +122,7 @@
                             </Path>
                         </Button>
                     </Grid>
-                    <ListBox Grid.Row="1" Margin="0,5,0,0" Style="{StaticResource AttachedFilesListboxStyle}">
-
-                    </ListBox>
+                    <ListBox Grid.Row="1" Margin="0,5,0,0" Style="{StaticResource AttachedFilesListboxStyle}"/>
                 </Grid>
             </Grid>
         </Grid>
