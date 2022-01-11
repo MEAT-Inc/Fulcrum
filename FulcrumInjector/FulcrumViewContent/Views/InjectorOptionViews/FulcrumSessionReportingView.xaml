@@ -26,10 +26,10 @@
     </UserControl.Resources>
 
     <!-- Session Reporting Content -->
-    <Grid Margin="15,15">
+    <Grid Margin="15,15,20,15">
         <Grid.RowDefinitions>
             <RowDefinition Height=".475*"/>
-            <RowDefinition Height="5"/>
+            <RowDefinition Height="10"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -48,12 +48,12 @@
         </Grid>
 
         <!-- Splitting Border -->
-        <Border VerticalAlignment="Top" Grid.Row="1" BorderBrush="{StaticResource TextColorBase}" BorderThickness="0,2,0,0"/>
+        <Border VerticalAlignment="Center" Grid.Row="1" BorderBrush="{StaticResource TextColorBase}" BorderThickness="0,2,0,0"/>
 
         <!-- Email Address Entry/Current Recipients, Email writing field and file selection to include in the list of output attachments -->
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height=".15*"/>
+                <RowDefinition Height=".125*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
@@ -75,7 +75,58 @@
             </Grid>
 
             <!-- Compose Box and File Selection -->
+            <Grid Grid.Row="1" Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="445"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
+                <!-- Content for Email Composition -->
+                <Grid Grid.Column="0" Margin="0,0,5,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".215*"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBox Style="{StaticResource  InputTextWithHolder}" Margin="0,10,0,10" Tag="Enter A Subject For This Report"/>
+                    <avEdit:TextEditor Grid.Row="1" Style="{StaticResource EmailContentBoxStyle}"/>
+                </Grid>
+
+                <!-- Splitting Border -->
+                <Border HorizontalAlignment="Center" 
+                        BorderThickness="0,0,3,0" 
+                        Margin="0,10,0,0" Grid.Column="1" 
+                        BorderBrush="{StaticResource DarkGreyThemeColor}"/>
+
+                <!-- Content For File Selection -->
+                <Grid Grid.Column="2" Margin="5,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".185*"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="35"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock 
+                            Margin="3,2,0,0" 
+                            Text="Report Attachments" FontSize="20"
+                            Style="{StaticResource AttachmentsTitleText}"/>
+                        <Button Click="AddReportAttachmentButton_OnClick" Margin="0,10,0,5"
+                                Grid.Column="1" Style="{StaticResource ActionButtonStyleTransparent}">
+                            <Path Fill="{DynamicResource TextColorBase}" Margin="0,1,5,0">
+                                <Path.Data>
+                                    <PathGeometry Figures="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                                </Path.Data>
+                            </Path>
+                        </Button>
+                    </Grid>
+                    <ListBox Grid.Row="1" Margin="0,5,0,0" Style="{StaticResource AttachedFilesListboxStyle}">
+
+                    </ListBox>
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

@@ -87,5 +87,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // TODO: Write logic to parse contents and build an output email to send.
         }
+        /// <summary>
+        /// Attaches a new file entry into our list of files by showing a file selection dialogue
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddReportAttachmentButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            // TODO: Write logic for adding a new file object into the report list of attachments for our email
+        }
     }
 }
