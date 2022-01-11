@@ -62,11 +62,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Get text of TextBox object and try to add address.
             TextBox BoxObject = (TextBox)SendingTextBox;
             if (this.ViewModel.AppendNewAddress(BoxObject.Text.Trim()))
-
-            // If Added, Set text to empty. The listbox of address values will auto update
-
+            {
+                // If Added, Set text to empty. The listbox of address values will auto update
+                return;
+            }
 
             // Else Set text to 'Invalid Email!', Highlight the box for 3 seconds in red and then reset to normal
+
         }
     }
 }
