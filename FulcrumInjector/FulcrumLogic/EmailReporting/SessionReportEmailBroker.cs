@@ -46,7 +46,11 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
                 }
 
                 // Combine the output address set with the current default address
-                var OutputList = new List<MailAddress> { DefaultRecipientAddress };
+                var OutputList = this.DefaultRecipientAddress == null ?
+                    new List<MailAddress>() :
+                    new List<MailAddress> { DefaultRecipientAddress };
+
+                // Append in existing address values now.
                 if (this._emailRecipientAddresses != null) OutputList.AddRange(this._emailRecipientAddresses);
 
                 // Remove duplicates and return output
@@ -73,18 +77,11 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// <param name="DefaultRecipient">Default recipient for emails</param>
         public SessionReportEmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient = null)
         {
-            // If the default recipient is null, set it here.
-            if (DefaultRecipient == null)
-            {
-                this.EmailLogger.WriteLog("DEFAULT RECIPIENT EMAIL WAS NULL! PULLING DEFAULT VALUE FROM SETTINGS NOW...", LogType.WarnLog);
-                DefaultRecipient = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultReportRecipient");
-                this.EmailLogger.WriteLog($"NEW DEFAULT RECIPIENT VALUE: {DefaultRecipient}", LogType.WarnLog);
-            }
-
             // Now build default settings values and log information
             this.EmailSenderName = SenderName;
             this.EmailSenderAddress = new MailAddress(SenderEmail);
-            this.DefaultRecipientAddress = new MailAddress(DefaultRecipient);
+            if (DefaultRecipient == null) this.EmailLogger.WriteLog("NOT INCLUDING A DEFAULT RECIPIENT ON THESE EMAILS!", LogType.WarnLog);
+            else { this.DefaultRecipientAddress = new MailAddress(DefaultRecipient); }
 
             // Configure password entry and the SMTP Client here
             this.EmailSenderPassword = new SecureString();
