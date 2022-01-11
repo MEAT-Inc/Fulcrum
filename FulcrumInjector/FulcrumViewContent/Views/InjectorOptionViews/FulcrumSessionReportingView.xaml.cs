@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
+using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -53,22 +55,37 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// Reacts to a new button click for adding an email entry into our list
         /// </summary>
         /// <param name="SendingTextBox">Sending button</param>
-        /// <param name="EnteredKeyArgs">Event Args processed</param>
-        private void AddAddressTextBox_KeyDown(object SendingTextBox, KeyEventArgs EnteredKeyArgs)
+        /// <param name="TextChangedArgs">Changed text arguments</param>
+        private void AddressListTextBox_OnChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
         {
-            // When a key is pressed, if it's not the enter key move on.
-            if (EnteredKeyArgs.Key != Key.Enter) return;
-
             // Get text of TextBox object and try to add address.
-            TextBox BoxObject = (TextBox)SendingTextBox;
-            if (this.ViewModel.AppendNewAddress(BoxObject.Text.Trim()))
-            {
-                // If Added, Set text to empty. The listbox of address values will auto update
-                return;
-            }
+            var BoxObject = (TextBox)SendingTextBox;
+            string NewTextContent = BoxObject.Text;
 
-            // Else Set text to 'Invalid Email!', Highlight the box for 3 seconds in red and then reset to normal
+            // Check if there's even an email to parse out. If none, remove all.
+            if (NewTextContent.Length == 0) { this.ViewModel.RemoveAddress(); }
+            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"); 
+            var MatchedEmails = SendingRegex.Matches(NewTextContent);
+            if (MatchedEmails.Count == 0) return; 
 
+            // Clear out all current address values and then add them back in one at a time.
+            this.ViewModel.RemoveAddress();
+            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.AppendAddress(AddressMatch.Value); }
+            this.ViewLogger.WriteLog($"CURRENT EMAILS: {string.Join(",", this.ViewModel.EmailAddressRecipients)}", LogType.TraceLog);
+
+            // Now remove address values that don't fly here.
+            BoxObject.Text = string.Join(",", this.ViewModel.EmailAddressRecipients);
+            this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
+        }
+
+        /// <summary>
+        /// Send email button for the report sender
+        /// </summary>
+        /// <param name="SendButton"></param>
+        /// <param name="SendButtonArgs"></param>
+        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
+        {
+            // TODO: Write logic to parse contents and build an output email to send.
         }
     }
 }

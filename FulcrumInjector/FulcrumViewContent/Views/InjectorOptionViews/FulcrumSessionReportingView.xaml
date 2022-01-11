@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews"
              xmlns:injectorOptionViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels"
+             xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              Loaded="FulcrumSessionReportingView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -28,6 +29,7 @@
     <Grid Margin="15,15">
         <Grid.RowDefinitions>
             <RowDefinition Height=".475*"/>
+            <RowDefinition Height="5"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -44,10 +46,35 @@
                 <Run FontWeight="DemiBold" Foreground="Yellow" Text="If you need support or something is broken in this app, include Neo on these log emails! He's quite the helpful guy if I do say so myself. His email is neo.smith@motorengineeringandtech.com"/>
             </TextBlock>
         </Grid>
-        <Border VerticalAlignment="Bottom" Grid.Row="0" BorderBrush="{StaticResource TextColorBase}" BorderThickness="0,0,0,2"/>
+
+        <!-- Splitting Border -->
+        <Border VerticalAlignment="Top" Grid.Row="1" BorderBrush="{StaticResource TextColorBase}" BorderThickness="0,2,0,0"/>
 
         <!-- Email Address Entry/Current Recipients, Email writing field and file selection to include in the list of output attachments -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".15*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Address Entries and Send Button -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width=".25*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox TextChanged="AddressListTextBox_OnChanged"
+                         Grid.Column="0" Margin="0,5,5,0" 
+                         Style="{StaticResource  InputTextWithHolder}"
+                         Tag="Enter Email Addresses To Share Report With"/>
+                <Button Grid.Column="1" 
+                        Content="Send Report" 
+                        Margin="5,5,0,0"
+                        Click="SendEmailButton_OnClick"
+                        Style="{StaticResource ActionButtonStyle}"/>
+            </Grid>
+
+            <!-- Compose Box and File Selection -->
 
         </Grid>
     </Grid>

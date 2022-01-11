@@ -90,7 +90,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             // Log information about passed output here.
             this.EmailLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this.EmailSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
             this.EmailLogger.WriteLog($"PULLED IN A NEW PASSWORD VALUE OF {SenderPassword} TO USE FOR SENDING OPERATIONS", LogType.InfoLog);
-            this.EmailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
+            if (this.DefaultRecipientAddress != null) this.EmailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// </summary>
         /// <param name="NextRecipient">Name to add in.</param>
         /// <returns>True if adding the user passed (Unique and format is right). False if not.</returns>
-        public bool AddNewRecipient(string NextRecipient)
+        public bool AddRecipient(string NextRecipient)
         {
             try
             {
@@ -178,9 +178,8 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
                 }
 
                 // Add address here since it does not currently exist.
-                this.EmailLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
                 this.EmailRecipientAddresses = this.EmailRecipientAddresses.Append(TempAddress).ToArray();
-                this.EmailLogger.WriteLog($"CURRENT EMAILS: {string.Join(",", this.EmailRecipientAddresses.Select(MailObj => MailObj.ToString()))}", LogType.TraceLog);
+                this.EmailLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
                 return true;
             }
             catch
@@ -189,6 +188,39 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
                 this.EmailLogger.WriteLog("EMAIL PROVIDED WAS NOT A VALID EMAIL! RETURNING FALSE", LogType.WarnLog);
                 return false;
             }
+        }
+        /// <summary>
+        /// Clears out the list of recipients to use for sending emails.
+        /// </summary>
+        public bool RemoveRecipient(string RecipientAddress = null)
+        {
+            // Check if the entered recipient is null or not.
+            if (RecipientAddress == null)
+            {
+                // Log Removing all.
+                this.EmailLogger.WriteLog("REMOVING ALL RECIPIENTS FROM LIST OF ENTRIES NOW...", LogType.WarnLog);
+                this.EmailRecipientAddresses = Array.Empty<MailAddress>();
+                return true;
+            }
+
+            // Remove only the given name.
+            if (this.EmailRecipientAddresses.All(EmailObj => !string.Equals(EmailObj.ToString(), RecipientAddress, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                this.EmailLogger.WriteLog($"NO EMAIL ADDRESS WITH THE VALUE {RecipientAddress} WAS FOUND!", LogType.WarnLog);
+                return false;
+            }
+
+            // Remove value here and return.
+            var StringAddresses = this.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString().ToUpper());
+            if (!StringAddresses.ToList().Remove(RecipientAddress.ToUpper())) {
+                this.EmailLogger.WriteLog($"FAILED TO REMOVE REQUESED ADDRESS OF {RecipientAddress}!", LogType.WarnLog);
+                return false;
+            }
+
+            // Now reset email list contents here.
+            this.EmailRecipientAddresses = StringAddresses.Select(StringAddr => new MailAddress(StringAddr)).ToArray();
+            this.EmailLogger.WriteLog($"REMOVED ADDRESS NAME {RecipientAddress} CORRECTLY! STORING NEW ADDRESS SET NOW...", LogType.InfoLog);
+            return true;
         }
     }
 }
