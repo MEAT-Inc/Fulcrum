@@ -64,12 +64,14 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
 #if DEBUG
             "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
 #else
-            ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumDLL");
+            ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorDllInformation.FulcrumDLL");
 #endif
 
         // Pipe Configurations for the default values.
-        public readonly string FulcrumPipeAlpha = "2CC3F0FB08354929BB453151BBAA5A15";
-        public readonly string FulcrumPipeBravo = "1D16333944F74A928A932417074DD2B3";
+        public string FulcrumPipeAlpha =>
+            ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorPipeLocations.ShimOutputPipe");
+        public string FulcrumPipeBravo =>
+            ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorPipeLocations.ShimInputPipe");
 
         // Pipe configuration information.
         public readonly string PipeLocation;

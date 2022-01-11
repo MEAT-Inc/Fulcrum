@@ -158,13 +158,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\EmailReporting\SessionReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\SingletonContentControl.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
+      <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
@@ -237,6 +242,10 @@
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
