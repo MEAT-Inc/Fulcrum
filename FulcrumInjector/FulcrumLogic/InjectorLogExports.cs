@@ -43,7 +43,7 @@ namespace FulcrumInjector.FulcrumLogic
 #if DEBUG
         "..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll";
 #else
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumDLL");  
+                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorDllInformation.FulcrumDLL");  
 #endif
 
         // --------------------------------------------------------------------------------------------------------------------------
