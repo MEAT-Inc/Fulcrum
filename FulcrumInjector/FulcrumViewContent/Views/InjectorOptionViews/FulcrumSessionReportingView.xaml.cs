@@ -93,7 +93,23 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// <param name="SendButtonArgs"></param>
         private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
         {
-            // TODO: Write logic to parse contents and build an output email to send.
+            // Log building new email object.
+            this.ViewLogger.WriteLog("BUILDING NEW EMAIL OBJECT TO SEND OUT FOR OUR REPORT GENERATION NOW...", LogType.WarnLog);
+
+            // Get our subject line, the body content, and then pass it over to our sender on the view model.
+            string SendingSubject = this.EmailSubjectText.Text;
+            if (SendingSubject.Length == 0) SendingSubject = $"Session Report - {DateTime.Now.ToString("F")}";
+            else { SendingSubject = SendingSubject + $"Session Report - {DateTime.Now.ToString("F")})"; }
+            this.ViewLogger.WriteLog($"REPORT SESSION SUBJECT: {SendingSubject}", LogType.InfoLog);
+            this.ViewLogger.WriteLog("STORED NEW SUBJECT BACK INTO OUR VIEW OBJECT!", LogType.InfoLog);
+            this.EmailSubjectText.Text = SendingSubject;
+
+            // Now get the body contents and pass them into our VM for processing and sending.
+            string BodyContents = this.EmailBodyTextContent.Text;
+            this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
+            this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
+            this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents, true);
+            this.ViewLogger.WriteLog("REPORT MESSAGE OBJECT HAS BEEN SENT OUT! HOPEFULLY THIS WILL SHOW UP SOMEWHERE LATER ON...", LogType.WarnLog);
         }
 
 

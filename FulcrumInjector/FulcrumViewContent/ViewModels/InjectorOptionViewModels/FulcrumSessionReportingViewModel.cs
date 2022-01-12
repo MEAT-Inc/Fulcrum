@@ -112,20 +112,5 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
                 BuiltSender = null; return false;
             }
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Updates the content of the email body passed in to include the names and paths of the attached file content on the output.
-        /// </summary>
-        /// <param name="MessageSubject">Subject of the message</param>
-        /// <param name="MessageBodyContent">Body of the message</param>
-        /// <returns>True if sent ok. false if not.</returns>
-        public bool SendDiagnosticReport(string MessageSubject, string MessageBodyContent)
-        {
-            // Return true if this is sent OK. Temp return true for testing.
-            ViewModelLogger.WriteLog("SENDING EMAIL OBJECT TO DESIRED RECIPIENTS NOW...", LogType.WarnLog);
-            return true;
-        }
     }
 }

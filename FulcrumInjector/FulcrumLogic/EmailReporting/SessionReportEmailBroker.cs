@@ -305,11 +305,14 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// <param name="MessageBodyContent">Body of the message</param>
         /// <param name="IncludeAttachments">Attachments to include in the message.</param>
         /// <returns>True if the message is sent. False if not.</returns>
-        public bool SendReportMessage(string MessageSubject, object MessageBodyContent, bool IncludeAttachments = true)
+        public bool SendReportMessage(string MessageSubject, string MessageBodyContent, bool IncludeAttachments = true)
         {
             // Log information about the startup of this new message object.
             this.EmailLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {this.EmailRecipientAddresses.Length} RECIPIENTS TITLED {MessageSubject}", LogType.WarnLog);
             this.EmailLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
+
+            // Update the content of our message with a final output for log file entries and names.
+            StringBuilder LogFileInfoBuilder = new StringBuilder();
 
             // Return passed sending
             return true;
