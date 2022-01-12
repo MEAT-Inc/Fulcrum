@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -91,7 +92,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// </summary>
         /// <param name="SendButton"></param>
         /// <param name="SendButtonArgs"></param>
-        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
+        private async void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
         {
             // Log building new email object.
             this.ViewLogger.WriteLog("BUILDING NEW EMAIL OBJECT TO SEND OUT FOR OUR REPORT GENERATION NOW...", LogType.WarnLog);
@@ -108,8 +109,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             string BodyContents = this.EmailBodyTextContent.Text;
             this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
-            this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents, true);
-            this.ViewLogger.WriteLog("REPORT MESSAGE OBJECT HAS BEEN SENT OUT! HOPEFULLY THIS WILL SHOW UP SOMEWHERE LATER ON...", LogType.WarnLog);
+            await Task.Run(() => this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents));
         }
 
 
