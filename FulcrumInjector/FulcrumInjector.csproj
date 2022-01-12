@@ -159,6 +159,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FulcrumLogic\EmailReporting\SessionReportEmailBroker.cs" />
+    <Compile Include="FulcrumLogic\EmailReporting\TextTableParser.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
