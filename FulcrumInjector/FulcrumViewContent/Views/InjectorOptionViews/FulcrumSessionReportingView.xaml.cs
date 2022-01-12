@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -104,10 +105,31 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.EmailSubjectText.Text = SendingSubject;
 
             // Now get the body contents and pass them into our VM for processing and sending.
+            Button SendingButton = (Button)SendButton;
             string BodyContents = this.EmailBodyTextContent.Text;
             this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
-            await Task.Run(() => this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents));
+            await Task.Run(() =>
+            {
+                // Toggle buttons and textbox use and run the send routine
+                Dispatcher.Invoke(() => {
+                    SendingButton.IsEnabled = false;
+                    this.EmailSubjectText.IsEnabled = false;
+                    this.EmailBodyTextContent.IsEnabled = false;
+                });
+
+                // Rend out the message request here.
+                var SendTime = new Stopwatch(); SendTime.Start();
+                this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
+                this.ViewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
+
+                // Turn everything back on.
+                Dispatcher.Invoke(() => {
+                    SendingButton.IsEnabled = true;
+                    this.EmailSubjectText.IsEnabled = true;
+                    this.EmailBodyTextContent.IsEnabled = true;
+                });
+            });
         }
 
 

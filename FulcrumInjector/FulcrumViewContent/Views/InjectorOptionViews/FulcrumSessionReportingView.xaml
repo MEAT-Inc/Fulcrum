@@ -110,8 +110,8 @@
             <!-- Content for Email Composition -->
             <Grid Grid.Column="0" Margin="0,5,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="42"/>
+                    <RowDefinition Height="42"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
