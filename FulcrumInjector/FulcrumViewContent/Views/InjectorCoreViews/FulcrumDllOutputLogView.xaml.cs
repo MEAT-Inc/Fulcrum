@@ -33,11 +33,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumDllOutputLogView()
         {
+            // Build new ViewModel object
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumDllOutputLogViewModel ?? new FulcrumDllOutputLogViewModel();
-
-            // Store into injector
-            // SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel>.CreateSingletonInstance(this, this.ViewModel);
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
