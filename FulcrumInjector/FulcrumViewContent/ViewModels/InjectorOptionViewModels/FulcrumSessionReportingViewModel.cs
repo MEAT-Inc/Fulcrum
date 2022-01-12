@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SessionReportViewModelLogger")) ?? new SubServiceLogger("SessionReportViewModelLogger");
 
         // Private Control Values
-        private bool _showEmailInfoText = false;
+        private bool _showEmailInfoText = true;
         private string[] _emailAddressRecipients;
         private string[] _emailMessageAttachments;
         private SessionReportEmailBroker _sessionReportSender;

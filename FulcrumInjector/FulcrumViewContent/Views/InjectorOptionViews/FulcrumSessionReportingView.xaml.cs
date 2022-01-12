@@ -54,7 +54,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.DataContext = this.ViewModel;
 
             // Force show help menu and build email temp text
-            this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
             this.EmailBodyTextContent.Text = 
                 "Dearest Neo,\n\n" +
                 "Please fix your broken software. I thought this was supposed to make my life easier?\n\n" +
@@ -62,6 +61,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 "A Pissed Off Tech";
 
             // Log done building new ViewModel.
+            this.ToggleEmailPaneInfoButton_OnClick(null, null);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR EMAIL REPORTING OUTPUT OK!", LogType.InfoLog);
         }
 
@@ -104,7 +104,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Start by logging button was clicked then flipping the value around.
             this.ViewLogger.WriteLog("PROCESSED A BUTTON CLICK TO TOGGLE VISIBILITY OF OUR EMAIL PANE HELP TEXT", LogType.WarnLog);
             this.ViewLogger.WriteLog($"CURRENTLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
-            
+
             // Log and update information
             this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
             this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
