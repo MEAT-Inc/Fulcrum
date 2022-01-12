@@ -9,6 +9,7 @@ using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -312,10 +313,74 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             this.EmailLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
 
             // Update the content of our message with a final output for log file entries and names.
-            StringBuilder LogFileInfoBuilder = new StringBuilder();
+            var OutputFilesTupleSet = this.MessageAttachmentFiles.Select(FileObj =>
+            {
+                // Build a new tuple object from the given file and return it.
+                string FileName = FileObj.Name;
+                string FileSizeFormatted = FileObj.Length.ToFileSize();
+                string TimeLastModified = FileObj.LastWriteTime.ToString("f");
+                return new Tuple<string, string, string>(FileName, FileSizeFormatted, TimeLastModified);
+            }).ToArray();
+            this.EmailLogger.WriteLog("BUILT NEW TUPLE ARRAY FOR ALL FILE OBJECTS IN USE CORRECTLY!", LogType.InfoLog);
+
+            // Build our output table object as a text block using the converter class.
+            string OutputFileTable = 
+                "Session Log File Attachments\n" + OutputFilesTupleSet.ToStringTable(
+                new[] { "File Name", "Size", "Last Modified" }, 
+                FileObj => FileObj.Item1, 
+                FileObj => FileObj.Item2, 
+                FileObj => FileObj.Item3
+            );
+
+            // Log the output table object here and build out the mailmessage.
+            MessageBodyContent += $"\n\n{string.Concat(Enumerable.Repeat("=", 75))}\n\n{OutputFileTable}";
+            this.EmailLogger.WriteLog("BUILT NEW OUTPUT TABLE CORRECTLY! ENTIRE MESSAGE OBJECT AND OUTPUT TABLE IS LOGGED BELOW!", LogType.InfoLog);
+            this.EmailLogger.WriteLog($"\n{OutputFileTable}", LogType.TraceLog);
+
+            // Build mail object and send it out.
+            bool OverallStatus = true;
+            foreach (var RecipientAddress in this.EmailRecipientAddresses)
+            {
+                // Build message, send it out, and move to the next one.
+                this.EmailLogger.WriteLog($"SENDING REPORT TO {RecipientAddress.Address}", LogType.TraceLog);
+                MailMessage OutputMessage = new MailMessage(
+                    this.EmailSenderAddress.Address,    // Sender
+                    RecipientAddress.Address,            // Recipient
+                    MessageSubject,                         // Message subject
+                    MessageBodyContent                      // Body content for message.
+                );
+
+                // File in the attachment objects now.
+                this.EmailLogger.WriteLog("ATTACHING FILES TO MESSAGE OBJECT NOW...", LogType.WarnLog);
+                foreach (var FileInstance in this.MessageAttachmentFiles) 
+                    OutputMessage.Attachments.Add(new Attachment(FileInstance.FullName));
+                this.EmailLogger.WriteLog("ATTACHMENT PROCESS PASSED WITHOUT ISSUES!", LogType.InfoLog);
+                this.EmailLogger.WriteLog($"MESSAGE OBJECT NOW CONTAINS A TOTAL OF {OutputMessage.Attachments.Count} ATTACHMENTS", LogType.TraceLog);
+
+                try
+                {
+                    // Ensure our SMTP server instance has been configured correctly.
+                    if (!this._smtpSetupConfigured) {
+                        this.EmailLogger.WriteLog("WARNING SMTP SERVER WAS NOT CONFIGURED! TRYING TO START IT UP NOW...", LogType.WarnLog);
+                        if (!this.AuthenticateSmtpClient()) throw new InvalidOperationException("FAILED TO CONFIGURE SMTP SERVER! ARE YOU SURE YOU PASSED IN CONFIG VALUES?");
+                    }
+
+                    // Now fire it off using our SMTP Server instance.
+                    this.EmailLogger.WriteLog($"SENDING OUTPUT MESSAGE TO RECIPIENT {RecipientAddress.Address} NOW...", LogType.WarnLog);
+                    this.SendingClient.Send(OutputMessage);
+                    this.EmailLogger.WriteLog($"SENDING ROUTINE PASSED FOR MESSAGE OUTPUT TO CLIENT {RecipientAddress.Address}!", LogType.InfoLog);
+                }
+                catch (Exception MailEx)
+                {
+                    // Log failures, set the overall output value to false.
+                    OverallStatus = false;
+                    this.EmailLogger.WriteLog($"FAILED TO INVOKE SENDING ROUTINE FOR MESSAGE TO BE SENT TO RECIPIENT {RecipientAddress.Address}!", LogType.ErrorLog);
+                    this.EmailLogger.WriteLog("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
+                }
+            }
 
             // Return passed sending
-            return true;
+            return OverallStatus;
         }
     }
 }
