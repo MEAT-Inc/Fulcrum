@@ -29,7 +29,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         {
             // Init component. Build new VM object
             InitializeComponent();
-            this.ViewModel = new FulcrumInstalledOeAppsViewModel();
+            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumInstalledOeAppsViewModel());
+            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         /// <summary>

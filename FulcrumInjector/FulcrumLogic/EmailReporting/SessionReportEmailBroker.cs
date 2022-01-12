@@ -61,15 +61,15 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             }
         }
 
+        // Message objects and contents.
+        public FileInfo[] MessageAttachmentFiles { get; private set; }
+
         // SMTP Client for Sending and properties for it.
         private bool _smtpSetupConfigured = false;   
         public int SmtpServerPort { get; private set; }
         public int SmtpServerTimeout { get; private set; }
         public string SmtpServerName { get; private set; }
         public SmtpClient SendingClient { get; private set; }
-
-        // Message objects and contents.
-        public List<FileInfo> MessageAttachmentFiles { get; private set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -237,7 +237,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         public bool AddMessageAttachment(string PathToAttachment)
         {
             // Check if the list exists at all and if the new path is in it.
-            this.MessageAttachmentFiles ??= new List<FileInfo>();
+            this.MessageAttachmentFiles ??= Array.Empty<FileInfo>();
             this.EmailLogger.WriteLog($"ATTACHING FILE {PathToAttachment}", LogType.InfoLog);
             if (!File.Exists(PathToAttachment)) {
                 this.EmailLogger.WriteLog("FILE OBJECT DOES NOT EXIST! CAN NOT ADD IT INTO OUR ATTACHMENT LIST!", LogType.ErrorLog);
@@ -245,12 +245,12 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             }
 
             // Find existing if possible.
-            if (MessageAttachmentFiles.Any(FileObj => FileObj.Name == Path.GetFileName(PathToAttachment))) return false;
+            if (MessageAttachmentFiles.Any(FileObj => FileObj.Name == Path.GetFileName(PathToAttachment))) 
+                return false;
 
             // Log total file count now and add into our list.
             this.EmailLogger.WriteLog("APPENDING NEW FILE OBJECT INTO OUR LIST OF ATTACHMENTS NOW...", LogType.InfoLog);
-            this.MessageAttachmentFiles.Add(new FileInfo(PathToAttachment));
-            this.EmailLogger.WriteLog($"TOTAL OF {MessageAttachmentFiles.Count} ATTACHMENTS ADDED NOW...", LogType.InfoLog);
+            this.MessageAttachmentFiles = this.MessageAttachmentFiles.Append(new FileInfo(PathToAttachment)).ToArray();
             return true;
         }
         /// <summary>
@@ -260,10 +260,19 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// <param name="NameToRemove">Name of file to remove</param>
         /// <param name="UseFilter">Filtering on or off</param>
         /// <returns>True if one or more files get removed. False if not.</returns>
-        public bool RemoveMessageAttachment(string NameToRemove, bool UseFilter = false)
+        public bool RemoveMessageAttachment(string NameToRemove = null, bool UseFilter = false)
         {
-            // Check if the list exists and log file removing.
-            this.MessageAttachmentFiles ??= new List<FileInfo>();
+            // Check for a clear command.
+            if (NameToRemove == null)
+            {
+                // Removes all entries if no value is given.
+                this.EmailLogger.WriteLog("NO NAME FILTER WAS PROVIDED! REMOVING ALL ENTRIES FROM OUR MAIL LIST NOW...");
+                this.MessageAttachmentFiles = Array.Empty<FileInfo>();
+                return true;
+            }
+
+            // Check if the list exists and log file removing
+            this.MessageAttachmentFiles ??= Array.Empty<FileInfo>();
             this.EmailLogger.WriteLog($"REMOVING FILE NAME {NameToRemove}", LogType.InfoLog);
             if (UseFilter) this.EmailLogger.WriteLog("WARNING: REGEX FILTERING WAS TURNED ON! USING IT NOW", LogType.WarnLog);
 
@@ -283,12 +292,27 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
 
             // Log how many files to remove and pull them all out.
             this.EmailLogger.WriteLog($"FILES TO PULL OUT OF THE LIST: {FilesToRemove.Count()}", LogType.InfoLog);
-            this.MessageAttachmentFiles = this.MessageAttachmentFiles.Where(FileObj => !FilesToRemove.Contains(FileObj)).ToList();
-            this.EmailLogger.WriteLog($"NEW LIST OBJECT HAS BEEN SET! FILE COUNT IS {this.MessageAttachmentFiles}", LogType.InfoLog);
+            this.MessageAttachmentFiles = this.MessageAttachmentFiles.Where(FileObj => !FilesToRemove.Contains(FileObj)).ToArray();
             return true;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Sends out the resulting report email object when this is called.
+        /// </summary>
+        /// <param name="MessageSubject">Subject of the message</param>
+        /// <param name="MessageBodyContent">Body of the message</param>
+        /// <param name="IncludeAttachments">Attachments to include in the message.</param>
+        /// <returns>True if the message is sent. False if not.</returns>
+        public bool SendReportMessage(string MessageSubject, object MessageBodyContent, bool IncludeAttachments = true)
+        {
+            // Log information about the startup of this new message object.
+            this.EmailLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {this.EmailRecipientAddresses.Length} RECIPIENTS TITLED {MessageSubject}", LogType.WarnLog);
+            this.EmailLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
+
+            // Return passed sending
+            return true;
+        }
     }
 }

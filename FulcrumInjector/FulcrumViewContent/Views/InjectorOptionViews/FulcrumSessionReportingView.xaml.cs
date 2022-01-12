@@ -12,6 +12,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using Application = System.Windows.Application;
+using Button = System.Windows.Controls.Button;
 using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -36,15 +37,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// </summary>
         public FulcrumSessionReportingView()
         {
-            // Init component. Build new VM object
+            // Build new ViewModel object
             InitializeComponent();
-
-            // Find the global color sheet and store values for it.
-            var CurrentMerged = Application.Current.Resources.MergedDictionaries;
-            this.Resources["AppColorTheme"] = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
-            ViewLogger.WriteLog($"SETUP MAIN COLOR THEME FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
-
-            // Store view model instance.
             this.ViewModel = InjectorConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
@@ -60,15 +54,48 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
 
-            // Store temp text into our email body.
-            this.EmailBodyTextContent.Text =
+            // Force show help menu and build email temp text
+            this.EmailBodyTextContent.Text = 
                 "Dearest Neo,\n\n" +
                 "Please fix your broken software. I thought this was supposed to make my life easier?\n\n" +
                 "With Love,\n" +
                 "A Pissed Off Tech";
+
+            // Log done building new ViewModel.
+            this.ToggleEmailPaneInfoButton_OnClick(null, null);
+            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR EMAIL REPORTING OUTPUT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Shows or hides the email information on the view object. 
+        /// </summary>
+        /// <param name="SendingButton"></param>
+        /// <param name="EventArgs"></param>
+        private void ToggleEmailPaneInfoButton_OnClick(object SendingButton, RoutedEventArgs EventArgs)
+        {
+            // Start by logging button was clicked then flipping the value around.
+            this.ViewLogger.WriteLog("PROCESSED A BUTTON CLICK TO TOGGLE VISIBILITY OF OUR EMAIL PANE HELP TEXT", LogType.WarnLog);
+            this.ViewLogger.WriteLog($"CURRENTLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
+
+            // Log and update information
+            this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
+            this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"NEWLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
+        }
+
+
+        /// <summary>
+        /// Send email button for the report sender
+        /// </summary>
+        /// <param name="SendButton"></param>
+        /// <param name="SendButtonArgs"></param>
+        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
+        {
+            // TODO: Write logic to parse contents and build an output email to send.
+        }
+
 
         /// <summary>
         /// Reacts to a new button click for adding an email entry into our list
@@ -82,44 +109,27 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             string NewTextContent = BoxObject.Text;
 
             // Check if there's even an email to parse out. If none, remove all.
-            if (NewTextContent.Length == 0) { this.ViewModel.RemoveRecipient(); }
-            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"); 
+            if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
+            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
             var MatchedEmails = SendingRegex.Matches(NewTextContent);
-            if (MatchedEmails.Count == 0) return; 
+            if (MatchedEmails.Count == 0) return;
 
             // Clear out all current address values and then add them back in one at a time.
-            this.ViewModel.RemoveRecipient();
-            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.AddRecipient(AddressMatch.Value); }
-            this.ViewLogger.WriteLog($"CURRENT EMAILS: {string.Join(",", this.ViewModel.EmailAddressRecipients)}", LogType.TraceLog);
+            this.ViewModel.SessionReportSender.RemoveRecipient();
+            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.SessionReportSender.AddRecipient(AddressMatch.Value); }
+            string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.EmailRecipientAddresses.Select(MailAddress => MailAddress.Address));
 
             // Now remove address values that don't fly here.
-            BoxObject.Text = string.Join(",", this.ViewModel.EmailAddressRecipients);
+            BoxObject.Text = NewAddressString;
+            this.ViewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
             this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
-        }
-
-
-        /// <summary>
-        /// Shows or hides the email information on the view object. 
-        /// </summary>
-        /// <param name="SendingButton"></param>
-        /// <param name="EventArgs"></param>
-        private void ToggleEmailPaneInfoButton_OnClick(object SendingButton, RoutedEventArgs EventArgs)
-        {
-            // Start by logging button was clicked then flipping the value around.
-            this.ViewLogger.WriteLog("PROCESSED A BUTTON CLICK TO TOGGLE VISIBILITY OF OUR EMAIL PANE HELP TEXT", LogType.WarnLog);
-            this.ViewLogger.WriteLog($"CURRENTLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
-            
-            // Log and update information
-            this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
-            this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
-            this.ViewLogger.WriteLog($"NEWLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
         }
         /// <summary>
         /// Attaches a new file entry into our list of files by showing a file selection dialogue
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddReportAttachmentButton_OnClick(object sender, RoutedEventArgs e)
+        /// <param name="AttachFileButton"></param>
+        /// <param name="AttachFileEventArgs"></param>
+        private void AddReportAttachmentButton_OnClick(object AttachFileButton, RoutedEventArgs AttachFileEventArgs)
         {
             // Log information about opening appending box and begin selection
             this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
@@ -137,27 +147,54 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
             if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
                 return;
             }
 
             // Now pull our file objects out and store them on our viewModel
             foreach (var FilePath in SelectAttachmentDialog.FileNames) {
                 this.ViewLogger.WriteLog($"ATTACHING FILE OBJECT: {FilePath}", LogType.TraceLog);
-                this.ViewModel.AddMessageAttachment(FilePath);
+                this.ViewModel.SessionReportSender.AddMessageAttachment(FilePath);
             }
-            
-            // Log information about done.
+
+            // Store content for the listbox using the VM Email broker and log complete.
+            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
             this.ViewLogger.WriteLog("DONE APPENDING NEW FILE INSTANCES. ATTACHMENTS LISTBOX SHOULD BE UPDATED WITH NEW INFORMATION NOW", LogType.InfoLog);
-            this.ViewLogger.WriteLog($"TOTAL OF {this.ViewModel.EmailMessageAttachments.Length} ATTACHMENTS ARE NOW BEING TRACKED", LogType.InfoLog);
         }
         /// <summary>
-        /// Send email button for the report sender
+        /// Event handler for when a button is clicked to remove the selected attachment.
         /// </summary>
-        /// <param name="SendButton"></param>
-        /// <param name="SendButtonArgs"></param>
-        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
+        /// <param name="RemoveFileButton"></param>
+        /// <param name="RemoveFileButtonEventArgs"></param>
+        private void RemoveAttachmentButton_OnClick(object RemoveFileButton, RoutedEventArgs RemoveFileButtonEventArgs)
         {
-            // TODO: Write logic to parse contents and build an output email to send.
+            // Get the index of the sending button and then find out what string content goes along with it.
+            this.ViewLogger.WriteLog("TRYING TO FIND PARENT GRID AND SENDING TEXT NAME NOW...", LogType.WarnLog);
+            try
+            {
+                // Find selected index and file name.
+                int IndexOfSelected = this.ReportAttachmentFiles.SelectedIndex;
+                if (IndexOfSelected > this.ViewModel.SessionReportSender.MessageAttachmentFiles.Length || IndexOfSelected < 0) {
+                    this.ViewLogger.WriteLog("INDEX WAS OUT OF RANGE FOR INPUT TEXT VALUE! THIS IS FATAL!", LogType.ErrorLog);
+                    throw new IndexOutOfRangeException("INDEX FOR SELECTED OBJECT IS OUTSIDE BOUNDS OF VIEWMODEL SENDING BROKER!");
+                }
+
+                // Store string for name of the file.
+                string FileNameToRemove = this.ViewModel.SessionReportSender.MessageAttachmentFiles[IndexOfSelected].FullName;
+                this.ViewLogger.WriteLog($"PULLED INDEX VALUE OK! TRYING TO REMOVE FILE NAMED {FileNameToRemove}", LogType.InfoLog);
+
+                // Store modified view binding list into the view model for updating.
+                this.ViewModel.SessionReportSender.RemoveMessageAttachment(FileNameToRemove);
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+                this.ViewLogger.WriteLog("REQUEST FOR REMOVAL PROCESSED AND PASSED OK! RETURNING NOW", LogType.InfoLog);
+            }
+            catch (Exception Ex)
+            {
+                // Log failures and return out. Set the content for the listbox to the VM
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+                this.ViewLogger.WriteLog("FAILED TO REMOVE FILE DUE TO AN EXCEPTION WHILE TRYING TO FIND FILE NAME OR VALUE!", LogType.ErrorLog);
+                this.ViewLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW.", Ex);
+            }
         }
     }
 }
