@@ -75,13 +75,19 @@
             <!-- Collapse Info Button -->
             <Button Grid.Row="0" 
                     VerticalAlignment="Stretch"
-                    Content="Collapse Information"
+                    Content="Hide Information"
                     Click="ToggleEmailPaneInfoButton_OnClick"
                     HorizontalAlignment="Right" Width="150" Margin="0,5">
                 <Button.Style>
                     <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Path=}"></DataTrigger>
+                            <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
+                                <Setter Property="Content" Value="Hide Information"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
+                                <Setter Property="Content" Value="Show Information"/>
+                            </DataTrigger>
+
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
