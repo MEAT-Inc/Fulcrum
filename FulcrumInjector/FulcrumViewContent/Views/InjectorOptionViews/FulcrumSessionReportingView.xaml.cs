@@ -82,6 +82,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         }
 
         /// <summary>
+        /// Shows or hides the email information on the view object. 
+        /// </summary>
+        /// <param name="SendingButton"></param>
+        /// <param name="EventArgs"></param>
+        private void ToggleEmailPaneInfoButton_OnClick(object SendingButton, RoutedEventArgs EventArgs)
+        {
+            // Start by logging button was clicked then flipping the value around.
+            this.ViewLogger.WriteLog("PROCESSED A BUTTON CLICK TO TOGGLE VISIBILITY OF OUR EMAIL PANE HELP TEXT", LogType.WarnLog);
+            this.ViewLogger.WriteLog($"CURRENT STATE IS {ViewModel.ShowEmailInfoText}", LogType.InfoLog);
+
+            // Log swapping and switch
+            this.ViewLogger.WriteLog("SWITCHING VALUE AND UPDATING VIEW CONTENT NOW...", LogType.InfoLog);
+            this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
+        }
+        /// <summary>
         /// Send email button for the report sender
         /// </summary>
         /// <param name="SendButton"></param>
@@ -99,5 +114,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // TODO: Write logic for adding a new file object into the report list of attachments for our email
         }
+
     }
 }
