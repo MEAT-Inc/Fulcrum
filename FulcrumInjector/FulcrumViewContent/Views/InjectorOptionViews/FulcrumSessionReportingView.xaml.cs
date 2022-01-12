@@ -56,14 +56,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.DataContext = this.ViewModel;
 
             // Force show help menu and build email temp text
-            this.EmailBodyTextContent.Text = 
-                "Dearest Neo,\n\n" +
-                "Please fix your broken software. I thought this was supposed to make my life easier?\n\n" +
-                "With Love,\n" +
-                "A Pissed Off Tech";
+            this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
+            this.ViewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
 
             // Log done building new ViewModel.
             this.ToggleEmailPaneInfoButton_OnClick(null, null);
+            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR EMAIL REPORTING OUTPUT OK!", LogType.InfoLog);
         }
 
@@ -156,7 +154,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 CheckPathExists = true,
                 RestoreDirectory = true,
                 AutoUpgradeEnabled = true,
-                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorLogging.DefaultLoggingPath")
+                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath")
             };
 
             // Now open the dialog and allow the user to pick some new files.
@@ -188,15 +186,25 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("TRYING TO FIND PARENT GRID AND SENDING TEXT NAME NOW...", LogType.WarnLog);
             try
             {
-                // Find selected index and file name.
-                int IndexOfSelected = this.ReportAttachmentFiles.SelectedIndex;
-                if (IndexOfSelected > this.ViewModel.SessionReportSender.MessageAttachmentFiles.Length || IndexOfSelected < 0) {
+                // Find selected index and file name. If failed, throw a null ref exception
+                var SendButton = (Button)RemoveFileButton; Grid ParentGrid = SendButton.Parent as Grid;
+                TextBlock FileNameBlock = ParentGrid?.Children.OfType<TextBlock>().FirstOrDefault();
+                if (FileNameBlock == null) throw new NullReferenceException("FAILED TO FIND FILE BLOCK OBJECT FOR NAME TO REMOVE!");
+
+                // Find possible index for file object.
+                this.ViewLogger.WriteLog($"FILE OBJECT TEXT WAS FOUND AND PARSED! LOOKING FOR FILE {FileNameBlock.Text}", LogType.InfoLog);
+                int FileIndex = this.ViewModel.SessionReportSender.MessageAttachmentFiles
+                    .ToList()
+                    .FindIndex(FileObj => string.Equals(FileObj.Name, FileNameBlock.Text, StringComparison.CurrentCultureIgnoreCase));
+
+                // Now ensure the index is valid
+                if (FileIndex > this.ViewModel.SessionReportSender.MessageAttachmentFiles.Length || FileIndex < 0) {
                     this.ViewLogger.WriteLog("INDEX WAS OUT OF RANGE FOR INPUT TEXT VALUE! THIS IS FATAL!", LogType.ErrorLog);
                     throw new IndexOutOfRangeException("INDEX FOR SELECTED OBJECT IS OUTSIDE BOUNDS OF VIEWMODEL SENDING BROKER!");
                 }
 
                 // Store string for name of the file.
-                string FileNameToRemove = this.ViewModel.SessionReportSender.MessageAttachmentFiles[IndexOfSelected].FullName;
+                string FileNameToRemove = this.ViewModel.SessionReportSender.MessageAttachmentFiles[FileIndex].FullName;
                 this.ViewLogger.WriteLog($"PULLED INDEX VALUE OK! TRYING TO REMOVE FILE NAMED {FileNameToRemove}", LogType.InfoLog);
 
                 // Store modified view binding list into the view model for updating.

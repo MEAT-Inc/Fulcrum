@@ -109,7 +109,7 @@ namespace FulcrumInjector
         {
             // Start by building a new logging configuration object and init the broker.
             string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
-            string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorLogging.DefaultLoggingPath");
+            string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath");
 
             // Make logger and build global logger object.
             LogBroker.ConfigureLoggingSession(AppName, LoggingPath);
@@ -126,7 +126,7 @@ namespace FulcrumInjector
         private void ConfigureLogCleanup()
         {
             // Pull values for log archive trigger and set values
-            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorLogging.LogArchiveSetup");
+            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.FulcrumInjectorLogging.LogArchiveSetup");
 
             // Check to see if we need to archive or not.
             LogBroker.Logger?.WriteLog($"CLEANUP ARCHIVE FILE SETUP STARTED! CHECKING FOR {ConfigObj.ArchiveOnFileCount} OR MORE LOG FILES...");
