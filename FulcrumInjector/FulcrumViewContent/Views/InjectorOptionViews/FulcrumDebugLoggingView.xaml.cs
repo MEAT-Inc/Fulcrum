@@ -33,12 +33,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// </summary>
         public FulcrumDebugLoggingView()
         {
-            // Init component. Build new VM object
+            // Build new ViewModel object
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
-
-            // Store into injector
-            // SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.CreateSingletonInstance(this, this.ViewModel);
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
             // Configure the new Logging Output Target.
@@ -48,6 +45,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
             CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
             LogManager.ReconfigExistingLoggers();
+            this.ViewLogger.WriteLog("BUILT INSTANCE FOR OUR DLL OUTPUT DEBUG LOGGING VIEW OK!", LogType.InfoLog);
         }
 
         /// <summary>

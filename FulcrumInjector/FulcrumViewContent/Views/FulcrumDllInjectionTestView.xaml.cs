@@ -32,6 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Build new view model object
             InitializeComponent();
             Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumDllInjectionTestViewModel());
+            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         /// <summary>
