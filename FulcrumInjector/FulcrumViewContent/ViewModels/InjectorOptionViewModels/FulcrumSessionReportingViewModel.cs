@@ -24,13 +24,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
         // Private Control Values
         private bool _showEmailInfoText = true;
-        private string[] _emailAddressRecipients;
         private string[] _emailMessageAttachments;
         private SessionReportEmailBroker _sessionReportSender;
 
         // Public values for our view to bind onto 
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public string[] EmailAddressRecipients { get => _emailAddressRecipients; set => PropertyUpdated(value); }
         public string[] EmailMessageAttachments { get => _emailMessageAttachments; set => PropertyUpdated(value); }
         public SessionReportEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
@@ -101,91 +99,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Adds a new email address into our list of emails to control
+        /// Updates the content of the email body passed in to include the names and paths of the attached file content on the output.
         /// </summary>
-        /// <param name="AddressToAppend">Address to add</param>
-        /// <returns>True if the address is added OK. False if not.</returns>
-        public void AddRecipient(string AddressToAppend)
+        /// <param name="MessageSubject">Subject of the message</param>
+        /// <param name="MessageBodyContent">Body of the message</param>
+        /// <returns>True if sent ok. false if not.</returns>
+        public bool SendDiagnosticReport(string MessageSubject, string MessageBodyContent)
         {
-            // Try and add the address into a copy of our sending broker list.
-            ViewModelLogger.WriteLog($"APPENDING ADDRESS {AddressToAppend} NOW...", LogType.InfoLog);
-            if (this.SessionReportSender.AddRecipient(AddressToAppend))
-            {
-                // Now set our list of email objects for addresses and update the view.
-                ViewModelLogger.WriteLog("UPDATED SESSION RECIPIENTS CORRECTLY!", LogType.InfoLog);
-                this.EmailAddressRecipients = this.SessionReportSender.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString()).ToArray();
-                ViewModelLogger.WriteLog($"VIEW CONTENTS NOW SHOWING CORRECT CONTENTS FOR A TOTAL OF {this.SessionReportSender.EmailRecipientAddresses.Length} EMAILS");
-                return;
-            }
-
-            // Log failed, return false and move on.
-            ViewModelLogger.WriteLog("FAILED TO ADD NEW EMAIL INTO SESSION LIST! THIS IS CONCERNING!", LogType.ErrorLog);
+            // Return true if this is sent OK. Temp return true for testing.
+            ViewModelLogger.WriteLog("SENDING EMAIL OBJECT TO DESIRED RECIPIENTS NOW...", LogType.WarnLog);
+            return true;
         }
-        /// <summary>
-        /// Attempts to remove an email address object.
-        /// </summary>
-        /// <param name="AddressToRemove">Address to purge out.</param>
-        /// <returns></returns>
-        public void RemoveRecipient(string AddressToRemove = null)
-        {
-            // Try and add the address into a copy of our sending broker list.
-            ViewModelLogger.WriteLog($"REMOVING ADDRESS {AddressToRemove} NOW...", LogType.InfoLog);
-            if (this.SessionReportSender.RemoveRecipient(AddressToRemove))
-            {
-                // Now set our list of email objects for addresses and update the view.
-                ViewModelLogger.WriteLog("UPDATED SESSION RECIPIENTS CORRECTLY!", LogType.InfoLog);
-                this.EmailAddressRecipients = this.SessionReportSender.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString()).ToArray();
-                ViewModelLogger.WriteLog($"VIEW CONTENTS NOW SHOWING CORRECT CONTENTS FOR A TOTAL OF {this.SessionReportSender.EmailRecipientAddresses.Length} EMAILS");
-                return;
-            }
-
-            // Log failed, return false and move on.
-            ViewModelLogger.WriteLog("FAILED TO REMOVE AN EMAIL FROM OUR SESSION LIST! THIS IS CONCERNING!", LogType.ErrorLog);
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Adds in a new file object to our list of attachments.
-        /// </summary>
-        /// <param name="PathToFile">Path to the file to include.</param>
-        public void AddMessageAttachment(string PathToFile)
-        {
-            // Try and add the address into a copy of our sending broker list.
-            ViewModelLogger.WriteLog($"APPENDING ATTACHMENT {PathToFile} NOW...", LogType.InfoLog);
-            if (this.SessionReportSender.AddMessageAttachment(PathToFile))
-            {
-                // Now set our list of email objects for addresses and update the view.
-                ViewModelLogger.WriteLog("UPDATED SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
-                this.EmailMessageAttachments = this.SessionReportSender.MessageAttachmentFiles.Select(FileObj => FileObj.FullName.ToString()).ToArray();
-                ViewModelLogger.WriteLog($"VIEW CONTENTS NOW SHOWING CORRECT CONTENTS FOR A TOTAL OF {this.SessionReportSender.MessageAttachmentFiles.Count} ATTACHMENTS");
-                return;
-            }
-
-            // Log failed, return false and move on.
-            ViewModelLogger.WriteLog("FAILED TO ADD NEW ATTACHMENT PATH INTO SESSION LIST! THIS IS CONCERNING!", LogType.ErrorLog);
-        }
-        /// <summary>
-        /// Adds in a new file object to our list of attachments.
-        /// </summary>
-        /// <param name="PathToFile">Path to the file to include.</param>
-        public void RemoveMessageAttachment(string PathToFile, bool RegexSearch = false)
-        {
-            // Try and add the address into a copy of our sending broker list.
-            ViewModelLogger.WriteLog($"APPENDING ATTACHMENT {PathToFile} NOW...", LogType.InfoLog);
-            if (this.SessionReportSender.RemoveMessageAttachment(PathToFile, RegexSearch))
-            {
-                // Now set our list of email objects for addresses and update the view.
-                ViewModelLogger.WriteLog("UPDATED SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
-                this.EmailMessageAttachments = this.SessionReportSender.MessageAttachmentFiles.Select(FileObj => FileObj.FullName.ToString()).ToArray();
-                ViewModelLogger.WriteLog($"VIEW CONTENTS NOW SHOWING CORRECT CONTENTS FOR A TOTAL OF {this.SessionReportSender.MessageAttachmentFiles.Count} ATTACHMENTS");
-                return;
-            }
-
-            // Log failed, return false and move on.
-            ViewModelLogger.WriteLog("FAILED TO REMOVE AM EXISTING ATTACHMENT PATH FROM THE SESSION LIST! THIS IS CONCERNING!", LogType.ErrorLog);
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
     }
 }

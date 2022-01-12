@@ -12,6 +12,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using Application = System.Windows.Application;
+using Button = System.Windows.Controls.Button;
 using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -68,33 +69,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Reacts to a new button click for adding an email entry into our list
-        /// </summary>
-        /// <param name="SendingTextBox">Sending button</param>
-        /// <param name="TextChangedArgs">Changed text arguments</param>
-        private void AddressListTextBox_OnChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
-        {
-            // Get text of TextBox object and try to add address.
-            var BoxObject = (TextBox)SendingTextBox;
-            string NewTextContent = BoxObject.Text;
-
-            // Check if there's even an email to parse out. If none, remove all.
-            if (NewTextContent.Length == 0) { this.ViewModel.RemoveRecipient(); }
-            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"); 
-            var MatchedEmails = SendingRegex.Matches(NewTextContent);
-            if (MatchedEmails.Count == 0) return; 
-
-            // Clear out all current address values and then add them back in one at a time.
-            this.ViewModel.RemoveRecipient();
-            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.AddRecipient(AddressMatch.Value); }
-            this.ViewLogger.WriteLog($"CURRENT EMAILS: {string.Join(",", this.ViewModel.EmailAddressRecipients)}", LogType.TraceLog);
-
-            // Now remove address values that don't fly here.
-            BoxObject.Text = string.Join(",", this.ViewModel.EmailAddressRecipients);
-            this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
-        }
-
-        /// <summary>
         /// Shows or hides the email information on the view object. 
         /// </summary>
         /// <param name="SendingButton"></param>
@@ -111,6 +85,44 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog($"NEWLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
         }
 
+
+        /// <summary>
+        /// Send email button for the report sender
+        /// </summary>
+        /// <param name="SendButton"></param>
+        /// <param name="SendButtonArgs"></param>
+        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
+        {
+            // TODO: Write logic to parse contents and build an output email to send.
+        }
+
+
+        /// <summary>
+        /// Reacts to a new button click for adding an email entry into our list
+        /// </summary>
+        /// <param name="SendingTextBox">Sending button</param>
+        /// <param name="TextChangedArgs">Changed text arguments</param>
+        private void AddressListTextBox_OnChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
+        {
+            // Get text of TextBox object and try to add address.
+            var BoxObject = (TextBox)SendingTextBox;
+            string NewTextContent = BoxObject.Text;
+
+            // Check if there's even an email to parse out. If none, remove all.
+            if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
+            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            var MatchedEmails = SendingRegex.Matches(NewTextContent);
+            if (MatchedEmails.Count == 0) return;
+
+            // Clear out all current address values and then add them back in one at a time.
+            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.SessionReportSender.AddRecipient(AddressMatch.Value); }
+            string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.EmailRecipientAddresses.Select(MailAddress => MailAddress.Address));
+
+            // Now remove address values that don't fly here.
+            BoxObject.Text = NewAddressString;
+            this.ViewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
+            this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
+        }
         /// <summary>
         /// Attaches a new file entry into our list of files by showing a file selection dialogue
         /// </summary>
@@ -134,18 +146,24 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
             if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
+                this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
+                    .Select(FileObj => FileObj.FullName).ToArray();
                 return;
             }
 
             // Now pull our file objects out and store them on our viewModel
             foreach (var FilePath in SelectAttachmentDialog.FileNames) {
                 this.ViewLogger.WriteLog($"ATTACHING FILE OBJECT: {FilePath}", LogType.TraceLog);
-                this.ViewModel.AddMessageAttachment(FilePath);
+                this.ViewModel.SessionReportSender.AddMessageAttachment(FilePath);
             }
-            
+
+            // Update viewmodel bound values and then exit out
+            this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
+                .Select(FileObj => FileObj.FullName).ToArray();
+
             // Log information about done.
             this.ViewLogger.WriteLog("DONE APPENDING NEW FILE INSTANCES. ATTACHMENTS LISTBOX SHOULD BE UPDATED WITH NEW INFORMATION NOW", LogType.InfoLog);
-            this.ViewLogger.WriteLog($"TOTAL OF {this.ViewModel.EmailMessageAttachments.Length} ATTACHMENTS ARE NOW BEING TRACKED", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"TOTAL OF {this.ViewModel.SessionReportSender.MessageAttachmentFiles.Count} ATTACHMENTS ARE NOW BEING TRACKED", LogType.InfoLog);
         }
         /// <summary>
         /// Event handler for when a button is clicked to remove the selected attachment.
@@ -154,17 +172,36 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// <param name="RemoveFileButtonEventArgs"></param>
         private void RemoveAttachmentButton_OnClick(object RemoveFileButton, RoutedEventArgs RemoveFileButtonEventArgs)
         {
-            // TODO: Build logic to remove file based on selected index.
-        }
+            // Get the index of the sending button and then find out what string content goes along with it.
+            this.ViewLogger.WriteLog("TRYING TO FIND PARENT GRID AND SENDING TEXT NAME NOW...", LogType.WarnLog);
+            try
+            {
+                // Pull button, Grid, and text content now.
+                Button SendButton = (Button)RemoveFileButton;
+                Grid ParentGrid = SendButton.Parent as Grid;
+                TextBlock TextContent = ParentGrid.Children.OfType<TextBlock>().FirstOrDefault();
+                if (TextContent == null) throw new InvalidOperationException("FAILED TO FIND A RELATED TEXTBOX FOR THE INPUT BUTTON!");
 
-        /// <summary>
-        /// Send email button for the report sender
-        /// </summary>
-        /// <param name="SendButton"></param>
-        /// <param name="SendButtonArgs"></param>
-        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
-        {
-            // TODO: Write logic to parse contents and build an output email to send.
+                // Store string for name of the file.
+                string FileNameToRemove = TextContent.Text;
+                this.ViewLogger.WriteLog($"TRYING TO REMOVE FILE NAMED {FileNameToRemove}", LogType.InfoLog);
+                this.ViewModel.SessionReportSender.RemoveMessageAttachment(FileNameToRemove);
+                
+                // Store modified view binding list into the view model for updating.
+                this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
+                    .Select(FileObj => FileObj.FullName).ToArray();
+                this.ViewLogger.WriteLog("REQUEST FOR REMOVAL PROCESSED AND PASSED OK! RETURNING NOW", LogType.InfoLog);
+            }
+            catch (Exception Ex)
+            {
+                // Store value onto VM regardless of result
+                this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
+                    .Select(FileObj => FileObj.FullName).ToArray();
+
+                // Log failures and return out.
+                this.ViewLogger.WriteLog("FAILED TO REMOVE FILE DUE TO AN EXCEPTION WHILE TRYING TO FIND FILE NAME OR VALUE!", LogType.ErrorLog);
+                this.ViewLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW.", Ex);
+            }
         }
     }
 }

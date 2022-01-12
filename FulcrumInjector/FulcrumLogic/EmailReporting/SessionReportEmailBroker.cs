@@ -260,9 +260,18 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// <param name="NameToRemove">Name of file to remove</param>
         /// <param name="UseFilter">Filtering on or off</param>
         /// <returns>True if one or more files get removed. False if not.</returns>
-        public bool RemoveMessageAttachment(string NameToRemove, bool UseFilter = false)
+        public bool RemoveMessageAttachment(string NameToRemove = null, bool UseFilter = false)
         {
-            // Check if the list exists and log file removing.
+            // Check for a clear command.
+            if (NameToRemove == null)
+            {
+                // Removes all entries if no value is given.
+                this.EmailLogger.WriteLog("NO NAME FILTER WAS PROVIDED! REMOVING ALL ENTRIES FROM OUR MAIL LIST NOW...");
+                this.MessageAttachmentFiles = new List<FileInfo>();
+                return true;
+            }
+
+            // Check if the list exists and log file removing
             this.MessageAttachmentFiles ??= new List<FileInfo>();
             this.EmailLogger.WriteLog($"REMOVING FILE NAME {NameToRemove}", LogType.InfoLog);
             if (UseFilter) this.EmailLogger.WriteLog("WARNING: REGEX FILTERING WAS TURNED ON! USING IT NOW", LogType.WarnLog);
@@ -290,5 +299,21 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Sends out the resulting report email object when this is called.
+        /// </summary>
+        /// <param name="MessageSubject">Subject of the message</param>
+        /// <param name="MessageBodyContent">Body of the message</param>
+        /// <param name="IncludeAttachments">Attachments to include in the message.</param>
+        /// <returns>True if the message is sent. False if not.</returns>
+        public bool SendReportMessage(string MessageSubject, object MessageBodyContent, bool IncludeAttachments = true)
+        {
+            // Log information about the startup of this new message object.
+            this.EmailLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {this.EmailRecipientAddresses.Length} RECIPIENTS TITLED {MessageSubject}", LogType.WarnLog);
+            this.EmailLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
+
+            // Return passed sending
+            return true;
+        }
     }
 }

@@ -37,6 +37,7 @@
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="FontSize" Value="14"/>
                 <Setter Property="Padding" Value="10"/>
+                <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
             </Style>
 
             <!-- Attachments Listbox File Content -->
