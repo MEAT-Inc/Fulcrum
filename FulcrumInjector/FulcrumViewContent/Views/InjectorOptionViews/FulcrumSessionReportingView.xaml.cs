@@ -108,19 +108,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Now get the body contents and pass them into our VM for processing and sending.
             Button SendingButton = (Button)SendButton;
-            SendingButton.Content = "Sending...";
             Brush SendingDefaultColor = SendingButton.Background;
             string BodyContents = this.EmailBodyTextContent.Text;
             this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
+
+            // Set Can modify to false to turn off controls.
             bool SendPassed = await Task.Run(() =>
             {
-                // Set Can modify to false to turn off controls.
+                // Toggle Can Modify
                 this.ViewModel.CanModifyMessage = false;
 
                 // Toggle buttons and textbox use and run the send routine
                 Dispatcher.Invoke(() => { 
                     SendingButton.IsEnabled = false;
+                    SendingButton.Content = "Sending...";
                     SendingButton.Background = Brushes.DarkOrange;
                 });
 
@@ -131,7 +133,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 this.ViewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
 
                 // Turn can modify back on.
-                this.ViewModel.CanModifyMessage = false;
+                this.ViewModel.CanModifyMessage = true;
                 return SendResult;
             });
 
@@ -169,7 +171,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
             Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
             var MatchedEmails = SendingRegex.Matches(NewTextContent);
-            if (MatchedEmails.Count == 0) return;
+            if (MatchedEmails.Count == 0) {
+                this.SendMessageButton.IsEnabled = false;
+                return;
+            }
 
             // Clear out all current address values and then add them back in one at a time.
             this.ViewModel.SessionReportSender.RemoveRecipient();
@@ -180,6 +185,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             BoxObject.Text = NewAddressString;
             this.ViewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
             this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
+            this.SendMessageButton.IsEnabled = this.ViewModel.SessionReportSender.EmailRecipientAddresses.Length != 0;
         }
         /// <summary>
         /// Attaches a new file entry into our list of files by showing a file selection dialogue

@@ -125,9 +125,11 @@
                              Style="{StaticResource  InputTextWithHolder}"
                              IsEnabled="{Binding Path=CanModifyMessage}">
                     </TextBox>
-                    <Button Click="SendEmailButton_OnClick" Width="75"
-                            Content="Send" Margin="5,0,0,0" 
-                            Style="{StaticResource ActionButtonStyle}">
+                    <Button 
+                        x:Name="SendMessageButton" 
+                        Click="SendEmailButton_OnClick" Width="75"
+                        Content="Send" Margin="5,0,0,0" 
+                        Style="{StaticResource ActionButtonStyle}">
                     </Button>
                 </StackPanel>
 
