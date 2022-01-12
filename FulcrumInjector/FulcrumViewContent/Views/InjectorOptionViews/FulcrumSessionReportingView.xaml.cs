@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using ICSharpCode.AvalonEdit;
@@ -98,18 +101,60 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Get our subject line, the body content, and then pass it over to our sender on the view model.
             string SendingSubject = this.EmailSubjectText.Text;
             if (SendingSubject.Length == 0) SendingSubject = $"Session Report - {DateTime.Now.ToString("F")}";
-            else { SendingSubject = SendingSubject + $" (Session Report - {DateTime.Now.ToString("F")})"; }
+            else { SendingSubject += $" (Session Report - {DateTime.Now.ToString("F")})"; }
             this.ViewLogger.WriteLog($"REPORT SESSION SUBJECT: {SendingSubject}", LogType.InfoLog);
             this.ViewLogger.WriteLog("STORED NEW SUBJECT BACK INTO OUR VIEW OBJECT!", LogType.InfoLog);
             this.EmailSubjectText.Text = SendingSubject;
 
             // Now get the body contents and pass them into our VM for processing and sending.
+            Button SendingButton = (Button)SendButton;
+            Brush SendingDefaultColor = SendingButton.Background;
             string BodyContents = this.EmailBodyTextContent.Text;
             this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
-            await Task.Run(() => this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents));
-        }
 
+            // Set Can modify to false to turn off controls.
+            bool SendPassed = await Task.Run(() =>
+            {
+                // Toggle Can Modify
+                this.ViewModel.CanModifyMessage = false;
+
+                // Toggle buttons and textbox use and run the send routine
+                Dispatcher.Invoke(() => { 
+                    SendingButton.IsEnabled = false;
+                    SendingButton.Content = "Sending...";
+                    SendingButton.Background = Brushes.DarkOrange;
+                });
+
+                // Rend out the message request here.
+                var SendTime = new Stopwatch(); SendTime.Start();
+                bool SendResult = this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
+                this.ViewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
+                this.ViewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
+
+                // Turn can modify back on.
+                this.ViewModel.CanModifyMessage = true;
+                return SendResult;
+            });
+
+            // Now set the send button based on the result.
+            SendingButton.IsEnabled = true;
+            SendingButton.Click -= SendEmailButton_OnClick;
+            SendingButton.Content = SendPassed ? "Sent!" : "Failed!";
+            SendingButton.Background = SendPassed ? Brushes.DarkGreen : Brushes.DarkRed;
+            Task.Run(() =>
+            {
+                // Now wait 3 seconds and reset our colors to default values.
+                Thread.Sleep(3000);
+                Dispatcher.Invoke(() =>
+                {
+                    SendingButton.Content = "Send";
+                    SendingButton.Background = SendingDefaultColor;
+                    SendingButton.Click += SendEmailButton_OnClick;
+                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
+                });
+            });
+        }
 
         /// <summary>
         /// Reacts to a new button click for adding an email entry into our list
@@ -126,7 +171,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
             Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
             var MatchedEmails = SendingRegex.Matches(NewTextContent);
-            if (MatchedEmails.Count == 0) return;
+            if (MatchedEmails.Count == 0) {
+                this.SendMessageButton.IsEnabled = false;
+                return;
+            }
 
             // Clear out all current address values and then add them back in one at a time.
             this.ViewModel.SessionReportSender.RemoveRecipient();
@@ -137,6 +185,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             BoxObject.Text = NewAddressString;
             this.ViewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
             this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
+            this.SendMessageButton.IsEnabled = this.ViewModel.SessionReportSender.EmailRecipientAddresses.Length != 0;
         }
         /// <summary>
         /// Attaches a new file entry into our list of files by showing a file selection dialogue
@@ -183,6 +232,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         private void RemoveAttachmentButton_OnClick(object RemoveFileButton, RoutedEventArgs RemoveFileButtonEventArgs)
         {
             // Get the index of the sending button and then find out what string content goes along with it.
+            if (!this.ViewModel.CanModifyMessage) return;
             this.ViewLogger.WriteLog("TRYING TO FIND PARENT GRID AND SENDING TEXT NAME NOW...", LogType.WarnLog);
             try
             {
