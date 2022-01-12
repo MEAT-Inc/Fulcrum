@@ -99,6 +99,9 @@ namespace FulcrumInjector.FulcrumViewContent
             SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
         public static SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel> FulcrumSettingsPaneSingleton =>
             SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
+        public static SingletonContentControl<FulcrumSessionReportingView, FulcrumSessionReportingViewModel> FulcrumSessionReportingSingleton =>
+            SingletonContentControl<FulcrumSessionReportingView, FulcrumSessionReportingViewModel>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
+
 
         // DLL Output viewing user control and view model object
         public static FulcrumDllOutputLogView FulcrumDllOutputLogView => FulcrumDllOutputSingleton?.SingletonUserControl;
@@ -111,6 +114,10 @@ namespace FulcrumInjector.FulcrumViewContent
         // User settings and configuration user control and view model object
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView => FulcrumSettingsPaneSingleton?.SingletonUserControl;
         public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => FulcrumSettingsPaneSingleton?.SingletonViewModel;
+
+        // Session output reporting user control and view model object
+        public static FulcrumSessionReportingView FulcrumSessionReportingView => FulcrumSessionReportingSingleton?.SingletonUserControl;
+        public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => FulcrumSessionReportingSingleton?.SingletonViewModel;
 
         // --------------------------------------------------------------------------------------------------------------------------
 

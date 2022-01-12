@@ -41,8 +41,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build new pipe model object and watchdogs.
-            this._readerPipeStateWatchdog = new PropertyWatchdog(250);
-            this._writerPipeStateWatchdog = new PropertyWatchdog(250);
+            this._readerPipeStateWatchdog = new PropertyWatchdog(500);
+            this._writerPipeStateWatchdog = new PropertyWatchdog(500);
             this._testInjectionButtonWatchdog = new PropertyWatchdog(250);
             ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
 
@@ -57,27 +57,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// </summary>
         internal void SetupPipeStateWatchdogs()
         {
-            // Reader State and Writer State watchdogs
-            this._readerPipeStateWatchdog.StartUpdateTimer((_, _) =>
-            {
-                // Check current value. If unchanged, drop out
-                string NewStateValue = FulcrumPipeReader.PipeInstance.PipeState.ToString();
-                if (this.ReaderPipeState != FulcrumPipeReader.PipeInstance.PipeState.ToString()) 
-                    ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: READER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {NewStateValue}", LogType.TraceLog);
-
-                // Log new value output and store it
-                this.ReaderPipeState = NewStateValue;
-            });
-            this._writerPipeStateWatchdog.StartUpdateTimer((_, _) =>
-            {
-                // Check current value. If unchanged, drop out
-                string NewStateValue = FulcrumPipeWriter.PipeInstance.PipeState.ToString();
-                if (this.WriterPipeState != FulcrumPipeWriter.PipeInstance.PipeState.ToString()) 
-                    ViewModelLogger.WriteLog($"[WATCHDOG UPDATE] ::: WRITER PIPE STATE HAS BEEN MODIFIED! NEW VALUE {NewStateValue}", LogType.TraceLog);
-
-                // Log new value output and store it.
-                this.WriterPipeState = NewStateValue;
-            });
+            // Reader State and Writer State watchdogs for the current pipe state values.
+            // BUG: Trying to understand why these two watchdogs are hanging up the UI. Seems logging operations hang forever? Maybe turn down frequency
+            this._readerPipeStateWatchdog.StartUpdateTimer((_, _) => { this.ReaderPipeState = FulcrumPipeReader.PipeInstance.PipeState.ToString(); });
+            this._writerPipeStateWatchdog.StartUpdateTimer((_, _) => { this.WriterPipeState = FulcrumPipeWriter.PipeInstance.PipeState.ToString(); });
 
             // Injector button state watchdog
             this._testInjectionButtonWatchdog.StartUpdateTimer((_,_) =>

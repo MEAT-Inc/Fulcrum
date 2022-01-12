@@ -110,10 +110,16 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.7.12\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpLogger.1.4.11.110\lib\net472\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.4.9.108\lib\net472\SharpLogger.dll</HintPath>
+    <Reference Include="SharpLogger, Version=1.4.11.110, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.1.4.11.110\lib\net472\SharpLogger.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpWrap2534, Version=2.1.5.109, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpWrap2534.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpWrap2534-UI, Version=1.2.1.16, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpWrap2534-UI.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
@@ -152,13 +158,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\EmailReporting\SessionReportEmailBroker.cs" />
+    <Compile Include="FulcrumLogic\EmailReporting\TextTableParser.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\SingletonContentControl.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
+      <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
@@ -234,6 +246,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumControlStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -259,6 +275,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
