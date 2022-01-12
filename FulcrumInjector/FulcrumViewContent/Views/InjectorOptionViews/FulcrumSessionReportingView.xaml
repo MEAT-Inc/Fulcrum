@@ -110,8 +110,8 @@
             <!-- Content for Email Composition -->
             <Grid Grid.Column="0" Margin="0,5,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="42"/>
+                    <RowDefinition Height="42"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -119,13 +119,17 @@
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,5" HorizontalAlignment="Stretch">
                     <TextBlock Text="Recipients" Style="{StaticResource AttachmentsTitleText}" Width="75"/>
                     <TextBox Margin="5,0"
+                             x:Name="RecipientAddressEntryBox"
                              TextChanged="AddressListTextBox_OnChanged" 
                              Width="275" Tag="Enter Recipient Addresses"
-                             Style="{StaticResource  InputTextWithHolder}">
+                             Style="{StaticResource  InputTextWithHolder}"
+                             IsEnabled="{Binding Path=CanModifyMessage}">
                     </TextBox>
-                    <Button Click="SendEmailButton_OnClick" Width="75"
-                            Content="Send" Margin="5,0,0,0" 
-                            Style="{StaticResource ActionButtonStyle}">
+                    <Button 
+                        x:Name="SendMessageButton" 
+                        Click="SendEmailButton_OnClick" Width="75"
+                        Content="Send" Margin="5,0,0,0" 
+                        Style="{StaticResource ActionButtonStyle}">
                     </Button>
                 </StackPanel>
 
@@ -134,12 +138,17 @@
                     <TextBlock Text="Subject" Style="{StaticResource AttachmentsTitleText}" Width="75"/>
                     <TextBox x:Name="EmailSubjectText" Width="360"
                              Style="{StaticResource  InputTextWithHolder}" 
-                             Margin="5,0" Tag="Enter A Subject For This Report">
+                             Margin="5,0" Tag="Enter A Subject For This Report"
+                             IsEnabled="{Binding Path=CanModifyMessage}">
                     </TextBox>
                 </StackPanel>
 
                 <!-- Body of message -->
-                <avEdit:TextEditor Grid.Row="2" Margin="0,5,0,0" x:Name="EmailBodyTextContent" Style="{StaticResource EmailContentBoxStyle}"/>
+                <avEdit:TextEditor
+                    x:Name="EmailBodyTextContent"
+                    Grid.Row="2" Margin="0,5,0,0"
+                    Style="{StaticResource EmailContentBoxStyle}"
+                    IsEnabled="{Binding Path=CanModifyMessage}"/>
             </Grid>
 
             <!-- Splitting Border -->
@@ -165,7 +174,8 @@
                             Style="{StaticResource AttachmentsTitleText}"/>
                     <Button Click="AddReportAttachmentButton_OnClick" 
                             Margin="10,10,0,10" Content="Add File"
-                            Grid.Column="1" Style="{StaticResource ActionButtonStyle}">
+                            Grid.Column="1" Style="{StaticResource ActionButtonStyle}"
+                            IsEnabled="{Binding Path=CanModifyMessage}">
                     </Button>
                 </Grid>
 
