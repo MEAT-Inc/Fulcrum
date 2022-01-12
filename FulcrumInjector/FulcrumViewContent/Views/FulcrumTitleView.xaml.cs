@@ -29,7 +29,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         public FulcrumTitleView()
         {
             InitializeComponent();
-            ViewModel = new FulcrumTitleViewModel();
+            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumTitleViewModel());
+            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         /// <summary>

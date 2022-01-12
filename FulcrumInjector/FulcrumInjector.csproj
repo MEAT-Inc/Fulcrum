@@ -110,10 +110,10 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpLogger.1.4.11.110\lib\net472\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.4.10.109, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpLogger.dll</HintPath>
+    <Reference Include="SharpLogger, Version=1.4.11.110, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.1.4.11.110\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
     <Reference Include="SharpWrap2534, Version=2.1.5.109, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\packages\SharpWrap2534-UI.1.2.1.16\lib\net472\SharpWrap2534.dll</HintPath>
@@ -159,6 +159,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FulcrumLogic\EmailReporting\SessionReportEmailBroker.cs" />
+    <Compile Include="FulcrumLogic\EmailReporting\TextTableParser.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />

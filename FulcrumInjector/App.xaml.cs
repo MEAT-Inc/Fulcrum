@@ -56,9 +56,9 @@ namespace FulcrumInjector
             LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION ROUTINE HAS BEEN COMPLETED OK!", LogType.InfoLog);
 
             // Configure settings and app theme
-            this.ConfigureStaticViews();
             this.ConfigureCurrentTheme();
             this.ConfigureUserSettings();
+            this.ConfigureSingletonViews();
             LogBroker.Logger?.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
         }
 
@@ -195,7 +195,7 @@ namespace FulcrumInjector
         /// <summary>
         /// Pulls in the resource dictionaries from the given resource path and stores them in the app
         /// </summary>
-        private void ConfigureStaticViews()
+        private void ConfigureSingletonViews()
         {
             // Log information. Pull files in and store them all. This tuple create call pulls types for views then types for view models
             LogBroker.Logger?.WriteLog("GENERATING STATIC VIEW CONTENTS FOR HAMBURGER CORE CONTENTS NOW...", LogType.WarnLog);

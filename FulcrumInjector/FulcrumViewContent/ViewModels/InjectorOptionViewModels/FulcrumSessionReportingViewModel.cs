@@ -23,12 +23,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SessionReportViewModelLogger")) ?? new SubServiceLogger("SessionReportViewModelLogger");
 
         // Private Control Values
-        private string[] _emailAddressRecipients;
+        private bool _showEmailInfoText = true;
         private SessionReportEmailBroker _sessionReportSender;
 
         // Public values for our view to bind onto 
-        public string[] EmailAddressRecipients { get => _emailAddressRecipients; private set => OnPropertyChanged(); }
-        public SessionReportEmailBroker SessionReportSender { get => _sessionReportSender; private set => OnPropertyChanged(); }
+        public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
+        public SessionReportEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             // Build our new Email broker instance
             if (GenerateEmailBroker(out var NewSender)) this.SessionReportSender = NewSender;
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW EMAIL HELPER OBJECT!");
+
+            // Log passed. Build in main log file.
             ViewModelLogger.WriteLog("EMAIL REPORT BROKER HAS BEEN BUILT OK AND BOUND TO OUR VIEW CONTENT!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {this.AppendDefaultLogFile()} OK!", LogType.InfoLog);
 
             // Log completed setup.
             ViewModelLogger.WriteLog("SETUP NEW VIEW MODEL FOR EMAIL BROKER VALUES OK!", LogType.InfoLog);
@@ -52,6 +55,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Appends the current injector log into the email object for including it.
+        /// </summary>
+        /// <returns>Name of the main log file.</returns>
+        private string AppendDefaultLogFile()
+        {
+            // Log information, find the main log file name, and include it in here.
+            ViewModelLogger.WriteLog("INCLUDING MAIN LOG FILE FROM NLOG OUTPUT IN THE LIST OF ATTACHMENTS NOW!", LogType.WarnLog);
+
+            // Get file name. Store and return it.
+            string LogFileName = LogBroker.MainLogFileName;
+            this.SessionReportSender.AddMessageAttachment(LogFileName);
+            ViewModelLogger.WriteLog($"ATTACHED NEW FILE NAMED {LogFileName} INTO SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
+            return LogFileName;
+        }
 
         /// <summary>
         /// Builds a new email reporting broker for the given settings values.
@@ -68,11 +87,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
                 string SendName = EmailConfigObject.ReportSenderName;
                 string SendEmail = EmailConfigObject.ReportSenderEmail;
                 string SendPassword = EmailConfigObject.ReportSenderPassword;
-                string DefaultRecipient = EmailConfigObject.DefaultReportRecipient;
 
                 // Build broker first
                 ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
-                BuiltSender = new SessionReportEmailBroker(SendName, SendEmail, SendPassword, DefaultRecipient);
+                BuiltSender = new SessionReportEmailBroker(SendName, SendEmail, SendPassword);
 
                 // Now try and authorize the client for a google address.
                 ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
@@ -93,29 +111,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW.", BuildBrokerEx);
                 BuiltSender = null; return false;
             }
-        }
-
-        /// <summary>
-        /// Adds a new email address into our list of emails to control
-        /// </summary>
-        /// <param name="AddressToAppend">Address to add</param>
-        /// <returns>True if the address is added OK. False if not.</returns>
-        public bool AppendNewAddress(string AddressToAppend)
-        {
-            // Try and add the address into a copy of our sending broker list.
-            ViewModelLogger.WriteLog($"APPENDING ADDRESS {AddressToAppend} NOW...", LogType.InfoLog);
-            if (this.SessionReportSender.AddNewRecipient(AddressToAppend))
-            {
-                // Now set our list of email objects for addresses and update the view.
-                ViewModelLogger.WriteLog("UPDATED SESSION RECIPIENTS CORRECTLY!", LogType.InfoLog);
-                this.EmailAddressRecipients = this.SessionReportSender.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString()).ToArray();
-                ViewModelLogger.WriteLog($"VIEW CONTENTS NOW SHOWING CORRECT CONTENTS FOR A TOTAL OF {this.SessionReportSender.EmailRecipientAddresses.Length} EMAILS");
-                return true;
-            }
-
-            // Log failed, return false and move on.
-            ViewModelLogger.WriteLog("FAILED TO ADD NEW EMAIL INTO SESSION LIST! THIS IS CONCERNING!", LogType.ErrorLog);
-            return false;   
         }
     }
 }
