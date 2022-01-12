@@ -37,8 +37,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             InitializeComponent();
 
             // Find the global color sheet and store values for it.
-            var CurrentMerged = Application.Current.Resources.MergedDictionaries;
-            this.Resources["AppColorTheme"] = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
+            this.Resources.MergedDictionaries.Add(Application.Current.Resources.MergedDictionaries
+                .FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme")));
             ViewLogger.WriteLog($"SETUP MAIN COLOR THEME FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
 
             // Store view model instance.
