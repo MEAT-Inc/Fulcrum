@@ -64,7 +64,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Store The path for icons output and the dynamic objects for our icons
             ViewModelLogger.WriteLog("BUILDING ICON PATH OUTPUT AND IMPORTING MENU ENTRIES NOW...", LogType.InfoLog);
             this.FulcrumMenuEntries = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumMenuEntries");
-            this.FulcrumIconPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumIconsPath");
+            this.FulcrumIconPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumIconsPath");
             ViewModelLogger.WriteLog("IMPORTED VALUES FROM JSON FILE OK!", LogType.InfoLog);
 
             // Ensure output icon path exists
