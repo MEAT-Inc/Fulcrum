@@ -101,7 +101,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Get our subject line, the body content, and then pass it over to our sender on the view model.
             string SendingSubject = this.EmailSubjectText.Text;
             if (SendingSubject.Length == 0) SendingSubject = $"Session Report - {DateTime.Now.ToString("F")}";
-            else { SendingSubject = SendingSubject + $" (Session Report - {DateTime.Now.ToString("F")})"; }
+            else { SendingSubject += $" (Session Report - {DateTime.Now.ToString("F")})"; }
             this.ViewLogger.WriteLog($"REPORT SESSION SUBJECT: {SendingSubject}", LogType.InfoLog);
             this.ViewLogger.WriteLog("STORED NEW SUBJECT BACK INTO OUR VIEW OBJECT!", LogType.InfoLog);
             this.EmailSubjectText.Text = SendingSubject;
@@ -115,35 +115,29 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
             bool SendPassed = await Task.Run(() =>
             {
+                // Set Can modify to false to turn off controls.
+                this.ViewModel.CanModifyMessage = false;
+
                 // Toggle buttons and textbox use and run the send routine
-                Dispatcher.Invoke(() =>
-                {
+                Dispatcher.Invoke(() => { 
                     SendingButton.IsEnabled = false;
-                    this.EmailSubjectText.IsEnabled = false;
-                    this.EmailBodyTextContent.IsEnabled = false;
                     SendingButton.Background = Brushes.DarkOrange;
-                    this.RecipientAddressEntryBox.IsEnabled = false;
                 });
 
                 // Rend out the message request here.
                 var SendTime = new Stopwatch(); SendTime.Start();
                 bool SendResult = this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
                 this.ViewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
-
-                // Turn everything back on.
-                Dispatcher.Invoke(() =>
-                {
-                    SendingButton.IsEnabled = true;
-                    this.EmailSubjectText.IsEnabled = true;
-                    this.EmailBodyTextContent.IsEnabled = true;
-                    this.RecipientAddressEntryBox.IsEnabled = true;
-                });
-
                 this.ViewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
+
+                // Turn can modify back on.
+                this.ViewModel.CanModifyMessage = false;
                 return SendResult;
             });
 
             // Now set the send button based on the result.
+            SendingButton.IsEnabled = true;
+            SendingButton.Click -= SendEmailButton_OnClick;
             SendingButton.Content = SendPassed ? "Sent!" : "Failed!";
             SendingButton.Background = SendPassed ? Brushes.DarkGreen : Brushes.DarkRed;
             Task.Run(() =>
@@ -154,6 +148,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 {
                     SendingButton.Content = "Send";
                     SendingButton.Background = SendingDefaultColor;
+                    SendingButton.Click += SendEmailButton_OnClick;
                     this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
                 });
             });
@@ -231,6 +226,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         private void RemoveAttachmentButton_OnClick(object RemoveFileButton, RoutedEventArgs RemoveFileButtonEventArgs)
         {
             // Get the index of the sending button and then find out what string content goes along with it.
+            if (!this.ViewModel.CanModifyMessage) return;
             this.ViewLogger.WriteLog("TRYING TO FIND PARENT GRID AND SENDING TEXT NAME NOW...", LogType.WarnLog);
             try
             {
