@@ -98,7 +98,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Get our subject line, the body content, and then pass it over to our sender on the view model.
             string SendingSubject = this.EmailSubjectText.Text;
             if (SendingSubject.Length == 0) SendingSubject = $"Session Report - {DateTime.Now.ToString("F")}";
-            else { SendingSubject = SendingSubject + $"Session Report - {DateTime.Now.ToString("F")})"; }
+            else { SendingSubject = SendingSubject + $" (Session Report - {DateTime.Now.ToString("F")})"; }
             this.ViewLogger.WriteLog($"REPORT SESSION SUBJECT: {SendingSubject}", LogType.InfoLog);
             this.ViewLogger.WriteLog("STORED NEW SUBJECT BACK INTO OUR VIEW OBJECT!", LogType.InfoLog);
             this.EmailSubjectText.Text = SendingSubject;
