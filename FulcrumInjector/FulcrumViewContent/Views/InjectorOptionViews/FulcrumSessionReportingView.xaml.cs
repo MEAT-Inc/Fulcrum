@@ -115,6 +115,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (MatchedEmails.Count == 0) return;
 
             // Clear out all current address values and then add them back in one at a time.
+            this.ViewModel.SessionReportSender.RemoveRecipient();
             foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.SessionReportSender.AddRecipient(AddressMatch.Value); }
             string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.EmailRecipientAddresses.Select(MailAddress => MailAddress.Address));
 
@@ -146,8 +147,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
             if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
-                this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
-                    .Select(FileObj => FileObj.FullName).ToArray();
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
                 return;
             }
 
@@ -157,13 +157,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 this.ViewModel.SessionReportSender.AddMessageAttachment(FilePath);
             }
 
-            // Update viewmodel bound values and then exit out
-            this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
-                .Select(FileObj => FileObj.FullName).ToArray();
-
-            // Log information about done.
+            // Store content for the listbox using the VM Email broker and log complete.
+            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
             this.ViewLogger.WriteLog("DONE APPENDING NEW FILE INSTANCES. ATTACHMENTS LISTBOX SHOULD BE UPDATED WITH NEW INFORMATION NOW", LogType.InfoLog);
-            this.ViewLogger.WriteLog($"TOTAL OF {this.ViewModel.SessionReportSender.MessageAttachmentFiles.Count} ATTACHMENTS ARE NOW BEING TRACKED", LogType.InfoLog);
         }
         /// <summary>
         /// Event handler for when a button is clicked to remove the selected attachment.
@@ -176,29 +172,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("TRYING TO FIND PARENT GRID AND SENDING TEXT NAME NOW...", LogType.WarnLog);
             try
             {
-                // Pull button, Grid, and text content now.
-                Button SendButton = (Button)RemoveFileButton;
-                Grid ParentGrid = SendButton.Parent as Grid;
-                TextBlock TextContent = ParentGrid.Children.OfType<TextBlock>().FirstOrDefault();
-                if (TextContent == null) throw new InvalidOperationException("FAILED TO FIND A RELATED TEXTBOX FOR THE INPUT BUTTON!");
+                // Find selected index and file name.
+                int IndexOfSelected = this.ReportAttachmentFiles.SelectedIndex;
+                if (IndexOfSelected > this.ViewModel.SessionReportSender.MessageAttachmentFiles.Length || IndexOfSelected < 0) {
+                    this.ViewLogger.WriteLog("INDEX WAS OUT OF RANGE FOR INPUT TEXT VALUE! THIS IS FATAL!", LogType.ErrorLog);
+                    throw new IndexOutOfRangeException("INDEX FOR SELECTED OBJECT IS OUTSIDE BOUNDS OF VIEWMODEL SENDING BROKER!");
+                }
 
                 // Store string for name of the file.
-                string FileNameToRemove = TextContent.Text;
-                this.ViewLogger.WriteLog($"TRYING TO REMOVE FILE NAMED {FileNameToRemove}", LogType.InfoLog);
-                this.ViewModel.SessionReportSender.RemoveMessageAttachment(FileNameToRemove);
-                
+                string FileNameToRemove = this.ViewModel.SessionReportSender.MessageAttachmentFiles[IndexOfSelected].FullName;
+                this.ViewLogger.WriteLog($"PULLED INDEX VALUE OK! TRYING TO REMOVE FILE NAMED {FileNameToRemove}", LogType.InfoLog);
+
                 // Store modified view binding list into the view model for updating.
-                this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
-                    .Select(FileObj => FileObj.FullName).ToArray();
+                this.ViewModel.SessionReportSender.RemoveMessageAttachment(FileNameToRemove);
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
                 this.ViewLogger.WriteLog("REQUEST FOR REMOVAL PROCESSED AND PASSED OK! RETURNING NOW", LogType.InfoLog);
             }
             catch (Exception Ex)
             {
-                // Store value onto VM regardless of result
-                this.ViewModel.EmailMessageAttachments = this.ViewModel.SessionReportSender.MessageAttachmentFiles
-                    .Select(FileObj => FileObj.FullName).ToArray();
-
-                // Log failures and return out.
+                // Log failures and return out. Set the content for the listbox to the VM
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
                 this.ViewLogger.WriteLog("FAILED TO REMOVE FILE DUE TO AN EXCEPTION WHILE TRYING TO FIND FILE NAME OR VALUE!", LogType.ErrorLog);
                 this.ViewLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW.", Ex);
             }

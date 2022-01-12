@@ -170,27 +170,45 @@
                 </Grid>
 
                 <!-- ListBox of file objects and placeholder to show no files added -->
-                <ListBox Grid.Row="1"
+                <ListBox Grid.Row="1" 
+                         x:Name="ReportAttachmentFiles"
                          Margin="0,0,0,0" 
                          Style="{StaticResource AttachedFilesListboxStyle}"
-                         ItemsSource="{Binding Path=EmailMessageAttachments, Mode=TwoWay}">
+                         DataContext="{Binding Path=SessionReportSender.MessageAttachmentFiles}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid>
+                            <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
-                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="40"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding }"/>
-                                <Button Grid.Column="1"
+                                <TextBlock
+                                        Margin="0,5"
+                                        Text="{Binding Path=Name}"
+                                        VerticalAlignment="Stretch" FontSize="12" 
+                                        TextWrapping="Wrap" TextAlignment="Left" Width="155"
+                                        Foreground="{StaticResource TextColorBase}"/>
+                                <Border
+                                    Margin="0,-5"
+                                    Grid.Column="1"
+                                    BorderBrush="{StaticResource DarkGreyThemeColor}"
+                                    BorderThickness="2,0,0,0">
+                                </Border>
+                                <Button Grid.Column="2"
                                         Width="25" Height="25"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
                                         Click="RemoveAttachmentButton_OnClick" 
                                         Style="{DynamicResource ActionButtonStyleTransparent}">
-                                    <Path Fill="{DynamicResource TextColorBase}" Margin="0,1,0,0">
+                                    <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,0,0">
                                         <Path.Data>
                                             <PathGeometry Figures="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
                                         </Path.Data>
                                     </Path>
+                                    <Button.LayoutTransform>
+                                        <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                                    </Button.LayoutTransform>
                                 </Button>
                             </Grid>
                         </DataTemplate>

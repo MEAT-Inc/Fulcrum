@@ -24,12 +24,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
         // Private Control Values
         private bool _showEmailInfoText = true;
-        private string[] _emailMessageAttachments;
         private SessionReportEmailBroker _sessionReportSender;
 
         // Public values for our view to bind onto 
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public string[] EmailMessageAttachments { get => _emailMessageAttachments; set => PropertyUpdated(value); }
         public SessionReportEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +44,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             // Build our new Email broker instance
             if (GenerateEmailBroker(out var NewSender)) this.SessionReportSender = NewSender;
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW EMAIL HELPER OBJECT!");
+
+            // Log passed. Build in main log file.
             ViewModelLogger.WriteLog("EMAIL REPORT BROKER HAS BEEN BUILT OK AND BOUND TO OUR VIEW CONTENT!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {this.AppendDefaultLogFile()} OK!", LogType.InfoLog);
 
             // Log completed setup.
             ViewModelLogger.WriteLog("SETUP NEW VIEW MODEL FOR EMAIL BROKER VALUES OK!", LogType.InfoLog);
@@ -54,6 +55,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Appends the current injector log into the email object for including it.
+        /// </summary>
+        /// <returns>Name of the main log file.</returns>
+        private string AppendDefaultLogFile()
+        {
+            // Log information, find the main log file name, and include it in here.
+            ViewModelLogger.WriteLog("INCLUDING MAIN LOG FILE FROM NLOG OUTPUT IN THE LIST OF ATTACHMENTS NOW!", LogType.WarnLog);
+
+            // Get file name. Store and return it.
+            string LogFileName = LogBroker.MainLogFileName;
+            this.SessionReportSender.AddMessageAttachment(LogFileName);
+            ViewModelLogger.WriteLog($"ATTACHED NEW FILE NAMED {LogFileName} INTO SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
+            return LogFileName;
+        }
 
         /// <summary>
         /// Builds a new email reporting broker for the given settings values.
