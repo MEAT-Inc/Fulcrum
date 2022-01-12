@@ -1,15 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
 
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="FontSize" Value="26"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
                 <Setter Property="FontStyle" Value="Italic"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="TextAlignment" Value="Center"/>
@@ -17,13 +17,33 @@
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
             </Style>
 
-            <!-- Email Address Entry Box Style -->
-            <Style x:Key="AddressEntryTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
-                <Setter Property="FontFamily" Value="Consolas"/>
-                <Setter Property="FontSize" Value="18"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <!--Subject Info Text-->
+            <Style x:Key="AttachmentsTitleText" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Foreground" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
+            <!-- AVEdit Output for Email Content -->
+            <Style x:Key="EmailContentBoxStyle" TargetType="avEdit:TextEditor">
+                <Setter Property="WordWrap" Value="True"/>
+                <Setter Property="FontFamily" Value="Times"/>
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Padding" Value="10"/>
+            </Style>
+
+            <!-- Attachments Listbox File Content -->
+            <Style x:Key="AttachedFilesListboxStyle" TargetType="ListBox">
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
             </Style>
 
         </ResourceDictionary>

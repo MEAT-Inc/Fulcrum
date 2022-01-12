@@ -38,6 +38,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewModel = InjectorConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
+            // Find the global color sheet and store values for it.
+            var CurrentMerged = Application.Current.Resources.MergedDictionaries;
+            this.Resources["AppColorTheme"] = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
+            ViewLogger.WriteLog($"SETUP MAIN COLOR THEME FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
             try { CurrentConfig.RemoveTarget("DebugToAvEditRedirect"); }
@@ -45,6 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
             CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
             LogManager.ReconfigExistingLoggers();
+            this.ViewLogger.WriteLog("BUILT INSTANCE FOR OUR DLL OUTPUT DEBUG LOGGING VIEW OK!", LogType.InfoLog);
         }
 
         /// <summary>

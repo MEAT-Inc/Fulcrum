@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
+using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using Application = System.Windows.Application;
+using TextBox = System.Windows.Controls.TextBox;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 {
@@ -31,6 +38,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Init component. Build new VM object
             InitializeComponent();
+
+            // Find the global color sheet and store values for it.
+            var CurrentMerged = Application.Current.Resources.MergedDictionaries;
+            this.Resources["AppColorTheme"] = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
+            ViewLogger.WriteLog($"SETUP MAIN COLOR THEME FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+
+            // Store view model instance.
             this.ViewModel = InjectorConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
@@ -45,6 +59,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+
+            // Store temp text into our email body.
+            this.EmailBodyTextContent.Text =
+                "Dearest Neo,\n\n" +
+                "Please fix your broken software. I thought this was supposed to make my life easier?\n\n" +
+                "With Love,\n" +
+                "A Pissed Off Tech";
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -53,22 +74,90 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// Reacts to a new button click for adding an email entry into our list
         /// </summary>
         /// <param name="SendingTextBox">Sending button</param>
-        /// <param name="EnteredKeyArgs">Event Args processed</param>
-        private void AddAddressTextBox_KeyDown(object SendingTextBox, KeyEventArgs EnteredKeyArgs)
+        /// <param name="TextChangedArgs">Changed text arguments</param>
+        private void AddressListTextBox_OnChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
         {
-            // When a key is pressed, if it's not the enter key move on.
-            if (EnteredKeyArgs.Key != Key.Enter) return;
-
             // Get text of TextBox object and try to add address.
-            TextBox BoxObject = (TextBox)SendingTextBox;
-            if (this.ViewModel.AppendNewAddress(BoxObject.Text.Trim()))
+            var BoxObject = (TextBox)SendingTextBox;
+            string NewTextContent = BoxObject.Text;
+
+            // Check if there's even an email to parse out. If none, remove all.
+            if (NewTextContent.Length == 0) { this.ViewModel.RemoveRecipient(); }
+            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"); 
+            var MatchedEmails = SendingRegex.Matches(NewTextContent);
+            if (MatchedEmails.Count == 0) return; 
+
+            // Clear out all current address values and then add them back in one at a time.
+            this.ViewModel.RemoveRecipient();
+            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.AddRecipient(AddressMatch.Value); }
+            this.ViewLogger.WriteLog($"CURRENT EMAILS: {string.Join(",", this.ViewModel.EmailAddressRecipients)}", LogType.TraceLog);
+
+            // Now remove address values that don't fly here.
+            BoxObject.Text = string.Join(",", this.ViewModel.EmailAddressRecipients);
+            this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
+        }
+
+
+        /// <summary>
+        /// Shows or hides the email information on the view object. 
+        /// </summary>
+        /// <param name="SendingButton"></param>
+        /// <param name="EventArgs"></param>
+        private void ToggleEmailPaneInfoButton_OnClick(object SendingButton, RoutedEventArgs EventArgs)
+        {
+            // Start by logging button was clicked then flipping the value around.
+            this.ViewLogger.WriteLog("PROCESSED A BUTTON CLICK TO TOGGLE VISIBILITY OF OUR EMAIL PANE HELP TEXT", LogType.WarnLog);
+            this.ViewLogger.WriteLog($"CURRENTLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
+            
+            // Log and update information
+            this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
+            this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"NEWLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
+        }
+        /// <summary>
+        /// Attaches a new file entry into our list of files by showing a file selection dialogue
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddReportAttachmentButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            // Log information about opening appending box and begin selection
+            this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
+            using OpenFileDialog SelectAttachmentDialog = new OpenFileDialog()
             {
-                // If Added, Set text to empty. The listbox of address values will auto update
+                Multiselect = true,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                RestoreDirectory = true,
+                AutoUpgradeEnabled = true,
+                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorLogging.DefaultLoggingPath")
+            };
+
+            // Now open the dialog and allow the user to pick some new files.
+            this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
+            if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
+                this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
             }
 
-            // Else Set text to 'Invalid Email!', Highlight the box for 3 seconds in red and then reset to normal
-
+            // Now pull our file objects out and store them on our viewModel
+            foreach (var FilePath in SelectAttachmentDialog.FileNames) {
+                this.ViewLogger.WriteLog($"ATTACHING FILE OBJECT: {FilePath}", LogType.TraceLog);
+                this.ViewModel.AddMessageAttachment(FilePath);
+            }
+            
+            // Log information about done.
+            this.ViewLogger.WriteLog("DONE APPENDING NEW FILE INSTANCES. ATTACHMENTS LISTBOX SHOULD BE UPDATED WITH NEW INFORMATION NOW", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"TOTAL OF {this.ViewModel.EmailMessageAttachments.Length} ATTACHMENTS ARE NOW BEING TRACKED", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Send email button for the report sender
+        /// </summary>
+        /// <param name="SendButton"></param>
+        /// <param name="SendButtonArgs"></param>
+        private void SendEmailButton_OnClick(object SendButton, RoutedEventArgs SendButtonArgs)
+        {
+            // TODO: Write logic to parse contents and build an output email to send.
         }
     }
 }

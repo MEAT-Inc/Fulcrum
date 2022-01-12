@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
@@ -66,6 +68,9 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         public string SmtpServerName { get; private set; }
         public SmtpClient SendingClient { get; private set; }
 
+        // Message objects and contents.
+        public List<FileInfo> MessageAttachmentFiles { get; private set; }
+
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -90,7 +95,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             // Log information about passed output here.
             this.EmailLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this.EmailSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
             this.EmailLogger.WriteLog($"PULLED IN A NEW PASSWORD VALUE OF {SenderPassword} TO USE FOR SENDING OPERATIONS", LogType.InfoLog);
-            this.EmailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
+            if (this.DefaultRecipientAddress != null) this.EmailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -113,7 +118,6 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             this.EmailLogger.WriteLog("CONFIGURED NEW SMTP CLIENT LOGIN AND CONFIG VALUES!");
             this.EmailLogger.WriteLog($"HOST: {this.EmailSenderName} | PORT: {this.SmtpServerPort} | TIMEOUT: {this.SmtpServerTimeout}", LogType.TraceLog);
         }
-
         /// <summary>
         /// Authorizes the sender email passed into the CTOR and ensures we can use it.
         /// </summary>
@@ -165,7 +169,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// </summary>
         /// <param name="NextRecipient">Name to add in.</param>
         /// <returns>True if adding the user passed (Unique and format is right). False if not.</returns>
-        public bool AddNewRecipient(string NextRecipient)
+        public bool AddRecipient(string NextRecipient)
         {
             try
             {
@@ -178,9 +182,8 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
                 }
 
                 // Add address here since it does not currently exist.
-                this.EmailLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
                 this.EmailRecipientAddresses = this.EmailRecipientAddresses.Append(TempAddress).ToArray();
-                this.EmailLogger.WriteLog($"CURRENT EMAILS: {string.Join(",", this.EmailRecipientAddresses.Select(MailObj => MailObj.ToString()))}", LogType.TraceLog);
+                this.EmailLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
                 return true;
             }
             catch
@@ -190,5 +193,102 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
                 return false;
             }
         }
+        /// <summary>
+        /// Clears out the list of recipients to use for sending emails.
+        /// </summary>
+        public bool RemoveRecipient(string RecipientAddress = null)
+        {
+            // Check if the entered recipient is null or not.
+            if (RecipientAddress == null)
+            {
+                // Log Removing all.
+                this.EmailLogger.WriteLog("REMOVING ALL RECIPIENTS FROM LIST OF ENTRIES NOW...", LogType.WarnLog);
+                this.EmailRecipientAddresses = Array.Empty<MailAddress>();
+                return true;
+            }
+
+            // Remove only the given name.
+            if (this.EmailRecipientAddresses.All(EmailObj => !string.Equals(EmailObj.ToString(), RecipientAddress, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                this.EmailLogger.WriteLog($"NO EMAIL ADDRESS WITH THE VALUE {RecipientAddress} WAS FOUND!", LogType.WarnLog);
+                return false;
+            }
+
+            // Remove value here and return.
+            var StringAddresses = this.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString().ToUpper());
+            if (!StringAddresses.ToList().Remove(RecipientAddress.ToUpper())) {
+                this.EmailLogger.WriteLog($"FAILED TO REMOVE REQUESED ADDRESS OF {RecipientAddress}!", LogType.WarnLog);
+                return false;
+            }
+
+            // Now reset email list contents here.
+            this.EmailRecipientAddresses = StringAddresses.Select(StringAddr => new MailAddress(StringAddr)).ToArray();
+            this.EmailLogger.WriteLog($"REMOVED ADDRESS NAME {RecipientAddress} CORRECTLY! STORING NEW ADDRESS SET NOW...", LogType.InfoLog);
+            return true;
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Puts a new file path into our list of attachment objects. 
+        /// </summary>
+        /// <param name="PathToAttachment">File to add</param>
+        /// <returns>True if added. False if not.</returns>
+        public bool AddMessageAttachment(string PathToAttachment)
+        {
+            // Check if the list exists at all and if the new path is in it.
+            this.MessageAttachmentFiles ??= new List<FileInfo>();
+            this.EmailLogger.WriteLog($"ATTACHING FILE {PathToAttachment}", LogType.InfoLog);
+            if (!File.Exists(PathToAttachment)) {
+                this.EmailLogger.WriteLog("FILE OBJECT DOES NOT EXIST! CAN NOT ADD IT INTO OUR ATTACHMENT LIST!", LogType.ErrorLog);
+                return false;
+            }
+
+            // Find existing if possible.
+            if (MessageAttachmentFiles.Any(FileObj => FileObj.Name == Path.GetFileName(PathToAttachment))) return false;
+
+            // Log total file count now and add into our list.
+            this.EmailLogger.WriteLog("APPENDING NEW FILE OBJECT INTO OUR LIST OF ATTACHMENTS NOW...", LogType.InfoLog);
+            this.MessageAttachmentFiles.Add(new FileInfo(PathToAttachment));
+            this.EmailLogger.WriteLog($"TOTAL OF {MessageAttachmentFiles.Count} ATTACHMENTS ADDED NOW...", LogType.InfoLog);
+            return true;
+        }
+        /// <summary>
+        /// Removes a file from the attachment list by passing in the name of it.
+        /// If filtering is on it runs a regex on the names in the system checking if any match the pattern. 
+        /// </summary>
+        /// <param name="NameToRemove">Name of file to remove</param>
+        /// <param name="UseFilter">Filtering on or off</param>
+        /// <returns>True if one or more files get removed. False if not.</returns>
+        public bool RemoveMessageAttachment(string NameToRemove, bool UseFilter = false)
+        {
+            // Check if the list exists and log file removing.
+            this.MessageAttachmentFiles ??= new List<FileInfo>();
+            this.EmailLogger.WriteLog($"REMOVING FILE NAME {NameToRemove}", LogType.InfoLog);
+            if (UseFilter) this.EmailLogger.WriteLog("WARNING: REGEX FILTERING WAS TURNED ON! USING IT NOW", LogType.WarnLog);
+
+            // Find matches or the file object.
+            var FilesToRemove = this.MessageAttachmentFiles.Where(FileObj =>
+            {
+                // Check if filtering or not.
+                if (UseFilter && Regex.Match(FileObj.FullName, NameToRemove).Success) return true;
+                return NameToRemove.ToUpper().Contains(FileObj.FullName.ToUpper());
+            }).ToList();
+
+            // Check if there's files to pull.
+            if (!FilesToRemove.Any()) {
+                this.EmailLogger.WriteLog("NO FILES FOUND TO REMOVE! RETURNING FAILED NOW...", LogType.ErrorLog);
+                return false;
+            }
+
+            // Log how many files to remove and pull them all out.
+            this.EmailLogger.WriteLog($"FILES TO PULL OUT OF THE LIST: {FilesToRemove.Count()}", LogType.InfoLog);
+            this.MessageAttachmentFiles = this.MessageAttachmentFiles.Where(FileObj => !FilesToRemove.Contains(FileObj)).ToList();
+            this.EmailLogger.WriteLog($"NEW LIST OBJECT HAS BEEN SET! FILE COUNT IS {this.MessageAttachmentFiles}", LogType.InfoLog);
+            return true;
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
     }
 }
