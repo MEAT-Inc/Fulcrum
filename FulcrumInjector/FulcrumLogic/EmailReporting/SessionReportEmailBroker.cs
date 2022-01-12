@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -147,6 +148,9 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential(EmailSenderAddress.Address, this.EmailSenderPassword),
+
+                    // BUG: This is causing some type of auth issues. Removing for testing.
+                    // DeliveryMethod = SmtpDeliveryMethod.Network
                 };
 
                 // Return passed and the built client.
