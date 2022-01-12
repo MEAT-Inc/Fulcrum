@@ -119,6 +119,7 @@
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,5" HorizontalAlignment="Stretch">
                     <TextBlock Text="Recipients" Style="{StaticResource AttachmentsTitleText}" Width="75"/>
                     <TextBox Margin="5,0"
+                             x:Name="RecipientAddressEntryBox"
                              TextChanged="AddressListTextBox_OnChanged" 
                              Width="275" Tag="Enter Recipient Addresses"
                              Style="{StaticResource  InputTextWithHolder}">

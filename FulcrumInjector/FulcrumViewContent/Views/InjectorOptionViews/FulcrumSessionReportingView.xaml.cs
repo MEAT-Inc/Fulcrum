@@ -2,11 +2,13 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using ICSharpCode.AvalonEdit;
@@ -106,32 +108,56 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Now get the body contents and pass them into our VM for processing and sending.
             Button SendingButton = (Button)SendButton;
+            SendingButton.Content = "Sending...";
+            SendingButton.Background = Brushes.DarkOrange;
             string BodyContents = this.EmailBodyTextContent.Text;
             this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
-            await Task.Run(() =>
+            bool SendPassed = await Task.Run(() =>
             {
                 // Toggle buttons and textbox use and run the send routine
-                Dispatcher.Invoke(() => {
+                Dispatcher.Invoke(() =>
+                {
                     SendingButton.IsEnabled = false;
                     this.EmailSubjectText.IsEnabled = false;
                     this.EmailBodyTextContent.IsEnabled = false;
+                    this.RecipientAddressEntryBox.IsEnabled = false;
                 });
 
                 // Rend out the message request here.
                 var SendTime = new Stopwatch(); SendTime.Start();
-                this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
+                bool SendResult = this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
                 this.ViewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
 
                 // Turn everything back on.
-                Dispatcher.Invoke(() => {
+                Dispatcher.Invoke(() =>
+                {
                     SendingButton.IsEnabled = true;
                     this.EmailSubjectText.IsEnabled = true;
                     this.EmailBodyTextContent.IsEnabled = true;
+                    this.RecipientAddressEntryBox.IsEnabled = true;
+                });
+
+                this.ViewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
+                return SendResult;
+            });
+
+            // Now set the send button based on the result.
+            Brush SendingDefaultColor = SendingButton.Background;
+            SendingButton.Content = SendPassed ? "Sent!" : "Failed!";
+            SendingButton.Background = SendPassed ? Brushes.DarkGreen : Brushes.DarkRed;
+            Task.Run(() =>
+            {
+                // Now wait 3 seconds and reset our colors to default values.
+                Thread.Sleep(3000);
+                Dispatcher.Invoke(() =>
+                {
+                    SendingButton.Content = "Send";
+                    SendingButton.Background = SendingDefaultColor;
+                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
                 });
             });
         }
-
 
         /// <summary>
         /// Reacts to a new button click for adding an email entry into our list
