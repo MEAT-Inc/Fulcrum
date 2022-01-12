@@ -109,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             // Now get the body contents and pass them into our VM for processing and sending.
             Button SendingButton = (Button)SendButton;
             SendingButton.Content = "Sending...";
-            SendingButton.Background = Brushes.DarkOrange;
+            Brush SendingDefaultColor = SendingButton.Background;
             string BodyContents = this.EmailBodyTextContent.Text;
             this.ViewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this.ViewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
@@ -121,6 +121,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                     SendingButton.IsEnabled = false;
                     this.EmailSubjectText.IsEnabled = false;
                     this.EmailBodyTextContent.IsEnabled = false;
+                    SendingButton.Background = Brushes.DarkOrange;
                     this.RecipientAddressEntryBox.IsEnabled = false;
                 });
 
@@ -143,7 +144,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             });
 
             // Now set the send button based on the result.
-            Brush SendingDefaultColor = SendingButton.Background;
             SendingButton.Content = SendPassed ? "Sent!" : "Failed!";
             SendingButton.Background = SendPassed ? Brushes.DarkGreen : Brushes.DarkRed;
             Task.Run(() =>
