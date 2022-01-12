@@ -30,13 +30,13 @@
         <Grid.RowDefinitions>
             <RowDefinition Height=".475*">
                 <RowDefinition.Style>
-                    <Style>
+                    <Style TargetType="RowDefinition">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
-                                <Setter Property="RowDefinition.Height" Value=".475*"/>
+                                <Setter Property="Height" Value=".475*"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
-                                <Setter Property="RowDefinition.Height" Value="0"/>
+                                <Setter Property="Height" Value="40"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -48,17 +48,29 @@
 
         <!-- Content For Session Title Information -->
         <Grid Grid.Row="0">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
+                            <Setter Property="Height" Value="40"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
+                            <Setter Property="Content" Value="*"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition>
                     <RowDefinition.Style>
-                        <Style>
+                        <Style TargetType="RowDefinition">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
-                                    <Setter Property="RowDefinition.Height" Value="*"/>
+                                    <Setter Property="Height" Value="*"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
-                                    <Setter Property="RowDefinition.Height" Value="0"/>
+                                    <Setter Property="Height" Value="0"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -75,7 +87,6 @@
             <!-- Collapse Info Button -->
             <Button Grid.Row="0" 
                     VerticalAlignment="Stretch"
-                    Content="Hide Information"
                     Click="ToggleEmailPaneInfoButton_OnClick"
                     HorizontalAlignment="Right" Width="150" Margin="0,5">
                 <Button.Style>
@@ -87,7 +98,6 @@
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
                                 <Setter Property="Content" Value="Show Information"/>
                             </DataTrigger>
-
                         </Style.Triggers>
                     </Style>
                 </Button.Style>

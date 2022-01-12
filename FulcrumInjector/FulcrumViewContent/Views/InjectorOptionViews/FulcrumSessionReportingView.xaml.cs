@@ -90,11 +90,23 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Start by logging button was clicked then flipping the value around.
             this.ViewLogger.WriteLog("PROCESSED A BUTTON CLICK TO TOGGLE VISIBILITY OF OUR EMAIL PANE HELP TEXT", LogType.WarnLog);
-            this.ViewLogger.WriteLog($"CURRENT STATE IS {ViewModel.ShowEmailInfoText}", LogType.InfoLog);
-
-            // Log swapping and switch
-            this.ViewLogger.WriteLog("SWITCHING VALUE AND UPDATING VIEW CONTENT NOW...", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"CURRENTLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
+            
+            // Log and update information
             this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
+            this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"NEWLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
+
+            // Get parent grid object here.
+            // Button SendingButtonCast = (Button)SendingButton;
+            // Grid ParentSendingGrid = SendingButtonCast.Parent as Grid;
+            // this.ViewLogger.WriteLog("PULLED GRID INSTANCE FOR OUR PARENT OBJECT OK! SETTING NEW VALUES NOW", LogType.InfoLog);
+
+            // Set grid content values.
+            // var LastRowInstance = ParentSendingGrid.RowDefinitions.LastOrDefault();
+            // if (!this.ViewModel.ShowEmailInfoText) ParentSendingGrid.RowDefinitions.Remove(LastRowInstance);
+            // else { ParentSendingGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) }); }
+            // this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
         }
         /// <summary>
         /// Send email button for the report sender
