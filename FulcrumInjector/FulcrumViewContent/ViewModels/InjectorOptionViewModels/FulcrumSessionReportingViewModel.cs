@@ -23,16 +23,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SessionReportViewModelLogger")) ?? new SubServiceLogger("SessionReportViewModelLogger");
 
         // Private Control Values
-        private bool _canSendEmail = false;
         private bool _showEmailInfoText = true;
-        private PropertyWatchdog _canSendWatchdog;
         private SessionReportEmailBroker _sessionReportSender;
-        private string _defaultBodyText = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
 
         // Public values for our view to bind onto 
-        public bool CanSendEmail { get => _canSendEmail; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public PropertyWatchdog CanSendWatchdog { get => _canSendWatchdog; set => PropertyUpdated(value); }
         public SessionReportEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -53,17 +48,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             // Log passed. Build in main log file.
             ViewModelLogger.WriteLog("EMAIL REPORT BROKER HAS BEEN BUILT OK AND BOUND TO OUR VIEW CONTENT!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {this.AppendDefaultLogFile()} OK!", LogType.InfoLog);
-
-            // Build watchdog for can send and move on.
-            this.CanSendWatchdog = new PropertyWatchdog(250);
-            this.CanSendWatchdog.StartUpdateTimer((_, _) =>
-            {
-                // Start by building our view object and casting it.
-                var ViewObject = InjectorConstants.FulcrumSessionReportingView;
-                this.CanSendEmail = ViewObject.EmailBodyTextContent.Text != this._defaultBodyText &&
-                                    this.SessionReportSender.EmailRecipientAddresses.Length != 0;
-            });
-            ViewModelLogger.WriteLog("BUILT NEW WATCHDOG FOR PROPERTY CONFIGURATION TO ENABLE OR DISABLE SENDING OK!", LogType.InfoLog);
 
             // Log completed setup.
             ViewModelLogger.WriteLog("SETUP NEW VIEW MODEL FOR EMAIL BROKER VALUES OK!", LogType.InfoLog);
