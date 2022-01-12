@@ -47,14 +47,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumHamburgerCoreView()
         {
-            // Init component. Build new VM object
+            // Build new ViewModel object
             InitializeComponent();
             this.ViewModel = new FulcrumHamburgerCoreViewModel();
-
-            // Find the global color sheet and store values for it.
-            this.Resources.MergedDictionaries.Add(Application.Current.Resources.MergedDictionaries
-                .FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme")));
-            ViewLogger.WriteLog($"SETUP MAIN COLOR THEME FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
 
             // Configure new Navigation Service helper
             this.NavService = new HamburgerNavService();

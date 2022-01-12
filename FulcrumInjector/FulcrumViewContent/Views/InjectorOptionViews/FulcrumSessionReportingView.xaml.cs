@@ -36,15 +36,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// </summary>
         public FulcrumSessionReportingView()
         {
-            // Init component. Build new VM object
+            // Build new ViewModel object
             InitializeComponent();
-
-            // Find the global color sheet and store values for it.
-            this.Resources.MergedDictionaries.Add(Application.Current.Resources.MergedDictionaries
-                .FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme")));
-            ViewLogger.WriteLog($"SETUP MAIN COLOR THEME FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
-
-            // Store view model instance.
             this.ViewModel = InjectorConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
@@ -60,12 +53,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
 
-            // Store temp text into our email body.
-            this.EmailBodyTextContent.Text =
+            // Force show help menu and build email temp text
+            this.ViewModel.ShowEmailInfoText = !this.ViewModel.ShowEmailInfoText;
+            this.EmailBodyTextContent.Text = 
                 "Dearest Neo,\n\n" +
                 "Please fix your broken software. I thought this was supposed to make my life easier?\n\n" +
                 "With Love,\n" +
                 "A Pissed Off Tech";
+
+            // Log done building new ViewModel.
+            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR EMAIL REPORTING OUTPUT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -97,7 +94,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
         }
 
-
         /// <summary>
         /// Shows or hides the email information on the view object. 
         /// </summary>
@@ -114,12 +110,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("UPDATED VIEW CONTENT VALUES CORRECTLY! GRIDS SHOULD HAVE RESIDED AS EXPECTED", LogType.InfoLog);
             this.ViewLogger.WriteLog($"NEWLY SET INFORMATION VISIBILITY STATE IS {this.ViewModel.ShowEmailInfoText}", LogType.TraceLog);
         }
+
         /// <summary>
         /// Attaches a new file entry into our list of files by showing a file selection dialogue
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddReportAttachmentButton_OnClick(object sender, RoutedEventArgs e)
+        /// <param name="AttachFileButton"></param>
+        /// <param name="AttachFileEventArgs"></param>
+        private void AddReportAttachmentButton_OnClick(object AttachFileButton, RoutedEventArgs AttachFileEventArgs)
         {
             // Log information about opening appending box and begin selection
             this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
@@ -150,6 +147,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("DONE APPENDING NEW FILE INSTANCES. ATTACHMENTS LISTBOX SHOULD BE UPDATED WITH NEW INFORMATION NOW", LogType.InfoLog);
             this.ViewLogger.WriteLog($"TOTAL OF {this.ViewModel.EmailMessageAttachments.Length} ATTACHMENTS ARE NOW BEING TRACKED", LogType.InfoLog);
         }
+        /// <summary>
+        /// Event handler for when a button is clicked to remove the selected attachment.
+        /// </summary>
+        /// <param name="RemoveFileButton"></param>
+        /// <param name="RemoveFileButtonEventArgs"></param>
+        private void RemoveAttachmentButton_OnClick(object RemoveFileButton, RoutedEventArgs RemoveFileButtonEventArgs)
+        {
+            // TODO: Build logic to remove file based on selected index.
+        }
+
         /// <summary>
         /// Send email button for the report sender
         /// </summary>
