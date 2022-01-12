@@ -82,13 +82,13 @@
                     HorizontalAlignment="Right" Width="150" Margin="0,5">
                 <Button.Style>
                     <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
-                        <Setter Property="Content" Value="Hide Information"/>
+                        <Setter Property="Content" Value="Hide Report Help"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
-                                <Setter Property="Content" Value="Hide Information"/>
+                                <Setter Property="Content" Value="Hide Report Help"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
-                                <Setter Property="Content" Value="Show Information"/>
+                                <Setter Property="Content" Value="Show Report Help"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
