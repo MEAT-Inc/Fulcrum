@@ -47,6 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumHamburgerCoreView()
         {
+            // Build new ViewModel object
             InitializeComponent();
             this.ViewModel = new FulcrumHamburgerCoreViewModel();
 
@@ -54,6 +55,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.NavService = new HamburgerNavService();
             this.InjectorHamburgerMenu.Content = NavService.NavigationFrame;
             this.NavService.Navigated += this.NavigationServiceEx_OnNavigated;
+            this.ViewLogger.WriteLog("CONFIGURED NEW NAV SERVICE FOR OUR HAMBURGER CORE OBJECT OK!", LogType.InfoLog);
         }
 
         /// <summary>
