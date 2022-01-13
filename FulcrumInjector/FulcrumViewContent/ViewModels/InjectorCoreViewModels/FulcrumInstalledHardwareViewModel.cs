@@ -25,11 +25,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private Control Values
         private ObservableCollection<J2534Dll> _installedDLLs;
-        private ObservableCollection<PassThruStructs.SDevice> _installedDevices;
+        private ObservableCollection<string> _installedDevices;
 
         // Public values for our view to bind onto 
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
-        public ObservableCollection<PassThruStructs.SDevice> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
+        public ObservableCollection<string> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -59,22 +59,21 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="DllEntry">DLL to find devices for</param>
         /// <returns>Collection of devices found built</returns>
-        public ObservableCollection<PassThruStructs.SDevice> PopulateDevicesForDLL(J2534Dll DllEntry)
+        public ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
         {
             // Log information and pull in our new Device entries for the DLL given if any exist.
             if (DllEntry == null)
             ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
 
             // Check if nothing was pulled in or not.
-            var PulledDeviceList = DllEntry.FindConnectedSDevices();
+            var PulledDeviceList = DllEntry.FindConnectedDeviceNames();
             if (PulledDeviceList.Count == 0) {
                 ViewModelLogger.WriteLog("WARNING: NO DEVICES WERE FOUND FOR THE GIVEN DLL ENTRY TYPE!", LogType.ErrorLog);
-                return new ObservableCollection<PassThruStructs.SDevice>();
+                return new ObservableCollection<string>();
             }
 
             // List out the full count of devices built and return it.
-            ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList.Select(DevObj => DevObj.DeviceName))}");
-            return new ObservableCollection<PassThruStructs.SDevice>(PulledDeviceList);
+            return new ObservableCollection<string>(PulledDeviceList);
         }
     }
 }
