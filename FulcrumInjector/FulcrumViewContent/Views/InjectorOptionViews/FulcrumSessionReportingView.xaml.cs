@@ -169,7 +169,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Check if there's even an email to parse out. If none, remove all.
             if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
-            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            Regex SendingRegex = new Regex(@"([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)");
             var MatchedEmails = SendingRegex.Matches(NewTextContent);
             if (MatchedEmails.Count == 0) {
                 this.SendMessageButton.IsEnabled = false;
