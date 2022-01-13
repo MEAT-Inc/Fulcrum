@@ -1,6 +1,8 @@
 # Fulcrum
 Fulcrum is the ultime J2534 DLL Shim written in C++ which is able to pipe data out from the native calls to any other location for super deep diagnostic logging
 
+![Injector_J2534Overview](https://user-images.githubusercontent.com/62027458/149416626-46309b13-6bf4-418f-b0c7-e7cd84c3c7c1.PNG)
+
 ---
 
 ### Using the Fulcrum
@@ -14,3 +16,4 @@ Fulcrum is the ultime J2534 DLL Shim written in C++ which is able to pipe data o
 ### Questions, Comments, Concerns? 
 - I don't wanna hear it...
 - But feel free to send an email to neo.smith@motorengineeringandtech.com. He might feel like being generous sometimes...
+
