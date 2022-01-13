@@ -43,8 +43,6 @@ namespace FulcrumInjector
             base.OnStartup(e);
 
             // Force the working directory. Build JSON settings objects
-            string RunningLocation = Assembly.GetExecutingAssembly().Location;
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(RunningLocation));
             JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorSettings.json");
 
             // Run single instance configuration first

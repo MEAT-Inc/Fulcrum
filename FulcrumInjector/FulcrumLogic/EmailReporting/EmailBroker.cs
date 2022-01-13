@@ -21,7 +21,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
     /// <summary>
     /// Class used for sending emails out to our client applications and users
     /// </summary>
-    public class SessionReportEmailBroker
+    public class EmailBroker
     {
         // Logger object
         private SubServiceLogger EmailLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -82,7 +82,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// <param name="SenderEmail">Sender email</param>
         /// <param name="SenderPassword">Sender password</param>
         /// <param name="DefaultRecipient">Default recipient for emails</param>
-        public SessionReportEmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient = null)
+        public EmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient = null)
         {
             // Now build default settings values and log information
             this.EmailSenderName = SenderName;

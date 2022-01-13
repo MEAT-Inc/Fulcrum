@@ -92,24 +92,29 @@ namespace FulcrumInjector.FulcrumViewContent
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        // Singleton Injector DLL Output View Contents. These get set to control view contents on the Main window
+        // Singleton Injector DLL Core Output View Contents. These get set to control view contents on the Main window
+        public static SingletonContentControl<FulcrumInstalledHardwareView, FulcrumInstalledHardwareViewModel> FulcrumInstalledHardwareSingleton =>
+            SingletonContentControl<FulcrumInstalledHardwareView, FulcrumInstalledHardwareViewModel>.LocateSingletonViewInstance(typeof(FulcrumInstalledHardwareView));
         public static SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel> FulcrumDllOutputSingleton =>
             SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
-        public static SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel> FulcrumDebugLoggingSingleton =>
-            SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
+
+        // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
         public static SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel> FulcrumSettingsPaneSingleton =>
             SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
         public static SingletonContentControl<FulcrumSessionReportingView, FulcrumSessionReportingViewModel> FulcrumSessionReportingSingleton =>
             SingletonContentControl<FulcrumSessionReportingView, FulcrumSessionReportingViewModel>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
+        public static SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel> FulcrumDebugLoggingSingleton =>
+            SingletonContentControl<FulcrumDebugLoggingView, FulcrumDebugLoggingViewModel>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
 
+        // --------------------------------------------------------------------------------------------------------------------------
 
-        // DLL Output viewing user control and view model object
+        // Installed Hardware view  user control and view model object
+        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => FulcrumInstalledHardwareSingleton?.SingletonUserControl;
+        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => FulcrumInstalledHardwareSingleton?.SingletonViewModel;
+
+        // DLL Output Logging user control and view model object
         public static FulcrumDllOutputLogView FulcrumDllOutputLogView => FulcrumDllOutputSingleton?.SingletonUserControl;
         public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => FulcrumDllOutputSingleton?.SingletonViewModel;
-
-        // Debug logging output user control and view model object
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => FulcrumDebugLoggingSingleton?.SingletonUserControl;
-        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => FulcrumDebugLoggingSingleton?.SingletonViewModel;
 
         // User settings and configuration user control and view model object
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView => FulcrumSettingsPaneSingleton?.SingletonUserControl;
@@ -118,6 +123,11 @@ namespace FulcrumInjector.FulcrumViewContent
         // Session output reporting user control and view model object
         public static FulcrumSessionReportingView FulcrumSessionReportingView => FulcrumSessionReportingSingleton?.SingletonUserControl;
         public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => FulcrumSessionReportingSingleton?.SingletonViewModel;
+
+        // Debug logging output user control and view model object
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => FulcrumDebugLoggingSingleton?.SingletonUserControl;
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => FulcrumDebugLoggingSingleton?.SingletonViewModel;
+
 
         // --------------------------------------------------------------------------------------------------------------------------
 

@@ -59,9 +59,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.DataContext = this.ViewModel;
 
             // Force show help menu and build email temp text
-            this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
-            this.ViewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
-
+            if (this.EmailBodyTextContent.Text.Length == 0) {
+                this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
+                this.ViewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
+            }
+    
             // Log done building new ViewModel.
             this.ToggleEmailPaneInfoButton_OnClick(null, null);
             this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
@@ -104,7 +106,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             else { SendingSubject += $" (Session Report - {DateTime.Now.ToString("F")})"; }
             this.ViewLogger.WriteLog($"REPORT SESSION SUBJECT: {SendingSubject}", LogType.InfoLog);
             this.ViewLogger.WriteLog("STORED NEW SUBJECT BACK INTO OUR VIEW OBJECT!", LogType.InfoLog);
-            this.EmailSubjectText.Text = SendingSubject;
 
             // Now get the body contents and pass them into our VM for processing and sending.
             Button SendingButton = (Button)SendButton;
@@ -169,7 +170,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Check if there's even an email to parse out. If none, remove all.
             if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
-            Regex SendingRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            Regex SendingRegex = new Regex(@"([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)");
             var MatchedEmails = SendingRegex.Matches(NewTextContent);
             if (MatchedEmails.Count == 0) {
                 this.SendMessageButton.IsEnabled = false;
@@ -182,7 +183,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.EmailRecipientAddresses.Select(MailAddress => MailAddress.Address));
 
             // Now remove address values that don't fly here.
-            BoxObject.Text = NewAddressString;
             this.ViewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
             this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
             this.SendMessageButton.IsEnabled = this.ViewModel.SessionReportSender.EmailRecipientAddresses.Length != 0;

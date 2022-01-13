@@ -37,12 +37,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         // Private control values
-        private HamburgerNavMenuItem[] _injectorMenuEntries;
-        private HamburgerNavMenuItem[] _injectorMenuOptions;
+        private ObservableCollection<HamburgerNavMenuItem> _injectorMenuEntries;
+        private ObservableCollection<HamburgerNavMenuItem> _injectorMenuOptions;
 
         // Public values for our view to bind to
-        public HamburgerNavMenuItem[] InjectorMenuEntries { get => _injectorMenuEntries; set => PropertyUpdated(value); }
-        public HamburgerNavMenuItem[] InjectorMenuOptions { get => _injectorMenuOptions; set => PropertyUpdated(value); }
+        public ObservableCollection<HamburgerNavMenuItem> InjectorMenuEntries { get => _injectorMenuEntries; set => PropertyUpdated(value); }
+        public ObservableCollection<HamburgerNavMenuItem> InjectorMenuOptions { get => _injectorMenuOptions; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Return built output object values
-            this.InjectorMenuEntries = OutputMenuItems;
+            this.InjectorMenuEntries = new ObservableCollection<HamburgerNavMenuItem>(OutputMenuItems);
             return OutputMenuItems;
         }
         /// <summary>
@@ -144,7 +144,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Return built output object values
-            this.InjectorMenuOptions = OutputOptionEntries;
+            this.InjectorMenuOptions = new ObservableCollection<HamburgerNavMenuItem>(OutputOptionEntries);
             return OutputOptionEntries;
         }
 
