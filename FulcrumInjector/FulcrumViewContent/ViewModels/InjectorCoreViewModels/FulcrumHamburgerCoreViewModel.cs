@@ -64,7 +64,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Store The path for icons output and the dynamic objects for our icons
             ViewModelLogger.WriteLog("BUILDING ICON PATH OUTPUT AND IMPORTING MENU ENTRIES NOW...", LogType.InfoLog);
             this.FulcrumMenuEntries = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumMenuEntries");
-            this.FulcrumIconPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumIconsPath");
+            this.FulcrumIconPath = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumIconsPath"));
             ViewModelLogger.WriteLog("IMPORTED VALUES FROM JSON FILE OK!", LogType.InfoLog);
 
             // Ensure output icon path exists
@@ -191,7 +193,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"   --> VIEW TYPE:       {MenuViewTypeName}", LogType.InfoLog);
             ViewModelLogger.WriteLog($"   --> VIEW MODEL TYPE: {MenuModelTypeName}", LogType.InfoLog);
 
-
             // Generate output result object.
             var NewResult = new HamburgerNavMenuItem()
             {
@@ -201,7 +202,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                 // Configure the label and the name of the menu entry
                 Label = MenuEntryName,
-                Glyph = new Uri(Path.GetFullPath(Path.Combine(this.FulcrumIconPath, IconName)), UriKind.Absolute).ToString(),
+                Glyph = new Uri(OutputIconFileName, UriKind.RelativeOrAbsolute).ToString(),
             };
 
             // Log the result of the binding actions

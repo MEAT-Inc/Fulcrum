@@ -19,7 +19,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumInstalledHardwareStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumInstalledHardwareViewStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -80,7 +80,7 @@
 
                 <!-- DLL Entries -->
                 <ListBox Grid.IsSharedSizeScope="True" Grid.Row="1" 
-                         x:Name="InstalledDLLsListBox" Margin="0,5" 
+                         x:Name="InstalledDLLsListBox" Margin="0,5,0,0" 
                          SelectionChanged="InstalledDLLsListBox_OnSelectionChanged"
                          Style="{StaticResource HardwareContentsListBoxStyle}"
                          ItemsSource="{Binding InstalledDLLs}">
@@ -132,7 +132,7 @@
                 </ListBox>
 
                 <!-- Placeholder for when there's no entries for Devices -->
-                <Grid Grid.Row="1" Margin="0,5">
+                <Grid Grid.Row="1" Margin="0,5,0,0">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -177,7 +177,7 @@
                 </Grid>
 
                 <!-- Device Entries -->
-                <ListBox Grid.Row="1" Margin="0,5" 
+                <ListBox Grid.Row="1" Margin="0,5,0,0" 
                          x:Name="InstalledDevicesListBox"
                          Style="{StaticResource HardwareContentsListBoxStyle}"
                          ItemsSource="{Binding InstalledDevices}">
@@ -189,7 +189,7 @@
                 </ListBox>
 
                 <!-- Placeholder for when there's no entries for Devices -->
-                <Grid Grid.Row="1" Margin="0,5">
+                <Grid Grid.Row="1" Margin="0,5,0,0">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
