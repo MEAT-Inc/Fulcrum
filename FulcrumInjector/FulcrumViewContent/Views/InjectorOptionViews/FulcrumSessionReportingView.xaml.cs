@@ -59,9 +59,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.DataContext = this.ViewModel;
 
             // Force show help menu and build email temp text
-            this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
-            this.ViewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
-
+            if (this.EmailBodyTextContent.Text.Length == 0) {
+                this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
+                this.ViewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
+            }
+    
             // Log done building new ViewModel.
             this.ToggleEmailPaneInfoButton_OnClick(null, null);
             this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
