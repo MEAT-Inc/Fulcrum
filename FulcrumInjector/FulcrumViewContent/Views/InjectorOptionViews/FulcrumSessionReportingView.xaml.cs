@@ -104,7 +104,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             else { SendingSubject += $" (Session Report - {DateTime.Now.ToString("F")})"; }
             this.ViewLogger.WriteLog($"REPORT SESSION SUBJECT: {SendingSubject}", LogType.InfoLog);
             this.ViewLogger.WriteLog("STORED NEW SUBJECT BACK INTO OUR VIEW OBJECT!", LogType.InfoLog);
-            this.EmailSubjectText.Text = SendingSubject;
 
             // Now get the body contents and pass them into our VM for processing and sending.
             Button SendingButton = (Button)SendButton;
