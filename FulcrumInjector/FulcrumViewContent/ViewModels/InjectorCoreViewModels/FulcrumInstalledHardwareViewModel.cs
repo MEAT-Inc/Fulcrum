@@ -10,6 +10,7 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruImport;
+using SharpWrap2534.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -24,11 +25,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private Control Values
         private ObservableCollection<J2534Dll> _installedDLLs;
-        private ObservableCollection<J2534Device> _installedDevices;
+        private ObservableCollection<PassThruStructs.SDevice> _installedDevices;
 
         // Public values for our view to bind onto 
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
-        public ObservableCollection<J2534Device> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
+        public ObservableCollection<PassThruStructs.SDevice> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -53,5 +54,27 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Populates an observable collection of J2534 Devices for a given input J2534 DLL
+        /// </summary>
+        /// <param name="DllEntry">DLL to find devices for</param>
+        /// <returns>Collection of devices found built</returns>
+        public ObservableCollection<PassThruStructs.SDevice> PopulateDevicesForDLL(J2534Dll DllEntry)
+        {
+            // Log information and pull in our new Device entries for the DLL given if any exist.
+            if (DllEntry == null)
+            ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
+
+            // Check if nothing was pulled in or not.
+            var PulledDeviceList = DllEntry.FindConnectedSDevices();
+            if (PulledDeviceList.Count == 0) {
+                ViewModelLogger.WriteLog("WARNING: NO DEVICES WERE FOUND FOR THE GIVEN DLL ENTRY TYPE!", LogType.ErrorLog);
+                return new ObservableCollection<PassThruStructs.SDevice>();
+            }
+
+            // List out the full count of devices built and return it.
+            ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList.Select(DevObj => DevObj.DeviceName))}");
+            return new ObservableCollection<PassThruStructs.SDevice>(PulledDeviceList);
+        }
     }
 }

@@ -18,6 +18,7 @@ using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534.J2534Objects;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 {
@@ -57,6 +58,32 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR HARDWARE INFORMATION OUTPUT OK!", LogType.InfoLog);
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Populates our new Device Listbox with a set of devices pulled from our DLL Entry object.
+        /// </summary>
+        /// <param name="SendingDllObject"></param>
+        /// <param name="DllChangedEventArgs"></param>
+
+        private void InstalledDLLsListBox_OnSelectionChanged(object SendingDllObject, SelectionChangedEventArgs DllChangedEventArgs)
+        {
+            // Log info, find the currently selected DLL object, cast it, and run the VM Method.
+            this.ViewLogger.WriteLog("PULLING IN NEW DEVICES FOR DLL ENTRY NOW...", LogType.InfoLog);
+
+            // Convert sender and cast our DLL object
+            ListBox SendingBox = (ListBox)SendingDllObject;
+            J2534Dll SelectedDLL = (J2534Dll)SendingBox.SelectedItem;
+            this.ViewLogger.WriteLog(
+                SelectedDLL == null ? "NO DLL ENTRY SELECTED! CLEARING" : $"DLL ENTRY PULLED: {SelectedDLL.Name}",
+                LogType.TraceLog);
+
+            // Log and populate devices
+            this.ViewLogger.WriteLog("POPULATING VALUES FROM VIEW MODEL ROUTINE NOW"); 
+            var LocatedDevices = this.ViewModel.PopulateDevicesForDLL(SelectedDLL);
+            this.ViewLogger.WriteLog($"POPULATED OUR DLL ENTRY SET WITH A TOTAL OF {LocatedDevices.Count} DEVICES!", LogType.InfoLog);
         }
     }
 }
