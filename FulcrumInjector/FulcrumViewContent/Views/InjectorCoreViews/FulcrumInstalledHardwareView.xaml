@@ -180,7 +180,13 @@
                 <ListBox Grid.Row="1" Margin="0,5" 
                          x:Name="InstalledDevicesListBox"
                          Style="{StaticResource HardwareContentsListBoxStyle}"
-                         ItemsSource="{Binding InstalledDevices}"/>
+                         ItemsSource="{Binding InstalledDevices}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
                 <!-- Placeholder for when there's no entries for Devices -->
                 <Grid Grid.Row="1" Margin="0,5">

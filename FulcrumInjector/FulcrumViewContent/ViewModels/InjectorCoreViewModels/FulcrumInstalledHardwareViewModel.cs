@@ -64,15 +64,29 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Log information and pull in our new Device entries for the DLL given if any exist.
             if (DllEntry == null) ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
 
-            // Check if nothing was pulled in or not.
-            var PulledDeviceList = DllEntry.FindConnectedDeviceNames();
-            if (PulledDeviceList.Count == 0) {
+            // Try and get devices here.
+            try
+            {
+                // Pull devices, list count, and return values.
+                var PulledDeviceList = DllEntry.FindConnectedDeviceNames();
+                if (PulledDeviceList.Count == 0)
+                    throw new InvalidOperationException("FAILED TO FIND ANY DEVICES TO USE FOR OUR J2534 INSTANCE!");
+                        
+                // Log information about pulling and return values.
+                ViewModelLogger.WriteLog("PULLED NEW DEVICES IN WITHOUT ISSUES!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList)}", LogType.InfoLog);
+                return new ObservableCollection<string>(PulledDeviceList);
+            }
+            catch (Exception FindEx)
+            {
+                // Log the exception found and return nothing.
+                ViewModelLogger.WriteLog("ERROR! FAILED TO PULL J2534 DEVICES FROM OUR GIVEN DLL ENTRY!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING SHOWN BELOW NOW", FindEx);
+
+                // List out the full count of devices built and return it.
                 ViewModelLogger.WriteLog("WARNING: NO DEVICES WERE FOUND FOR THE GIVEN DLL ENTRY TYPE!", LogType.ErrorLog);
                 return new ObservableCollection<string>();
             }
-
-            // List out the full count of devices built and return it.
-            return new ObservableCollection<string>(PulledDeviceList);
         }
     }
 }
