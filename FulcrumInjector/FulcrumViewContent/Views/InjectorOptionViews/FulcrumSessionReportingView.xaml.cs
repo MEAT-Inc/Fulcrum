@@ -182,7 +182,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.EmailRecipientAddresses.Select(MailAddress => MailAddress.Address));
 
             // Now remove address values that don't fly here.
-            BoxObject.Text = NewAddressString;
             this.ViewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
             this.ViewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
             this.SendMessageButton.IsEnabled = this.ViewModel.SessionReportSender.EmailRecipientAddresses.Length != 0;
