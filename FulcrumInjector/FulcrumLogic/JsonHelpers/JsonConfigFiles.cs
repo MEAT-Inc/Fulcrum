@@ -52,6 +52,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonHelpers
             ConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
             FulcrumInjectorExe = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #else
+            string FulcrumInjectorDir;
             var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
             if (FulcrumKey != null) { FulcrumInjectorExe = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()); } 
             else 
