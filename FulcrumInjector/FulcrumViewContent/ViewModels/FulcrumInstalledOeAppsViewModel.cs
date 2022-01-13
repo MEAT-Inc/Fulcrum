@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
@@ -20,10 +21,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledOeAppsViewModelLogger")) ?? new SubServiceLogger("InstalledOeAppsViewModelLogger");
 
         // Private Control Values
-        private OeApplicationModel[] _installedOeApps;
+        private ObservableCollection<OeApplicationModel> _installedOeApps;
 
         // Public values for our view to bind onto 
-        public OeApplicationModel[] InstalledOeApps { get => _installedOeApps; set => PropertyUpdated(value); }
+        public ObservableCollection<OeApplicationModel> InstalledOeApps { get => _installedOeApps; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP OE APPLICATION LIST NOW...", LogType.WarnLog);
 
             // Import the list of possible OE App names from our json configuration file now.
-            this.InstalledOeApps = this.ImportOeApplications().ToArray();
+            this.InstalledOeApps = this.ImportOeApplications();
             ViewModelLogger.WriteLog("IMPORT PROCESS COMPLETE! VIEW SHOULD BE UPDATED WITH APP INSTANCE OBJECTS NOW!", LogType.InfoLog);
 
             // Log completed setup.
@@ -49,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Pulls in a list of OE application names and paths as a set of objects.
         /// Converts them into a list and returns them.
         /// </summary>
-        internal List<OeApplicationModel> ImportOeApplications()
+        internal ObservableCollection<OeApplicationModel> ImportOeApplications()
         {
             // Log info. Pull app objects in from the settings file, and begin to import them.
             ViewModelLogger.WriteLog("PULLING IN LIST OF PREDEFINED OE APPLICATIONS AND STORING THEM ONTO OUR VIEW OBJECT NOW...", LogType.WarnLog);
@@ -83,7 +84,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             // Log output information here.
             ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {PulledAppsObject.Length} OBJECTS AND CREATED {OutputApps.Count} CAST APP OBJECTS!", LogType.WarnLog);
             ViewModelLogger.WriteLog("RETURNING BUILT APP OBJECT INSTANCES NOW...");
-            return OutputApps;
+            return new ObservableCollection<OeApplicationModel>(OutputApps);
         }
 
 

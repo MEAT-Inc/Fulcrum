@@ -54,7 +54,7 @@
             </Button.LayoutTransform>
         </Button>
         <Border Grid.Row="0"
-                Margin="10,0"
+                Margin="9,0,15,0"
                 x:Name="WidthHelperBorder"
                 BorderThickness="0,0,0,2"
                 BorderBrush="{StaticResource  DarkGreyThemeColor}"/>
@@ -62,7 +62,7 @@
         <!-- Content for the settings objects goes in here -->
         <ListBox Grid.Row="1"
                  x:Name="SettingsListBoxView"
-                 Margin="10,10,10,10"
+                 Margin="5,10,10,10"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center"
                  Style="{StaticResource ListBoxSettingsStyle}"

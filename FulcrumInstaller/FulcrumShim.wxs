@@ -42,7 +42,6 @@
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
                                 <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
                                 <File Id="SHARPWRAP2534.DLL" Name="SharpWrap2534.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrap2534.dll" />
-                                <File Id="SHARPWRAP2534_UI.DLL" Name="SharpWrap2534-UI.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrap2534-UI.dll" />
                             </Component>
                             <Directory Id="FulcrumXaml">
                                 <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
