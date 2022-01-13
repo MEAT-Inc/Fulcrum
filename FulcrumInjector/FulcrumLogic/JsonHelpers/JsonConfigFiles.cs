@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using SharpLogger;
@@ -44,21 +45,22 @@ namespace FulcrumInjector.FulcrumLogic.JsonHelpers
         /// <param name="NewConfigFileName"></param>
         public static void SetNewAppConfigFile(string NewConfigFileName)
         {
-            // Pull location of the configuration application
-            string FulcrumInjectorDir;
+            // Pull location of the configuration application. If debugging is on, then try and set it using the working dir. 
+            ConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
+#if DEBUG
+            ConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
+            var FulcrumInjectorDir = Directory.GetCurrentDirectory();
+#else
             var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
             if (FulcrumKey != null) { FulcrumInjectorDir = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()); } 
             else 
             {
                 ConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
-#if DEBUG
-                FulcrumInjectorDir = Directory.GetCurrentDirectory();
-#else
                 FulcrumInjectorDir = @"C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumInjector";
-#endif
             }
-
+#endif
             // List all the files in the directory we've located now and then find our settings file by name
+            Directory.SetCurrentDirectory(FulcrumInjectorDir);
             ConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorDir}", LogType.InfoLog);
             string[] LocatedFilesInDirectory = Directory.GetFiles(FulcrumInjectorDir, "*.json", SearchOption.AllDirectories);
             ConfigLogger?.WriteLog($"LOCATED A TOTAL OF {LocatedFilesInDirectory.Length} FILES IN OUR APP FOLDER WITH A JSON EXTENSION");

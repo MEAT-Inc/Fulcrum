@@ -63,7 +63,6 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Set the resource back here.
             Application.Current.Resources["AppColorTheme"] = ColorResources;
-            SharpWrap2534_UI.SharpWrapUi.RegisterApplicationThemes(ColorResources);
             ThemeManager.Current.ChangeTheme(Application.Current, RuntimeThemeGenerator.Current.GenerateRuntimeTheme(
                     (ThemeToSet.TypeOfTheme == ThemeType.DARK_COLORS ? "Dark" : "Light"), 
                     ThemeToSet.PrimaryColor.ToMediaColor()
