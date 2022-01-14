@@ -64,7 +64,7 @@
 									          Directory="ProgramMenuFolder"
 									          Icon="InjectorStartMenuAppIcon.exe"
 									          WorkingDirectory="FULCRUMINJECTORFILES"
-									          Name="FulcrumInjector"
+											  Name="FulcrumInjector - $(var.ProductVersion)"
 									          Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
 										<Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
 									</Shortcut>
@@ -75,7 +75,7 @@
 									          Directory="DesktopFolder"
 											  Icon="InjectorDesktopAppIcon.exe"
 											  WorkingDirectory="FULCRUMINJECTORFILES"
-									          Name="FulcrumInjector - $(var.ProductVersion)"
+									          Name="FulcrumInjector"
 									          Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
 										<Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
 									</Shortcut>
