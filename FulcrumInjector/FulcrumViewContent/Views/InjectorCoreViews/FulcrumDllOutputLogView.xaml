@@ -55,10 +55,7 @@
                          TextChanged="DllLogFilteringTextBox_OnTextChanged"/>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
-                <Run Foreground="{StaticResource TextColorBase}" Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to a vehicle."/>
-                <LineBreak/>
-                <Run Foreground="Yellow" Text="Syntax Highlighting is in the works for this viewer! When complete, auto simulations will be ready!"/>
-            </TextBlock>
+                <Run Foreground="{StaticResource TextColorBase}" Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to a vehicle. You can also review old logs by loading them in using the button at the right"/></TextBlock>
         </Grid>
 
         <!-- Logging Content Output -->
