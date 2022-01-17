@@ -257,12 +257,19 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	fulcrum_CHECK_DLL();
 	fulcrum_CHECK_FUNCTION(_PassThruClose);
 
+	// Close input pipe instance
+	fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
+	CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
+
 	// Get output value and return it here
 	retval = _PassThruClose(DeviceID);
 	fulcrum_printretval(retval);
 
-	// Close pipes
-	CFulcrumShim::ShutdownPipes();
+	// Close output pipe instance.
+	fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
+	CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
+
+	// Return output value.
 	return retval;
 }
 

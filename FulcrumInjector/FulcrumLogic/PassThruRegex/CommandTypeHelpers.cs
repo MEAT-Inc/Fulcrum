@@ -37,7 +37,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
                 if (OutputLines.Contains(NextCommand)) break;
 
-                // If the next command does not exist in the list, add it and move on. 
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
                 OutputLines.Add(NextCommand);
                 CharIndex = ErrorCloseIndex;
