@@ -91,6 +91,7 @@
 									<File Id="FULCRUMHAMBURGERCOREVIEWSTYLES.XAML" Name="FulcrumHamburgerCoreViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml" />
 									<File Id="FULCRUMINSTALLEDHARDWAREVIEWSTYLES.XAML" Name="FulcrumInstalledHardwareViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml" />
 									<File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
+									<File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
 									<File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
 									<File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
 									<File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />

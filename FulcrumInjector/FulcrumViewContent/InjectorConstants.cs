@@ -97,6 +97,9 @@ namespace FulcrumInjector.FulcrumViewContent
             SingletonContentControl<FulcrumInstalledHardwareView, FulcrumInstalledHardwareViewModel>.LocateSingletonViewInstance(typeof(FulcrumInstalledHardwareView));
         public static SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel> FulcrumDllOutputSingleton =>
             SingletonContentControl<FulcrumDllOutputLogView, FulcrumDllOutputLogViewModel>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
+        public static SingletonContentControl<FulcrumLogReviewView, FulcrumLogReviewViewModel> FulcrumLogReviewSingleton =>
+            SingletonContentControl<FulcrumLogReviewView, FulcrumLogReviewViewModel>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
+
 
         // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
         public static SingletonContentControl<FulcrumSettingsPaneView, FulcrumSettingsPaneViewModel> FulcrumSettingsPaneSingleton =>
@@ -115,6 +118,10 @@ namespace FulcrumInjector.FulcrumViewContent
         // DLL Output Logging user control and view model object
         public static FulcrumDllOutputLogView FulcrumDllOutputLogView => FulcrumDllOutputSingleton?.SingletonUserControl;
         public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => FulcrumDllOutputSingleton?.SingletonViewModel;
+
+        // Log Reviewing user control and view model object
+        public static FulcrumLogReviewView FulcrumLogReviewView => FulcrumLogReviewSingleton?.SingletonUserControl;
+        public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => FulcrumLogReviewSingleton?.SingletonViewModel;
 
         // User settings and configuration user control and view model object
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView => FulcrumSettingsPaneSingleton?.SingletonUserControl;
