@@ -1,27 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
 using System.Security;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.EmailReporting
+namespace FulcrumInjector.FulcrumLogic
 {
     /// <summary>
     /// Class used for sending emails out to our client applications and users
     /// </summary>
-    public class EmailBroker
+    public class ReportEmailBroker
     {
         // Logger object
         private SubServiceLogger EmailLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -82,7 +77,7 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
         /// <param name="SenderEmail">Sender email</param>
         /// <param name="SenderPassword">Sender password</param>
         /// <param name="DefaultRecipient">Default recipient for emails</param>
-        public EmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient = null)
+        public ReportEmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient = null)
         {
             // Now build default settings values and log information
             this.EmailSenderName = SenderName;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.EmailReporting;
+using FulcrumInjector.FulcrumLogic;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -25,12 +25,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         // Private Control Values
         private bool _canModifyMessage = true;
         private bool _showEmailInfoText = true;
-        private EmailBroker _sessionReportSender;
+        private ReportEmailBroker _sessionReportSender;
 
         // Public values for our view to bind onto 
         public bool CanModifyMessage { get => _canModifyMessage; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public EmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        public ReportEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         /// </summary>
         /// <param name="BuiltSender">Sender object built</param>
         /// <returns>True if built ok. False if not.</returns>
-        private bool GenerateEmailBroker(out EmailBroker BuiltSender)
+        private bool GenerateEmailBroker(out ReportEmailBroker BuiltSender)
         { 
             try
             {
@@ -92,7 +92,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
                 // Build broker first
                 ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
-                BuiltSender = new EmailBroker(SendName, SendEmail, SendPassword);
+                BuiltSender = new ReportEmailBroker(SendName, SendEmail, SendPassword);
 
                 // Now try and authorize the client for a google address.
                 ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
