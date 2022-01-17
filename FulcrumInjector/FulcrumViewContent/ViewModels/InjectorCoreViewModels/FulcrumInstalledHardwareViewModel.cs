@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.EmailReporting;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -59,7 +58,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="DllEntry">DLL to find devices for</param>
         /// <returns>Collection of devices found built</returns>
-        public ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
+        internal ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
         {
             // Log information and pull in our new Device entries for the DLL given if any exist.
             if (DllEntry == null) ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);

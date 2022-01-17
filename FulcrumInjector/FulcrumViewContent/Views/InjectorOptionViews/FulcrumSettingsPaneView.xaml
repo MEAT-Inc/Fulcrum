@@ -57,7 +57,7 @@
                 Margin="9,0,15,0"
                 x:Name="WidthHelperBorder"
                 BorderThickness="0,0,0,2"
-                BorderBrush="{StaticResource  DarkGreyThemeColor}"/>
+                BorderBrush="{StaticResource  TextColorBase}"/>
 
         <!-- Content for the settings objects goes in here -->
         <ListBox Grid.Row="1"

@@ -132,7 +132,7 @@
                 </ListBox>
 
                 <!-- Placeholder for when there's no entries for Devices -->
-                <Grid Grid.Row="1" Margin="0,5">
+                <Grid Grid.Row="1" Margin="0,5,0,0">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -147,7 +147,7 @@
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
                     <TextBlock Text="No DLLs Located!" 
-                               Foreground="{StaticResource TextColorBase}" FontSize="28" 
+                               Foreground="Yellow" FontSize="28" 
                                HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold"/>
                 </Grid>
             </Grid>
@@ -177,7 +177,7 @@
                 </Grid>
 
                 <!-- Device Entries -->
-                <ListBox Grid.Row="1" Margin="0,5" 
+                <ListBox Grid.Row="1" Margin="0,5,0,0" 
                          x:Name="InstalledDevicesListBox"
                          Style="{StaticResource HardwareContentsListBoxStyle}"
                          ItemsSource="{Binding InstalledDevices}">
@@ -206,7 +206,7 @@
                     <Border Opacity=".50" BorderThickness="3"
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
-                    <TextBlock Foreground="{StaticResource TextColorBase}" FontSize="28" 
+                    <TextBlock Foreground="Yellow" FontSize="28" 
                                HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
