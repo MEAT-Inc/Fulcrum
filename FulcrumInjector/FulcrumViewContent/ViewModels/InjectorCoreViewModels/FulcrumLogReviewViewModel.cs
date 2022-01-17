@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private control values
         private string _loadedLogFile = "";
-        private string _logFileContents;
+        private string _logFileContents = "";
 
         // Public values for our view to bind onto 
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
@@ -40,6 +40,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR LOG REVIEW VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
+            // Setup dummy values for log file values.
+            this.LoadedLogFile = "";
+            this.LogFileContents = "";
+
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL LOG REVIEW OUTPUT VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
@@ -51,7 +55,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
         /// <param name="InputLogFile"></param>
-        public void LoadLogFileContents(string InputLogFile)
+        internal void LoadLogFileContents(string InputLogFile)
         {
             // Log information, load contents, store values.
             ViewModelLogger.WriteLog("LOADING NEW LOG FILE CONTENTS NOW...", LogType.InfoLog);

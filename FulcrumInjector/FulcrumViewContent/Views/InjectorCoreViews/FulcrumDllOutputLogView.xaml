@@ -77,7 +77,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding ElementName=DebugRedirectOutputEdit, Path=Text}" Value="">
+                        <DataTrigger Binding="{Binding Path=HasOutput}" Value="false">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>

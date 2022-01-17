@@ -26,7 +26,7 @@
     </UserControl.Resources>
 
     <!-- Content For Log Reviewing -->
-    <Grid Margin="5,10">
+    <Grid Margin="10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="115"/>
             <RowDefinition Height="10"/>
@@ -108,7 +108,7 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ReplayLogInputContent, Path=Text}" Value="">
+                                <DataTrigger Binding="{Binding ElementName=LoadedLogFileTextBox, Path=Text}" Value="">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
