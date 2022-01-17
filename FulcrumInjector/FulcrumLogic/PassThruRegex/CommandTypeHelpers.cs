@@ -21,7 +21,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         public static string[] SplitFileIntoCommands(string FileContents)
         {
             // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+");
+            var TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+PT");
             var PtErrorRegex = new Regex(@"(\d+\.\d+s)\s+(\d+:[^\n]+)");
 
             // Make an empty array of strings and then begin splitting.
@@ -30,10 +30,16 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             {
                 // Find the first index of a time entry and the close command index.
                 int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
-                int ErrorCloseIndex = PtErrorRegex.Match(FileContents, CharIndex, TimeStartIndex).Index;
-                OutputLines.Add(FileContents.Substring(TimeStartIndex, ErrorCloseIndex));
+                var ErrorCloseMatch = PtErrorRegex.Match(FileContents, TimeStartIndex);
+                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
 
-                // Tick the current index value to our last closed index.
+                // Take the difference in End/Start as our string length value.
+                string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
+                if (OutputLines.Contains(NextCommand)) break;
+
+                // If the next command does not exist in the list, add it and move on. 
+                // If it was found in the list already, then we break out of this loop to stop adding dupes.
+                OutputLines.Add(NextCommand);
                 CharIndex = ErrorCloseIndex;
             }
 

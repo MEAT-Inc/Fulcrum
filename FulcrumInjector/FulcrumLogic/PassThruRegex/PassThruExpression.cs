@@ -33,7 +33,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     {
         // Time values for the Regex on the command.
         public readonly PassThruCommandType TypeOfExpression;
-        public readonly Regex TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+");
+        public readonly Regex TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+PT");
         public readonly Regex PtErrorRegex = new Regex(@"(\d+\.\d+s)\s+(\d+:[^\n]+)");
 
         // String Values for Command
