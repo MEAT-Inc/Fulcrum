@@ -21,6 +21,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         [Description("PassThruExpresssion")]   NONE,
         [Description("PassThruOpenRegex")]     PTOpen,
         [Description("PassThruCloseRegex")]    PTClose,
+        [Description("PassThruConnectRegex")]  PTConnect,
     }
     
     // --------------------------------------------------------------------------------------------------------------
