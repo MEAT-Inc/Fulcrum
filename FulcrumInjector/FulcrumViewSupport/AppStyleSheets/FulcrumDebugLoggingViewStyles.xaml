@@ -6,6 +6,18 @@
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
 
+            <!--Main Title Text-->
+            <Style x:Key="TitleStringText" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="FontSize" Value="26"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
             <!-- Search Box Style -->
             <Style x:Key="SearchBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
                 <Setter Property="FontFamily" Value="Consolas"/>

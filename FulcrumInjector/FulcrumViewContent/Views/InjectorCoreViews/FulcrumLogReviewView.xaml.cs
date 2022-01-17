@@ -98,7 +98,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Log failed, set no file, reset sending button and return.
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
-                this.ViewModel.LoadedLogFile = null;
 
                 // Reset Sending button
                 SenderButton.Content = DefaultContent;
@@ -107,8 +106,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             }
 
             // Store new file object value. Validate it on the ViewModel object first.
-            this.ViewModel.LoadedLogFile = SelectAttachmentDialog.FileName;
-            this.ViewLogger.WriteLog($"LOADING INPUT LOG FILE OBJECT: {SelectAttachmentDialog.FileName}", LogType.TraceLog);
+            this.ViewModel.LoadLogFileContents(SelectAttachmentDialog.FileName);
+            this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {SelectAttachmentDialog.FileName}", LogType.TraceLog);
 
             // Reset Sending Button now.
             SenderButton.Content = DefaultContent;

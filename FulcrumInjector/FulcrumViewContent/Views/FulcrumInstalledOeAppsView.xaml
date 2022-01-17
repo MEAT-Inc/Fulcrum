@@ -46,12 +46,12 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="1" CornerRadius="5">
-                        <Grid ToolTip="{Binding Path=OEAppPath}">
+                        <Grid ToolTip="Double Click to Change App Configuration (Not Yet Built In. Use Settings JSON For Now)" MouseDown="OEApplicationMouseDown_Twice">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Padding="5" Grid.Column="0" Style="{StaticResource OeAppPropertyBox}" Text="{Binding OEAppName}"/>
+                            <TextBlock ToolTip="{Binding Path=OEAppPath}" Padding="5" Grid.Column="0" Style="{StaticResource OeAppPropertyBox}" Text="{Binding OEAppName}"/>
                             <TextBox Grid.Column="1" Style="{StaticResource IsAppReadyBoxStyle}"/>
                         </Grid>
                     </Border>
@@ -68,7 +68,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" IsEnabled="False" Margin="5,10" FontSize="18" Content="Add App" Style="{StaticResource ActionButtonStyle}"/>
             <Button Grid.Column="1" IsEnabled="False" Margin="5,10" FontSize="18" Content="Remove App" Style="{StaticResource ActionButtonStyle}"/>
-            <Button Grid.Column="2" IsEnabled="False" Margin="5,10" FontSize="18" Content="Modify App" Style="{StaticResource ActionButtonStyle}"/>
+            <Button Grid.Column="2" IsEnabled="False" Margin="5,10" FontSize="18" Content="Launch App" Style="{StaticResource ActionButtonStyle}"/>
         </Grid>
     </Grid>
 </UserControl>
