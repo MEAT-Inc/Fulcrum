@@ -20,10 +20,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogReviewViewModelLogger")) ?? new SubServiceLogger("InjectorLogReviewViewModelLogger");
 
         // Private control values
-
+        private string _loadedLogFile;
 
         // Public values for our view to bind onto 
-
+        public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 

@@ -147,7 +147,7 @@
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
                     <TextBlock Text="No DLLs Located!" 
-                               Foreground="{StaticResource TextColorBase}" FontSize="28" 
+                               Foreground="Yellow" FontSize="28" 
                                HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold"/>
                 </Grid>
             </Grid>
@@ -206,7 +206,7 @@
                     <Border Opacity=".50" BorderThickness="3"
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
-                    <TextBlock Foreground="{StaticResource TextColorBase}" FontSize="28" 
+                    <TextBlock Foreground="Yellow" FontSize="28" 
                                HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
