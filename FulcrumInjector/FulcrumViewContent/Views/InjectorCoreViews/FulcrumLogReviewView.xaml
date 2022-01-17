@@ -108,7 +108,7 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=LogFileContents}" Value="">
+                                <DataTrigger Binding="{Binding ElementName=ReplayLogInputContent, Path=Text}" Value="">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
