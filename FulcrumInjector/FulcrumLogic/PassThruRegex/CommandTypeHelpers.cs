@@ -38,8 +38,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 if (OutputLines.Contains(NextCommand)) break;
 
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                OutputLines.Add(NextCommand);
-                CharIndex = ErrorCloseIndex;
+                if (ErrorCloseIndex < CharIndex) break; 
+                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
             }
 
             // Return the built set of commands.
