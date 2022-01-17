@@ -67,7 +67,8 @@
                 </Grid>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
-                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer. The breakdown view of commands will select the raw log lines when an entry is picked."/>
+                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer. The breakdown view of commands will select the raw log lines when an entry is picked.  "/>
+                <Run Foreground="Yellow" FontWeight="DemiBold" Text="If the breakdown view is missing, use the slider at the right edge of the page to expand it"/>
             </TextBlock>
         </Grid>
 
@@ -81,7 +82,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="10"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition MinWidth="10"/>
+                <ColumnDefinition MinWidth="10" Width="10"/>
             </Grid.ColumnDefinitions>
 
             <!-- File Contents -->
