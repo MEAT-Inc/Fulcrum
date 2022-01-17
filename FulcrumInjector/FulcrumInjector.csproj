@@ -43,7 +43,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DebugType>portable</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>
@@ -64,9 +64,7 @@
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>FulcrumInjector.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <ApplicationIcon>FulcrumResources\ShimIconProject.ico</ApplicationIcon>
   </PropertyGroup>
@@ -89,6 +87,9 @@
     <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>FulcrumInjector.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
@@ -155,9 +156,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumLogic\EmailReporting\EmailBroker.cs" />
-    <Compile Include="FulcrumLogic\EmailReporting\TextTableParser.cs" />
+    <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
+    <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruOpenRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandTypeToClass.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\ResultAttribute.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
@@ -187,6 +191,7 @@
     <Compile Include="FulcrumLogic\InjectorPipes\PipeEvents\FulcrumPipeStateChangedEventArgs.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruExpression.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />
@@ -271,7 +276,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumInstalledHardwareStyles.xaml">
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -400,7 +405,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\InjectorSyntaxFormatters\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"

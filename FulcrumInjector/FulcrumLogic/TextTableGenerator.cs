@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace FulcrumInjector.FulcrumLogic.EmailReporting
+namespace FulcrumInjector.FulcrumLogic
 {
     /// <summary>
     /// Class used to convert a set of tuples of values into an ASCII printed text table.
     /// </summary>
-    public static class TextTableParser
+    public static class TextTableGenerator
     {
         /// <summary>
         /// Converts table object into our string output.
@@ -80,7 +79,10 @@ namespace FulcrumInjector.FulcrumLogic.EmailReporting
             }
 
             // Return built output from string builder here.
-            return TableBuilder.ToString();
+            string TableString = TableBuilder.ToString();
+            int TableWidth = TableString.Split('\n')[0].Length;
+            string PaddingLineString = $"+{Enumerable.Repeat("=", TableWidth - 2)}+";
+            return $"{PaddingLineString}\n{TableString.Trim()}\n{PaddingLineString}";
         }
 
 
