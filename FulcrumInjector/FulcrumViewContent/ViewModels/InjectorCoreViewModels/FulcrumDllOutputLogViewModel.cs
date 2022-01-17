@@ -38,34 +38,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
-            // Build watchdogs.
-            this.HasOutput = false;
-            this._outputWatchdog = new PropertyWatchdog(100);
-            ViewModelLogger.WriteLog("BUILT NEW WATCHDOG OBJECT HELPER FOR VIEW OUTPUT ON DEBUG LOG PLACEHOLDER CONTENT!", LogType.InfoLog);
-
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL INJECTION OUTPUT LOG VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
-        /// <summary>
-        /// Boots watchdog for view content watching.
-        /// </summary>
-        public void SetupWatchdogs()
-        {
-            // Start watchdog objects here.
-            this._outputWatchdog.StartUpdateTimer((_, _) =>
-            {
-                // Cast view output object and then pull value from it.
-                var CastView = this.BaseViewControl as FulcrumDllOutputLogView;
-                try { this.HasOutput = CastView.DebugRedirectOutputEdit.Text.Length != 0; } 
-                catch {
-                    // Ignore failure on this set method. 
-                    // View is still updating as desired.
-                }
-            });
-            ViewModelLogger.WriteLog("STARTED NEW WATCHDOG OBJECT HELPER FOR VIEW OUTPUT ON DEBUG LOG PLACEHOLDER CONTENT!", LogType.InfoLog);
-        }
 
         // --------------------------------------------------------------------------------------------------------------------------
 

@@ -40,6 +40,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Build event for our pipe objects to process new pipe content into our output box
             FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => {
+                this.ViewModel.HasOutput = this.DebugRedirectOutputEdit.Text.Length != 0;
                 Dispatcher.Invoke(() => this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n");
             };
         }
@@ -56,7 +57,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Configure pipe instances here.
-            this.ViewModel.SetupWatchdogs();
             this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
