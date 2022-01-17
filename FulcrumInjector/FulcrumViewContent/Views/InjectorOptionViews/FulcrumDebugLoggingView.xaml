@@ -26,14 +26,43 @@
     </UserControl.Resources>
 
     <!-- Log Viewing Content -->
-    <Grid>
+    <Grid Margin="5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".125*"/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height=".15*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         
+        <!-- Title and information -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".50*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".60*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Grid.Row="0"
+                    Margin="10,0"
+                    Text="Injector DLL Output" 
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource TitleStringText}"/>
+            </Grid>
+            <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
+                <Run Foreground="{StaticResource TextColorBase}" Text="This output view is used to search through the current Injector Application log file to review the status of some background operations which may not always throw a visible error to the user. This file can be searched by just typing into it or by using a custom regex defined as @r plus the regular expression desired. Use the combobox at the right to filter output by a logger type for more concise filtering."/></TextBlock>
+        </Grid>
+
+        <!-- Splitting Border -->
+        <Border Grid.Row="1" Margin="10,0,15,0"
+                BorderBrush="{StaticResource TextColorBase}" 
+                BorderThickness="0,2,0,0" VerticalAlignment="Bottom"/>
+
         <!-- Log Filter and Search Controls -->
-        <Grid Grid.Row="0" Margin="10,15,10,5">
+        <Grid Grid.Row="2" Margin="10,10,10,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width=".5*"/>
@@ -50,7 +79,7 @@
                 SelectedIndex="0"
                 HorizontalContentAlignment="Center" 
                 VerticalContentAlignment="Center"
-                Margin="10,0"
+                Margin="10,0,5,0"
                 DropDownOpened="LoggerNameComboBox_OnDropDownOpened"
                 SelectionChanged="LoggerNameComboBox_OnSelectionChanged"
                 Style="{StaticResource MahApps.Styles.ComboBox}"
@@ -59,7 +88,7 @@
 
         <!-- Logging Content Output -->
         <avEdit:TextEditor 
-            Grid.Row="1" 
+            Grid.Row="3" Margin="10,0,15,0"
             x:Name="DebugRedirectOutputEdit"
             Style="{StaticResource LoggingOutputBoxStyle}"/>
     </Grid>

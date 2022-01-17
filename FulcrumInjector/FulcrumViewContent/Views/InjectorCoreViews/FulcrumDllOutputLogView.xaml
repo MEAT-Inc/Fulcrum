@@ -26,9 +26,10 @@
     </UserControl.Resources>
 
     <!-- Logging Output Content View -->
-    <Grid Margin="10,10">
+    <Grid Margin="5,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="110"/>
+            <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -55,17 +56,44 @@
                          TextChanged="DllLogFilteringTextBox_OnTextChanged"/>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
-                <Run Foreground="{StaticResource TextColorBase}" Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to a vehicle."/>
-                <LineBreak/>
-                <Run Foreground="Yellow" Text="Syntax Highlighting is in the works for this viewer! When complete, auto simulations will be ready!"/>
-            </TextBlock>
+                <Run Foreground="{StaticResource TextColorBase}" Text="This output viewer box is used to monitor the J2534 API Calls that are being run from the Injector DLL, the OE Application, and the PassThru Interface which is currently being used to communicate to a vehicle. You can also review old logs by loading them in using the replay view which is the next icon in the menu."/></TextBlock>
         </Grid>
+
+        <!-- Splitting Border -->
+        <Border Grid.Row="1" Margin="10,0"
+                BorderBrush="{StaticResource TextColorBase}" 
+                BorderThickness="0,2,0,0" VerticalAlignment="Top"/>
 
         <!-- Logging Content Output -->
         <avalonedit:TextEditor 
-            Grid.Row="1" 
-            Margin="10,0,10,5"
+            Grid.Row="2" 
+            Margin="10,5,10,5"
             x:Name="DebugRedirectOutputEdit"
+            TextChanged="DebugRedirectOutputEdit_OnTextChanged"
             Style="{StaticResource LoggingOutputBoxStyle}"/>
+
+        <!-- Placeholder for when there's no entries for Devices -->
+        <Grid Grid.Row="2" Margin="10,5,10,5">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=HasOutput}" Value="false">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Border Opacity=".50" BorderThickness="3"
+                    BorderBrush="{StaticResource TextColorBase}"
+                    Background="{StaticResource SecondaryColor_Darker_65}"/>
+            <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                       Margin="20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="28" Text="No DLL Output Has Been Detected!"/>
+                    <LineBreak/>
+                    <LineBreak/>
+                    <Run FontSize="16" Text="Launch an OE Application and allow the Injector to shim it to see output information generated from the Shim DLL here."/>
+            </TextBlock>
+        </Grid>
     </Grid>
 </UserControl>

@@ -64,6 +64,9 @@
  "$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"
  "$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumInjector\FulcrumInjector.csproj"</PreBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent />
+  </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
 	Other similar extension points exist, see Wix.targets.

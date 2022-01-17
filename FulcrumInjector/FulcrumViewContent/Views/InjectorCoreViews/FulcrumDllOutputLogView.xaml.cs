@@ -37,6 +37,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumDllOutputLogViewModel ?? new FulcrumDllOutputLogViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Build event for our pipe objects to process new pipe content into our output box
+            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => {
+                Dispatcher.Invoke(() => { this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
+            };
         }
 
         /// <summary>
@@ -53,11 +58,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Configure pipe instances here.
             this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
-
-            // Build event for our pipe objects to process new pipe content into our output box
-            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => {
-                Dispatcher.Invoke(() => this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n");
-            };
 
             // Log completed setup values ok
             this.ViewLogger.WriteLog("SETUP A NEW PIPE READING EVENT OBJECT TO PROCESS OUR OUTPUT PIPE CONTENTS INTO THE DLL OUTPUT BOX OK!", LogType.WarnLog);
@@ -84,6 +84,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 ViewModel.SearchForText(TextToFilter);
                 Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
             });
+        }
+
+        /// <summary>
+        /// Updates has content value on the view model when text is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DebugRedirectOutputEdit_OnTextChanged(object sender, EventArgs e)
+        {
+            // Check the content value. If empty, set hasContent to false.
+            this.ViewModel.HasOutput = this.DebugRedirectOutputEdit.Text.Trim().Length != 0;
         }
     }
 }

@@ -90,7 +90,7 @@ BOOL CSelectionBox::OnInitDialog()
 
 	// Build the log file path using the log dir above
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%02d%02d%04d-%02d%02d%02d.txt"),
+	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%02d%02d%04d-%02d%02d%02d.shimLog"),
 		szPath,
 		LocalTime.wMonth,
 		LocalTime.wDay,

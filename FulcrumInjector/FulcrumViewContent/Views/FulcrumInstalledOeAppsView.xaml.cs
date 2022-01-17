@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -50,5 +51,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        private void OEApplicationMouseDown_Twice(object sender, MouseButtonEventArgs e)
+        {
+            // Check for a double click event action. If not, return out. If it is, show a new flyout object to allow user to modify the app object.
+            bool DoubleClick = e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2;
+            if (!DoubleClick) return;
+        }
     }
 }

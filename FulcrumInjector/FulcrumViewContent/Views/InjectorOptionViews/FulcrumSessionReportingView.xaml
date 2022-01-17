@@ -76,7 +76,7 @@
             </TextBlock>
 
             <!-- Collapse Info Button -->
-            <Button Grid.Row="0" 
+            <Button Grid.Row="0" Visibility="Collapsed"
                     VerticalAlignment="Stretch"
                     Click="ToggleEmailPaneInfoButton_OnClick"
                     HorizontalAlignment="Right" Width="150" Margin="0,5">
