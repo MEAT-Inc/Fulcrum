@@ -18,10 +18,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     public enum PassThruCommandType
     {
         // Command Types for PassThru Regex
-        [Description("PassThruExpresssion")]   NONE,
-        [Description("PassThruOpenRegex")]     PTOpen,
-        [Description("PassThruCloseRegex")]    PTClose,
-        [Description("PassThruConnectRegex")]  PTConnect,
+        [Description("PassThruExpresssion")]        NONE,
+        [Description("PassThruOpenRegex")]          PTOpen,
+        [Description("PassThruCloseRegex")]         PTClose,
+        [Description("PassThruConnectRegex")]       PTConnect,
+        [Description("PassThruDisconnectRegex")]    PTDisconnect,
     }
     
     // --------------------------------------------------------------------------------------------------------------

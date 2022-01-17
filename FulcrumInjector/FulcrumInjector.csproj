@@ -158,6 +158,7 @@
     </ApplicationDefinition>
     <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruCloseRegex.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruConnectRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruDisconnectRegex.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
