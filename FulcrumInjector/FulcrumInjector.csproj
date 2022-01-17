@@ -165,6 +165,7 @@
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
@@ -172,6 +173,9 @@
     <Compile Include="FulcrumViewContent\SingletonContentControl.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumInstalledHardwareView.xaml.cs">
       <DependentUpon>FulcrumInstalledHardwareView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumLogReviewView.xaml.cs">
+      <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
@@ -256,6 +260,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumLogReviewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -285,6 +293,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumLogReviewViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
