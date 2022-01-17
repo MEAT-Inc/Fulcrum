@@ -12,7 +12,7 @@
 
     <!-- DataContext Binding -->
     <UserControl.DataContext>
-        <injectorCoreViewModels:FulcrumDllOutputLogViewModel/>
+        <injectorCoreViewModels:FulcrumLogReviewViewModel/>
     </UserControl.DataContext>
 
     <!-- Style Sheets -->
@@ -26,7 +26,7 @@
     </UserControl.Resources>
 
     <!-- Content For Log Reviewing -->
-    <Grid Margin="10,10">
+    <Grid Margin="5,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="115"/>
             <RowDefinition Height="10"/>
@@ -79,9 +79,9 @@
         <!-- Raw Log File Contents and PT Command Contents -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="250"/>
+                <ColumnDefinition MinWidth="10"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition MinWidth="250"/>
+                <ColumnDefinition MinWidth="10"/>
             </Grid.ColumnDefinitions>
 
             <!-- File Contents -->
@@ -92,23 +92,23 @@
                 </Grid.RowDefinitions>
 
                 <!-- Currently Loaded file -->
-                <TextBox Grid.Row="0" 
+                <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
                          Style="{StaticResource InputTextWithHolder}" 
                          VerticalAlignment="Bottom" IsReadOnly="True"
                          Tag="Please Load a File First" Margin="10,0"/>
 
                 <avalonedit:TextEditor
                     Grid.Row="1"
+                    IsReadOnly="True"
                     x:Name="ReplayLogInputContent"
-                    Style="{StaticResource LoggingOutputBoxStyle}">
-                </avalonedit:TextEditor>
+                    Style="{StaticResource LoggingOutputBoxStyle}"/>
 
                 <Grid Grid.Row="1" Margin="10,5">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ReplayLogInputContent, Path=Text}" Value="">
+                                <DataTrigger Binding="{Binding Path=LogFileContents}" Value="">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -138,7 +138,7 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ReplayLogInputContent, Path=Text}" Value="">
+                                <DataTrigger Binding="{Binding ElementName=CommandBreakdownListBox, Path=HasItems}" Value="false">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
