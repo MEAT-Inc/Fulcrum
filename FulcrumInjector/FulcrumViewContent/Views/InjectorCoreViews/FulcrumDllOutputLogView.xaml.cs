@@ -38,9 +38,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel = InjectorConstants.FulcrumDllOutputLogViewModel ?? new FulcrumDllOutputLogViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
+            // TODO: Append new Transformers into this constructor to apply color filtering on the output view.
+
             // Build event for our pipe objects to process new pipe content into our output box
             FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => {
-                Dispatcher.Invoke(() => this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n");
+                Dispatcher.Invoke(() => { this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
             };
         }
 
@@ -84,6 +86,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 ViewModel.SearchForText(TextToFilter);
                 Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
             });
+        }
+
+        /// <summary>
+        /// Updates has content value on the view model when text is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DebugRedirectOutputEdit_OnTextChanged(object sender, EventArgs e)
+        {
+            // Check the content value. If empty, set hasContent to false.
+            this.ViewModel.HasOutput = this.DebugRedirectOutputEdit.Text.Trim().Length != 0;
         }
     }
 }

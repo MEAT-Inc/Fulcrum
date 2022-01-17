@@ -149,16 +149,24 @@ namespace FulcrumInjector.FulcrumViewContent
                 // Sets the value on the class into the current invoking object
                 case MemberTypes.Field:
                     FieldInfo MemberAsField = (FieldInfo)MemberToUpdate;
-                    try { ValueChanged = NewJson != JsonConvert.SerializeObject(MemberAsField.GetValue(ViewModelObject)); }
+                    try
+                    {
+                        // Try setting value inside this block in case VM value has no public setter.
+                        ValueChanged = NewJson != JsonConvert.SerializeObject(MemberAsField.GetValue(ViewModelObject));
+                        MemberAsField.SetValue(null, ViewModelObject);
+                    }
                     catch { ValueChanged = false; }
-                    MemberAsField.SetValue(null, ViewModelObject);
                     break;
 
                 case MemberTypes.Property:
                     PropertyInfo MemberAsProperty = (PropertyInfo)MemberToUpdate;
-                    try { ValueChanged = NewJson != JsonConvert.SerializeObject(MemberAsProperty.GetValue(ViewModelObject)); }
+                    try
+                    {
+                        // Try setting value inside this block in case VM value has no public setter.
+                        ValueChanged = NewJson != JsonConvert.SerializeObject(MemberAsProperty.GetValue(ViewModelObject));
+                        MemberAsProperty.SetValue(null, ViewModelObject);
+                    }
                     catch { ValueChanged = false; }
-                    MemberAsProperty.SetValue(null, ViewModelObject);
                     break;
 
                 // If neither field or property fail out

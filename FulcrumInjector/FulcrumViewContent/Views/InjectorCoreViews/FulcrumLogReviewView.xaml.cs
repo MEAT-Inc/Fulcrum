@@ -47,6 +47,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // TODO: Append new Transformers into this constructor to apply color filtering on the output view.
         }
 
         /// <summary>
@@ -61,7 +63,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Log completed setup values ok
-            this.ViewLogger.WriteLog("SETUP A NEW PIPE READING EVENT OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
+            this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

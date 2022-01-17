@@ -44,6 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             ViewModelLogger.WriteLog("SETTING UP REPORTING VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build our new Email broker instance
+            this.ShowEmailInfoText = true;
             if (GenerateEmailBroker(out var NewSender)) this.SessionReportSender = NewSender;
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW EMAIL HELPER OBJECT!");
 

@@ -65,7 +65,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             }
     
             // Log done building new ViewModel.
-            this.ToggleEmailPaneInfoButton_OnClick(null, null);
+            if (this.ViewModel.ShowEmailInfoText) this.ToggleEmailPaneInfoButton_OnClick(null, null);
             this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR EMAIL REPORTING OUTPUT OK!", LogType.InfoLog);
         }
