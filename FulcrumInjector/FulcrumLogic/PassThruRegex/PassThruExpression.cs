@@ -127,35 +127,5 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             // Now see if all the values in the Results array passed.
             return ResultsPassed.All(ValueObj => ValueObj);
         }
-
-        // ---------------------------------------------------------------------------------------------------------------
-        
-        /// <summary>
-        /// Splits an input content string into a set fo PT Command objects which are split into objects.
-        /// </summary>
-        /// <param name="FileContents">Input file object content</param>
-        /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        public static string[] SplitFileIntoCommands(string FileContents)
-        {
-            // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+");
-            var PtErrorRegex = new Regex(@"(\d+\.\d+s)\s+(\d+:[^\n]+)");
-
-            // Make an empty array of strings and then begin splitting.
-            List<string> OutputLines = new List<string>();
-            for (int CharIndex = 0; CharIndex < FileContents.Length;)
-            {
-                // Find the first index of a time entry and the close command index.
-                int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
-                int ErrorCloseIndex = PtErrorRegex.Match(FileContents, CharIndex, TimeStartIndex).Index;
-                OutputLines.Add(FileContents.Substring(TimeStartIndex, ErrorCloseIndex));
-
-                // Tick the current index value to our last closed index.
-                CharIndex = ErrorCloseIndex;
-            }
-
-            // Return the built set of commands.
-            return OutputLines.ToArray();
-        }
     }
 }

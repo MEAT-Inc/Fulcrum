@@ -156,11 +156,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruCloseRegex.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruOpenRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\CommandTypeToClass.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandTypeHelpers.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\ResultAttribute.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
