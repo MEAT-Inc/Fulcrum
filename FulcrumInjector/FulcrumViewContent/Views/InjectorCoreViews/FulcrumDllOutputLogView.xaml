@@ -69,6 +69,7 @@
             Grid.Row="2" 
             Margin="10,5,10,5"
             x:Name="DebugRedirectOutputEdit"
+            TextChanged="DebugRedirectOutputEdit_OnTextChanged"
             Style="{StaticResource LoggingOutputBoxStyle}"/>
 
         <!-- Placeholder for when there's no entries for Devices -->
