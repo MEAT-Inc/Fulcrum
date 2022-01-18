@@ -62,10 +62,19 @@
                         Grid.Column="0" Click="LoadInjectorLogFile_OnClick"
                         Content="Load Log File" VerticalAlignment="Stretch"/>
                     <Button
-                        Margin="5,0"
-                        Style="{StaticResource ActionButtonStyle}"
+                        Margin="5,0" 
                         Grid.Column="1" Click="ProcessLogFileContent_OnClick"
-                        Content="Process Content" VerticalAlignment="Stretch"/>
+                        Content="Process Content" VerticalAlignment="Stretch">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=LoadedLogFileTextBox, Path=Text}" Value="">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button
                         Margin="5,0"
                         Style="{StaticResource ActionButtonStyle}" Grid.Column="2"

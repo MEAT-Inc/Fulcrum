@@ -28,36 +28,44 @@
     </UserControl.Resources>
 
         <!-- Settings items -->
-    <Grid Margin="5">
+    <Grid Margin="5,10,5,5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".15*"/>
+            <RowDefinition Height=".325*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <!-- Title View Block -->
-        <TextBlock Style="{StaticResource TitleStringText}">
-            <Run Text="Injector Settings"/>
-            <Run Foreground="Yellow" FontWeight="Bold" FontStyle="Normal" Text="(Work In Progress)"/>
-        </TextBlock>
+        <!-- Title and information -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".50*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <TextBlock Style="{StaticResource TitleStringText}" Margin="10,0" HorizontalAlignment="Left">
+                    <Run Text="Injector Settings"/>
+                    <Run Foreground="Yellow" FontWeight="Bold" FontStyle="Normal" Text="(Work In Progress)"/>
+                </TextBlock>
+            </Grid>
 
-        <!-- Advances Options Gear -->
-        <Button HorizontalAlignment="Right"  VerticalAlignment="Center" Grid.Row="0"
-                Style="{DynamicResource ActionButtonStyleTransparent}" 
-                Width="25" Margin="0,0,15,0" Grid.Column="0" Click="OpenJsonViewerFlyoutButton_OnClick">
-            <Path Fill="{StaticResource TextColorBase}">
-                <Path.Data>
-                    <PathGeometry Figures="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z   M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z"/>
-                </Path.Data>
-            </Path>
-            <Button.LayoutTransform>
-                <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
-            </Button.LayoutTransform>
-        </Button>
-        <Border Grid.Row="0"
-                Margin="9,0,15,0"
+            <!-- Advances Options Gear -->
+            <Button HorizontalAlignment="Right"
+                    Content="Show Advanced Settings" Grid.Row="0"
+                    Style="{StaticResource ActionButtonStyle}" Margin="0,5,15,5"
+                    Click="OpenJsonViewerFlyoutButton_OnClick" Width="175">
+            </Button>
+            <Border Grid.Row="1"
+                Margin="9,0,15,-2"
                 x:Name="WidthHelperBorder"
+                VerticalAlignment="Bottom"
                 BorderThickness="0,0,0,2"
                 BorderBrush="{StaticResource  TextColorBase}"/>
+
+            <!-- Information Text -->
+            <TextBlock Grid.Row="1" Margin="10,0" TextWrapping="Wrap" Foreground="{StaticResource TextColorBase}" FontSize="14">
+                <Run Text="This settings view is used to configure some settings which may need to be changed at runtime to allow better support with ALL OE Applications. For almost all cases, these values do not need to be changed. But if you feel as though something should be different, feel free to change it."/>
+                <Run FontWeight="DemiBold" Foreground="Yellow" Text="Never change JSON values directly without being instructed to do so!"/>
+            </TextBlock>
+        </Grid>
 
         <!-- Content for the settings objects goes in here -->
         <ListBox Grid.Row="1"
@@ -72,8 +80,8 @@
                 <DataTemplate>
                     <Grid Margin="-5">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height=".25*"/>
-                            <RowDefinition/>
+                            <RowDefinition Height="55"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.Background>
                             <SolidColorBrush Color="#020202" Opacity=".85"/>
@@ -85,7 +93,7 @@
                         <ListBox
                             Grid.Row="1" 
                             Width="{Binding ElementName=SettingsListBoxView, Path=Width}"
-                            Height="350"
+                            Height="300"
                             Padding="0"
                             Margin="0,0,6,0"
                             BorderThickness="0"
