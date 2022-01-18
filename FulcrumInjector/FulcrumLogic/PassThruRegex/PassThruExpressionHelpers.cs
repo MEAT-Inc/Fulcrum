@@ -55,8 +55,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 .ToArray();
 
             // Find the return type here based on the first instance of a PTCommand type object on the array.
+            string JoinedLines = string.Join("\n", InputLines);
             return (PassThruCommandType)Enum.Parse(typeof(PassThruCommandType), 
-                EnumTypesArray.FirstOrDefault(EnumObj => InputLines.Contains(EnumObj)));
+                EnumTypesArray.FirstOrDefault(EnumObj => JoinedLines.Contains(EnumObj)));
         }
 
 

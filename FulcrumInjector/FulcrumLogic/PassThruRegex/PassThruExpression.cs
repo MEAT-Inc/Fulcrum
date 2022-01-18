@@ -87,7 +87,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 
             // Build default Tuple LIst value set and apply new values into it from property attributes
             var RegexResultTuples = new List<Tuple<string, string, string>>() {
-                new("Command Type", this.TypeOfExpression.ToString(), this.ExpressionPassed() ? "Parse Passed" : "Parse Failed")
+                new("J2534 Command", this.TypeOfExpression.ToString(), this.ExpressionPassed() ? "Parse Passed" : "Parse Failed")
             };
 
             // Now find ones with the attribute and pull value
