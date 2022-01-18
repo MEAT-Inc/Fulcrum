@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using FulcrumInjector.FulcrumViewContent.Models;
@@ -139,7 +140,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // --------------------------------------------------------------------------------------------------------------------------
 
         // All Setting entries
-        public static SettingsEntryCollectionModel[] SettingsEntrySets;
+        public static ObservableCollection<SettingsEntryCollectionModel> SettingsEntrySets;
 
         // Settings for Debug log viewing (Or an empty settings model if null)
         public static SettingsEntryCollectionModel DebugLogViewerSettings =>

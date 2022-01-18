@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
@@ -20,15 +21,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsViewModelLogger")) ?? new SubServiceLogger("SettingsViewModelLogger");
 
+        // Private control values
+        private ObservableCollection<SettingsEntryCollectionModel> _settingsEntrySets;
+
         // Public values for our view to bind onto 
-        public SettingsEntryCollectionModel[] SettingsEntrySets
+        public ObservableCollection<SettingsEntryCollectionModel> SettingsEntrySets
         {
             get => InjectorConstants.SettingsEntrySets; 
             set
             {
                 // Update the local value and store it onto the injector constants
-                OnPropertyChanged();
-                InjectorConstants.SettingsEntrySets = value;
+                PropertyUpdated(value); InjectorConstants.SettingsEntrySets = value;
             }
         }
 
@@ -59,27 +62,23 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         /// Builds a list of settings model objects to use from our input json objects
         /// </summary>
         /// <returns></returns>
-        internal SettingsEntryCollectionModel[] GenerateSettingsModels()
+        internal ObservableCollection<SettingsEntryCollectionModel> GenerateSettingsModels()
         {
             // Check if the constants value is null or not.
-            if (InjectorConstants.SettingsEntrySets != null)
-            {
+            if (InjectorConstants.SettingsEntrySets != null) {
                 ViewModelLogger.WriteLog("USING SETTINGS VALUES FROM INJECTOR CONSTANTS!", LogType.WarnLog);
                 return InjectorConstants.SettingsEntrySets;
             }
 
             // Pull our settings objects out from the settings file.
-            var SettingsLoaded = 
-                ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");
-                
-            // Log information and build UI content view outputs
+            var SettingsLoaded = ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");
             ViewModelLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
             foreach (var SettingSet in SettingsLoaded) ViewModelLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet}");
 
             // Log passed and return output
             ViewModelLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
-            return SettingsLoaded;
+            return new ObservableCollection<SettingsEntryCollectionModel>(SettingsLoaded);
         }
 
 
