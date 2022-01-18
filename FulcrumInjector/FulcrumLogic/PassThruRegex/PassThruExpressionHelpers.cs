@@ -51,12 +51,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             // Find the type of command by converting all enums to string array and searching for the type.
             var EnumTypesArray = Enum.GetValues(typeof(PassThruCommandType))
                 .Cast<PassThruCommandType>()
-                .Select(v => v.ToString())
+                .Select(PtEnumValue => PtEnumValue.ToString())
                 .ToArray();
 
             // Find the return type here based on the first instance of a PTCommand type object on the array.
-            if (EnumTypesArray.All(EnumString => !InputLines.Contains(EnumString))) return PassThruCommandType.NONE;
-            return (PassThruCommandType)Enum.Parse(typeof(PassThruCommandType), EnumTypesArray.FirstOrDefault(EnumObj => InputLines.Contains(EnumObj)));
+            return (PassThruCommandType)Enum.Parse(typeof(PassThruCommandType), 
+                EnumTypesArray.FirstOrDefault(EnumObj => InputLines.Contains(EnumObj)));
         }
 
 

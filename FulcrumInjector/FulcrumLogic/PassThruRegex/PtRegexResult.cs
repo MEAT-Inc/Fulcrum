@@ -49,6 +49,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         {
             // Store values for attribute
             this.ResultName = Name;
+            this.ResultValue = "";
             this._passedState = "Value Validated";
             this._failedState = "Value Was Invalid!";
         }
@@ -62,8 +63,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// <returns>True/False based on input values.</returns>
         public string ResultState(string InputValue)
         {
-            // If no value set to compare, return true every time
+            // If no value set to compare, return true every time. Check input as well
             if (string.IsNullOrWhiteSpace(FailOnMatch ? _failedState : _passedState))
+                return FailOnMatch ? _failedState : _passedState;
+            if (string.IsNullOrWhiteSpace(InputValue)) 
                 return FailOnMatch ? _failedState : _passedState;
 
             // If this fails when matched, then return the inverse of the result.

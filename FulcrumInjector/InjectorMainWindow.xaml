@@ -94,7 +94,6 @@
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <mah:Flyout 
                 Margin="0,0,0,0"
-                IsOpen="False"
                 Position="Top"
                 x:Name="InformationFlyout"
                 HorizontalAlignment="Center"
@@ -149,5 +148,6 @@
                 </Grid>
             </mah:Flyout>
         </mah:FlyoutsControl>
+
     </Grid>
 </mah:MetroWindow>

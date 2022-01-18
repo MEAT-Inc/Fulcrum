@@ -41,9 +41,9 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid>
-                <TextBlock Style="{StaticResource TitleStringText}" Margin="10,0" HorizontalAlignment="Left">
+                <TextBlock Style="{StaticResource TitleStringText}"  FontWeight="Bold" Margin="10,0" HorizontalAlignment="Left">
                     <Run Text="Injector Settings"/>
-                    <Run Foreground="Yellow" FontWeight="Bold" FontStyle="Normal" Text="(Work In Progress)"/>
+                    <Run Foreground="Yellow" FontStyle="Normal" Text="(Work In Progress)"/>
                 </TextBlock>
             </Grid>
 
