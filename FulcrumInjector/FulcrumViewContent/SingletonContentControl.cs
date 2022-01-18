@@ -75,11 +75,18 @@ namespace FulcrumInjector.FulcrumViewContent
                 // Log found existing instance and return it out
                 SingletonLogger.WriteLog("FOUND EXISTING INSTANCE OBJECT ENTRY! RETURNING IT NOW...", LogType.InfoLog);
                 SingletonLogger.WriteLog($"EXISTING INSTANCE HAS BEEN BUILT AND DEFINED SINCE: {LocatedSingleton.TimeCreated:s}", LogType.TraceLog);
+                SingletonLogger.WriteLog("UPDATING DEFINITIONS FOR THIS OBJECT NOW...", LogType.WarnLog);
+
+                // Pull the singleton from our list and replace the content.
+                int IndexOfSingleton = BuiltSingletonInstances.ToList().IndexOf(LocatedSingleton);
+                BuiltSingletonInstances[IndexOfSingleton] = new SingletonContentControl<TViewType, TViewModelType>(ViewObject, ViewModelObject);
+                SingletonLogger.WriteLog("UPDATED CONTENTS OF OUR SINGLETON VIEW OBJECT OK!", LogType.InfoLog);
 
                 // Return current instance.
-                return LocatedSingleton;
+                return BuiltSingletonInstances[IndexOfSingleton];
             }
 
+            // Build new instance and return output.
             SingletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
             var NewSingletonInstance = new SingletonContentControl<TViewType, TViewModelType>(ViewObject, ViewModelObject);
             BuiltSingletonInstances = BuiltSingletonInstances.Append(NewSingletonInstance).ToArray();

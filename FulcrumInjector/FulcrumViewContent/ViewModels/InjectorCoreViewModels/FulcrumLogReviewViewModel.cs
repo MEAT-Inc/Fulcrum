@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using SharpLogger;
@@ -25,11 +27,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // Private control values
         private string _loadedLogFile = "";
         private string _logFileContents = "";
-        private string[] _splitCommandLines;
+        private double _processingProgress = 0.00;
 
         // Public values for our view to bind onto 
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
+        public double ParsingProgress { get => _processingProgress; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -57,17 +60,23 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
         /// <param name="InputLogFile"></param>
-        internal void LoadLogFileContents(string InputLogFile)
+        internal bool LoadLogFileContents(out string[] SplitLogContent)
         {
             // Log information, load contents, store values.
             ViewModelLogger.WriteLog("LOADING NEW LOG FILE CONTENTS NOW...", LogType.InfoLog);
             FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
-
+            
             try
             {
+                // Make sure a file is loaded
+                if (string.IsNullOrWhiteSpace(this.LoadedLogFile)) {
+                    ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
+                    throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
+                }
+    
+
                 // Log passed and return output.
-                this.LoadedLogFile = InputLogFile;
-                this.LogFileContents = File.ReadAllText(InputLogFile);
+                this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
 
                 // Store lines here.
                 CastView.Dispatcher.Invoke(() => {
@@ -76,9 +85,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 });
 
                 // Now find our command contents. Log completed and return out.
-                this._splitCommandLines = CommandTypeHelpers.SplitFileIntoCommands(LogFileContents);
-                ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {this._splitCommandLines.Length} CONTENT SET OBJECTS", LogType.WarnLog);
-                ViewModelLogger.WriteLog($"LOADED CONTENTS OF LOG FILE {InputLogFile} CORRECTLY AND STORED ONTO VIEW INSTANCE!", LogType.InfoLog);
+                SplitLogContent = ExpressionHelpers.SplitFileIntoCommands(LogFileContents);
+                ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
+                ViewModelLogger.WriteLog($"LOADED CONTENTS OF LOG FILE {this.LoadedLogFile} CORRECTLY AND STORED ONTO VIEW INSTANCE!", LogType.InfoLog);
+                return true;
             }
             catch (Exception Ex)
             {
@@ -87,13 +97,28 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW.", Ex);
 
                 // Store new values.
-                this.LoadedLogFile = $"Failed to Load File: {Path.GetFileName(InputLogFile)}!";
+                this.LoadedLogFile = $"Failed to Load File: {Path.GetFileName(this.LoadedLogFile)}!";
                 this.LogFileContents = Ex.Message + "\n" + "STACK TRACE:\n" + Ex.StackTrace;
                 CastView.Dispatcher.Invoke(() => {
                     CastView.LoadedLogFileTextBox.Text = this.LoadedLogFile;
                     CastView.ReplayLogInputContent.Text = this.LogFileContents;
                 });
+
+                // Return split content
+                SplitLogContent = this.LogFileContents.Split('\n');
+                return false;   
             }
+        }
+
+        /// <summary>
+        /// Splits out the input command lines into a set of PTObjects.
+        /// </summary>
+        /// <param name="CommandLines"></param>
+        /// <returns></returns>
+        internal ObservableCollection<PassThruCommandModel> ProcessLogContents(string[] InputContentStrings)
+        {
+            // Start by building PTExpressions from input string object sets.
+
         }
     }
 }

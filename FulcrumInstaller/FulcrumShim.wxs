@@ -112,6 +112,11 @@
 									<File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
 								</Component>
 							</Directory>
+							<Directory Id="FULCRUMEXPRESSIONS" Name="FulcrumExpressions">
+								<Component Id="CreateFulcrumExpressionsFolder" Guid="6367FEEB-615C-4D19-B68F-984BF71C7321">
+									<CreateFolder />
+								</Component>
+							</Directory>
 						</Directory>
 						<!-- DLL Files for the Fulcrum -->
 						<Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
@@ -207,9 +212,10 @@
             <ComponentRef Id="FulcrumShimFiles" />
             <ComponentRef Id="FulcrumInjectorFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
-            <ComponentRef Id="CreateFulcrumIconsFolder" />
-            <ComponentRef Id="CreateFulcrumLoggingFolder" />
-            <ComponentRef Id="CreateFulcrumArchivesFolder" />
+			<ComponentRef Id="CreateFulcrumIconsFolder" />
+			<ComponentRef Id="CreateFulcrumLoggingFolder" />
+			<ComponentRef Id="CreateFulcrumArchivesFolder" />
+			<ComponentRef Id="CreateFulcrumExpressionsFolder"/>
         </Feature>
         <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 

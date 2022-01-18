@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using SharpLogger;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 {
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class CommandTypeHelpers
+    public static class ExpressionHelpers
     {
         /// <summary>
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
@@ -46,7 +51,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             return OutputLines.ToArray();
         }
 
-
         /// <summary>
         /// Converts an input Regex command type enum into a type output
         /// </summary>
@@ -73,6 +77,55 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 
             // Find the return type here based on the first instance of a PTCommand type object on the array.
             return (PassThruCommandType)Enum.Parse(typeof(PassThruCommandType), EnumTypesArray.FirstOrDefault(EnumObj => InputLines.Contains(EnumObj)));
+        }
+
+        /// <summary>
+        /// Takes an input set of PTExpressions and writes them to a file object desired.
+        /// </summary>
+        /// <param name="InputExpressions">Expression input objects</param>
+        /// <returns>Path of our built expression file</returns>
+        public static string SaveExpressionsToFile(this PassThruExpression[] InputExpressions, string BaseFileName = "")
+        {
+            // Get a logger object for saving expression sets.
+            var ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("ExpressionLogger")) ?? new SubServiceLogger("ExpressionLogger");
+
+            // First build our output location for our file.
+            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath");
+            string FinalOutputPath = BaseFileName.Contains(Path.DirectorySeparatorChar) ? 
+                Path.ChangeExtension(BaseFileName, "ptExp") :
+                BaseFileName.Length == 0 ?
+                    Path.Combine(OutputFolder, $"PassThruExpressions_{DateTime.Now:MMddyyyy-HHmmss}.ptExp") :
+                    Path.Combine($"{Path.GetFileNameWithoutExtension(BaseFileName)}_{DateTime.Now:MMddyyyy-HHmmss}.ptExp");
+
+            // Find output path and then build final path value.
+            ExpressionLogger.WriteLog($"BASE OUTPUT LOCATION FOR EXPRESSIONS IS SEEN TO BE {Path.GetDirectoryName(FinalOutputPath)}", LogType.InfoLog);
+            if (!Directory.Exists(Path.GetDirectoryName(FinalOutputPath))) { Directory.CreateDirectory(Path.GetDirectoryName(FinalOutputPath)); }
+
+            // Log information about the expression set and output location
+            ExpressionLogger.WriteLog($"SAVING A TOTAL OF {InputExpressions.Length} EXPRESSION OBJECTS NOW...", LogType.InfoLog);
+            ExpressionLogger.WriteLog($"EXPRESSION SET IS BEING SAVED TO OUTPUT FILE: {FinalOutputPath}", LogType.InfoLog);
+
+            // Now Build output string content from each expression object.
+            ExpressionLogger.WriteLog("CONVERTING TO STRINGS NOW...", LogType.WarnLog);
+            List<string> OutputExpressionStrings = InputExpressions
+                .SelectMany(InputObj => (InputObj + "ENDTABLE\n").Split('\n'))
+                .ToList();
+            
+            // Find size of our largest string object here then populate split lines in place of ENDTABLE
+            int MaxSizeString = OutputExpressionStrings.OrderByDescending(StringObj => StringObj.Length).First().Length;
+            OutputExpressionStrings = OutputExpressionStrings
+                .Select(StringObj => StringObj == "ENDTABLE" ? Enumerable.Repeat("=", MaxSizeString).ToString() : StringObj)
+                .ToList();
+
+            // Log information and write output.
+            ExpressionLogger.WriteLog($"CONVERTED INPUT OBJECTS INTO A TOTAL OF {OutputExpressionStrings.Count} LINES OF TEXT!", LogType.WarnLog);
+            ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
+            File.WriteAllLines(FinalOutputPath, OutputExpressionStrings.ToArray());
+
+            // Write completed info to the log and return our new output path value.
+            ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+            return FinalOutputPath;
         }
     }
 }

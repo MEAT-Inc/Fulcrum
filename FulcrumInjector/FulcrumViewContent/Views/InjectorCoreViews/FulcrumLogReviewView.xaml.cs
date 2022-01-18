@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -73,7 +74,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="SendingButton"></param>
         /// <param name="SenderEventArgs"></param>
-        private void LoadInjectorLogFile_OnClick(object SendingButton, RoutedEventArgs SenderEventArgs)
+        private async void LoadInjectorLogFile_OnClick(object SendingButton, RoutedEventArgs SenderEventArgs)
         {
             // Start by setting the sending button content to "Loading..." and disable it.
             Button SenderButton = (Button)SendingButton;
@@ -108,8 +109,44 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             }
 
             // Store new file object value. Validate it on the ViewModel object first.
-            this.ViewModel.LoadLogFileContents(SelectAttachmentDialog.FileName);
-            this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {SelectAttachmentDialog.FileName}", LogType.TraceLog);
+            this.ViewModel.LoadedLogFile = SelectAttachmentDialog.FileName;
+            if (!this.ViewModel.LoadLogFileContents(out var SplitContent))
+            {
+                // Log Failed and show buttons again
+                var DefaultColor = SenderButton.Background;
+                this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
+                SenderButton.Content = "Failed!"; SenderButton.Click -= LoadInjectorLogFile_OnClick; SenderButton.Background = Brushes.DarkRed;
+
+                // Show this for 3.5 Seconds and then reset.
+                Dispatcher.InvokeAsync(() =>
+                {
+                    // Wait for 3.5 Seconds
+                    Thread.Sleep(3500);
+
+                    // Reset button values 
+                    SenderButton.Content = DefaultContent;
+                    SenderButton.Background = DefaultColor;
+                    SenderButton.Click += LoadInjectorLogFile_OnClick;
+
+                    // Log information
+                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                });
+
+                // Return failed.
+                this.ViewLogger.WriteLog("ASYNC DISPATCHER FOR FAILED BUTTON CONTENT CONTROL IS RUNNING. RETURNING FROM METHOD NOW", LogType.ErrorLog);
+                return;
+            }
+
+            // Parse Contents out now on the VM and show the please wait operation.
+            await Task.Run(() =>
+            {
+                // Log information and parse content output.
+                this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {SelectAttachmentDialog.FileName}", LogType.TraceLog); 
+                this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+
+                // Run the parse operation here.
+                this.ViewModel.ProcessLogContents(SplitContent);
+            });
 
             // Reset Sending Button now.
             SenderButton.Content = DefaultContent;
