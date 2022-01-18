@@ -163,8 +163,8 @@
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruOpenRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\ExpressionHelpers.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\ResultAttribute.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruExpressionHelpers.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PtRegexResult.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruCommandModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />

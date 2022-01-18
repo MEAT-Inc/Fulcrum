@@ -15,9 +15,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         // Command for the open command it self
         public readonly Regex PtCloseCommandRegex = new Regex(@"(PTClose)\((\d+)\)");
 
+        // -----------------------------------------------------------------------------------------
+
         // Strings of the command and results from the command output.
-        [ResultAttribute("Command")] public readonly string PtCommand;
-        [ResultAttribute("DeviceId", FailedResult: "-1")] public readonly string DeviceId;
+        [PtRegexResult("PTClose")]          // PassThru Close command Result
+        public readonly string PtCommand;       // 1.714s -- PTClose(1)
+
+        [PtRegexResult("DeviceId", "-1", new[] { "Device Valid", "Device Invalid!" })] 
+        public readonly string DeviceId;        // Device Id Result
 
         // ------------------------------------------------------------------------------------------
 

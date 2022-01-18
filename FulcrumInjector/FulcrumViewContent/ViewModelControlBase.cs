@@ -53,12 +53,12 @@ namespace FulcrumInjector.FulcrumViewContent
         /// <param name="Value">Value being used</param>
         internal void PropertyUpdated(object Value, [CallerMemberName] string PropertyName = null, bool ForceSilent = false)
         {
-            // Run prop changed event and set private value
+            // Property Changed Event
             OnPropertyChanged(PropertyName);
 
-            // Update Globals and the current value. Log value change done.
-            bool ValueChanged = UpdatePrivatePropertyValue(this, PropertyName, Value) || UpdateViewModelPropertyValue(this);
-            if (ValueChanged && !ForceSilent) ViewModelPropLogger.WriteLog($"PROPERTY {PropertyName} IS BEING UPDATED NOW WITH VALUE {Value}", LogType.TraceLog);
+            // Update VM Value and Global value
+            UpdateViewModelPropertyValue(this);
+            UpdatePrivatePropertyValue(this, PropertyName, Value);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent
         /// </summary>
         /// <param name="PropertyName">Name of property to emit change for</param>
         /// <param name="NotifierObject">Object sending this out</param>
-        private bool UpdatePrivatePropertyValue(object NotifierObject, string PropertyName, object NewPropValue)
+        private void UpdatePrivatePropertyValue(object NotifierObject, string PropertyName, object NewPropValue)
         {
             // Store the type of the sender
             var InputObjType = NotifierObject.GetType();
@@ -77,45 +77,30 @@ namespace FulcrumInjector.FulcrumViewContent
                 FieldObj.Name.Contains("_") &&
                 FieldObj.Name.Substring(1).ToUpper() == PropertyName.ToUpper());
 
-            // Set the model property value here and raise an args value.
-            bool ValueChanged = false;
-            string NewJson = "";
-
             // Try serialization here. Set if failed.
-            try { NewJson = JsonConvert.SerializeObject(NewPropValue); }
-            catch (Exception ExThrown) { ValueChanged = false; }
-
-            // Set Value
             switch (MemberObject.MemberType)
             {
-                // Sets the value on the class into the current invoking object
+                // For Field Objects
                 case MemberTypes.Field:
                     FieldInfo InvokerField = (FieldInfo)MemberObject;
-                    try { ValueChanged = NewJson != JsonConvert.SerializeObject(InvokerField.GetValue(NotifierObject)); }
-                    catch { ValueChanged = false; }
                     InvokerField.SetValue(NotifierObject, NewPropValue);
                     break;
 
+                // For Property objects
                 case MemberTypes.Property:
                     PropertyInfo InvokerProperty = (PropertyInfo)MemberObject;
-                    try { ValueChanged = NewJson != JsonConvert.SerializeObject(InvokerProperty.GetValue(NotifierObject)); }
-                    catch { ValueChanged = false; }
                     InvokerProperty.SetValue(NotifierObject, NewPropValue);
                     break;
 
-                default:
-                    ValueChanged = false;
-                    throw new NotImplementedException($"THE INVOKED MEMBER {PropertyName} COULD NOT BE FOUND!");
+                // Throw if value to modify is not found
+                default: throw new NotImplementedException($"THE INVOKED MEMBER {PropertyName} COULD NOT BE FOUND!");
             }
-
-            // Return value changed.
-            return ValueChanged;
         }
         /// <summary>
         /// Updates the globals with the new values configured into this object 
         /// </summary>
         /// <param name="ViewModelObject">Object to update</param>
-        private bool UpdateViewModelPropertyValue(ViewModelControlBase ViewModelObject)
+        private void UpdateViewModelPropertyValue(ViewModelControlBase ViewModelObject)
         {
             // Get the types on the globals first.
             var AppViewStoreType = typeof(InjectorConstants);
@@ -124,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewContent
 
             // Gets all the members and sets one to update
             var AppStoreMembers = AppViewStoreType.GetMembers();
-            if (InjectorConstants.InjectorMainWindow == null) { return false; }
+            if (InjectorConstants.InjectorMainWindow == null) { return; }
 
             // If the main window isn't null keep going.
             var MemberToUpdate = AppStoreMembers.FirstOrDefault((MemberObj) =>
@@ -133,78 +118,54 @@ namespace FulcrumInjector.FulcrumViewContent
                 string ComponentTypeRemoved = ViewModelTypeName.Name.Replace("ViewModel", string.Empty);
                 return MemberObj.Name.StartsWith(ComponentTypeRemoved) && MemberObj.Name.Contains("ViewModel");
             });
-            if (MemberToUpdate == null) { throw new NullReferenceException($"THE MEMBER {ViewModelTypeName.Name} COULD NOT BE FOUND!"); }
 
-            // Apply new value on object here.
-            try
+            // If the member to update is null, throw a not found exception
+            if (MemberToUpdate == null) throw new NullReferenceException($"THE MEMBER {ViewModelTypeName.Name} COULD NOT BE FOUND!");
+            switch (MemberToUpdate.MemberType)
             {
-                // Try serialization here. Set if failed. Then set value
-                var NewJson = JsonConvert.SerializeObject(ViewModelObject);
-                switch (MemberToUpdate.MemberType)
-                {
-                    // For Field based objects
-                    case MemberTypes.Field:
-                        FieldInfo MemberAsField = (FieldInfo)MemberToUpdate;
-                        try
+                // For Field based objects
+                case MemberTypes.Field:
+                    FieldInfo MemberAsField = (FieldInfo)MemberToUpdate;
+                    try
+                    {
+                        // Check for singleton content object
+                        if (!ViewModelObject.GetType().Name.Contains("InjectorCoreViewModels") && !ViewModelObject.GetType().Name.Contains("InjectorOptionViewModels"))
                         {
-                            // Convert value into new JSON Content
-                            bool FieldChanged = NewJson != JsonConvert.SerializeObject(MemberAsField.GetValue(ViewModelObject));
-
-                            // Check to see if we have a singleton object.
-                            if (ViewModelObject.GetType().Name.Contains("InjectorCoreViews") || ViewModelObject.GetType().Name.Contains("InjectorOptionViews"))
-                            {
-                                try
-                                {
-                                    // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
-                                    var PulledSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                                    SingletonContentControl<UserControl, ViewModelControlBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
-
-                                    // Return if the value of our property has changed or not. 
-                                    return FieldChanged;
-                                }
-                                catch { return false; }
-                            }
-
                             // Try setting value inside this block in case VM value has no public setter.
                             MemberAsField.SetValue(null, ViewModelObject);
-                            return FieldChanged;
+                            return;
                         }
-                        catch { return false; }
 
-                    // For Property Based objects
-                    case MemberTypes.Property:
-                        PropertyInfo MemberAsProperty = (PropertyInfo)MemberToUpdate;
-                        try
+                        // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
+                        var PulledSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
+                        SingletonContentControl<UserControl, ViewModelControlBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
+                        return;
+                    }
+                    catch { return; }
+
+                // For Property Based objects
+                case MemberTypes.Property:
+                    PropertyInfo MemberAsProperty = (PropertyInfo)MemberToUpdate;
+                    try
+                    {
+                        // Check for singleton content object
+                        if (!ViewModelObject.GetType().Name.Contains("InjectorCoreViewModels") && !ViewModelObject.GetType().Name.Contains("InjectorOptionViewModels"))
                         {
-                            // Convert value into new JSON Content
-                            bool PropertyChanged = NewJson != JsonConvert.SerializeObject(MemberAsProperty.GetValue(ViewModelObject));
-
-                            // Check to see if we have a singleton object.
-                            if (ViewModelObject.GetType().Name.Contains("InjectorCoreViews") || ViewModelObject.GetType().Name.Contains("InjectorOptionViews"))
-                            {
-                                try
-                                {
-                                    // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
-                                    var PulledSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                                    SingletonContentControl<UserControl, ViewModelControlBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
-
-                                    // Return if the value of our property has changed or not. 
-                                    return PropertyChanged;
-                                }
-                                catch { return false; }
-                            }
-
                             // Try setting value inside this block in case VM value has no public setter.
                             MemberAsProperty.SetValue(null, ViewModelObject);
-                            return PropertyChanged;
+                            return;
                         }
-                        catch { return false; }
 
-                    // If neither field or property fail out
-                    default: throw new NotImplementedException($"THE REQUESTED MEMBER {nameof(ViewModelObject)} COULD NOT BE FOUND!");
-                }
+                        // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
+                        var PulledSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
+                        SingletonContentControl<UserControl, ViewModelControlBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
+                        return;
+                    }
+                    catch { return; }
+
+                // If neither field or property fail out
+                default: throw new NotImplementedException($"THE REQUESTED MEMBER {nameof(ViewModelObject)} COULD NOT BE FOUND!");
             }
-            catch { return false; }
         }
     }
 }

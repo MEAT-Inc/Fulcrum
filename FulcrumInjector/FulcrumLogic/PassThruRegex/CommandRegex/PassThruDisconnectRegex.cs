@@ -16,8 +16,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         public readonly Regex PTDisconnectRegex = new Regex(@"(PTDisconnect)\((\d+)\)");
 
         // Strings of the command and results from the command output.
-        [ResultAttribute("Command")] public readonly string PtCommand;
-        [ResultAttribute("ChannelId", FailedResult: "-1")] public readonly string ChannelId;
+        [PtRegexResult("Command")] public readonly string PtCommand;
+        [PtRegexResult("ChannelId", "-1", new[] { "Channel Closed", "Invalid Channel!" }, true)]
+        public readonly string ChannelId;
 
         // -------------------------------------------------------------------------------------------------------
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Forms;
@@ -110,7 +111,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Store new file object value. Validate it on the ViewModel object first.
             this.ViewModel.LoadedLogFile = SelectAttachmentDialog.FileName;
-            if (!this.ViewModel.LoadLogFileContents(out var SplitContent))
+            if (!this.ViewModel.LoadLogFileContents())
             {
                 // Log Failed and show buttons again
                 var DefaultColor = SenderButton.Background;
@@ -137,20 +138,47 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 return;
             }
 
+            // Reset Sending Button now.
+            SenderButton.Content = DefaultContent;
+            SenderButton.IsEnabled = true;
+        }
+
+        /// <summary>
+        /// Runs the processing command instance object commands for log processing.
+        /// </summary>
+        /// <param name="SendingButton"></param>
+        /// <param name="ButtonEventArgs"></param>
+        private async void ProcessLogFileContent_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
+        {
+            // Start by turning off the grid for all sending buttons.
+            this.ViewLogger.WriteLog("PROCESSED CLICK FOR LOG PARSE COMMAND! DISABLING BUTTONS AND PREPARING TO PROCESS FILE NOW", LogType.WarnLog);
+
+            // Pull the button object
+            Button SendButton = (Button)SendingButton;
+            string DefaultContent = SendButton.Content.ToString(); 
+            SendButton.Content = "Processing...";
+
+            // Get Grid object
+            Grid ParentGrid = SendButton.Parent as Grid;
+            ParentGrid.IsEnabled = false;
+
             // Parse Contents out now on the VM and show the please wait operation.
             await Task.Run(() =>
             {
                 // Log information and parse content output.
-                this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {SelectAttachmentDialog.FileName}", LogType.TraceLog); 
+                this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {ViewModel.LoadedLogFile}", LogType.TraceLog);
                 this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
 
+                // TODO: Pop open a flyout view here to show progress of these operations
+
                 // Run the parse operation here.
-                this.ViewModel.ProcessLogContents(SplitContent);
+                this.ViewModel.ProcessLogContents();
+                this.ViewLogger.WriteLog("DONE PROCESSING OUTPUT CONTENT FOR OUR EXPRESSION OBJECTS! READY TO DISPLAY ON OUR VIEW CONTENT", LogType.InfoLog);
             });
 
-            // Reset Sending Button now.
-            SenderButton.Content = DefaultContent;
-            SenderButton.IsEnabled = true;
+            // Reenable the grid for the parent buttons.
+            ParentGrid.IsEnabled = true;
+            SendButton.Content = DefaultContent;
         }
     }
 }

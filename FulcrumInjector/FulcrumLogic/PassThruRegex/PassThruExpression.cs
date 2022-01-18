@@ -43,8 +43,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         public readonly string[] SplitCommandLines;
 
         // Input command time and result values for regex searching.
-        [ResultAttribute("Time")]   public readonly string ExecutionTime;
-        [ResultAttribute("Error", "0:STATUS_NOERROR")]  public readonly string JErrorResult;
+        [PtRegexResult("Time Issued")]
+        public readonly string ExecutionTime;       // Execution time of the command.
+        
+        [PtRegexResult("J2534 Error", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
+        public readonly string JErrorResult;        // J2534 Result Error
 
         // --------------------------------------------------------------------------------------------------------------
 
@@ -64,8 +67,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             var ErrorMatch = this.PtErrorRegex.Match(this.CommandLines);
 
             // Store values based on results.
-            this.ExecutionTime = TimeMatch.Success ? TimeMatch.Value : "REGEX_FAILED";
             this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Value : "REGEX_FAILED";
+            this.ExecutionTime = TimeMatch.Success ? TimeMatch.Groups[1].Value : "REGEX_FAILED";
         }
 
         // --------------------------------------------------------------------------------------------------------------
@@ -77,17 +80,25 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         public override string ToString()
         {
             // Find Field object values here.
-            var ResultFieldInfos = this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-            var RegexResultTuples = ResultFieldInfos.Select(FieldObj =>
+            var ResultFieldInfos = this.GetType()
+                .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(MemberObj => MemberObj.GetCustomAttribute(typeof(PtRegexResult)) != null)
+                .ToArray();
+
+            // Now find ones with the attribute and pull value
+            var RegexResultTuples = ResultFieldInfos.Select(MemberObj =>
             {
                 // Pull the ResultAttribute object.
-                var CurrentValue = FieldObj.GetValue(this).ToString();
-                var ResultValue = (ResultAttribute)FieldObj.GetCustomAttributes(typeof(ResultAttribute)).FirstOrDefault();
-                return new Tuple<string, string, string>(
-                    ResultValue.ResultName,
-                    CurrentValue,
-                    ResultValue.CheckValue(CurrentValue) ? "Result Valid" : "Invalid Result!"
-                );
+                FieldInfo InvokerField = (FieldInfo)MemberObj;
+                string CurrentValue = InvokerField.GetValue(this).ToString();
+
+                // Now cast the result attribute of the member and store the value of it.
+                var ResultValue = (PtRegexResult)MemberObj
+                    .GetCustomAttributes(typeof(PtRegexResult))
+                    .FirstOrDefault();
+
+                // Build our output tuple object here. Compare current value to the desired one and return a state value.
+                return new Tuple<string, string, string>(ResultValue.ResultName, CurrentValue, ResultValue.ResultState(CurrentValue));
             }).ToArray();
 
             // Prepend a new Tuple with the type of command the regex name set
@@ -95,11 +106,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 new Tuple<string, string, string>(
                     "Command Type",
                     this.TypeOfExpression.ToString(),
-                    this.ExpressionPassed() ? "Regex Valid" : "Regex Failed"));
+                    this.ExpressionPassed() ? "Parse Passed" : "Parse Failed"));
 
             // Build a text table object here.
             string RegexValuesOutputString = RegexResultTuples.ToStringTable(
-                new[] { "Value Name", "Current Value", "Value Status" },
+                new[] { "Value Name", "Determined Value", "Value Status" },
                 RegexObj => RegexObj.Item1,
                 RegexObj => RegexObj.Item2,
                 RegexObj => RegexObj.Item3
@@ -120,10 +131,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             {
                 // Pull the ResultAttribute object.
                 var CurrentValue = FieldObj.GetValue(this).ToString();
-                var ResultValue = (ResultAttribute)FieldObj.GetCustomAttributes(typeof(ResultAttribute)).FirstOrDefault();
+                var ResultAttribute = (PtRegexResult)FieldObj.GetCustomAttributes(typeof(PtRegexResult)).FirstOrDefault();
 
                 // Now compare value to the passed/failed setup.
-                return ResultValue.CheckValue(CurrentValue);
+                return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
             });
 
             // Now see if all the values in the Results array passed.
