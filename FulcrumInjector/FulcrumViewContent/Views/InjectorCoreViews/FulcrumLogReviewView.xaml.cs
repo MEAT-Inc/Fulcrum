@@ -75,13 +75,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="SendingButton"></param>
         /// <param name="SenderEventArgs"></param>
-        private async void LoadInjectorLogFile_OnClick(object SendingButton, RoutedEventArgs SenderEventArgs)
+        private void LoadInjectorLogFile_OnClick(object SendingButton, RoutedEventArgs SenderEventArgs)
         {
             // Start by setting the sending button content to "Loading..." and disable it.
             Button SenderButton = (Button)SendingButton;
             string DefaultContent = SenderButton.Content.ToString();
-            SenderButton.Content = "Loading File...";
-            SenderButton.IsEnabled = false;
+            var DefaultColor = SenderButton.Background;
 
             // Log information about opening appending box and begin selection
             this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
@@ -102,28 +101,41 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Log failed, set no file, reset sending button and return.
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
-
-                // Reset Sending button
-                SenderButton.Content = DefaultContent;
-                SenderButton.IsEnabled = true;
                 return;
             }
 
+            // Get Grid object
+            Grid ParentGrid = SenderButton.Parent as Grid;
+            SenderButton.Content = "Loading...";
+            ParentGrid.IsEnabled = false;
+
             // Store new file object value. Validate it on the ViewModel object first.
             this.ViewModel.LoadedLogFile = SelectAttachmentDialog.FileName;
-            if (!this.ViewModel.LoadLogFileContents())
+            bool LoadResult = this.ViewModel.LoadLogFileContents();
+
+            // Log result
+            if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
+            else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
+
+            // Enable grid, remove click command.
+            Task.Run(() =>
             {
-                // Log Failed and show buttons again
-                var DefaultColor = SenderButton.Background;
-                this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
-                SenderButton.Content = "Failed!"; SenderButton.Click -= LoadInjectorLogFile_OnClick; SenderButton.Background = Brushes.DarkRed;
-
-                // Show this for 3.5 Seconds and then reset.
-                Dispatcher.InvokeAsync(() =>
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
                 {
-                    // Wait for 3.5 Seconds
-                    Thread.Sleep(3500);
+                    // Show new temp state
+                    ParentGrid.IsEnabled = true;
+                    SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
+                    SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                    SenderButton.Click -= LoadInjectorLogFile_OnClick;
+                });
 
+                // Wait for 3.5 Seconds
+                Thread.Sleep(3500);
+
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
+                {
                     // Reset button values 
                     SenderButton.Content = DefaultContent;
                     SenderButton.Background = DefaultColor;
@@ -132,38 +144,30 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     // Log information
                     this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                 });
-
-                // Return failed.
-                this.ViewLogger.WriteLog("ASYNC DISPATCHER FOR FAILED BUTTON CONTENT CONTROL IS RUNNING. RETURNING FROM METHOD NOW", LogType.ErrorLog);
-                return;
-            }
-
-            // Reset Sending Button now.
-            SenderButton.Content = DefaultContent;
-            SenderButton.IsEnabled = true;
+            });
         }
-
         /// <summary>
         /// Runs the processing command instance object commands for log processing.
         /// </summary>
         /// <param name="SendingButton"></param>
         /// <param name="ButtonEventArgs"></param>
-        private async void ProcessLogFileContent_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
+        private void ProcessLogFileContent_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
         {
             // Start by turning off the grid for all sending buttons.
             this.ViewLogger.WriteLog("PROCESSED CLICK FOR LOG PARSE COMMAND! DISABLING BUTTONS AND PREPARING TO PROCESS FILE NOW", LogType.WarnLog);
 
             // Pull the button object
-            Button SendButton = (Button)SendingButton;
-            string DefaultContent = SendButton.Content.ToString(); 
-            SendButton.Content = "Processing...";
+            Button SenderButton = (Button)SendingButton;
+            string DefaultContent = SenderButton.Content.ToString();
+            var DefaultColor = SenderButton.Background;
+            SenderButton.Content = "Processing...";
 
             // Get Grid object
-            Grid ParentGrid = SendButton.Parent as Grid;
+            Grid ParentGrid = SenderButton.Parent as Grid;
             ParentGrid.IsEnabled = false;
 
             // Parse Contents out now on the VM and show the please wait operation.
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 // Log information and parse content output.
                 this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {ViewModel.LoadedLogFile}", LogType.TraceLog);
@@ -172,13 +176,36 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // TODO: Pop open a flyout view here to show progress of these operations
 
                 // Run the parse operation here.
-                this.ViewModel.ProcessLogContents();
+                bool ProcessResult = this.ViewModel.ProcessLogContents(out _);
                 this.ViewLogger.WriteLog("DONE PROCESSING OUTPUT CONTENT FOR OUR EXPRESSION OBJECTS! READY TO DISPLAY ON OUR VIEW CONTENT", LogType.InfoLog);
-            });
 
-            // Reenable the grid for the parent buttons.
-            ParentGrid.IsEnabled = true;
-            SendButton.Content = DefaultContent;
+                // Enable grid, remove click command.
+                Task.Run(() =>
+                {
+                    // Invoke via Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        // Enable grid, show result on buttons
+                        ParentGrid.IsEnabled = true;
+                        SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
+                        SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                        SenderButton.Click -= ProcessLogFileContent_OnClick;
+                    });
+
+                    // Wait for 3.5 Seconds
+                    Thread.Sleep(3500);
+
+                    // Invoke via Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        // Reset values and log information
+                        SenderButton.Content = DefaultContent;
+                        SenderButton.Background = DefaultColor;
+                        SenderButton.Click += ProcessLogFileContent_OnClick;
+                        this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                    });
+                });
+            });
         }
     }
 }

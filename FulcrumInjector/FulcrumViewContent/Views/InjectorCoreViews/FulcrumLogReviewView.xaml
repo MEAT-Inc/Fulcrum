@@ -82,7 +82,7 @@
                 </Grid>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
-                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer. The breakdown view of commands will select the raw log lines when an entry is picked.  "/>
+                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer. Expressions files are located in our logs directory with the program files for this app."/>
                 <Run Foreground="Yellow" FontWeight="DemiBold" Text="If the breakdown view is missing, use the slider at the right edge of the page to expand it"/>
             </TextBlock>
         </Grid>
@@ -93,11 +93,11 @@
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
         <!-- Raw Log File Contents and PT Command Contents -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="10"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition MinWidth="10" Width="10"/>
+                <ColumnDefinition MinWidth="10" Width="10" MaxWidth="695"/>
             </Grid.ColumnDefinitions>
 
             <!-- File Contents -->
@@ -134,7 +134,7 @@
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
                     <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
-                               Margin="20,5" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                               Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Shim Log File Loaded!"/>
                         <LineBreak/>
                         <LineBreak/>
@@ -164,7 +164,7 @@
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
                     <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
-                               Margin="20,5" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                               Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Shim Log File Loaded!"/>
                         <LineBreak/>
                         <LineBreak/>

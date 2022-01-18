@@ -105,13 +105,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("ExpressionLogger")) ?? new SubServiceLogger("ExpressionLogger");
 
             // First build our output location for our file.
-            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath");
+            string OutputFolder = Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions");
             string FinalOutputPath = 
                 BaseFileName.Contains(Path.DirectorySeparatorChar) ? 
                     Path.ChangeExtension(BaseFileName, "ptExp") : 
                     BaseFileName.Length == 0 ? 
                         Path.Combine(OutputFolder, $"FulcrumExpressions_{DateTime.Now:MMddyyyy-HHmmss}.ptExp") : 
-                        Path.Combine(OutputFolder, $"{Path.GetFileNameWithoutExtension(BaseFileName)}_{DateTime.Now:MMddyyyy-HHmmss}.ptExp");
+                        Path.Combine(OutputFolder, $"FulcrumExpressions_{Path.GetFileNameWithoutExtension(BaseFileName)}.ptExp");
 
             // Find output path and then build final path value.             
             Directory.CreateDirectory(Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions"));
@@ -127,24 +127,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 // Now Build output string content from each expression object.
                 ExpressionLogger.WriteLog("CONVERTING TO STRINGS NOW...", LogType.WarnLog);
                 List<string> OutputExpressionStrings = InputExpressions
-                    .SelectMany(InputObj => (InputObj + "ENDTABLE\n").Split('\n'))
-                    .ToList();
-
-                // Find size of our largest string object here then populate split lines in place of ENDTABLE
-                int MaxSizeString = OutputExpressionStrings.OrderByDescending(StringObj => StringObj.Length).First().Length;
-                OutputExpressionStrings = OutputExpressionStrings
-                    .Select(StringObj => StringObj == "ENDTABLE" ? Enumerable.Repeat("=", MaxSizeString).ToString() : StringObj)
+                    .SelectMany(InputObj => (InputObj + "\n").Split('\n'))
                     .ToList();
 
                 // Log information and write output.
                 ExpressionLogger.WriteLog($"CONVERTED INPUT OBJECTS INTO A TOTAL OF {OutputExpressionStrings.Count} LINES OF TEXT!", LogType.WarnLog);
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
-                File.WriteAllLines(FinalOutputPath, OutputExpressionStrings.ToArray());
-
-                // Copy into our log file directory now
-                File.Copy(FinalOutputPath, Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions"));
-                ExpressionLogger.WriteLog("CLONED EXPRESSIONS INTO OUR LOG DIRECTORY OK!", LogType.InfoLog);
-
+                File.WriteAllText(FinalOutputPath, string.Join("\n", OutputExpressionStrings));
+                
                 // Write completed info to the log and return our new output path value.
                 ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
                 return FinalOutputPath;

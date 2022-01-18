@@ -113,8 +113,16 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 RegexObj => RegexObj.Item2,
                 RegexObj => RegexObj.Item3
             );
-
+                
             // Now return the output string values here.
+            string[] SplitTable = RegexValuesOutputString.Split('\n');
+            string SplitString = SplitTable[1].Replace("+", "=");
+            var NewLines = new List<string> { $"{SplitString}{SplitString}" };
+            NewLines.AddRange(this.SplitCommandLines.Select(CmdLine => $" {CmdLine}"));
+            NewLines.Add("\n"); NewLines.AddRange(SplitTable.Skip(2).Take(1));
+            NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
+            NewLines.Add(NewLines[0]);
+            RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
         }
         /// <summary>
