@@ -68,7 +68,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 
             // Store values based on results.
             this.ExecutionTime = TimeMatch.Success ? TimeMatch.Groups[1].Value : "REGEX_FAILED";
-            this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Groups[1].Value : "REGEX_FAILED";
+            this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Groups[2].Value : "REGEX_FAILED";
         }
 
         // --------------------------------------------------------------------------------------------------------------
