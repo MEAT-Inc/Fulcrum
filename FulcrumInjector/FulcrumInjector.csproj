@@ -139,6 +139,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -164,10 +165,12 @@
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruOpenRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\ExpressionExtensions.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\PassThruRegexResult.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
+    <Compile Include="FulcrumViewContent\Models\ModelShares\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruCommandModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\ModelShares\PassThruExpressionShare.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />

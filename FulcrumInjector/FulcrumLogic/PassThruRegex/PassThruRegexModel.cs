@@ -14,9 +14,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     public class PassThruRegexModel
     {
         // Values for the regex object.
-        public readonly string ExpressionName;
-        public readonly string ExpressionPattern;
-        public readonly int[] ExpressionValueGroups;
+        public string ExpressionName { get; set; }
+        public string ExpressionPattern { get; set; }
+        public int[] ExpressionValueGroups { get; set; }
+        public PassThruCommandType ExpressionType { get; set; }
 
         // ------------------------------------------------------------------------------------------------
 
@@ -25,19 +26,17 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// </summary>
         [JsonConstructor]
         public PassThruRegexModel() {  }
-
-        // ------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Makes a new regex model object from the input values given
         /// </summary>
         /// <param name="ExpressionName"></param>
         /// <param name="ExpressionPattern"></param>
         /// <param name="ExpressionGroups"></param>
-        public PassThruRegexModel(string ExpressionName, string ExpressionPattern, int ExpressionGroup = 0)
+        public PassThruRegexModel(string ExpressionName, string ExpressionPattern, PassThruCommandType ExpressionType = PassThruCommandType.NONE, int ExpressionGroup = 0)
         {
             // Store model object values here.
             this.ExpressionName = ExpressionName;
+            this.ExpressionType = ExpressionType;
             this.ExpressionPattern = ExpressionPattern;
             this.ExpressionValueGroups = new int[] { ExpressionGroup };
         }
@@ -47,10 +46,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// <param name="ExpressionName"></param>
         /// <param name="ExpressionPattern"></param>
         /// <param name="ExpressionGroups"></param>
-        public PassThruRegexModel(string ExpressionName, string ExpressionPattern, int[] ExpressionGroups = null)
+        public PassThruRegexModel(string ExpressionName, string ExpressionPattern, PassThruCommandType ExpressionType = PassThruCommandType.NONE, int[] ExpressionGroups = null)
         {
             // Store model object values here.
             this.ExpressionName = ExpressionName;
+            this.ExpressionType = ExpressionType;
             this.ExpressionPattern = ExpressionPattern;
             this.ExpressionValueGroups = ExpressionGroups ?? new int[] { 0 };
         }
@@ -62,14 +62,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// </summary>
         /// <param name="InputLines">Lines to check</param>
         /// <returns>Value matched.</returns>
-        public string Evaluate(string InputLines, string GroupSplit = "")
+        public bool Evaluate(string InputLines, out string ResultString)
         {
             // Build a regex, find our results.
+            ResultString = "REGEX_FAILED";
             var MatchResults = new Regex(this.ExpressionPattern).Match(InputLines);
 
             // If failed, return an empty string. If all groups, return here too.
-            if (!MatchResults.Success) return string.Empty;
-            if (this.ExpressionValueGroups.All(IndexObj => IndexObj == 0)) return MatchResults.Value;
+            if (!MatchResults.Success) return false;
+            if (this.ExpressionValueGroups.All(IndexObj => IndexObj == 0)) {
+                ResultString = MatchResults.Value;
+                return true;
+            }
 
             // Loop our pulled values out and store them
             List<string> PulledValues = new List<string>();
@@ -79,7 +83,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             }
 
             // Build output and return it.
-            return string.Join(GroupSplit, PulledValues);
+            ResultString = string.Join(" ", PulledValues);
+            return PulledValues.Count == this.ExpressionValueGroups.Length;
         }
     }
 }

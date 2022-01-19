@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using FulcrumInjector.FulcrumViewContent.Models.ModelShares;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 {
@@ -15,14 +19,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     /// The names of the command types.
     /// Matches a type for the PT Command to a regex class type.
     /// </summary>
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PassThruCommandType
     {
         // Command Types for PassThru Regex
-        [Description("PassThruExpresssion")]        NONE,
-        [Description("PassThruOpenRegex")]          PTOpen,
-        [Description("PassThruCloseRegex")]         PTClose,
-        [Description("PassThruConnectRegex")]       PTConnect,
-        [Description("PassThruDisconnectRegex")]    PTDisconnect,
+        [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")]               NONE,
+        [EnumMember(Value = "PTOpen")] [Description("PassThruOpenRegex")]               PTOpen,
+        [EnumMember(Value = "PTClose")] [Description("PassThruCloseRegex")]             PTClose,
+        [EnumMember(Value = "PTConnect")] [Description("PassThruConnectRegex")]         PTConnect,
+        [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectRegex")]   PTDisconnect,
     }
     
     // --------------------------------------------------------------------------------------------------------------
@@ -35,8 +40,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     {
         // Time values for the Regex on the command.
         public readonly PassThruCommandType TypeOfExpression;
-        public readonly Regex TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+PT");
-        public readonly Regex PtErrorRegex = new Regex(@"(\d+\.\d+s)\s+(\d+:[^\n]+)");
+        public readonly PassThruRegexModel TimeRegex = PassThruExpressionShare.PassThruTime;
+        public readonly PassThruRegexModel StatusCodeRegex = PassThruExpressionShare.PassThruStatus;
 
         // String Values for Command
         public readonly string CommandLines;
@@ -46,8 +51,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         [PassThruRegexResult("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
         public readonly string ExecutionTime;       // Execution time of the command.
         
-        [PassThruRegexResult("J2534 Error", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
-        public readonly string JErrorResult;        // J2534 Result Error
+        [PassThruRegexResult("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
+        public readonly string JStatusCode;        // J2534 Result Error
 
         // --------------------------------------------------------------------------------------------------------------
 
@@ -63,12 +68,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             this.SplitCommandLines = CommandInput.Split('\n');
 
             // Match values here with regex values.
-            var TimeMatch = this.TimeRegex.Match(this.CommandLines);
-            var ErrorMatch = this.PtErrorRegex.Match(this.CommandLines);
-
-            // Store values based on results.
-            this.ExecutionTime = TimeMatch.Success ? TimeMatch.Groups[1].Value : "REGEX_FAILED";
-            this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Groups[2].Value : "REGEX_FAILED";
+            this.TimeRegex.Evaluate(this.CommandLines, out this.ExecutionTime);
+            this.StatusCodeRegex.Evaluate(this.CommandLines, out this.JStatusCode);
         }
 
         // --------------------------------------------------------------------------------------------------------------
