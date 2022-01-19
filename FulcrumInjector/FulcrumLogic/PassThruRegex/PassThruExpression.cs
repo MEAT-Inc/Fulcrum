@@ -113,15 +113,23 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 RegexObj => RegexObj.Item2,
                 RegexObj => RegexObj.Item3
             );
-                
-            // Now return the output string values here.
-            string[] SplitTable = RegexValuesOutputString.Split('\n');
-            string SplitString = SplitTable[1].Replace("+", "=");
-            var NewLines = new List<string> { $"{SplitString}{SplitString}" };
-            NewLines.AddRange(this.SplitCommandLines.Select(CmdLine => $" {CmdLine}"));
-            NewLines.Add("\n"); NewLines.AddRange(SplitTable.Skip(2).Take(1));
-            NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
-            NewLines.Add(NewLines[0]);
+
+            // Split lines, build some splitting strings, and return output.
+            string SplitString = string.Join("", Enumerable.Repeat("=", 100));
+            string[] SplitTable = RegexValuesOutputString.Split('\n')
+                .Select(StringObj => "   " + StringObj.Trim())
+                .ToArray();
+
+            // Store string to replace and build new list of strings
+            var NewLines = new List<string>() { SplitString }; NewLines.Add("\r");
+            NewLines.AddRange(this.SplitCommandLines.Select(CmdLine => $"   {CmdLine}"));
+            NewLines.Add("\n");
+
+            // Add our breakdown contents here.
+            NewLines.Add(SplitTable[0]); NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2)); 
+            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n"); NewLines.Add(SplitString); 
+
+            // Remove double newlines. Command lines are split with \r so this doesn't apply.
             RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
         }
