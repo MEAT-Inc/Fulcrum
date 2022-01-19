@@ -115,7 +115,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             try
             {
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = PassThruExpressionHelpers.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = ExpressionExtensions.SplitLogToCommands(LogFileContents);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -124,7 +124,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 {
                     // Split our output content here and then build a type for the expressions
                     string[] SplitLines = LineSet.Split('\n');
-                    var ExpressionType = PassThruExpressionHelpers.GetTypeFromLines(SplitLines);
+                    var ExpressionType = ExpressionExtensions.GetTypeFromLines(SplitLines);
 
                     // Build expression class object and tick our progress
                     var NextClassObject = ExpressionType.ToRegexClass(SplitLines);

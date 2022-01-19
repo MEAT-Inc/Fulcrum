@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     /// Result Attribute for a Regex command operation
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    sealed class PtRegexResult : Attribute
+    sealed class PassThruRegexResult : Attribute
     {
         // Name of result to set
         public readonly bool FailOnMatch;
@@ -28,7 +28,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// </summary>
         /// <param name="Name">Name of result</param>
         /// <param name="DesiredResult">Value to equal.</param>
-        public PtRegexResult(string Name, string ResultValue = "", string[] ResultStates = null, bool OnFail = false)
+        public PassThruRegexResult(string Name, string ResultValue = "", string[] ResultStates = null, bool OnFail = false)
         {
             // Store values for attribute
             this.ResultName = Name;
@@ -45,7 +45,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// </summary>
         /// <param name="Name">Name of result</param>
         /// <param name="DesiredResult">Value to equal.</param>
-        public PtRegexResult(string Name)
+        public PassThruRegexResult(string Name)
         {
             // Store values for attribute
             this.ResultName = Name;

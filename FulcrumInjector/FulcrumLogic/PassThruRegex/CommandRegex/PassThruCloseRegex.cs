@@ -18,10 +18,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         // -----------------------------------------------------------------------------------------
 
         // Strings of the command and results from the command output.
-        [PtRegexResult("PTClose")]          // PassThru Close command Result
+        [PassThruRegexResult("PTClose")]          // PassThru Close command Result
         public readonly string PtCommand;       // 1.714s -- PTClose(1)
 
-        [PtRegexResult("DeviceId", "-1", new[] { "Device Valid", "Device Invalid!" })] 
+        [PassThruRegexResult("DeviceId", "-1", new[] { "Device Valid", "Device Invalid!" })] 
         public readonly string DeviceId;        // Device Id Result
 
         // ------------------------------------------------------------------------------------------

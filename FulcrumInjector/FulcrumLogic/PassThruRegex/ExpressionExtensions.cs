@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class PassThruExpressionHelpers
+    public static class ExpressionExtensions
     {
         /// <summary>
         /// Converts an input Regex command type enum into a type output
