@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Windows.Documents;
-using System.Windows.Forms;
+using FulcrumInjector.FulcrumViewContent.ViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent
+namespace FulcrumInjector.FulcrumViewContent.Models
 {
     /// <summary>
     /// Singleton instance builder for user controls.

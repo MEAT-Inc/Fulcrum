@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Models.ModelShares
+namespace FulcrumInjector.FulcrumViewContent.Models
 {
     /// <summary>
     /// Static share class object for settings entries.

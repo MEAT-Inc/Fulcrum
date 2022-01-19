@@ -3,12 +3,11 @@ using System.Linq;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruRegex;
-using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Models.ModelShares
+namespace FulcrumInjector.FulcrumViewContent.Models
 {
     /// <summary>
     /// Static class object for the PT Regex object we've built from the settings page.

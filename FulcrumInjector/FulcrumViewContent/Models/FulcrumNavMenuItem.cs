@@ -12,18 +12,18 @@ namespace FulcrumInjector.FulcrumViewContent.Models
     /// <summary>
     /// Dependency property object for navigation menu types
     /// </summary>
-    public class HamburgerNavMenuItem : HamburgerMenuGlyphItem
+    public class FulcrumNavMenuItem : HamburgerMenuGlyphItem
     {
         // Sets if we can navigate on this object or not.
         public bool IsNavigation => this.NavUserControlType != null && this.NavViewModelType != null;
 
         // Destination property based on Type
         public static readonly DependencyProperty NavUserControlTypeProperty = DependencyProperty.Register(
-            nameof(NavUserControlType), typeof(Type), typeof(HamburgerNavMenuItem), new PropertyMetadata(default(Type)));
+            nameof(NavUserControlType), typeof(Type), typeof(FulcrumNavMenuItem), new PropertyMetadata(default(Type)));
 
         // Destination property based on Type
         public static readonly DependencyProperty NavViewModelTypeProperty = DependencyProperty.Register(
-            nameof(NavViewModelType), typeof(Type), typeof(HamburgerNavMenuItem), new PropertyMetadata(default(Type)));
+            nameof(NavViewModelType), typeof(Type), typeof(FulcrumNavMenuItem), new PropertyMetadata(default(Type)));
 
         // --------------------------------------------------------------------------------------------------------------------------------------------
 

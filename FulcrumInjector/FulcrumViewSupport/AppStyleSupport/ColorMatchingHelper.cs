@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Reflection;
 
-namespace FulcrumInjector.FulcrumViewSupport
+namespace FulcrumInjector.FulcrumViewSupport.AppStyleSupport
 {
     public class ColorMatchingHelper
     {

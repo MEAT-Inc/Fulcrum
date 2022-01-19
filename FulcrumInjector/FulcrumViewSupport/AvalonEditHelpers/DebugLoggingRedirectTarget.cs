@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers.DebugLogFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
 using ICSharpCode.AvalonEdit;
 using NLog;
 using NLog.Config;
