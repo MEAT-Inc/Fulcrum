@@ -144,7 +144,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             var ResultsPassed = ResultFieldInfos.Select(FieldObj =>
             {
                 // Pull the ResultAttribute object.
-                var CurrentValue = FieldObj.GetValue(this).ToString();
+                var CurrentValue = FieldObj.GetValue(this).ToString().Trim();
                 var ResultAttribute = (PtRegexResult)FieldObj.GetCustomAttributes(typeof(PtRegexResult)).FirstOrDefault();
 
                 // Now compare value to the passed/failed setup.
