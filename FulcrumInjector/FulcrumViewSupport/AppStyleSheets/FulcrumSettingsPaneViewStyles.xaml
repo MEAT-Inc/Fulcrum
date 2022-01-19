@@ -21,7 +21,7 @@
 
             <!--Main Settings Info Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
-                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="FontSize" Value="26"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>

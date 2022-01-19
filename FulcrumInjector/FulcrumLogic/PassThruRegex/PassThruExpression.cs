@@ -43,7 +43,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         public readonly string[] SplitCommandLines;
 
         // Input command time and result values for regex searching.
-        [PtRegexResult("Time Issued")]
+        [PtRegexResult("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
         public readonly string ExecutionTime;       // Execution time of the command.
         
         [PtRegexResult("J2534 Error", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
@@ -67,8 +67,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             var ErrorMatch = this.PtErrorRegex.Match(this.CommandLines);
 
             // Store values based on results.
-            this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Value : "REGEX_FAILED";
             this.ExecutionTime = TimeMatch.Success ? TimeMatch.Groups[1].Value : "REGEX_FAILED";
+            this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Groups[1].Value : "REGEX_FAILED";
         }
 
         // --------------------------------------------------------------------------------------------------------------
@@ -85,8 +85,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 .Where(MemberObj => MemberObj.GetCustomAttribute(typeof(PtRegexResult)) != null)
                 .ToArray();
 
+            // Build default Tuple LIst value set and apply new values into it from property attributes
+            var RegexResultTuples = new List<Tuple<string, string, string>>() {
+                new("J2534 Command", this.TypeOfExpression.ToString(), this.ExpressionPassed() ? "Parse Passed" : "Parse Failed")
+            };
+
             // Now find ones with the attribute and pull value
-            var RegexResultTuples = ResultFieldInfos.Select(MemberObj =>
+            RegexResultTuples.AddRange(ResultFieldInfos.Select(MemberObj =>
             {
                 // Pull the ResultAttribute object.
                 FieldInfo InvokerField = (FieldInfo)MemberObj;
@@ -99,14 +104,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 
                 // Build our output tuple object here. Compare current value to the desired one and return a state value.
                 return new Tuple<string, string, string>(ResultValue.ResultName, CurrentValue, ResultValue.ResultState(CurrentValue));
-            }).ToArray();
-
-            // Prepend a new Tuple with the type of command the regex name set
-            RegexResultTuples = (Tuple<string, string, string>[])RegexResultTuples.Prepend(
-                new Tuple<string, string, string>(
-                    "Command Type",
-                    this.TypeOfExpression.ToString(),
-                    this.ExpressionPassed() ? "Parse Passed" : "Parse Failed"));
+            }).ToArray());
 
             // Build a text table object here.
             string RegexValuesOutputString = RegexResultTuples.ToStringTable(
@@ -116,7 +114,23 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 RegexObj => RegexObj.Item3
             );
 
-            // Now return the output string values here.
+            // Split lines, build some splitting strings, and return output.
+            string SplitString = string.Join("", Enumerable.Repeat("=", 100));
+            string[] SplitTable = RegexValuesOutputString.Split('\n')
+                .Select(StringObj => "   " + StringObj.Trim())
+                .ToArray();
+
+            // Store string to replace and build new list of strings
+            var NewLines = new List<string>() { SplitString }; NewLines.Add("\r");
+            NewLines.AddRange(this.SplitCommandLines.Select(CmdLine => $"   {CmdLine}"));
+            NewLines.Add("\n");
+
+            // Add our breakdown contents here.
+            NewLines.Add(SplitTable[0]); NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2)); 
+            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n"); NewLines.Add(SplitString); 
+
+            // Remove double newlines. Command lines are split with \r so this doesn't apply.
+            RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
         }
         /// <summary>

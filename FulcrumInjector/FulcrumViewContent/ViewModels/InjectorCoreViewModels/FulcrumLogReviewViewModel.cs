@@ -109,34 +109,46 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="CommandLines"></param>
         /// <returns></returns>
-        internal ObservableCollection<PassThruExpression> ProcessLogContents()
+        internal bool ProcessLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
         {
             // Build command split log contents first. 
-            ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-            var SplitLogContent = PassThruExpressionHelpers.SplitLogToCommands(LogFileContents);
-            ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
-
-            // Start by building PTExpressions from input string object sets.
-            ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PTEXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
-            var ExpressionSet = SplitLogContent.Select(LineSet =>
+            try
             {
-                // Split our output content here and then build a type for the expressions
-                string[] SplitLines = LineSet.Split('\n');
-                var ExpressionType = PassThruExpressionHelpers.GetTypeFromLines(SplitLines);
+                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
+                var SplitLogContent = PassThruExpressionHelpers.SplitLogToCommands(LogFileContents);
+                ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
-                // Build expression class object and tick our progress
-                var NextClassObject = ExpressionType.ToRegexClass(SplitLines);
-                this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / SplitLogContent.Length);
+                // Start by building PTExpressions from input string object sets.
+                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PTEXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
+                var ExpressionSet = SplitLogContent.Select(LineSet =>
+                {
+                    // Split our output content here and then build a type for the expressions
+                    string[] SplitLines = LineSet.Split('\n');
+                    var ExpressionType = PassThruExpressionHelpers.GetTypeFromLines(SplitLines);
 
-                // Return the built expression object
-                return NextClassObject;
-            }).ToArray();
+                    // Build expression class object and tick our progress
+                    var NextClassObject = ExpressionType.ToRegexClass(SplitLines);
+                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / SplitLogContent.Length);
 
-            // Convert the expression set into a list of file strings now and return list built.
-            string BuiltExpressionFile = ExpressionSet.SaveExpressionsToFile(Path.GetFileName(LoadedLogFile));
-            ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {BuiltExpressionFile}!", LogType.InfoLog);
-            return new ObservableCollection<PassThruExpression>(ExpressionSet);
+                    // Return the built expression object
+                    return NextClassObject;
+                }).ToArray();
+
+                // Convert the expression set into a list of file strings now and return list built.
+                string BuiltExpressionFile = ExpressionSet.SaveExpressionsToFile(Path.GetFileName(LoadedLogFile));
+                ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {BuiltExpressionFile}!", LogType.InfoLog);
+                OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet);
+                return true;
+            }
+            catch (Exception Ex)
+            {
+                // Log failures, return nothing
+                ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
+                OutputExpressions = null;
+                return false;
+            }
         }
     }
 }
