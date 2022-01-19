@@ -13,6 +13,7 @@ using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumLogic.InjectorPipes

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FulcrumInjector.FulcrumViewContent.Models
+﻿namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 {
     /// <summary>
     /// Class object for a universal binding of a PassThruExpression type for UI content

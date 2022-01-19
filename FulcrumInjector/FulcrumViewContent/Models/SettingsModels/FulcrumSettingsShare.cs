@@ -6,7 +6,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Models
+namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
     /// <summary>
     /// Static share class object for settings entries.
@@ -36,6 +36,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
             ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
+
+        // Settings for Regex Objects during parsing.
+
 
         // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using ICSharpCode.AvalonEdit;
 using Newtonsoft.Json;
 using SharpLogger;
