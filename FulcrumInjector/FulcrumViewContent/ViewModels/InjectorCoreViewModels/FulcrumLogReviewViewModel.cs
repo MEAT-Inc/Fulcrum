@@ -4,11 +4,16 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.ExtensionClasses;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruRegex;
 using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Models.ModelShares;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
+using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -46,7 +51,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR LOG REVIEW VIEW BOUND VALUES NOW...", LogType.WarnLog);
-            
+
+            // Import Regex objects.
+            ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
+            var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
+            ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
+
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL LOG REVIEW OUTPUT VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
@@ -103,7 +113,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;   
             }
         }
-
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
@@ -115,7 +124,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             try
             {
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = PassThruExpressionHelpers.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = this.SplitLogToCommands(LogFileContents);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -124,7 +133,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 {
                     // Split our output content here and then build a type for the expressions
                     string[] SplitLines = LineSet.Split('\n');
-                    var ExpressionType = PassThruExpressionHelpers.GetTypeFromLines(SplitLines);
+                    var ExpressionType = ExpressionExtensions.GetTypeFromLines(SplitLines);
 
                     // Build expression class object and tick our progress
                     var NextClassObject = ExpressionType.ToRegexClass(SplitLines);
@@ -149,6 +158,41 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 OutputExpressions = null;
                 return false;
             }
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Splits an input content string into a set fo PT Command objects which are split into objects.
+        /// </summary>
+        /// <param name="FileContents">Input file object content</param>
+        /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
+        private string[] SplitLogToCommands(string FileContents)
+        {
+            // Build regex objects to help split input content into sets.
+            var TimeRegex = new Regex(PassThruExpressionShare.PassThruTime.ExpressionPattern);
+            var StatusRegex = new Regex(PassThruExpressionShare.PassThruStatus.ExpressionPattern);
+
+            // Make an empty array of strings and then begin splitting.
+            List<string> OutputLines = new List<string>();
+            for (int CharIndex = 0; CharIndex < FileContents.Length;)
+            {
+                // Find the first index of a time entry and the close command index.
+                int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
+                var ErrorCloseMatch = StatusRegex.Match(FileContents, TimeStartIndex);
+                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
+
+                // Take the difference in End/Start as our string length value.
+                string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
+                if (OutputLines.Contains(NextCommand)) break;
+
+                // If it was found in the list already, then we break out of this loop to stop adding dupes.
+                if (ErrorCloseIndex < CharIndex) break;
+                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
+            }
+
+            // Return the built set of commands.
+            return OutputLines.ToArray();
         }
     }
 }

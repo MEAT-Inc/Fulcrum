@@ -17,13 +17,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         public readonly Regex ChannelIdRegex = new Regex(@"returning ChannelID: (\d+)");
 
         // Strings of the command and results from the command output.
-        [PtRegexResult("PTConnect")] public readonly string PtCommand;
-        [PtRegexResult("DeviceId")] public readonly string DeviceId;
-        [PtRegexResult("ProtocolId")] public readonly string ProtocolId;
-        [PtRegexResult("ConnectFlags")] public readonly string ConnectFlags;
-        [PtRegexResult("BaudRate")] public readonly string BaudRate;
-        [PtRegexResult("ChannelPointer")] public readonly string ChannelPointer;
-        [PtRegexResult("ChannelId", "-1", new[] { "Channel Opened", "Invalid Channel!"}, true)] 
+        [PassThruRegexResult("PTConnect")] public readonly string PtCommand;
+        [PassThruRegexResult("DeviceId")] public readonly string DeviceId;
+        [PassThruRegexResult("ProtocolId")] public readonly string ProtocolId;
+        [PassThruRegexResult("ConnectFlags")] public readonly string ConnectFlags;
+        [PassThruRegexResult("BaudRate")] public readonly string BaudRate;
+        [PassThruRegexResult("ChannelPointer")] public readonly string ChannelPointer;
+        [PassThruRegexResult("ChannelId", "-1", new[] { "Channel Opened", "Invalid Channel!"}, true)] 
         public readonly string ChannelId;
 
         // ----------------------------------------------------------------------------------------------------

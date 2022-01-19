@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using FulcrumInjector.FulcrumViewContent.Models.ModelShares;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 {
@@ -15,14 +19,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     /// The names of the command types.
     /// Matches a type for the PT Command to a regex class type.
     /// </summary>
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PassThruCommandType
     {
         // Command Types for PassThru Regex
-        [Description("PassThruExpresssion")]        NONE,
-        [Description("PassThruOpenRegex")]          PTOpen,
-        [Description("PassThruCloseRegex")]         PTClose,
-        [Description("PassThruConnectRegex")]       PTConnect,
-        [Description("PassThruDisconnectRegex")]    PTDisconnect,
+        [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")]               NONE,
+        [EnumMember(Value = "PTOpen")] [Description("PassThruOpenRegex")]               PTOpen,
+        [EnumMember(Value = "PTClose")] [Description("PassThruCloseRegex")]             PTClose,
+        [EnumMember(Value = "PTConnect")] [Description("PassThruConnectRegex")]         PTConnect,
+        [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectRegex")]   PTDisconnect,
     }
     
     // --------------------------------------------------------------------------------------------------------------
@@ -35,19 +40,19 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     {
         // Time values for the Regex on the command.
         public readonly PassThruCommandType TypeOfExpression;
-        public readonly Regex TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+PT");
-        public readonly Regex PtErrorRegex = new Regex(@"(\d+\.\d+s)\s+(\d+:[^\n]+)");
+        public readonly PassThruRegexModel TimeRegex = PassThruExpressionShare.PassThruTime;
+        public readonly PassThruRegexModel StatusCodeRegex = PassThruExpressionShare.PassThruStatus;
 
         // String Values for Command
         public readonly string CommandLines;
         public readonly string[] SplitCommandLines;
 
         // Input command time and result values for regex searching.
-        [PtRegexResult("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
+        [PassThruRegexResult("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
         public readonly string ExecutionTime;       // Execution time of the command.
         
-        [PtRegexResult("J2534 Error", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
-        public readonly string JErrorResult;        // J2534 Result Error
+        [PassThruRegexResult("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
+        public readonly string JStatusCode;        // J2534 Result Error
 
         // --------------------------------------------------------------------------------------------------------------
 
@@ -63,12 +68,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             this.SplitCommandLines = CommandInput.Split('\n');
 
             // Match values here with regex values.
-            var TimeMatch = this.TimeRegex.Match(this.CommandLines);
-            var ErrorMatch = this.PtErrorRegex.Match(this.CommandLines);
-
-            // Store values based on results.
-            this.ExecutionTime = TimeMatch.Success ? TimeMatch.Groups[1].Value : "REGEX_FAILED";
-            this.JErrorResult = ErrorMatch.Success ? ErrorMatch.Groups[2].Value : "REGEX_FAILED";
+            this.TimeRegex.Evaluate(this.CommandLines, out this.ExecutionTime);
+            this.StatusCodeRegex.Evaluate(this.CommandLines, out this.JStatusCode);
         }
 
         // --------------------------------------------------------------------------------------------------------------
@@ -82,7 +83,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             // Find Field object values here.
             var ResultFieldInfos = this.GetType()
                 .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(MemberObj => MemberObj.GetCustomAttribute(typeof(PtRegexResult)) != null)
+                .Where(MemberObj => MemberObj.GetCustomAttribute(typeof(PassThruRegexResult)) != null)
                 .ToArray();
 
             // Build default Tuple LIst value set and apply new values into it from property attributes
@@ -98,8 +99,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 string CurrentValue = InvokerField.GetValue(this).ToString().Trim();
 
                 // Now cast the result attribute of the member and store the value of it.
-                var ResultValue = (PtRegexResult)MemberObj
-                    .GetCustomAttributes(typeof(PtRegexResult))
+                var ResultValue = (PassThruRegexResult)MemberObj
+                    .GetCustomAttributes(typeof(PassThruRegexResult))
                     .FirstOrDefault();
 
                 // Build our output tuple object here. Compare current value to the desired one and return a state value.
@@ -145,7 +146,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             {
                 // Pull the ResultAttribute object.
                 var CurrentValue = FieldObj.GetValue(this).ToString().Trim();
-                var ResultAttribute = (PtRegexResult)FieldObj.GetCustomAttributes(typeof(PtRegexResult)).FirstOrDefault();
+                var ResultAttribute = (PassThruRegexResult)FieldObj.GetCustomAttributes(typeof(PassThruRegexResult)).FirstOrDefault();
 
                 // Now compare value to the passed/failed setup.
                 return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;

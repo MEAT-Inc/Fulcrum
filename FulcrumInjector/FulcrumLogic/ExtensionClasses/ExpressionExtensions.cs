@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.PassThruRegex;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruRegex
+namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class PassThruExpressionHelpers
+    public static class ExpressionExtensions
     {
         /// <summary>
         /// Converts an input Regex command type enum into a type output
@@ -58,40 +55,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             string JoinedLines = string.Join("\n", InputLines);
             return (PassThruCommandType)Enum.Parse(typeof(PassThruCommandType), 
                 EnumTypesArray.FirstOrDefault(EnumObj => JoinedLines.Contains(EnumObj)));
-        }
-
-
-        /// <summary>
-        /// Splits an input content string into a set fo PT Command objects which are split into objects.
-        /// </summary>
-        /// <param name="FileContents">Input file object content</param>
-        /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        public static string[] SplitLogToCommands(string FileContents)
-        {
-            // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(@"(\d+\.\d+s)\s+(\+\+|--|!!|\*\*)\s+PT");
-            var PtErrorRegex = new Regex(@"(\d+\.\d+s)\s+(\d+:[^\n]+)");
-
-            // Make an empty array of strings and then begin splitting.
-            List<string> OutputLines = new List<string>();
-            for (int CharIndex = 0; CharIndex < FileContents.Length;)
-            {
-                // Find the first index of a time entry and the close command index.
-                int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
-                var ErrorCloseMatch = PtErrorRegex.Match(FileContents, TimeStartIndex);
-                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
-
-                // Take the difference in End/Start as our string length value.
-                string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
-                if (OutputLines.Contains(NextCommand)) break;
-
-                // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                if (ErrorCloseIndex < CharIndex) break;
-                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
-            }
-
-            // Return the built set of commands.
-            return OutputLines.ToArray();
         }
         /// <summary>
         /// Takes an input set of PTExpressions and writes them to a file object desired.
@@ -147,5 +110,27 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
                 return string.Empty;
             }
         }
+
+        // -----------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Build a new regex model object from a given name value for a regex.
+        /// </summary>
+        /// <param name="RegexName"></param>
+        /// <returns></returns>
+        public static PassThruRegexModel GetRegexByName(this PassThruRegexModel[] RegexModelSet, string RegexName) {
+            return RegexModelSet.FirstOrDefault(RegexObj => RegexObj.ExpressionName.ToUpper().Contains(RegexName.ToUpper()));
+        }
+        /// <summary>
+        /// Build a new regex model object from a given name value for a regex.
+        /// </summary>
+        /// <param name="RegexName"></param>
+        /// <returns></returns>
+        public static PassThruRegexModel GetRegexByName(this ObservableCollection<PassThruRegexModel> RegexModelSet, string RegexName) {
+            return RegexModelSet.FirstOrDefault(RegexObj => RegexObj.ExpressionName.ToUpper().Contains(RegexName.ToUpper()));
+        }
+
+        // -----------------------------------------------------------------------------------------------------------------
+
     }
 }
