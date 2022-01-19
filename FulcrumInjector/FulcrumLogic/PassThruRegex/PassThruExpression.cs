@@ -95,7 +95,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             {
                 // Pull the ResultAttribute object.
                 FieldInfo InvokerField = (FieldInfo)MemberObj;
-                string CurrentValue = InvokerField.GetValue(this).ToString();
+                string CurrentValue = InvokerField.GetValue(this).ToString().Trim();
 
                 // Now cast the result attribute of the member and store the value of it.
                 var ResultValue = (PtRegexResult)MemberObj
