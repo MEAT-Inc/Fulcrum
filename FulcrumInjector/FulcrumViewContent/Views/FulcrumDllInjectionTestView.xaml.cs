@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
+using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -62,6 +63,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 TestInjectionButton.IsEnabled = false;
                 this.ViewModel.InjectorTestResult = "Working...";
                 ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
+
+                // Set View to show the Injector Output View for the hamburger main menu
+                // var MenuItem = InjectorConstants.FulcrumHamburgerCoreViewModel.FulcrumMenuEntries
+                //     .FirstOrDefault(MenuObj => MenuObj.MenuViewType == typeof(FulcrumDllOutputLogView).FullName);
+                // InjectorConstants.FulcrumHamburgerCoreView.InjectorHamburgerMenu.SelectedIndex =
+                //     InjectorConstants.FulcrumHamburgerCoreViewModel.FulcrumMenuEntries.ToList().IndexOf(MenuItem);
 
                 // Run the injection test here on a Dispatched thread 
                 string ResultOutput = string.Empty;

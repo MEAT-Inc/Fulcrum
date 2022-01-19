@@ -116,8 +116,8 @@ void CFulcrumShim::StartupPipes()
 	if (PipesConnecting) 
 	{
 		// Join the thread to finish setup and return
-		fulcrum_output::fulcrumDebug(_T("%.3fs    WARNING: Pipes were already connecting!\n", GetTimeSinceInit()));
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Forcing execution of the setup thread to synchronize now...\n", GetTimeSinceInit()));
+		fulcrum_output::fulcrumDebug(_T("-->       WARNING: Pipes were already connecting!\n"));
+		fulcrum_output::fulcrumDebug(_T("-->       Forcing execution of the setup thread to synchronize now...\n"));
 		return;
 	}
 
@@ -131,15 +131,15 @@ void CFulcrumShim::StartupPipes()
 
 	// Log heading information so we see this on boot
 	fulcrum_output::fulcrumDebug(_T("------------------------------------------------------------------------------------\n"));
-	fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("-->       FulcrumShim DLL - Sniffin CAN, And Crushing Neo's Morale Since 2021\n"));
 
 	// Now see if we're loaded correctly.
 	LoadedPipeInput && LoadedPipeOutput;
-	if (!LoadedPipeInput || !LoadedPipeOutput) fulcrum_output::fulcrumDebug(_T("%.3fs    Failed to boot new pipe instances for our FulcrumShim Server!\n", GetTimeSinceInit()));
+	if (!LoadedPipeInput || !LoadedPipeOutput) fulcrum_output::fulcrumDebug(_T("-->       Failed to boot new pipe instances for our FulcrumShim Server!\n"));
 	else 
 	{
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Booted new pipe instances correctly!\n", GetTimeSinceInit()));
-		fulcrum_output::fulcrumDebug(_T("%.3fs    FulcrumInjector should now be running in the background\n", GetTimeSinceInit()));
+		fulcrum_output::fulcrumDebug(_T("-->       Booted new pipe instances correctly!\n"));
+		fulcrum_output::fulcrumDebug(_T("-->       FulcrumInjector should now be running in the background\n"));
 	}
 
 	// Log closing line output
@@ -151,9 +151,9 @@ void CFulcrumShim::ShutdownPipes()
 	// Run the shutdown method
 	if (CFulcrumShim::fulcrumPiper->PipesConnected())
 	{
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Calling pipe shutdown methods now...\n", GetTimeSinceInit()));
+		fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
 		CFulcrumShim::fulcrumPiper->ShutdownPipes();
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Pipe instances have been released OK!\n", GetTimeSinceInit()));
+		fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
 	}
-	else { fulcrum_output::fulcrumDebug(_T("%.3fs    Pipe instances were already closed!\n", GetTimeSinceInit())); }
+	else { fulcrum_output::fulcrumDebug(_T("-->       Pipe instances were already closed!\n")); }
 }

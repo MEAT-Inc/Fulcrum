@@ -15,10 +15,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         public readonly Regex DeviceIdRegex = new Regex(@"returning DeviceID: (\d+)");
 
         // Strings of the command and results from the command output.
-        [ResultAttribute("Command")] public readonly string PtCommand;
-        [ResultAttribute("DeviceName")] public readonly string DeviceName;
-        [ResultAttribute("DevicePointer")] public readonly string DevicePointer;
-        [ResultAttribute("DeviceId", FailedResult:"-1")] public readonly string DeviceId;
+        [PtRegexResult("Command")] public readonly string PtCommand;
+        [PtRegexResult("DeviceName")] public readonly string DeviceName;
+        [PtRegexResult("DevicePointer")] public readonly string DevicePointer;
+        [PtRegexResult("DeviceId", "-1", new[] { "Device Opened", "Invalid Device ID!" }, true)]
+        public readonly string DeviceId;
 
         // ------------------------------------------------------------------------------------------
 

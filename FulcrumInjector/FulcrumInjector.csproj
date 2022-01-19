@@ -156,13 +156,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruCloseRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruConnectRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruDisconnectRegex.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruOpenRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\CommandTypeToClass.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\ResultAttribute.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruExpressionHelpers.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PtRegexResult.cs" />
     <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
+    <Compile Include="FulcrumViewContent\Models\PassThruCommandModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
@@ -434,6 +438,7 @@ cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
 cmd.exe /C mkdir "$(TargetDir)FulcrumImages"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
+cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
 
 copy /Y "$(ProjectDir)FulcrumViewSupport\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
 copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"
