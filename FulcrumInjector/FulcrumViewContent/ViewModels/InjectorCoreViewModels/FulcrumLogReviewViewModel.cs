@@ -10,9 +10,8 @@ using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruRegex;
 using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.Models.ModelShares;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -34,6 +33,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string _logFileContents = "";
         private double _parsingProgress = 0.00;
 
+        // Private set of log file commands. Stored temp values here for internal use
         private string[] _logFileCommands;
 
         // Public values for our view to bind onto 

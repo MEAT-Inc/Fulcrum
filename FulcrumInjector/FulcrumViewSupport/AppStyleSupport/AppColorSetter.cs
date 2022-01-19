@@ -5,7 +5,7 @@ using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewSupport.DataConverters;
 using FulcrumInjector.FulcrumViewSupport.StyleModels;
 
-namespace FulcrumInjector.FulcrumViewSupport
+namespace FulcrumInjector.FulcrumViewSupport.AppStyleSupport
 {
     /// <summary>
     /// Class used to help configure coloring setup for themes

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace FulcrumInjector.FulcrumViewSupport
+namespace FulcrumInjector.FulcrumViewSupport.AppStyleSupport
 {
     public static class CustomColorShader
     {

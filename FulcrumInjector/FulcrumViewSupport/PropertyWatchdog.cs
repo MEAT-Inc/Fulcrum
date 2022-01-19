@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace FulcrumInjector.FulcrumViewContent
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Refreshes and checks a property value on a given value object

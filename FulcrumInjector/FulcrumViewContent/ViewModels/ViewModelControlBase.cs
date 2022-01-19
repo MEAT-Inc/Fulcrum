@@ -4,12 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
-using Newtonsoft.Json;
+using FulcrumInjector.FulcrumViewContent.Models;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent
+namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {
     /// <summary>
     /// Base class for Model objects on the UI

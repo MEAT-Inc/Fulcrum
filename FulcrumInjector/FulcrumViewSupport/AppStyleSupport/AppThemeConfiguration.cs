@@ -10,7 +10,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport
+namespace FulcrumInjector.FulcrumViewSupport.AppStyleSupport
 {
     /// <summary>
     /// Class reserved to configuring theme object values on the application

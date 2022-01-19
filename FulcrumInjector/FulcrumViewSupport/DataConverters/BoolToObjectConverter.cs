@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace LoaderApplication.Objects.AutomationObjects
+namespace FulcrumInjector.FulcrumViewSupport.DataConverters
 {
     /// <summary>
     /// Converts a boolean value into a visibility but inverse based on value.

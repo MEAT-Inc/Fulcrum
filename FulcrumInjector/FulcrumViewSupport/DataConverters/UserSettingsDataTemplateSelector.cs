@@ -2,12 +2,13 @@
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.AppStyleSupport
+namespace FulcrumInjector.FulcrumViewSupport.DataConverters
 {
     /// <summary>
     /// Builds a new template selection object which helps us find templates

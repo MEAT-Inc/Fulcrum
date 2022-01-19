@@ -11,7 +11,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-using FulcrumInjector.FulcrumViewContent.Models.ModelShares;
+using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 {

@@ -17,7 +17,6 @@ using System.Windows.Shapes;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
