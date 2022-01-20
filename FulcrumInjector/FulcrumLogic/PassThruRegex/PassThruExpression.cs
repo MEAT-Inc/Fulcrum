@@ -39,18 +39,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
     /// </summary>
     public class PassThruExpression
     {
+        // String Values for Command content
+        public readonly string CommandLines;
+        public readonly string[] SplitCommandLines;
+
         // Time values for the Regex on the command.
         public readonly PassThruCommandType TypeOfExpression;
         public readonly PassThruRegexModel TimeRegex = PassThruExpressionShare.PassThruTime;
         public readonly PassThruRegexModel StatusCodeRegex = PassThruExpressionShare.PassThruStatus;
 
-        // String Values for Command
-        public readonly string CommandLines;
-        public readonly string[] SplitCommandLines;
-
         // Input command time and result values for regex searching.
         [PassThruRegexResult("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
-        public readonly string ExecutionTime;       // Execution time of the command.
+        public readonly string ExecutionTime;      // Execution time of the command.
         
         [PassThruRegexResult("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
         public readonly string JStatusCode;        // J2534 Result Error
@@ -68,9 +68,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\n');
 
-            // Match values here with regex values.
-            this.TimeRegex.Evaluate(this.CommandLines, out this.ExecutionTime);
-            this.StatusCodeRegex.Evaluate(this.CommandLines, out this.JStatusCode);
+            // Match values here with regex values. Index 0 is the full match string.
+            this.ExecutionTime = this.TimeRegex.Evaluate(this.CommandLines, out var ExecutionTimeStrings) ?
+                ExecutionTimeStrings[this.TimeRegex.ExpressionValueGroups[0]] : "REGEX_FAILED";
+            this.JStatusCode = this.StatusCodeRegex.Evaluate(this.CommandLines, out var StatusCodeStrings) ? 
+                StatusCodeStrings[this.StatusCodeRegex.ExpressionValueGroups[0]] : "REGEX_FAILED";
         }
 
         // --------------------------------------------------------------------------------------------------------------

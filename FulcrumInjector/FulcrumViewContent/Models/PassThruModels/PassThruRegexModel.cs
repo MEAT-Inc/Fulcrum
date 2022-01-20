@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using Newtonsoft.Json;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruRegex
+namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 {
     /// <summary>
     ///  Model object for imported regular expression values for a command part
@@ -62,29 +60,31 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// </summary>
         /// <param name="InputLines">Lines to check</param>
         /// <returns>Value matched.</returns>
-        public bool Evaluate(string InputLines, out string ResultString)
+        public bool Evaluate(string InputLines, out string[] ResultStrings)
         {
             // Build a regex, find our results.
-            ResultString = "REGEX_FAILED";
             var MatchResults = new Regex(this.ExpressionPattern).Match(InputLines);
 
             // If failed, return an empty string. If all groups, return here too.
-            if (!MatchResults.Success) return false;
+            if (!MatchResults.Success) {
+                ResultStrings = new[] { "REGEX_FAILED" };
+                return false;
+            }
+
+            // If no groups given, return full match
             if (this.ExpressionValueGroups.All(IndexObj => IndexObj == 0)) {
-                ResultString = MatchResults.Value;
-                return true;
+                ResultStrings = new[] { MatchResults.Value }; return true;
             }
 
             // Loop our pulled values out and store them
             List<string> PulledValues = new List<string>();
             for (int GroupIndex = 0; GroupIndex < MatchResults.Groups.Count; GroupIndex++) { 
-                if (!this.ExpressionValueGroups.Contains(GroupIndex)) continue;
                 PulledValues.Add(MatchResults.Groups[GroupIndex].Value.Trim());
             }
 
             // Build output and return it.
-            ResultString = string.Join(" ", PulledValues);
-            return PulledValues.Count == this.ExpressionValueGroups.Length;
+            ResultStrings = PulledValues.ToArray();
+            return true;
         }
     }
 }

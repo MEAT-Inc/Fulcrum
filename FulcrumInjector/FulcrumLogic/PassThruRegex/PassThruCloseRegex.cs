@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
+namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 {
     /// <summary>
     /// PTClose Command Regex Operations
@@ -18,10 +13,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         // -----------------------------------------------------------------------------------------
 
         // Strings of the command and results from the command output.
-        [PassThruRegexResult("PTClose")]          // PassThru Close command Result
+        [PassThruRegexResult("PTClose")]    // PassThru Close command Result
         public readonly string PtCommand;       // 1.714s -- PTClose(1)
 
-        [PassThruRegexResult("DeviceId", "-1", new[] { "Device Valid", "Device Invalid!" })] 
+        [PassThruRegexResult("DeviceId", "-1", new[] { "Device Closed", "Device Invalid!" }, true)] 
         public readonly string DeviceId;        // Device Id Result
 
         // ------------------------------------------------------------------------------------------

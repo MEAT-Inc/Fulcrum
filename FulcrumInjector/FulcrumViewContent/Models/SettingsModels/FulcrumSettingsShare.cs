@@ -38,7 +38,10 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
             ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
 
         // Settings for Regex Objects during parsing.
-
+        public static SettingsEntryCollectionModel InjectorRegexSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("PassThru Regex Settings")
+            ) ?? new SettingsEntryCollectionModel("PassThru Regex Settings", Array.Empty<SettingsEntryModel>());
 
         // ---------------------------------------------------------------------------------------------------------------------
 

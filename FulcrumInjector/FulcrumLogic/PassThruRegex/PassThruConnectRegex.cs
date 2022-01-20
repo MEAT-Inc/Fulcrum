@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
+namespace FulcrumInjector.FulcrumLogic.PassThruRegex
 {
     /// <summary>
     /// Set of Regular Expressions for the PTConnect Command
@@ -13,8 +8,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
     public class PassThruConnectRegex : PassThruExpression
     {
         // Command for the open command it self
-        public readonly Regex PtConnectCommandRegex = new Regex(@"(PTConnect)\((\d+),\s+([^,]+),\s([^,]+),\s+([^,]+),\s+([^)]+)\)");
         public readonly Regex ChannelIdRegex = new Regex(@"returning ChannelID: (\d+)");
+        public readonly Regex PtConnectRegex = new Regex(@"(PTConnect)\((\d+),\s+([^,]+),\s([^,]+),\s+([^,]+),\s+([^)]+)\)");
 
         // Strings of the command and results from the command output.
         [PassThruRegexResult("PTConnect")] public readonly string PtCommand;
@@ -35,7 +30,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex.CommandRegex
         public PassThruConnectRegex(string CommandInput) : base(CommandInput, PassThruCommandType.PTConnect)
         {
             // Find the PTOpen Command Results.
-            var CommandMatch = this.PtConnectCommandRegex.Match(CommandInput);
+            var CommandMatch = this.PtConnectRegex.Match(CommandInput);
             var ChannelIdMatch = this.ChannelIdRegex.Match(CommandInput);
 
             // Store values based on results.
