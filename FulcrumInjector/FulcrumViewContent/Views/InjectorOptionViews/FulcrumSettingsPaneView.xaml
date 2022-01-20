@@ -78,21 +78,22 @@
                  ItemsSource="{Binding Path=SettingsEntrySets}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="-5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="55"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.Background>
-                            <SolidColorBrush Color="#020202" Opacity=".85"/>
-                        </Grid.Background>
-                        <TextBlock
+                    <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
+                        <Grid Margin="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.Background>
+                                <SolidColorBrush Color="#020202" Opacity=".85"/>
+                            </Grid.Background>
+                            <TextBlock
                             Margin="5,5,10,0"
                             Style="{StaticResource SettingSectionTitleStyle}"
                             Text="{Binding Path=SettingSectionTitle}"/>
-                        <ListBox
+                            <ListBox
                             Grid.Row="1" 
-                            Width="{Binding ElementName=SettingsListBoxView, Path=Width}"
+                            Width="630"
                             Height="300"
                             Padding="0"
                             Margin="0,0,6,0"
@@ -103,14 +104,15 @@
                             ItemsSource="{Binding}"
                             Style="{StaticResource ListBoxSettingsStyle}"
                             DataContext="{Binding Path=SettingsEntries}">
-                            <ListBox.Background>
-                                <SolidColorBrush Color="Gray" Opacity=".50"/>
-                            </ListBox.Background>
-                            <ListBox.ItemTemplateSelector>
-                                <dataConverters:UserSettingsDataTemplateSelector/>
-                            </ListBox.ItemTemplateSelector>
-                        </ListBox>
-                    </Grid>
+                                <ListBox.Background>
+                                    <SolidColorBrush Color="Gray" Opacity=".50"/>
+                                </ListBox.Background>
+                                <ListBox.ItemTemplateSelector>
+                                    <dataConverters:UserSettingsDataTemplateSelector/>
+                                </ListBox.ItemTemplateSelector>
+                            </ListBox>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
