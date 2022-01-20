@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -35,7 +35,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static PassThruExpression ToRegexClass(this PassThruCommandType InputType, string InputLines)
         {
             // Pull the description string and get type of regex class.
-            string ClassType = $"FulcrumInjector.FulcrumLogic.PassThruRegex.{InputType.ToDescriptionString()}";
+            string ClassType = $"{typeof(PassThruExpression).Namespace}.{InputType.ToDescriptionString()}";
             if (Type.GetType(ClassType) == null) return new PassThruExpression(InputLines, InputType);
 
             // Find our output type value here.
