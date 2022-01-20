@@ -20,11 +20,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         // Private values for setting true/false here.
         private readonly string _failedState;
         private readonly string _passedState;
-        
+
         // ------------------------------------------------------------------------------
 
         /// <summary>
         /// This makes a result tag for the name given and sets to passed when the value matches the given result.
+        /// Set OnFail to true to make the value fail when it matches the input
         /// </summary>
         /// <param name="Name">Name of result</param>
         /// <param name="DesiredResult">Value to equal.</param>
@@ -42,6 +43,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         }
         /// <summary>
         /// This makes a result tag for the name given and sets to passed when the value matches the given result.
+        /// Set OnFail to true to make the value fail when it matches the input
         /// </summary>
         /// <param name="Name">Name of result</param>
         /// <param name="DesiredResult">Value to equal.</param>

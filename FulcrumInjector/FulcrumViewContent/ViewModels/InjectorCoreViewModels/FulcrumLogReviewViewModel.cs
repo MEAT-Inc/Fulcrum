@@ -10,9 +10,8 @@ using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruRegex;
 using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.Models.ModelShares;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -34,6 +33,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string _logFileContents = "";
         private double _parsingProgress = 0.00;
 
+        // Private set of log file commands. Stored temp values here for internal use
         private string[] _logFileCommands;
 
         // Public values for our view to bind onto 
@@ -53,9 +53,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog("SETTING UP INJECTOR LOG REVIEW VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Import Regex objects.
-            ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
-            var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
-            ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
+            // ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
+            // var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
+            // ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
 
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL LOG REVIEW OUTPUT VALUES OK!", LogType.InfoLog);
@@ -170,8 +170,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string[] SplitLogToCommands(string FileContents)
         {
             // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruExpressionShare.PassThruTime.ExpressionPattern);
-            var StatusRegex = new Regex(PassThruExpressionShare.PassThruStatus.ExpressionPattern);
+            var TimeRegex = new Regex(PassThruExpressionShare.PassThruTime.ExpressionPattern.Trim());
+            var StatusRegex = new Regex(PassThruExpressionShare.PassThruStatus.ExpressionPattern.Trim());
 
             // Make an empty array of strings and then begin splitting.
             List<string> OutputLines = new List<string>();

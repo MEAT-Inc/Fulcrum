@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Models.ModelShares
+namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
     /// <summary>
     /// Static share class object for settings entries.
@@ -39,6 +36,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models.ModelShares
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
             ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
+
+        // Settings for Regex Objects during parsing.
+        public static SettingsEntryCollectionModel InjectorRegexSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("PassThru Regex Settings")
+            ) ?? new SettingsEntryCollectionModel("PassThru Regex Settings", Array.Empty<SettingsEntryModel>());
 
         // ---------------------------------------------------------------------------------------------------------------------
 

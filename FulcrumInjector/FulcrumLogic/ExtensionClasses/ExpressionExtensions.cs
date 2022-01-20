@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -34,9 +36,12 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         {
             // Pull the description string and get type of regex class.
             string ClassType = $"FulcrumInjector.FulcrumLogic.PassThruRegex.{InputType.ToDescriptionString()}";
-            return (PassThruExpression)(Type.GetType(ClassType) == null ?
-                new PassThruExpression(InputLines, InputType) :
-                Activator.CreateInstance(Type.GetType(ClassType)));
+            if (Type.GetType(ClassType) == null) return new PassThruExpression(InputLines, InputType);
+
+            // Find our output type value here.
+            Type OutputType = Type.GetType(ClassType);
+            var RegexConstructor = OutputType.GetConstructor(new[] { typeof(string) });
+            return (PassThruExpression)RegexConstructor.Invoke(new[] { InputLines });
         }
         /// <summary>
         /// Finds a PTCommand type from the given input line set
@@ -53,8 +58,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Find the return type here based on the first instance of a PTCommand type object on the array.
             string JoinedLines = string.Join("\n", InputLines);
-            return (PassThruCommandType)Enum.Parse(typeof(PassThruCommandType), 
-                EnumTypesArray.FirstOrDefault(EnumObj => JoinedLines.Contains(EnumObj)));
+            var EnumStringSelected = EnumTypesArray.FirstOrDefault(EnumObj => JoinedLines.Contains(EnumObj));
+            return (PassThruCommandType)(string.IsNullOrWhiteSpace(EnumStringSelected) ? 
+                PassThruCommandType.NONE : Enum.Parse(typeof(PassThruCommandType), EnumStringSelected));
         }
         /// <summary>
         /// Takes an input set of PTExpressions and writes them to a file object desired.

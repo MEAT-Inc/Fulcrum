@@ -37,12 +37,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         // Private control values
-        private ObservableCollection<HamburgerNavMenuItem> _injectorMenuEntries;
-        private ObservableCollection<HamburgerNavMenuItem> _injectorMenuOptions;
+        private ObservableCollection<FulcrumNavMenuItem> _injectorMenuEntries;
+        private ObservableCollection<FulcrumNavMenuItem> _injectorMenuOptions;
 
         // Public values for our view to bind to
-        public ObservableCollection<HamburgerNavMenuItem> InjectorMenuEntries { get => _injectorMenuEntries; set => PropertyUpdated(value); }
-        public ObservableCollection<HamburgerNavMenuItem> InjectorMenuOptions { get => _injectorMenuOptions; set => PropertyUpdated(value); }
+        public ObservableCollection<FulcrumNavMenuItem> InjectorMenuEntries { get => _injectorMenuEntries; set => PropertyUpdated(value); }
+        public ObservableCollection<FulcrumNavMenuItem> InjectorMenuOptions { get => _injectorMenuOptions; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -85,10 +85,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Applies new hamburger menu items here
         /// </summary>
-        internal HamburgerNavMenuItem[] SetupHamburgerMenuItems()
+        internal FulcrumNavMenuItem[] SetupHamburgerMenuItems()
         {
             // Pull icon objects, store menu entries into a list
-            HamburgerNavMenuItem[] OutputMenuItems = Array.Empty<HamburgerNavMenuItem>();
+            FulcrumNavMenuItem[] OutputMenuItems = Array.Empty<FulcrumNavMenuItem>();
             ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OBJECTS NOW...", LogType.InfoLog);
             foreach (var IconObjectEntry in this.FulcrumMenuEntries)
             {
@@ -112,17 +112,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Return built output object values
-            this.InjectorMenuEntries = new ObservableCollection<HamburgerNavMenuItem>(OutputMenuItems);
+            this.InjectorMenuEntries = new ObservableCollection<FulcrumNavMenuItem>(OutputMenuItems);
             return OutputMenuItems;
         }
         /// <summary>
         /// Builds the option item entries for our injector hamburger menu
         /// </summary>
         /// <returns>List of objects built for our hamburger views</returns>
-        internal HamburgerNavMenuItem[] SetupHamburgerOptionItems()
+        internal FulcrumNavMenuItem[] SetupHamburgerOptionItems()
         {
             // Pull icon objects, store menu entries into a list
-            HamburgerNavMenuItem[] OutputOptionEntries = Array.Empty<HamburgerNavMenuItem>();
+            FulcrumNavMenuItem[] OutputOptionEntries = Array.Empty<FulcrumNavMenuItem>();
             ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OPTION OBJECTS NOW...", LogType.InfoLog);
             foreach (var IconObjectEntry in this.FulcrumMenuEntries)
             {
@@ -146,7 +146,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Return built output object values
-            this.InjectorMenuOptions = new ObservableCollection<HamburgerNavMenuItem>(OutputOptionEntries);
+            this.InjectorMenuOptions = new ObservableCollection<FulcrumNavMenuItem>(OutputOptionEntries);
             return OutputOptionEntries;
         }
 
@@ -157,7 +157,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <param name="IconPath">Path to icons folder</param>
         /// <param name="IconObjectEntry">Icon object to use for set</param>
         /// <returns></returns>
-        private HamburgerNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
+        private FulcrumNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
         {
             // Replace Icon path with current text color value
             var CurrentMerged = Application.Current.Resources.MergedDictionaries;
@@ -194,7 +194,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"   --> VIEW MODEL TYPE: {MenuModelTypeName}", LogType.InfoLog);
 
             // Generate output result object.
-            var NewResult = new HamburgerNavMenuItem()
+            var NewResult = new FulcrumNavMenuItem()
             {
                 // Stores the content type for view and view model
                 NavUserControlType = MenuContentType,
