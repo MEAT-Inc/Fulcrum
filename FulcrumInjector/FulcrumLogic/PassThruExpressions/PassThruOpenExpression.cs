@@ -1,20 +1,19 @@
-﻿using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+﻿using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruRegex
+namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 {
     // Regex Values for Different Command Types.
-    public class PassThruOpenRegex : PassThruExpression
+    public class PassThruOpenExpression : PassThruExpression
     {
         // Command for the open command it self
-        public readonly PassThruRegexModel PtOpenRegex = PassThruExpressionShare.PassThruOpen;
-        public readonly PassThruRegexModel DeviceIdRegex = PassThruExpressionShare.DeviceIdReturned;
+        public readonly PassThruRegexModel PtOpenRegex = PassThruRegexModelShare.PassThruOpen;
+        public readonly PassThruRegexModel DeviceIdRegex = PassThruRegexModelShare.DeviceIdReturned;
 
         // Strings of the command and results from the command output.
-        [PassThruRegexResult("Command")] public readonly string PtCommand;
-        [PassThruRegexResult("DeviceName")] public readonly string DeviceName;
-        [PassThruRegexResult("DevicePointer")] public readonly string DevicePointer;
-        [PassThruRegexResult("DeviceId", "-1", new[] { "Device Opened", "Invalid Device ID!" }, true)]
+        [PtExpressionProperty("Command")] public readonly string PtCommand;
+        [PtExpressionProperty("DeviceName")] public readonly string DeviceName;
+        [PtExpressionProperty("DevicePointer")] public readonly string DevicePointer;
+        [PtExpressionProperty("DeviceId", "-1", new[] { "Device Opened", "Invalid Device ID!" }, true)]
         public readonly string DeviceId;
 
         // ------------------------------------------------------------------------------------------
@@ -23,7 +22,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruRegex
         /// Builds a new PTOpen Regex command type.
         /// </summary>
         /// <param name="commandInput"></param>
-        public PassThruOpenRegex(string CommandInput) : base(CommandInput, PassThruCommandType.PTOpen)
+        public PassThruOpenExpression(string CommandInput) : base(CommandInput, PassThruCommandType.PTOpen)
         {
             // Find the PTOpen Command Send instance.
             bool PtOpenResult = this.PtOpenRegex.Evaluate(CommandInput, out var PassThruOpenStrings);

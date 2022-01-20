@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;

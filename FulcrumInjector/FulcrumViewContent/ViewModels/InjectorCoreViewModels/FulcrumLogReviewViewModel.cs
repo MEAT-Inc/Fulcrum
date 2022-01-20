@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
-using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
@@ -170,8 +170,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string[] SplitLogToCommands(string FileContents)
         {
             // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruExpressionShare.PassThruTime.ExpressionPattern.Trim());
-            var StatusRegex = new Regex(PassThruExpressionShare.PassThruStatus.ExpressionPattern.Trim());
+            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern.Trim());
+            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern.Trim());
 
             // Make an empty array of strings and then begin splitting.
             List<string> OutputLines = new List<string>();
