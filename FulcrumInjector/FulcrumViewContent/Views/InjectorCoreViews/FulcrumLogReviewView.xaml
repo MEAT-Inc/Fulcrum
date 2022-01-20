@@ -39,7 +39,7 @@
                 <RowDefinition Height=".55*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid Margin="0,0,15,0">
+            <Grid Margin="0,0,15,0" x:Name="MainActionLoadButtons">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width=".60*"/>
                     <ColumnDefinition/>
@@ -108,10 +108,20 @@
                 </Grid.RowDefinitions>
 
                 <!-- Currently Loaded file -->
-                <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
-                         Style="{StaticResource InputTextWithHolder}" 
-                         VerticalAlignment="Bottom" IsReadOnly="True"
-                         Tag="Please Load a File First" Margin="10,0"/>
+                <Grid Grid.Row="0" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/> 
+                        <ColumnDefinition Width="175"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
+                             Style="{StaticResource InputTextWithHolder}" 
+                             VerticalAlignment="Bottom" IsReadOnly="True" Margin="0,0,10,0"
+                             Tag="Please Load a File First" Grid.Column="0"/>
+                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
+                            Margin="0,0" Height="30" VerticalAlignment="Bottom"
+                            IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
+                            Content="Show Parsed Contents" Click="ToggleParsedContentButton_OnClick"/>
+                </Grid>
 
                 <avalonedit:TextEditor
                     Grid.Row="1"

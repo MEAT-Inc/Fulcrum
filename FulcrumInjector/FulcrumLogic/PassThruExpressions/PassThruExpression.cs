@@ -143,7 +143,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             StringsToApply.AddRange(from NextIndex in this.StatusCodeRegex.ExpressionValueGroups where NextIndex <= StatusCodeStrings.Length select StatusCodeStrings[NextIndex]);
 
             // Now apply values using base method and exit out of this routine
-            if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray())) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!");
+            bool StorePassed = this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()); 
+            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!"); 
             this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
         }
 
@@ -156,7 +157,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         {
             // Determine the type of base property to use
             var DeclaredTypeExpected = BaseClassValues ? 
-                this.GetType().BaseType : this.GetType();
+                typeof(PassThruExpression) : this.GetType();
 
             // Pull our property values here.
             var PropertiesLocated = this.GetType()

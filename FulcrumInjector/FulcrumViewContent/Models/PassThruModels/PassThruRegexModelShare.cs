@@ -61,8 +61,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static ObservableCollection<PassThruRegexModel> GeneratePassThruRegexModels()
         {
             // Pull the objects from the settings store that relate to our expressions and then build an object from them.
-            RegexStoreLogger.WriteLog($"REBUILDING STORE VALUES FOR INJECTOR REGEX COMMAND OBJECTS NOW...",
-                LogType.WarnLog);
+            RegexStoreLogger.WriteLog($"REBUILDING STORE VALUES FOR INJECTOR REGEX COMMAND OBJECTS NOW...", LogType.WarnLog);
             var RegexModelArray = FulcrumSettingsShare.InjectorRegexSettings.SettingsEntries.Select(SettingObj =>
             {
                 // Find our group binding values here.
@@ -74,10 +73,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                 try
                 {
                     // Try to parse out values here. If Failed default to all
-                    if (!SettingGroups.Contains(","))
-                    {
-                        ArrayOfGroups = new[] { int.Parse(SettingGroups) };
-                    }
+                    if (!SettingGroups.Contains(",")) { ArrayOfGroups = new[] { int.Parse(SettingGroups) }; }
                     else
                     {
                         // Split content out, parse values, and return.
@@ -85,10 +81,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                         ArrayOfGroups = SplitGroupValues.Select(int.Parse).ToArray();
                     }
                 }
-                catch
-                {
-                    ArrayOfGroups = new[] { 0 };
-                }
+                catch { ArrayOfGroups = new[] { 0 }; }
 
                 // Build our new object for the model of regex now.
                 var SettingNameSplit = SettingObj.SettingName.Split(' ').ToArray();
@@ -100,10 +93,10 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 
                 // Return our new output object here.
                 return new PassThruRegexModel(
-                    RegexName, // Name of command. Just the input setting with no spaces
-                    RegexPattern, // Pattern used during regex operations (No group value)
-                    ExpressionType, // Type of expression. Defined for PTCommands or none for base
-                    ArrayOfGroups // Index set of groups to use
+                    RegexName,          // Name of command. Just the input setting with no spaces
+                    RegexPattern,       // Pattern used during regex operations (No group value)
+                    ExpressionType,     // Type of expression. Defined for PTCommands or none for base
+                    ArrayOfGroups       // Index set of groups to use
                 );
             }).ToArray();
 
