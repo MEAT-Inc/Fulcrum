@@ -178,13 +178,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 string NewLogContents = this.ShowingParsed ? File.ReadAllText(this.LoadedLogFile) : File.ReadAllText(this._lastBuiltExpressionsFile);
 
                 // Once pulled in, load our content values out.
+                this.ShowingParsed = !this.ShowingParsed;
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
                 ViewModelLogger.WriteLog("FILE CONTENT PARSED OK! STORING TO VIEW NOW...", LogType.InfoLog);
-                CastView.Dispatcher.Invoke(() => { CastView.ReplayLogInputContent.Text = NewLogContents; });
-                ViewModelLogger.WriteLog("IMPORTED CONTENT WITHOUT ISSUES! RETURNING NOW.", LogType.InfoLog);
+                CastView.Dispatcher.Invoke(() => {
+                    CastView.ReplayLogInputContent.Text = NewLogContents;
+                    CastView.LoadedLogFileTextBox.Text = this.ShowingParsed ? this.LoadedLogFile : this._lastBuiltExpressionsFile;
+                });
 
                 // Toggle the showing parsed value.
-                this.ShowingParsed = !this.ShowingParsed;
+                ViewModelLogger.WriteLog("IMPORTED CONTENT WITHOUT ISSUES! RETURNING NOW.", LogType.InfoLog);
                 return true;
             }
             catch (Exception LoadEx)
