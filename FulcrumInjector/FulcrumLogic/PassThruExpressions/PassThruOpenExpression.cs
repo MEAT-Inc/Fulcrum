@@ -1,4 +1,6 @@
-﻿using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 {
@@ -21,18 +23,22 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         /// <summary>
         /// Builds a new PTOpen Regex command type.
         /// </summary>
-        /// <param name="commandInput"></param>
+        /// <param name="CommandInput">Input expression lines to store.</param>
         public PassThruOpenExpression(string CommandInput) : base(CommandInput, PassThruCommandType.PTOpen)
         {
-            // Find the PTOpen Command Send instance.
+            // Find command issue request values
+            var FieldsToSet = this.GetExpressionProperties();
             bool PtOpenResult = this.PtOpenRegex.Evaluate(CommandInput, out var PassThruOpenStrings);
-            this.PtCommand = PtOpenResult ? PassThruOpenStrings[0] : "REGEX_FAILED";
-            this.DeviceName = PtOpenResult ? PassThruOpenStrings[this.PtOpenRegex.ExpressionValueGroups[0]] : "REGEX_FAILED";
-            this.DevicePointer = PtOpenResult ? PassThruOpenStrings[this.PtOpenRegex.ExpressionValueGroups[1]] : "REGEX_FAILED";
-
-            // Find the PTOpen Command Results (Device ID)
             bool DeviceIdResult = this.DeviceIdRegex.Evaluate(CommandInput, out var DeviceIdStrings);
-            this.DeviceId =  DeviceIdResult ? DeviceIdStrings[this.DeviceIdRegex.ExpressionValueGroups[0]] : "-1";
+            if (!PtOpenResult || !DeviceIdResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+
+            // Find our values to store here and add them to our list of values.
+            List<string> StringsToApply = new List<string> { PassThruOpenStrings[0] };
+            StringsToApply.AddRange(from NextIndex in this.PtOpenRegex.ExpressionValueGroups where NextIndex <= PassThruOpenStrings.Length select PassThruOpenStrings[NextIndex]);
+            StringsToApply.AddRange(from NextIndex in this.DeviceIdRegex.ExpressionValueGroups where NextIndex <= DeviceIdStrings.Length select DeviceIdStrings[NextIndex]);
+
+            // Now apply values using base method and exit out of this routine
+            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
         }
     }
 }

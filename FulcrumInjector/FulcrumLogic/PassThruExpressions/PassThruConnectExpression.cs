@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             var FieldsToSet = this.GetExpressionProperties();
             bool PtConnectResult = this.PtConnectRegex.Evaluate(CommandInput, out var PassThruConnectStrings);
             bool ChannelIdResult = this.ChannelIdRegex.Evaluate(CommandInput, out var ChannelIdStrings);
-            if (!PtConnectResult || !ChannelIdResult) return;
+            if (!PtConnectResult || !ChannelIdResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string> { PassThruConnectStrings[0] };

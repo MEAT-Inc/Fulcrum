@@ -1,4 +1,6 @@
-﻿using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 {
@@ -13,11 +15,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         // -----------------------------------------------------------------------------------------
 
         // Strings of the command and results from the command output.
-        [PtExpressionProperty("PTClose")]    // PassThru Close Command
-        public readonly string PtCommand;      
-
+        [PtExpressionProperty("PTClose")] public readonly string PtCommand;
         [PtExpressionProperty("DeviceId", "-1", new[] { "Device Closed", "Device Invalid!" }, true)] 
-        public readonly string DeviceId;        // Device Id Result
+        public readonly string DeviceId;    
 
         // ------------------------------------------------------------------------------------------
 
@@ -28,9 +28,16 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public PassThruCloseExpression(string CommandInput) : base(CommandInput, PassThruCommandType.PTClose)
         {
             // Find the PTClose Command Results.
+            var FieldsToSet = this.GetExpressionProperties();
             bool PtCloseResult = this.PtCloseRegex.Evaluate(CommandInput, out var PassThruCloseStrings);
-            this.PtCommand = PtCloseResult ? PassThruCloseStrings[0] : "REGEX_FAILED";
-            this.DeviceId = PtCloseResult ? PassThruCloseStrings[this.PtCloseRegex.ExpressionValueGroups[0]] : "REGEX_FAILED";
+            if (!PtCloseResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+
+            // Find our values to store here and add them to our list of values.
+            List<string> StringsToApply = new List<string> { PassThruCloseStrings[0] };
+            StringsToApply.AddRange(from NextIndex in this.PtCloseRegex.ExpressionValueGroups where NextIndex <= PassThruCloseStrings.Length select PassThruCloseStrings[NextIndex]);
+
+            // Now apply values using base method and exit out of this routine
+            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
         }
     }
 }
