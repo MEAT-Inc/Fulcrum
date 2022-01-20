@@ -42,6 +42,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel PassThruOpen => PassThruExpressionObjects.GetRegexByName("PTOpen");
         public static PassThruRegexModel PassThruClose => PassThruExpressionObjects.GetRegexByName("PTClose");
         public static PassThruRegexModel PassThruConnect => PassThruExpressionObjects.GetRegexByName("PTConnect");
+        public static PassThruRegexModel PassThruDisconnect => PassThruExpressionObjects.GetRegexByName("PTDisconnect");
 
         // --------------------------------------------------------------------------------------------------------------------------
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
@@ -38,7 +39,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             StringsToApply.AddRange(from NextIndex in this.DeviceIdRegex.ExpressionValueGroups where NextIndex <= DeviceIdStrings.Length select DeviceIdStrings[NextIndex]);
 
             // Now apply values using base method and exit out of this routine
-            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
+            if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
+                throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
     }
 }

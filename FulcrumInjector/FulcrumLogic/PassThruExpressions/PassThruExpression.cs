@@ -50,8 +50,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public readonly PassThruRegexModel StatusCodeRegex = PassThruRegexModelShare.PassThruStatus;
 
         // Input command time and result values for regex searching.
-        [PtExpressionProperty("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })] public readonly string ExecutionTime;     
-        [PtExpressionProperty("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] public readonly string JStatusCode;
+        [PtExpressionProperty("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
+        public readonly string ExecutionTime;     
+        [PtExpressionProperty("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
+        public readonly string JStatusCode;
 
         // --------------------------------------------------------------------------------------------------------------
 
@@ -128,12 +130,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             this.CommandLines = CommandInput;
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\n');
-            
-            // Find command issue request values
-            var FieldsToSet = this.GetExpressionProperties();
+
+            // Find command issue request values. (Pull using Base Class)
+            var FieldsToSet = this.GetExpressionProperties(true);
             bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
             bool StatusCodeResult = this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings);
-            if (!ExecutionTimeResult || !StatusCodeResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
             if (!ExecutionTimeResult || !StatusCodeResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
@@ -142,7 +143,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             StringsToApply.AddRange(from NextIndex in this.StatusCodeRegex.ExpressionValueGroups where NextIndex <= StatusCodeStrings.Length select StatusCodeStrings[NextIndex]);
 
             // Now apply values using base method and exit out of this routine
-            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
+            if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray())) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!");
             this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
         }
 
@@ -151,11 +152,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         /// <summary>
         /// Gets the list of properties linked to a regex group and returns them in order of decleration
         /// </summary>
-        protected internal FieldInfo[] GetExpressionProperties()
+        protected internal FieldInfo[] GetExpressionProperties(bool BaseClassValues = false)
         {
+            // Determine the type of base property to use
+            var DeclaredTypeExpected = BaseClassValues ? 
+                this.GetType().BaseType : this.GetType();
+
             // Pull our property values here.
             var PropertiesLocated = this.GetType()
-                .GetFields()
+                .GetFields().Where(FieldObj => FieldObj.DeclaringType == DeclaredTypeExpected)
                 .Where(PropObj => Attribute.IsDefined(PropObj, typeof(PtExpressionProperty)))
                 .OrderBy(PropObj => ((PtExpressionProperty)PropObj.GetCustomAttributes(typeof(PtExpressionProperty), false).Single()).LineNumber)
                 .ToArray();

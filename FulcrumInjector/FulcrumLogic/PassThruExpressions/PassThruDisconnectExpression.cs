@@ -1,4 +1,8 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 {
@@ -8,7 +12,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
     public class PassThruDisconnectExpression : PassThruExpression
     {
         // Command for the open command it self
-        public readonly Regex PTDisconnectRegex = new Regex(@"(PTDisconnect)\((\d+)\)");
+        public readonly PassThruRegexModel PTDisconnectRegex = PassThruRegexModelShare.PassThruDisconnect;
 
         // Strings of the command and results from the command output.
         [PtExpressionProperty("Command")] public readonly string PtCommand;
@@ -23,13 +27,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         /// <param name="CommandInput">Lines to filter out of.</param>
         public PassThruDisconnectExpression(string CommandInput) : base(CommandInput, PassThruCommandType.PTDisconnect)
         {
-            // Find the PTDisconnect Command Results.
-            var CommandMatch = this.PTDisconnectRegex.Match(CommandInput);
-            var DeviceIdMatch = this.PTDisconnectRegex.Match(CommandInput).Groups[2];
+            // Find command issue request values
+            var FieldsToSet = this.GetExpressionProperties();
+            bool PtDisconnectResult = this.PTDisconnectRegex.Evaluate(CommandInput, out var PassThruDisconnectStrings);
+            if (!PtDisconnectResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
-            // Store values based on results.v
-            this.ChannelId = DeviceIdMatch.Success ? DeviceIdMatch.Value : "-1";
-            this.PtCommand = CommandMatch.Success ? CommandMatch.Value : "REGEX_FAILED";
+            // Find our values to store here and add them to our list of values.
+            List<string> StringsToApply = new List<string> { PassThruDisconnectStrings[0] };
+            StringsToApply.AddRange(from NextIndex in this.PTDisconnectRegex.ExpressionValueGroups where NextIndex <= PassThruDisconnectStrings.Length select PassThruDisconnectStrings[NextIndex]);
+
+            // Now apply values using base method and exit out of this routine
+            if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
+                throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
     }
 }

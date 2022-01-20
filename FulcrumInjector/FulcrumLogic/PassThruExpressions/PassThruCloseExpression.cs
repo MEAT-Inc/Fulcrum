@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
@@ -15,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         // -----------------------------------------------------------------------------------------
 
         // Strings of the command and results from the command output.
-        [PtExpressionProperty("PTClose")] public readonly string PtCommand;
+        [PtExpressionProperty("Command")] public readonly string PtCommand;
         [PtExpressionProperty("DeviceId", "-1", new[] { "Device Closed", "Device Invalid!" }, true)] 
         public readonly string DeviceId;    
 
@@ -37,7 +38,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             StringsToApply.AddRange(from NextIndex in this.PtCloseRegex.ExpressionValueGroups where NextIndex <= PassThruCloseStrings.Length select PassThruCloseStrings[NextIndex]);
 
             // Now apply values using base method and exit out of this routine
-            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
+            if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
+                throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
     }
 }

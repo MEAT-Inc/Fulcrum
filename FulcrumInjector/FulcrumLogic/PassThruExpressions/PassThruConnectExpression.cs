@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public readonly PassThruRegexModel ChannelIdRegex = PassThruRegexModelShare.ChannelIdReturned;
 
         // Strings of the command and results from the command output.
-        [PtExpressionProperty("PTConnect")] public readonly string PtCommand;
+        [PtExpressionProperty("Command")] public readonly string PtCommand;
         [PtExpressionProperty("DeviceId")] public readonly string DeviceId;
         [PtExpressionProperty("ProtocolId")] public readonly string ProtocolId;
         [PtExpressionProperty("ConnectFlags")] public readonly string ConnectFlags;
@@ -43,9 +43,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             List<string> StringsToApply = new List<string> { PassThruConnectStrings[0] };
             StringsToApply.AddRange(from NextIndex in this.PtConnectRegex.ExpressionValueGroups where NextIndex <= PassThruConnectStrings.Length select PassThruConnectStrings[NextIndex]);
             StringsToApply.AddRange(from NextIndex in this.ChannelIdRegex.ExpressionValueGroups where NextIndex <= ChannelIdStrings.Length select ChannelIdStrings[NextIndex]);
-
+          
             // Now apply values using base method and exit out of this routine
-            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
+            if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
+                throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
     }
 }
