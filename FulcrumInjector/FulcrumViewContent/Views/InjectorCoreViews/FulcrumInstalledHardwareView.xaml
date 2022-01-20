@@ -145,10 +145,17 @@
                     </Grid.Style>
                     <Border Opacity=".50" BorderThickness="3"
                             BorderBrush="{StaticResource TextColorBase}"
-                            Background="{StaticResource SecondaryColor_Darker_65}"/>
-                    <TextBlock Text="No DLLs Located!" 
-                               Foreground="Yellow" FontSize="28" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold"/>
+                            Background="{StaticResource SecondaryColor_Darker_65}"></Border>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="No DLLs Located!" 
+                                   Foreground="Yellow" FontSize="28" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold"/>
+                        <TextBlock Foreground="{StaticResource TextColorBase}" FontSize="14" Margin="15,5" 
+                                   TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                                   Text="No J2534 DLLs were found on this system! Please make sure one or more PassThru Drivers are installed then restart this app.">
+                        </TextBlock>
+                    </StackPanel>
                 </Grid>
             </Grid>
 
@@ -206,21 +213,38 @@
                     <Border Opacity=".50" BorderThickness="3"
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
-                    <TextBlock Foreground="Yellow" FontSize="28" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=InstalledDevicesListBox, Path=HasItems}" Value="False">
-                                        <Setter Property="Text" Value="No Devices Found!"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
-                                        <Setter Property="Text" Value="No DLL Selected!"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Foreground="Yellow" FontSize="28" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=InstalledDevicesListBox, Path=HasItems}" Value="False">
+                                            <Setter Property="Text" Value="No Devices Found!"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
+                                            <Setter Property="Text" Value="No DLL Selected!"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Foreground="{StaticResource TextColorBase}" FontSize="14" Margin="15,5" 
+                                   TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=InstalledDevicesListBox, Path=HasItems}" Value="False">
+                                            <Setter Property="Text" Value="No J2534 DLLs were found on this system! Please make sure one or more PassThru Drivers are installed then restart this app."/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
+                                            <Setter Property="Text" Value="Ensure at least one device for the selected DLL has been connected to this machine before trying to view the details of it."/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Grid>

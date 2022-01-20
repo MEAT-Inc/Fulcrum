@@ -18,7 +18,6 @@ using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using MahApps.Metro.Controls;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -89,7 +88,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void InjectorHamburgerMenu_OnItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs e)
         {
             // Navigate assuming it's a type of nav menu item and the menu item can navigate
-            if (e.InvokedItem is not HamburgerNavMenuItem BuiltItemObject || !BuiltItemObject.IsNavigation) return;
+            if (e.InvokedItem is not FulcrumNavMenuItem BuiltItemObject || !BuiltItemObject.IsNavigation) return;
 
             // Navigate here and 
             this.NavService.Navigate(BuiltItemObject.NavUserControlType, BuiltItemObject.NavViewModelType);
@@ -106,14 +105,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Select the menu item and the option item here
             this.InjectorHamburgerMenu.SelectedItem = this.InjectorHamburgerMenu
                 .Items
-                .OfType<HamburgerNavMenuItem>()
+                .OfType<FulcrumNavMenuItem>()
                 .FirstOrDefault(MenuObj => MenuObj.NavUserControlType == e.Content?.GetType());
             this.ViewLogger.WriteLog($"BOUND SELECTED MENU ITEM TO {this.InjectorHamburgerMenu.SelectedIndex}", LogType.TraceLog);
  
             // Set options items
             this.InjectorHamburgerMenu.SelectedOptionsItem = this.InjectorHamburgerMenu
                 .OptionsItems
-                .OfType<HamburgerNavMenuItem>()
+                .OfType<FulcrumNavMenuItem>()
                 .FirstOrDefault(MenuObj => MenuObj.NavUserControlType == e.Content?.GetType());
             this.ViewLogger.WriteLog($"BOUND SELECTED OPTIONS ITEM TO {this.InjectorHamburgerMenu.SelectedOptionsIndex}", LogType.TraceLog);
         }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
-namespace LoaderApplication.Objects.AutomationObjects
+namespace FulcrumInjector.FulcrumViewSupport.DataConverters
 { 
     /// <summary>
     /// Class used for casting bools to inverse visibility values

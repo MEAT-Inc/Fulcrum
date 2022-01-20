@@ -139,6 +139,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -156,13 +157,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruCloseRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruConnectRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruDisconnectRegex.cs" />
+    <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\CommandRegex\PassThruOpenRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\CommandTypeToClass.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\ResultAttribute.cs" />
-    <Compile Include="FulcrumViewContent\Models\HamburgerNavMenuItem.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruOpenRegex.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
+    <Compile Include="FulcrumLogic\PassThruRegex\PassThruRegexResult.cs" />
+    <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
+    <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruExpressionShare.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
@@ -170,7 +177,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\SingletonContentControl.cs" />
+    <Compile Include="FulcrumViewContent\Models\SingletonContentControl.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumInstalledHardwareView.xaml.cs">
       <DependentUpon>FulcrumInstalledHardwareView.xaml</DependentUpon>
     </Compile>
@@ -180,13 +187,13 @@
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\AvalonEditFilteringHelpers.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogCallStackColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLineFilteringColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogSelectMatchesColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLevelColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogLoggerNameColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLogTimeColorFormatter.cs" />
     <Compile Include="FulcrumLogic\FulcrumWin32Invokers.cs" />
     <Compile Include="FulcrumLogic\InjectorPipes\FulcrumPipe.cs" />
     <Compile Include="FulcrumLogic\InjectorPipes\PipeEvents\FulcrumPipeDataReadEventArgs.cs" />
@@ -196,16 +203,16 @@
     <Compile Include="FulcrumLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="FulcrumLogic\PassThruRegex\PassThruExpression.cs" />
-    <Compile Include="FulcrumViewSupport\AppStyleSupport\UserSettingsDataTemplateSelector.cs" />
-    <Compile Include="FulcrumViewSupport\AppColorSetter.cs" />
+    <Compile Include="FulcrumViewSupport\DataConverters\UserSettingsDataTemplateSelector.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\HamburgerNavService.cs" />
-    <Compile Include="FulcrumViewSupport\ColorMatchingHelper.cs" />
-    <Compile Include="FulcrumViewSupport\CustomColorShader.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\ColorMatchingHelper.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\CustomColorShader.cs" />
     <Compile Include="FulcrumViewSupport\WindowBlurSetup.cs" />
-    <Compile Include="FulcrumViewSupport\AppThemeConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\AppStyleSupport\AppThemeConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\CustomColorConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\CustomColorValueJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\CustomFilePathJsonConverters.cs" />
@@ -217,10 +224,10 @@
     <Compile Include="FulcrumLogic\ExtensionClasses\EnumLibExtensions.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\LongToStringSize.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="FulcrumViewContent\Models\DebugLoggingRedirectTarget.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLoggingRedirectTarget.cs" />
     <Compile Include="FulcrumViewContent\Models\OeApplicationModel.cs" />
-    <Compile Include="FulcrumViewContent\Models\SettingsEntryModel.cs" />
-    <Compile Include="FulcrumViewContent\Models\SettingsEntryModelCollection.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsModels\SettingsEntryModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsModels\SettingsEntryModelCollection.cs" />
     <Compile Include="FulcrumViewSupport\PropertyWatchdog.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumDebugLoggingViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumDllOutputLogViewModel.cs" />
@@ -228,7 +235,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumPipeStatusViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSettingsPaneViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumTitleViewModel.cs" />
-    <Compile Include="FulcrumViewContent\ViewModelControlBase.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\ViewModelControlBase.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumDebugLoggingView.xaml.cs">
       <DependentUpon>FulcrumDebugLoggingView.xaml</DependentUpon>
@@ -418,7 +425,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="FulcrumViewSupport\AppStyleSupport\AvalonEditHelpers\InjectorSyntaxFormatters\" />
+    <Folder Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -434,6 +441,7 @@ cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
 cmd.exe /C mkdir "$(TargetDir)FulcrumImages"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
+cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
 
 copy /Y "$(ProjectDir)FulcrumViewSupport\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
 copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"

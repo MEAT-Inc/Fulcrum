@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -41,8 +42,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build new pipe model object and watchdogs.
-            this._readerPipeStateWatchdog = new PropertyWatchdog(500);
-            this._writerPipeStateWatchdog = new PropertyWatchdog(500);
+            this._readerPipeStateWatchdog = new PropertyWatchdog(250);
+            this._writerPipeStateWatchdog = new PropertyWatchdog(250);
             this._testInjectionButtonWatchdog = new PropertyWatchdog(250);
             ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
 

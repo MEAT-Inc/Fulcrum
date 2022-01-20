@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 
-namespace FulcrumInjector.FulcrumViewContent.Models
+namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
     /// <summary>
     /// Wrapper holding a list of settings sets

@@ -7,7 +7,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewContent.Models
+namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
     /// <summary>
     /// Types of possible controls we can use here.

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.PassThruRegex;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
@@ -8,6 +11,7 @@ using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewContent.Views;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews;
+using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -138,23 +142,6 @@ namespace FulcrumInjector.FulcrumViewContent
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        // All Setting entries
-        public static SettingsEntryCollectionModel[] SettingsEntrySets;
-
-        // Settings for Debug log viewing (Or an empty settings model if null)
-        public static SettingsEntryCollectionModel DebugLogViewerSettings =>
-            SettingsEntrySets?.FirstOrDefault(SettingObj =>
-                SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Settings")
-            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Settings", Array.Empty<SettingsEntryModel>());
-
-        // Settings for pipe configuration (Or an empty settings model if null)
-        public static SettingsEntryCollectionModel InjectorPipeConfigSettings =>
-            SettingsEntrySets?.FirstOrDefault(SettingObj =>
-                SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
-            ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Builds a static set of control objects for view use
         /// </summary>
@@ -168,8 +155,13 @@ namespace FulcrumInjector.FulcrumViewContent
 
             // Set the flyouts for our debugging configuration and settings pane
             ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
-            if (FulcrumTitleView.SetFlyoutBindings(InjectorMainWindow.InformationFlyout, InjectorMainWindow.CloseInfoFlyoutButton))
-                ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
+            bool SetConstants = FulcrumTitleView.SetFlyoutBindings(
+                InjectorMainWindow.InformationFlyout, 
+                InjectorMainWindow.CloseInfoFlyoutButton
+            ); 
+            
+            // Check result
+            if (SetConstants) ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
 
         }
