@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
-using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
@@ -33,10 +33,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string _logFileContents = "";
         private double _parsingProgress = 0.00;
 
-        // Private set of log file commands. Stored temp values here for internal use
-        private string[] _logFileCommands;
+        // Private string for last built expressions file.
+        private bool _inputParsed = false;
+        private bool _showingParsed = false;
+        private string _lastBuiltExpressionsFile;
 
         // Public values for our view to bind onto 
+        public bool InputParsed { get => _inputParsed; set => PropertyUpdated(value); }
+        public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
         public double ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
@@ -68,7 +72,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
         /// <param name="InputLogFile"></param>
-        internal bool LoadLogFileContents()
+        internal bool LoadLogContents(string NewLogFile)
         {
             // Log information, load contents, store values.
             ViewModelLogger.WriteLog("LOADING NEW LOG FILE CONTENTS NOW...", LogType.InfoLog);
@@ -77,21 +81,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             try
             {
                 // Make sure a file is loaded
+                this.LoadedLogFile = NewLogFile;
                 if (string.IsNullOrWhiteSpace(this.LoadedLogFile)) {
                     ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
                     throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
                 }
 
-                // Log passed and return output.
+                // Log passed and return output. Store onto view content.
                 this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
-
-                // Store lines here.
                 CastView.Dispatcher.Invoke(() => {
                     CastView.LoadedLogFileTextBox.Text = this.LoadedLogFile;
                     CastView.ReplayLogInputContent.Text = this.LogFileContents;
                 });
-                
+
                 // Return passed
+                this.InputParsed = false;
+                this._lastBuiltExpressionsFile = null;
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
             }
@@ -118,7 +123,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="CommandLines"></param>
         /// <returns></returns>
-        internal bool ProcessLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
+        internal bool ParseLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
         {
             // Build command split log contents first. 
             try
@@ -144,10 +149,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
-                string BuiltExpressionFile = ExpressionSet.SaveExpressionsToFile(Path.GetFileName(LoadedLogFile));
+                this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsToFile(Path.GetFileName(LoadedLogFile));
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {BuiltExpressionFile}!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._lastBuiltExpressionsFile}!", LogType.InfoLog);
                 OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet);
+                this.InputParsed = true;
                 return true;
             }
             catch (Exception Ex)
@@ -156,6 +162,36 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
                 OutputExpressions = null;
+                this.InputParsed = false;
+                return false;
+            }
+        }
+        /// <summary>
+        /// Toggles the current contents of the log viewer based on the bool trigger for it.
+        /// </summary>
+        internal bool ToggleViewerContents()
+        {
+            try
+            {
+                // Start by getting our string values needed for the desired file.
+                ViewModelLogger.WriteLog("PULLING IN NEW CONTENT FOR A DESIRED FILE OBJECT OUTPUT NOW!", LogType.WarnLog);
+                string NewLogContents = this.ShowingParsed ? File.ReadAllText(this.LoadedLogFile) : File.ReadAllText(this._lastBuiltExpressionsFile);
+
+                // Once pulled in, load our content values out.
+                FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
+                ViewModelLogger.WriteLog("FILE CONTENT PARSED OK! STORING TO VIEW NOW...", LogType.InfoLog);
+                CastView.Dispatcher.Invoke(() => { CastView.ReplayLogInputContent.Text = NewLogContents; });
+                ViewModelLogger.WriteLog("IMPORTED CONTENT WITHOUT ISSUES! RETURNING NOW.", LogType.InfoLog);
+
+                // Toggle the showing parsed value.
+                this.ShowingParsed = !this.ShowingParsed;
+                return true;
+            }
+            catch (Exception LoadEx)
+            {
+                // Log failures. Return false.
+                ViewModelLogger.WriteLog("FAILED TO LOAD IN NEW CONTENTS FOR OUR FILE ENTRIES!");
+                ViewModelLogger.WriteLog("EXCEPTIONS ARE BEING LOGGED BELOW", LoadEx);
                 return false;
             }
         }
@@ -170,8 +206,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string[] SplitLogToCommands(string FileContents)
         {
             // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruExpressionShare.PassThruTime.ExpressionPattern.Trim());
-            var StatusRegex = new Regex(PassThruExpressionShare.PassThruStatus.ExpressionPattern.Trim());
+            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
+            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern);
 
             // Make an empty array of strings and then begin splitting.
             List<string> OutputLines = new List<string>();

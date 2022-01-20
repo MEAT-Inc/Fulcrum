@@ -157,19 +157,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumLogic\PassThruRegex\PassThruCloseRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\PassThruConnectRegex.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\PassThruDisconnectRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruDisconnectExpression.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\PassThruOpenRegex.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruOpenExpression.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\PassThruRegexResult.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PtExpressionProperty.cs" />
     <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
-    <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruExpressionShare.cs" />
+    <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModelShare.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
@@ -202,7 +202,7 @@
     <Compile Include="FulcrumLogic\InjectorPipes\PipeEvents\FulcrumPipeStateChangedEventArgs.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
-    <Compile Include="FulcrumLogic\PassThruRegex\PassThruExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruExpression.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />

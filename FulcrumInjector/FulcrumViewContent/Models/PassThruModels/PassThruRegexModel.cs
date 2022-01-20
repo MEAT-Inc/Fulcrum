@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumLogic.PassThruRegex;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions;
 using Newtonsoft.Json;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
