@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public readonly PassThruRegexModel PTDisconnectRegex = PassThruRegexModelShare.PassThruDisconnect;
 
         // Strings of the command and results from the command output.
-        [PtExpressionProperty("Command")] public readonly string PtCommand;
+        [PtExpressionProperty("Command Line")] public readonly string PtCommand;
         [PtExpressionProperty("ChannelId", "-1", new[] { "Channel Closed", "Invalid Channel!" }, true)]
         public readonly string ChannelId;
 

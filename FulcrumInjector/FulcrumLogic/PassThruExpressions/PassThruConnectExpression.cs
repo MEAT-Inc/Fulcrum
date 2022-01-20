@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public readonly PassThruRegexModel ChannelIdRegex = PassThruRegexModelShare.ChannelIdReturned;
 
         // Strings of the command and results from the command output.
-        [PtExpressionProperty("Command")] public readonly string PtCommand;
+        [PtExpressionProperty("Command Line")] public readonly string PtCommand;
         [PtExpressionProperty("DeviceId")] public readonly string DeviceId;
         [PtExpressionProperty("ProtocolId")] public readonly string ProtocolId;
         [PtExpressionProperty("ConnectFlags")] public readonly string ConnectFlags;

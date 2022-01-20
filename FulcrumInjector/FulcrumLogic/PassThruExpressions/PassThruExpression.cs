@@ -20,7 +20,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PassThruCommandType
     {
-        // Command Types for PassThru Regex
+        // Command Types for PassThru Regex. Pulled values from settings parse into here.
         [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")]                    NONE,
         [EnumMember(Value = "PTOpen")] [Description("PassThruOpenExpression")]               PTOpen,
         [EnumMember(Value = "PTClose")] [Description("PassThruCloseExpression")]             PTClose,
