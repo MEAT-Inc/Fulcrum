@@ -1,12 +1,11 @@
-# Fulcrum
-Fulcrum is the ultime J2534 DLL Shim written in C++ which is able to pipe data out from the native calls to any other location for super deep diagnostic logging
+# FulcrumInjector
 
 ![Injector_HardwareOverview](https://user-images.githubusercontent.com/62027458/150359554-159cc76f-e989-417c-b052-9acab40f1718.PNG)
 
 ---
 
-### Fulcrum Features
-This application has a TON of useful features in it. Some of the most notable ones are listed below. Not all features are complete at this time but all of the layouts for them are more than 90% complete on the UI side of things.
+### FulcrumInjector Features
+FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pipe data out from the native calls to any other location for super deep diagnostic logging.  This application has a TON of useful features in it. Some of the most notable ones are listed below. Not all features are complete at this time but all of the layouts for them are more than 90% complete on the UI side of things.
 - Full shim logging between a PassThru interface and my application
 - Dynamic realtime processing of log output to build simulations that can be replayed at any time using this app. (this is a WIP. It's like 40% done. I can build the sims but I can't replay them yet.)
 - Easy access to booting any OE app on a machine. This works for your Unicorn boxes as well. 
@@ -17,7 +16,7 @@ This application has a TON of useful features in it. Some of the most notable on
 
 ---
 
-### Using the Fulcrum
+### Using the FulcrumInjector
 
 - Here's a little piece of software I made which allows me to inject data in real time into a running J2534 session for any of the OE software applications. It also provides me with usable debug logging output so I can review and modify any of my projects I build for you guys going forward.
 - This is a super super early version of this app so bear with me when it comes to features on it. Once we gather a ton of data for our simulations, we can then build the PassThru testing app we've been talking about.
@@ -28,16 +27,17 @@ This application has a TON of useful features in it. Some of the most notable on
 ### Questions, Comments, Concerns? 
 - I don't wanna hear it...
 - But feel free to send an email to neo.smith@motorengineeringandtech.com. He might feel like being generous sometimes...
+- Or if you're feeling like a good little nerd, make an issue on this repo's project and I'll take a peek at it.
 
 --- 
 
-### Screenshots of The Fulcrum
+### Screenshots of The FulcrumInjector
 ![Injector_DllLogging](https://user-images.githubusercontent.com/62027458/150359675-b8639413-fed9-4a25-84b3-8dba5ad96c50.PNG)
-<br/>
+
 ![Injector_LogReviewing](https://user-images.githubusercontent.com/62027458/150359678-a0066a0f-980b-4a8d-a585-79cfb2dbd795.PNG)
-<br/>
+
 ![Injector_SessionReporting](https://user-images.githubusercontent.com/62027458/150359682-0a0a3b61-5e89-48a3-ae08-b15339ad0999.PNG)
-<br/>
+
 ![Injector_SettingsPage](https://user-images.githubusercontent.com/62027458/150359686-88da0940-78ea-4754-9121-41c4172a5844.PNG)
-<br/>
+
 ![Injector_DebuggingView](https://user-images.githubusercontent.com/62027458/150359672-4788a044-b863-49be-9046-b387c4f6a0c8.PNG)
