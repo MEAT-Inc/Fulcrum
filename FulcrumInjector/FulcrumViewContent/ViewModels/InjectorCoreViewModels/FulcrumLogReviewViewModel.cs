@@ -170,8 +170,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string[] SplitLogToCommands(string FileContents)
         {
             // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern.Trim());
-            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern.Trim());
+            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
+            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern);
 
             // Make an empty array of strings and then begin splitting.
             List<string> OutputLines = new List<string>();

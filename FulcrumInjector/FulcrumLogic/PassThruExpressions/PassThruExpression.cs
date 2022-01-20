@@ -21,11 +21,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
     public enum PassThruCommandType
     {
         // Command Types for PassThru Regex
-        [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")]               NONE,
-        [EnumMember(Value = "PTOpen")] [Description("PassThruOpenRegex")]               PTOpen,
-        [EnumMember(Value = "PTClose")] [Description("PassThruCloseRegex")]             PTClose,
-        [EnumMember(Value = "PTConnect")] [Description("PassThruConnectRegex")]         PTConnect,
-        [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectRegex")]   PTDisconnect,
+        [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")]                    NONE,
+        [EnumMember(Value = "PTOpen")] [Description("PassThruOpenExpression")]               PTOpen,
+        [EnumMember(Value = "PTClose")] [Description("PassThruCloseExpression")]             PTClose,
+        [EnumMember(Value = "PTConnect")] [Description("PassThruConnectExpression")]         PTConnect,
+        [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")]   PTDisconnect,
     }
     
     // --------------------------------------------------------------------------------------------------------------
@@ -128,14 +128,21 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             this.CommandLines = CommandInput;
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\n');
+            
+            // Find command issue request values
+            var FieldsToSet = this.GetExpressionProperties();
+            bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
+            bool StatusCodeResult = this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings);
+            if (!ExecutionTimeResult || !StatusCodeResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+            if (!ExecutionTimeResult || !StatusCodeResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
-            // Match values here with regex values. Index 0 is the full match string.
-            this.ExecutionTime = this.TimeRegex.Evaluate(this.CommandLines, out var ExecutionTimeStrings) ?
-                ExecutionTimeStrings[this.TimeRegex.ExpressionValueGroups[0]] : "REGEX_FAILED";
-            this.JStatusCode = this.StatusCodeRegex.Evaluate(this.CommandLines, out var StatusCodeStrings) ? 
-                StatusCodeStrings[this.StatusCodeRegex.ExpressionValueGroups[0]] : "REGEX_FAILED";
+            // Find our values to store here and add them to our list of values.
+            List<string> StringsToApply = new List<string>();
+            StringsToApply.AddRange(from NextIndex in this.TimeRegex.ExpressionValueGroups where NextIndex <= TimeStrings.Length select TimeStrings[NextIndex]);
+            StringsToApply.AddRange(from NextIndex in this.StatusCodeRegex.ExpressionValueGroups where NextIndex <= StatusCodeStrings.Length select StatusCodeStrings[NextIndex]);
 
-            // Log complete information and break out.
+            // Now apply values using base method and exit out of this routine
+            this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
             this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
         }
 

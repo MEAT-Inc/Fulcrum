@@ -13,6 +13,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     /// </summary>
     public static class FulcrumSettingsShare
     {
+        // Logger Object
+        private static SubServiceLogger SettingStoreLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsModelStoreLogger")) ?? new SubServiceLogger("SettingsModelStoreLogger");
+
+        // ---------------------------------------------------------------------------------------------------------------------
+
         // All Setting entries
         private static ObservableCollection<SettingsEntryCollectionModel> _settingsEntrySets;
         public static ObservableCollection<SettingsEntryCollectionModel> SettingsEntrySets
@@ -24,6 +30,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 return _settingsEntrySets;
             }
         }
+
+        // ---------------------------------------------------------------------------------------------------------------------
 
         // Settings for Debug log viewing (Or an empty settings model if null)
         public static SettingsEntryCollectionModel DebugLogViewerSettings =>
@@ -51,10 +59,6 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         /// <returns>Settings entries built output</returns>
         public static ObservableCollection<SettingsEntryCollectionModel> GenerateSettingsModels()
         {
-            // Get Logger instance 
-            var SettingStoreLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsModelStoreLogger")) ?? new SubServiceLogger("SettingsModelStoreLogger");
-
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");
             SettingStoreLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);

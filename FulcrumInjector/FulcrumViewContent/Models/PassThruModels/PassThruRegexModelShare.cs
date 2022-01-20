@@ -17,6 +17,13 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
     /// </summary>
     public static class PassThruRegexModelShare
     {
+        // Logger Object 
+
+        private static SubServiceLogger RegexStoreLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("PassThruRegexModelShareLogger")) ?? new SubServiceLogger("PassThruRegexModelShareLogger");
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
         // PassThru Regex options.
         private static ObservableCollection<PassThruRegexModel> _passThruExpressionObjects;
         public static ObservableCollection<PassThruRegexModel> PassThruExpressionObjects
@@ -52,12 +59,6 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         /// <returns></returns>
         public static ObservableCollection<PassThruRegexModel> GeneratePassThruRegexModels()
         {
-            // Get Logger instance 
-            var RegexStoreLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                                       .FirstOrDefault(LoggerObj =>
-                                           LoggerObj.LoggerName.StartsWith("PassThruRegexModelShareLogger")) ??
-                                   new SubServiceLogger("PassThruRegexModelShareLogger");
-
             // Pull the objects from the settings store that relate to our expressions and then build an object from them.
             RegexStoreLogger.WriteLog($"REBUILDING STORE VALUES FOR INJECTOR REGEX COMMAND OBJECTS NOW...",
                 LogType.WarnLog);
