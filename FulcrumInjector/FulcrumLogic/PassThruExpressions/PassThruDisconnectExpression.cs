@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
         // Strings of the command and results from the command output.
         [PtExpressionProperty("Command Line")] public readonly string PtCommand;
-        [PtExpressionProperty("ChannelId", "-1", new[] { "Channel Closed", "Invalid Channel!" }, true)]
+        [PtExpressionProperty("Channel ID", "-1", new[] { "Channel Closed", "Invalid Channel!" }, true)]
         public readonly string ChannelId;
 
         // -------------------------------------------------------------------------------------------------------

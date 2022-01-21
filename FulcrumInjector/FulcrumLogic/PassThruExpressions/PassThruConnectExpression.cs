@@ -17,12 +17,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
         // Strings of the command and results from the command output.
         [PtExpressionProperty("Command Line")] public readonly string PtCommand;
-        [PtExpressionProperty("DeviceId")] public readonly string DeviceId;
-        [PtExpressionProperty("ProtocolId")] public readonly string ProtocolId;
-        [PtExpressionProperty("ConnectFlags")] public readonly string ConnectFlags;
+        [PtExpressionProperty("Device ID")] public readonly string DeviceId;
+        [PtExpressionProperty("Protocol ID")] public readonly string ProtocolId;
+        [PtExpressionProperty("Connect Flags")] public readonly string ConnectFlags;
         [PtExpressionProperty("BaudRate")] public readonly string BaudRate;
-        [PtExpressionProperty("ChannelPointer")] public readonly string ChannelPointer;
-        [PtExpressionProperty("ChannelId", "-1", new[] { "Channel Opened", "Invalid Channel!"}, true)] 
+        [PtExpressionProperty("Channel Pointer")] public readonly string ChannelPointer;
+        [PtExpressionProperty("Channel ID", "-1", new[] { "Channel Opened", "Invalid Channel!"}, true)] 
         public readonly string ChannelId;
 
         // ----------------------------------------------------------------------------------------------------

@@ -26,8 +26,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         [EnumMember(Value = "PTClose")] [Description("PassThruCloseExpression")]             PTClose,
         [EnumMember(Value = "PTConnect")] [Description("PassThruConnectExpression")]         PTConnect,
         [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")]   PTDisconnect,
+        [EnumMember(Value = "PTReadMsgs")] [Description("PassThruReadMessagesExpression")]   PTReadMsgs,
     }
-    
+
     // --------------------------------------------------------------------------------------------------------------
 
     /// <summary>
