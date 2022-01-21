@@ -105,8 +105,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             if (ViewTypeToLocate != typeof(TViewType) && ViewTypeToLocate.BaseType != typeof(TViewType))
             {
                 // IF this failed, try using VMs before failing out.
-                var ViewModelFallbackValue = LocateSingletonViewModelInstance(ViewTypeToLocate);
-                if (ViewModelFallbackValue != null) return ViewModelFallbackValue;
+                // var ViewModelFallbackValue = LocateSingletonViewModelInstance(ViewTypeToLocate);
+                // if (ViewModelFallbackValue != null) return ViewModelFallbackValue;
                 throw new InvalidCastException($"CAN NOT USE A NON USER CONTROL BASE TYPE FOR SINGLETON LOOKUPS!");
             }
             
