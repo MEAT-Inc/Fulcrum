@@ -69,136 +69,175 @@ auto_lock::auto_lock()
 {
 	// ONCE -- the first time somebody creates an autolock we need to initialize the mutex
 	CritSectionAutoLock.Lock();
-	if (! fAutoLockInitialized)
-	{
+	if (!fAutoLockInitialized) {
 		InitializeCriticalSection(&mAutoLock);
 		fAutoLockInitialized = true;
 	}
+
+	// Unlock auto selected object
 	CritSectionAutoLock.Unlock();
 
-	if (! TryEnterCriticalSection(&mAutoLock))
-	{
-		fulcrum_output::fulcrumDebug(_T("Multi-threading error"));
-		EnterCriticalSection(&mAutoLock);
-	}
+	// Try and reset the lock state. Fail out if this fails.
+	if (TryEnterCriticalSection(&mAutoLock)) return;
+	fulcrum_output::fulcrumDebug(_T("Multi-threading error"));
+	EnterCriticalSection(&mAutoLock);
 }
 
-auto_lock::~auto_lock()
-{
-	LeaveCriticalSection(&mAutoLock);
-}
+auto_lock::~auto_lock() { LeaveCriticalSection(&mAutoLock); }
 
 // Find all J2534 v04.04 interfaces listed in the registry
-static void EnumPassThruInterfaces(std::set<cPassThruInfo> &registryList)
+static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 {
-	HKEY hKey1,hKey2,hKey3;
-	FILETIME FTime;
-	long hKey2RetVal;
-	DWORD VendorIndex;
-	DWORD KeyType;
-	DWORD KeySize;
+	// Values for reg keys and info for this method.
+	HKEY softwareKey, reg0404Key;
+	HKEY wowNodeKey, reg0500Key = NULL;
+	HKEY VendorKey_v0404, VendorKey_v0500;
 
+	// Other information about key entries as we loop them
+	FILETIME FTime_v0404, FTime_v0500;
+	long hKey2RetVal_v0404, hKey2RetVal_v0500;
+	DWORD VendorIndex_v0404, VendorIndex_v0500;
+	DWORD KeyType_v0404, KeyType_v0500;
+	DWORD KeySize_v0404, KeySize_v0500;
+
+	// Clear out/init our return list.
 	registryList.clear();
 
-	// Open HKLM/Software
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("Software"), 0, KEY_READ, &hKey1) != ERROR_SUCCESS)
-	{
-		//strcpy_s(J2534BoilerplateErrorResult, sizeof(J2534BoilerplateErrorResult), "Can't open HKEY_LOCAL_MACHINE->Software key.");
-		return;
+	// Open the software key and the WOW6432Node Key objects here. If this fails, return out.
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("Software"), 0, KEY_READ, &softwareKey) != ERROR_SUCCESS) return;
+
+	// Store values for the 04.04 DLLs first then try and pull out our v05.00 DLLs.
+	RegOpenKeyEx(softwareKey, _T("PassThruSupport.04.04"), 0, KEY_READ, &reg0404Key);
+	if (RegOpenKeyEx(softwareKey, _T("WOW6432Node"), 0, KEY_READ, &wowNodeKey) == ERROR_SUCCESS) {
+		RegOpenKeyEx(wowNodeKey, _T("PassThruSupport.05.00"), 0, KEY_READ, &reg0500Key);
+		RegCloseKey(wowNodeKey);
 	}
 
-	// Open HKLM/Software/PassThruSupport.04.04
-	if (RegOpenKeyEx(hKey1, _T("PassThruSupport.04.04"), 0, KEY_READ, &hKey2) != ERROR_SUCCESS)
-	{
-		//strcpy_s(J2534BoilerplateErrorResult, sizeof(J2534BoilerplateErrorResult), "Can't open HKEY_LOCAL_MACHINE->..->PassThruSupport.04.04 key");
-		RegCloseKey(hKey1);
-		return;
-	}
-	RegCloseKey(hKey1);
+	// Close the software key entry now.
+	RegCloseKey(softwareKey);
+
+	// ------------------------------------------------------------------------------------------------
 
 	// Determine the maximum subkey length for HKLM/Software/PassThruSupport.04.04/*
-	DWORD lMaxSubKeyLen;
-	RegQueryInfoKey(hKey2, NULL, NULL, NULL, NULL, &lMaxSubKeyLen, NULL, NULL, NULL, NULL, NULL, NULL);
-
-	// Allocate a buffer large enough to hold that name
-	TCHAR * KeyValue = new TCHAR[lMaxSubKeyLen+1];
+	VendorIndex_v0404 = 0;
+	DWORD lMaxSubKeyLen_v0404;
+	RegQueryInfoKey(reg0404Key, NULL, NULL, NULL, NULL, &lMaxSubKeyLen_v0404, NULL, NULL, NULL, NULL, NULL, NULL);
+	TCHAR * KeyValue_v0404 = new TCHAR[lMaxSubKeyLen_v0404+1];
 
 	// Iterate through HKLM/Software/PassThruSupport.04.04/*
-	VendorIndex = 0;
 	do
 	{
 		// Get the name of HKLM/Software/PassThruSupport.04.04/VendorDevice[i]
-		KeySize = lMaxSubKeyLen+1;
-		hKey2RetVal = RegEnumKeyEx(hKey2, VendorIndex++, KeyValue, &KeySize, NULL, NULL, NULL, &FTime);
-		if (hKey2RetVal != ERROR_SUCCESS)
-		{
-			continue;
-		}
-
-#ifdef DREWTECHONLY
-		// Check to see if it is Drew Tech
-		if (strncmp("Drew Tech", (char *)KeyValue, 9) != 0)
-		{
-			continue;
-		}
-#endif
+		KeySize_v0404 = lMaxSubKeyLen_v0404+1;
+		hKey2RetVal_v0404 = RegEnumKeyEx(reg0404Key, VendorIndex_v0404++, KeyValue_v0404, &KeySize_v0404, NULL, NULL, NULL, &FTime_v0404);
+		if (hKey2RetVal_v0404 != ERROR_SUCCESS) { continue; }
 
 		// Open HKLM/Software/PassThruSupport.04.04/Vendor[i]
-		if (RegOpenKeyEx(hKey2, KeyValue, 0, KEY_READ, &hKey3) == ERROR_SUCCESS)
+		if (RegOpenKeyEx(reg0404Key, KeyValue_v0404, 0, KEY_READ, &VendorKey_v0404) == ERROR_SUCCESS)
 		{
-			tstring strVendor, strName, strFunctionLibrary, strConfigApplication;
+			// Return value state and strings for DLL information
 			LSTATUS retval;
+			tstring strVendor, strName, strFunctionLibrary, strConfigApplication;
 
 			// Determine the maximum value length for HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/*
 			DWORD lMaxValueLen;
-			retval = RegQueryInfoKey(hKey3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
+			retval = RegQueryInfoKey(VendorKey_v0404, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
 
 			// Allocate a buffer large enough to hold that name
-			TCHAR * KeyValue = new TCHAR[lMaxValueLen+1];
+			TCHAR * KeyValue_v0404 = new TCHAR[lMaxValueLen+1];
 
 			// Query HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/Vendor
-			KeySize = lMaxValueLen+1;
-			retval = RegQueryValueEx(hKey3, _T("Vendor"), 0, &KeyType, (LPBYTE) KeyValue, &KeySize);
-			if (retval == ERROR_SUCCESS)
-			{
-				strVendor = KeyValue;
-			}
+			KeySize_v0404 = lMaxValueLen+1;
+			if (RegQueryValueEx(VendorKey_v0404, _T("Vendor"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+				strVendor = KeyValue_v0404;
 
 			// Query HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/Name
-			KeySize = lMaxValueLen+1;
-			retval = RegQueryValueEx(hKey3, _T("Name"), 0, &KeyType, (LPBYTE) KeyValue, &KeySize);
-			if (retval == ERROR_SUCCESS)
-			{
-				strName = KeyValue;
-			}
+			KeySize_v0404 = lMaxValueLen+1;
+			if (RegQueryValueEx(VendorKey_v0404, _T("Name"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+				strName = KeyValue_v0404; strName += L" (v04.04)";
 
 			// Read HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/FunctionLibrary
-			KeySize = lMaxValueLen+1;
-			retval = RegQueryValueEx(hKey3, _T("FunctionLibrary"), 0, &KeyType, (LPBYTE) KeyValue, &KeySize);
-			if (retval == ERROR_SUCCESS)
-			{
-				strFunctionLibrary = KeyValue;
-			}
+			KeySize_v0404 = lMaxValueLen+1;
+			if (RegQueryValueEx(VendorKey_v0404, _T("FunctionLibrary"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+				strFunctionLibrary = KeyValue_v0404;
 
 			// Read HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/ConfigApplication
-			KeySize = lMaxValueLen+1;
-			retval = RegQueryValueEx(hKey3, _T("ConfigApplication"), 0, &KeyType, (LPBYTE) KeyValue, &KeySize);
-			if (retval == ERROR_SUCCESS)
-			{
-				strConfigApplication = KeyValue;
-			}
+			KeySize_v0404 = lMaxValueLen+1;
+			if (RegQueryValueEx(VendorKey_v0404, _T("ConfigApplication"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+				strConfigApplication = KeyValue_v0404;
 
-			RegCloseKey(hKey3);
-			delete KeyValue;
+			// Clsoe our key, clear the memory allocation for it.
+			RegCloseKey(VendorKey_v0404); delete KeyValue_v0404;
 
 			// If everything was successful then add it to the list
 			cPassThruInfo registryEntry(strVendor, strName, strFunctionLibrary, strConfigApplication);
 			registryList.insert(registryEntry);
 		}
-	} while (hKey2RetVal == ERROR_SUCCESS);
+	} while (hKey2RetVal_v0404 == ERROR_SUCCESS);
+	RegCloseKey(reg0404Key);
 
-	RegCloseKey(hKey2);
-	delete KeyValue;
+	// ------------------------------------------------------------------------------------------------
+
+	// Stop here if this key is null
+	if (reg0500Key == NULL) return;
+
+	// Determine the maximum subkey length for HKLM/Software/WOW6432Node/PassThruSupport.05.00/*
+	VendorIndex_v0500 = 0;
+	DWORD lMaxSubKeyLen_v0500;
+	RegQueryInfoKey(reg0500Key, NULL, NULL, NULL, NULL, &lMaxSubKeyLen_v0500, NULL, NULL, NULL, NULL, NULL, NULL);
+	TCHAR* KeyValue_v0500 = new TCHAR[lMaxSubKeyLen_v0500 + 1];
+
+	// Iterate through HKLM/Software/WOW6432Node/PassThruSupport.05.00/*
+	do
+	{
+		// Get the name of HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]
+		KeySize_v0500 = lMaxSubKeyLen_v0500 + 1;
+		hKey2RetVal_v0500 = RegEnumKeyEx(reg0500Key, VendorIndex_v0500++, KeyValue_v0500, &KeySize_v0500, NULL, NULL, NULL, &FTime_v0500);
+		if (hKey2RetVal_v0500 != ERROR_SUCCESS) { continue; }
+
+		// HKLM/Software/WOW6432Node/PassThruSupport.05.00/Vendor[i]
+		if (RegOpenKeyEx(reg0500Key, KeyValue_v0500, 0, KEY_READ, &VendorKey_v0500) == ERROR_SUCCESS)
+		{
+			// Return value state and strings for DLL information
+			LSTATUS retval;
+			tstring strVendor, strName, strFunctionLibrary, strConfigApplication;
+
+			// Determine the maximum value length for HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/*
+			DWORD lMaxValueLen;
+			retval = RegQueryInfoKey(VendorKey_v0500, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
+
+			// Allocate a buffer large enough to hold that name
+			TCHAR* KeyValue_v0500 = new TCHAR[lMaxValueLen + 1];
+
+			// Query HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/Vendor
+			KeySize_v0500 = lMaxValueLen + 1;
+			if (RegQueryValueEx(VendorKey_v0500, _T("Vendor"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+				strVendor = KeyValue_v0500;
+
+			// Query HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/Name
+			KeySize_v0500 = lMaxValueLen + 1;
+			if (RegQueryValueEx(VendorKey_v0500, _T("Name"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+				strName = KeyValue_v0500; strName += L" (v05.00)";
+
+			// Read HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/FunctionLibrary
+			KeySize_v0500 = lMaxValueLen + 1;
+			if (RegQueryValueEx(VendorKey_v0500, _T("FunctionLibrary"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+				strFunctionLibrary = KeyValue_v0500;
+
+			// Read HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/ConfigApplication
+			KeySize_v0500 = lMaxValueLen + 1;
+			if (RegQueryValueEx(VendorKey_v0500, _T("ConfigApplication"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+				strConfigApplication = KeyValue_v0500;
+
+			// Clsoe our key, clear the memory allocation for it.
+			RegCloseKey(VendorKey_v0500); delete KeyValue_v0500;
+
+			// If everything was successful then add it to the list
+			cPassThruInfo registryEntry(strVendor, strName, strFunctionLibrary, strConfigApplication);
+			registryList.insert(registryEntry);
+		}
+	} while (hKey2RetVal_v0500 == ERROR_SUCCESS);
+	RegCloseKey(reg0500Key);
 }
 
 double GetTimeSinceInit()
@@ -208,14 +247,15 @@ double GetTimeSinceInit()
 
 	// ONCE -- the first time somebody gets a timestamp set the timer to 0.000s
 	CritSectionPerformanceCounter.Lock();
-	if (! fPerformanceCounterInitialized)
+	if (fPerformanceCounterInitialized) CritSectionPerformanceCounter.Unlock();
+	else
 	{
 		QueryPerformanceFrequency(&ticksPerSecond);
 		QueryPerformanceCounter(&tick);
 		fPerformanceCounterInitialized = true;
 	}
-	CritSectionPerformanceCounter.Unlock();
 
+	// Now find the time value.
 	QueryPerformanceCounter(&tock);
 	time = (double)(tock.QuadPart-tick.QuadPart)/(double)ticksPerSecond.QuadPart;
 	return time;
@@ -239,8 +279,7 @@ bool fulcrum_checkAndAutoload(void)
 	std::set<cPassThruInfo> interfaceList;
 	EnumPassThruInterfaces(interfaceList);
 
-	if (interfaceList.size() == 0)
-	{
+	if (interfaceList.size() == 0) {
 		// No interfaces listed in the registry? Failure!
 		return false;
 	}
@@ -264,27 +303,22 @@ bool fulcrum_checkAndAutoload(void)
 		CSelectionBox Dlg(interfaceList);
 
 		retval = Dlg.DoModal();
-		if (retval == IDCANCEL)
-		{
-			return false;
-		}
-
+		if (retval == IDCANCEL) { return false; }
 		cPassThruInfo * tmp = Dlg.GetSelectedPassThru();
 
 		bool fSuccess;
 		fSuccess = fulcrum_loadLibrary(tmp->FunctionLibrary.c_str());
-		if (! fSuccess)
+		if (fSuccess) fLibLoaded = true;
+		else 
 		{
-			//fulcrum_setInternalError(_T("Failed to open '%s'"), tmp->FunctionLibrary.c_str());
-			//dbug_printretval(ERR_FAILED);
+			fulcrum_setInternalError(_T("Failed to open '%s'"), tmp->FunctionLibrary.c_str());
+			fulcrum_printretval(ERR_FAILED);
 			return false;
 		}
-		fLibLoaded = true;
 
 		// The user specified a debug output file in the dialog. Write any buffered text to this file
 		// and start using it from now on
 		fulcrum_output::writeNewLogFile(Dlg.GetDebugFilename(), true);
-
 		return true;
 	}
 }
@@ -292,16 +326,10 @@ bool fulcrum_checkAndAutoload(void)
 bool fulcrum_loadLibrary(LPCTSTR szDLL)
 {
 	// Can't load a library if the string is NULL
-	if (szDLL == NULL)
-	{
-		return false;
-	}
+	if (szDLL == NULL) return false;
 
 	// Can't load a library if there's one currently loaded
-	if (fLibLoaded)
-	{
-		return false;
-	}
+	if (fLibLoaded)	return false;
 
 	hDLL = LoadLibrary(szDLL);
 	if (hDLL == NULL)
@@ -311,8 +339,10 @@ bool fulcrum_loadLibrary(LPCTSTR szDLL)
 		return false;
 	}
 
+	// Set loaded to true. 
 	fLibLoaded = true;
 
+	// Find our method locations via pointers inside the other DLLs
 	_PassThruOpen = (PTOPEN)GetProcAddress(hDLL, "PassThruOpen");
 	_PassThruClose = (PTCLOSE)GetProcAddress(hDLL, "PassThruClose");
 	_PassThruGetNextCarDAQ = (PTGETNEXTCARDAQ)GetProcAddress(hDLL, "PassThruGetNextCarDAQ");
@@ -330,15 +360,16 @@ bool fulcrum_loadLibrary(LPCTSTR szDLL)
 	_PassThruGetLastError = (PTGETLASTERROR)GetProcAddress(hDLL, "PassThruGetLastError");
 	_PassThruIoctl = (PTIOCTL)GetProcAddress(hDLL, "PassThruIoctl");
 
+	// Return passed.
 	return true;
 }
 
 void fulcrum_unloadLibrary()
 {
 	// Can't unload a library if there's nothing loaded
-	if (! fLibLoaded)
-		return;
+	if (!fLibLoaded) return;
 
+	// Set loaded to false
 	fLibLoaded = false;
 
 	// Invalidate the function pointers
@@ -359,16 +390,9 @@ void fulcrum_unloadLibrary()
 	_PassThruGetLastError = NULL;
 	_PassThruIoctl = NULL;
 
+	// Set results out and free the lib.
 	BOOL fSuccess;
 	fSuccess = FreeLibrary(hDLL);
-	if (! fSuccess)
-	{
-		// Try to get the error text
-		// Set the internal error text based on the win32 message
-	}
 }
 
-bool fulcrum_hasLibraryLoaded()
-{
-	return fLibLoaded;
-}
+bool fulcrum_hasLibraryLoaded() { return fLibLoaded; }

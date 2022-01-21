@@ -26,6 +26,7 @@
 
 // Fulcrum Resource Imports
 #include "fulcrum_cfifo.h"
+#include "FulcrumShim.h"
 
 // Puts a new entry into our log output file
 void fulcrum_cfifo::Put(LPCTSTR szMsg)
@@ -35,8 +36,8 @@ void fulcrum_cfifo::Put(LPCTSTR szMsg)
 
 	// If the string doesn't fit, start later to get the final maxSize characters
 	if (nSize > m_nSize) {
-		szMsg = &szMsg[nSize - m_nSize]; // start later, in order to get last m_nSize samples
-		nSize = m_nSize; // limit the length to the buffer's length
+		szMsg = &szMsg[nSize - m_nSize];	 // start later, in order to get last m_nSize samples
+		nSize = m_nSize;					 // limit the length to the buffer's length
 	}
 
 	// Wrap around buffer end

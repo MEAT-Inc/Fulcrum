@@ -152,40 +152,25 @@ void fulcrum_pipe::ShutdownInputPipe()
 
 
 // Writes data to our pipe streams
-void fulcrum_pipe::WriteStringOut(std::string str)
+void fulcrum_pipe::WriteStringOut(std::string msgString)
 {
-	DWORD written;
-	DWORD bytesToWrite = (DWORD)strlen(str.c_str());
-	BOOL res = WriteFile(hFulcrumWriter, str.c_str(), bytesToWrite, &written, NULL);
-
-	// Removing this for testing purposes
-	// CloseHandle(hFulcrumWriter);
+	DWORD bytesWritten;
+	DWORD bytesToWrite = (DWORD)strlen(msgString.c_str());
+	BOOL resultValue = WriteFile(hFulcrumWriter, msgString.c_str(), bytesToWrite, &bytesWritten, NULL);
 }
-void fulcrum_pipe::WriteBytesOut(byte b[], int b_len)
+void fulcrum_pipe::WriteBytesOut(byte byteValues[], int byteLength)
 {
-	DWORD written;
-	BOOL res = WriteFile(hFulcrumWriter, b, b_len, &written, NULL);
-
-	// Removing this for testing purposes
-	// CloseHandle(hFulcrumWriter);
+	DWORD bytesWritten;
+	BOOL resultValue = WriteFile(hFulcrumWriter, byteValues, byteLength, &bytesWritten, NULL);
 }
-void fulcrum_pipe::WriteUint32(unsigned int num) {
-	WriteBytesOut((byte*)&num, 4);
-
-	// Removing this for testing purposes
-	// CloseHandle(hFulcrumWriter);
+void fulcrum_pipe::WriteUint32(unsigned int writeNumber) {
+	WriteBytesOut((byte*)&writeNumber, 4);
 }
-void fulcrum_pipe::WriteUint32(unsigned int* a, unsigned int len) {
-	for (unsigned int i = 0; i < len; i++) WriteUint32(a[i]);
-
-	// Removing this for testing purposes
-	// CloseHandle(hFulcrumWriter);
+void fulcrum_pipe::WriteUint32(unsigned int* writeNumber, unsigned int uintLen) {
+	for (unsigned int i = 0; i < uintLen; i++) WriteUint32(writeNumber[i]);
 }
-void fulcrum_pipe::Writeint32(int num) {
-	WriteBytesOut((byte*)&num, 4); 
-
-	// Removing this for testing purposes
-	// CloseHandle(hFulcrumWriter);
+void fulcrum_pipe::Writeint32(int writeNumber) {
+	WriteBytesOut((byte*)&writeNumber, 4); 
 }
 
 // Reads data from our pipe streams
@@ -199,20 +184,20 @@ std::string fulcrum_pipe::ReadStringIn()
 	std::string str(read_buffer, bytes_read);
 	return str;
 }
-void fulcrum_pipe::ReadBytesIn(byte b[], int* b_len)
+void fulcrum_pipe::ReadBytesIn(byte inputByteBuffer[], int* bufferLength)
 {
 	DWORD bytes_read = 0;
-	DWORD bytes_to_read = *b_len;
+	DWORD bytes_to_read = *bufferLength;
 
 	// (01/23/18 TAB) - don't try to read 0 bytes, it might block forever if nothing is added at the other end
-	if (bytes_to_read > 0) BOOL res = ReadFile(hFulcrumReader, b, bytes_to_read, &bytes_read, NULL);
-	*b_len = bytes_read;
+	if (bytes_to_read > 0) BOOL res = ReadFile(hFulcrumReader, inputByteBuffer, bytes_to_read, &bytes_read, NULL);
+	*bufferLength = bytes_read;
 }
-void fulcrum_pipe::ReadBytes(byte b[], int num)
+void fulcrum_pipe::ReadBytes(byte inputByteBuffer[], int bufferLength)
 {
-	int bytesRead = num;
-	ReadBytesIn(b, &bytesRead);
-	if (bytesRead < num)
+	int bytesRead = bufferLength;
+	ReadBytesIn(inputByteBuffer, &bytesRead);
+	if (bytesRead < bufferLength)
 		throw& CPipeException(std::string(("not enough bytes")));
 }
 unsigned int fulcrum_pipe::ReadUint32()
