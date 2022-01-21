@@ -41,60 +41,45 @@ void fulcrum_output::writeNewLogFile(LPCTSTR szFilename, bool in_fLogToFile)
 {
 	// Write the memory-buffer to a file. Then either close the file, or keep the file open
 	// and set a flag that redirects all future log messages directly to the file
-	if (in_fLogToFile)
-	{
+	if (in_fLogToFile) {
 		// Open the file object here and get the handle from it
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
 		logFifo.Get(fp); fLogToFile = true;
 	}
-	else
-	{
+	else {
 		// Open the file object handle here and close the stream to it.
 		_tfopen_s(&fp, szFilename, _T("w, ccs=UTF-8"));
-		logFifo.Get(fp);
-		fclose(fp);
+		logFifo.Get(fp); fclose(fp);
 	}
 }
-void fulcrum_output::fulcrumDebug(LPCTSTR format, ...)
+void fulcrum_output::fulcrumDebug(LPCTSTR format_string, ...)
 {
-	// Args formating for log output
-	va_list args; va_start(args, format);
+	// Setup constant values for this method.
+	TCHAR bufferOutputArray[10240];							// Char array for output string. (This value may need work)
+	va_list str_args; va_start(str_args, format_string);	// Args formating for log output. List of args and setup command
 
-	// If logging directly to file
-	if (fLogToFile) { _vftprintf_s(fp, format, args); }
-	else
-	{
-		// Send this to the circular memory-buffer
-		TCHAR temp[100];
-		_vsntprintf_s(temp, sizeof(temp) / sizeof(temp[0]), _TRUNCATE, format, args);
-		logFifo.Put(temp);
-	}
+	// If logging directly to file write it out here.
+	if (fLogToFile) { _vftprintf_s(fp, format_string, str_args); }
+	
+	// Send this to the circular memory-buffer
+	size_t bufferSize = sizeof(bufferOutputArray) / sizeof(bufferOutputArray[0]);
+	_vsntprintf_s(
+		bufferOutputArray,	// Output Array
+		bufferSize,			// Size to add in
+		_TRUNCATE,			// Truncate Mode.
+		format_string,		// Format input string
+		str_args			// Args being formatted.
+	);
 
-	// Convert our input string to a std::string and buffer of char[]
-	std::string fmt_str = CT2A(format);
-	std::unique_ptr<char[]> formatted;
-	int final_n, n = ((int)fmt_str.size()) * 2;
-
-	// Now run thru each char object and find where the arguments are. 
-	while (1) {
-		// Format new output for this argument object
-		formatted.reset(new char[n]);
-		strcpy(&fmt_str[0], fmt_str.c_str());
-		final_n = _vsnprintf(&formatted[0], n, fmt_str.c_str(), args);
-
-		// If we're at the end of the line or no more args appear, return
-		if (final_n < 0 || final_n >= n) { n += abs(final_n - n + 1); }
-		else break;
+	// Put this entry into our buffer output.
+	if (!fLogToFile) {
+		logFifo.Put(bufferOutputArray);
+		va_end(str_args);
 	}
 
 	// Send to pipe server only if our pipe instances are currently open and connected
-	 if (CFulcrumShim::fulcrumPiper->OutputConnected)
-	 {
-	 	// Convert into a string object and write to pipes
-	 	std::string built_string = std::string(formatted.get());
-	 	CFulcrumShim::fulcrumPiper->WriteStringOut(built_string);
-	 }
-	
-	// Stop arg fprmatting session
-	va_end(args);
+	if (!CFulcrumShim::fulcrumPiper->OutputConnected) return;
+	std::wstring charString(bufferOutputArray);
+	std::string outputString(charString.begin(), charString.end());
+	CFulcrumShim::fulcrumPiper->WriteStringOut(outputString);
 }

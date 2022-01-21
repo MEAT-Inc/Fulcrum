@@ -41,8 +41,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // TODO: Append new Transformers into this constructor to apply color filtering on the output view.
 
             // Build event for our pipe objects to process new pipe content into our output box
-            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => {
+            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => 
+            {
+                // Attach output content into our session log box.
                 Dispatcher.Invoke(() => { this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
+                if (!EventArgs.PipeDataString.Contains("Session Log File:")) return;
+
+                // Store log file object name onto our injector constants here.
+                string NextSessionLog = string.Join("", EventArgs.PipeDataString.Split(':').Skip(1));
+                ViewLogger.WriteLog("STORING NEW FILE NAME VALUE INTO STORE OBJECT FOR REGISTERED OUTPUT FILES!", LogType.WarnLog);
+                ViewLogger.WriteLog($"SESSION LOG FILE BEING APPENDED APPEARED TO HAVE NAME OF {NextSessionLog}", LogType.InfoLog);
+                this.ViewModel.SessionLogs = this.ViewModel.SessionLogs.Append(NextSessionLog).ToArray();
             };
         }
 

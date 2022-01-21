@@ -42,34 +42,39 @@ public:
 
 class fulcrum_pipe {
 public:
-	fulcrum_pipe();
-	~fulcrum_pipe();
+	// Methods for pipe object setup and shutdown.
+	fulcrum_pipe(); ~fulcrum_pipe();
+
+	// Bools for states of pipes.
+	bool InputConnected = false;
+	bool OutputConnected = false;
+
+	// Connect Pipe Routines
 	bool PipesConnected();
 	bool ConnectInputPipe();
 	bool ConnectOutputPipe();
+
+	// Shut down pipe routines.
 	void ShutdownPipes();
 	void ShutdownInputPipe();
 	void ShutdownOutputPipe();
 
 	// Writing operations
-	void WriteStringOut(std::string str);
-	void WriteBytesOut(byte b[], int b_len);
+	void Writeint32(int writeNumber);
+	void WriteStringOut(std::string msgString);
+	void WriteUint32(unsigned int writeNumber);
+	void WriteBytesOut(byte byteValues[], int byteLength);
+	void WriteUint32(unsigned int* writeNumber, unsigned int uintLen);
 
 	// Reading Operations
-	std::string ReadStringIn();
-	void ReadBytesIn(byte b[], int* b_len);
-	void ReadBytes(byte b[], int num);			
-	unsigned int ReadUint32();
 	int ReadInt32();
-	void WriteUint32(unsigned int num);
-	void WriteUint32(unsigned int* a, unsigned int len);
-	void Writeint32(int num);
-
-	// Bools for states
-	bool InputConnected = false;
-	bool OutputConnected = false;
+	unsigned int ReadUint32();
+	std::string ReadStringIn();
+	void ReadBytes(byte inputByteBuffer[], int bufferLength);
+	void ReadBytesIn(byte inputByteBuffer[], int* bufferLength);
 
 private:
+	// Pipe state values.
 	bool _pipesConnected = false;
 	HANDLE hFulcrumWriter, hFulcrumReader;
 };
