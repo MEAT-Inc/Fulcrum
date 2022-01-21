@@ -603,12 +603,9 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 	fulcrum_output::fulcrumDebug(_T("%.3fs ** PTGetLastError(0x%08X)\n"), GetTimeSinceInit(), pErrorDescription);
 
 	if (pErrorDescription == NULL)
-	{
-		fulcrum_output::fulcrumDebug(_T("  pErrorDescription is NULL\n"));
-	}
+		fulcrum_output::fulcrumDebug(_T("%.3fs pErrorDescription is NULL\n"), GetTimeSinceInit());
 
 	retval = fulcrum_PassThruGetLastError(pErrorDescription);
-
 	if (pErrorDescription != NULL)
 	{
 #ifdef UNICODE
