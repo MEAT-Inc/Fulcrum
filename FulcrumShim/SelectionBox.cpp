@@ -84,9 +84,8 @@ BOOL CSelectionBox::OnInitDialog()
 	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
 	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) 
 		fulcrum_output::fulcrumDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
-	else 
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
-
+	else fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Log folder location: %s\n", GetTimeSinceInit(), logDir));
 
 	// Build the log file path using the log dir above
 	CString cstrPath;
@@ -100,8 +99,9 @@ BOOL CSelectionBox::OnInitDialog()
 		LocalTime.wSecond
 	);
 
-	// Log new file name output.
+	// Log new file name output and open the selection box entry object.
 	fulcrum_output::fulcrumDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Session Log File: %s\n"), GetTimeSinceInit(), cstrPath);
 
 	// Set information about the new output file
 	m_logfilename.SetWindowText(cstrPath);

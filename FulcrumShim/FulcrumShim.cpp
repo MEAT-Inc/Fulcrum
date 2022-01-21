@@ -84,7 +84,7 @@ BOOL CFulcrumShim::InitInstance()
 	// std::thread([this] { CFulcrumShim::StartupPipes(); });
 
 	// Build our pipes and return passed
-		// Build config app path value here and run the injector application
+	// Build config app path value here and run the injector application
 #if _DEBUG
 	TCHAR szPath[MAX_PATH]; CString ConfigAppPath;
 	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, szPath);
@@ -100,6 +100,8 @@ BOOL CFulcrumShim::InitInstance()
 	ZeroMemory(&StartupInfos, sizeof(StartupInfos));
 	StartupInfos.cb = sizeof(StartupInfos);
 	ZeroMemory(&ProcessInfos, sizeof(ProcessInfos));
+	
+	// Build a new process and store values of it. Close handles to avoid memory leaks.
 	::CreateProcess(ConfigAppPath.GetString(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfos, &ProcessInfos);
 	CloseHandle(ProcessInfos.hProcess);	CloseHandle(ProcessInfos.hThread);
 	return TRUE;
@@ -149,11 +151,12 @@ void CFulcrumShim::StartupPipes()
 void CFulcrumShim::ShutdownPipes()
 {
 	// Run the shutdown method
-	if (CFulcrumShim::fulcrumPiper->PipesConnected())
+	if (!CFulcrumShim::fulcrumPiper->PipesConnected()) { fulcrum_output::fulcrumDebug(_T("-->       Pipe instances were already closed!\n")); }
+	else 
 	{
+		// Close pipes one at a time and log as the close out.
 		fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
 		CFulcrumShim::fulcrumPiper->ShutdownPipes();
 		fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
 	}
-	else { fulcrum_output::fulcrumDebug(_T("-->       Pipe instances were already closed!\n")); }
 }

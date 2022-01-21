@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="InputExpressions">Expression input objects</param>
         /// <returns>Path of our built expression file</returns>
-        public static string SaveExpressionsToFile(this PassThruExpression[] InputExpressions, string BaseFileName = "")
+        public static string SaveExpressionsFile(this PassThruExpression[] InputExpressions, string BaseFileName = "")
         {
             // Get a logger object for saving expression sets.
             var ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -75,9 +75,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // First build our output location for our file.
             string OutputFolder = Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions");
-            string FinalOutputPath = 
-                BaseFileName.Contains(Path.DirectorySeparatorChar) ? 
-                    Path.ChangeExtension(BaseFileName, "ptExp") : 
+            string FinalOutputPath =
+                BaseFileName.Contains(Path.DirectorySeparatorChar) ?
+                    Path.ChangeExtension(Path.Combine(
+                        Path.GetDirectoryName(BaseFileName), $"FulcrumExpressions_{Path.GetFileName(BaseFileName)}"),
+                "ptExp") :
                     BaseFileName.Length == 0 ? 
                         Path.Combine(OutputFolder, $"FulcrumExpressions_{DateTime.Now:MMddyyyy-HHmmss}.ptExp") : 
                         Path.Combine(OutputFolder, $"FulcrumExpressions_{Path.GetFileNameWithoutExtension(BaseFileName)}.ptExp");

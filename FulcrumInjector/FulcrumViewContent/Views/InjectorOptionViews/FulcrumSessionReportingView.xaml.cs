@@ -58,6 +58,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
 
+            // Append new session log files.
+            this.ViewModel.AppendSessionLogFiles();
+            this.ViewLogger.WriteLog("STORED SESSION LOG FILES INTO EMAIL ATTACHMENTS OK!", LogType.InfoLog);
+
             // Force show help menu and build email temp text
             if (this.EmailBodyTextContent.Text.Length == 0) {
                 this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
