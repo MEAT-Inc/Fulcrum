@@ -125,15 +125,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <returns></returns>
         internal bool ParseLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
         {
-            // Build command split log contents first. 
             try
             {
+                // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
                 var SplitLogContent = this.SplitLogToCommands(LogFileContents);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
-                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PTEXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
+                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
                 var ExpressionSet = SplitLogContent.Select(LineSet =>
                 {
                     // Split our output content here and then build a type for the expressions
@@ -149,11 +149,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
-                this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsToFile(Path.GetFileName(LoadedLogFile));
+                this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsFile(this.LoadedLogFile);
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._lastBuiltExpressionsFile}!", LogType.InfoLog);
-                OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet);
-                this.InputParsed = true;
+                OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet); this.InputParsed = true;
                 return true;
             }
             catch (Exception Ex)
@@ -161,8 +160,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Log failures, return nothing
                 ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
-                OutputExpressions = null;
-                this.InputParsed = false;
+                OutputExpressions = null; this.InputParsed = false;
                 return false;
             }
         }

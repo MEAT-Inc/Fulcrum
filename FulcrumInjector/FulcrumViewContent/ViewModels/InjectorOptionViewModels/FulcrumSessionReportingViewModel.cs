@@ -48,9 +48,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             if (GenerateEmailBroker(out var NewSender)) this.SessionReportSender = NewSender;
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW EMAIL HELPER OBJECT!");
 
-            // Log passed. Build in main log file.
+            // Log passed. Build in main log file and session logs if any.
             ViewModelLogger.WriteLog("EMAIL REPORT BROKER HAS BEEN BUILT OK AND BOUND TO OUR VIEW CONTENT!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {this.AppendDefaultLogFile()} OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {this.AppendDefaultLogFiles()} OK!", LogType.InfoLog);
 
             // Log completed setup.
             ViewModelLogger.WriteLog("SETUP NEW VIEW MODEL FOR EMAIL BROKER VALUES OK!", LogType.InfoLog);
@@ -58,30 +58,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Appends the current injector log into the email object for including it.
-        /// </summary>
-        /// <returns>Name of the main log file.</returns>
-        private string AppendDefaultLogFile()
-        {
-            // Log information, find the main log file name, and include it in here.
-            ViewModelLogger.WriteLog("INCLUDING MAIN LOG FILE FROM NLOG OUTPUT IN THE LIST OF ATTACHMENTS NOW!", LogType.WarnLog);
-
-            // Get file name. Store and return it.
-            string LogFileName = LogBroker.MainLogFileName;
-            this.SessionReportSender.AddMessageAttachment(LogFileName);
-            ViewModelLogger.WriteLog($"ATTACHED NEW FILE NAMED {LogFileName} INTO SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
-            return LogFileName;
-        }
-
+     
         /// <summary>
         /// Builds a new email reporting broker for the given settings values.
         /// </summary>
         /// <param name="BuiltSender">Sender object built</param>
         /// <returns>True if built ok. False if not.</returns>
         private bool GenerateEmailBroker(out ReportEmailBroker BuiltSender)
-        { 
+        {
             try
             {
                 // Pull in new settings values for sender and default receivers.
@@ -114,6 +98,57 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW.", BuildBrokerEx);
                 BuiltSender = null; return false;
             }
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Appends the current injector log into the email object for including it.
+        /// </summary>
+        /// <returns>Name of the main log file.</returns>
+        internal string AppendDefaultLogFiles()
+        {
+            // Log information, find the main log file name, and include it in here.
+            ViewModelLogger.WriteLog("INCLUDING MAIN LOG FILE FROM NLOG OUTPUT IN THE LIST OF ATTACHMENTS NOW!", LogType.WarnLog);
+
+            // Get file name. Store and return it
+            string LogFileName = LogBroker.MainLogFileName;
+            this.SessionReportSender.AddMessageAttachment(LogFileName);
+            ViewModelLogger.WriteLog($"ATTACHED NEW FILE NAMED {LogFileName} INTO SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
+            return LogFileName;
+        }
+        /// <summary>
+        /// Pulls in the session logs from our DLL output view.
+        /// </summary>
+        /// <returns>Strings added</returns>
+        internal string[] AppendSessionLogFiles()
+        {
+            // Log information, pull view from constants and get values.
+            ViewModelLogger.WriteLog("PULLING IN DLL SESSION LOG FILE ENTRIES NOW...", LogType.InfoLog);
+            var FilesLocated = InjectorConstants.FulcrumDllOutputLogViewModel?.SessionLogs;
+            if (FilesLocated == null) {
+                ViewModelLogger.WriteLog("ERROR! SESSION LOG OBJECT WAS NULL!", LogType.ErrorLog);
+                return Array.Empty<string>();
+            }
+
+            // Check how many files we pulled and return.
+            ViewModelLogger.WriteLog(
+                FilesLocated.Length == 0 ? 
+                    "NO FILES WERE LOCATED ON THE VIEW MODEL OBJECT!" : 
+                    $"FOUND A TOTAL OF {FilesLocated.Length} SESSION LOG FILES!", 
+                FilesLocated.Length == 0 ?
+                    LogType.WarnLog :
+                    LogType.InfoLog);
+
+            // Append them into our list of reports and return.
+            foreach (var MessageAttachment in FilesLocated) {
+                this.SessionReportSender.AddMessageAttachment(MessageAttachment);
+                ViewModelLogger.WriteLog($"APPENDED ATTACHMENT FILE: {MessageAttachment} TO REPORT", LogType.TraceLog);
+            }
+
+            // Return information and return out.
+            ViewModelLogger.WriteLog("RETURNING OUTPUT FROM THE SESSION LOG EXTRACTION ROUTINE NOW...", LogType.InfoLog);
+            return FilesLocated;
         }
     }
 }
