@@ -90,11 +90,11 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 {
 	// Values for reg keys and info for this method.
 	HKEY softwareKey, reg0404Key;
-	HKEY wowNodeKey, reg0500Key;
+	HKEY wowNodeKey, reg0500Key = NULL;
 	HKEY vendorKey_v0404, vendorKey_v0500;
 
 	// Other information about key entries as we loop them
-	FILETIME FTime;
+	FILETIME FTime_v0404, FTime_v0500;
 	long hKey2RetVal_v0404, hKey2RetVal_v0500;
 	DWORD VendorIndex_v0404, VendorIndex_v0500;
 	DWORD KeyType_v0404, KeyType_v0500;
@@ -103,18 +103,20 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 	// Clear out/init our return list.
 	registryList.clear();
 
-	// Open the software key and the WOW6432Node Key objects here.
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("Software"), 0, KEY_READ, &softwareKey) == ERROR_SUCCESS) {
-		if (RegOpenKeyEx(softwareKey, _T("PassThruSupport.04.04"), 0, KEY_READ, &reg0404Key) == ERROR_SUCCESS) {
-			if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("WOW6432Node"), 0, KEY_READ, &wowNodeKey) == ERROR_SUCCESS) {
-				RegOpenKeyEx(wowNodeKey, _T("PassThruSupport.05.00"), 0, KEY_READ, &reg0500Key);
-				RegCloseKey(wowNodeKey);
-			} 
-			else { RegCloseKey(softwareKey); return; }
-		}
-		else { RegCloseKey(softwareKey); return; }
+	// Open the software key and the WOW6432Node Key objects here. If this fails, return out.
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("Software"), 0, KEY_READ, &softwareKey) != ERROR_SUCCESS) return;
+
+	// Store values for the 04.04 DLLs first then try and pull out our v05.00 DLLs.
+	RegOpenKeyEx(softwareKey, _T("PassThruSupport.04.04"), 0, KEY_READ, &reg0404Key);
+	if (RegOpenKeyEx(softwareKey, _T("WOW6432Node"), 0, KEY_READ, &wowNodeKey) == ERROR_SUCCESS) {
+		RegOpenKeyEx(wowNodeKey, _T("PassThruSupport.05.00"), 0, KEY_READ, &reg0500Key);
+		RegCloseKey(wowNodeKey);
 	}
-	else { return; }
+
+	// Close the software key entry now.
+	RegCloseKey(softwareKey);
+
+	// ------------------------------------------------------------------------------------------------
 
 	// Determine the maximum subkey length for HKLM/Software/PassThruSupport.04.04/*
 	VendorIndex_v0404 = 0;
@@ -122,18 +124,12 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 	RegQueryInfoKey(reg0404Key, NULL, NULL, NULL, NULL, &lMaxSubKeyLen_v0404, NULL, NULL, NULL, NULL, NULL, NULL);
 	TCHAR * KeyValue_v0404 = new TCHAR[lMaxSubKeyLen_v0404+1];
 
-	// Determine the maximum subkey length for HKLM/Software/WOW6432Node/PassThruSupport.05.00/*
-	VendorIndex_v0500 = 0;
-	DWORD lMaxSubKeyLen_v0500;
-	RegQueryInfoKey(reg0500Key, NULL, NULL, NULL, NULL, &lMaxSubKeyLen_v0500, NULL, NULL, NULL, NULL, NULL, NULL);
-	TCHAR* KeyValue_v0500 = new TCHAR[lMaxSubKeyLen_v0500 + 1];
-
 	// Iterate through HKLM/Software/PassThruSupport.04.04/*
 	do
 	{
 		// Get the name of HKLM/Software/PassThruSupport.04.04/VendorDevice[i]
 		KeySize_v0404 = lMaxSubKeyLen_v0404+1;
-		hKey2RetVal_v0404 = RegEnumKeyEx(reg0404Key, VendorIndex_v0404++, KeyValue_v0404, &KeySize_v0404, NULL, NULL, NULL, &FTime);
+		hKey2RetVal_v0404 = RegEnumKeyEx(reg0404Key, VendorIndex_v0404++, KeyValue_v0404, &KeySize_v0404, NULL, NULL, NULL, &FTime_v0404);
 		if (hKey2RetVal_v0404 != ERROR_SUCCESS) { continue; }
 
 		// Open HKLM/Software/PassThruSupport.04.04/Vendor[i]
@@ -180,12 +176,23 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 	} while (hKey2RetVal_v0404 == ERROR_SUCCESS);
 	RegCloseKey(reg0404Key);
 
+	// ------------------------------------------------------------------------------------------------
+
+	// Stop here if this key is null
+	if (reg0500Key == NULL) return;
+
+	// Determine the maximum subkey length for HKLM/Software/WOW6432Node/PassThruSupport.05.00/*
+	VendorIndex_v0500 = 0;
+	DWORD lMaxSubKeyLen_v0500;
+	RegQueryInfoKey(reg0500Key, NULL, NULL, NULL, NULL, &lMaxSubKeyLen_v0500, NULL, NULL, NULL, NULL, NULL, NULL);
+	TCHAR* KeyValue_v0500 = new TCHAR[lMaxSubKeyLen_v0500 + 1];
+
 	// Iterate through HKLM/Software/WOW6432Node/PassThruSupport.05.00/*
 	do
 	{
 		// Get the name of HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]
 		KeySize_v0500 = lMaxSubKeyLen_v0500 + 1;
-		hKey2RetVal_v0500 = RegEnumKeyEx(reg0404Key, VendorIndex_v0404++, KeyValue_v0404, &KeySize_v0500, NULL, NULL, NULL, &FTime);
+		hKey2RetVal_v0500 = RegEnumKeyEx(reg0500Key, VendorIndex_v0500++, KeyValue_v0500, &KeySize_v0500, NULL, NULL, NULL, &FTime_v0500);
 		if (hKey2RetVal_v0500 != ERROR_SUCCESS) { continue; }
 
 		// HKLM/Software/WOW6432Node/PassThruSupport.05.00/Vendor[i]
