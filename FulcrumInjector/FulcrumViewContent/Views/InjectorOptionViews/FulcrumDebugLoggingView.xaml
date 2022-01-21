@@ -42,7 +42,7 @@
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".60*"/>
+                    <ColumnDefinition Width=".90*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
