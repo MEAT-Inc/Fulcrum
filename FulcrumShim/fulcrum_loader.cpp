@@ -91,7 +91,7 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 	// Values for reg keys and info for this method.
 	HKEY softwareKey, reg0404Key;
 	HKEY wowNodeKey, reg0500Key = NULL;
-	HKEY vendorKey_v0404, vendorKey_v0500;
+	HKEY VendorKey_v0404, VendorKey_v0500;
 
 	// Other information about key entries as we loop them
 	FILETIME FTime_v0404, FTime_v0500;
@@ -133,7 +133,7 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 		if (hKey2RetVal_v0404 != ERROR_SUCCESS) { continue; }
 
 		// Open HKLM/Software/PassThruSupport.04.04/Vendor[i]
-		if (RegOpenKeyEx(reg0404Key, KeyValue_v0404, 0, KEY_READ, &vendorKey_v0404) == ERROR_SUCCESS)
+		if (RegOpenKeyEx(reg0404Key, KeyValue_v0404, 0, KEY_READ, &VendorKey_v0404) == ERROR_SUCCESS)
 		{
 			// Return value state and strings for DLL information
 			LSTATUS retval;
@@ -141,33 +141,33 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 
 			// Determine the maximum value length for HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/*
 			DWORD lMaxValueLen;
-			retval = RegQueryInfoKey(vendorKey_v0404, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
+			retval = RegQueryInfoKey(VendorKey_v0404, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
 
 			// Allocate a buffer large enough to hold that name
 			TCHAR * KeyValue_v0404 = new TCHAR[lMaxValueLen+1];
 
 			// Query HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/Vendor
 			KeySize_v0404 = lMaxValueLen+1;
-			if (RegQueryValueEx(vendorKey_v0404, _T("Vendor"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0404, _T("Vendor"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
 				strVendor = KeyValue_v0404;
 
 			// Query HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/Name
 			KeySize_v0404 = lMaxValueLen+1;
-			if (RegQueryValueEx(vendorKey_v0404, _T("Name"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
-				strName = KeyValue_v0404;	strName += L" (v04.04)";
+			if (RegQueryValueEx(VendorKey_v0404, _T("Name"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+				strName = KeyValue_v0404; strName += L" (v04.04)";
 
 			// Read HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/FunctionLibrary
 			KeySize_v0404 = lMaxValueLen+1;
-			if (RegQueryValueEx(vendorKey_v0404, _T("FunctionLibrary"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0404, _T("FunctionLibrary"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
 				strFunctionLibrary = KeyValue_v0404;
 
 			// Read HKLM/Software/PassThruSupport.04.04/VendorDevice[i]/ConfigApplication
 			KeySize_v0404 = lMaxValueLen+1;
-			if (RegQueryValueEx(vendorKey_v0404, _T("ConfigApplication"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0404, _T("ConfigApplication"), 0, &KeyType_v0404, (LPBYTE)KeyValue_v0404, &KeySize_v0404) == ERROR_SUCCESS)
 				strConfigApplication = KeyValue_v0404;
 
 			// Clsoe our key, clear the memory allocation for it.
-			RegCloseKey(vendorKey_v0404); delete KeyValue_v0404;
+			RegCloseKey(VendorKey_v0404); delete KeyValue_v0404;
 
 			// If everything was successful then add it to the list
 			cPassThruInfo registryEntry(strVendor, strName, strFunctionLibrary, strConfigApplication);
@@ -196,7 +196,7 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 		if (hKey2RetVal_v0500 != ERROR_SUCCESS) { continue; }
 
 		// HKLM/Software/WOW6432Node/PassThruSupport.05.00/Vendor[i]
-		if (RegOpenKeyEx(reg0404Key, KeyValue_v0404, 0, KEY_READ, &vendorKey_v0500) == ERROR_SUCCESS)
+		if (RegOpenKeyEx(reg0500Key, KeyValue_v0500, 0, KEY_READ, &VendorKey_v0500) == ERROR_SUCCESS)
 		{
 			// Return value state and strings for DLL information
 			LSTATUS retval;
@@ -204,33 +204,33 @@ static void EnumPassThruInterfaces(std::set<cPassThruInfo>& registryList)
 
 			// Determine the maximum value length for HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/*
 			DWORD lMaxValueLen;
-			retval = RegQueryInfoKey(vendorKey_v0500, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
+			retval = RegQueryInfoKey(VendorKey_v0500, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &lMaxValueLen, NULL, NULL);
 
 			// Allocate a buffer large enough to hold that name
 			TCHAR* KeyValue_v0500 = new TCHAR[lMaxValueLen + 1];
 
 			// Query HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/Vendor
 			KeySize_v0500 = lMaxValueLen + 1;
-			if (RegQueryValueEx(vendorKey_v0500, _T("Vendor"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0500, _T("Vendor"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
 				strVendor = KeyValue_v0500;
 
 			// Query HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/Name
 			KeySize_v0500 = lMaxValueLen + 1;
-			if (RegQueryValueEx(vendorKey_v0500, _T("Name"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0500, _T("Name"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
 				strName = KeyValue_v0500; strName += L" (v05.00)";
 
 			// Read HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/FunctionLibrary
 			KeySize_v0500 = lMaxValueLen + 1;
-			if (RegQueryValueEx(vendorKey_v0500, _T("FunctionLibrary"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0500, _T("FunctionLibrary"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
 				strFunctionLibrary = KeyValue_v0500;
 
 			// Read HKLM/Software/WOW6432Node/PassThruSupport.05.00/VendorDevice[i]/ConfigApplication
 			KeySize_v0500 = lMaxValueLen + 1;
-			if (RegQueryValueEx(vendorKey_v0500, _T("ConfigApplication"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
+			if (RegQueryValueEx(VendorKey_v0500, _T("ConfigApplication"), 0, &KeyType_v0500, (LPBYTE)KeyValue_v0500, &KeySize_v0500) == ERROR_SUCCESS)
 				strConfigApplication = KeyValue_v0500;
 
 			// Clsoe our key, clear the memory allocation for it.
-			RegCloseKey(vendorKey_v0500); delete KeyValue_v0500;
+			RegCloseKey(VendorKey_v0500); delete KeyValue_v0500;
 
 			// If everything was successful then add it to the list
 			cPassThruInfo registryEntry(strVendor, strName, strFunctionLibrary, strConfigApplication);

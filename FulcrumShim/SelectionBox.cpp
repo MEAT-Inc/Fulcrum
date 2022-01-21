@@ -85,7 +85,6 @@ BOOL CSelectionBox::OnInitDialog()
 	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) 
 		fulcrum_output::fulcrumDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
 	else fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Log folder location: %s\n", GetTimeSinceInit(), logDir));
 
 	// Build the log file path using the log dir above
 	CString cstrPath;

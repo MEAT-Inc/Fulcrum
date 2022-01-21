@@ -72,7 +72,10 @@ void fulcrum_output::fulcrumDebug(LPCTSTR format_string, ...)
 	);
 
 	// Put this entry into our buffer output.
-	logFifo.Put(bufferOutputArray);	va_end(str_args);
+	if (!fLogToFile) {
+		logFifo.Put(bufferOutputArray);
+		va_end(str_args);
+	}
 
 	// Send to pipe server only if our pipe instances are currently open and connected
 	if (!CFulcrumShim::fulcrumPiper->OutputConnected) return;
