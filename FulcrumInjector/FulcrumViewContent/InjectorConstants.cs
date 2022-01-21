@@ -116,27 +116,27 @@ namespace FulcrumInjector.FulcrumViewContent
         // --------------------------------------------------------------------------------------------------------------------------
 
         // Installed Hardware view  user control and view model object
-        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => (FulcrumInstalledHardwareView)Convert.ChangeType(FulcrumInstalledHardwareSingleton?.SingletonUserControl, typeof(FulcrumInstalledHardwareView));
-        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => (FulcrumInstalledHardwareViewModel)FulcrumInstalledHardwareView?.ViewModel;
+        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => (FulcrumInstalledHardwareView)FulcrumInstalledHardwareSingleton?.SingletonUserControl;
+        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => (FulcrumInstalledHardwareViewModel)FulcrumInstalledHardwareSingleton?.SingletonViewModel;
 
         // DLL Output Logging user control and view model object
-        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => (FulcrumDllOutputLogView)Convert.ChangeType(FulcrumDllOutputSingleton?.SingletonUserControl, typeof(FulcrumDllOutputLogView));
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => (FulcrumDllOutputLogView)FulcrumDllOutputSingleton?.SingletonUserControl;
         public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => (FulcrumDllOutputLogViewModel)FulcrumDllOutputSingleton?.SingletonViewModel;
 
         // Log Reviewing user control and view model object
-        public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)Convert.ChangeType(FulcrumLogReviewSingleton?.SingletonUserControl, typeof(FulcrumLogReviewView));
+        public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)FulcrumLogReviewSingleton?.SingletonUserControl;
         public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => (FulcrumLogReviewViewModel)FulcrumLogReviewSingleton?.SingletonViewModel;
 
         // User settings and configuration user control and view model object
-        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)Convert.ChangeType(FulcrumSettingsPaneSingleton?.SingletonUserControl, typeof(FulcrumSettingsPaneView));
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)FulcrumSettingsPaneSingleton?.SingletonUserControl;
         public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => (FulcrumSettingsPaneViewModel)FulcrumSettingsPaneSingleton?.SingletonViewModel;
 
         // Session output reporting user control and view model object
-        public static FulcrumSessionReportingView FulcrumSessionReportingView => (FulcrumSessionReportingView)Convert.ChangeType(FulcrumSessionReportingSingleton?.SingletonUserControl, typeof(FulcrumSessionReportingView));
+        public static FulcrumSessionReportingView FulcrumSessionReportingView => (FulcrumSessionReportingView)FulcrumSessionReportingSingleton?.SingletonUserControl;
         public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => (FulcrumSessionReportingViewModel)FulcrumSessionReportingSingleton?.SingletonViewModel;
 
         // Debug logging output user control and view model object
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)Convert.ChangeType(FulcrumDebugLoggingSingleton?.SingletonUserControl, typeof(FulcrumDebugLoggingView));
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)FulcrumDebugLoggingSingleton?.SingletonUserControl;
         public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)FulcrumDebugLoggingSingleton?.SingletonViewModel;
 
 

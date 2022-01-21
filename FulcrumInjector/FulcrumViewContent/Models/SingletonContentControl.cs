@@ -20,7 +20,10 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
         // List of currently open objects for our singleton types and methods for finding existing ones.
-        public static SingletonContentControl<TViewType, TViewModelType>[] BuiltSingletonInstances = Array.Empty<SingletonContentControl<TViewType, TViewModelType>>();
+        private static SingletonContentControl<TViewType, TViewModelType>[] _builtSingletonInstances = Array.Empty<SingletonContentControl<TViewType, TViewModelType>>();
+        public static SingletonContentControl<TViewType, TViewModelType>[] BuiltSingletonInstances { get => _builtSingletonInstances; private set => _builtSingletonInstances = value; }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new lazy instance based on the values provided in the input args
@@ -105,13 +108,13 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             if (ViewTypeToLocate != typeof(TViewType) && ViewTypeToLocate.BaseType != typeof(TViewType))
             {
                 // IF this failed, try using VMs before failing out.
-                // var ViewModelFallbackValue = LocateSingletonViewModelInstance(ViewTypeToLocate);
-                // if (ViewModelFallbackValue != null) return ViewModelFallbackValue;
+                var ViewModelFallbackValue = LocateSingletonViewModelInstance(ViewTypeToLocate);
+                if (ViewModelFallbackValue != null) return ViewModelFallbackValue;
                 throw new InvalidCastException($"CAN NOT USE A NON USER CONTROL BASE TYPE FOR SINGLETON LOOKUPS!");
             }
             
             // Find first object with the type matching the given viewmodel type
-            var PulledSingleton = BuiltSingletonInstances.FirstOrDefault(ViewObj => ViewObj.SingletonViewModel.GetType() == typeof(TViewType));
+            var PulledSingleton = BuiltSingletonInstances.FirstOrDefault(ViewObj => ViewObj.SingletonUserControl.GetType() == ViewTypeToLocate);
             if (PulledSingleton == null) SingletonLogger.WriteLog("FAILED TO LOCATE VALID SINGLETON INSTANCE!", LogType.ErrorLog);
             return PulledSingleton;
         }
@@ -132,7 +135,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             }
 
             // Find first object with the type matching the given viewmodel type
-            var PulledSingleton = BuiltSingletonInstances.FirstOrDefault(ViewObj => ViewObj.SingletonViewModel.GetType() == typeof(TViewType));
+            var PulledSingleton = BuiltSingletonInstances.FirstOrDefault(ViewObj => ViewObj.SingletonViewModel.GetType() == ViewModelTypeToLocate);
             if (PulledSingleton == null) SingletonLogger.WriteLog("FAILED TO LOCATE VALID SINGLETON INSTANCE!", LogType.ErrorLog);
             return PulledSingleton;
         }
@@ -156,6 +159,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         {
             // Store time information.
             this.TimeCreated = DateTime.Now;
+            BuiltSingletonInstances ??= Array.Empty<SingletonContentControl<TViewType, TViewModelType>>();
 
             // Build new logger instance for singleton object
             string TypeName = SingletonUserControlContent.GetType().Name;
@@ -180,8 +184,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             this.InstanceLogger.WriteLog($"INSTANCE HAS BEEN ALIVE FOR A TOTAL OF {(DateTime.Now - this.TimeCreated).ToString("g")}", LogType.TraceLog);
 
             // Remove it from our list of instances here and store result.
-            var SingletonsCleaned = BuiltSingletonInstances.Where(SingletonObj => SingletonObj != this);
-            BuiltSingletonInstances = SingletonsCleaned.ToArray();
+            // var SingletonsCleaned = BuiltSingletonInstances.Where(SingletonObj => SingletonObj != this);
+            // BuiltSingletonInstances = SingletonsCleaned.ToArray();
         }
     }
 }
