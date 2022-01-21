@@ -56,6 +56,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR LOG REVIEW VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
+            // Toggle parsed value based on contents.
+            this.InputParsed = false;
+            ViewModelLogger.WriteLog("TOGGLED ENABLED STATUS OF TOGGLE BUTTON OK!", LogType.InfoLog);
+
             // Import Regex objects.
             // ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
             // var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();

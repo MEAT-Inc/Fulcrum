@@ -121,7 +121,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 {
                     // Show new temp state
                     ParentGrid.IsEnabled = true;
-                    ToggleViewTextButton.IsEnabled = true;
                     SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
                     SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
                     SenderButton.Click -= LoadInjectorLogFile_OnClick;
