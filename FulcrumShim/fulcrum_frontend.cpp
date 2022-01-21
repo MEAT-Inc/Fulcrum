@@ -603,25 +603,22 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 	fulcrum_output::fulcrumDebug(_T("%.3fs ** PTGetLastError(0x%08X)\n"), GetTimeSinceInit(), pErrorDescription);
 
 	if (pErrorDescription == NULL)
-	{
-		fulcrum_output::fulcrumDebug(_T("  pErrorDescription is NULL\n"));
-	}
+		fulcrum_output::fulcrumDebug(_T("%.3fs pErrorDescription is NULL\n"), GetTimeSinceInit());
 
 	retval = fulcrum_PassThruGetLastError(pErrorDescription);
-
 	if (pErrorDescription != NULL)
 	{
 #ifdef UNICODE
 		CStringW cstrErrorDescriptionW(pErrorDescription);
-		fulcrum_output::fulcrumDebug(_T("  %s\n"), (LPCWSTR)cstrErrorDescriptionW);
+		fulcrum_output::fulcrumDebug(_T("%.3fs  %s\n"), GetTimeSinceInit(), (LPCWSTR)cstrErrorDescriptionW);
 #else
-		dtDebug(_T("  %s\n"), pErrorDescription);
+		dtDebug(_T("%.3fs  %s\n"), GetTimeSinceInit(), pErrorDescription);
 #endif
 	}
 
 	// Log the return value for this function without using dbg_printretval().
 	// Even if an error occured inside this function, the error text was not
 	// updated to describe the error.
-	fulcrum_output::fulcrumDebug(_T("  %s\n"), fulcrumDebug_return(retval).c_str());
+	fulcrum_output::fulcrumDebug(_T("%.3fs  %s\n"), GetTimeSinceInit(), fulcrumDebug_return(retval).c_str());
 	return retval;
 }

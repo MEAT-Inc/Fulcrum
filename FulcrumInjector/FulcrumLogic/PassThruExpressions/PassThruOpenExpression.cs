@@ -13,10 +13,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public readonly PassThruRegexModel DeviceIdRegex = PassThruRegexModelShare.DeviceIdReturned;
 
         // Strings of the command and results from the command output.
-        [PtExpressionProperty("CommandLine")] public readonly string PtCommand;
-        [PtExpressionProperty("DeviceName")] public readonly string DeviceName;
-        [PtExpressionProperty("DevicePointer")] public readonly string DevicePointer;
-        [PtExpressionProperty("DeviceId", "-1", new[] { "Device Opened", "Invalid Device ID!" }, true)]
+        [PtExpressionProperty("Command Line")] public readonly string PtCommand;
+        [PtExpressionProperty("Device Name")] public readonly string DeviceName;
+        [PtExpressionProperty("Device Pointer")] public readonly string DevicePointer;
+        [PtExpressionProperty("Device ID", "-1", new[] { "Device Opened", "Invalid Device ID!" }, true)]
         public readonly string DeviceId;
 
         // ------------------------------------------------------------------------------------------

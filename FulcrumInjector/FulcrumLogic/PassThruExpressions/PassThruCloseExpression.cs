@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
         // Strings of the command and results from the command output.
         [PtExpressionProperty("Command Line")] public readonly string PtCommand;
-        [PtExpressionProperty("DeviceId", "-1", new[] { "Device Closed", "Device Invalid!" }, true)] 
+        [PtExpressionProperty("Device ID", "-1", new[] { "Device Closed", "Device Invalid!" }, true)] 
         public readonly string DeviceId;    
 
         // ------------------------------------------------------------------------------------------
