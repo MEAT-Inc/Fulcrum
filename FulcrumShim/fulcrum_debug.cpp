@@ -629,7 +629,7 @@ void fulcrumDebug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, 
 	{
 		if (isWrite == true)
 		{
-			fulcrum_output::fulcrumDebug(_T("  %s[%2ld] %s. %lu bytes. TxF=0x%08lx\n"),
+			fulcrum_output::fulcrumDebug(_T("  %s[%2d] %s. %lu bytes. TxF=0x%08lx\n"),
 				s,
 				i,
 				//numMsgs,
@@ -639,7 +639,7 @@ void fulcrumDebug_printmsg(PASSTHRU_MSG mm[], LPCTSTR s, unsigned long numMsgs, 
 		}
 		else
 		{
-			fulcrum_output::fulcrumDebug(_T("  %s[%2ld] %fs. %s. Actual data %lu of %lu bytes. RxS=0x%08lx\n"),
+			fulcrum_output::fulcrumDebug(_T("  %s[%2d] %fs. %s. Actual data %lu of %lu bytes. RxS=0x%08lx\n"),
 				s,
 				i,
 				//numMsgs,

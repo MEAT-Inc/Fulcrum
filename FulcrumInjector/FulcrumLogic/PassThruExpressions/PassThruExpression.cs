@@ -233,6 +233,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         /// </summary>
         protected internal void FindMessageContents()
         {
+            // Pull in our message Regex Object commands here.
 
         }
     }
