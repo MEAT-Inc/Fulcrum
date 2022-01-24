@@ -27,6 +27,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         [EnumMember(Value = "PTConnect")] [Description("PassThruConnectExpression")]         PTConnect,
         [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")]   PTDisconnect,
         [EnumMember(Value = "PTReadMsgs")] [Description("PassThruReadMessagesExpression")]   PTReadMsgs,
+        [EnumMember(Value = "PTWriteMsgs")] [Description("PassThruWriteMessagesExpression")] PTWriteMsgs,
     }
 
     // --------------------------------------------------------------------------------------------------------------
@@ -107,16 +108,54 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
             // Store string to replace and build new list of strings
             var NewLines = new List<string>() { SplitString }; NewLines.Add("\r");
-            NewLines.AddRange(this.SplitCommandLines.Select(CmdLine => $"   {CmdLine}"));
+            NewLines.AddRange(this.SplitCommandLines.Select(LineObj => "   " + LineObj));
             NewLines.Add("\n");
 
             // Add our breakdown contents here.
-            NewLines.Add(SplitTable[0]); NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
-            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n"); NewLines.Add(SplitString);
+            NewLines.Add(SplitTable[0]);
+            NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
+            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n");
+
+            // Append in contents for message values if needed. 
+            if (this.GetType() == typeof(PassThruReadMessagesExpression) || this.GetType() == typeof(PassThruWriteMessagesExpression))
+            {
+                // Log information, pull in new split table contents
+                this.ExpressionLogger.WriteLog("APPENDING MESSAGE CONTENT VALUES NOW...", LogType.WarnLog);
+                string MessagesTable = this.FindMessageContents(out _);
+
+                // Append the new table of messages into the current output.
+                NewLines.AddRange(MessagesTable.Split('\n').Select(LineObj => "   " + LineObj).ToArray());
+                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
+
+                // Splitting endline.
+                NewLines.Add("\n");
+            }
 
             // Remove double newlines. Command lines are split with \r so this doesn't apply.
+            NewLines.Add(SplitString);
             RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
+        }
+        /// <summary>
+        /// Expression evaluation computed result based on output values.
+        /// </summary>
+        /// <returns>True or false based on expression eval results.</returns>
+        public bool ExpressionPassed()
+        {
+            // Returns true if passing matched for time
+            var ResultFieldInfos = this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            var ResultsPassed = ResultFieldInfos.Select(FieldObj =>
+            {
+                // Pull the ResultAttribute object.
+                var CurrentValue = FieldObj.GetValue(this).ToString().Trim();
+                var ResultAttribute = (PtExpressionProperty)FieldObj.GetCustomAttributes(typeof(PtExpressionProperty)).FirstOrDefault();
+
+                // Now compare value to the passed/failed setup.
+                return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
+            });
+
+            // Now see if all the values in the Results array passed.
+            return ResultsPassed.All(ValueObj => ValueObj);
         }
 
         // --------------------------------------------------------------------------------------------------------------
@@ -207,25 +246,91 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         // --------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Expression evaluation computed result based on output values.
+        /// Pulls out all of our message content values and stores them into a list with details.
         /// </summary>
-        /// <returns>True or false based on expression eval results.</returns>
-        public bool ExpressionPassed()
+        protected internal string FindMessageContents(out List<string[]> MessageProperties)
         {
-            // Returns true if passing matched for time
-            var ResultFieldInfos = this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-            var ResultsPassed = ResultFieldInfos.Select(FieldObj =>
+            // Check if not read or write types. 
+            if (this.GetType() != typeof(PassThruReadMessagesExpression) && this.GetType() != typeof(PassThruWriteMessagesExpression)) {
+                this.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON READ OR WRITE COMMAND TYPE!", LogType.ErrorLog);
+                MessageProperties = new List<string[]>();
+                return string.Empty;
+            }
+
+            // Pull the object, find our matches based on our type object value.
+            var MessageContentRegex = this.GetType() == typeof(PassThruReadMessagesExpression) ?
+                PassThruRegexModelShare.MessageReadInfo : PassThruRegexModelShare.MessageSentInfo;
+
+            // Make our value lookup table here and output tuples
+            var RegexResultTuples = new List<Tuple<string, string>>();
+            bool IsReadExpression = this.GetType() == typeof(PassThruReadMessagesExpression);
+            List<string> ResultStringTable = new List<string>() { "Message Number" };
+
+            // Fill in strings for property type values here.
+            if (IsReadExpression) ResultStringTable.AddRange(new[] { "TimeStamp", "Protocol ID", "Data Count", "Rx Flags", "Flag Value", "Message Data" });
+            else ResultStringTable.AddRange(new[] { "Protocol ID", "Data Count", "Tx Flags", "Flag Value", "Message Data" });
+
+            // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
+            string[] SplitMessageLines = this.CommandLines.Split(new[] { "Msg" }, StringSplitOptions.None)
+                .Where(LineObj => LineObj.StartsWith("["))
+                .Select(LineObj => "Msg" + LineObj)
+                .ToArray();
+
+            // If no messages are found during the split process, then we need to return out.
+            if (SplitMessageLines.Length == 0) {
+                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {this.GetType().Name}!");
+                MessageProperties = new List<string[]>();
+                return "No Messages Found!";
+            }
+
+            // Now run each of them thru here.
+            MessageProperties = new List<string[]>();
+            List<string> OutputMessages = new List<string>();
+            foreach (var MsgLineSet in SplitMessageLines)
             {
-                // Pull the ResultAttribute object.
-                var CurrentValue = FieldObj.GetValue(this).ToString().Trim();
-                var ResultAttribute = (PtExpressionProperty)FieldObj.GetCustomAttributes(typeof(PtExpressionProperty)).FirstOrDefault();
+                // RegexMatch output here.
+                bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
+                if (!MatchedContent) {
+                    this.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
+                    continue;
+                }
 
-                // Now compare value to the passed/failed setup.
-                return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
-            });
+                // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
+                if (IsReadExpression && MatchedMessageStrings[5] == "0x00000000") MatchedMessageStrings.ToList().Insert(5, "No Value");
+                else if (!IsReadExpression && MatchedMessageStrings[4] == "0x00000000") MatchedMessageStrings.ToList().Insert(4, "No Value");
 
-            // Now see if all the values in the Results array passed.
-            return ResultsPassed.All(ValueObj => ValueObj);
+                // Now loop each part of the matched content and add values into our output tuple set.
+                string[] SelectedStrings = MatchedMessageStrings.Skip(1).ToArray();
+                for (int StringIndex = 0; StringIndex < SelectedStrings.Length; StringIndex++)
+                    RegexResultTuples.Add(new Tuple<string, string>(ResultStringTable[StringIndex], SelectedStrings[StringIndex]));
+
+                // Build our output table once all our values have been appended in here.
+                string RegexValuesOutputString = RegexResultTuples.ToStringTable(
+                    new[] { "Message Property", "Message Value" },
+                    RegexObj => RegexObj.Item1,
+                    RegexObj => RegexObj.Item2
+                );
+
+                // Add this string to our list of messages.
+                OutputMessages.Add(RegexValuesOutputString);
+                MessageProperties.Add(RegexResultTuples.Select(TupleObj => TupleObj.Item2).ToArray());
+                this.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.InfoLog);
+            }
+
+            // Return built table string object.
+            this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
+            return string.Join("\n", OutputMessages);
+        }
+        /// <summary>
+        /// Pulls out the filter contents of this command as messages and pulls them back. One entry per filter property
+        /// If we have a Flow filter it's 3 lines. All others would be 2 line .
+        /// </summary>
+        /// <param name="FilterProperties">Properties of filter pulled</param>
+        /// <returns>Text String table for filter messages.</returns>
+        protected internal string FindFilterContents(out List<string[]> FilterProperties)
+        {
+            // Throw an exception since this is isn't yet dont.
+            throw new InvalidOperationException("FILTER PARSING IS NOT YET DEVELOPED! TRY AGAIN ONCE READY");
         }
     }
 }

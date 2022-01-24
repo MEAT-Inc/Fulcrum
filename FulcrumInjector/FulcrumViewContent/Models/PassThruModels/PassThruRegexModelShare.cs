@@ -44,6 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel PassThruConnect => PassThruExpressionObjects.GetRegexByName("PTConnect");
         public static PassThruRegexModel PassThruDisconnect => PassThruExpressionObjects.GetRegexByName("PTDisconnect");
         public static PassThruRegexModel PassThruReadMessages => PassThruExpressionObjects.GetRegexByName("PTReadMsgs");
+        public static PassThruRegexModel PassThruWriteMessages => PassThruExpressionObjects.GetRegexByName("PTWriteMsgs");
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -53,6 +54,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel DeviceIdReturned => PassThruExpressionObjects.GetRegexByName("DeviceID");
         public static PassThruRegexModel ChannelIdReturned => PassThruExpressionObjects.GetRegexByName("ChannelID");
         public static PassThruRegexModel NumberOfMessages => PassThruExpressionObjects.GetRegexByName("MessageCount");
+        public static PassThruRegexModel MessageSentInfo => PassThruExpressionObjects.GetRegexByName("MessageSentInfo");
+        public static PassThruRegexModel MessageReadInfo => PassThruExpressionObjects.GetRegexByName("MessageReadInfo");
+        public static PassThruRegexModel MessageDataContent => PassThruExpressionObjects.GetRegexByName("MessageData");
 
         // --------------------------------------------------------------------------------------------------------------------------
 

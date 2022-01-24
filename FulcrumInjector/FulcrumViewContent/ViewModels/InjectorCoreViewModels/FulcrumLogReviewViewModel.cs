@@ -154,6 +154,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                 // Convert the expression set into a list of file strings now and return list built.
                 this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsFile(this.LoadedLogFile);
+                if (this._lastBuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._lastBuiltExpressionsFile}!", LogType.InfoLog);
                 OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet); this.InputParsed = true;

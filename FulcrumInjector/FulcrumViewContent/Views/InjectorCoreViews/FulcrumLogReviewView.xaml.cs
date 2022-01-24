@@ -158,6 +158,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             var DefaultColor = SenderButton.Background;
             SenderButton.Content = "Processing...";
 
+            // Open the processing flyout
+            this.ProcessingFlyout.IsOpen = true;
+
             // Get Grid object
             Grid ParentGrid = SenderButton.Parent as Grid;
             ToggleViewTextButton.IsEnabled = false; ParentGrid.IsEnabled = false;
@@ -181,6 +184,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     // Invoke via Dispatcher
                     Dispatcher.Invoke(() =>
                     {
+                        // Close the processing flyout
+                        this.ProcessingFlyout.IsOpen = false;
+
                         // Enable grid, show result on buttons
                         ParentGrid.IsEnabled = true;
                         ToggleViewTextButton.IsEnabled = true;  
