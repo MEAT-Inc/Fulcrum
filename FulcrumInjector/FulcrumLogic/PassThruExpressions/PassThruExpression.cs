@@ -112,10 +112,23 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             NewLines.Add("\n");
 
             // Add our breakdown contents here.
-            NewLines.Add(SplitTable[0]); NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
-            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n"); NewLines.Add(SplitString);
+            NewLines.Add(SplitTable[0]);
+            NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
+
+            // Append in contents for message values if needed. 
+            if (this.GetType() == typeof(PassThruReadMessagesExpression) || this.GetType() == typeof(PassThruWriteMessagesExpression))
+            {
+                // Log information, pull in new split table contents
+                this.ExpressionLogger.WriteLog("APPENDING MESSAGE CONTENT VALUES NOW...", LogType.WarnLog);
+                string MessagesTable = this.FindMessageContents();
+
+                // Append the new table of messages into the current output.
+                NewLines.AddRange(MessagesTable.Split('\n'));
+                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
+            }
 
             // Remove double newlines. Command lines are split with \r so this doesn't apply.
+            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n"); NewLines.Add(SplitString);
             RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
         }
@@ -225,16 +238,60 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             this.ExpressionLogger.WriteLog($"UPDATED EXPRESSION VALUES FOR A TYPE OF {this.GetType().Name} OK!");
             return true;
         }
-
-        // --------------------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
         /// </summary>
-        protected internal void FindMessageContents()
+        private string FindMessageContents()
         {
-            // Pull in our message Regex Object commands here.
+            // Pull the object, find our matches based on our type object value.
+            var MessageContentRegex = this.GetType() == typeof(PassThruReadMessagesExpression) ?
+                PassThruRegexModelShare.MessageReadInfo : PassThruRegexModelShare.MessageSentInfo;
 
+            // Make our value lookup table here and output tuples
+            var RegexResultTuples = new List<Tuple<string, string>>();
+            bool IsReadExpression = this.GetType() == typeof(PassThruReadMessagesExpression);
+            List<string> ResultStringTable = new List<string>()
+            {
+                "Message Number",
+                IsReadExpression ? "TimeStamp" : "Protocol ID",
+                IsReadExpression ? "Protocol ID" : "Data Count",
+                IsReadExpression ? "Data Count" : "Tx Flags",
+                IsReadExpression ? "Rx Flags" : "Message Data",
+                IsReadExpression ? "Message Data" : string.Empty
+            };
+
+            // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
+            string[] SplitMessageLines = this.CommandLines.Split(new[] { "Msg" }, StringSplitOptions.None)
+                .Where(LineObj => LineObj.StartsWith("["))
+                .Select(LineObj => "Msg" + LineObj)
+                .ToArray();
+
+            // Now run each of them thru here.
+            foreach (var MsgLineSet in SplitMessageLines)
+            {
+                // RegexMatch output here.
+                bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
+                if (!MatchedContent) {
+                    this.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
+                    continue;
+                }
+
+                // Now loop each part of the matched content and add values into our output tuple set.
+                for (int StringIndex = 0; StringIndex < MatchedMessageStrings.Length; StringIndex++)
+                    RegexResultTuples.Add(new Tuple<string, string>(ResultStringTable[StringIndex], MatchedMessageStrings[StringIndex]));
+            }
+            
+
+            // Build our output table once all our values have been appended in here.
+            string RegexValuesOutputString = RegexResultTuples.ToStringTable(
+                new[] { "Message Property", "Message Value" },
+                RegexObj => RegexObj.Item1,
+                RegexObj => RegexObj.Item2
+            );
+
+            // Return built table string object.
+            this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
+            return RegexValuesOutputString;
         }
     }
 }

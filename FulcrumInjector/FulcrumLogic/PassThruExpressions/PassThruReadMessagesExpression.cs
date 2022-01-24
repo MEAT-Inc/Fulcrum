@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 {
