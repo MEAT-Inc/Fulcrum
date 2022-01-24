@@ -187,12 +187,12 @@
                          DataContext="{Binding Path=SessionReportSender.MessageAttachmentFiles}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="4,5" Margin="-5,0"
+                            <Border Padding="4,5" Margin="0,0,0,0"
                                     BorderThickness="2" BorderBrush="{StaticResource DarkGreyThemeColor}">
-                                <Grid Margin="3,0">
+                                <Grid Margin="3,0,3,0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="5"/>
                                         <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock
@@ -206,11 +206,11 @@
                                     Margin="0,-5"
                                     Grid.Column="1"
                                     BorderBrush="{StaticResource DarkGreyThemeColor}"
-                                    BorderThickness="2,0,0,0">
+                                    BorderThickness="0,0,2,0">
                                     </Border>
                                     <Button Grid.Column="2"
                                         VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Right"
                                         Click="RemoveAttachmentButton_OnClick">
                                         <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,0,0">
                                             <Path.Data>
