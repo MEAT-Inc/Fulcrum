@@ -121,7 +121,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             {
                 // Log information, pull in new split table contents
                 this.ExpressionLogger.WriteLog("APPENDING MESSAGE CONTENT VALUES NOW...", LogType.WarnLog);
-                string MessagesTable = this.FindMessageContents();
+                string MessagesTable = this.FindMessageContents(out _);
 
                 // Append the new table of messages into the current output.
                 NewLines.AddRange(MessagesTable.Split('\n').Select(LineObj => "   " + LineObj).ToArray());
@@ -242,11 +242,21 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             this.ExpressionLogger.WriteLog($"UPDATED EXPRESSION VALUES FOR A TYPE OF {this.GetType().Name} OK!");
             return true;
         }
+
+        // --------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
         /// </summary>
-        private string FindMessageContents()
+        protected internal string FindMessageContents(out List<string[]> MessageProperties)
         {
+            // Check if not read or write types. 
+            if (this.GetType() != typeof(PassThruReadMessagesExpression) && this.GetType() != typeof(PassThruWriteMessagesExpression)) {
+                this.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON READ OR WRITE COMMAND TYPE!", LogType.ErrorLog);
+                MessageProperties = new List<string[]>();
+                return string.Empty;
+            }
+
             // Pull the object, find our matches based on our type object value.
             var MessageContentRegex = this.GetType() == typeof(PassThruReadMessagesExpression) ?
                 PassThruRegexModelShare.MessageReadInfo : PassThruRegexModelShare.MessageSentInfo;
@@ -269,10 +279,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             // If no messages are found during the split process, then we need to return out.
             if (SplitMessageLines.Length == 0) {
                 this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {this.GetType().Name}!");
+                MessageProperties = new List<string[]>();
                 return "No Messages Found!";
             }
 
             // Now run each of them thru here.
+            MessageProperties = new List<string[]>();
             List<string> OutputMessages = new List<string>();
             foreach (var MsgLineSet in SplitMessageLines)
             {
@@ -299,14 +311,26 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                     RegexObj => RegexObj.Item2
                 );
 
-                 // Add this string to our list of messages.
-                 OutputMessages.Add(RegexValuesOutputString);
+                // Add this string to our list of messages.
+                OutputMessages.Add(RegexValuesOutputString);
+                MessageProperties.Add(RegexResultTuples.Select(TupleObj => TupleObj.Item2).ToArray());
                 this.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.InfoLog);
             }
 
             // Return built table string object.
             this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
             return string.Join("\n", OutputMessages);
+        }
+        /// <summary>
+        /// Pulls out the filter contents of this command as messages and pulls them back. One entry per filter property
+        /// If we have a Flow filter it's 3 lines. All others would be 2 line .
+        /// </summary>
+        /// <param name="FilterProperties">Properties of filter pulled</param>
+        /// <returns>Text String table for filter messages.</returns>
+        protected internal string FindFilterContents(out List<string[]> FilterProperties)
+        {
+            // Throw an exception since this is isn't yet dont.
+            throw new InvalidOperationException("FILTER PARSING IS NOT YET DEVELOPED! TRY AGAIN ONCE READY");
         }
     }
 }

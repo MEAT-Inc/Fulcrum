@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 {
@@ -25,6 +26,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         [PtExpressionProperty("Sent Count")] public readonly string MessageCountSent;
         [PtExpressionProperty("Expected Count")] public readonly string MessageCountTotal;
 
+        // Contents of message objects located. Shown as a set of tuples and values.
+        // The output Array contains a list of tuples paired "Property, Value" 
+        // When we complete the expression sets and need to parse these objects into command models, we can Just loop the arrays
+        // and pull out the values one by one.
+        //
+        // So a Sample would be
+        //      Message 0 { 0,  ISO15765 }
+        //      Message 1 { 0,  ISO15765 }
+        //
+        // Then from those values, we can build out a PTMessage object.
+        public readonly List<string[]> MessageProperties;
+
         // ----------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -43,6 +56,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             List<string> StringsToApply = new List<string> { PassThruWriteMsgsStrings[0] };
             StringsToApply.AddRange(from NextIndex in this.PtWriteMessagesRegex.ExpressionValueGroups where NextIndex <= PassThruWriteMsgsStrings.Length select PassThruWriteMsgsStrings[NextIndex]);
             StringsToApply.AddRange(from NextIndex in this.MessagesWrittenRegex.ExpressionValueGroups where NextIndex <= MessagesSentStrings.Length select MessagesSentStrings[NextIndex]);
+
+            // Find our message content values here.
+            string MessageTable = this.FindMessageContents(out this.MessageProperties);
+            if (MessageTable is "" or "No Messages Found!") 
+                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR EXPRESSION TYPE {this.GetType().Name}!", LogType.WarnLog);
 
             // Now apply values using base method and exit out of this routine
             if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
