@@ -108,12 +108,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
             // Store string to replace and build new list of strings
             var NewLines = new List<string>() { SplitString }; NewLines.Add("\r");
-            NewLines.AddRange(this.SplitCommandLines.Select(CmdLine => $"   {CmdLine}"));
+            NewLines.AddRange(this.SplitCommandLines.Select(LineObj => "   " + LineObj));
             NewLines.Add("\n");
 
             // Add our breakdown contents here.
             NewLines.Add(SplitTable[0]);
             NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
+            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n");
 
             // Append in contents for message values if needed. 
             if (this.GetType() == typeof(PassThruReadMessagesExpression) || this.GetType() == typeof(PassThruWriteMessagesExpression))
@@ -123,12 +124,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 string MessagesTable = this.FindMessageContents();
 
                 // Append the new table of messages into the current output.
-                NewLines.AddRange(MessagesTable.Split('\n'));
+                NewLines.AddRange(MessagesTable.Split('\n').Select(LineObj => "   " + LineObj).ToArray());
                 this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
+
+                // Splitting endline.
+                NewLines.Add("\n");
             }
 
             // Remove double newlines. Command lines are split with \r so this doesn't apply.
-            NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n"); NewLines.Add(SplitString);
+            NewLines.Add(SplitString);
             RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
         }
@@ -250,15 +254,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             // Make our value lookup table here and output tuples
             var RegexResultTuples = new List<Tuple<string, string>>();
             bool IsReadExpression = this.GetType() == typeof(PassThruReadMessagesExpression);
-            List<string> ResultStringTable = new List<string>()
-            {
-                "Message Number",
-                IsReadExpression ? "TimeStamp" : "Protocol ID",
-                IsReadExpression ? "Protocol ID" : "Data Count",
-                IsReadExpression ? "Data Count" : "Tx Flags",
-                IsReadExpression ? "Rx Flags" : "Message Data",
-                IsReadExpression ? "Message Data" : string.Empty
-            };
+            List<string> ResultStringTable = new List<string>() { "Message Number" };
+
+            // Fill in strings for property type values here.
+            if (IsReadExpression) ResultStringTable.AddRange(new[] { "TimeStamp", "Protocol ID", "Data Count", "Rx Flags", "Flag Value", "Message Data" });
+            else ResultStringTable.AddRange(new[] { "Protocol ID", "Data Count", "Tx Flags", "Flag Value", "Message Data" });
 
             // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
             string[] SplitMessageLines = this.CommandLines.Split(new[] { "Msg" }, StringSplitOptions.None)
@@ -266,7 +266,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 .Select(LineObj => "Msg" + LineObj)
                 .ToArray();
 
+            // If no messages are found during the split process, then we need to return out.
+            if (SplitMessageLines.Length == 0) {
+                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {this.GetType().Name}!");
+                return "No Messages Found!";
+            }
+
             // Now run each of them thru here.
+            List<string> OutputMessages = new List<string>();
             foreach (var MsgLineSet in SplitMessageLines)
             {
                 // RegexMatch output here.
@@ -276,22 +283,30 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                     continue;
                 }
 
-                // Now loop each part of the matched content and add values into our output tuple set.
-                for (int StringIndex = 0; StringIndex < MatchedMessageStrings.Length; StringIndex++)
-                    RegexResultTuples.Add(new Tuple<string, string>(ResultStringTable[StringIndex], MatchedMessageStrings[StringIndex]));
-            }
-            
+                // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
+                if (IsReadExpression && MatchedMessageStrings[5] == "0x00000000") MatchedMessageStrings.ToList().Insert(5, "No Value");
+                else if (!IsReadExpression && MatchedMessageStrings[4] == "0x00000000") MatchedMessageStrings.ToList().Insert(4, "No Value");
 
-            // Build our output table once all our values have been appended in here.
-            string RegexValuesOutputString = RegexResultTuples.ToStringTable(
-                new[] { "Message Property", "Message Value" },
-                RegexObj => RegexObj.Item1,
-                RegexObj => RegexObj.Item2
-            );
+                // Now loop each part of the matched content and add values into our output tuple set.
+                string[] SelectedStrings = MatchedMessageStrings.Skip(1).ToArray();
+                for (int StringIndex = 0; StringIndex < SelectedStrings.Length; StringIndex++)
+                    RegexResultTuples.Add(new Tuple<string, string>(ResultStringTable[StringIndex], SelectedStrings[StringIndex]));
+
+                // Build our output table once all our values have been appended in here.
+                string RegexValuesOutputString = RegexResultTuples.ToStringTable(
+                    new[] { "Message Property", "Message Value" },
+                    RegexObj => RegexObj.Item1,
+                    RegexObj => RegexObj.Item2
+                );
+
+                 // Add this string to our list of messages.
+                 OutputMessages.Add(RegexValuesOutputString);
+                this.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.InfoLog);
+            }
 
             // Return built table string object.
             this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
-            return RegexValuesOutputString;
+            return string.Join("\n", OutputMessages);
         }
     }
 }

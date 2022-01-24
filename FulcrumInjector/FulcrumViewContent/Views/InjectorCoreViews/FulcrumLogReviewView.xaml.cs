@@ -185,7 +185,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     Dispatcher.Invoke(() =>
                     {
                         // Close the processing flyout
-                        this.ProcessingFlyout.IsOpen = true;
+                        this.ProcessingFlyout.IsOpen = false;
 
                         // Enable grid, show result on buttons
                         ParentGrid.IsEnabled = true;
