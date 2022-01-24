@@ -27,6 +27,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         [EnumMember(Value = "PTConnect")] [Description("PassThruConnectExpression")]         PTConnect,
         [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")]   PTDisconnect,
         [EnumMember(Value = "PTReadMsgs")] [Description("PassThruReadMessagesExpression")]   PTReadMsgs,
+        [EnumMember(Value = "PTWriteMsgs")] [Description("PassThruWriteMessagesExpression")] PTWriteMsgs,
     }
 
     // --------------------------------------------------------------------------------------------------------------
@@ -118,6 +119,27 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             RegexValuesOutputString = string.Join("\n", NewLines).Replace("\n\n", "\n");
             return RegexValuesOutputString;
         }
+        /// <summary>
+        /// Expression evaluation computed result based on output values.
+        /// </summary>
+        /// <returns>True or false based on expression eval results.</returns>
+        public bool ExpressionPassed()
+        {
+            // Returns true if passing matched for time
+            var ResultFieldInfos = this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            var ResultsPassed = ResultFieldInfos.Select(FieldObj =>
+            {
+                // Pull the ResultAttribute object.
+                var CurrentValue = FieldObj.GetValue(this).ToString().Trim();
+                var ResultAttribute = (PtExpressionProperty)FieldObj.GetCustomAttributes(typeof(PtExpressionProperty)).FirstOrDefault();
+
+                // Now compare value to the passed/failed setup.
+                return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
+            });
+
+            // Now see if all the values in the Results array passed.
+            return ResultsPassed.All(ValueObj => ValueObj);
+        }
 
         // --------------------------------------------------------------------------------------------------------------
 
@@ -207,25 +229,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         // --------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Expression evaluation computed result based on output values.
+        /// Pulls out all of our message content values and stores them into a list with details.
         /// </summary>
-        /// <returns>True or false based on expression eval results.</returns>
-        public bool ExpressionPassed()
+        protected internal void FindMessageContents()
         {
-            // Returns true if passing matched for time
-            var ResultFieldInfos = this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-            var ResultsPassed = ResultFieldInfos.Select(FieldObj =>
-            {
-                // Pull the ResultAttribute object.
-                var CurrentValue = FieldObj.GetValue(this).ToString().Trim();
-                var ResultAttribute = (PtExpressionProperty)FieldObj.GetCustomAttributes(typeof(PtExpressionProperty)).FirstOrDefault();
 
-                // Now compare value to the passed/failed setup.
-                return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
-            });
-
-            // Now see if all the values in the Results array passed.
-            return ResultsPassed.All(ValueObj => ValueObj);
         }
     }
 }
