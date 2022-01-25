@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -37,7 +38,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         // TODO: Write PassThruSetProgrammingVoltage (Not Needed for Sims)
         // TODO: Write PTReadVersion (Not Needed for Sims)
         [EnumMember(Value = "PTIoctl")] [Description("PassThruIoctlExpression")]                        PTIoctl,
-        // TODO: Write PassThruGetLastError
+        // TODO: Write PassThruGetLastError (Not needed for Sims)
     }
 
     // --------------------------------------------------------------------------------------------------------------
@@ -126,34 +127,45 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             NewLines.AddRange(SplitTable.Skip(1).Take(SplitTable.Length - 2));
             NewLines.Add(SplitTable.FirstOrDefault()); NewLines.Add("\n");
 
-            // Append in contents for message values if needed. 
+            // Check the type of this object. If it matches the types with extra content then build the values for it now.
             if (this.GetType() == typeof(PassThruReadMessagesExpression) || this.GetType() == typeof(PassThruWriteMessagesExpression))
             {
                 // Log information, pull in new split table contents
-                this.ExpressionLogger.WriteLog("APPENDING MESSAGE CONTENT VALUES NOW...", LogType.WarnLog);
-                string MessagesTable = this.FindMessageContents(out _);
+                NewLines.AddRange(this.FindMessageContents(out _)
+                    .Split('\n')
+                    .Where(LineObj => !string.IsNullOrEmpty(LineObj))
+                    .Select(LineObj => "   " + LineObj)
+                    .Append("\n")
+                    .ToArray());
 
-                // Append the new table of messages into the current output.
-                NewLines.AddRange(MessagesTable.Split('\n').Select(LineObj => "   " + LineObj).ToArray());
+                // Log added new content
                 this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
-
-                // Splitting end line.
-                NewLines.Add("\n");
             }
-
-            // Append in contents for a filter message set if needed.
             if (this.GetType() == typeof(PassThruStartMessageFilterExpression))
             {
-                // Log information, pull in split table contents.
-                this.ExpressionLogger.WriteLog("APPENDING FILTER CONTENT VALUES NOW...", LogType.WarnLog);
-                string FilterMessageTable = this.FindFilterContents(out _);
-
                 // Append the new values for the messages into our output strings now.
-                NewLines.AddRange(FilterMessageTable.Split('\n').Select(LineObj => "   " + LineObj).ToArray());
-                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
+                NewLines.AddRange(this.FindFilterContents(out _)
+                    .Split('\n')
+                    .Where(LineObj => !string.IsNullOrEmpty(LineObj))
+                    .Select(LineObj => "   " + LineObj)
+                    .Append("\n")
+                    .ToArray());
 
-                // Splitting end line.
-                NewLines.Add("\n");
+                // Log added new content
+                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
+            }
+            if (this.GetType() == typeof(PassThruStartMessageFilterExpression))
+            {
+                // Append the new values for the Ioctl values into our output strings now.
+                NewLines.AddRange(this.FindFilterContents(out _)
+                    .Split('\n')
+                    .Where(LineObj => !string.IsNullOrEmpty(LineObj))
+                    .Select(LineObj => "   " + LineObj)
+                    .Append("\n")
+                    .ToArray());
+
+                // Log added new content
+                this.ExpressionLogger.WriteLog("PULLED IN NEW IOCTL VALUES FOR COMMAND CONTENTS CORRECTLY!", LogType.InfoLog);
             }
 
             // Remove double newlines. Command lines are split with \r so this doesn't apply.
@@ -266,213 +278,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             // Log passed, return output.
             this.ExpressionLogger.WriteLog($"UPDATED EXPRESSION VALUES FOR A TYPE OF {this.GetType().Name} OK!");
             return true;
-        }
-
-        // --------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Pulls out all of our message content values and stores them into a list with details.
-        /// </summary>
-        protected internal string FindMessageContents(out List<string[]> MessageProperties)
-        {
-            // Check if not read or write types. 
-            if (this.GetType() != typeof(PassThruReadMessagesExpression) && this.GetType() != typeof(PassThruWriteMessagesExpression)) {
-                this.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON READ OR WRITE COMMAND TYPE!", LogType.ErrorLog);
-                MessageProperties = new List<string[]>();
-                return string.Empty;
-            }
-
-            // Pull the object, find our matches based on our type object value.
-            var MessageContentRegex = this.GetType() == typeof(PassThruReadMessagesExpression) ?
-                PassThruRegexModelShare.MessageReadInfo : PassThruRegexModelShare.MessageSentInfo;
-
-            // Make our value lookup table here and output tuples
-            var RegexResultTuples = new List<Tuple<string, string>>();
-            bool IsReadExpression = this.GetType() == typeof(PassThruReadMessagesExpression);
-            List<string> ResultStringTable = new List<string>() { "Message Number" };
-
-            // Fill in strings for property type values here.
-            if (IsReadExpression) ResultStringTable.AddRange(new[] { "TimeStamp", "Protocol ID", "Data Count", "RX Flags", "Flag Value", "Message Data" });
-            else ResultStringTable.AddRange(new[] { "Protocol ID", "Data Count", "TX Flags", "Flag Value", "Message Data" });
-
-            // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
-            string[] SplitMessageLines = this.CommandLines.Split(new[] { "Msg" }, StringSplitOptions.None)
-                .Where(LineObj => LineObj.StartsWith("["))
-                .Select(LineObj => "Msg" + LineObj)
-                .ToArray();
-
-            // If no messages are found during the split process, then we need to return out.
-            if (SplitMessageLines.Length == 0) {
-                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {this.GetType().Name}!");
-                MessageProperties = new List<string[]>();
-                return "No Messages Found!";
-            }
-
-            // Now run each of them thru here.
-            MessageProperties = new List<string[]>();
-            List<string> OutputMessages = new List<string>();
-            foreach (var MsgLineSet in SplitMessageLines)
-            {
-                // RegexMatch output here.
-                bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
-                if (!MatchedContent) {
-                    this.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
-                    continue;
-                }
-
-                // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
-                var TempList = MatchedMessageStrings.ToList();
-                int IndexOfZeroFlags = TempList.IndexOf("0x00000000");
-                if (IndexOfZeroFlags != -1) { TempList.Insert(IndexOfZeroFlags + 1, "No Value"); }
-                MatchedMessageStrings = TempList.ToArray();
-
-                // Remove any and all whitespace values from our output content here.
-                string[] SelectedStrings = MatchedMessageStrings
-                    .Skip(1)
-                    .Where(StringObj => !string.IsNullOrEmpty(StringObj))
-                    .ToArray();
-
-                // Now loop each part of the matched content and add values into our output tuple set.
-                RegexResultTuples.AddRange(SelectedStrings
-                    .Select((T, StringIndex) => new Tuple<string, string>(ResultStringTable[StringIndex], T)));
-
-                // Build our output table once all our values have been appended in here.
-                string RegexValuesOutputString = RegexResultTuples.ToStringTable(
-                    new[] { "Message Property", "Message Value" },
-                    RegexObj => RegexObj.Item1,
-                    RegexObj => RegexObj.Item2
-                );
-
-                // Add this string to our list of messages.
-                OutputMessages.Add(RegexValuesOutputString);
-                MessageProperties.Add(RegexResultTuples.Select(TupleObj => TupleObj.Item2).ToArray());
-                this.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.InfoLog);
-            }
-
-            // Return built table string object.
-            this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
-            return string.Join("\n", OutputMessages);
-        }
-        /// <summary>
-        /// Pulls out the filter contents of this command as messages and pulls them back. One entry per filter property
-        /// If we have a Flow filter it's 3 lines. All others would be 2 line .
-        /// </summary>
-        /// <param name="FilterProperties">Properties of filter pulled</param>
-        /// <returns>Text String table for filter messages.</returns>
-        protected internal string FindFilterContents(out List<string[]> FilterProperties)
-        {
-            // Check if we can use this method or not.
-            if (this.GetType() != typeof(PassThruStartMessageFilterExpression)) {
-                this.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON PTSTART FILTER COMMAND TYPE!", LogType.ErrorLog);
-                FilterProperties = new List<string[]>();
-                return string.Empty;
-            }
-
-            // Make our value lookup table here and output tuples.
-            List<string> ResultStringTable = new List<string>()
-            {
-                "Message Type",     // Mask Pattern or Flow
-                "Message Number",   // Always 0
-                "Protocol ID",      // Protocol Of Message
-                "Message Size",     // Size of message
-                "TX Flags",         // Tx Flags
-                "Flag Value",       // String Flag Value
-                "Message Content"   // Content of the filter message
-            };
-
-            // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
-            List<string> CombinedOutputs = new List<string>();
-            string[] SplitMessageLines = Regex.Split(this.CommandLines, @"\s+(Mask|Pattern|FlowControl)").Skip(1).ToArray();
-            for (int LineIndex = 0; LineIndex < SplitMessageLines.Length; LineIndex++)
-            {
-                // Append based on line value input here.
-                CombinedOutputs.Add(LineIndex + 1 >= SplitMessageLines.Length
-                    ? SplitMessageLines[LineIndex]
-                    : string.Join(string.Empty, SplitMessageLines.Skip(LineIndex).Take(2)));
-
-                // Check index value.
-                if (LineIndex + 1 >= SplitMessageLines.Length) break;
-                LineIndex += 1;
-            }
-
-            // Check if no values were pulled. If this is the case then dump out.
-            if (SplitMessageLines.Length == 0) {
-                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {this.GetType().Name}!");
-                FilterProperties = new List<string[]>();
-                return "No Filter Content Found!";
-            }
-
-            // Setup Loop constants for parsing operations
-            FilterProperties = new List<string[]>();
-            List<string> OutputMessages = new List<string>();
-            var MessageContentRegex = PassThruRegexModelShare.MessageFilterInfo;
-
-            // Now parse out our content matches. Add a trailing newline to force matches.
-            SplitMessageLines = CombinedOutputs.Select(LineSet => LineSet + "\n").ToArray();
-            foreach (var MsgLineSet in SplitMessageLines)
-            {
-                // RegexMatch output here.
-                var OutputMessageTuple = new List<Tuple<string, string>>();
-                bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
-                if (!MatchedContent) 
-                {
-                    // Check if this is a null flow control instance
-                    if (MsgLineSet.Trim() != "FlowControl is NULL") {
-                        this.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
-                        continue;
-                    }
-
-                    // Add null flow control here.
-                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[1], "FlowControl"));
-                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[2], "-1"));
-                    for (int TupleIndex = 3; TupleIndex < ResultStringTable.Count; TupleIndex++)
-                        OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[TupleIndex], "NULL"));
-
-                    // Log Expression found and continue.
-                    this.ExpressionLogger.WriteLog("FOUND NULL FLOW CONTROL! PARSING AND MOVING ON...", LogType.InfoLog);
-                }
-
-                // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
-                var TempList = MatchedMessageStrings.ToList();
-                int IndexOfZeroFlags = TempList.IndexOf("0x00000000");
-                if (IndexOfZeroFlags != -1) { TempList.Insert(IndexOfZeroFlags + 1, "No Value"); }
-                MatchedMessageStrings = TempList.ToArray();
-
-                // Knock out any of the whitespace values.
-                MatchedMessageStrings = MatchedMessageStrings
-                    .Skip(1)
-                    .Where(StringObj => !string.IsNullOrEmpty(StringObj))
-                    .ToArray();
-
-                // Now loop each part of the matched content and add values into our output tuple set.
-                OutputMessageTuple.AddRange(MatchedMessageStrings
-                    .Select((T, StringIndex) => new Tuple<string, string>(ResultStringTable[StringIndex], T)));
-
-                // Build our output table once all our values have been appended in here.
-                string RegexValuesOutputString = OutputMessageTuple.ToStringTable(
-                    new[] { "Filter Message Property", "Filter Message Value" },
-                    RegexObj => RegexObj.Item1,
-                    RegexObj => RegexObj.Item2
-                );
-
-                // Add this string to our list of messages.
-                OutputMessages.Add(RegexValuesOutputString + "\n");
-                FilterProperties.Add(OutputMessageTuple.Select(TupleObj => TupleObj.Item2).ToArray());
-                this.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.InfoLog);
-            }
-
-            // Return built table string object.
-            this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE FILTER CONTENTS OK!", LogType.InfoLog);
-            return string.Join("\n", OutputMessages);
-        }
-        /// <summary>
-        /// Finds all the parameters of the IOCTL command output from the input content
-        /// </summary>
-        /// <param name="ParameterProperties">Properties to return out.</param>
-        /// <returns>The properties of the IOCTL as a string table.</returns>
-        protected internal string FindIoctlParameters(out Tuple<string, string>[] ParameterProperties)
-        {
-            // Check if we can run this type
         }
     }
 }

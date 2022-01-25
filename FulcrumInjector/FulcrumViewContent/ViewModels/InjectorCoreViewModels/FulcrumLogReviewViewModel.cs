@@ -148,7 +148,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     var ExpressionType = this.GetTypeFromLines(SplitLines);
 
                     // Build expression class object and tick our progress
-                    var NextClassObject = ExpressionType.ToRegexClass(SplitLines);
+                    var NextClassObject = this.GetRegexClassFromCommand(ExpressionType, SplitLines);
                     this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
 
                     // Return the built expression object
@@ -225,6 +225,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             var EnumStringSelected = EnumTypesArray.FirstOrDefault(EnumObj => JoinedLines.Contains(EnumObj));
             return (PassThruCommandType)(string.IsNullOrWhiteSpace(EnumStringSelected) ?
                 PassThruCommandType.NONE : Enum.Parse(typeof(PassThruCommandType), EnumStringSelected));
+        }
+        /// <summary>
+        /// Converts an input Regex command type enum into a type output
+        /// </summary>
+        /// <param name="InputType">Enum Regex Typ</param>
+        /// <returns>Type of regex for the class output</returns>
+        private PassThruExpression GetRegexClassFromCommand(PassThruCommandType InputType, string[] InputLines)
+        {
+            // Pull the description string and get type of regex class.
+            string ClassType = $"{typeof(PassThruExpression).Namespace}.{InputType.ToDescriptionString()}";
+            if (Type.GetType(ClassType) == null) return new PassThruExpression(string.Join("\n", InputLines), InputType);
+
+            // Find our output type value here.
+            Type OutputType = Type.GetType(ClassType);
+            var RegexConstructor = OutputType.GetConstructor(new[] { typeof(string) });
+            return (PassThruExpression)RegexConstructor.Invoke(new[] { InputLines });
         }
         /// <summary>
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
