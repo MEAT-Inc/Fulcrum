@@ -157,7 +157,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             if (this.GetType() == typeof(PassThruIoctlExpression))
             {
                 // Append the new values for the Ioctl values into our output strings now.
-                NewLines.AddRange(this.FindFilterContents(out _)
+                NewLines.AddRange(this.FindIoctlParameters(out _)
                     .Split('\n')
                     .Where(LineObj => !string.IsNullOrEmpty(LineObj))
                     .Select(LineObj => "   " + LineObj)
