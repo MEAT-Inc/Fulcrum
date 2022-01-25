@@ -13,6 +13,7 @@ using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using Newtonsoft.Json;
+using NLog.Targets;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -141,16 +142,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 var ExpressionSet = SplitLogContent.Select(LineSet =>
                 {
                     // Split our output content here and then build a type for the expressions
+                    if (LineSet.Length == 0) return null;
                     string[] SplitLines = LineSet.Split('\n');
                     var ExpressionType = ExpressionExtensions.GetTypeFromLines(SplitLines);
 
                     // Build expression class object and tick our progress
                     var NextClassObject = ExpressionType.ToRegexClass(SplitLines);
-                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / SplitLogContent.Length);
+                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
 
                     // Return the built expression object
                     return NextClassObject;
-                }).ToArray();
+                }).Where(ExpObj => ExpObj != null).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
                 this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsFile(this.LoadedLogFile);
@@ -186,7 +188,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("FILE CONTENT PARSED OK! STORING TO VIEW NOW...", LogType.InfoLog);
                 CastView.Dispatcher.Invoke(() => {
                     CastView.ReplayLogInputContent.Text = NewLogContents;
-                    CastView.LoadedLogFileTextBox.Text = this.ShowingParsed ? this.LoadedLogFile : this._lastBuiltExpressionsFile;
+                    CastView.LoadedLogFileTextBox.Text = this.ShowingParsed ? this._lastBuiltExpressionsFile : this.LoadedLogFile;
                 });
 
                 // Toggle the showing parsed value.
