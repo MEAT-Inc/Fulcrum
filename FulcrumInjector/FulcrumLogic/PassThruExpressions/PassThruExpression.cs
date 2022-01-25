@@ -334,7 +334,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
                 // Build our output table once all our values have been appended in here.
                 string RegexValuesOutputString = RegexResultTuples.ToStringTable(
-                    new[] { "Filter Message Property", "Filter Message Value" },
+                    new[] { "Message Property", "Message Value" },
                     RegexObj => RegexObj.Item1,
                     RegexObj => RegexObj.Item2
                 );
@@ -446,7 +446,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
                 // Build our output table once all our values have been appended in here.
                 string RegexValuesOutputString = OutputMessageTuple.ToStringTable(
-                    new[] { "Message Property", "Message Value" },
+                    new[] { "Filter Message Property", "Filter Message Value" },
                     RegexObj => RegexObj.Item1,
                     RegexObj => RegexObj.Item2
                 );
