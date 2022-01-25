@@ -160,6 +160,7 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruDisconnectExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruIoctlExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruReadMessagesExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />

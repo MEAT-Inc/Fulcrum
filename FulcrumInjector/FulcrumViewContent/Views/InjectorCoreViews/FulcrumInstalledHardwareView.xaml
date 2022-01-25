@@ -27,7 +27,7 @@
     <!-- Installed Hardware View Content -->
     <Grid Margin="15,15,20,15">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".275*"/>
+            <RowDefinition Height=".235*"/>
             <RowDefinition Height="10"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -60,7 +60,7 @@
             <!-- DLL Output Content View -->
             <Grid Grid.Column="0" Margin="0,5,10,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height=".425*"/>
+                    <RowDefinition Height=".35*"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 
@@ -165,7 +165,7 @@
             <!-- Device Output Content View -->
             <Grid Grid.Column="2" Margin="10,5,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height=".425*"/>
+                    <RowDefinition Height=".35*"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 

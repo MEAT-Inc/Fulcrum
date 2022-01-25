@@ -30,14 +30,14 @@
         <!-- Settings items -->
     <Grid Margin="5,10,5,5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".325*"/>
+            <RowDefinition Height=".275*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <!-- Title and information -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height=".50*"/>
+                <RowDefinition Height=".475*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid>
@@ -54,7 +54,7 @@
                     Click="OpenJsonViewerFlyoutButton_OnClick" Width="175">
             </Button>
             <Border Grid.Row="1"
-                Margin="9,0,15,-2"
+                Margin="9,0,15,0"
                 x:Name="WidthHelperBorder"
                 VerticalAlignment="Bottom"
                 BorderThickness="0,0,0,2"
@@ -94,7 +94,7 @@
                             <ListBox
                             Grid.Row="1" 
                             Width="630"
-                            Height="300"
+                            Height="350"
                             Padding="0"
                             Margin="0,0,6,0"
                             BorderThickness="0"
