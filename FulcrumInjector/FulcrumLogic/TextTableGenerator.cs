@@ -82,7 +82,8 @@ namespace FulcrumInjector.FulcrumLogic
             string TableString = TableBuilder.ToString();
             int TableWidth = TableString.Split('\n')[0].Length;
             string PaddingLineString = $"+{string.Join("", Enumerable.Repeat("=", TableWidth - 5))}+";
-            return $"{PaddingLineString}\n{TableString}{PaddingLineString}".Replace("\r\n", "\n");
+            string FinalTableString = $"{PaddingLineString}\n{TableString}{PaddingLineString}".Replace("\r\n", "\n");
+            return string.Join("\n", FinalTableString.Split('\n').Select(LineObj => LineObj.TrimStart()));
         }
 
 

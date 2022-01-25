@@ -7,6 +7,7 @@
              xmlns:injectorCoreViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
+             xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
              Loaded="FulcrumLogReviewView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -39,7 +40,7 @@
                 <RowDefinition Height=".55*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid Margin="0,0,15,0">
+            <Grid Margin="0,0,15,0" x:Name="MainActionLoadButtons">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width=".60*"/>
                     <ColumnDefinition/>
@@ -108,10 +109,20 @@
                 </Grid.RowDefinitions>
 
                 <!-- Currently Loaded file -->
-                <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
-                         Style="{StaticResource InputTextWithHolder}" 
-                         VerticalAlignment="Bottom" IsReadOnly="True"
-                         Tag="Please Load a File First" Margin="10,0"/>
+                <Grid Grid.Row="0" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/> 
+                        <ColumnDefinition Width="175"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
+                             Style="{StaticResource InputTextWithHolder}" 
+                             VerticalAlignment="Bottom" IsReadOnly="True" Margin="0,0,10,0"
+                             Tag="Please Load a File First" Grid.Column="0"/>
+                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
+                            Margin="0,0" Height="30" VerticalAlignment="Bottom"
+                            IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
+                            Content="Show Parsed Contents" Click="ToggleParsedContentButton_OnClick"/>
+                </Grid>
 
                 <avalonedit:TextEditor
                     Grid.Row="1"
@@ -173,5 +184,42 @@
                 </Grid>
             </Grid>
         </Grid>
+
+        <!-- Flyout for Progress -->
+        <mahapps:FlyoutsControl Grid.RowSpan="3" Grid.Row="0" Margin="50,60,70,60" Background="{StaticResource PrimaryColor_Darker_65}">
+            <mahapps:Flyout 
+                Background="{StaticResource PrimaryColor_Darker_65}"
+                IsOpen="False" x:Name="ProcessingFlyout"
+                Position="Top" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                <!-- Empty Header Template -->
+                <mahapps:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mahapps:Flyout.HeaderTemplate>
+
+                <!-- Content for our main flyout -->
+                <Border BorderBrush="{StaticResource TextColorBase}" 
+                        BorderThickness="3" CornerRadius="2" 
+                        HorizontalAlignment="Stretch" 
+                        VerticalAlignment="Stretch" Margin="-20,0,0,0">
+                    <Grid Margin="50,70">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="150"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            Text="Processing Log Contents Now..." 
+                            Style="{StaticResource TitleStringText}"/>
+                        <TextBlock Grid.Row="1" Style="{StaticResource ParsingInfoTextStyle}"
+                                   Text="This process may take a long time if the file requested to parse out is a rather large log file. Most processing commands will take at most 20 seconds. If they take longer than 120 seconds you might want to consider closing this app and trying again. If this process continues to take an exceptionally long time, create a ticket using the email page in this app." Foreground="{StaticResource TextColorBase}"/>
+                        <Grid VerticalAlignment="Bottom" Height="30" Grid.Row="2">
+                            <ProgressBar Style="{StaticResource ParsingBarStyle}"/>
+                            <TextBlock Style="{StaticResource ParsingProgressTextStyle}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </mahapps:Flyout>
+        </mahapps:FlyoutsControl>
     </Grid>
 </UserControl>

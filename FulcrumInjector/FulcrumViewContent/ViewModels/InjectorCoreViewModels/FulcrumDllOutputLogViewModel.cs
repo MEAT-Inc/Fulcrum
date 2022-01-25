@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
+using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -17,14 +20,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private bool _hasOutput;
         private bool _usingRegex;
         private bool _noResultsOnSearch;
-        
+        private string[] _sessionLogs;
+
         // Public values for our view to bind onto 
         public bool HasOutput { get => _hasOutput; set => PropertyUpdated(value); }
         public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
+        public string[] SessionLogs { get => _sessionLogs; set => PropertyUpdated(value); }
         public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        private readonly PropertyWatchdog _outputWatchdog;
         public AvalonEditFilteringHelpers LogContentHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -37,6 +41,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
+
+            // Build default value for session log files.
+            ViewModelLogger.WriteLog("BUILDING EMPTY ARRAY FOR SESSION LOG FILES NOW...", LogType.WarnLog);
+            this.SessionLogs = Array.Empty<string>();
 
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL INJECTION OUTPUT LOG VALUES OK!", LogType.InfoLog);

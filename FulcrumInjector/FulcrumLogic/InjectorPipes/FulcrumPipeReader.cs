@@ -12,6 +12,8 @@ using System.Windows.Documents;
 using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent;
+using FulcrumInjector.FulcrumViewContent.Models;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumLogic.InjectorPipes
@@ -76,9 +78,9 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             );
 
             // Store our new settings values for the pipe object and apply them
-            DefaultBufferValue = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Buffer Size", DefaultBufferValue);
-            DefaultReadingTimeout = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Processing Timeout", DefaultReadingTimeout);
-            DefaultConnectionTimeout = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Connection Timeout", DefaultConnectionTimeout);
+            DefaultBufferValue = FulcrumSettingsShare.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Buffer Size", DefaultBufferValue);
+            DefaultReadingTimeout = FulcrumSettingsShare.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Processing Timeout", DefaultReadingTimeout);
+            DefaultConnectionTimeout = FulcrumSettingsShare.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Connection Timeout", DefaultConnectionTimeout);
             this.PipeLogger.WriteLog($"STORED NEW DEFAULT BUFFER SIZE VALUE OK! VALUE STORED IS: {DefaultBufferValue}", LogType.WarnLog);
             this.PipeLogger.WriteLog($"STORED NEW CONNECTION TIMEOUT VALUE OK! VALUE STORED IS: {DefaultConnectionTimeout}", LogType.WarnLog);
             this.PipeLogger.WriteLog($"STORED NEW READ OPERATION TIMEOUT VALUE OK! VALUE STORED IS: {DefaultReadingTimeout}", LogType.WarnLog);
@@ -149,7 +151,7 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
             // Build task token objects
             this.AsyncConnectionTokenSource = new CancellationTokenSource();
             this.PipeLogger.WriteLog("CONFIGURED NEW ASYNC CONNECTION TASK TOKENS OK!", LogType.InfoLog);
-            DefaultConnectionTimeout = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Connection Timeout", DefaultConnectionTimeout);
+            DefaultConnectionTimeout = FulcrumSettingsShare.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Connection Timeout", DefaultConnectionTimeout);
 
             // Set connection building bool value and update view if possible
             IsConnecting = true;
@@ -296,8 +298,8 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         internal bool ReadPipeData(out string ReadDataContents)
         {
             // Store our new settings for the pipe buffer and timeout
-            DefaultBufferValue = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Buffer Size", DefaultBufferValue);
-            DefaultReadingTimeout = InjectorConstants.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Processing Timeout", DefaultReadingTimeout);
+            DefaultBufferValue = FulcrumSettingsShare.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Buffer Size", DefaultBufferValue);
+            DefaultReadingTimeout = FulcrumSettingsShare.InjectorPipeConfigSettings.GetSettingValue("Reader Pipe Processing Timeout", DefaultReadingTimeout);
 
             // Build new timeout token values for reading operation and read now
             byte[] OutputBuffer = new byte[DefaultBufferValue];

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Windows.Media;
+using FulcrumInjector.FulcrumViewSupport.AppStyleSupport;
 using FulcrumInjector.FulcrumViewSupport.DataConverters;
 using Newtonsoft.Json;
 using Color = System.Drawing.Color;

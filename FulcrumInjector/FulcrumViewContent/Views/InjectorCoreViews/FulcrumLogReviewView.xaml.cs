@@ -17,7 +17,6 @@ using System.Windows.Shapes;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport.AvalonEditHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -103,17 +102,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
             }
-
-            // Get Grid object
+            
+            // Get Grid object and toggle buttons
+            ToggleViewTextButton.IsEnabled = false;
             Grid ParentGrid = SenderButton.Parent as Grid;
-            SenderButton.Content = "Loading...";
-            ParentGrid.IsEnabled = false;
+            SenderButton.Content = "Loading..."; ParentGrid.IsEnabled = false;
 
             // Store new file object value. Validate it on the ViewModel object first.
-            this.ViewModel.LoadedLogFile = SelectAttachmentDialog.FileName;
-            bool LoadResult = this.ViewModel.LoadLogFileContents();
-
-            // Log result
+            bool LoadResult = this.ViewModel.LoadLogContents(SelectAttachmentDialog.FileName);
             if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
             else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
@@ -162,9 +158,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             var DefaultColor = SenderButton.Background;
             SenderButton.Content = "Processing...";
 
+            // Open the processing flyout
+            this.ProcessingFlyout.IsOpen = true;
+
             // Get Grid object
             Grid ParentGrid = SenderButton.Parent as Grid;
-            ParentGrid.IsEnabled = false;
+            ToggleViewTextButton.IsEnabled = false; ParentGrid.IsEnabled = false;
 
             // Parse Contents out now on the VM and show the please wait operation.
             Task.Run(() =>
@@ -176,7 +175,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // TODO: Pop open a flyout view here to show progress of these operations
 
                 // Run the parse operation here.
-                bool ProcessResult = this.ViewModel.ProcessLogContents(out _);
+                bool ProcessResult = this.ViewModel.ParseLogContents(out _);
                 this.ViewLogger.WriteLog("DONE PROCESSING OUTPUT CONTENT FOR OUR EXPRESSION OBJECTS! READY TO DISPLAY ON OUR VIEW CONTENT", LogType.InfoLog);
 
                 // Enable grid, remove click command.
@@ -185,8 +184,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     // Invoke via Dispatcher
                     Dispatcher.Invoke(() =>
                     {
+                        // Close the processing flyout
+                        this.ProcessingFlyout.IsOpen = false;
+
                         // Enable grid, show result on buttons
                         ParentGrid.IsEnabled = true;
+                        ToggleViewTextButton.IsEnabled = true;  
                         SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
                         SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
                         SenderButton.Click -= ProcessLogFileContent_OnClick;
@@ -206,6 +209,55 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     });
                 });
             });
+        }
+
+        /// <summary>
+        /// Shows or hides the content inside the TextEditor to either show the parsed content view or the raw log input view.
+        /// </summary>
+        /// <param name="SenderButton"></param>
+        /// <param name="E"></param>
+        private void ToggleParsedContentButton_OnClick(object SenderButton, RoutedEventArgs E)
+        {
+            // Setup basic control values.
+            MainActionLoadButtons.IsEnabled = false;
+            Button ParseToggleButton = (Button)SenderButton;
+            Brush DefaultColor = ParseToggleButton.Background;
+
+            // Run the switch to show the new content value type here.
+            ParseToggleButton.IsEnabled = false;
+            bool LoadResult = this.ViewModel.ToggleViewerContents();
+            this.ViewLogger.WriteLog("TOGGLED VIEW CONTENTS ON THE TEXTBOX VIEWER OBJECT OK!", LogType.InfoLog);
+
+            // Enable grid, remove click command.
+            Task.Run(() =>
+            {
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    // Enable grid, show result on buttons
+                    ParseToggleButton.IsEnabled = true;
+                    MainActionLoadButtons.IsEnabled = true;
+                    ParseToggleButton.Content = LoadResult ? "Loaded!" : "Failed!";
+                    ParseToggleButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                    ParseToggleButton.Click -= ToggleParsedContentButton_OnClick;
+                });
+
+                // Wait for 3.5 Seconds
+                Thread.Sleep(3500);
+
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    // Reset values and log information
+                    ParseToggleButton.Background = DefaultColor;
+                    ParseToggleButton.Click += ToggleParsedContentButton_OnClick;
+                    ParseToggleButton.Content = this.ViewModel.ShowingParsed ? "Show Raw Log Contents" : "Show Parsed Content";
+                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                });
+            });
+
+            // Log failed. Return.
+            this.ViewLogger.WriteLog("PROCESSED TOGGLE REQUEST OK! SHOWING DEFAULT VALUES AFTER CONTENT UPDATING IS COMPLETE!", LogType.WarnLog);
         }
     }
 }
