@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels"
              mc:Ignorable="d" 
-             Width="400" Height="435"
+             Width="400" Height="525"
              Loaded="FulcrumInstalledOeAppsView_OnLoaded">
 
     <!-- DataContext Binding -->
@@ -28,13 +28,13 @@
         <Grid.RowDefinitions>
             <RowDefinition Height=".15*"/>
             <RowDefinition/>
-            <RowDefinition Height=".175*"/>
+            <RowDefinition Height=".15*"/>
         </Grid.RowDefinitions>
         
         <!-- Title Value -->
         <TextBlock
             Text="Installed OE Applications"
-            VerticalAlignment="Bottom" 
+            VerticalAlignment="Center" 
             Margin="0,5"
             Style="{StaticResource TitleStringText}"/>
 

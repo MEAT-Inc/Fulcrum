@@ -29,7 +29,7 @@
     <!-- Content For Log Reviewing -->
     <Grid Margin="10,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="115"/>
+            <RowDefinition Height="120"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -82,8 +82,8 @@
                         IsEnabled="False" Content="Build Simulation" VerticalAlignment="Stretch"/>
                 </Grid>
             </Grid>
-            <TextBlock Grid.Row="1" FontSize="13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
-                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer. Expressions files are located in our logs directory with the program files for this app."/>
+            <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
+                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer."/>
                 <Run Foreground="Yellow" FontWeight="DemiBold" Text="If the breakdown view is missing, use the slider at the right edge of the page to expand it"/>
             </TextBlock>
         </Grid>
@@ -214,7 +214,9 @@
                         <TextBlock Grid.Row="1" Style="{StaticResource ParsingInfoTextStyle}"
                                    Text="This process may take a long time if the file requested to parse out is a rather large log file. Most processing commands will take at most 20 seconds. If they take longer than 120 seconds you might want to consider closing this app and trying again. If this process continues to take an exceptionally long time, create a ticket using the email page in this app." Foreground="{StaticResource TextColorBase}"/>
                         <Grid VerticalAlignment="Bottom" Height="30" Grid.Row="2">
-                            <ProgressBar Style="{StaticResource ParsingBarStyle}"/>
+                            <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3">
+                                <ProgressBar Style="{StaticResource ParsingBarStyle}"/>
+                            </Border>
                             <TextBlock Style="{StaticResource ParsingProgressTextStyle}"/>
                         </Grid>
                     </Grid>
