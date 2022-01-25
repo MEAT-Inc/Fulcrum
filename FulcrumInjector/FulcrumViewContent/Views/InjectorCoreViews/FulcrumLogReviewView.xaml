@@ -186,7 +186,7 @@
         </Grid>
 
         <!-- Flyout for Progress -->
-        <mahapps:FlyoutsControl Grid.RowSpan="3" Grid.Row="0" Margin="50,60,70,60" Background="{StaticResource PrimaryColor_Darker_65}">
+        <mahapps:FlyoutsControl Grid.RowSpan="3" Grid.Row="0" Margin="50,95,70,60" Background="{StaticResource SecondaryColor}">
             <mahapps:Flyout 
                 Background="{StaticResource PrimaryColor_Darker_65}"
                 IsOpen="False" x:Name="ProcessingFlyout"

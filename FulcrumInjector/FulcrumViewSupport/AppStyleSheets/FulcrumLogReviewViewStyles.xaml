@@ -72,7 +72,7 @@
                         <Setter Property="Text" Value="Starting..."/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding ParsingProgress}" Value="100">
-                        <Setter Property="Text" Value="Parse Complete!"/>
+                        <Setter Property="Text" Value="Parse Complete! Saving Output Now..."/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

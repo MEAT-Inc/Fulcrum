@@ -75,6 +75,34 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Combines a set of input log files into one output file.
+        /// </summary>
+        /// <param name="LogFilePaths"></param>
+        /// <returns>Path to a combined output log file.</returns>
+        internal string CombineLogFiles(string[] LogFilePaths)
+        {
+            // Find the name of the first file and use it as our base.
+            string OutputPath = Path.GetDirectoryName(LogFilePaths[0]);
+            string BaseFileName = Path.GetFileNameWithoutExtension(LogFilePaths[0]);
+            string FinalFileName = Path.Combine(OutputPath, $"CombinedLogs_{BaseFileName}.shimLog");
+
+            // Now load the files in one by one and combine their output.
+            string[] TotalContent = Array.Empty<string>();
+            TotalContent = LogFilePaths.SelectMany(FileObj =>
+            {
+                try { return File.ReadAllLines(FileObj); }
+                catch {
+                    ViewModelLogger.WriteLog("ERROR! FAILED TO PARSE IN ONE OR MORE LOG FILES!", LogType.ErrorLog);
+                    return Array.Empty<string>();
+                }
+            }).ToArray();
+
+            // Write final output contents now.
+            ViewModelLogger.WriteLog($"WRITING A TOTAL OF {TotalContent.Length} NEW FILE LINES OUT TO OUR OUTPUT LOCATION NOW...", LogType.InfoLog);
+            File.WriteAllLines(FinalFileName, TotalContent);
+            return FinalFileName;
+        }
+        /// <summary>
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
         /// <param name="InputLogFile"></param>
@@ -156,6 +184,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }).Where(ExpObj => ExpObj != null).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
+                this.ParsingProgress = 100;
                 this._lastBuiltExpressionsFile = this.SaveExpressionsFile(ExpressionSet, this.LoadedLogFile);
                 if (this._lastBuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
