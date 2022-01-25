@@ -140,8 +140,8 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width=".375*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock 
                                 Grid.Row="0" 
@@ -160,12 +160,13 @@
                         <!-- TODO: BUILD LOGIC FOR BINDING THIS TO A CONFIG VALUE -->
                         <TextBox
                                 Grid.Row="0"
-                                Width="300"
+                                Width="250"
                                 Grid.Column="1"
                                 Margin="0,0,5,0"
                                 Padding="25,0,25,0"
                                 IsEnabled="False"
                                 HorizontalAlignment="Right"
+                                HorizontalContentAlignment="Center"
                                 Text="{Binding Path=SettingValue}"
                                 Style="{StaticResource StaticBackgroundInputTextBox}"/>
 
