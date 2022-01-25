@@ -45,6 +45,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel PassThruDisconnect => PassThruExpressionObjects.GetRegexByName("PTDisconnect");
         public static PassThruRegexModel PassThruReadMessages => PassThruExpressionObjects.GetRegexByName("PTReadMsgs");
         public static PassThruRegexModel PassThruWriteMessages => PassThruExpressionObjects.GetRegexByName("PTWriteMsgs");
+        public static PassThruRegexModel PassThruStartMsgFilter => PassThruExpressionObjects.GetRegexByName("PTStartMsgFilter");
+        public static PassThruRegexModel PassThruStopMsgFilter => PassThruExpressionObjects.GetRegexByName("PTStopMsgFilter");
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -53,10 +55,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel PassThruStatus => PassThruExpressionObjects.GetRegexByName("CommandStatus");
         public static PassThruRegexModel DeviceIdReturned => PassThruExpressionObjects.GetRegexByName("DeviceID");
         public static PassThruRegexModel ChannelIdReturned => PassThruExpressionObjects.GetRegexByName("ChannelID");
+        public static PassThruRegexModel FilterIdReturned => PassThruExpressionObjects.GetRegexByName("FilterID");
         public static PassThruRegexModel NumberOfMessages => PassThruExpressionObjects.GetRegexByName("MessageCount");
+        public static PassThruRegexModel MessageDataContent => PassThruExpressionObjects.GetRegexByName("MessageData");
         public static PassThruRegexModel MessageSentInfo => PassThruExpressionObjects.GetRegexByName("MessageSentInfo");
         public static PassThruRegexModel MessageReadInfo => PassThruExpressionObjects.GetRegexByName("MessageReadInfo");
-        public static PassThruRegexModel MessageDataContent => PassThruExpressionObjects.GetRegexByName("MessageData");
+        public static PassThruRegexModel MessageFilterInfo => PassThruExpressionObjects.GetRegexByName("MessageFilterInfo");
 
         // --------------------------------------------------------------------------------------------------------------------------
 

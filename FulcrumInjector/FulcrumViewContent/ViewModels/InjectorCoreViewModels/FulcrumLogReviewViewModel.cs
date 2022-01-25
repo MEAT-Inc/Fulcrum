@@ -13,6 +13,7 @@ using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using Newtonsoft.Json;
+using NLog.Targets;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -141,6 +142,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 var ExpressionSet = SplitLogContent.Select(LineSet =>
                 {
                     // Split our output content here and then build a type for the expressions
+                    if (LineSet.Length == 0) return null;
                     string[] SplitLines = LineSet.Split('\n');
                     var ExpressionType = ExpressionExtensions.GetTypeFromLines(SplitLines);
 
@@ -150,7 +152,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Return the built expression object
                     return NextClassObject;
-                }).ToArray();
+                }).Where(ExpObj => ExpObj != null).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
                 this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsFile(this.LoadedLogFile);

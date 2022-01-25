@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using FulcrumInjector.FulcrumLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+using NLog.Targets;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -106,7 +107,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
                 File.WriteAllText(FinalOutputPath, string.Join("\n", OutputExpressionStrings));
                 
-                // Write completed info to the log and return our new output path value.
+                // Remove the Expressions Logger. Log done and return
                 ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
                 return FinalOutputPath;
             }
@@ -115,6 +116,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Log failures. Return an empty string.
                 ExpressionLogger.WriteLog("FAILED TO SAVE OUR OUTPUT EXPRESSION SETS! THIS IS FATAL!", LogType.FatalLog);
                 ExpressionLogger.WriteLog("EXCEPTION FOR THIS INSTANCE IS BEING LOGGED BELOW", WriteEx);
+
+                // Return nothing.
                 return string.Empty;
             }
         }
