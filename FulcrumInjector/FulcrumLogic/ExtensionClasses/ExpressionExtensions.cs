@@ -223,13 +223,40 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         {
             // Check if we can run this type for the given object.
             if (ExpressionObject.GetType() != typeof(PassThruIoctlExpression)) {
-                ExpressionObject.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON PTSTART FILTER COMMAND TYPE!", LogType.ErrorLog);
+                ExpressionObject.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON IOCTL COMMAND TYPE!", LogType.ErrorLog);
                 ParameterProperties = Array.Empty<Tuple<string, string>>();
                 return string.Empty;
             }
 
+            // Try and parse out the IOCTL Command objects from the input strings here.
+            var IoctlRegex = PassThruRegexModelShare.PassThruIoctl;
+            bool IoctlResults = IoctlRegex.Evaluate(ExpressionObject.CommandLines, out var IoctlResultStrings);
+            if (!IoctlResults || IoctlResultStrings.Length == 6) {
+                ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.WarnLog);
+                ParameterProperties = Array.Empty<Tuple<string, string>>();
+                return "No Parameters";
+            }
+
+            // Now pull out the IOCTL command objects
+            ParameterProperties = IoctlResultStrings
+                .Last()
+                .Split('\n')
+                .Select(StringObj => {
+                    string[] SplitValueAndName = StringObj.Split('=');
+                    return new Tuple<string, string>(SplitValueAndName[0].Trim(), SplitValueAndName[1].Trim());
+                })
+                .ToArray();
+
+            // Build our output table object here.
+            string IoctlTableOutput = ParameterProperties.ToStringTable(
+                new[] { "Ioctl Name", "Set Value" },
+                IoctlPair => IoctlPair.Item1,
+                IoctlPair => IoctlPair.Item2
+            );
+
             // Throw new exception since not yet built.
-            throw new MissingMethodException("EXTRACTING IOCTL COMMAND VALUES IS NOT YET BUILT!");
+            ExpressionObject.ExpressionLogger.WriteLog($"BUILT OUT A TOTAL OF {ParameterProperties.Length} NEW PT IOCTL COMMAND OBJECTS!", LogType.InfoLog);
+            return IoctlTableOutput;
         }
     }
 }
