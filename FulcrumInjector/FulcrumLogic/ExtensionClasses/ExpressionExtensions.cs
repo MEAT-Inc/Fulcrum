@@ -229,9 +229,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             }
 
             // Try and parse out the IOCTL Command objects from the input strings here.
-            var IoctlRegex = PassThruRegexModelShare.PassThruIoctl;
+            var IoctlRegex = PassThruRegexModelShare.IoctlParameterValue;
             bool IoctlResults = IoctlRegex.Evaluate(ExpressionObject.CommandLines, out var IoctlResultStrings);
-            if (!IoctlResults || IoctlResultStrings.Length == 6) {
+            if (!IoctlResults) {
                 ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.WarnLog);
                 ParameterProperties = Array.Empty<Tuple<string, string>>();
                 return "No Parameters";
@@ -240,7 +240,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Now pull out the IOCTL command objects
             ParameterProperties = IoctlResultStrings
                 .Last()
-                .Split('\n')
+                .Split('\r')
                 .Select(StringObj => {
                     string[] SplitValueAndName = StringObj.Split('=');
                     return new Tuple<string, string>(SplitValueAndName[0].Trim(), SplitValueAndName[1].Trim());

@@ -62,6 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel MessageSentInfo => PassThruExpressionObjects.GetRegexByName("MessageSentInfo");
         public static PassThruRegexModel MessageReadInfo => PassThruExpressionObjects.GetRegexByName("MessageReadInfo");
         public static PassThruRegexModel MessageFilterInfo => PassThruExpressionObjects.GetRegexByName("MessageFilterInfo");
+        public static PassThruRegexModel IoctlParameterValue => PassThruExpressionObjects.GetRegexByName("IoctlParameterValue");
 
         // --------------------------------------------------------------------------------------------------------------------------
 

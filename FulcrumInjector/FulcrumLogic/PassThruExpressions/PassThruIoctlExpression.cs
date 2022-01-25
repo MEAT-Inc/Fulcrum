@@ -46,15 +46,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             StringsToApply.AddRange(from NextIndex in this.PtIoctlRegex.ExpressionValueGroups where NextIndex <= PassThruIoctlStrings.Length select PassThruIoctlStrings[NextIndex]);
 
             // Now build the Ioctl Parameters from the input content if any exist.
-            string IoctlParametersTable = this.FindIoctlParameters(out this.ParameterValues);
+            this.FindIoctlParameters(out this.ParameterValues);
             this.ParameterCount = this.ParameterValues.Length == 0 ? "No Parameters" : $"{this.ParameterValues.Length} Parameters";
-            if (IoctlParametersTable is "" or "No Parameters!") {
+            if (this.ParameterCount == "No Parameters") 
                 this.ExpressionLogger.WriteLog($"WARNING! NO IOCTL PARAMETERS FOUND FOR TYPE {this.GetType().Name}!", LogType.WarnLog);
-            }
-            
+
             // Now apply values using base method and exit out of this routine
             if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
                 throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
     }
 }
+
