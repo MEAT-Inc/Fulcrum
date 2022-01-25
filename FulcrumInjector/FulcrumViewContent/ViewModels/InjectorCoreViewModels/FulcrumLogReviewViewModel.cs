@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // Private control values
         private string _loadedLogFile = "";
         private string _logFileContents = "";
-        private double _parsingProgress = 0.00;
+        private int _parsingProgress = 0;
 
         // Private string for last built expressions file.
         private bool _inputParsed = false;
@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
-        public double ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
+        public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -177,7 +177,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Build expression class object and tick our progress
                     var NextClassObject = this.GetRegexClassFromCommand(ExpressionType, SplitLines);
-                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
+                    this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
 
                     // Return the built expression object
                     return NextClassObject;
