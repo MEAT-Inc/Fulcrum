@@ -156,6 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }).Where(ExpObj => ExpObj != null).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
+                this.ParsingProgress = 100;
                 this._lastBuiltExpressionsFile = this.SaveExpressionsFile(ExpressionSet, this.LoadedLogFile);
                 if (this._lastBuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
