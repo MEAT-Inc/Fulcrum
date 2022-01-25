@@ -288,8 +288,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             List<string> ResultStringTable = new List<string>() { "Message Number" };
 
             // Fill in strings for property type values here.
-            if (IsReadExpression) ResultStringTable.AddRange(new[] { "TimeStamp", "Protocol ID", "Data Count", "Rx Flags", "Flag Value", "Message Data" });
-            else ResultStringTable.AddRange(new[] { "Protocol ID", "Data Count", "Tx Flags", "Flag Value", "Message Data" });
+            if (IsReadExpression) ResultStringTable.AddRange(new[] { "TimeStamp", "Protocol ID", "Data Count", "RX Flags", "Flag Value", "Message Data" });
+            else ResultStringTable.AddRange(new[] { "Protocol ID", "Data Count", "TX Flags", "Flag Value", "Message Data" });
 
             // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
             string[] SplitMessageLines = this.CommandLines.Split(new[] { "Msg" }, StringSplitOptions.None)
@@ -371,7 +371,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 "Message Number",   // Always 0
                 "Protocol ID",      // Protocol Of Message
                 "Message Size",     // Size of message
-                "Tx Flags",         // Tx Flags
+                "TX Flags",         // Tx Flags
                 "Flag Value",       // String Flag Value
                 "Message Content"   // Content of the filter message
             };
@@ -403,8 +403,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             List<string> OutputMessages = new List<string>();
             var MessageContentRegex = PassThruRegexModelShare.MessageFilterInfo;
 
-            // Now parse out our content matches
-            SplitMessageLines = CombinedOutputs.ToArray();
+            // Now parse out our content matches. Add a trailing newline to force matches.
+            SplitMessageLines = CombinedOutputs.Select(LineSet => LineSet + "\n").ToArray();
             foreach (var MsgLineSet in SplitMessageLines)
             {
                 // RegexMatch output here.
@@ -428,13 +428,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                     this.ExpressionLogger.WriteLog("FOUND NULL FLOW CONTROL! PARSING AND MOVING ON...", LogType.InfoLog);
                 }
 
-                // Ensure we fill in gaps for filter content if flags are not an option
-                if (MatchedMessageStrings.Any(StringObj => StringObj == "0x00000000")) {
-                    int IndexOfNoFlag = MatchedMessageStrings.ToList().IndexOf("0x00000000");
-                    var TempList = MatchedMessageStrings.ToList();
-                    TempList.Insert(IndexOfNoFlag, "No Flags");
-                    MatchedMessageStrings = TempList.ToArray();
-                }
+                // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
+                var TempList = MatchedMessageStrings.ToList();
+                int IndexOfZeroFlags = TempList.IndexOf("0x00000000");
+                if (IndexOfZeroFlags != -1) { TempList.Insert(IndexOfZeroFlags + 1, "No Value"); }
+                MatchedMessageStrings = TempList.ToArray();
 
                 // Knock out any of the whitespace values.
                 MatchedMessageStrings = MatchedMessageStrings
