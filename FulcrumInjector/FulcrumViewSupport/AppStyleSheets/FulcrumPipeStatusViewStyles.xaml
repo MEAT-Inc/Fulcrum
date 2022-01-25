@@ -18,7 +18,7 @@
 
             <!-- Pipe Title Names -->
             <Style x:Key="PipeNameText" TargetType="TextBlock">
-                <Setter Property="FontWeight" Value="Regular"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
                 <Setter Property="FontSize" Value="20"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>

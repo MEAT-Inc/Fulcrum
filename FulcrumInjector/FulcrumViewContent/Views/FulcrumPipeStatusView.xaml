@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels"
              mc:Ignorable="d" 
-             Width="400" Height="150"
+             Width="400" Height="165"
              Loaded="FulcrumPipeStatusView_OnLoaded">
 
     <!-- DataContext Binding -->
@@ -57,10 +57,12 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Margin="10,5"
+                         VerticalAlignment="Stretch"
                          Style="{StaticResource PipeStateValueText}"
                          DataContext="{Binding ReaderPipeState}"
                          Text="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"/>
                 <TextBox Grid.Row="1" Margin="10,5" 
+                         VerticalAlignment="Stretch"
                          Style="{StaticResource PipeStateValueText}" 
                          DataContext="{Binding WriterPipeState}"
                          Text="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"/>

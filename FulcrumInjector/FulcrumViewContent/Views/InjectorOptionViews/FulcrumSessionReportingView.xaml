@@ -31,10 +31,10 @@
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="RowDefinition">
-                        <Setter Property="Height" Value=".475*"/>
+                        <Setter Property="Height" Value=".40*"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
-                                <Setter Property="Height" Value=".475*"/>
+                                <Setter Property="Height" Value=".40*"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
                                 <Setter Property="Height" Value="40"/>

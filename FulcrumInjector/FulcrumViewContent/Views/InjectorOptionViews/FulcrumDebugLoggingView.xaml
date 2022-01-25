@@ -62,7 +62,7 @@
                 BorderThickness="0,2,0,0" VerticalAlignment="Bottom"/>
 
         <!-- Log Filter and Search Controls -->
-        <Grid Grid.Row="2" Margin="10,10,10,5">
+        <Grid Grid.Row="2" Margin="10,10,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width=".5*"/>
@@ -88,7 +88,7 @@
 
         <!-- Logging Content Output -->
         <avEdit:TextEditor 
-            Grid.Row="3" Margin="10,0,15,0"
+            Grid.Row="3" Margin="10,-5,15,0"
             x:Name="DebugRedirectOutputEdit"
             Style="{StaticResource LoggingOutputBoxStyle}"/>
     </Grid>
