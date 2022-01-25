@@ -160,6 +160,7 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruDisconnectExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\PassThruIoctlExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruReadMessagesExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
@@ -169,7 +170,7 @@
     <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruOpenExpression.cs" />
-    <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\CommandTypeExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PtExpressionProperty.cs" />
     <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />

@@ -30,10 +30,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")]              PTDisconnect,
         [EnumMember(Value = "PTReadMsgs")] [Description("PassThruReadMessagesExpression")]              PTReadMsgs,
         [EnumMember(Value = "PTWriteMsgs")] [Description("PassThruWriteMessagesExpression")]            PTWriteMsgs,
-        // TODO: Write PTStartPeriodic
-        // TODO: Write PTStopPeriodic
+        // TODO: Write PTStartPeriodic (May be needed for Sims)
+        // TODO: Write PTStopPeriodic (May be needed for Sims)
         [EnumMember(Value = "PTStartMsgFilter")] [Description("PassThruStartMessageFilterExpression")]  PTStartMsgFilter,
         [EnumMember(Value = "PTStartMsgFilter")] [Description("PassThruStopMessageFilterExpression")]   PTStopMsgFilter,
+        // TODO: Write PassThruSetProgrammingVoltage (Not Needed for Sims)
+        // TODO: Write PTReadVersion (Not Needed for Sims)
+        [EnumMember(Value = "PTIoctl")] [Description("PassThruIoctlExpression")]                        PTIoctl,
+        // TODO: Write PassThruGetLastError
     }
 
     // --------------------------------------------------------------------------------------------------------------
@@ -460,6 +464,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             // Return built table string object.
             this.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE FILTER CONTENTS OK!", LogType.InfoLog);
             return string.Join("\n", OutputMessages);
+        }
+        /// <summary>
+        /// Finds all the parameters of the IOCTL command output from the input content
+        /// </summary>
+        /// <param name="ParameterProperties">Properties to return out.</param>
+        /// <returns>The properties of the IOCTL as a string table.</returns>
+        protected internal string FindIoctlParameters(out Tuple<string, string>[] ParameterProperties)
+        {
+            // Check if we can run this type
         }
     }
 }

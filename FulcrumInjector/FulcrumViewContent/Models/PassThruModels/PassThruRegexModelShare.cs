@@ -47,6 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public static PassThruRegexModel PassThruWriteMessages => PassThruExpressionObjects.GetRegexByName("PTWriteMsgs");
         public static PassThruRegexModel PassThruStartMsgFilter => PassThruExpressionObjects.GetRegexByName("PTStartMsgFilter");
         public static PassThruRegexModel PassThruStopMsgFilter => PassThruExpressionObjects.GetRegexByName("PTStopMsgFilter");
+        public static PassThruRegexModel PassThruIoctl => PassThruExpressionObjects.GetRegexByName("PTIoctl");
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -114,6 +115,16 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
             RegexStoreLogger.WriteLog($"BUILT A TOTAL OF {RegexModelArray.Length} OUTPUT OBJECTS!", LogType.InfoLog);
             _passThruExpressionObjects = new ObservableCollection<PassThruRegexModel>(RegexModelArray);
             return PassThruExpressionObjects;
+        }
+        /// <summary>
+        /// Build a new regex model object from a given name value for a regex.
+        /// </summary>
+        /// <param name="RegexName"></param>
+        /// <returns></returns>
+        private static PassThruRegexModel GetRegexByName(this ObservableCollection<PassThruRegexModel> RegexModelSet, string RegexName)
+        {
+            // Finds the first Regex object matching the current name provided from a collection instance.
+            return RegexModelSet.FirstOrDefault(RegexObj => RegexObj.ExpressionName.ToUpper().Contains(RegexName.ToUpper()));
         }
     }
 }
