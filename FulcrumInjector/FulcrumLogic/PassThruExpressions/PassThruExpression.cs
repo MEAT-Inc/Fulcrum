@@ -204,8 +204,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public PassThruExpression(string CommandInput, PassThruCommandType ExpressionType)
         {
             // Store input lines
-            this.CommandLines = CommandInput;
             this.TypeOfExpression = ExpressionType;
+            this.CommandLines = CommandInput.TrimStart();
             this.SplitCommandLines = CommandInput.Split('\n');
 
             // Find command issue request values. (Pull using Base Class)
@@ -255,8 +255,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         protected internal bool SetExpressionProperties(FieldInfo[] FieldObjects, string[] FieldValueStrings)
         {
             // Make sure the count of properties matches the count of lines.
-            if (FieldValueStrings.Length != FieldObjects.Length)
-            {
+            if (FieldValueStrings.Length != FieldObjects.Length) {
                 this.ExpressionLogger.WriteLog("EXPRESSIONS FOR FIELDS AND VALUES ARE NOT EQUAL SIZES! THIS IS FATAL!", LogType.FatalLog);
                 return false;
             }
