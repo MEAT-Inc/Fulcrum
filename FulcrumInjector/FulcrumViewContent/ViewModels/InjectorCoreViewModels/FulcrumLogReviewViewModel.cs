@@ -148,7 +148,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Build expression class object and tick our progress
                     var NextClassObject = ExpressionType.ToRegexClass(SplitLines);
-                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / SplitLogContent.Length);
+                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
 
                     // Return the built expression object
                     return NextClassObject;
@@ -188,7 +188,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("FILE CONTENT PARSED OK! STORING TO VIEW NOW...", LogType.InfoLog);
                 CastView.Dispatcher.Invoke(() => {
                     CastView.ReplayLogInputContent.Text = NewLogContents;
-                    CastView.LoadedLogFileTextBox.Text = this.ShowingParsed ? this.LoadedLogFile : this._lastBuiltExpressionsFile;
+                    CastView.LoadedLogFileTextBox.Text = this.ShowingParsed ? this._lastBuiltExpressionsFile : this.LoadedLogFile;
                 });
 
                 // Toggle the showing parsed value.

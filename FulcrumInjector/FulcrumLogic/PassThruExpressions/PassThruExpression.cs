@@ -317,17 +317,24 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 }
 
                 // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
-                if (IsReadExpression && MatchedMessageStrings[5] == "0x00000000") MatchedMessageStrings.ToList().Insert(5, "No Value");
-                else if (!IsReadExpression && MatchedMessageStrings[4] == "0x00000000") MatchedMessageStrings.ToList().Insert(4, "No Value");
+                var TempList = MatchedMessageStrings.ToList();
+                int IndexOfZeroFlags = TempList.IndexOf("0x00000000");
+                if (IndexOfZeroFlags != -1) { TempList.Insert(IndexOfZeroFlags + 1, "No Value"); }
+                MatchedMessageStrings = TempList.ToArray();
+
+                // Remove any and all whitespace values from our output content here.
+                string[] SelectedStrings = MatchedMessageStrings
+                    .Skip(1)
+                    .Where(StringObj => !string.IsNullOrEmpty(StringObj))
+                    .ToArray();
 
                 // Now loop each part of the matched content and add values into our output tuple set.
-                string[] SelectedStrings = MatchedMessageStrings.Skip(1).ToArray();
-                for (int StringIndex = 0; StringIndex < SelectedStrings.Length; StringIndex++)
-                    RegexResultTuples.Add(new Tuple<string, string>(ResultStringTable[StringIndex], SelectedStrings[StringIndex]));
+                RegexResultTuples.AddRange(SelectedStrings
+                    .Select((T, StringIndex) => new Tuple<string, string>(ResultStringTable[StringIndex], T)));
 
                 // Build our output table once all our values have been appended in here.
                 string RegexValuesOutputString = RegexResultTuples.ToStringTable(
-                    new[] { "Message Property", "Message Value" },
+                    new[] { "Filter Message Property", "Filter Message Value" },
                     RegexObj => RegexObj.Item1,
                     RegexObj => RegexObj.Item2
                 );
@@ -366,7 +373,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 "Message Size",     // Size of message
                 "Tx Flags",         // Tx Flags
                 "Flag Value",       // String Flag Value
-                "Message Content"   // Content of the 
+                "Message Content"   // Content of the filter message
             };
 
             // Split input command lines by the "Msg[x]" identifier and then regex match all of the outputs.
@@ -384,11 +391,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 LineIndex += 1;
             }
 
-            // Rebuild final output list from newly built input lists. Trim dupe newlines.
-            SplitMessageLines = CombinedOutputs
-                .Select(LineObj => LineObj.Replace("\r\n", "\n"))
-                .ToArray();
-            
             // Check if no values were pulled. If this is the case then dump out.
             if (SplitMessageLines.Length == 0) {
                 this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {this.GetType().Name}!");
@@ -402,6 +404,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             var MessageContentRegex = PassThruRegexModelShare.MessageFilterInfo;
 
             // Now parse out our content matches
+            SplitMessageLines = CombinedOutputs.ToArray();
             foreach (var MsgLineSet in SplitMessageLines)
             {
                 // RegexMatch output here.
@@ -416,9 +419,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                     }
 
                     // Add null flow control here.
-                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[0], "FlowControl"));
-                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[1], "-1"));
-                    for (int TupleIndex = 2; TupleIndex < ResultStringTable.Count; TupleIndex++)
+                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[1], "FlowControl"));
+                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[2], "-1"));
+                    for (int TupleIndex = 3; TupleIndex < ResultStringTable.Count; TupleIndex++)
                         OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[TupleIndex], "NULL"));
 
                     // Log Expression found and continue.
@@ -428,12 +431,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 // Ensure we fill in gaps for filter content if flags are not an option
                 if (MatchedMessageStrings.Any(StringObj => StringObj == "0x00000000")) {
                     int IndexOfNoFlag = MatchedMessageStrings.ToList().IndexOf("0x00000000");
-                    MatchedMessageStrings.ToList().Insert(IndexOfNoFlag, "No Flags");
+                    var TempList = MatchedMessageStrings.ToList();
+                    TempList.Insert(IndexOfNoFlag, "No Flags");
+                    MatchedMessageStrings = TempList.ToArray();
                 }
 
+                // Knock out any of the whitespace values.
+                MatchedMessageStrings = MatchedMessageStrings
+                    .Skip(1)
+                    .Where(StringObj => !string.IsNullOrEmpty(StringObj))
+                    .ToArray();
+
                 // Now loop each part of the matched content and add values into our output tuple set.
-                for (int StringIndex = 0; StringIndex < MatchedMessageStrings.Length; StringIndex++)
-                    OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[StringIndex], MatchedMessageStrings[StringIndex]));
+                OutputMessageTuple.AddRange(MatchedMessageStrings
+                    .Select((T, StringIndex) => new Tuple<string, string>(ResultStringTable[StringIndex], T)));
 
                 // Build our output table once all our values have been appended in here.
                 string RegexValuesOutputString = OutputMessageTuple.ToStringTable(

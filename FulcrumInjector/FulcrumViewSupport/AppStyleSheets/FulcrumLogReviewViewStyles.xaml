@@ -60,11 +60,11 @@
             <!-- Parsing progress text block value -->
             <Style x:Key="ParsingProgressTextStyle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryColor_Darker_65}"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="Text" Value="{Binding Path=ParsingProgress, StringFormat={}{0}%}"/>
+                <Setter Property="Text" Value="{Binding Path=ParsingProgress, StringFormat={}{0:F2}%}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding ParsingProgress}" Value="0">
                         <Setter Property="Text" Value="Starting..."/>
