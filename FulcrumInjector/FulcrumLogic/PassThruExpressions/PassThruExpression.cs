@@ -24,20 +24,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
     public enum PassThruCommandType
     {
         // Command Types for PassThru Regex. Pulled values from settings parse into here.
-        [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")]                               NONE,
-        [EnumMember(Value = "PTOpen")] [Description("PassThruOpenExpression")]                          PTOpen,
-        [EnumMember(Value = "PTClose")] [Description("PassThruCloseExpression")]                        PTClose,
-        [EnumMember(Value = "PTConnect")] [Description("PassThruConnectExpression")]                    PTConnect,
-        [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")]              PTDisconnect,
-        [EnumMember(Value = "PTReadMsgs")] [Description("PassThruReadMessagesExpression")]              PTReadMsgs,
-        [EnumMember(Value = "PTWriteMsgs")] [Description("PassThruWriteMessagesExpression")]            PTWriteMsgs,
+        [EnumMember(Value = "NONE")] [Description("PassThruExpresssion")] NONE,
+        [EnumMember(Value = "PTOpen")] [Description("PassThruOpenExpression")] PTOpen,
+        [EnumMember(Value = "PTClose")] [Description("PassThruCloseExpression")] PTClose,
+        [EnumMember(Value = "PTConnect")] [Description("PassThruConnectExpression")] PTConnect,
+        [EnumMember(Value = "PTDisconnect")] [Description("PassThruDisconnectExpression")] PTDisconnect,
+        [EnumMember(Value = "PTReadMsgs")] [Description("PassThruReadMessagesExpression")] PTReadMsgs,
+        [EnumMember(Value = "PTWriteMsgs")] [Description("PassThruWriteMessagesExpression")] PTWriteMsgs,
         // TODO: Write PTStartPeriodic (May be needed for Sims)
         // TODO: Write PTStopPeriodic (May be needed for Sims)
-        [EnumMember(Value = "PTStartMsgFilter")] [Description("PassThruStartMessageFilterExpression")]  PTStartMsgFilter,
-        [EnumMember(Value = "PTStartMsgFilter")] [Description("PassThruStopMessageFilterExpression")]   PTStopMsgFilter,
+        [EnumMember(Value = "PTStartMsgFilter")] [Description("PassThruStartMessageFilterExpression")] PTStartMsgFilter,
+        [EnumMember(Value = "PTStartMsgFilter")] [Description("PassThruStopMessageFilterExpression")] PTStopMsgFilter,
         // TODO: Write PassThruSetProgrammingVoltage (Not Needed for Sims)
         // TODO: Write PTReadVersion (Not Needed for Sims)
-        [EnumMember(Value = "PTIoctl")] [Description("PassThruIoctlExpression")]                        PTIoctl,
+        [EnumMember(Value = "PTIoctl")] [Description("PassThruIoctlExpression")] PTIoctl,
         // TODO: Write PassThruGetLastError (Not needed for Sims)
     }
 
@@ -64,8 +64,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
 
         // Input command time and result values for regex searching.
         [PtExpressionProperty("Time Issued", "", new[] { "Timestamp Valid", "Invalid Timestamp" })]
-        public readonly string ExecutionTime;     
-        [PtExpressionProperty("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })] 
+        public readonly string ExecutionTime;
+        [PtExpressionProperty("J2534 Status", "0:STATUS_NOERROR", new[] { "Command Passed", "Command Failed" })]
         public readonly string JStatusCode;
 
         // --------------------------------------------------------------------------------------------------------------
@@ -220,20 +220,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
             StringsToApply.AddRange(from NextIndex in this.StatusCodeRegex.ExpressionValueGroups where NextIndex <= StatusCodeStrings.Length select StatusCodeStrings[NextIndex]);
 
             // Now apply values using base method and exit out of this routine
-            bool StorePassed = this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()); 
-            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!"); 
+            bool StorePassed = this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
+            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!");
             this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------
-        
+
         /// <summary>
         /// Gets the list of properties linked to a regex group and returns them in order of decleration
         /// </summary>
         protected internal FieldInfo[] GetExpressionProperties(bool BaseClassValues = false)
         {
             // Determine the type of base property to use
-            var DeclaredTypeExpected = BaseClassValues ? 
+            var DeclaredTypeExpected = BaseClassValues ?
                 typeof(PassThruExpression) : this.GetType();
 
             // Pull our property values here.
@@ -255,7 +255,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         protected internal bool SetExpressionProperties(FieldInfo[] FieldObjects, string[] FieldValueStrings)
         {
             // Make sure the count of properties matches the count of lines.
-            if (FieldValueStrings.Length != FieldObjects.Length) {
+            if (FieldValueStrings.Length != FieldObjects.Length)
+            {
                 this.ExpressionLogger.WriteLog("EXPRESSIONS FOR FIELDS AND VALUES ARE NOT EQUAL SIZES! THIS IS FATAL!", LogType.FatalLog);
                 return false;
             }
