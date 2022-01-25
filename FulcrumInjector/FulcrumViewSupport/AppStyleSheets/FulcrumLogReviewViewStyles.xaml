@@ -64,10 +64,13 @@
                 <Setter Property="Foreground" Value="{StaticResource PrimaryColor_Darker_65}"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="Text" Value="{Binding Path=ParsingProgress}"/>
+                <Setter Property="Text" Value="{Binding Path=ParsingProgress, StringFormat={}{0}%}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding ParsingProgress}" Value="0">
                         <Setter Property="Text" Value="Starting..."/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ParsingProgress}" Value="100">
+                        <Setter Property="Text" Value="Parse Complete!"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
