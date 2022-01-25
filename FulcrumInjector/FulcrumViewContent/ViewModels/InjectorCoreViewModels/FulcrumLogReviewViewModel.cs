@@ -240,7 +240,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Find our output type value here.
             Type OutputType = Type.GetType(ClassType);
             var RegexConstructor = OutputType.GetConstructor(new[] { typeof(string) });
-            return (PassThruExpression)RegexConstructor.Invoke(new[] { InputLines });
+            return (PassThruExpression)RegexConstructor.Invoke(new[] { string.Join("\n", InputLines) });
         }
         /// <summary>
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
