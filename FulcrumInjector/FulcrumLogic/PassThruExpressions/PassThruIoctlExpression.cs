@@ -52,6 +52,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 this.ExpressionLogger.WriteLog($"WARNING! NO IOCTL PARAMETERS FOUND FOR TYPE {this.GetType().Name}!", LogType.WarnLog);
 
             // Now apply values using base method and exit out of this routine
+            StringsToApply.Add(this.ParameterCount);
             if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
                 throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
