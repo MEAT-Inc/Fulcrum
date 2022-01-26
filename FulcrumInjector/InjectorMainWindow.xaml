@@ -12,7 +12,7 @@
         xmlns:injectorOptionViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
-        Height="725" Width="1100" 
+        Height="725" Width="1200" 
         AllowsTransparency="True"
         ResizeMode="CanMinimize"
         Loaded="InjectorMainWindow_OnLoaded">
@@ -43,9 +43,9 @@
         <!-- All Other App Content Goes Down Here -->
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".35*"/>
+                <ColumnDefinition Width="275"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Left Side Pane View -->
@@ -93,7 +93,7 @@
         <!-- About this application flyout -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <mah:Flyout 
-                Margin="0,25,0,0"
+                Margin="55,25,0,0"
                 Position="Top"
                 x:Name="InformationFlyout"
                 HorizontalAlignment="Center"
@@ -144,7 +144,7 @@
                             x:Name="CloseInfoFlyoutButton"
                             VerticalAlignment="Top"
                             Style="{StaticResource ActionButtonStyle}"
-                            Content="Close Information" Width="250" Height="35" />
+                            Content="Close" Width="250" Height="35" />
                 </Grid>
             </mah:Flyout>
         </mah:FlyoutsControl>
