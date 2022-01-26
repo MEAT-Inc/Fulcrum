@@ -81,6 +81,15 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                     .Where(StringObj => !string.IsNullOrEmpty(StringObj))
                     .ToArray();
 
+                // Format our message data content to include a 0x before the data byte and caps lock message bytes.
+                int LastStringIndex = SelectedStrings.Length - 1;
+                SelectedStrings[LastStringIndex] = string.Join(" ",
+                    SelectedStrings[LastStringIndex]
+                        .Split(' ')
+                        .Select(StringPart => $"0x{StringPart.Trim().ToUpper()}")
+                        .ToArray()
+                    );
+
                 // Now loop each part of the matched content and add values into our output tuple set.
                 RegexResultTuples.AddRange(SelectedStrings
                     .Select((T, StringIndex) => new Tuple<string, string>(ResultStringTable[StringIndex], T)));
@@ -193,6 +202,15 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                     .Where(StringObj => !string.IsNullOrEmpty(StringObj))
                     .ToArray();
 
+                // Format our message data content to include a 0x before the data byte and caps lock message bytes.
+                int LastStringIndex = MatchedMessageStrings.Length - 1;
+                MatchedMessageStrings[LastStringIndex] = string.Join(" ",
+                    MatchedMessageStrings[LastStringIndex]
+                        .Split(' ')
+                        .Select(StringPart => $"0x{StringPart.Trim().ToUpper()}")
+                        .ToArray()
+                );
+
                 // Now loop each part of the matched content and add values into our output tuple set.
                 OutputMessageTuple.AddRange(MatchedMessageStrings
                     .Select((T, StringIndex) => new Tuple<string, string>(ResultStringTable[StringIndex], T)));
@@ -219,12 +237,12 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="ParameterProperties">Properties to return out.</param>
         /// <returns>The properties of the IOCTL as a string table.</returns>
-        public static string FindIoctlParameters(this PassThruExpression ExpressionObject, out Tuple<string, string>[] ParameterProperties)
+        public static string FindIoctlParameters(this PassThruExpression ExpressionObject, out Tuple<string, string, string>[] ParameterProperties)
         {
             // Check if we can run this type for the given object.
             if (ExpressionObject.GetType() != typeof(PassThruIoctlExpression)) {
                 ExpressionObject.ExpressionLogger.WriteLog("CAN NOT USE THIS METHOD ON A NON IOCTL COMMAND TYPE!", LogType.ErrorLog);
-                ParameterProperties = Array.Empty<Tuple<string, string>>();
+                ParameterProperties = Array.Empty<Tuple<string, string, string>>();
                 return string.Empty;
             }
 
@@ -233,23 +251,33 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             bool IoctlResults = IoctlRegex.Evaluate(ExpressionObject.CommandLines, out var IoctlResultStrings);
             if (!IoctlResults) {
                 ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.WarnLog);
-                ParameterProperties = Array.Empty<Tuple<string, string>>();
+                ParameterProperties = Array.Empty<Tuple<string, string, string>>();
                 return "No Parameters";
             }
 
             // Now pull out the IOCTL command objects
             ParameterProperties = IoctlResultStrings
-                .Last()
-                .Split('\r')
-                .Select(StringObj => {
+                .Last().Split('\r').Select(StringObj =>
+                {
+                    // Get base values for name and value output.
                     string[] SplitValueAndName = StringObj.Split('=');
-                    return new Tuple<string, string>(SplitValueAndName[0].Trim(), SplitValueAndName[1].Trim());
+                    string[] SplitIdAndNameValue = SplitValueAndName[0].Split(':');
+
+                    // Store values for content here for output tuple set.
+                    string NameValue = SplitIdAndNameValue[1].Trim();
+                    string ValueString = SplitValueAndName[1].Trim();
+                    string IdValue = int.TryParse(SplitIdAndNameValue[0], out int OutputInt) ?
+                        $"0x{OutputInt:x8}".Trim() :
+                        $"{SplitIdAndNameValue[0]} (ERROR!)".Trim();
+
+                    // Build new output tuple object here and return it.
+                    return new Tuple<string, string, string>(IdValue, NameValue, ValueString);
                 })
                 .ToArray();
 
             // Build our output table object here.
             string IoctlTableOutput = ParameterProperties.ToStringTable(
-                new[] { "Ioctl Name", "Set Value" },
+                new[] { "Ioctl ID", "Ioctl Name", "Set Value" },
                 IoctlPair => IoctlPair.Item1,
                 IoctlPair => IoctlPair.Item2
             );

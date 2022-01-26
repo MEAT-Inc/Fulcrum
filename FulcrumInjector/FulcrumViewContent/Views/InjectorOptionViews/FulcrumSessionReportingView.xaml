@@ -31,10 +31,10 @@
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="RowDefinition">
-                        <Setter Property="Height" Value=".40*"/>
+                        <Setter Property="Height" Value=".345*"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="true">
-                                <Setter Property="Height" Value=".40*"/>
+                                <Setter Property="Height" Value=".345*"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=ShowEmailInfoText}" Value="false">
                                 <Setter Property="Height" Value="40"/>
@@ -170,7 +170,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock 
                             Margin="0" 
-                            Text="Report Attachments"
+                            Text="Session Report Attachments"
                             Style="{StaticResource AttachmentsTitleText}"/>
                     <Button Click="AddReportAttachmentButton_OnClick" 
                             Margin="10,10,0,10" Content="Add File"
@@ -187,26 +187,26 @@
                          DataContext="{Binding Path=SessionReportSender.MessageAttachmentFiles}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="4,5" Margin="0,0,0,0"
+                            <Border Padding="5,5" Margin="-5,0,0,0"
                                     BorderThickness="2" BorderBrush="{StaticResource DarkGreyThemeColor}">
-                                <Grid Margin="3,0,3,0">
+                                <Grid Margin="1,0,0,0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150"/>
-                                        <ColumnDefinition Width="5"/>
-                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="30"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock
-                                    Grid.Column="0"
-                                    Margin="0,5"
-                                    Text="{Binding Path=Name}"
-                                    VerticalAlignment="Stretch" FontSize="12" 
-                                    TextWrapping="Wrap" TextAlignment="Left" Width="155"
-                                    Foreground="{StaticResource TextColorBase}"/>
+                                        Grid.Column="0"
+                                        Margin="0,5"
+                                        Text="{Binding Path=Name}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                                        FontSize="13" TextWrapping="Wrap" TextAlignment="Left"
+                                        Foreground="{StaticResource TextColorBase}"/>
                                     <Border
-                                    Margin="0,-5"
-                                    Grid.Column="1"
-                                    BorderBrush="{StaticResource DarkGreyThemeColor}"
-                                    BorderThickness="0,0,2,0">
+                                        Margin="4,-5"
+                                        Grid.Column="1"
+                                        BorderBrush="{StaticResource DarkGreyThemeColor}"
+                                        BorderThickness="2,0,0,0">
                                     </Border>
                                     <Button Grid.Column="2"
                                         VerticalAlignment="Center"
@@ -218,7 +218,7 @@
                                             </Path.Data>
                                         </Path>
                                         <Button.LayoutTransform>
-                                            <ScaleTransform ScaleX="1.25" ScaleY="1.25"/>
+                                            <ScaleTransform ScaleX="1" ScaleY="1"/>
                                         </Button.LayoutTransform>
                                     </Button>
                                 </Grid>
