@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,16 +75,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             this.ViewLogger.WriteLog($"APP OBJECT SELECTED FOR TARGETING IS: {SelectedObject}", LogType.InfoLog);
             this.ViewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
 
-            // Check the view model of our object instance. If Can boot then boot. If can kill then kill.
+            // Check the view model of our object instance. If Can boot then boot. If can kill then kill
             bool RanCommand = false; bool WasBooted = this.ViewModel.CanBootApp;
-            if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication();
-            else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out var BuiltProcess);
+            Process BootedProcess = null; OeApplicationModel KilledApplication = null; 
+            if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication(out KilledApplication);
+            else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out BootedProcess);
             else throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
 
             // Pull in the current object from our sender.
             Button SenderButton = (Button)SendingButton;
             Brush DefaultColor = SenderButton.Background;
-            string DefaultContent = SenderButton.Content.ToString();
 
             // Now setup temp values for booted or not.
             Task.Run(() =>
@@ -95,10 +96,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                     SenderButton.Content = RanCommand ?
                         WasBooted ?
                             $"Booted {this.ViewModel.RunningAppModel.OEAppName} OK!" :
-                            $"Killed {SelectedObject.OEAppName} OK!" :
+                            $"Killed {(KilledApplication == null ? "OE Application" : KilledApplication.OEAppName)} OK!" :
                         WasBooted ?
-                            $"Failed To Boot {SelectedObject.OEAppName}!" :
-                            $"Failed To Kill {SelectedObject.OEAppName}!";
+                            $"Failed To Boot OE Application!" :
+                            $"Failed To Kill OE Application!";
 
                     // Set background value here.
                     SenderButton.Click -= this.ControlOeApplicationButton_OnClick;
@@ -112,9 +113,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 Dispatcher.Invoke(() =>
                 {
                     // Reset button values 
-                    SenderButton.Content = DefaultContent;
                     SenderButton.Background = DefaultColor;
                     SenderButton.Click += this.ControlOeApplicationButton_OnClick;
+
+                    // Set content values here.  If the command passed, then show the inverse of the last shown state.
+                    SenderButton.Content = RanCommand ?
+                        WasBooted ?
+                            $"Terminate OE Application" :
+                            $"Launch OE Application" :
+                        WasBooted ?
+                            $"Launch OE Application" :
+                            $"Terminate OE Application";
 
                     // Log information
                     this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
