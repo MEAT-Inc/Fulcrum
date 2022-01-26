@@ -80,14 +80,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out var BuiltProcess);
             else throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
 
+            // Pull in the current object from our sender.
+            Button SenderButton = (Button)SendingButton;
+            Brush DefaultColor = SenderButton.Background;
+            string DefaultContent = SenderButton.Content.ToString();
+
             // Now setup temp values for booted or not.
             Task.Run(() =>
             {
-                // Pull in the current object from our sender.
-                Button SenderButton = (Button)SendingButton;
-                Brush DefaultColor = SenderButton.Background;
-                string DefaultContent = SenderButton.Content.ToString();
-
                 // Invoke via Dispatcher
                 Dispatcher.Invoke(() =>
                 {
