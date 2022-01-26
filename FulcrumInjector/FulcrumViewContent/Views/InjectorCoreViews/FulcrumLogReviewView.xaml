@@ -89,7 +89,7 @@
         </Grid>
 
         <!-- Splitting Border -->
-        <Border Grid.Row="1" Margin="10,0"
+        <Border Grid.Row="1" Margin="10,3,10,0"
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
