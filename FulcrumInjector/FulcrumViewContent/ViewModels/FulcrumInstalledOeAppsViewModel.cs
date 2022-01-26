@@ -163,9 +163,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this._runningAppProcess.Exited += (SendingApp, _) =>
             {
                 // Cast Sending App and use this for input values.
-                OeApplicationModel SendingModel = (OeApplicationModel)SendingApp;
+                Process SendingModel = (Process)SendingApp;
                 this.RunningAppModel = null; this.CanKillApp = false; this.CanBootApp = true;
-                ViewModelLogger.WriteLog($"WARNING! OE APP PROCESS {SendingModel.OEAppName} EXITED WITHOUT USER COMMAND!", LogType.WarnLog);
+                ViewModelLogger.WriteLog($"WARNING! OE APP PROCESS {SendingModel.ProcessName} EXITED WITHOUT USER COMMAND!", LogType.WarnLog);
             };
 
             // Store output process and return.

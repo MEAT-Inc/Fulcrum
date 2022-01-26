@@ -64,15 +64,15 @@
             <Button.Style>
                 <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                     <Style.Triggers>
-                        <Trigger Property="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
-                            <Setter Property="IsEnabled" Value="False"/>
-                            <Setter Property="Content" Value="Select An OE Application"/>
-                        </Trigger>
                         <DataTrigger Binding="{Binding Path=CanBootApp}" Value="true">
                             <Setter Property="Content" Value="Launch OE Application"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Path=CanBootApp}" Value="false">
+                        <DataTrigger Binding="{Binding Path=CanKillApp}" Value="true">
                             <Setter Property="Content" Value="Terminate OE Application"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
+                            <Setter Property="IsEnabled" Value="False"/>
+                            <Setter Property="Content" Value="Select An OE Application"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
