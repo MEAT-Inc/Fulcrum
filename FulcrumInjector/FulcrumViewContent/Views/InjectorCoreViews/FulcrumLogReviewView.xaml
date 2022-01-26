@@ -29,7 +29,7 @@
     <!-- Content For Log Reviewing -->
     <Grid Margin="10,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="120"/>
+            <RowDefinition Height="105"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -37,7 +37,7 @@
         <!-- Title and information -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height=".55*"/>
+                <RowDefinition Height=".70*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid Margin="0,0,15,0" x:Name="MainActionLoadButtons">
@@ -104,12 +104,12 @@
             <!-- File Contents -->
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <!-- Currently Loaded file -->
-                <Grid Grid.Row="0" Margin="10,0">
+                <Grid Grid.Row="0" Margin="10,3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/> 
                         <ColumnDefinition Width="175"/>
