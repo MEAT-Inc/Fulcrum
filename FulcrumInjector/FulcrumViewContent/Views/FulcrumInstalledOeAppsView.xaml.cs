@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -51,11 +52,50 @@ namespace FulcrumInjector.FulcrumViewContent.Views
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        private void OEApplicationMouseDown_Twice(object sender, MouseButtonEventArgs e)
+        /// <summary>
+        /// Checks the currently selected item on the listbox and sets the button state for controlling OE Apps.
+        /// </summary>
+        /// <param name="SendingObject"></param>
+        /// <param name="SelectionChangedArgs"></param>
+        private void InstalledAppsListView_OnSelectionChanged(object SendingObject, SelectionChangedEventArgs SelectionChangedArgs)
+        {
+            // Pull in the current object from our sender.
+            ListBox SendingListBox = (ListBox)SendingObject;
+            int SelectedIndexValue = SendingListBox.SelectedIndex;
+            this.ViewLogger.WriteLog($"PULLED IN NEW SELECTED INDEX VALUE OF AN OE APP AS {SelectedIndexValue}", LogType.InfoLog);
+            if (SelectedIndexValue == -1 || SelectedIndexValue > this.ViewModel.InstalledOeApps.Count) {
+                this.ViewLogger.WriteLog("ERROR! INDEX WAS OUT OF RANGE FOR POSSIBLE OE APP OBJECTS!", LogType.ErrorLog);
+                return;
+            }
+
+            // Now using this index value, find our current model object.
+            this.ViewModel.SetCurrentOeApplication(this.ViewModel.InstalledOeApps[SelectedIndexValue]);
+            this.ViewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
+            this.ViewLogger.WriteLog($"OE APPLICATION LOADED IS {ViewModel.SelectedAppModel.OEAppName} AT PATH {ViewModel.SelectedAppModel.OEAppPath}");
+        }
+        /// <summary>
+        /// Opens or closes an OE app based on our current selected object.
+        /// </summary>
+        /// <param name="SendingButton">Button object</param>
+        /// <param name="ButtonEventArgs">Event args for the button</param>
+        private void ControlOeApplicationButton_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
+        {
+            // Check the view model of our object instance. If Can boot then boot. If can kill then kill.
+
+        }
+
+
+        /// <summary>
+        /// Event for a double click on an OE Application object.
+        /// THIS IS NOT YET DONE!
+        /// </summary>
+        /// <param name="SendingGrid"></param>
+        /// <param name="GridClickedArgs"></param>
+        private void OEApplicationMouseDown_Twice(object SendingGrid, MouseButtonEventArgs GridClickedArgs)
         {
             // Check for a double click event action. If not, return out. If it is, show a new flyout object to allow user to modify the app object.
-            bool DoubleClick = e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2;
-            if (!DoubleClick) return;
+            bool DoubleClick = GridClickedArgs.LeftButton == MouseButtonState.Pressed && GridClickedArgs.ClickCount == 2;
+            if (DoubleClick) this.ViewLogger.WriteLog("PROCESSED REQUEST TO CHANGE OE APP CONTENT! THIS IS NOT YET BUILT!");
         }
     }
 }

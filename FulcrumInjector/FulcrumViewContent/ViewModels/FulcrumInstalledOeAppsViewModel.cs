@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
@@ -21,10 +22,19 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledOeAppsViewModelLogger")) ?? new SubServiceLogger("InstalledOeAppsViewModelLogger");
 
         // Private Control Values
+        private bool _canBootApp;
+        private bool _canKillApp;
+        private Process _runningAppProcess;
+        private OeApplicationModel _runningAppModel;
+        private OeApplicationModel _selectedAppModel;
         private ObservableCollection<OeApplicationModel> _installedOeApps;
 
         // Public values for our view to bind onto 
-        public ObservableCollection<OeApplicationModel> InstalledOeApps { get => _installedOeApps; set => PropertyUpdated(value); }
+        public bool CanBootApp { get => _canBootApp; private set => PropertyUpdated(value); }
+        public bool CanKillApp { get => _canKillApp; private set => PropertyUpdated(value); }
+        public OeApplicationModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
+        public OeApplicationModel SelectedAppModel { get => _selectedAppModel; private set => PropertyUpdated(value); }
+        public ObservableCollection<OeApplicationModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -40,11 +50,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             // Import the list of possible OE App names from our json configuration file now.
             this.InstalledOeApps = this.ImportOeApplications();
             ViewModelLogger.WriteLog("IMPORT PROCESS COMPLETE! VIEW SHOULD BE UPDATED WITH APP INSTANCE OBJECTS NOW!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("BOUND NEW APP OBJECT TO INDEX ZERO ON THE VIEW CONTENT! THIS IS GOOD!", LogType.InfoLog);
 
             // Log completed setup.
             ViewModelLogger.WriteLog("SETUP NEW OE APP STATUS MONITOR VALUES OK!", LogType.InfoLog);
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Pulls in a list of OE application names and paths as a set of objects.
@@ -89,11 +101,31 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
 
         /// <summary>
-        /// Append a new app into our list of OE apps and store it inside our JSON
+        /// Boots a new OE Application based on the current value given for it.
         /// </summary>
-        /// <returns></returns>
-        internal OeApplicationModel AddNewOeApp(string Name, string Path, string Version = "N/A", string BatLaunchCommand = "NO_COMMAND") {
-            throw new NotImplementedException("Adding OE Apps is not yet supported");
+        /// <param name="AppToStore">App to boot </param>
+        /// <returns>True if booted. false if failed.</returns>
+        internal bool SetCurrentOeApplication(OeApplicationModel AppToStore)
+        {
+            // If this app is not in our list throw out an error.
+            if (!this.InstalledOeApps.Contains(AppToStore)) {
+                ViewModelLogger.WriteLog("ERROR! INPUT APP WAS NOT FOUND IN OUR LIST OF DEFINED OBJECTS!", LogType.ErrorLog);
+                return false;   
+            }
+
+            // Store the app here and return status.
+            ViewModelLogger.WriteLog($"STORING NEW OE APPLICATION NAMED {AppToStore.OEAppName} NOW...", LogType.WarnLog);
+            ViewModelLogger.WriteLog("STORING CONTENT CONTROL BOOL VALUES FOR OUR BUTTON SENDER NOW...", LogType.InfoLog);
+
+            // Store bool values for the state of the command button
+            this.CanBootApp = this.RunningAppModel == null;            // If the running object is null then we can boot.
+            this.CanKillApp = this.RunningAppModel == AppToStore;      // If the running model matches our input app and the process is live, we can kill.
+
+            // Store the input button object here.
+            this.SelectedAppModel = AppToStore;
+            ViewModelLogger.WriteLog($"STORED NEW VALUES FOR BOOLEAN CONTENT CONTROLS OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("VALUES SET --> BOOTABLE: {this.CanBootApp} | KILLABLE: {this.CanKillApp}", LogType.TraceLog);
+            return true;
         }
         /// <summary>
         /// Modifies the command object value of an oe application
@@ -102,28 +134,70 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <param name="NewCommandValue"></param>
         /// <returns></returns>
         internal OeApplicationModel ModifyOeAppCommand(string AppName, string NewCommandValue) {
+            // Throw since this is not yet built in.
             throw new NotImplementedException("Modifying OE Apps is not yet supported");
         }
+
+
         /// <summary>
-        /// Modifies the command object value of an oe application
+        /// Boots a new OE Application based on the current value given for it.
         /// </summary>
-        /// <param name="AppName"></param>
-        /// <param name="NewCommandValue"></param>
-        /// <returns></returns>
-        internal OeApplicationModel ModifyOeAppCommand(OeApplicationModel AppName, string NewCommandValue) {
-            throw new NotImplementedException("Modifying OE Apps is not yet supported");
+        /// <returns>True if booted. false if failed.</returns>
+        internal bool LaunchOeApplication(out Process BootedAppProcess)
+        {
+            // Check if app to run is not null.
+            if (this.SelectedAppModel == null || !this.CanBootApp) { 
+                ViewModelLogger.WriteLog("ERROR! SELECTED APP OBJECT WAS NULL! ENSURE ONE HAS BEEN CONFIRMED BEFORE RUNNING THIS METHOD!", LogType.ErrorLog);
+                BootedAppProcess = null;
+                return false;   
+            }
+
+            // Boot the app here and return status. Build process object out and return it.
+            ViewModelLogger.WriteLog($"BOOTING OE APPLICATION NAMED {this.SelectedAppModel.OEAppName} NOW...", LogType.WarnLog);
+            this._runningAppProcess = new Process() {
+                EnableRaisingEvents = true,
+                StartInfo = new ProcessStartInfo(this.SelectedAppModel.OEAppPath) {
+                    Verb = "runas",
+                    WindowStyle = ProcessWindowStyle.Maximized,
+                }
+            };
+
+            // Tack on the exited process event. Clear out values and setup new process object.
+            this._runningAppProcess.Exited += (SendingApp, _) =>
+            {
+                // Cast Sending App and use this for input values.
+                OeApplicationModel SendingModel = (OeApplicationModel)SendingApp;
+                this.RunningAppModel = null; this.CanKillApp = false; this.CanBootApp = this.SelectedAppModel != null;
+                ViewModelLogger.WriteLog($"WARNING! OE APP PROCESS {SendingModel.OEAppName} EXITED WITHOUT USER COMMAND!", LogType.WarnLog);
+            };
+
+            // Store output process and return.
+            this._runningAppProcess.Start();
+            ViewModelLogger.WriteLog($"BOOTED NEW OE APP PROCESS OK! PROCESS ID: {_runningAppProcess.Id}", LogType.InfoLog);
+            BootedAppProcess = _runningAppProcess;
+            return true;    
         }
         /// <summary>
-        /// Removes an OE App from our list of apps and the JSON
+        /// Boots a new OE Application based on the current value given for it.
         /// </summary>
-        /// <param name="AppToRemove"></param>
-        /// <returns>True if removed. False if not.</returns>
-        internal bool RemoveOeApp(string AppToRemove) { throw new NotImplementedException("Removing OE Apps is not yet supported"); }
-        /// <summary>
-        /// Removes an OE App from our list of apps and the JSON
-        /// </summary>
-        /// <param name="AppToRemove"></param>
-        /// <returns>True if removed. False if not.</returns>
-        internal bool RemoveOeApp(OeApplicationModel AppToRemove) { throw new NotImplementedException("Removing OE Apps is not yet supported"); }
+        /// <returns>True if killed. false if failed.</returns>
+        internal bool KillOeApplication()
+        {
+            // Check if app to kill is not null.
+            if (this.RunningAppModel == null || !this.CanKillApp) {
+                ViewModelLogger.WriteLog("ERROR! SELECTED APP OBJECT WAS NULL! ENSURE ONE HAS BEEN CONFIRMED BEFORE RUNNING THIS METHOD!", LogType.ErrorLog);
+                return false;
+            }
+
+            // Kill the app here and return status.
+            ViewModelLogger.WriteLog($"KILLING RUNNING OE APPLICATION NAMED {this.RunningAppModel.OEAppName} NOW...", LogType.WarnLog);
+            this._runningAppProcess.Kill();
+            this.CanBootApp = this.SelectedAppModel != null;
+            this.RunningAppModel = null; this.CanKillApp = false;
+
+            // Return passed output here.
+            ViewModelLogger.WriteLog("KILLED APP OBJECT CORRECTLY! READY TO PROCESS A NEW BOOT OR KILL COMMAND", LogType.InfoLog);
+            return true;
+        }
     }
 }
