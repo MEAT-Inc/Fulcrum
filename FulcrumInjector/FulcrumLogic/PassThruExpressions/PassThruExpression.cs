@@ -204,9 +204,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public PassThruExpression(string CommandInput, PassThruCommandType ExpressionType)
         {
             // Store input lines
+            this.CommandLines = CommandInput;
             this.TypeOfExpression = ExpressionType;
-            this.CommandLines = CommandInput.TrimStart();
-            this.SplitCommandLines = CommandInput.Split('\n');
+            this.SplitCommandLines = CommandInput.Split('\r');
 
             // Find command issue request values. (Pull using Base Class)
             var FieldsToSet = this.GetExpressionProperties(true);
