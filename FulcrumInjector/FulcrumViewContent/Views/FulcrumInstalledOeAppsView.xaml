@@ -40,7 +40,6 @@
 
         <!-- List of OE Apps -->
         <ListView Grid.Row="1" 
-                  
                   Name="InstalledAppsListView"
                   Style="{StaticResource ListViewOeAppsStyle}" 
                   ItemsSource="{Binding InstalledOeApps}">
