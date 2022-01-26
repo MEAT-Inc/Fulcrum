@@ -30,7 +30,7 @@
         <!-- Settings items -->
     <Grid Margin="5,10,5,5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".275*"/>
+            <RowDefinition Height=".25*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -53,12 +53,6 @@
                     Style="{StaticResource ActionButtonStyle}" Margin="0,5,15,5"
                     Click="OpenJsonViewerFlyoutButton_OnClick" Width="175">
             </Button>
-            <Border Grid.Row="1"
-                Margin="9,0,15,0"
-                x:Name="WidthHelperBorder"
-                VerticalAlignment="Bottom"
-                BorderThickness="0,0,0,2"
-                BorderBrush="{StaticResource  TextColorBase}"/>
 
             <!-- Information Text -->
             <TextBlock Grid.Row="1" Margin="10,0" TextWrapping="Wrap" Foreground="{StaticResource TextColorBase}" FontSize="14">
@@ -67,56 +61,62 @@
             </TextBlock>
         </Grid>
 
-        <!-- Content for the settings objects goes in here -->
-        <ListBox Grid.Row="1"
-                 x:Name="SettingsListBoxView"
-                 Margin="10,10,15,10"
-                 HorizontalContentAlignment="Stretch"
-                 VerticalContentAlignment="Stretch"
-                 VerticalAlignment="Stretch"
-                 Style="{StaticResource ListBoxSettingsStyle}"
-                 ItemsSource="{Binding Path=SettingsEntrySets}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
-                        <Grid Margin="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid.Background>
-                                <SolidColorBrush Color="#020202" Opacity=".85"/>
-                            </Grid.Background>
-                            <TextBlock
-                            Margin="5,5,10,0"
-                            Style="{StaticResource SettingSectionTitleStyle}"
-                            Text="{Binding Path=SettingSectionTitle}"/>
-                            <ListBox
-                            Grid.Row="1" 
-                            Width="630"
-                            Height="350"
-                            Padding="0"
-                            Margin="0,0,6,0"
-                            BorderThickness="0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Stretch"
-                            ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                            ItemsSource="{Binding}"
-                            Style="{StaticResource ListBoxSettingsStyle}"
-                            DataContext="{Binding Path=SettingsEntries}">
-                                <ListBox.Background>
-                                    <SolidColorBrush Color="Gray" Opacity=".50"/>
-                                </ListBox.Background>
-                                <ListBox.ItemTemplateSelector>
-                                    <dataConverters:UserSettingsDataTemplateSelector/>
-                                </ListBox.ItemTemplateSelector>
-                            </ListBox>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <!-- Dividing Border -->
+        <Border Grid.Row="0"
+                Margin="10,0,15,12"
+                x:Name="WidthHelperBorder"
+                VerticalAlignment="Bottom"
+                BorderThickness="0,2,0,0"
+                BorderBrush="{StaticResource  TextColorBase}"/>
 
+        <!-- Content for the settings objects goes in here -->
+        <ScrollViewer Grid.Row="1" Background="Black" Margin="10,-5,10,5">
+            <ListBox x:Name="SettingsListBoxView"
+                     HorizontalContentAlignment="Stretch"
+                     VerticalContentAlignment="Stretch"
+                     VerticalAlignment="Stretch"
+                     ItemsSource="{Binding Path=SettingsEntrySets}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
+                            <Grid Margin="0, 5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Background>
+                                    <SolidColorBrush Color="#020202" Opacity=".85"/>
+                                </Grid.Background>
+                                <TextBlock
+                                Margin="5,5,10,0"
+                                Style="{StaticResource SettingSectionTitleStyle}"
+                                Text="{Binding Path=SettingSectionTitle}"/>
+                                <ListBox
+                                Grid.Row="1" 
+                                Height="Auto"
+                                Padding="0"
+                                Margin="0,0,5,0"
+                                BorderThickness="0"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                ItemsSource="{Binding}"
+                                Style="{StaticResource ListBoxSettingsStyle}"
+                                DataContext="{Binding Path=SettingsEntries}">
+                                    <ListBox.Background>
+                                        <SolidColorBrush Color="Gray" Opacity=".50"/>
+                                    </ListBox.Background>
+                                    <ListBox.ItemTemplateSelector>
+                                        <dataConverters:UserSettingsDataTemplateSelector/>
+                                    </ListBox.ItemTemplateSelector>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
 
         <!-- Viewing Json Flyout -->
         <mah:FlyoutsControl Grid.Row="1">

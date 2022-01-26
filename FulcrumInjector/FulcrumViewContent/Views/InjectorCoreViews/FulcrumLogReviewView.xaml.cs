@@ -85,7 +85,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
             using OpenFileDialog SelectAttachmentDialog = new OpenFileDialog()
             {
-                Multiselect = false,
+                Multiselect = true,
                 CheckFileExists = true,
                 CheckPathExists = true,
                 RestoreDirectory = true,
@@ -96,8 +96,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Now open the dialog and allow the user to pick some new files.
             this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
-            if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0)
-            {
+            if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 // Log failed, set no file, reset sending button and return.
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
@@ -108,8 +107,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Grid ParentGrid = SenderButton.Parent as Grid;
             SenderButton.Content = "Loading..."; ParentGrid.IsEnabled = false;
 
+            // Check if we have multiple files. 
+            string FileToLoad = Task.Run(() => SelectAttachmentDialog.FileNames.Length == 1 ?
+                SelectAttachmentDialog.FileName :
+                this.ViewModel.CombineLogFiles(SelectAttachmentDialog.FileNames)).Result;
+
             // Store new file object value. Validate it on the ViewModel object first.
-            bool LoadResult = this.ViewModel.LoadLogContents(SelectAttachmentDialog.FileName);
+            bool LoadResult = this.ViewModel.LoadLogContents(FileToLoad);
             if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
             else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 

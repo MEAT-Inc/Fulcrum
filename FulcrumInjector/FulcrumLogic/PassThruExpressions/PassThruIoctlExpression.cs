@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         [PtExpressionProperty("Parameter Count")] public readonly string ParameterCount;
 
         // Number of Parameters and values for the IOCTL command.
-        public readonly Tuple<string, string>[] ParameterValues;
+        public readonly Tuple<string, string, string>[] ParameterValues;
 
         // ------------------------------------------------------------------------------------------
 

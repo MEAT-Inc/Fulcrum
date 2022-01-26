@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // Private control values
         private string _loadedLogFile = "";
         private string _logFileContents = "";
-        private double _parsingProgress = 0.00;
+        private int _parsingProgress = 0;
 
         // Private string for last built expressions file.
         private bool _inputParsed = false;
@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
-        public double ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
+        public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -74,6 +74,34 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Combines a set of input log files into one output file.
+        /// </summary>
+        /// <param name="LogFilePaths"></param>
+        /// <returns>Path to a combined output log file.</returns>
+        internal string CombineLogFiles(string[] LogFilePaths)
+        {
+            // Find the name of the first file and use it as our base.
+            string OutputPath = Path.GetDirectoryName(LogFilePaths[0]);
+            string BaseFileName = Path.GetFileNameWithoutExtension(LogFilePaths[0]);
+            string FinalFileName = Path.Combine(OutputPath, $"CombinedLogs_{BaseFileName}.shimLog");
+
+            // Now load the files in one by one and combine their output.
+            string[] TotalContent = Array.Empty<string>();
+            TotalContent = LogFilePaths.SelectMany(FileObj =>
+            {
+                try { return File.ReadAllLines(FileObj); }
+                catch {
+                    ViewModelLogger.WriteLog("ERROR! FAILED TO PARSE IN ONE OR MORE LOG FILES!", LogType.ErrorLog);
+                    return Array.Empty<string>();
+                }
+            }).ToArray();
+
+            // Write final output contents now.
+            ViewModelLogger.WriteLog($"WRITING A TOTAL OF {TotalContent.Length} NEW FILE LINES OUT TO OUR OUTPUT LOCATION NOW...", LogType.InfoLog);
+            File.WriteAllLines(FinalFileName, TotalContent);
+            return FinalFileName;
+        }
         /// <summary>
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
@@ -149,7 +177,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Build expression class object and tick our progress
                     var NextClassObject = this.GetRegexClassFromCommand(ExpressionType, SplitLines);
-                    this.ParsingProgress = (double)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
+                    this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
 
                     // Return the built expression object
                     return NextClassObject;

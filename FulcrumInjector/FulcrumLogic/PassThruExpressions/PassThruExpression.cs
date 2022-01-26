@@ -154,10 +154,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 // Log added new content
                 this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
             }
-            if (this.GetType() == typeof(PassThruStartMessageFilterExpression))
+            if (this.GetType() == typeof(PassThruIoctlExpression))
             {
                 // Append the new values for the Ioctl values into our output strings now.
-                NewLines.AddRange(this.FindFilterContents(out _)
+                NewLines.AddRange(this.FindIoctlParameters(out _)
                     .Split('\n')
                     .Where(LineObj => !string.IsNullOrEmpty(LineObj))
                     .Select(LineObj => "   " + LineObj)
@@ -204,8 +204,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         public PassThruExpression(string CommandInput, PassThruCommandType ExpressionType)
         {
             // Store input lines
-            this.CommandLines = CommandInput;
             this.TypeOfExpression = ExpressionType;
+            this.CommandLines = CommandInput.TrimStart();
             this.SplitCommandLines = CommandInput.Split('\n');
 
             // Find command issue request values. (Pull using Base Class)
@@ -255,8 +255,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
         protected internal bool SetExpressionProperties(FieldInfo[] FieldObjects, string[] FieldValueStrings)
         {
             // Make sure the count of properties matches the count of lines.
-            if (FieldValueStrings.Length != FieldObjects.Length)
-            {
+            if (FieldValueStrings.Length != FieldObjects.Length) {
                 this.ExpressionLogger.WriteLog("EXPRESSIONS FOR FIELDS AND VALUES ARE NOT EQUAL SIZES! THIS IS FATAL!", LogType.FatalLog);
                 return false;
             }
