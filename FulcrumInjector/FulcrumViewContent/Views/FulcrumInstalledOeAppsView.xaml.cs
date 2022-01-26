@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using SharpLogger;
@@ -46,34 +49,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
-
-            // Configure pipe instances here.
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR OE APP INSTALLS OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// Checks the currently selected item on the listbox and sets the button state for controlling OE Apps.
-        /// </summary>
-        /// <param name="SendingObject"></param>
-        /// <param name="SelectionChangedArgs"></param>
-        private void InstalledAppsListView_OnSelectionChanged(object SendingObject, SelectionChangedEventArgs SelectionChangedArgs)
-        {
-            // Pull in the current object from our sender.
-            ListBox SendingListBox = (ListBox)SendingObject;
-            int SelectedIndexValue = SendingListBox.SelectedIndex;
-            this.ViewLogger.WriteLog($"PULLED IN NEW SELECTED INDEX VALUE OF AN OE APP AS {SelectedIndexValue}", LogType.InfoLog);
-            if (SelectedIndexValue == -1 || SelectedIndexValue > this.ViewModel.InstalledOeApps.Count) {
-                this.ViewLogger.WriteLog("ERROR! INDEX WAS OUT OF RANGE FOR POSSIBLE OE APP OBJECTS!", LogType.ErrorLog);
-                return;
-            }
-
-            // Now using this index value, find our current model object.
-            this.ViewModel.SetCurrentOeApplication(this.ViewModel.InstalledOeApps[SelectedIndexValue]);
-            this.ViewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
-            this.ViewLogger.WriteLog($"OE APPLICATION LOADED IS {ViewModel.SelectedAppModel.OEAppName} AT PATH {ViewModel.SelectedAppModel.OEAppPath}");
-        }
         /// <summary>
         /// Opens or closes an OE app based on our current selected object.
         /// </summary>
@@ -81,23 +60,70 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <param name="ButtonEventArgs">Event args for the button</param>
         private void ControlOeApplicationButton_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
         {
+            // Build selected object output here.
+            int SelectedIndexValue = this.InstalledAppsListView.SelectedIndex;
+            var SelectedObject = this.ViewModel.InstalledOeApps[SelectedIndexValue];
+            this.ViewLogger.WriteLog($"PULLED IN NEW SELECTED INDEX VALUE OF AN OE APP AS {SelectedIndexValue}", LogType.InfoLog);
+            if (SelectedIndexValue == -1 || SelectedIndexValue > this.ViewModel.InstalledOeApps.Count) {
+                this.ViewLogger.WriteLog("ERROR! INDEX WAS OUT OF RANGE FOR POSSIBLE OE APP OBJECTS!", LogType.ErrorLog);
+                return;
+            }
+
+            // Now using this index value, find our current model object.
+            this.ViewModel.SetTargetOeApplication(SelectedObject);
+            this.ViewLogger.WriteLog($"APP OBJECT SELECTED FOR TARGETING IS: {SelectedObject}", LogType.InfoLog);
+            this.ViewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
+
             // Check the view model of our object instance. If Can boot then boot. If can kill then kill.
-            if (this.ViewModel.CanBootApp) {
-                this.ViewLogger.WriteLog("BOOTING NEW OE APP OBJECT NOW!", LogType.WarnLog);
-                this.ViewModel.LaunchOeApplication(out var BuiltProcess);
-                this.ViewLogger.WriteLog($"PROCESS ID FOR APP BUILT: {BuiltProcess.Id}", LogType.InfoLog);
-            }
+            bool RanCommand = false; bool WasBooted = this.ViewModel.CanBootApp;
+            if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication();
+            else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out var BuiltProcess);
+            else throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
 
-            // If we can kill the app
-            if (this.ViewModel.CanKillApp) {
-                this.ViewLogger.WriteLog("KILLING RUNNING OE APP INSTANCE NOW...", LogType.WarnLog);
-                this.ViewModel.KillOeApplication();
-                this.ViewLogger.WriteLog("KILLED OE APP OK!", LogType.InfoLog);
-            }
+            // Now setup temp values for booted or not.
+            Task.Run(() =>
+            {
+                // Pull in the current object from our sender.
+                Button SenderButton = (Button)SendingButton;
+                Brush DefaultColor = SenderButton.Background;
+                string DefaultContent = SenderButton.Content.ToString();
 
-            // If we can't do either of these, then throw an exception
-            this.ViewLogger.WriteLog("FAILED TO BUILD NEW COMMAND FOR APP START OR STOP! THIS IS FATAL!", LogType.ErrorLog);
-            throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    // Show our new temp values. Set content based on if the command passed or failed.
+                    SenderButton.Content = RanCommand ?
+                        WasBooted ?
+                            $"Booted {this.ViewModel.RunningAppModel.OEAppName} OK!" :
+                            $"Killed {SelectedObject.OEAppName} OK!" :
+                        WasBooted ?
+                            $"Failed To Boot {SelectedObject.OEAppName}!" :
+                            $"Failed To Kill {SelectedObject.OEAppName}!";
+
+                    // Set background value here.
+                    SenderButton.Click -= this.ControlOeApplicationButton_OnClick;
+                    SenderButton.Background = RanCommand ? Brushes.DarkGreen : Brushes.DarkRed;
+                });
+
+                // Wait for 3.5 Seconds
+                Thread.Sleep(3500);
+
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    // Reset button values 
+                    SenderButton.Content = DefaultContent;
+                    SenderButton.Background = DefaultColor;
+                    SenderButton.Click += this.ControlOeApplicationButton_OnClick;
+
+                    // Log information
+                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                });
+            });
+
+            // Log Passed output and return here
+            this.ViewLogger.WriteLog("BUILT NEW COMMAND INSTANCE FOR OE APP OBJECT OK!", LogType.InfoLog);
+            this.ViewLogger.WriteLog("TOGGLED CONTENT VALUES, AND TRIGGERED APP METHOD CORRECTLY!", LogType.InfoLog);
         }
 
 
