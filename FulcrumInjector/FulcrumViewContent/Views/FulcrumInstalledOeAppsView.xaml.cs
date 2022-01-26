@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -81,7 +82,22 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         private void ControlOeApplicationButton_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
         {
             // Check the view model of our object instance. If Can boot then boot. If can kill then kill.
+            if (this.ViewModel.CanBootApp) {
+                this.ViewLogger.WriteLog("BOOTING NEW OE APP OBJECT NOW!", LogType.WarnLog);
+                this.ViewModel.LaunchOeApplication(out var BuiltProcess);
+                this.ViewLogger.WriteLog($"PROCESS ID FOR APP BUILT: {BuiltProcess.Id}", LogType.InfoLog);
+            }
 
+            // If we can kill the app
+            if (this.ViewModel.CanKillApp) {
+                this.ViewLogger.WriteLog("KILLING RUNNING OE APP INSTANCE NOW...", LogType.WarnLog);
+                this.ViewModel.KillOeApplication();
+                this.ViewLogger.WriteLog("KILLED OE APP OK!", LogType.InfoLog);
+            }
+
+            // If we can't do either of these, then throw an exception
+            this.ViewLogger.WriteLog("FAILED TO BUILD NEW COMMAND FOR APP START OR STOP! THIS IS FATAL!", LogType.ErrorLog);
+            throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
         }
 
 

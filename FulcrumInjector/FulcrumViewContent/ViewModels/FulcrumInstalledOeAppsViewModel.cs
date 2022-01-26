@@ -118,8 +118,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("STORING CONTENT CONTROL BOOL VALUES FOR OUR BUTTON SENDER NOW...", LogType.InfoLog);
 
             // Store bool values for the state of the command button
-            this.CanBootApp = this.RunningAppModel == null;            // If the running object is null then we can boot.
-            this.CanKillApp = this.RunningAppModel == AppToStore;      // If the running model matches our input app and the process is live, we can kill.
+            this.CanBootApp = this.RunningAppModel == null;       // If the running object is null then we can boot.
+            this.CanKillApp = this.RunningAppModel != null && 
+                              this._runningAppProcess != null;    // If the running model matches our input app and the process is live, we can kill.
 
             // Store the input button object here.
             this.SelectedAppModel = AppToStore;
@@ -175,6 +176,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this._runningAppProcess.Start();
             ViewModelLogger.WriteLog($"BOOTED NEW OE APP PROCESS OK! PROCESS ID: {_runningAppProcess.Id}", LogType.InfoLog);
             BootedAppProcess = _runningAppProcess;
+
+            // Store bool values for the state of the command button
+            this.RunningAppModel = this.SelectedAppModel;
+            this.CanBootApp = this.RunningAppModel == null;       // If the running object is null then we can boot.
+            this.CanKillApp = this.RunningAppModel != null &&
+                              this._runningAppProcess != null;    // If the running model matches our input app and the process is live, we can kill
+
+            // Return output state
             return true;    
         }
         /// <summary>
