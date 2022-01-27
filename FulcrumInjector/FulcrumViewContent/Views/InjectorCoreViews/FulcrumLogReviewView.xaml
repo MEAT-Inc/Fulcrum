@@ -58,12 +58,12 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Button
-                        Margin="5,0"
+                        Margin="5,2"
                         Style="{StaticResource ActionButtonStyle}"
                         Grid.Column="0" Click="LoadInjectorLogFile_OnClick"
                         Content="Load Log File" VerticalAlignment="Stretch"/>
                     <Button
-                        Margin="5,0" 
+                        Margin="5,2" 
                         Grid.Column="1" Click="ProcessLogFileContent_OnClick"
                         Content="Process Content" VerticalAlignment="Stretch">
                         <Button.Style>
@@ -77,7 +77,7 @@
                         </Button.Style>
                     </Button>
                     <Button
-                        Margin="5,0"
+                        Margin="5,2"
                         Style="{StaticResource ActionButtonStyle}" Grid.Column="2"
                         IsEnabled="False" Content="Build Simulation" VerticalAlignment="Stretch"/>
                 </Grid>
