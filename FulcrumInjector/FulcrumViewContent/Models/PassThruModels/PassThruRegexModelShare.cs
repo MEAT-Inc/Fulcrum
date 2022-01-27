@@ -119,6 +119,19 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
             return PassThruExpressionObjects;
         }
         /// <summary>
+        /// Finds a PTRegex Model for the given PTCommand type
+        /// </summary>
+        /// <param name="InputCommandType">Type to return</param>
+        /// <returns>Regex model for this PT Type if passed, or null if nothing found.</returns>
+        public static PassThruRegexModel GetRegexForCommand(PassThruCommandType InputCommandType)
+        {
+            // Find the command instance by name. Replace the input enum with a string and return.
+            return PassThruExpressionObjects.GetRegexByName(InputCommandType.ToString());
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
         /// Build a new regex model object from a given name value for a regex.
         /// </summary>
         /// <param name="RegexName"></param>
