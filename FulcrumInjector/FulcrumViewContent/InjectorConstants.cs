@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
@@ -239,5 +242,43 @@ namespace FulcrumInjector.FulcrumViewContent
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Method to invoke as an event when the end app routines are hit.
+        /// </summary>
+        public static void ProcessAppExit(object AppObject, ExitEventArgs ExitArgs)
+        {
+            // First Log information
+            LogBroker.Logger?.WriteLog("PROCESSED APP ENVIRONMENT OBJECT SHUTDOWN COMMAND OK!", LogType.WarnLog);
+            LogBroker.Logger?.WriteLog("CLOSING THIS INSTANCE CLEANLY AND THEN FORCE RUNNING A TERMINATION COMMAND!", LogType.InfoLog);
+
+            // Now build a process object. Simple bat file that runs a Taskkill instance on this app after waiting 3 seconds.
+            string TempBat = Path.ChangeExtension(Path.GetTempFileName(), "bat");
+            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+            string BatContents = string.Join("\n", new string[]
+            {
+                "timeout /t 5 /nobreak > NUL",
+                $"taskkill /F /IM {CurrentInstanceName}*"
+            });
+
+            // Write temp bat file to output and then run it.
+            LogBroker.Logger?.WriteLog($"BAT FILE LOCATION WAS GENERATED AND SET TO {TempBat}", LogType.InfoLog);
+            LogBroker.Logger?.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents}", LogType.TraceLog);
+            File.WriteAllText(TempBat, BatContents);
+
+            // Now run the output command.
+            LogBroker.Logger?.WriteLog("RUNNING TERMINATION COMMAND INSTANCE NOW...", LogType.WarnLog);
+            LogBroker.Logger?.WriteLog("THIS SHOULD BE THE LAST TIME THIS LOG FILE IS USED!", LogType.InfoLog);
+            ProcessStartInfo TerminateInfo = new ProcessStartInfo()
+            {
+                FileName = "cmd.exe",
+                CreateNoWindow = true,
+                Arguments = $"/C \"{TempBat}\""
+            };
+
+            // Execute here and exit out app.
+            LogBroker.Logger?.WriteLog($"EXECUTING NOW! TIME OF APP EXIT: {DateTime.Now:R}", LogType.WarnLog);
+            Process.Start(TerminateInfo);
+        }
     }
 }

@@ -32,7 +32,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // Public values for our view to bind onto 
         public bool CanBootApp { get => _canBootApp; private set => PropertyUpdated(value); }
         public bool CanKillApp { get => _canKillApp; private set => PropertyUpdated(value); }
-        public OeApplicationModel TargetAppModel { get => _targetAppModel; private set => PropertyUpdated(value); }
         public OeApplicationModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
         public ObservableCollection<OeApplicationModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
 

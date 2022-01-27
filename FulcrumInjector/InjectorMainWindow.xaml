@@ -15,7 +15,8 @@
         Height="725" Width="1200" 
         AllowsTransparency="True"
         ResizeMode="CanMinimize"
-        Loaded="InjectorMainWindow_OnLoaded">
+        Loaded="InjectorMainWindow_OnLoaded"
+        Closed="InjectorMainWindow_OnClosed">
     
     <!-- Dark Semi Transparent Background -->
     <Window.Background>
@@ -81,7 +82,7 @@
             </Viewbox>
 
             <!-- Splitting Border -->
-            <Border Grid.Column="1" Margin="0,0" Opacity=".75" BorderThickness="5,0" BorderBrush="{StaticResource SecondaryColor}"/>
+            <Border Grid.Column="1" Margin="3,0,0,0" Opacity=".75" BorderThickness="0,0,3,0" BorderBrush="{StaticResource TextColorBase}"/>
 
             <!-- Main Content View Box -->
             <injectorCoreViews:FulcrumHamburgerCoreView 
