@@ -81,7 +81,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         {
             // Attach output content into our session log box.
             FulcrumDllOutputLogView ViewCast = this.BaseViewControl as FulcrumDllOutputLogView;
-            ViewCast.Dispatcher.Invoke(() => { ViewCast.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
+            if (ViewCast == null) ViewModelLogger.WriteLog("WARNING: CAST VIEW ENTRY WAS NULL!", LogType.TraceLog); 
+            else ViewCast?.Dispatcher.Invoke(() => { ViewCast.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
         }
     }
 }
