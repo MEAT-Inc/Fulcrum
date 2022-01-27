@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruExpressions;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions.ExpressionObjects;
 using Newtonsoft.Json;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels

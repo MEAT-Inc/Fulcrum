@@ -157,7 +157,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PtExpressionExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruDisconnectExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruIoctlExpression.cs" />
@@ -171,7 +173,7 @@
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruOpenExpression.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
-    <Compile Include="FulcrumLogic\PassThruExpressions\PtExpressionProperty.cs" />
+    <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PtExpressionProperty.cs" />
     <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModelShare.cs" />
@@ -208,7 +210,8 @@
     <Compile Include="FulcrumLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruExpression.cs" />
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorOutputRedirectTarget.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorOutputSyntaxHelper.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\PassThruCommandFormatter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />
@@ -430,9 +433,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"

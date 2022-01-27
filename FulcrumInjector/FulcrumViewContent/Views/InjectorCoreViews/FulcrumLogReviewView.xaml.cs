@@ -51,22 +51,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
-
-            // Configure the new Logging Output Target.
-            var CurrentConfig = LogManager.Configuration;
-            if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "ReplayedInjectorOutputTarget")) {
-                this.ViewLogger.WriteLog("WARNING: TARGET WAS ALREADY CONFIGURED AND FOUND! NOT BUILDING AGAIN", LogType.WarnLog);
-                return;
-            }
-
-            // Log information, build new target output and return.
-            ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition("ReplayedInjectorOutputTarget", typeof(InjectorOutputRedirectTarget));
-            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.ReplayLogInputContent));
-            LogManager.ReconfigExistingLoggers();
-
-            // Log information about events built.
-            this.ViewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR INPUT CONTENT COLORING OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -79,6 +63,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+
+            // Setup coloring helper.
+            this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
+            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
             // Log completed setup values ok
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);

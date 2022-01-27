@@ -16,39 +16,29 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     /// <summary>
     /// Target for redirecting logging configuration on our output
     /// </summary>
-    [Target("InjectorOutputRedirectTarget")]
-    public sealed class InjectorOutputRedirectTarget : TargetWithLayout
+    public sealed class InjectorOutputSyntaxHelper 
     {
         // Edit Object which we will be using to write into.
-        [RequiredParameter]
-        public TextEditor OutputEditor { get; set; }
-        [RequiredParameter]
-        public UserControl ParentUserControl { get; set; }
+        public readonly TextEditor OutputEditor;
+
+        // TODO: Build properties into here to represent our objects built and parsed during runtime operations
 
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new instance of our redirecting target object.
         /// </summary>
-        public InjectorOutputRedirectTarget(UserControl UserControlParent, TextEditor EditorObject)
+        public InjectorOutputSyntaxHelper(TextEditor EditorObject)
         {
             // Store UserControl and Exit box
             this.OutputEditor = EditorObject;
-            this.ParentUserControl = UserControlParent;
             
             // Build document transforming helper objects now. Each one colors in a segment of the output line
             // TODO: Build an include new logger target redirect coloring helpers for fulcrum outputs.
         }
 
-        /// <summary>
-        /// Writes the message out to our Logging box.
-        /// </summary>
-        /// <param name="LogEvent"></param>
-        protected override void Write(LogEventInfo LogEvent)
-        {
-            // Write output using dispatcher to avoid threading issues.
-            string RenderedText = this.Layout.Render(LogEvent);
-            this.ParentUserControl.Dispatcher.Invoke(() => OutputEditor.Text += RenderedText + "\n");
-        }
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        // TODO: Determine what kind of helper methods this class object will need.
     }
 }
