@@ -8,6 +8,9 @@ using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using ICSharpCode.AvalonEdit;
+using NLog;
+using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -38,21 +41,24 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel = InjectorConstants.FulcrumDllOutputLogViewModel ?? new FulcrumDllOutputLogViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
-            // TODO: Append new Transformers into this constructor to apply color filtering on the output view.
-
             // Build event for our pipe objects to process new pipe content into our output box
-            FulcrumPipeReader.PipeInstance.PipeDataProcessed += (_, EventArgs) => 
-            {
-                // Attach output content into our session log box.
-                Dispatcher.Invoke(() => { this.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
-                if (!EventArgs.PipeDataString.Contains("Session Log File:")) return;
+            FulcrumPipeReader.PipeInstance.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
+            this.ViewLogger.WriteLog("STORED NEW EVENT BROKER FOR PIPE READING DATA PROCESSED OK!", LogType.InfoLog);
 
-                // Store log file object name onto our injector constants here.
-                string NextSessionLog = string.Join("", EventArgs.PipeDataString.Split(':').Skip(1));
-                ViewLogger.WriteLog("STORING NEW FILE NAME VALUE INTO STORE OBJECT FOR REGISTERED OUTPUT FILES!", LogType.WarnLog);
-                ViewLogger.WriteLog($"SESSION LOG FILE BEING APPENDED APPEARED TO HAVE NAME OF {NextSessionLog}", LogType.InfoLog);
-                this.ViewModel.SessionLogs = this.ViewModel.SessionLogs.Append(NextSessionLog).ToArray();
-            };
+            // Configure the new Logging Output Target.
+            var CurrentConfig = LogManager.Configuration;
+            if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "LiveInjectorOutputTarget")) {
+                this.ViewLogger.WriteLog("WARNING: TARGET WAS ALREADY CONFIGURED AND FOUND! NOT BUILDING AGAIN", LogType.WarnLog);
+                return;
+            }
+
+            // Log information, build new target output and return.
+            ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition("LiveInjectorOutputTarget", typeof(InjectorOutputRedirectTarget));
+            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
+
+            // Log information about events built.
+            this.ViewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR PIPE OUTPUT AND FOR INJECTOR DLL OUTPUT OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -79,12 +85,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <summary>
         /// Searches for the provided text values
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DllLogFilteringTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        /// <param name="SendingTextBox"></param>
+        /// <param name="TextChangedArgs"></param>
+        private void DllLogFilteringTextBox_OnTextChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
         {
             // Get the current text entry value and pass it over to the VM for actions.
-            var FilteringTextBox = (TextBox)sender;
+            var FilteringTextBox = (TextBox)SendingTextBox;
             string TextToFilter = FilteringTextBox.Text;
 
             // Run the search and show method on the view model
@@ -100,12 +106,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <summary>
         /// Updates has content value on the view model when text is changed.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DebugRedirectOutputEdit_OnTextChanged(object sender, EventArgs e)
+        /// <param name="SendingTextBox"></param>
+        /// <param name="TextChangedArgs"></param>
+        private void DebugRedirectOutputEdit_OnTextChanged(object SendingTextBox, EventArgs TextChangedArgs)
         {
             // Check the content value. If empty, set hasContent to false.
-            this.ViewModel.HasOutput = this.DebugRedirectOutputEdit.Text.Trim().Length != 0;
+            TextEditor DebugEditor = (TextEditor)SendingTextBox;
+            this.ViewModel.HasOutput = DebugEditor.Text.Trim().Length != 0;
         }
     }
 }

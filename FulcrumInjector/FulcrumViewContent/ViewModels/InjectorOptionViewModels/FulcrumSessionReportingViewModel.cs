@@ -5,7 +5,9 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic;
+using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -149,6 +151,26 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             // Return information and return out.
             ViewModelLogger.WriteLog("RETURNING OUTPUT FROM THE SESSION LOG EXTRACTION ROUTINE NOW...", LogType.InfoLog);
             return FilesLocated;
+        }
+        /// <summary>
+        /// Event object to run when the injector output gets new content.
+        /// Pulls log files out from text and saves their contents here.
+        /// </summary>
+        /// <param name="PipeInstance">Pipe object calling these events</param>
+        /// <param name="EventArgs">The events themselves.</param>
+        internal void OnPipeReaderContentProcessed(object PipeInstance, FulcrumPipeDataReadEventArgs EventArgs)
+        {
+            // See if there's a new log file to contain and update here.
+            if (!EventArgs.PipeDataString.Contains("Session Log File:")) return;
+
+            // Store log file object name onto our injector constants here.
+            string NextSessionLog = string.Join("", EventArgs.PipeDataString.Split(':').Skip(1));
+            ViewModelLogger.WriteLog("STORING NEW FILE NAME VALUE INTO STORE OBJECT FOR REGISTERED OUTPUT FILES!", LogType.WarnLog);
+            ViewModelLogger.WriteLog($"SESSION LOG FILE BEING APPENDED APPEARED TO HAVE NAME OF {NextSessionLog}", LogType.InfoLog);
+
+            // Try and attach it to our output report helper.
+            if (this.SessionReportSender.AddMessageAttachment(NextSessionLog)) ViewModelLogger.WriteLog("ATTACHED REPORT FILE OK!", LogType.InfoLog);
+            else ViewModelLogger.WriteLog("FAILED TO ATTACH REPORT INTO OUR OUTPUT CONTENT!", LogType.ErrorLog);
         }
     }
 }

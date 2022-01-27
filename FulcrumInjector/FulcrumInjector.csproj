@@ -208,6 +208,7 @@
     <Compile Include="FulcrumLogic\JsonConverters\OeApplicationJsonConverter.cs" />
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruExpression.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorOutputRedirectTarget.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />

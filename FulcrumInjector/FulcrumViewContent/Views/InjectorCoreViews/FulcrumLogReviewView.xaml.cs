@@ -17,6 +17,9 @@ using System.Windows.Shapes;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using NLog;
+using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -49,7 +52,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel = InjectorConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
-            // TODO: Append new Transformers into this constructor to apply color filtering on the output view.
+            // Configure the new Logging Output Target.
+            var CurrentConfig = LogManager.Configuration;
+            if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "ReplayedInjectorOutputTarget")) {
+                this.ViewLogger.WriteLog("WARNING: TARGET WAS ALREADY CONFIGURED AND FOUND! NOT BUILDING AGAIN", LogType.WarnLog);
+                return;
+            }
+
+            // Log information, build new target output and return.
+            ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition("ReplayedInjectorOutputTarget", typeof(InjectorOutputRedirectTarget));
+            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.ReplayLogInputContent));
+            LogManager.ReconfigExistingLoggers();
+
+            // Log information about events built.
+            this.ViewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR INPUT CONTENT COLORING OK!", LogType.InfoLog);
         }
 
         /// <summary>

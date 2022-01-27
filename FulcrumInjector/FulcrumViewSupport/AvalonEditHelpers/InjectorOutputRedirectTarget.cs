@@ -1,4 +1,9 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
 using ICSharpCode.AvalonEdit;
 using NLog;
@@ -11,12 +16,12 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     /// <summary>
     /// Target for redirecting logging configuration on our output
     /// </summary>
-    [Target("DebugLoggingRedirectTarget")]
-    public sealed class DebugLoggingRedirectTarget : TargetWithLayout
+    [Target("InjectorOutputRedirectTarget")]
+    public sealed class InjectorOutputRedirectTarget : TargetWithLayout
     {
         // Edit Object which we will be using to write into.
         [RequiredParameter]
-        public TextEditor DebugEditor { get; set; }
+        public TextEditor OutputEditor { get; set; }
         [RequiredParameter]
         public UserControl ParentUserControl { get; set; }
 
@@ -25,22 +30,14 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// <summary>
         /// Builds a new instance of our redirecting target object.
         /// </summary>
-        public DebugLoggingRedirectTarget(UserControl UserControlParent, TextEditor EditorObject)
+        public InjectorOutputRedirectTarget(UserControl UserControlParent, TextEditor EditorObject)
         {
             // Store UserControl and Exit box
-            this.DebugEditor = EditorObject;
+            this.OutputEditor = EditorObject;
             this.ParentUserControl = UserControlParent;
-
-            // Setup our Layout
-            this.Layout = new SimpleLayout(
-                "[${date:format=hh\\:mm\\:ss}][${level:uppercase=true}][${mdc:custom-name}][${mdc:item=calling-class-short}] ::: ${message}"
-            );
-
+            
             // Build document transforming helper objects now. Each one colors in a segment of the output line
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogTimeColorFormatter());
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogLevelColorFormatter());
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogCallStackColorFormatter());
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogLoggerNameColorFormatter()); 
+            // TODO: Build an include new logger target redirect coloring helpers for fulcrum outputs.
         }
 
         /// <summary>
@@ -51,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // Write output using dispatcher to avoid threading issues.
             string RenderedText = this.Layout.Render(LogEvent);
-            this.ParentUserControl.Dispatcher.Invoke(() => DebugEditor.Text += RenderedText + "\n");
+            this.ParentUserControl.Dispatcher.Invoke(() => OutputEditor.Text += RenderedText + "\n");
         }
     }
 }

@@ -40,9 +40,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
-            try { CurrentConfig.RemoveTarget("DebugToAvEditRedirect"); }
+            try { CurrentConfig.RemoveTarget("DebugLoggingRedirectTarget"); }
             catch { ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog); }
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugToAvEditRedirect", typeof(DebugLoggingRedirectTarget));
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugLoggingRedirectTarget", typeof(DebugLoggingRedirectTarget));
             CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
             LogManager.ReconfigExistingLoggers();
             this.ViewLogger.WriteLog("BUILT INSTANCE FOR OUR DLL OUTPUT DEBUG LOGGING VIEW OK!", LogType.InfoLog);
