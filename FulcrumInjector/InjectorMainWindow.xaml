@@ -15,7 +15,8 @@
         Height="725" Width="1200" 
         AllowsTransparency="True"
         ResizeMode="CanMinimize"
-        Loaded="InjectorMainWindow_OnLoaded">
+        Loaded="InjectorMainWindow_OnLoaded"
+        Closed="InjectorMainWindow_OnClosed">
     
     <!-- Dark Semi Transparent Background -->
     <Window.Background>

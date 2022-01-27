@@ -51,6 +51,8 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Configures specific control values when the window is loaded
         /// </summary>
@@ -75,7 +77,19 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("CONFIGURED NEW TITLE VALUE BASED ON OPERATIONAL CONDITIONS OK!", LogType.InfoLog);
             InjectorMainLogger.WriteLog($"NEW TITLE VALUE CONFIGURED: {this.Title}", LogType.InfoLog);
         }
+        /// <summary>
+        /// Routine method for closing actions when the main window instance is closed out.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void InjectorMainWindow_OnClosed(object Sender, EventArgs E)
+        {
+            // Log information about closing out now.
+            InjectorMainLogger.WriteLog("PROCESSED MAIN WINDOW CLOSEOUT ROUTINE CALL! CALLING TERMINATE ROUTINE!", LogType.ErrorLog);
+            InjectorMainLogger.WriteLog("THIS EXIT COMMAND STARTED FROM WITHIN OUR MAIN WINDOW INSTANCE! THIS WAS LIKELY A CLOSE BUTTON CALL", LogType.InfoLog);
 
-        // --------------------------------------------------------------------------------------------------------------------------
+            // Now call the routine in the constants file.
+            InjectorConstants.ProcessAppExit(null, null);
+        }
     }
 }
