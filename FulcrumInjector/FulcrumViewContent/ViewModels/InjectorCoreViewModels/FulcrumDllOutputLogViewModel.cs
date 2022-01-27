@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Threading;
+using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -68,6 +71,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             if (string.IsNullOrEmpty(TextToFind)) return;
             this.UsingRegex = OutputTransformer?.UseRegex ?? false;
             this.NoResultsOnSearch = OutputTransformer?.NoMatches ?? false;
+        }
+        /// <summary>
+        /// Event object to run when the injector output gets new content.
+        /// </summary>
+        /// <param name="PipeInstance">Pipe object calling these events</param>
+        /// <param name="EventArgs">The events themselves.</param>
+        internal void OnPipeReaderContentProcessed(object PipeInstance, FulcrumPipeDataReadEventArgs EventArgs)
+        {
+            // Attach output content into our session log box.
+            FulcrumDllOutputLogView ViewCast = this.BaseViewControl as FulcrumDllOutputLogView;
+            ViewCast.Dispatcher.Invoke(() => { ViewCast.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
         }
     }
 }
