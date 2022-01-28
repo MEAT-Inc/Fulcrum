@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit;
 using NLog;
 using NLog.Config;
@@ -21,8 +22,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         // Edit Object which we will be using to write into.
         public readonly TextEditor OutputEditor;
 
-        // TODO: Build properties into here to represent our objects built and parsed during runtime operations
-
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -30,15 +29,9 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// </summary>
         public InjectorOutputSyntaxHelper(TextEditor EditorObject)
         {
-            // Store UserControl and Exit box
-            this.OutputEditor = EditorObject;
-            
             // Build document transforming helper objects now. Each one colors in a segment of the output line
-            // TODO: Build an include new logger target redirect coloring helpers for fulcrum outputs.
+            this.OutputEditor = EditorObject;
+            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new PassThruCommandFormatter());       // For coloring in PTCommand values.
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        // TODO: Determine what kind of helper methods this class object will need.
     }
 }
