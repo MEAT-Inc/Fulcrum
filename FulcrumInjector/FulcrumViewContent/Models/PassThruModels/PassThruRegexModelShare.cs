@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruExpressions;
+using FulcrumInjector.FulcrumLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -117,6 +118,19 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
             _passThruExpressionObjects = new ObservableCollection<PassThruRegexModel>(RegexModelArray);
             return PassThruExpressionObjects;
         }
+        /// <summary>
+        /// Finds a PTRegex Model for the given PTCommand type
+        /// </summary>
+        /// <param name="InputCommandType">Type to return</param>
+        /// <returns>Regex model for this PT Type if passed, or null if nothing found.</returns>
+        public static PassThruRegexModel GetRegexForCommand(PassThruCommandType InputCommandType)
+        {
+            // Find the command instance by name. Replace the input enum with a string and return.
+            return PassThruExpressionObjects.GetRegexByName(InputCommandType.ToString());
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Build a new regex model object from a given name value for a regex.
         /// </summary>

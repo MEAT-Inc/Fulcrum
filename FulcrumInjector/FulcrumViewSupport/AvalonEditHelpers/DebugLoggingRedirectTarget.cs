@@ -6,12 +6,12 @@ using NLog.Config;
 using NLog.Layouts;
 using NLog.Targets;
 
-namespace FulcrumInjector.FulcrumViewContent.Models
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
 {
     /// <summary>
     /// Target for redirecting logging configuration on our output
     /// </summary>
-    [Target("DebugToAvEditRedirect")]
+    [Target("DebugLoggingRedirectTarget")]
     public sealed class DebugLoggingRedirectTarget : TargetWithLayout
     {
         // Edit Object which we will be using to write into.
