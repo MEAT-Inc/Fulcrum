@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             string LineText = CurrentContext.Document.GetText(InputLine);
             PassThruCommandType CommandType = LineText.GetTypeFromLines();
             if (CommandType == PassThruCommandType.NONE) return;
-
+            
             // If we don't have a type of none, then we get the regex for that type object.
             var LineExpression = PassThruRegexModelShare.GetRegexForCommand(CommandType); 
             if (!LineExpression.Evaluate(LineText, out var ExpressionMatches)) return;

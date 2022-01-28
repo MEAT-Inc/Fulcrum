@@ -121,8 +121,8 @@
                              Tag="Enter a filter or @r regex" Grid.Column="0" TextChanged="LogFilteringTextBox_OnTextChanged"/>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
                             Margin="0,5,5,2"
-                            IsEnabled="{Binding InputParsed}" x:Name="ToggleFilteringOrFileName" 
-                            Content="Syntax Highlighting "/>
+                            x:Name="ToggleFilteringOrFileName"
+                            IsEnabled="False" Content="Syntax Highlighting"/>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
                             Margin="5,5,0,2"
                             IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
