@@ -29,15 +29,16 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
 
         // --------------------------------------------------------------------------------------------------------------------------
 
-        // Color Configuration
-        public Tuple<string, Tuple<string, string>[]>[] ColorConfigurationValues { get; }
-
-
         // Edit Object which we will be using to write into.
         [RequiredParameter]
-        public TextEditor DebugEditor { get; set; }
+        public TextEditor OutputEditor { get; set; }
         [RequiredParameter]
         public UserControl ParentUserControl { get; set; }
+
+        // Color Configuration
+        public Tuple<string, Tuple<string, string>[]>[] ColorConfigurationValues { get; }
+        public bool IsHighlighting => this.OutputEditor?.TextArea.TextView.LineTransformers.Count != 0;
+
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         public DebugLoggingRedirectTarget(UserControl UserControlParent, TextEditor EditorObject)
         {
             // Store UserControl and Exit box
-            this.DebugEditor = EditorObject;
+            this.OutputEditor = EditorObject;
             this.ParentUserControl = UserControlParent;
             this.ConfigLogger.WriteLog("STORED NEW CONTENT VALUES FOR USER CONTROL AND EDITOR INPUT OK!", LogType.InfoLog);
 
@@ -138,15 +139,15 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
             this.StopColorHighlighting();
 
             // Now build all our new color format helpers.
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogTimeColorFormatter());
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogLevelColorFormatter());
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogCallStackColorFormatter());
-            this.DebugEditor.TextArea.TextView.LineTransformers.Add(new DebugLogLoggerNameColorFormatter());
+            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new DebugLogTimeColorFormatter());
+            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new DebugLogLevelColorFormatter());
+            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new DebugLogCallStackColorFormatter());
+            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new DebugLogLoggerNameColorFormatter());
         }
         /// <summary>
         /// Clears out the color helpers from the main input doc object.
         /// </summary>
-        public void StopColorHighlighting() { this.DebugEditor.TextArea.TextView.LineTransformers.Clear(); }
+        public void StopColorHighlighting() { this.OutputEditor.TextArea.TextView.LineTransformers.Clear(); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -158,7 +159,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // Write output using dispatcher to avoid threading issues.
             string RenderedText = this.Layout.Render(LogEvent);
-            this.ParentUserControl.Dispatcher.Invoke(() => DebugEditor.Text += RenderedText + "\n");
+            this.ParentUserControl.Dispatcher.Invoke(() => OutputEditor.Text += RenderedText + "\n");
         }
     }
 }
