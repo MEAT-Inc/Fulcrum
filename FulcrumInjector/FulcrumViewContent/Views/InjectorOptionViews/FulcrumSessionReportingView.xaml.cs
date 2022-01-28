@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using ICSharpCode.AvalonEdit;
@@ -45,6 +46,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Build event broker for session logging output
+            FulcrumPipeReader.PipeInstance.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
+            this.ViewLogger.WriteLog("STORED NEW EVENT HELPER FOR PROCESSING LOG CONTENTS ON PIPE DATA OUTPUT!", LogType.InfoLog);
         }
 
         /// <summary>

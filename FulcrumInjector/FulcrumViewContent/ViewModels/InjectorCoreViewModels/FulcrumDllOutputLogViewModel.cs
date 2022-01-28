@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Threading;
+using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -18,18 +21,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private control values
         private bool _hasOutput;
-        private bool _usingRegex;
-        private bool _noResultsOnSearch;
         private string[] _sessionLogs;
 
         // Public values for our view to bind onto 
         public bool HasOutput { get => _hasOutput; set => PropertyUpdated(value); }
-        public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
         public string[] SessionLogs { get => _sessionLogs; set => PropertyUpdated(value); }
-        public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public AvalonEditFilteringHelpers LogContentHelper;
+        public LogOutputFilteringHelper LogFilteringHelper;
+        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -61,13 +61,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         internal void SearchForText(string TextToFind)
         {
             // Make sure transformer is built
-            if (LogContentHelper == null) return;
-            var OutputTransformer = this.LogContentHelper.SearchForText(TextToFind);
-
-            // Store values here
-            if (string.IsNullOrEmpty(TextToFind)) return;
-            this.UsingRegex = OutputTransformer?.UseRegex ?? false;
-            this.NoResultsOnSearch = OutputTransformer?.NoMatches ?? false;
+            if (LogFilteringHelper == null) return;
+            this.LogFilteringHelper.SearchForText(TextToFind);
+        }
+        /// <summary>
+        /// Event object to run when the injector output gets new content.
+        /// </summary>
+        /// <param name="PipeInstance">Pipe object calling these events</param>
+        /// <param name="EventArgs">The events themselves.</param>
+        internal void OnPipeReaderContentProcessed(object PipeInstance, FulcrumPipeDataReadEventArgs EventArgs)
+        {
+            // Attach output content into our session log box.
+            FulcrumDllOutputLogView ViewCast = this.BaseViewControl as FulcrumDllOutputLogView;
+            if (ViewCast == null) ViewModelLogger.WriteLog("WARNING: CAST VIEW ENTRY WAS NULL!", LogType.TraceLog); 
+            else ViewCast?.Dispatcher.Invoke(() => { ViewCast.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
         }
     }
 }

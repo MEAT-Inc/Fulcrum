@@ -17,10 +17,14 @@ using System.Windows.Shapes;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using NLog;
+using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using Button = System.Windows.Controls.Button;
+using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
@@ -48,8 +52,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             InitializeComponent();
             this.ViewModel = InjectorConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
-
-            // TODO: Append new Transformers into this constructor to apply color filtering on the output view.
         }
 
         /// <summary>
@@ -62,6 +64,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+
+            // Setup coloring helper.
+            this.ViewModel.LogFilteringHelper = new LogOutputFilteringHelper(this.ReplayLogInputContent);
+            this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
+            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
             // Log completed setup values ok
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
@@ -215,6 +222,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             });
         }
 
+        /// <summary>
+        /// Searches for the provided text values
+        /// </summary>
+        /// <param name="SendingTextBox"></param>
+        /// <param name="TextChangedArgs"></param>
+        private void LogFilteringTextBox_OnTextChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
+        {
+            // Get the current text entry value and pass it over to the VM for actions.
+            var FilteringTextBox = (TextBox)SendingTextBox;
+            string TextToFilter = FilteringTextBox.Text;
+
+            // Run the search and show method on the view model
+            Task.Run(() =>
+            {
+                // Disable TextBox for the duration of the task
+                Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = false);
+                ViewModel.SearchForText(TextToFilter);
+                Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
+            });
+        }
         /// <summary>
         /// Shows or hides the content inside the TextEditor to either show the parsed content view or the raw log input view.
         /// </summary>

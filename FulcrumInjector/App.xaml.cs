@@ -50,6 +50,7 @@ namespace FulcrumInjector
 
             // Run single instance configuration first
             this.ConfigureSingleInstance();
+            this.ConfigureAppExitRoutine();
 
             // Logging config and app theme config.
             this.ConfigureLogging();
@@ -99,6 +100,16 @@ namespace FulcrumInjector
 
             // Return passed output.
             LogBroker.Logger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
+        }
+        /// <summary>
+        /// Builds an event control object for methods to run when the app closes out.
+        /// </summary>
+        private void ConfigureAppExitRoutine()
+        {
+            // Build event helper, Log done and return out.
+            Application.Current.Exit += InjectorConstants.ProcessAppExit;
+            LogBroker.Logger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
+            LogBroker.Logger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------

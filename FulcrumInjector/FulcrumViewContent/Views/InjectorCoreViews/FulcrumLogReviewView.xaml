@@ -58,18 +58,18 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Button
-                        Margin="5,0"
+                        Margin="5,2"
                         Style="{StaticResource ActionButtonStyle}"
                         Grid.Column="0" Click="LoadInjectorLogFile_OnClick"
                         Content="Load Log File" VerticalAlignment="Stretch"/>
                     <Button
-                        Margin="5,0" 
+                        Margin="5,2" 
                         Grid.Column="1" Click="ProcessLogFileContent_OnClick"
                         Content="Process Content" VerticalAlignment="Stretch">
                         <Button.Style>
                             <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=LoadedLogFileTextBox, Path=Text}" Value="">
+                                    <DataTrigger Binding="{Binding ElementName=FilteringLogFileTextBox, Path=Text}" Value="">
                                         <Setter Property="IsEnabled" Value="False"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -77,7 +77,7 @@
                         </Button.Style>
                     </Button>
                     <Button
-                        Margin="5,0"
+                        Margin="5,2"
                         Style="{StaticResource ActionButtonStyle}" Grid.Column="2"
                         IsEnabled="False" Content="Build Simulation" VerticalAlignment="Stretch"/>
                 </Grid>
@@ -89,7 +89,7 @@
         </Grid>
 
         <!-- Splitting Border -->
-        <Border Grid.Row="1" Margin="10,3,10,0"
+        <Border Grid.Row="1" Margin="10,3,10,2"
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
@@ -109,21 +109,27 @@
                 </Grid.RowDefinitions>
 
                 <!-- Currently Loaded file -->
-                <Grid Grid.Row="0" Margin="10,3">
+                <Grid Grid.Row="0" Margin="10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/> 
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="175"/>
                         <ColumnDefinition Width="175"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
+                    <TextBox Grid.Row="0" x:Name="FilteringLogFileTextBox"
                              Style="{StaticResource InputTextWithHolder}" 
-                             VerticalAlignment="Bottom" IsReadOnly="True" Margin="0,0,10,0"
-                             Tag="Please Load a File First" Grid.Column="0"/>
+                             VerticalAlignment="Stretch" IsReadOnly="True" Margin="0,5,10,2"
+                             Tag="Enter a filter or @r regex" Grid.Column="0" TextChanged="LogFilteringTextBox_OnTextChanged"/>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
-                            Margin="0,0" Height="30" VerticalAlignment="Bottom"
+                            Margin="0,5,5,2"
+                            x:Name="ToggleFilteringOrFileName"
+                            IsEnabled="False" Content="Syntax Highlighting"/>
+                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
+                            Margin="5,5,0,2"
                             IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
                             Content="Show Parsed Contents" Click="ToggleParsedContentButton_OnClick"/>
                 </Grid>
 
+                <!-- Content for output -->
                 <avalonedit:TextEditor
                     Grid.Row="1"
                     IsReadOnly="True"
@@ -135,7 +141,7 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=LoadedLogFileTextBox, Path=Text}" Value="">
+                                <DataTrigger Binding="{Binding ElementName=FilteringLogFileTextBox, Path=Text}" Value="">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
