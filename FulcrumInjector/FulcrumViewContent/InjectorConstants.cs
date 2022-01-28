@@ -166,7 +166,6 @@ namespace FulcrumInjector.FulcrumViewContent
             // Check result
             if (SetConstants) ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
-
         }
         /// <summary>
         /// Sets a value on one of the global UI Control values here
@@ -273,7 +272,8 @@ namespace FulcrumInjector.FulcrumViewContent
             {
                 FileName = "cmd.exe",
                 CreateNoWindow = true,
-                Arguments = $"/C \"{TempBat}\""
+                Arguments = $"/C \"{TempBat}\"",
+                WindowStyle = ProcessWindowStyle.Hidden,
             };
 
             // Execute here and exit out app.
