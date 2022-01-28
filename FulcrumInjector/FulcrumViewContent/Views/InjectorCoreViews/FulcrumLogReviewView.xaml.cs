@@ -24,6 +24,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using Button = System.Windows.Controls.Button;
+using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
@@ -221,6 +222,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             });
         }
 
+        /// <summary>
+        /// Searches for the provided text values
+        /// </summary>
+        /// <param name="SendingTextBox"></param>
+        /// <param name="TextChangedArgs"></param>
+        private void LogFilteringTextBox_OnTextChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
+        {
+            // Get the current text entry value and pass it over to the VM for actions.
+            var FilteringTextBox = (TextBox)SendingTextBox;
+            string TextToFilter = FilteringTextBox.Text;
+
+            // Run the search and show method on the view model
+            Task.Run(() =>
+            {
+                // Disable TextBox for the duration of the task
+                Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = false);
+                ViewModel.SearchForText(TextToFilter);
+                Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
+            });
+        }
         /// <summary>
         /// Shows or hides the content inside the TextEditor to either show the parsed content view or the raw log input view.
         /// </summary>
