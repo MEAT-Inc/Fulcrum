@@ -21,15 +21,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private control values
         private bool _hasOutput;
-        private bool _usingRegex;
-        private bool _noResultsOnSearch;
         private string[] _sessionLogs;
 
         // Public values for our view to bind onto 
         public bool HasOutput { get => _hasOutput; set => PropertyUpdated(value); }
-        public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
         public string[] SessionLogs { get => _sessionLogs; set => PropertyUpdated(value); }
-        public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
         public LogOutputFilteringHelper LogFilteringHelper;
@@ -66,12 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         {
             // Make sure transformer is built
             if (LogFilteringHelper == null) return;
-            var OutputTransformer = this.LogFilteringHelper.SearchForText(TextToFind);
-
-            // Store values here
-            if (string.IsNullOrEmpty(TextToFind)) return;
-            this.UsingRegex = OutputTransformer?.UseRegex ?? false;
-            this.NoResultsOnSearch = OutputTransformer?.NoMatches ?? false;
+            this.LogFilteringHelper.SearchForText(TextToFind);
         }
         /// <summary>
         /// Event object to run when the injector output gets new content.

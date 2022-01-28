@@ -88,7 +88,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="SendingTextBox"></param>
         /// <param name="TextChangedArgs"></param>
-        private void DllLogFilteringTextBox_OnTextChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
+        private void LogFilteringTextBox_OnTextChanged(object SendingTextBox, TextChangedEventArgs TextChangedArgs)
         {
             // Get the current text entry value and pass it over to the VM for actions.
             var FilteringTextBox = (TextBox)SendingTextBox;

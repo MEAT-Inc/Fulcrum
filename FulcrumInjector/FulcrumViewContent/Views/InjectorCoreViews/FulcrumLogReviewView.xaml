@@ -118,7 +118,7 @@
                     <TextBox Grid.Row="0" x:Name="FilteringLogFileTextBox"
                              Style="{StaticResource InputTextWithHolder}" 
                              VerticalAlignment="Stretch" IsReadOnly="True" Margin="0,5,10,2"
-                             Tag="Enter a filter or @r regex" Grid.Column="0"/>
+                             Tag="Enter a filter or @r regex" Grid.Column="0" TextChanged="LogFilteringTextBox_OnTextChanged"/>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
                             Margin="0,5,5,2"
                             IsEnabled="{Binding InputParsed}" x:Name="ToggleFilteringOrFileName" 

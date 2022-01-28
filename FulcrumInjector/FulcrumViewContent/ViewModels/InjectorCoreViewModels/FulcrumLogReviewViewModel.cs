@@ -32,9 +32,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogReviewViewModelLogger")) ?? new SubServiceLogger("InjectorLogReviewViewModelLogger");
 
         // Private control values
+        private bool _usingRegex;
+        private bool _noResultsOnSearch;
+        private int _parsingProgress = 0;
         private string _loadedLogFile = "";
         private string _logFileContents = "";
-        private int _parsingProgress = 0;
 
         // Private string for last built expressions file.
         private bool _inputParsed = false;
@@ -42,12 +44,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string _lastBuiltExpressionsFile;
 
         // Public values for our view to bind onto 
+        public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
         public bool InputParsed { get => _inputParsed; set => PropertyUpdated(value); }
         public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
-        public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
         public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
-
+        public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
+        public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
+        
         // Helper for syntax formatting and filtering
         public LogOutputFilteringHelper LogFilteringHelper;
         public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
@@ -130,7 +134,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Log passed and return output. Store onto view content.
                 this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
                 CastView.Dispatcher.Invoke(() => {
-                    CastView.LoadedLogFileTextBox.Text = this.LoadedLogFile;
+                    CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
                     CastView.ReplayLogInputContent.Text = this.LogFileContents;
                 });
 
@@ -150,7 +154,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 this.LoadedLogFile = $"Failed to Load File: {Path.GetFileName(this.LoadedLogFile)}!";
                 this.LogFileContents = Ex.Message + "\n" + "STACK TRACE:\n" + Ex.StackTrace;
                 CastView.Dispatcher.Invoke(() => {
-                    CastView.LoadedLogFileTextBox.Text = this.LoadedLogFile;
+                    CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
                     CastView.ReplayLogInputContent.Text = this.LogFileContents;
                 });
 
@@ -207,6 +211,18 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;
             }
         }
+
+
+        /// <summary>
+        /// Searches the AvalonEdit object for text matching what we want.
+        /// </summary>
+        /// <param name="TextToFind"></param>
+        internal void SearchForText(string TextToFind)
+        {
+            // Make sure transformer is built
+            if (LogFilteringHelper == null) return;
+            this.LogFilteringHelper.SearchForText(TextToFind);
+        }
         /// <summary>
         /// Toggles the current contents of the log viewer based on the bool trigger for it.
         /// </summary>
@@ -224,7 +240,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("FILE CONTENT PARSED OK! STORING TO VIEW NOW...", LogType.InfoLog);
                 CastView.Dispatcher.Invoke(() => {
                     CastView.ReplayLogInputContent.Text = NewLogContents;
-                    CastView.LoadedLogFileTextBox.Text = this.ShowingParsed ? this._lastBuiltExpressionsFile : this.LoadedLogFile;
+                    CastView.FilteringLogFileTextBox.Text = this.ShowingParsed ? this._lastBuiltExpressionsFile : this.LoadedLogFile;
                 });
 
                 // Toggle the showing parsed value.
