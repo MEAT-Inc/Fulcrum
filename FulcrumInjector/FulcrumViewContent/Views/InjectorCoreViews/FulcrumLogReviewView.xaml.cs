@@ -65,6 +65,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Setup coloring helper.
+            this.ViewModel.LogFilteringHelper = new LogOutputFilteringHelper(this.ReplayLogInputContent);
             this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 

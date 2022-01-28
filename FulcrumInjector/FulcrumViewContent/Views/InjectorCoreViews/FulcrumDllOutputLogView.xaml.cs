@@ -73,7 +73,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Configure filtering and coloring instances here.
-            this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
+            this.ViewModel.LogFilteringHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
             this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 

@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public AvalonEditFilteringHelpers LogContentHelper;
+        public LogOutputFilteringHelper LogFilteringHelper;
         public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -65,8 +65,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         internal void SearchForText(string TextToFind)
         {
             // Make sure transformer is built
-            if (LogContentHelper == null) return;
-            var OutputTransformer = this.LogContentHelper.SearchForText(TextToFind);
+            if (LogFilteringHelper == null) return;
+            var OutputTransformer = this.LogFilteringHelper.SearchForText(TextToFind);
 
             // Store values here
             if (string.IsNullOrEmpty(TextToFind)) return;

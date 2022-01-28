@@ -27,7 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         public List<string> LoggerNamesFound { get => _loggerNamesFound; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public AvalonEditFilteringHelpers LogContentHelper;
+        public LogOutputFilteringHelper LogContentHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
 

@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     /// <summary>
     /// Contains a set of methods which are able to help us modify avEdit objects by filtering
     /// </summary>
-    public class AvalonEditFilteringHelpers
+    public class LogOutputFilteringHelper
     {
         // Logger object.
         private static SubServiceLogger FilterLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -25,7 +25,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// Builds a new instance of this helper class object
         /// </summary>
         /// <param name="EditorInput"></param>
-        public AvalonEditFilteringHelpers(TextEditor EditorInput)
+        public LogOutputFilteringHelper(TextEditor EditorInput)
         {
             // Store class values and log information
             this.SessionEditor = EditorInput;

@@ -64,7 +64,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
 
             // Configure pipe instances here.
-            this.ViewModel.LogContentHelper = new AvalonEditFilteringHelpers(this.DebugRedirectOutputEdit);
+            this.ViewModel.LogContentHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
         }
 

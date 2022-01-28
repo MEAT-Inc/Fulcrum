@@ -11,7 +11,6 @@
                 <Setter Property="FontSize" Value="18"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                 <Setter Property="VerticalAlignment" Value="Stretch"/>
-                <Setter Property="Margin" Value="0,5,15,0"/>
                 <Setter Property="Foreground" Value="{StaticResource SecondaryColor_Lighter_35}"/>
             </Style>
 
@@ -22,9 +21,8 @@
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
                 <Setter Property="BorderThickness" Value="2"/>
-                <Setter Property="Margin" Value="10,5"/>
                 <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="5,5,5,10"/>
+                <Setter Property="Padding" Value="5,10,5,10"/>
                 <Setter Property="ShowLineNumbers" Value="True"/>
             </Style>
 

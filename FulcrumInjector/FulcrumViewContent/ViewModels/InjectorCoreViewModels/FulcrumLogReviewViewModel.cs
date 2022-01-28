@@ -48,7 +48,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
         public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
 
-        // Helper for syntax formatting
+        // Helper for syntax formatting and filtering
+        public LogOutputFilteringHelper LogFilteringHelper;
         public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -89,7 +89,7 @@
         </Grid>
 
         <!-- Splitting Border -->
-        <Border Grid.Row="1" Margin="10,3,10,0"
+        <Border Grid.Row="1" Margin="10,3,10,2"
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
@@ -109,17 +109,22 @@
                 </Grid.RowDefinitions>
 
                 <!-- Currently Loaded file -->
-                <Grid Grid.Row="0" Margin="10,3">
+                <Grid Grid.Row="0" Margin="10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/> 
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="175"/>
                         <ColumnDefinition Width="175"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Row="0" x:Name="LoadedLogFileTextBox"
                              Style="{StaticResource InputTextWithHolder}" 
-                             VerticalAlignment="Bottom" IsReadOnly="True" Margin="0,0,10,0"
+                             VerticalAlignment="Stretch" IsReadOnly="True" Margin="0,5,10,2"
                              Tag="Please Load a File First" Grid.Column="0"/>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
-                            Margin="0,0" Height="30" VerticalAlignment="Bottom"
+                            Margin="0,5,5,2"
+                            IsEnabled="{Binding InputParsed}" x:Name="ToggleFilteringOrFileName" 
+                            Content="Enable Log Filtering"/>
+                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
+                            Margin="5,5,0,2"
                             IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
                             Content="Show Parsed Contents" Click="ToggleParsedContentButton_OnClick"/>
                 </Grid>
