@@ -211,7 +211,7 @@
     <Compile Include="FulcrumLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruExpression.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorOutputSyntaxHelper.cs" />
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\PassThruCommandFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\PassThruTypeAndTimeColors.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataConverters\BoolToObjectConverter.cs" />

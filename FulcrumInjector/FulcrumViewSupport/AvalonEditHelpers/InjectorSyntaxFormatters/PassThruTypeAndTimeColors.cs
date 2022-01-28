@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
+using FulcrumInjector.FulcrumViewSupport.DataConverters;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
+
+// Color Brushes
+using MediaBrush = System.Windows.Media.Brush;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters
 {
     /// <summary>
     /// Colors the stacktrace on the log line
     /// </summary>
-    public class PassThruCommandFormatter : DocumentColorizingTransformer
+    public class PassThruTypeAndTimeColors : DocumentColorizingTransformer
     {
         /// <summary>
         /// Color our line output for the stack trace
@@ -33,11 +37,12 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
 
             // Loop all the matched values here. If none, this method ends here.
             // Eventually we might include special conditions for different types of commands.
+            int LineStartOffset = InputLine.Offset;
             for (int MatchIndex = 1; MatchIndex < ExpressionMatches.Length - 1; MatchIndex++)
             {
                 // Find the index start, stop, and then the whole range.
                 string MatchFound = ExpressionMatches[MatchIndex];
-                int MatchIndexStart = LineText.IndexOf(MatchFound);
+                int MatchIndexStart = LineStartOffset + LineText.IndexOf(MatchFound);
                 int MatchIndexClose = MatchIndexStart + MatchFound.Length;
 
                 // Now apply a color value based on the type of contents provided for it.
