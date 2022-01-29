@@ -31,8 +31,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                     int EndOffset = StartOffset + LoggerName.Length;
                     base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                     {
-                    // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
+                        // Colorize our logger name here.
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
                         NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.DarkCyan);
                     });
 

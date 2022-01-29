@@ -99,7 +99,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                 foreach (Match RegexMatch in MatchSetBuilt.Groups)
                 {
                     // Check if we have a set of values or not. If not, then we make a new pair value.
-                    if (!RegexMatch.Value.Contains(",")) PulledColorSetList.Add(new(RegexMatch.Value, "000000"));
+                    if (!RegexMatch.Value.Contains(",")) PulledColorSetList.Add(new(RegexMatch.Value, "NONE"));
                     else
                     {
                         // Split content into two parts and add a value set here.
