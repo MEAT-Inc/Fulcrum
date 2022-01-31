@@ -52,8 +52,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                 base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                 {
                     // Set our current color scheme we want.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[0].Item1);
-                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[0].Item2);
+                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[0].Item1);
+                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[0].Item2);
 
                     // Pull current typeface, update it with new value
                     Typeface CurrentTypeFace = NextMatchElement.TextRunProperties.Typeface;

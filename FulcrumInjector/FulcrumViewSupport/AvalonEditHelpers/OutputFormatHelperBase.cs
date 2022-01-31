@@ -54,24 +54,27 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
 
                 // Find matches on this string output here.
                 List<Tuple<string, string>> PulledColorSetList = new List<Tuple<string, string>>();
-                var MatchSetBuilt = FormatParse.Match(SettingColorValues);
+                var MatchSetBuilt = FormatParse.Matches(SettingColorValues);
 
                 // If Failed, log it and move on.
-                if (!MatchSetBuilt.Success) {
+                if (MatchSetBuilt.Count == 0) {
                     FormatLogger?.WriteLog($"[INJECTOR SYNTAX] ::: FAILED TO PULL COLOR VALUES FOR STRING ENTRY {SettingColorValues}!", LogType.ErrorLog);
                     continue;
                 }
 
                 // Find the values and build a foreground background pair value.
-                foreach (Match RegexMatch in MatchSetBuilt.Groups)
-                {
+                foreach (Match RegexMatch in MatchSetBuilt)
+                { 
                     // Check if we have a set of values or not. If not, then we make a new pair value.
-                    if (!RegexMatch.Value.Contains(",")) PulledColorSetList.Add(new(RegexMatch.Value, "000000"));
+                    if (!RegexMatch.Value.Contains(",")) PulledColorSetList.Add(new(RegexMatch.Value.Trim('(', ')'), "000000"));
                     else
                     {
                         // Split content into two parts and add a value set here.
                         string[] SplitColorValues = RegexMatch.Value.Split(',');
-                        PulledColorSetList.Add(new(SplitColorValues[0], SplitColorValues[1]));
+                        PulledColorSetList.Add(new(
+                            SplitColorValues[0].Trim('(', ')'),
+                            SplitColorValues[1].Trim('(', ')'))
+                        );
                     }
                 }
 
@@ -129,10 +132,13 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // Pull the media string brush set first and then convert our output.
             Tuple<string, string>[] OutputStrings = this.PullColorsForCommand(TypeOfFormatter);
-            return OutputStrings.Select(StringSet => new Tuple<Brush, Brush>(
+            var CastBrushSet = OutputStrings.Select(StringSet => new Tuple<Brush, Brush>(
                 StringSet.Item1.ToMediaBrush(),
                 StringSet.Item2.ToMediaBrush()))
-            .ToArray();   
+            .ToArray();
+
+            // Return built output set.
+            return CastBrushSet;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------------------------

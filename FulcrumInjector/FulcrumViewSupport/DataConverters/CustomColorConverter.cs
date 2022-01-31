@@ -64,10 +64,16 @@ namespace FulcrumInjector.FulcrumViewSupport.DataConverters
         /// <returns></returns>
         public static System.Windows.Media.Brush ToMediaBrush(this string ColorString)
         {
-            // Convert and return the color value here.
+            // Build new color from converted values to avoid parse string input issues.
             var MediaColor = ColorString.ToMediaColor();
-            var BrushConverter = new System.Windows.Media.BrushConverter();
-            return (System.Windows.Media.Brush)BrushConverter.ConvertFromString(MediaColor.ToString());
+            var OutputColor = System.Windows.Media.Color.FromRgb(
+                MediaColor.R,   // Red Channel
+                MediaColor.G,   // Green Channel
+                MediaColor.B    // Blue Channel
+            );
+
+            // Cast color into a brush object and return output.
+            return new System.Windows.Media.SolidColorBrush(OutputColor);
         }
         /// <summary>
         /// Converts an input string into a media brush
