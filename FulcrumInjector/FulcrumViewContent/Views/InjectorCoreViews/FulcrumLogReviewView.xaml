@@ -119,10 +119,28 @@
                              Style="{StaticResource InputTextWithHolder}" 
                              VerticalAlignment="Stretch" IsReadOnly="True" Margin="0,5,10,2"
                              Tag="Enter a filter or @r regex" Grid.Column="0" TextChanged="LogFilteringTextBox_OnTextChanged"/>
-                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
+                    <Button Grid.Column="1" 
                             Margin="0,5,5,2"
                             x:Name="ToggleFilteringOrFileName"
-                            IsEnabled="False" Content="Syntax Highlighting"/>
+                            Click="SyntaxHighlightingButton_OnClick"
+                            Content="Syntax Highlighting">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InjectorSyntaxHelper.IsHighlighting}" Value="True">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Setter Property="Background" Value="DarkGreen"/>
+                                        <Setter Property="Content" Value="Syntax Highlighting: ON"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding InjectorSyntaxHelper.IsHighlighting}" Value="False">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Setter Property="Background" Value="DarkRed"/>
+                                        <Setter Property="Content" Value="Syntax Highlighting: OFF"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
                             Margin="5,5,0,2"
                             IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 

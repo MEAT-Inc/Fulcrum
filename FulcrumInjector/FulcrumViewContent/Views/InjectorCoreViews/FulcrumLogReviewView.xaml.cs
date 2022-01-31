@@ -290,5 +290,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Log failed. Return.
             this.ViewLogger.WriteLog("PROCESSED TOGGLE REQUEST OK! SHOWING DEFAULT VALUES AFTER CONTENT UPDATING IS COMPLETE!", LogType.WarnLog);
         }
+
+        /// <summary>
+        /// Toggles format output for syntax outlining when writing new entries into our log files.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Check the current state and toggle it.
+            if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting)
+                this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
+            else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+
+            // Log toggle result.
+            this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
+        }
     }
 }

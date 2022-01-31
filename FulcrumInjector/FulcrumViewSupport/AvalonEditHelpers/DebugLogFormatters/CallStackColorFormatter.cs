@@ -1,16 +1,33 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
-    /// Colorizes the logger names on the log output view
+    /// Colors the stacktrace on the log line
     /// </summary>
-    public class DebugLogLoggerNameColorFormatter : DocumentColorizingTransformer
+    public class CallStackColorFormatter : DocumentColorizingTransformer
     {
+        // Color format brushes for this format instance.
+        private readonly OutputFormatHelperBase _formatBase;
+        private readonly Tuple<Brush, Brush>[] _coloringBrushes;
+
         /// <summary>
-        /// Color logger names here
+        /// Builds a new color format helping object.
+        /// </summary>
+        public CallStackColorFormatter(OutputFormatHelperBase FormatBase)
+        {
+            // Pull in our color values. Store format helper.
+            this._formatBase = FormatBase;
+            this._coloringBrushes = this._formatBase.PullColorForCommand(this.GetType());
+        }
+
+        // --------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Color our line output for the stack trace
         /// </summary>
         /// <param name="InputLine"></param>
         protected override void ColorizeLine(DocumentLine InputLine)
@@ -23,7 +40,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
             // Find our logger name segment.
             try
             {
-                string LoggerName = LineText.Split(']')[2].Trim('[', ']');
+                string LoggerName = LineText.Split(']')[3].Trim('[', ']');
                 while ((CurrentIndex = LineText.IndexOf(LoggerName, StartIndex)) >= 0)
                 {
                     // Change line part call here.
@@ -31,9 +48,9 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                     int EndOffset = StartOffset + LoggerName.Length;
                     base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                     {
-                    // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
-                        NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.Gray);
+                        // Colorize our logger name here.
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[0].Item1);
+                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[0].Item2);
                     });
 
                     // Tick our index and move on

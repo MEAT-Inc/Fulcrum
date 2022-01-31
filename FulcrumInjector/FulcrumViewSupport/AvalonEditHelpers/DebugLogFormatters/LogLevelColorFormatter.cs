@@ -11,8 +11,24 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
     /// <summary>
     /// Colorizing object helper to format our built log lines.
     /// </summary>
-    public class DebugLogLevelColorFormatter : DocumentColorizingTransformer
+    public class LogLevelColorFormatter : DocumentColorizingTransformer
     {
+        // Color format brushes for this format instance.
+        private readonly OutputFormatHelperBase _formatBase;
+        private readonly Tuple<Brush, Brush>[] _coloringBrushes;
+
+        /// <summary>
+        /// Builds a new color format helping object.
+        /// </summary>
+        public LogLevelColorFormatter(OutputFormatHelperBase FormatBase)
+        {
+            // Pull in our color values. Store format helper.
+            this._formatBase = FormatBase;
+            this._coloringBrushes = this._formatBase.PullColorForCommand(this.GetType());
+        }
+
+        // --------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Coloring Line command override
         /// </summary>
@@ -43,30 +59,30 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                     int EndOffset = StartOffset + NextLogType.Length;
                     base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                     {
-                            // Set our current color scheme we want.
-                            switch (LogTypeObj)
+                        // Set our current color scheme we want.
+                        switch (LogTypeObj)
                         {
                             case "TRACE":
-                                NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Black);
-                                NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.Gray);
+                                NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[0].Item1);
+                                NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[0].Item2);
                                 break;
 
                             case "DEBUG":
-                                NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
-                                NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.White);
+                                NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[1].Item1);
+                                NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[1].Item2);
                                 break;
 
                             case "INFO":
-                                NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Green);
-                                NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.White);
+                                NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[2].Item1);
+                                NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[2].Item2);
                                 break;
 
                             case "WARN":
-                                NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Orange);
-                                NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.White);
+                                NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[3].Item1);
+                                NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[3].Item2);
 
-                                    // Pull current typeface, update it with new value
-                                    Typeface WarnTypeFace = NextMatchElement.TextRunProperties.Typeface;
+                                // Pull current typeface, update it with new value
+                                Typeface WarnTypeFace = NextMatchElement.TextRunProperties.Typeface;
                                 NextMatchElement.TextRunProperties.SetTypeface(new Typeface(
                                     WarnTypeFace.FontFamily,
                                     FontStyles.Italic,
@@ -77,11 +93,12 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
 
                             case "ERROR":
                             case "FATAL":
-                                NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.DarkRed);
-                                NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.White);
+                                int IndexOfBrush = LogTypeObj == "ERROR" ? 4 : 5;
+                                NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
+                                NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
 
-                                    // Pull current typeface, update it with new value
-                                    Typeface ErrorTypeFace = NextMatchElement.TextRunProperties.Typeface;
+                                // Pull current typeface, update it with new value
+                                Typeface ErrorTypeFace = NextMatchElement.TextRunProperties.Typeface;
                                 NextMatchElement.TextRunProperties.SetTypeface(new Typeface(
                                     ErrorTypeFace.FontFamily,
                                     FontStyles.Normal,

@@ -8,6 +8,7 @@ using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
 using ICSharpCode.AvalonEdit;
 using NLog;
 using NLog.Config;
@@ -114,6 +115,22 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Check the content value. If empty, set hasContent to false.
             TextEditor DebugEditor = (TextEditor)SendingTextBox;
             this.ViewModel.HasOutput = DebugEditor.Text.Trim().Length != 0;
+        }
+
+        /// <summary>
+        /// Toggles format output for syntax outlining when writing new entries into our log files.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Check the current state and toggle it.
+            if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting) 
+                this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting(); 
+            else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting(); 
+
+            // Log toggle result.
+            this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
         }
     }
 }

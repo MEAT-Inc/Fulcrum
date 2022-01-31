@@ -49,8 +49,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
         
         // Helper for syntax formatting and filtering
-        public LogOutputFilteringHelper LogFilteringHelper;
-        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
+        public LogOutputFilteringHelper LogFilteringHelper { get; set; }
+        public InjectorOutputSyntaxHelper InjectorSyntaxHelper { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -111,7 +111,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
-        /// <param name="InputLogFile"></param>
+        /// <param name="NewLogFile"></param>
         internal bool LoadLogContents(string NewLogFile)
         {
             // Log information, load contents, store values.
@@ -161,7 +161,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
-        /// <param name="CommandLines"></param>
+        /// <param name="OutputExpressions"></param>
         /// <returns></returns>
         internal bool ParseLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
         {
@@ -208,6 +208,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.
