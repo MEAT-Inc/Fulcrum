@@ -95,8 +95,8 @@ namespace FulcrumInjector.FulcrumViewSupport.StyleModels
         {
             // Setup main values
             Color TextBase = IsDark ? Color.White : Color.Black;
-            Color PrimaryFromString = PrimaryColorString.FromStringToDrawing();
-            Color SecondaryFromString = SecondaryColorString.FromStringToDrawing();
+            Color PrimaryFromString = PrimaryColorString.ToDrawingColor();
+            Color SecondaryFromString = SecondaryColorString.ToDrawingColor();
 
             // Return the new instance
             this.SetColors(PrimaryFromString, SecondaryFromString, TextBase);

@@ -32,8 +32,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogReviewViewModelLogger")) ?? new SubServiceLogger("InjectorLogReviewViewModelLogger");
 
         // Private control values
-        private bool _usingRegex;
-        private bool _noResultsOnSearch;
         private int _parsingProgress = 0;
         private string _loadedLogFile = "";
         private string _logFileContents = "";
@@ -44,17 +42,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string _lastBuiltExpressionsFile;
 
         // Public values for our view to bind onto 
-        public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
         public bool InputParsed { get => _inputParsed; set => PropertyUpdated(value); }
         public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
         public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
-        public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
         
         // Helper for syntax formatting and filtering
-        public LogOutputFilteringHelper LogFilteringHelper;
-        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
+        public LogOutputFilteringHelper LogFilteringHelper { get; set; }
+        public InjectorOutputSyntaxHelper InjectorSyntaxHelper { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +111,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
-        /// <param name="InputLogFile"></param>
+        /// <param name="NewLogFile"></param>
         internal bool LoadLogContents(string NewLogFile)
         {
             // Log information, load contents, store values.
@@ -165,7 +161,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
-        /// <param name="CommandLines"></param>
+        /// <param name="OutputExpressions"></param>
         /// <returns></returns>
         internal bool ParseLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
         {
@@ -212,6 +208,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.
