@@ -75,7 +75,7 @@
                     Tag="Enter a filter or @r regex"
                     TextChanged="LogFilteringTextBox_OnTextChanged"/>
                 <Button Click="SyntaxHighlightingButton_OnClick"
-                        Content="Syntax Highlighting" 
+                        Content="Syntax Highlighting"
                         Grid.Column="1" Margin="5,0,0,5">
                     <Button.Style>
                         <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">

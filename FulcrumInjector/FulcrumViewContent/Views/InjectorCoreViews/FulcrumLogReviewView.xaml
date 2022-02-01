@@ -123,23 +123,8 @@
                             Margin="0,5,5,2"
                             x:Name="ToggleFilteringOrFileName"
                             Click="SyntaxHighlightingButton_OnClick"
-                            Content="Syntax Highlighting">
-                        <Button.Style>
-                            <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding InjectorSyntaxHelper.IsHighlighting}" Value="True">
-                                        <Setter Property="IsEnabled" Value="True"/>
-                                        <Setter Property="Background" Value="DarkGreen"/>
-                                        <Setter Property="Content" Value="Syntax Highlighting: ON"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding InjectorSyntaxHelper.IsHighlighting}" Value="False">
-                                        <Setter Property="IsEnabled" Value="True"/>
-                                        <Setter Property="Background" Value="DarkRed"/>
-                                        <Setter Property="Content" Value="Syntax Highlighting: OFF"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
+                            Content="Syntax Highlighting"
+                            Style="{StaticResource ActionButtonStyle}">
                     </Button>
                     <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
                             Margin="5,5,0,2"

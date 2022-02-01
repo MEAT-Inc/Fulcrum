@@ -73,6 +73,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
             // Log completed setup values ok
+            this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
@@ -304,6 +305,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting)
                 this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
             else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+
+            // Now apply new values to our button.
+            Button SendButton = (Button)Sender;
+            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? Brushes.DarkGreen : Brushes.DarkRed;
+            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting ON" : "Syntax Highlighting OFF";
 
             // Log toggle result.
             this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
