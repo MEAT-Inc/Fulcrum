@@ -123,7 +123,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewModel.CombineLogFiles(SelectAttachmentDialog.FileNames)).Result;
 
             // Store new file object value. Validate it on the ViewModel object first.
-            bool LoadResult = this.ViewModel.LoadLogContents(FileToLoad);
+            bool LoadResult = Task.Run(() => this.ViewModel.LoadLogContents(FileToLoad)).Result;
             if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
             else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
