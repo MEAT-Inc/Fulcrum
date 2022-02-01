@@ -6,6 +6,8 @@ using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;

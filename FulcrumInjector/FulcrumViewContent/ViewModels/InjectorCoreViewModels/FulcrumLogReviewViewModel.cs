@@ -14,6 +14,8 @@ using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using Newtonsoft.Json;
 using NLog.Targets;
 using SharpLogger;
@@ -32,9 +34,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogReviewViewModelLogger")) ?? new SubServiceLogger("InjectorLogReviewViewModelLogger");
 
         // Private control values
-        private bool _usingRegex;
-        private bool _noResultsOnSearch;
         private int _parsingProgress = 0;
+        private bool _isLogLoaded = false;
         private string _loadedLogFile = "";
         private string _logFileContents = "";
 
@@ -44,14 +45,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string _lastBuiltExpressionsFile;
 
         // Public values for our view to bind onto 
-        public bool UsingRegex { get => _usingRegex; set => PropertyUpdated(value); }
+        public bool IsLogLoaded { get => _isLogLoaded; set => PropertyUpdated(value); }
         public bool InputParsed { get => _inputParsed; set => PropertyUpdated(value); }
         public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
         public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
-        public bool NoResultsOnSearch { get => _noResultsOnSearch; set => PropertyUpdated(value); }
-        
+
         // Helper for syntax formatting and filtering
         public LogOutputFilteringHelper LogFilteringHelper;
         public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
@@ -69,6 +69,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
             // Toggle parsed value based on contents.
             this.InputParsed = false;
+            this.IsLogLoaded = false;
             ViewModelLogger.WriteLog("TOGGLED ENABLED STATUS OF TOGGLE BUTTON OK!", LogType.InfoLog);
 
             // This is turned off for now. No need to dupe import all of these objects
@@ -115,7 +116,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
-        /// <param name="InputLogFile"></param>
+        /// <param name="NewLogFile"></param>
         internal bool LoadLogContents(string NewLogFile)
         {
             // Log information, load contents, store values.
@@ -139,8 +140,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 });
 
                 // Return passed
-                this.InputParsed = false;
                 this._lastBuiltExpressionsFile = null;
+                this.IsLogLoaded = true; this.InputParsed = false;
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
             }
@@ -151,11 +152,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW.", Ex);
 
                 // Store new values.
-                this.LoadedLogFile = $"Failed to Load File: {Path.GetFileName(this.LoadedLogFile)}!";
+                this.IsLogLoaded = false; this.LoadedLogFile = null;
                 this.LogFileContents = Ex.Message + "\n" + "STACK TRACE:\n" + Ex.StackTrace;
                 CastView.Dispatcher.Invoke(() => {
-                    CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
                     CastView.ReplayLogInputContent.Text = this.LogFileContents;
+                    CastView.FilteringLogFileTextBox.Text = $"Failed to Load File: {Path.GetFileName(this.LoadedLogFile)}!";
                 });
 
                 // Return split content
@@ -165,7 +166,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
-        /// <param name="CommandLines"></param>
+        /// <param name="OutputExpressions"></param>
         /// <returns></returns>
         internal bool ParseLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
         {
@@ -212,6 +213,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.

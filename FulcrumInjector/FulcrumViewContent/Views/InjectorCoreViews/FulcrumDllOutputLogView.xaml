@@ -74,10 +74,10 @@
                     Style="{StaticResource SearchBoxStyle}"
                     Tag="Enter a filter or @r regex"
                     TextChanged="LogFilteringTextBox_OnTextChanged"/>
-                <Button IsEnabled="False" 
-                        Content="Syntax Highlighting" 
-                        Grid.Column="1" Style="{StaticResource ActionButtonStyle}"
-                        Margin="5,0,0,5"/>
+                <Button Click="SyntaxHighlightingButton_OnClick"
+                        Content="Syntax Highlighting" Style="{StaticResource ActionButtonStyle}"
+                        Grid.Column="1" Margin="5,0,0,5">
+                </Button>
             </Grid>
 
             <!-- Editor Box -->

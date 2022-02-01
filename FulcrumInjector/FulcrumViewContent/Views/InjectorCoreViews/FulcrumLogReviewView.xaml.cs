@@ -18,6 +18,8 @@ using FulcrumInjector.FulcrumLogic.InjectorPipes;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using NLog;
 using NLog.Config;
 using SharpLogger;
@@ -66,11 +68,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Setup coloring helper.
-            this.ViewModel.LogFilteringHelper = new LogOutputFilteringHelper(this.ReplayLogInputContent);
-            this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
+            this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.ReplayLogInputContent);
+            this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
             // Log completed setup values ok
+            this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
@@ -120,7 +123,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewModel.CombineLogFiles(SelectAttachmentDialog.FileNames)).Result;
 
             // Store new file object value. Validate it on the ViewModel object first.
-            bool LoadResult = this.ViewModel.LoadLogContents(FileToLoad);
+            bool LoadResult = Task.Run(() => this.ViewModel.LoadLogContents(FileToLoad)).Result;
             if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
             else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
@@ -289,6 +292,35 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Log failed. Return.
             this.ViewLogger.WriteLog("PROCESSED TOGGLE REQUEST OK! SHOWING DEFAULT VALUES AFTER CONTENT UPDATING IS COMPLETE!", LogType.WarnLog);
+        }
+
+        /// <summary>
+        /// Toggles format output for syntax outlining when writing new entries into our log files.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private async void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Build new button object.
+            Button SendButton = (Button)Sender;
+            SendButton.Content = "Toggling...";
+            SendButton.Background = Brushes.DarkOrange;
+
+            // Async toggle button content and output format.
+            await Task.Run(() =>
+            {
+                // Check the current state and toggle it.
+                if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting)
+                    this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
+                else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+            });
+
+            // Now apply new values to our button.
+            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? Brushes.DarkGreen : Brushes.DarkRed;
+            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting: ON" : "Syntax Highlighting: OFF";
+
+            // Log toggle result.
+            this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
         }
     }
 }

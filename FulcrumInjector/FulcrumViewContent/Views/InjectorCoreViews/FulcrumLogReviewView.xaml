@@ -69,7 +69,7 @@
                         <Button.Style>
                             <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=FilteringLogFileTextBox, Path=Text}" Value="">
+                                    <DataTrigger Binding="{Binding IsLogLoaded}" Value="false">
                                         <Setter Property="IsEnabled" Value="False"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -84,7 +84,7 @@
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
                 <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load in previously run J2534 Logs from the Fulcrum Injector and provide a detailed command breakdown of each instance/command run during a session. These values are both outlined in a per command format and highlighted on the output log viewer."/>
-                <Run Foreground="Yellow" FontWeight="DemiBold" Text="If the breakdown view is missing, use the slider at the right edge of the page to expand it"/>
+                <Run Foreground="Yellow" FontWeight="DemiBold" Text="Detailed breakdown views and simulation replaying are done on the Simulation Review Page"/>
             </TextBlock>
         </Grid>
 
@@ -95,99 +95,63 @@
 
         <!-- Raw Log File Contents and PT Command Contents -->
         <Grid Grid.Row="2" HorizontalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="10"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition MinWidth="10" Width="10" MaxWidth="695"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-            <!-- File Contents -->
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <!-- Currently Loaded file -->
-                <Grid Grid.Row="0" Margin="10,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="175"/>
-                        <ColumnDefinition Width="175"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Row="0" x:Name="FilteringLogFileTextBox"
+            <!-- Currently Loaded file -->
+            <Grid Grid.Row="0" Margin="10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition Width="175"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Row="0" x:Name="FilteringLogFileTextBox"
                              Style="{StaticResource InputTextWithHolder}" 
-                             VerticalAlignment="Stretch" IsReadOnly="True" Margin="0,5,10,2"
+                             VerticalAlignment="Stretch" IsReadOnly="False" Margin="0,5,10,2"
                              Tag="Enter a filter or @r regex" Grid.Column="0" TextChanged="LogFilteringTextBox_OnTextChanged"/>
-                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" 
+                <Button Grid.Column="1" 
                             Margin="0,5,5,2"
                             x:Name="ToggleFilteringOrFileName"
-                            IsEnabled="False" Content="Syntax Highlighting"/>
-                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
+                            Click="SyntaxHighlightingButton_OnClick"
+                            Content="Syntax Highlighting"
+                            Style="{StaticResource ActionButtonStyle}">
+                </Button>
+                <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
                             Margin="5,5,0,2"
                             IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
                             Content="Show Parsed Contents" Click="ToggleParsedContentButton_OnClick"/>
-                </Grid>
+            </Grid>
 
-                <!-- Content for output -->
-                <avalonedit:TextEditor
+            <!-- Content for output -->
+            <avalonedit:TextEditor
                     Grid.Row="1"
                     IsReadOnly="True"
                     x:Name="ReplayLogInputContent"
                     Style="{StaticResource LoggingOutputBoxStyle}"/>
 
-                <Grid Grid.Row="1" Margin="10,5">
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=FilteringLogFileTextBox, Path=Text}" Value="">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Style>
-                    <Border Opacity=".50" BorderThickness="3"
+            <Grid Grid.Row="1" Margin="10,5">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLogLoaded}" Value="false">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Border Opacity=".50" BorderThickness="3"
                             BorderBrush="{StaticResource TextColorBase}"
                             Background="{StaticResource SecondaryColor_Darker_65}"/>
-                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
                                Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Shim Log File Loaded!"/>
                         <LineBreak/>
                         <LineBreak/>
                         <Run FontSize="16" Text="Load a Shim log file using the Load Injector Log File button at the top right corner of this page. Once loaded, the contents of the file will appear here in a color coded output."/>
-                    </TextBlock>
-                </Grid>
-            </Grid>
-
-            <!-- Splitter Object -->
-            <GridSplitter Grid.Column="1" Background="{StaticResource TextColorBase}" Margin="1,5"/>
-
-            <!-- ListBox for PTCommand Breakdowns -->
-            <Grid Grid.Column="2">
-                <ListBox Style="{StaticResource CommandBreakdownListBoxStyle}" x:Name="CommandBreakdownListBox" Margin="10,5"/>
-                <Grid Margin="10,5">
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=CommandBreakdownListBox, Path=HasItems}" Value="false">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Style>
-                    <Border Opacity=".50" BorderThickness="3"
-                            BorderBrush="{StaticResource TextColorBase}"
-                            Background="{StaticResource SecondaryColor_Darker_65}"/>
-                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
-                               Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Shim Log File Loaded!"/>
-                        <LineBreak/>
-                        <LineBreak/>
-                        <Run FontSize="16" Text="Load a Shim log file using the Load Injector Log File button at the top right corner of this page. Once a log file is loaded, the commands issued in that log file will populate this listbox in order or appearance. "/>
-                    </TextBlock>
-                </Grid>
+                </TextBlock>
             </Grid>
         </Grid>
 

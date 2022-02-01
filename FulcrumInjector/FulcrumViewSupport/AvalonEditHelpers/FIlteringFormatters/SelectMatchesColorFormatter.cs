@@ -4,12 +4,12 @@ using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
 {
     /// <summary>
     /// Selects the text matching the given input pattern.
     /// </summary>
-    public class DebugLogSelectMatchesColorFormatter : DocumentColorizingTransformer
+    public class SelectMatchesColorFormatter : DocumentColorizingTransformer
     {
         // No matches bool value
         public bool NoMatches { get; private set; }
@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         /// </summary>
         /// <param name="MatchingString">String to find</param>
         /// <param name="UseRegex">Sets if this is a regex or not.</param>
-        public DebugLogSelectMatchesColorFormatter(string MatchingString, bool UseRegex = false)
+        public SelectMatchesColorFormatter(string MatchingString, bool UseRegex = false)
         {
             // Store the matching string. Remove Regex call if needed.
             this.MatchString = MatchingString.ToLower().StartsWith("@r") ? 

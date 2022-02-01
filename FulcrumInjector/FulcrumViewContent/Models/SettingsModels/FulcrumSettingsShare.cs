@@ -51,6 +51,19 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 SettingObj.SettingSectionTitle.Contains("PassThru Regex Settings")
             ) ?? new SettingsEntryCollectionModel("PassThru Regex Settings", Array.Empty<SettingsEntryModel>());
 
+        // Settings for color output during formatting for PT Output
+        public static SettingsEntryCollectionModel InjectorDllSyntaxSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("PassThru Syntax Settings")
+            ) ?? new SettingsEntryCollectionModel("PassThru Syntax Settings", Array.Empty<SettingsEntryModel>());
+
+        // TODO: FINISH DEBUG SYNTAX SETTINGS HERE
+        // Settings for color output during formatting for PT Output
+        public static SettingsEntryCollectionModel InjectorDebugSyntaxSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Syntax Settings")
+            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Syntax Settings", Array.Empty<SettingsEntryModel>());
+
         // ---------------------------------------------------------------------------------------------------------------------
 
         /// <summary>

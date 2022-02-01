@@ -3,12 +3,12 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
 {
     /// <summary>
     /// Shows or hides line objects based on the filtering methods
     /// </summary>
-    public class DebugLogLineFilteringColorFormatter : DocumentColorizingTransformer
+    public class FilteringColorFormatter : DocumentColorizingTransformer
     {
         // Filtering Key Value
         public readonly string FilterKey;
@@ -20,13 +20,13 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         /// <summary>
         /// DCTOR For this object type. Resets the text content to be the input original contents
         /// </summary>
-        ~DebugLogLineFilteringColorFormatter() { this.DocumentEditor.Text = OriginalInputLines; }
+        ~FilteringColorFormatter() { this.DocumentEditor.Text = OriginalInputLines; }
         
         /// <summary>
         /// Configures line filtering helper
         /// </summary>
         /// <param name="InputTextLines"></param>
-        public DebugLogLineFilteringColorFormatter(TextEditor InputEditor, string FilteringKey)
+        public FilteringColorFormatter(TextEditor InputEditor, string FilteringKey)
         {
             // Store the matching string. Remove Regex call if needed.
             this.FilterKey = FilteringKey;

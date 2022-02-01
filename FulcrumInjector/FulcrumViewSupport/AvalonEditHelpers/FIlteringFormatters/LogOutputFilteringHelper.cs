@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
 using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
 {
     /// <summary>
     /// Contains a set of methods which are able to help us modify avEdit objects by filtering
@@ -39,7 +38,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// Searches the AvalonEdit object for text matching what we want.
         /// </summary>
         /// <param name="TextToFind"></param>
-        public DebugLogSelectMatchesColorFormatter SearchForText(string TextToFind)
+        public SelectMatchesColorFormatter SearchForText(string TextToFind)
         {
             try
             {
@@ -47,7 +46,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                 return SessionEditor.Dispatcher.Invoke(() =>
                 {
                     var TransformerList = SessionEditor.TextArea.TextView.LineTransformers.ToList();
-                    TransformerList.RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(DebugLogSelectMatchesColorFormatter));
+                    TransformerList.RemoveAll(TransformerObj => TransformerObj.GetType() == typeof(SelectMatchesColorFormatter));
 
                     // Clear out transformers and append them in again
                     SessionEditor.TextArea.TextView.LineTransformers.Clear();
@@ -62,7 +61,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                     }
 
                     // Apply Searcher. Store if using Regex or not.
-                    var NewSearcher = new DebugLogSelectMatchesColorFormatter(TextToFind);
+                    var NewSearcher = new SelectMatchesColorFormatter(TextToFind);
                     SessionEditor.TextArea.TextView.LineTransformers.Add(NewSearcher);
                     return NewSearcher;
                 });
@@ -81,7 +80,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// Filters log lines by logger name
         /// </summary>
         /// <param name="FilteringText">Name of logger to filter with</param>
-        public DebugLogLineFilteringColorFormatter FilterByText(string FilteringText)
+        public FilteringColorFormatter FilterByText(string FilteringText)
         {
             try
             {
@@ -92,11 +91,11 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                     TransformerList.RemoveAll(TransformerObj =>
                     {
                         // If not a filtering type, return false to not remove
-                        if (TransformerObj.GetType() != typeof(DebugLogLineFilteringColorFormatter))
+                        if (TransformerObj.GetType() != typeof(FilteringColorFormatter))
                             return false;
 
                         // Cast and run the reset command here then remove
-                        var FilteringObj = TransformerObj as DebugLogLineFilteringColorFormatter;
+                        var FilteringObj = TransformerObj as FilteringColorFormatter;
                         FilteringObj.ResetDocumentContent();
                         return true;
                     });
@@ -110,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                     if (string.IsNullOrEmpty(FilteringText)) { SessionEditor.TextArea.TextView.Redraw(); return null; }
 
                     // Apply Searcher. Store if using Regex or not.
-                    var NewSearcher = new DebugLogLineFilteringColorFormatter(SessionEditor, FilteringText);
+                    var NewSearcher = new FilteringColorFormatter(SessionEditor, FilteringText);
                     SessionEditor.TextArea.TextView.LineTransformers.Add(NewSearcher);
                     return NewSearcher;
                 });

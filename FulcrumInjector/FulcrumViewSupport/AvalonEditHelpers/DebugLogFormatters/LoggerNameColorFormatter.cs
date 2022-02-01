@@ -1,14 +1,28 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
     /// Colorizes the logger names on the log output view
     /// </summary>
-    public class DebugLogLoggerNameColorFormatter : DocumentColorizingTransformer
+    public class LoggerNameColorFormatter : InjectorDocFormatterBase
     {
+        /// <summary>
+        /// Builds a new color format helping object.
+        /// </summary>
+        public LoggerNameColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
+        {
+            // Log the type of object built on our helper instance and then return out.
+            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
+        }
+
+        // --------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Color logger names here
         /// </summary>
@@ -31,9 +45,9 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                     int EndOffset = StartOffset + LoggerName.Length;
                     base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                     {
-                    // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
-                        NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.Gray);
+                        // Colorize our logger name here.
+                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[0].Item1);
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[0].Item2);
                     });
 
                     // Tick our index and move on

@@ -1,16 +1,30 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
+using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
 {
     /// <summary>
     /// Colorizing object helper to format our built log lines.
     /// </summary>
-    public class DebugLogTimeColorFormatter : DocumentColorizingTransformer
+    public class TimeColorFormatter : InjectorDocFormatterBase
     {
+        /// <summary>
+        /// Builds a new color format helping object.
+        /// </summary>
+        public TimeColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
+        {
+            // Log the type of object built on our helper instance and then return out.
+            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
+        }
+
+        // --------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Coloring Line command override
         /// </summary>
@@ -35,8 +49,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                 base.ChangeLinePart(StartOffset, EndOffset, (NextMatchElement) =>
                 {
                     // Set our current color scheme we want.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(Brushes.Transparent);
-                    NextMatchElement.TextRunProperties.SetForegroundBrush(Brushes.DarkGreen);
+                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[0].Item1);
+                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[0].Item2);
 
                     // Pull current typeface, update it with new value
                     Typeface CurrentTypeFace = NextMatchElement.TextRunProperties.Typeface;
