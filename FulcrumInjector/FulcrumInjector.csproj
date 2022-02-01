@@ -194,7 +194,8 @@
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandNameColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParameterColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\InjectorDocColorizerBase.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\LogOutputFilteringHelper.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\CallStackColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\OutputFormatHelperBase.cs" />

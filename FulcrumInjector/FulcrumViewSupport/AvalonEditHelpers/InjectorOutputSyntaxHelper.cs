@@ -52,13 +52,13 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// </summary>
         public override void StartColorHighlighting()
         {
-            // Configure new outputs here.  
+            // Stop old format helpers and clear them.
             this.StopColorHighlighting(); 
             FormatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
+            
+            // Add in our output objects now.
             this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
-
-            // TODO: Finish the next output format helper objects.
-            // First up is CommandNameColorFormatter.
+            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));
         }
         /// <summary>
         /// Clears out the color helpers from the main input doc object.
