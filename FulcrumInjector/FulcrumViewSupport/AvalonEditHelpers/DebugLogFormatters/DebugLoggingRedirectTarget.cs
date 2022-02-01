@@ -25,19 +25,16 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         // Edit Object which we will be using to write into.
         [RequiredParameter]
         public new TextEditor OutputEditor { get; set; }
-        [RequiredParameter]
-        public UserControl ParentUserControl { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new instance of our redirecting target object.
         /// </summary>
-        public DebugLoggingRedirectTarget(UserControl UserControlParent, TextEditor EditorObject)
+        public DebugLoggingRedirectTarget(TextEditor EditorObject)
         {
             // Store UserControl and Exit box
             this.OutputEditor = EditorObject;
-            this.ParentUserControl = UserControlParent;
             FormatLogger.WriteLog("STORED NEW CONTENT VALUES FOR USER CONTROL AND EDITOR INPUT OK!", LogType.InfoLog);
 
             // Setup our Layout
@@ -91,7 +88,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         {
             // Write output using dispatcher to avoid threading issues.
             string RenderedText = this.Layout.Render(LogEvent);
-            this.ParentUserControl.Dispatcher.Invoke(() => OutputEditor.Text += RenderedText + "\n");
+            this.OutputEditor.Dispatcher.Invoke(() => OutputEditor.Text += RenderedText + "\n");
         }
     }
 }

@@ -6,6 +6,8 @@ using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -28,8 +30,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public string[] SessionLogs { get => _sessionLogs; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public LogOutputFilteringHelper LogFilteringHelper { get; set; }
-        public InjectorOutputSyntaxHelper InjectorSyntaxHelper { get; set; }
+        public LogOutputFilteringHelper LogFilteringHelper;
+        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
 

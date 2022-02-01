@@ -1,26 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Rendering;
-using NLog;
-using NLog.Config;
-using NLog.Layouts;
-using NLog.Targets;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters
 {
     /// <summary>
     /// Target for redirecting logging configuration on our output
@@ -52,13 +34,16 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// </summary>
         public override void StartColorHighlighting()
         {
-            // Configure new outputs here.  
+            // Stop old format helpers and clear them.
             this.StopColorHighlighting(); 
             FormatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
-            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
 
-            // TODO: Finish the next output format helper objects.
-            // First up is CommandNameColorFormatter.
+            // Add in our output objects now.
+            this.OutputEditor.Dispatcher.Invoke(() =>
+            {
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));
+            });
         }
         /// <summary>
         /// Clears out the color helpers from the main input doc object.
@@ -67,7 +52,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // Remove all previous transformers and return out.
             FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
-            this.OutputEditor.TextArea.TextView.LineTransformers.Clear();
+            this.OutputEditor.Dispatcher.Invoke(() => { this.OutputEditor.TextArea.TextView.LineTransformers.Clear(); });
         }
     }
 }

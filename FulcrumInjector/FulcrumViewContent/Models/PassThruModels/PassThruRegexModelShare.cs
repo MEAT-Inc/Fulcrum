@@ -54,6 +54,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 
         // Helper Regex objects.
         public static PassThruRegexModel PassThruTime => PassThruExpressionObjects.GetRegexByName("CommandTime");
+        public static PassThruRegexModel PassThruParameters => PassThruExpressionObjects.GetRegexByName("CommandParameter");
         public static PassThruRegexModel PassThruStatus => PassThruExpressionObjects.GetRegexByName("CommandStatus");
         public static PassThruRegexModel DeviceIdReturned => PassThruExpressionObjects.GetRegexByName("DeviceID");
         public static PassThruRegexModel ChannelIdReturned => PassThruExpressionObjects.GetRegexByName("ChannelID");

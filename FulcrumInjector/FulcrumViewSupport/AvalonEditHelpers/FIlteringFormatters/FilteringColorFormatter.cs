@@ -3,7 +3,7 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.UniversalFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
 {
     /// <summary>
     /// Shows or hides line objects based on the filtering methods
