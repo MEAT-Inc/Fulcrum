@@ -30,8 +30,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public string[] SessionLogs { get => _sessionLogs; set => PropertyUpdated(value); }
 
         // Helper for editing Text box contents
-        public LogOutputFilteringHelper LogFilteringHelper { get; set; }
-        public InjectorOutputSyntaxHelper InjectorSyntaxHelper { get; set; }
+        public LogOutputFilteringHelper LogFilteringHelper;
+        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
 
         // --------------------------------------------------------------------------------------------------------------------------
 
