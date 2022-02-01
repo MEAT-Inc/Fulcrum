@@ -59,7 +59,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Log information, build new target output and return.
             ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
             ConfigurationItemFactory.Default.Targets.RegisterDefinition("LiveInjectorOutputTarget", typeof(InjectorOutputSyntaxHelper));
-            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this, this.DebugRedirectOutputEdit));
+            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
 
             // Log information about events built.
             this.ViewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR PIPE OUTPUT AND FOR INJECTOR DLL OUTPUT OK!", LogType.InfoLog);
@@ -77,8 +77,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.DataContext = this.ViewModel;
 
             // Configure filtering and coloring instances here.
-            this.ViewModel.LogFilteringHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
-            this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit);
+            this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
+            this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
 
             // Log completed setup values ok
@@ -126,17 +126,25 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
+        private async void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
         {
-            // Check the current state and toggle it.
-            if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting) 
-                this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting(); 
-            else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+            // Build new button object.
+            Button SendButton = (Button)Sender;
+            SendButton.Content = "Toggling...";
+            SendButton.Background = Brushes.DarkOrange;
+
+            // Async toggle button content and output format.
+            await Task.Run(() =>
+            {
+                // Check the current state and toggle it.
+                if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting)
+                    this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
+                else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+            });
 
             // Now apply new values to our button.
-            Button SendButton = (Button)Sender;
             SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? Brushes.DarkGreen : Brushes.DarkRed;
-            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting ON" : "Syntax Highlighting OFF";
+            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting: ON" : "Syntax Highlighting: OFF";
 
             // Log toggle result.
             this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);

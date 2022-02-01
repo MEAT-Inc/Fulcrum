@@ -33,7 +33,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
             // Pull in our color values. Store format helper.
             if (this.GetType() == typeof(InjectorDocFormatterBase)) return;
             this._coloringBrushes = FormatBase.PullColorForCommand(this.GetType());
-            if (this._coloringBrushes == null) this.FormatLogger.WriteLog($"WARNING! NO BRUSH VALUES FOUND FOR TYPE {this.GetType().Name}!", LogType.ErrorLog);
         }
 
         // --------------------------------------------------------------------------------------------------
@@ -47,9 +46,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // Validate our match count and brush values match correctly.
             if (MatchesFound == this._coloringBrushes.Length) return true;
-
-            // Now build new values here.
-            this.FormatLogger.WriteLog($"BUILDING {MatchesFound - this._coloringBrushes.Length} EXTRA BRUSH SETS FOR MATCHES!", LogType.WarnLog);
             while (this._coloringBrushes.Length < MatchesFound)
             {
                 // Append in a new brush set of White FG and no background.
@@ -69,7 +65,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // First fix our coloring count if needed.
             if (!this.UpdateBrushesForMatches(MatchesFound.Count))
-                this.FormatLogger.WriteLog($"WARNING: APPENDING BLANK BRUSH VALUES FOR MATCHES ON TYPE {this.GetType().Name}!", LogType.WarnLog);
+                this.FormatLogger.WriteLog($"WARNING: APPENDED BLANK BRUSH VALUES FOR MATCHES ON TYPE {this.GetType().Name}!", LogType.WarnLog);
 
             // Now from all our matches made, loop and apply color values.
             int LineStartOffset = InputLine.Offset;

@@ -75,24 +75,8 @@
                     Tag="Enter a filter or @r regex"
                     TextChanged="LogFilteringTextBox_OnTextChanged"/>
                 <Button Click="SyntaxHighlightingButton_OnClick"
-                        Content="Syntax Highlighting"
+                        Content="Syntax Highlighting" Style="{StaticResource ActionButtonStyle}"
                         Grid.Column="1" Margin="5,0,0,5">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding InjectorSyntaxHelper.IsHighlighting}" Value="True">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                    <Setter Property="Background" Value="DarkGreen"/>
-                                    <Setter Property="Content" Value="Syntax Highlighting: ON"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding InjectorSyntaxHelper.IsHighlighting}" Value="False">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                    <Setter Property="Background" Value="DarkRed"/>
-                                    <Setter Property="Content" Value="Syntax Highlighting: OFF"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
                 </Button>
             </Grid>
 
