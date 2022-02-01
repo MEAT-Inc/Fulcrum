@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 using SharpLogger.LoggerSupport;
@@ -11,20 +12,15 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
     /// <summary>
     /// Colorizing object helper to format our built log lines.
     /// </summary>
-    public class LogLevelColorFormatter : DocumentColorizingTransformer
+    public class LogLevelColorFormatter : InjectorDocFormatterBase
     {
-        // Color format brushes for this format instance.
-        private readonly OutputFormatHelperBase _formatBase;
-        private readonly Tuple<Brush, Brush>[] _coloringBrushes;
-
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public LogLevelColorFormatter(OutputFormatHelperBase FormatBase)
+        public LogLevelColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
         {
-            // Pull in our color values. Store format helper.
-            this._formatBase = FormatBase;
-            this._coloringBrushes = this._formatBase.PullColorForCommand(this.GetType());
+            // Log the type of object built on our helper instance and then return out.
+            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------

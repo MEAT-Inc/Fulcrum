@@ -7,6 +7,7 @@ using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using NLog;
 using NLog.Config;
 using SharpLogger;

@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
     /// <summary>
     /// Class instance used to help format color values for the command parameter values when pulled from the log lines.
     /// </summary>
-    public class CommandParameterColorFormatter : InjectorDocColorizerBase
+    public class CommandParameterColorFormatter : InjectorDocFormatterBase
     {
         /// <summary>
         /// Builds a new color format helping object.

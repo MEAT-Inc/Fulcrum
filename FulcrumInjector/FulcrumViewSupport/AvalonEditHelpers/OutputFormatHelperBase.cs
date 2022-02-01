@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using FulcrumInjector.FulcrumViewSupport.DataConverters;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Rendering;
@@ -95,7 +96,12 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         public Tuple<string, string>[] PullColorsForCommand(Type TypeOfFormatter)
         {
             // Make sure type is a doc formatter. If not return null. Then try to pull value.
-            if (TypeOfFormatter.BaseType != typeof(DocumentColorizingTransformer)) return null;
+            if (TypeOfFormatter.BaseType != typeof(InjectorDocFormatterBase)) {
+                this.FormatLogger.WriteLog("CAN NOT FORMAT OUTPUT FOR INJECTOR LOGS THAT ARE NOT OF DOC COLORIZING TYPE!");
+                return null;
+            }
+
+            // Now find our output matches.
             var MatchedType = this.ColorConfigurationValues.FirstOrDefault(ColorSet =>
             {
                 // Sample Name conversion

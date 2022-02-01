@@ -9,6 +9,8 @@ using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using ICSharpCode.AvalonEdit;
 using NLog;
 using NLog.Config;

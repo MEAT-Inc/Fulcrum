@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 using SharpLogger;
@@ -15,12 +11,12 @@ using SharpLogger.LoggerSupport;
 using MediaBrush = System.Windows.Media.Brush;
 using MediaBrushes = System.Windows.Media.Brushes;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
 {
     /// <summary>
     /// Base helper class instance for injector coloring configuration
     /// </summary>
-    public class InjectorDocColorizerBase : DocumentColorizingTransformer
+    public class InjectorDocFormatterBase : DocumentColorizingTransformer
     {
         // Logger object and color brushes for formatting output.
         protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -32,9 +28,10 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        protected InjectorDocColorizerBase(OutputFormatHelperBase FormatBase)
+        protected InjectorDocFormatterBase(OutputFormatHelperBase FormatBase)
         {
             // Pull in our color values. Store format helper.
+            if (this.GetType() == typeof(InjectorDocFormatterBase)) return;
             this._coloringBrushes = FormatBase.PullColorForCommand(this.GetType());
             if (this._coloringBrushes == null) this.FormatLogger.WriteLog($"WARNING! NO BRUSH VALUES FOUND FOR TYPE {this.GetType().Name}!", LogType.ErrorLog);
         }

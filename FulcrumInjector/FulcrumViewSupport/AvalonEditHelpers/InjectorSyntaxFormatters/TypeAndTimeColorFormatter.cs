@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
     /// <summary>
     /// Colors the stacktrace on the log line
     /// </summary>
-    public class TypeAndTimeColorFormatter : InjectorDocColorizerBase
+    public class TypeAndTimeColorFormatter : InjectorDocFormatterBase
     {
         /// <summary>
         /// Builds a new color format helping object.

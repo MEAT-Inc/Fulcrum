@@ -1,26 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Rendering;
-using NLog;
-using NLog.Config;
-using NLog.Layouts;
-using NLog.Targets;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters
 {
     /// <summary>
     /// Target for redirecting logging configuration on our output
