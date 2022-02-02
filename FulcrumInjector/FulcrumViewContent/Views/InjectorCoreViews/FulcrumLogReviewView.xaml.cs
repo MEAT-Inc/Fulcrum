@@ -74,7 +74,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Log completed setup values ok
             this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
-            this.SyntaxHighlightingButton_OnClick(this.ToggleHighlightingButton, null);
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
