@@ -15,11 +15,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public LoggerNameColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
-        {
-            // Log the type of object built on our helper instance and then return out.
-            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
-        }
+        public LoggerNameColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
         // --------------------------------------------------------------------------------------------------
 

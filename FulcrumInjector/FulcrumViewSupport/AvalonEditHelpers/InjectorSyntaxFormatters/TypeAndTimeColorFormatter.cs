@@ -22,11 +22,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public TypeAndTimeColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) 
-        {
-            // Log the type of object built on our helper instance and then return out.
-            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
-        }
+        public TypeAndTimeColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
         // --------------------------------------------------------------------------------------------------
 
