@@ -83,6 +83,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Log completed setup values ok
             this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
+            this.SyntaxHighlightingButton_OnClick(this.ToggleHighlightingButton, null);
             this.ViewLogger.WriteLog("SETUP A NEW PIPE READING EVENT OBJECT TO PROCESS OUR OUTPUT PIPE CONTENTS INTO THE DLL OUTPUT BOX OK!", LogType.WarnLog);
         }
 

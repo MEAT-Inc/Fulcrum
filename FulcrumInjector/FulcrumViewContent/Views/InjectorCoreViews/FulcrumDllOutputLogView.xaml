@@ -74,7 +74,7 @@
                     Style="{StaticResource SearchBoxStyle}"
                     Tag="Enter a filter or @r regex"
                     TextChanged="LogFilteringTextBox_OnTextChanged"/>
-                <Button Click="SyntaxHighlightingButton_OnClick"
+                <Button Click="SyntaxHighlightingButton_OnClick" x:Name="ToggleHighlightingButton"
                         Content="Syntax Highlighting" Style="{StaticResource ActionButtonStyle}"
                         Grid.Column="1" Margin="5,0,0,5">
                 </Button>

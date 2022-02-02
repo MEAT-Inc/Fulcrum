@@ -1,4 +1,5 @@
-﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using System.Linq;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using ICSharpCode.AvalonEdit;
 using SharpLogger.LoggerSupport;
 
@@ -52,7 +53,18 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Remove all previous transformers and return out.
             FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
-            this.OutputEditor.Dispatcher.Invoke(() => { this.OutputEditor.TextArea.TextView.LineTransformers.Clear(); });
+            this.OutputEditor.Dispatcher.Invoke(() =>
+            {
+                // Log information, find transformers to remove, and remove them
+                FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
+                var TransformersToApply = this.OutputEditor.TextArea.TextView.LineTransformers
+                    .Where(TransformHelper => TransformHelper.GetType().BaseType != typeof(InjectorDocFormatterBase))
+                    .ToArray();
+
+                // Now apply the new transformers onto the editor
+                this.OutputEditor.TextArea.TextView.LineTransformers.Clear();
+                foreach (var TransformHelper in TransformersToApply) { this.OutputEditor.TextArea.TextView.LineTransformers.Add(TransformHelper); }
+            });
         }
     }
 }
