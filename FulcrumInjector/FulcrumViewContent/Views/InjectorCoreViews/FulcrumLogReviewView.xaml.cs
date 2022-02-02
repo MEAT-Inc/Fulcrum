@@ -70,10 +70,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup coloring helper.
             this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.ReplayLogInputContent);
             this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
-
-            // Log completed setup values ok
-            this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
