@@ -71,9 +71,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new LogLevelColorFormatter(this));
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CallStackColorFormatter(this));
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new LoggerNameColorFormatter(this));
-
-                // Force Redraw output here.
-                this.OutputEditor.TextArea.TextView.Redraw();
             });
         }
         /// <summary>
@@ -94,9 +91,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
                 this.OutputEditor.TextArea.TextView.LineTransformers.Clear();
                 foreach (var TransformHelper in TransformersToRemove)
                     this.OutputEditor.TextArea.TextView.LineTransformers.Add(TransformHelper);
-
-                // Force Redraw output here.
-                this.OutputEditor.TextArea.TextView.Redraw();
             });
         }
 

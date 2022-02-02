@@ -80,10 +80,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
             this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit);
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
-
-            // Log completed setup values ok
-            this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
-            this.ViewLogger.WriteLog("SETUP A NEW PIPE READING EVENT OBJECT TO PROCESS OUR OUTPUT PIPE CONTENTS INTO THE DLL OUTPUT BOX OK!", LogType.WarnLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

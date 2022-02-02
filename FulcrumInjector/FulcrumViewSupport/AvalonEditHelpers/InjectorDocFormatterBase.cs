@@ -69,20 +69,25 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
             // Now from all our matches made, loop and apply color values.
             int LineStartOffset = InputLine.Offset;
             string LineText = CurrentContext.Document.GetText(InputLine);
-            for (int MatchIndex = 1; MatchIndex < MatchesFound.Count; MatchIndex++)
+            for (int MatchIndex = 0; MatchIndex < MatchesFound.Count; MatchIndex++)
             {
                 // Find the index start, stop, and then the whole range.
-                string MatchFound = MatchesFound[MatchIndex].Value;
-                int MatchIndexStart = LineStartOffset + LineText.IndexOf(MatchFound);
-                int MatchIndexClose = MatchIndexStart + MatchFound.Length;
-
-                // Now apply a color value based on the type of contents provided for it.
-                base.ChangeLinePart(MatchIndexStart, MatchIndexClose, (NextMatchElement) =>
+                Match FoundMatch = MatchesFound[MatchIndex];
+                for (int MatchGroupIndex = 0; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
                 {
-                    // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[MatchIndex].Item1);
-                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[MatchIndex].Item2);
-                });
+                    // Pull the current group object value
+                    string GroupFound = FoundMatch.Groups[MatchGroupIndex].Value;
+                    int GroupPositionStart = LineStartOffset + LineText.IndexOf(GroupFound);
+                    int GroupPositionEnd = GroupPositionStart + GroupFound.Length;
+
+                    // Now apply a color value based on the type of contents provided for it.
+                    base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
+                    {
+                        // Colorize our logger name here.
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[MatchIndex].Item1);
+                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[MatchIndex].Item2);
+                    });
+                }
             }
         }
 

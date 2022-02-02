@@ -22,10 +22,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             // Build color objects here.
             base.BuildColorFormatValues(FulcrumSettingsShare.InjectorDllSyntaxSettings.SettingsEntries);
             FormatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
-
-            // Kickoff color formatting here.
-            this.StartColorHighlighting();
-            FormatLogger.WriteLog("FORMAT OUTPUT HAS BEEN BUILT AND KICKED OFF OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -45,9 +41,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
                 // Add in our output objects now.
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));
-
-                // Force Redraw output here.
-                this.OutputEditor.TextArea.TextView.Redraw();
             });
         }
         /// <summary>
@@ -68,9 +61,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
                 // Now apply the new transformers onto the editor
                 foreach (var TransformHelper in TransformersToRemove) 
                     this.OutputEditor.TextArea.TextView.LineTransformers.Remove(TransformHelper);
-
-                // Force Redraw output here.
-                this.OutputEditor.TextArea.TextView.Redraw();
             });
         }
     }
