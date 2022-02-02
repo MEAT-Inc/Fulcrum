@@ -39,11 +39,15 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             this.StopColorHighlighting(); 
             FormatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
 
-            // Add in our output objects now.
+            // Invoke this on a background thread
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
+                // Add in our output objects now.
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));
+
+                // Force Redraw output here.
+                this.OutputEditor.TextArea.TextView.Redraw();
             });
         }
         /// <summary>
@@ -64,6 +68,9 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
                 // Now apply the new transformers onto the editor
                 foreach (var TransformHelper in TransformersToRemove) 
                     this.OutputEditor.TextArea.TextView.LineTransformers.Remove(TransformHelper);
+
+                // Force Redraw output here.
+                this.OutputEditor.TextArea.TextView.Redraw();
             });
         }
     }
