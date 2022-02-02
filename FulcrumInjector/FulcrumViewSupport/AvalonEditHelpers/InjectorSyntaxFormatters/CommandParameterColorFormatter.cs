@@ -31,39 +31,33 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Find the command type for our input object here. If none, drop out
             Regex TimeMatchRegex = new(PassThruRegexModelShare.PassThruParameters.ExpressionPattern);
-            MatchCollection MatchesFound = TimeMatchRegex.Matches(CurrentContext.Document.GetText(InputLine));
-            if (MatchesFound.Count == 0) return;
+            Match FoundMatch = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
+            if (FoundMatch.Groups.Count == 0) return;
 
             // Now run our coloring definitions and return out.
             int LineStartOffset = InputLine.Offset;
-            this.UpdateBrushesForMatches(MatchesFound.Count);
+            this.UpdateBrushesForMatches(FoundMatch.Groups.Count);
             string LineText = CurrentContext.Document.GetText(InputLine);
-            for (int MatchIndex = 0; MatchIndex < MatchesFound.Count; MatchIndex++)
+            for (int MatchGroupIndex = 0; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
             {
-                // Find the index start, stop, and then the whole range.
-                Match FoundMatch = MatchesFound[MatchIndex];
-                string MatchFound = MatchesFound[MatchIndex].Value;
-                for (int MatchGroupIndex = 0; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
+                // Pull the current group object value
+                string GroupFound = FoundMatch.Groups[MatchGroupIndex].Value;
+                int GroupPositionStart = LineStartOffset + LineText.IndexOf(GroupFound);
+                int GroupPositionEnd = GroupPositionStart + GroupFound.Length;
+
+                // Check to see what type of value we've pulled in. 
+                bool IsInt = int.TryParse(GroupFound, out _);
+                bool IsProtocolId = Regex.Match(GroupFound, @"\d+:\S+").Success;
+                bool IsHexValue = int.TryParse(GroupFound, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _);
+
+                // Now apply a color value based on the type of contents provided for it.
+                int IndexOfBrush = IsInt ? 0 : IsProtocolId ? 1 : IsHexValue ? 2 : 3;
+                base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
                 {
-                    // Pull the current group object value
-                    string GroupFound = FoundMatch.Groups[MatchGroupIndex].Value;
-                    int GroupPositionStart = LineStartOffset + LineText.IndexOf(GroupFound);
-                    int GroupPositionEnd = GroupPositionStart + GroupFound.Length;
-
-                    // Check to see what type of value we've pulled in. 
-                    bool IsInt = int.TryParse(MatchFound, out _);
-                    bool IsProtocolId = Regex.Match(MatchFound, @"\d+:\S+").Success;
-                    bool IsHexValue = int.TryParse(MatchFound, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _);
-
-                    // Now apply a color value based on the type of contents provided for it.
-                    int IndexOfBrush = IsInt ? 0 : IsProtocolId ? 1 : IsHexValue ? 2 : 3;
-                    base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
-                    {
-                        // Colorize our logger name here.
-                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
-                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
-                    });
-                }
+                    // Colorize our logger name here.
+                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
+                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
+                });
             }
         }
     }

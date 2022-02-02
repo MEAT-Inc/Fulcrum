@@ -61,33 +61,28 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         /// </summary>
         /// <param name="InputLine"></param>
         /// <param name="MatchesFound"></param>
-        protected internal void ColorNewMatches(DocumentLine InputLine, MatchCollection MatchesFound)
+        protected internal void ColorNewMatches(DocumentLine InputLine, Match MatchFound)
         {
             // First fix our coloring count if needed.
-            this.UpdateBrushesForMatches(MatchesFound.Count);
+            this.UpdateBrushesForMatches(MatchFound.Groups.Count);
 
             // Now from all our matches made, loop and apply color values.
             int LineStartOffset = InputLine.Offset;
             string LineText = CurrentContext.Document.GetText(InputLine);
-            for (int MatchIndex = 0; MatchIndex < MatchesFound.Count; MatchIndex++)
+            for (int GroupIndex = 0; GroupIndex < MatchFound.Groups.Count; GroupIndex++)
             {
-                // Find the index start, stop, and then the whole range.
-                Match FoundMatch = MatchesFound[MatchIndex];
-                for (int MatchGroupIndex = 0; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
-                {
-                    // Pull the current group object value
-                    string GroupFound = FoundMatch.Groups[MatchGroupIndex].Value;
-                    int GroupPositionStart = LineStartOffset + LineText.IndexOf(GroupFound);
-                    int GroupPositionEnd = GroupPositionStart + GroupFound.Length;
+                // Pull the current group object value
+                string GroupFound = MatchFound.Groups[GroupIndex].Value;
+                int GroupPositionStart = LineStartOffset + LineText.IndexOf(GroupFound);
+                int GroupPositionEnd = GroupPositionStart + GroupFound.Length;
 
-                    // Now apply a color value based on the type of contents provided for it.
-                    base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
-                    {
-                        // Colorize our logger name here.
-                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[MatchIndex].Item1);
-                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[MatchIndex].Item2);
-                    });
-                }
+                // Now apply a color value based on the type of contents provided for it.
+                base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
+                {
+                    // Colorize our logger name here.
+                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[GroupIndex].Item1);
+                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[GroupIndex].Item2);
+                });
             }
         }
 
