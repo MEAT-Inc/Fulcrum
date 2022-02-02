@@ -34,10 +34,10 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Find the command type for our input object here. If none, drop out
             Regex TimeMatchRegex = new(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
-            MatchCollection MatchesFound = TimeMatchRegex.Matches(CurrentContext.Document.GetText(InputLine));
+            Match MatchesFound = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
 
             // Now run our coloring definitions and return out.
-            if (MatchesFound.Count == 0) return;
+            if (MatchesFound.Groups.Count == 0) return;
             this.ColorNewMatches(InputLine, MatchesFound);
         }
     }
