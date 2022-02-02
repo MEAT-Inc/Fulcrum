@@ -64,8 +64,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         protected internal void ColorNewMatches(DocumentLine InputLine, MatchCollection MatchesFound)
         {
             // First fix our coloring count if needed.
-            if (!this.UpdateBrushesForMatches(MatchesFound.Count))
-                this.FormatLogger.WriteLog($"WARNING: APPENDED BLANK BRUSH VALUES FOR MATCHES ON TYPE {this.GetType().Name}!", LogType.WarnLog);
+            this.UpdateBrushesForMatches(MatchesFound.Count);
 
             // Now from all our matches made, loop and apply color values.
             int LineStartOffset = InputLine.Offset;
