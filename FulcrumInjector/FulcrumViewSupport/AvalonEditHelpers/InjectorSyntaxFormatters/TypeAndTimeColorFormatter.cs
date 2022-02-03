@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             Match MatchesFound = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
 
             // Now run our coloring definitions and return out.
-            if (MatchesFound.Groups.Count == 0) return;
+            if (!MatchesFound.Success) return;
             this.ColorNewMatches(InputLine, MatchesFound);
         }
     }
