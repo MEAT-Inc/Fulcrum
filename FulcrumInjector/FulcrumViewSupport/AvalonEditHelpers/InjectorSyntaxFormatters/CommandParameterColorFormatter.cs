@@ -32,32 +32,41 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             // Find the command type for our input object here. If none, drop out
             Regex TimeMatchRegex = new(PassThruRegexModelShare.PassThruParameters.ExpressionPattern);
             Match FoundMatch = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
-            if (FoundMatch.Groups.Count == 0) return;
+            if (!FoundMatch.Success) return;
 
             // Now run our coloring definitions and return out.
             int LineStartOffset = InputLine.Offset;
-            this.UpdateBrushesForMatches(FoundMatch.Groups.Count);
             string LineText = CurrentContext.Document.GetText(InputLine);
-            for (int MatchGroupIndex = 0; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
+            for (int MatchGroupIndex = 1; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
             {
-                // Pull the current group object value
-                string GroupFound = FoundMatch.Groups[MatchGroupIndex].Value;
-                int GroupPositionStart = LineStartOffset + LineText.IndexOf(GroupFound);
-                int GroupPositionEnd = GroupPositionStart + GroupFound.Length;
-
-                // Check to see what type of value we've pulled in. 
-                bool IsInt = int.TryParse(GroupFound, out _);
-                bool IsProtocolId = Regex.Match(GroupFound, @"\d+:\S+").Success;
-                bool IsHexValue = int.TryParse(GroupFound, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _);
-
-                // Now apply a color value based on the type of contents provided for it.
-                int IndexOfBrush = IsInt ? 0 : IsProtocolId ? 1 : IsHexValue ? 2 : 3;
-                base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
+                // Pull the current group object value and split it into group values.
+                string[] ParameterValuesFound = FoundMatch.Groups[MatchGroupIndex].Value
+                    .Split(',')
+                    .Select(ParamPart => ParamPart.Trim())
+                    .Select(ParamPart => ParamPart.Trim('(', ')'))
+                    .ToArray();
+                
+                // Loop the values and pull out the desired output
+                foreach (var ParamFound in ParameterValuesFound)
                 {
-                    // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
-                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
-                });
+                    // Grab the index of our current group value first
+                    int GroupPositionStart = LineStartOffset + LineText.IndexOf(ParamFound);
+                    int GroupPositionEnd = GroupPositionStart + ParamFound.Length;
+
+                    // Check to see what type of value we've pulled in. 
+                    bool IsInt = int.TryParse(ParamFound, out _);
+                    bool IsProtocolId = Regex.Match(ParamFound, @"\d+:\S+").Success;
+                    bool IsHexValue = Regex.Match(ParamFound, @"0x[0-9A-F]+").Success;
+
+                    // Now apply a color value based on the type of contents provided for it.
+                    int IndexOfBrush = IsInt ? 0 : IsProtocolId ? 1 : IsHexValue ? 2 : 3;
+                    base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
+                    {
+                        // Colorize our logger name here.
+                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
+                    });
+                }
             }
         }
     }

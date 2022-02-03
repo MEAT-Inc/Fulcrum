@@ -69,7 +69,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
             // Now from all our matches made, loop and apply color values.
             int LineStartOffset = InputLine.Offset;
             string LineText = CurrentContext.Document.GetText(InputLine);
-            for (int GroupIndex = 0; GroupIndex < MatchFound.Groups.Count; GroupIndex++)
+            for (int GroupIndex = 1; GroupIndex < MatchFound.Groups.Count; GroupIndex++)
             {
                 // Pull the current group object value
                 string GroupFound = MatchFound.Groups[GroupIndex].Value;
@@ -80,8 +80,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                 base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
                 {
                     // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[GroupIndex].Item1);
-                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[GroupIndex].Item2);
+                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[GroupIndex - 1].Item1);
+                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[GroupIndex - 1].Item2);
                 });
             }
         }
