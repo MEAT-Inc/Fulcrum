@@ -22,11 +22,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public TypeAndTimeColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) 
-        {
-            // Log the type of object built on our helper instance and then return out.
-            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
-        }
+        public TypeAndTimeColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
         // --------------------------------------------------------------------------------------------------
 
@@ -38,11 +34,11 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Find the command type for our input object here. If none, drop out
             Regex TimeMatchRegex = new(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
-            MatchCollection MatchesFound = TimeMatchRegex.Matches(CurrentContext.Document.GetText(InputLine));
+            Match MatchesFound = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
 
             // Now run our coloring definitions and return out.
+            if (!MatchesFound.Success) return;
             this.ColorNewMatches(InputLine, MatchesFound);
-            this.FormatLogger.WriteLog($"FORMATTED NEW OUTPUT FOR TYPE {this.GetType().Name} CORRECTLY!", LogType.TraceLog);
         }
     }
 }

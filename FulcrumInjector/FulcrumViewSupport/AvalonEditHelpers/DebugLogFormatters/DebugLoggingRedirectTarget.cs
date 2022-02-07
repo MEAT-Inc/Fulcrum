@@ -62,20 +62,36 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
             // Build all the color formatting helpers here. Clear out existing ones first.
             this.StopColorHighlighting();
 
-            // Now build all our new color format helpers.
+            // Invoke this on a background thread to avoid access issues.
             FormatLogger.WriteLog("STARTING NEW FORMAT HELPERS NOW...", LogType.WarnLog);
-            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TimeColorFormatter(this));
-            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new LogLevelColorFormatter(this));
-            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CallStackColorFormatter(this));
-            this.OutputEditor.TextArea.TextView.LineTransformers.Add(new LoggerNameColorFormatter(this));
+            this.OutputEditor.Dispatcher.Invoke(() =>
+            {
+                // Now build all our new color format helpers.
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TimeColorFormatter(this));
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new LogLevelColorFormatter(this));
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CallStackColorFormatter(this));
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new LoggerNameColorFormatter(this));
+            });
         }
         /// <summary>
         /// Clears out the color helpers from the main input doc object.
         /// </summary>
         public override void StopColorHighlighting()
         {
+            // Log information, find transformers to remove, and remove them
             FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
-            this.OutputEditor.TextArea.TextView.LineTransformers.Clear();
+            this.OutputEditor.Dispatcher.Invoke(() =>
+            {
+                // Get the transformers to pull away from this editor
+                var TransformersToRemove = this.OutputEditor.TextArea.TextView.LineTransformers
+                    .Where(TransformHelper => TransformHelper.GetType().BaseType == typeof(InjectorDocFormatterBase))
+                    .ToArray();
+
+                // Now apply the new transformers onto the editor
+                this.OutputEditor.TextArea.TextView.LineTransformers.Clear();
+                foreach (var TransformHelper in TransformersToRemove)
+                    this.OutputEditor.TextArea.TextView.LineTransformers.Add(TransformHelper);
+            });
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

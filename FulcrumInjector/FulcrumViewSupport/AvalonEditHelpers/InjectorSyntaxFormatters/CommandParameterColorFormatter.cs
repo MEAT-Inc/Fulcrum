@@ -19,11 +19,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public CommandParameterColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
-        {
-            // Log the type of object built on our helper instance and then return out.
-            this.FormatLogger.WriteLog($"BUILT NEW {this.GetType().Name} FORMAT HELPER!", LogType.TraceLog);
-        }
+        public CommandParameterColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
         // --------------------------------------------------------------------------------------------------
 
@@ -35,39 +31,43 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Find the command type for our input object here. If none, drop out
             Regex TimeMatchRegex = new(PassThruRegexModelShare.PassThruParameters.ExpressionPattern);
-            MatchCollection MatchesFound = TimeMatchRegex.Matches(CurrentContext.Document.GetText(InputLine));
+            Match FoundMatch = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
+            if (!FoundMatch.Success) return;
 
             // Now run our coloring definitions and return out.
             int LineStartOffset = InputLine.Offset;
-            this.UpdateBrushesForMatches(MatchesFound.Count);
             string LineText = CurrentContext.Document.GetText(InputLine);
-            for (int MatchIndex = 1; MatchIndex < MatchesFound.Count; MatchIndex++)
+            for (int MatchGroupIndex = 1; MatchGroupIndex < FoundMatch.Groups.Count; MatchGroupIndex++)
             {
-                // Find the index start, stop, and then the whole range.
-                string MatchFound = MatchesFound[MatchIndex].Value;
-                int MatchIndexStart = LineStartOffset + LineText.IndexOf(MatchFound);
-                int MatchIndexClose = MatchIndexStart + MatchFound.Length;
-
-                // Check to see what type of value we've pulled in. 
-                bool IsInt = int.TryParse(MatchFound, out _);
-                bool IsProtocolId = Regex.Match(MatchFound, @"\d+:\S+").Success;
-                bool IsHexValue = int.TryParse(MatchFound, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _);
-
-                // Now set an index value for our int to pull from.
-                int IndexOfBrush = IsInt ? 0 : IsProtocolId ? 1 : IsHexValue ? 2 : 3;
-                this.FormatLogger.WriteLog($"PULLING FORMAT INDEX VALUE OF {IndexOfBrush} FOR NEW OUTPUT {MatchesFound}", LogType.TraceLog);
-
-                // Now apply a color value based on the type of contents provided for it.
-                base.ChangeLinePart(MatchIndexStart, MatchIndexClose, (NextMatchElement) =>
+                // Pull the current group object value and split it into group values.
+                string[] ParameterValuesFound = FoundMatch.Groups[MatchGroupIndex].Value
+                    .Split(',')
+                    .Select(ParamPart => ParamPart.Trim())
+                    .Select(ParamPart => ParamPart.Trim('(', ')'))
+                    .ToArray();
+                
+                // Loop the values and pull out the desired output
+                foreach (var ParamFound in ParameterValuesFound)
                 {
-                    // Colorize our logger name here.
-                    NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
-                    NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
-                });
-            }
+                    // Grab the index of our current group value first
+                    int GroupPositionStart = LineStartOffset + LineText.IndexOf(ParamFound);
+                    int GroupPositionEnd = GroupPositionStart + ParamFound.Length;
 
-            // Log done building values here.
-            this.FormatLogger.WriteLog($"FORMATTED NEW OUTPUT FOR TYPE {this.GetType().Name} CORRECTLY!", LogType.TraceLog);
+                    // Check to see what type of value we've pulled in. 
+                    bool IsInt = int.TryParse(ParamFound, out _);
+                    bool IsProtocolId = Regex.Match(ParamFound, @"\d+:\S+").Success;
+                    bool IsHexValue = Regex.Match(ParamFound, @"0x[0-9A-F]+").Success;
+
+                    // Now apply a color value based on the type of contents provided for it.
+                    int IndexOfBrush = IsInt ? 0 : IsProtocolId ? 1 : IsHexValue ? 2 : 3;
+                    base.ChangeLinePart(GroupPositionStart, GroupPositionEnd, (NextMatchElement) =>
+                    {
+                        // Colorize our logger name here.
+                        NextMatchElement.TextRunProperties.SetForegroundBrush(this._coloringBrushes[IndexOfBrush].Item1);
+                        NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[IndexOfBrush].Item2);
+                    });
+                }
+            }
         }
     }
 }
