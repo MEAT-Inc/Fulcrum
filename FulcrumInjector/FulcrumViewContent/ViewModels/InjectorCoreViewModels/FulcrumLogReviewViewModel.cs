@@ -93,8 +93,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         internal string CombineLogFiles(string[] LogFilePaths)
         {
             // Find the name of the first file and use it as our base.
-            string OutputPath = Path.GetDirectoryName(LogFilePaths[0]);
-            string BaseFileName = Path.GetFileNameWithoutExtension(LogFilePaths[0]);
+            string OutputPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath")
+            );
+
+            // Build file name here.
+            string BaseFileName = $"{Guid.NewGuid().ToString("D").ToUpper()}";
             string FinalFileName = Path.Combine(OutputPath, $"CombinedLogs_{BaseFileName}.shimLog");
 
             // Now load the files in one by one and combine their output.
@@ -125,9 +130,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             
             try
             {
-                // Make sure a file is loaded
+                // Copy new file to our expressions folder here.
+                string OutputPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath")
+                );
+
+                // Copy to our new output location and set that as our new log file value.
+                string OutputFileName = Path.Combine(OutputPath, Path.GetFileName(NewLogFile));
                 this.LoadedLogFile = NewLogFile;
-                if (string.IsNullOrWhiteSpace(this.LoadedLogFile)) {
+                if (!string.IsNullOrWhiteSpace(this.LoadedLogFile)) { File.Copy(NewLogFile, OutputFileName); }
+                else {
                     ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
                     throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
                 }
