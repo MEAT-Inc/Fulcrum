@@ -1,4 +1,5 @@
-﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using System.Linq;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using ICSharpCode.AvalonEdit;
 using SharpLogger.LoggerSupport;
 
@@ -21,10 +22,6 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             // Build color objects here.
             base.BuildColorFormatValues(FulcrumSettingsShare.InjectorDllSyntaxSettings.SettingsEntries);
             FormatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
-
-            // Kickoff color formatting here.
-            this.StartColorHighlighting();
-            FormatLogger.WriteLog("FORMAT OUTPUT HAS BEEN BUILT AND KICKED OFF OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -38,9 +35,10 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             this.StopColorHighlighting(); 
             FormatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
 
-            // Add in our output objects now.
+            // Invoke this on a background thread
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
+                // Add in our output objects now.
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));
             });
@@ -52,7 +50,18 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Remove all previous transformers and return out.
             FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
-            this.OutputEditor.Dispatcher.Invoke(() => { this.OutputEditor.TextArea.TextView.LineTransformers.Clear(); });
+            this.OutputEditor.Dispatcher.Invoke(() =>
+            {
+                // Log information, find transformers to remove, and remove them
+                FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
+                var TransformersToRemove = this.OutputEditor.TextArea.TextView.LineTransformers
+                    .Where(TransformHelper => TransformHelper.GetType().BaseType == typeof(InjectorDocFormatterBase))
+                    .ToArray();
+
+                // Now apply the new transformers onto the editor
+                foreach (var TransformHelper in TransformersToRemove) 
+                    this.OutputEditor.TextArea.TextView.LineTransformers.Remove(TransformHelper);
+            });
         }
     }
 }

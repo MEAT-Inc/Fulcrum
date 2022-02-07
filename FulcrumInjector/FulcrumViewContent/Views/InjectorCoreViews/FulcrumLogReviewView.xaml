@@ -113,9 +113,10 @@
                              Tag="Enter a filter or @r regex" Grid.Column="0" TextChanged="LogFilteringTextBox_OnTextChanged"/>
                 <Button Grid.Column="1" 
                             Margin="0,5,5,2"
-                            x:Name="ToggleFilteringOrFileName"
+                            x:Name="ToggleHighlightingButton"
                             Click="SyntaxHighlightingButton_OnClick"
                             Content="Syntax Highlighting"
+                            IsEnabled="{Binding Path=IsLogLoaded}"
                             Style="{StaticResource ActionButtonStyle}">
                 </Button>
                 <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 

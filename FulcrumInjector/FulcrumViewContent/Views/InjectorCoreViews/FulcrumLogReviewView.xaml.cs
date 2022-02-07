@@ -70,10 +70,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup coloring helper.
             this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.ReplayLogInputContent);
             this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
-
-            // Log completed setup values ok
-            this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
             this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
@@ -111,49 +107,54 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
             }
-            
+
             // Get Grid object and toggle buttons
             ToggleViewTextButton.IsEnabled = false;
             Grid ParentGrid = SenderButton.Parent as Grid;
             SenderButton.Content = "Loading..."; ParentGrid.IsEnabled = false;
 
-            // Check if we have multiple files. 
-            string FileToLoad = Task.Run(() => SelectAttachmentDialog.FileNames.Length == 1 ?
-                SelectAttachmentDialog.FileName :
-                this.ViewModel.CombineLogFiles(SelectAttachmentDialog.FileNames)).Result;
-
-            // Store new file object value. Validate it on the ViewModel object first.
-            bool LoadResult = Task.Run(() => this.ViewModel.LoadLogContents(FileToLoad)).Result;
-            if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
-            else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
-
-            // Enable grid, remove click command.
+            // Run this in the background for smoother operation
             Task.Run(() =>
             {
-                // Invoke via Dispatcher
-                Dispatcher.Invoke(() =>
+                // Check if we have multiple files. 
+                string FileToLoad = SelectAttachmentDialog.FileNames.Length == 1 ?
+                    SelectAttachmentDialog.FileName :
+                    this.ViewModel.CombineLogFiles(SelectAttachmentDialog.FileNames);
+
+                // Store new file object value. Validate it on the ViewModel object first.
+                bool LoadResult = this.ViewModel.LoadLogContents(FileToLoad);
+                if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
+                else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
+
+                // Enable grid, remove click command.
+                Task.Run(() =>
                 {
-                    // Show new temp state
-                    ParentGrid.IsEnabled = true;
-                    SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
-                    SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
-                    SenderButton.Click -= LoadInjectorLogFile_OnClick;
+                    // Invoke via Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        // Show new temp state
+                        ParentGrid.IsEnabled = true;
+                        SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
+                        SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                        SenderButton.Click -= LoadInjectorLogFile_OnClick;
+                    });
+
+                    // Wait for 3.5 Seconds
+                    Thread.Sleep(3500);
+
+                    // Invoke via Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        // Reset button values 
+                        SenderButton.Content = DefaultContent;
+                        SenderButton.Background = DefaultColor;
+                        SenderButton.Click += LoadInjectorLogFile_OnClick;
+
+                        // Log information
+                        this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                    });
                 });
 
-                // Wait for 3.5 Seconds
-                Thread.Sleep(3500);
-
-                // Invoke via Dispatcher
-                Dispatcher.Invoke(() =>
-                {
-                    // Reset button values 
-                    SenderButton.Content = DefaultContent;
-                    SenderButton.Background = DefaultColor;
-                    SenderButton.Click += LoadInjectorLogFile_OnClick;
-
-                    // Log information
-                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
-                });
             });
         }
         /// <summary>

@@ -89,7 +89,7 @@
         <!-- Logging Content Output -->
         <avEdit:TextEditor 
             Grid.Row="3" Margin="10,-5,15,0"
-            x:Name="DebugRedirectOutputEdit"
+            x:Name="DebugRedirectOutputEdit" IsReadOnly="True"
             Style="{StaticResource LoggingOutputBoxStyle}"/>
     </Grid>
 </UserControl>

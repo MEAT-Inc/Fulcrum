@@ -31,7 +31,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         // Editor object and color helper objects.
         public TextEditor OutputEditor { get; protected set; }
         public Tuple<string, Tuple<string, string>[]>[] ColorConfigurationValues { get; protected set; }
-        public bool IsHighlighting => this.OutputEditor?.TextArea.TextView.LineTransformers.Count != 0;
+        public bool IsHighlighting => (this.OutputEditor?.TextArea.TextView.LineTransformers)!
+            .Count(TransObj => TransObj.GetType().BaseType == typeof(InjectorDocFormatterBase)) != 0;
 
         // --------------------------------------------------------------------------------------------------------------------------------------------
 

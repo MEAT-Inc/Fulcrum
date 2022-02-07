@@ -74,7 +74,8 @@
                     Style="{StaticResource SearchBoxStyle}"
                     Tag="Enter a filter or @r regex"
                     TextChanged="LogFilteringTextBox_OnTextChanged"/>
-                <Button Click="SyntaxHighlightingButton_OnClick"
+                <Button Click="SyntaxHighlightingButton_OnClick" x:Name="ToggleHighlightingButton"
+                        IsEnabled="{Binding Path=HasOutput}"
                         Content="Syntax Highlighting" Style="{StaticResource ActionButtonStyle}"
                         Grid.Column="1" Margin="5,0,0,5">
                 </Button>
@@ -83,7 +84,7 @@
             <!-- Editor Box -->
             <avalonedit:TextEditor 
                 Grid.Row="1" 
-                x:Name="DebugRedirectOutputEdit"
+                x:Name="DebugRedirectOutputEdit" IsReadOnly="True"
                 TextChanged="DebugRedirectOutputEdit_OnTextChanged"
                 Style="{StaticResource LoggingOutputBoxStyle}"/>
 
