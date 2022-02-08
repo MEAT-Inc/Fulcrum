@@ -187,7 +187,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = this.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = ExpressionExtensions.SplitLogToCommands(LogFileContents);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -269,41 +269,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("EXCEPTIONS ARE BEING LOGGED BELOW", LoadEx);
                 return false;
             }
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Splits an input content string into a set fo PT Command objects which are split into objects.
-        /// </summary>
-        /// <param name="FileContents">Input file object content</param>
-        /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        private string[] SplitLogToCommands(string FileContents)
-        {
-            // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
-            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern);
-
-            // Make an empty array of strings and then begin splitting.
-            List<string> OutputLines = new List<string>();
-            for (int CharIndex = 0; CharIndex < FileContents.Length;)
-            {
-                // Find the first index of a time entry and the close command index.
-                int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
-                var ErrorCloseMatch = StatusRegex.Match(FileContents, TimeStartIndex);
-                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
-
-                // Take the difference in End/Start as our string length value.
-                string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
-                if (OutputLines.Contains(NextCommand)) break;
-
-                // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                if (ErrorCloseIndex < CharIndex) break;
-                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
-            }
-
-            // Return the built set of commands.
-            return OutputLines.ToArray();
         }
     }
 }
