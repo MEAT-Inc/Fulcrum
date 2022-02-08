@@ -158,7 +158,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PtExpressionExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
@@ -170,7 +169,7 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
-    <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruOpenExpression.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />

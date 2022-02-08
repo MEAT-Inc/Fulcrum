@@ -93,8 +93,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         internal string CombineLogFiles(string[] LogFilePaths)
         {
             // Find the name of the first file and use it as our base.
-            string OutputPath = Path.GetDirectoryName(LogFilePaths[0]);
-            string BaseFileName = Path.GetFileNameWithoutExtension(LogFilePaths[0]);
+            string OutputPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath")
+            );
+
+            // Build file name here.
+            string BaseFileName = $"{Guid.NewGuid().ToString("D").ToUpper()}";
             string FinalFileName = Path.Combine(OutputPath, $"CombinedLogs_{BaseFileName}.shimLog");
 
             // Now load the files in one by one and combine their output.
@@ -125,9 +130,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             
             try
             {
-                // Make sure a file is loaded
+                // Copy new file to our expressions folder here.
+                string OutputPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath")
+                );
+
+                // Copy to our new output location and set that as our new log file value.
+                string OutputFileName = Path.Combine(OutputPath, Path.GetFileName(NewLogFile));
                 this.LoadedLogFile = NewLogFile;
-                if (string.IsNullOrWhiteSpace(this.LoadedLogFile)) {
+                if (!string.IsNullOrWhiteSpace(this.LoadedLogFile)) { File.Copy(NewLogFile, OutputFileName); }
+                else {
                     ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
                     throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
                 }
@@ -174,7 +187,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = this.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = ExpressionExtensions.SplitLogToCommands(LogFileContents);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -256,41 +269,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("EXCEPTIONS ARE BEING LOGGED BELOW", LoadEx);
                 return false;
             }
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Splits an input content string into a set fo PT Command objects which are split into objects.
-        /// </summary>
-        /// <param name="FileContents">Input file object content</param>
-        /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        private string[] SplitLogToCommands(string FileContents)
-        {
-            // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
-            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern);
-
-            // Make an empty array of strings and then begin splitting.
-            List<string> OutputLines = new List<string>();
-            for (int CharIndex = 0; CharIndex < FileContents.Length;)
-            {
-                // Find the first index of a time entry and the close command index.
-                int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
-                var ErrorCloseMatch = StatusRegex.Match(FileContents, TimeStartIndex);
-                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
-
-                // Take the difference in End/Start as our string length value.
-                string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
-                if (OutputLines.Contains(NextCommand)) break;
-
-                // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                if (ErrorCloseIndex < CharIndex) break;
-                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
-            }
-
-            // Return the built set of commands.
-            return OutputLines.ToArray();
         }
     }
 }
