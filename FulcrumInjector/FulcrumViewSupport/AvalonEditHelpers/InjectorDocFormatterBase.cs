@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
@@ -84,6 +85,25 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
                     NextMatchElement.TextRunProperties.SetBackgroundBrush(this._coloringBrushes[GroupIndex - 1].Item2);
                 });
             }
+        }
+        /// <summary>
+        /// Colors an index based set of values by the brushes given at index values specified.
+        /// </summary>
+        /// <param name="BrushSet">Brushes to color</param>
+        /// <param name="IndexBounds">Index to set from</param>
+        protected internal void ColorMatch(DocumentLine InputLine, MediaBrush[] BrushSet, int[] IndexBounds = null)
+        {
+            // See if the index values and Brushes exist or not.
+            IndexBounds ??= new[] { InputLine.Offset, InputLine.EndOffset };
+            BrushSet ??= new[] { MediaBrushes.White, MediaBrushes.Transparent };
+
+            // Now apply a color value based on the type of contents provided for it.
+            base.ChangeLinePart(IndexBounds[0], IndexBounds[1], (NextLineObject) =>
+            {
+                // Colorize our logger name here.
+                NextLineObject.TextRunProperties.SetForegroundBrush(BrushSet.FirstOrDefault());
+                NextLineObject.TextRunProperties.SetBackgroundBrush(BrushSet.LastOrDefault());
+            });
         }
 
         // -----------------------------------------------------------------------------------------------------
