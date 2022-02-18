@@ -10,10 +10,12 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FulcrumInjector.FulcrumLogic.InjectorPipes;
+using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewSupport;
@@ -91,5 +93,33 @@ namespace FulcrumInjector
             // Now call the routine in the constants file.
             InjectorConstants.ProcessAppExit(null, null);
         }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Processes a new device state change event on this main window 
+        /// </summary>
+        /// <param name="DeviceStateArgs">Event args for our device state change</param>
+        protected override void OnSourceInitialized(EventArgs DeviceStateArgs)
+        {
+            // Base override for source configuration
+            base.OnSourceInitialized(DeviceStateArgs);
+            InjectorMainLogger.WriteLog("PROCESSING A NEW SOURCE INIT EVENT TRIGGER NOW...", LogType.InfoLog);
+
+            // Adds the windows message processing hook and registers USB device add/removal notification.
+            HwndSource HandleSource = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+            if (HandleSource == null) {
+                InjectorMainLogger.WriteLog("WARNING! MAIN SOURCE HANDLE WAS SEEN TO BE NULL!", LogType.ErrorLog);
+                return;
+            }
+
+            // Now build new handle object values and register our event
+            HandleSource.AddHook(DeviceManagerEventWatchdog.WindowEventHandlerHook);
+            DeviceManagerEventWatchdog.RegisterDeviceNotification(HandleSource.Handle);
+            InjectorMainLogger.WriteLog("REGISTERED NEW EVENT MONITORING TRIGGER CORRECTLY!", LogType.InfoLog);
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
     }
 }
