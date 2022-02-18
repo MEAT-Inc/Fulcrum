@@ -167,6 +167,7 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruWatchdog\CheckDeviceManagerVciList.cs" />
     <Compile Include="FulcrumLogic\PassThruWatchdog\DeviceManagerEventWatchdog.cs" />
     <Compile Include="FulcrumLogic\PassThruWatchdog\DeviceStateCallbackTriggers.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
