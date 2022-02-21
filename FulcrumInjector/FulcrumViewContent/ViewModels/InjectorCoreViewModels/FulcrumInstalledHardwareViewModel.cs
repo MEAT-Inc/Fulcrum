@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -56,9 +57,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP HARDWARE INSTANCE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
+            // Pull refresh times out of the settings file
+            int DLLRefreshTime = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorHardwareRefresh.RefreshDLLsInterval");
+            int DeviceRefreshTime = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorHardwareRefresh.RefreshDevicesInterval");
+
             // Build new Watchdog for PTDevice instance helpers
             JBoxEventWatchdog.JBoxStateChanged += StateChangeEventHandler;
-            JBoxEventWatchdog.StartBackgroundRefresh(JVersion.ALL_VERSIONS, 1000);
+            JBoxEventWatchdog.StartBackgroundRefresh(JVersion.ALL_VERSIONS, DeviceRefreshTime, DLLRefreshTime);
             ViewModelLogger.WriteLog("STARTING BACKGROUND REFRESH INSTANCE FOR HARDWARE MONITORING NOW...", LogType.InfoLog);
 
             // Pull in our DLL Entries and our device entries now.
