@@ -14,8 +14,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
     /// If connected, make a SharpSession and pull Voltage values out and read a VIN. Then once done, setup a background refresh for voltage
     /// For disconnected, set that the device is gone. Use events to fire off a JBoxLost Event that will modify our UI and reset the search routines
     /// </summary>
-    public class DeviceStateCallbackTriggers
+    public class JBoxStateEventArgs : EventArgs
     {
+        // Device and DLL information about a built event
+        public string DllName { get; set; }
+        public string DeviceName { get; set; }
 
+        // Time event was fired off and the state of the device.
+        public bool IsConnected { get; set; }
+        public DateTime TimeStateTriggered { get; set; }
     }
 }

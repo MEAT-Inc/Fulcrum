@@ -81,8 +81,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 LogType.TraceLog);
 
             // Log and populate devices
+            this.ViewModel.SelectedDLL = SelectedDLL;
             this.ViewLogger.WriteLog("POPULATING VALUES FROM VIEW MODEL ROUTINE NOW"); 
-            this.ViewModel.InstalledDevices = this.ViewModel.PopulateDevicesForDLL(SelectedDLL);
             this.InstalledDevicesListBox.ItemsSource = this.ViewModel.InstalledDevices;
             this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
         }

@@ -112,13 +112,13 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.2.10.5.111\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.2.10.6.114\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.2.10.5.111\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.2.10.6.114\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=2.10.5.112, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.2.10.5.111\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=2.10.6.114, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534.2.10.6.114\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
@@ -167,9 +167,8 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
-    <Compile Include="FulcrumLogic\PassThruWatchdog\CheckDeviceManagerVciList.cs" />
-    <Compile Include="FulcrumLogic\PassThruWatchdog\DeviceManagerEventWatchdog.cs" />
-    <Compile Include="FulcrumLogic\PassThruWatchdog\DeviceStateCallbackTriggers.cs" />
+    <Compile Include="FulcrumLogic\PassThruWatchdog\JBoxEventWatchdog.cs" />
+    <Compile Include="FulcrumLogic\PassThruWatchdog\JBoxStateEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />

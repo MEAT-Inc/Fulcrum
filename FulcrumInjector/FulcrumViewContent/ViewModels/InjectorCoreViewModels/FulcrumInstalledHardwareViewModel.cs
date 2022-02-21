@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruImport;
 using SharpWrap2534.PassThruTypes;
+using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -23,10 +25,23 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledHardwareViewModelLogger")) ?? new SubServiceLogger("InstalledHardwareViewModelLogger");
 
         // Private Control Values
+        private J2534Dll _selectedDLL;
         private ObservableCollection<J2534Dll> _installedDLLs;
         private ObservableCollection<string> _installedDevices;
 
-        // Public values for our view to bind onto 
+        // Selected DLL object
+        public J2534Dll SelectedDLL
+        {
+            get => _selectedDLL;
+            set
+            {
+                // Update property value. Setup new List of DLLs.
+                PropertyUpdated(value);
+                InstalledDevices = this.PopulateDevicesForDLL(value);
+            }
+        }
+
+        // Current Installed DLL List object and installed Devices for Said DLL
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
         public ObservableCollection<string> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
 
@@ -41,6 +56,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP HARDWARE INSTANCE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
+            // Build new Watchdog for PTDevice instance helpers
+            JBoxEventWatchdog.JBoxStateChanged += StateChangeEventHandler;
+            JBoxEventWatchdog.StartBackgroundRefresh(JVersion.ALL_VERSIONS, 1000);
+            ViewModelLogger.WriteLog("STARTING BACKGROUND REFRESH INSTANCE FOR HARDWARE MONITORING NOW...", LogType.InfoLog);
+
             // Pull in our DLL Entries and our device entries now.
             ViewModelLogger.WriteLog("UPDATING AND IMPORTING CURRENT DLL LIST FOR THIS SYSTEM NOW...", LogType.WarnLog);
             this.InstalledDLLs = new ObservableCollection<J2534Dll>(new PassThruImportDLLs().LocatedJ2534DLLs);
@@ -54,11 +74,42 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Event handler for new JBox State changed conditions
+        /// </summary>
+        /// <param name="StateChangedHandler">Handler sender for event</param>
+        /// <param name="StateChangedArgs">Changed state event object info</param>
+        private void StateChangeEventHandler(object StateChangedHandler, JBoxStateEventArgs StateChangedArgs)
+        {
+            // Check if the device is connected or not first and see if the DLL is in our list of installed DLLs.
+            Tuple<J2534Dll, PassThruStructs.SDevice[]> SenderCast = (Tuple<J2534Dll, PassThruStructs.SDevice[]>)StateChangedHandler;
+            
+            // If the current DLL is not matching the DLL of the sending device, return.
+            if (!_installedDLLs.Contains(SenderCast.Item1)) _installedDLLs.Add(SenderCast.Item1);
+            if (SelectedDLL != SenderCast.Item1) { return; }
+            
+            // Check if the device is connected or not. If not, try to remove it.
+            if (StateChangedArgs.IsConnected == false)
+            {
+                // Try to remove instance value
+                try { InstalledDevices.Remove(StateChangedArgs.DeviceName); }
+                catch { ViewModelLogger.WriteLog("WARNING: COULD NOT REMOVE DEVICE INSTANCE FROM LIST OF INSTALLED DEVICES!", LogType.WarnLog); }
+
+                // Store new value here.
+                InstalledDevices = InstalledDevices;
+                return;
+            }
+
+            // If the DLL matches here and our device is connected, then we need to append in a new device object.
+            InstalledDevices.Add(StateChangedArgs.DeviceName);
+            InstalledDevices = InstalledDevices;
+            ViewModelLogger.WriteLog("UPDATED NEW LIST OF DEVICES WITH EVENT TRIGGERED DEVICE VALUE!", LogType.WarnLog);
+        }
+        /// <summary>
         /// Populates an observable collection of J2534 Devices for a given input J2534 DLL
         /// </summary>
         /// <param name="DllEntry">DLL to find devices for</param>
         /// <returns>Collection of devices found built</returns>
-        internal ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
+        private ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
         {
             // Log information and pull in our new Device entries for the DLL given if any exist.
             if (DllEntry == null) ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
@@ -74,7 +125,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Log information about pulling and return values.
                 ViewModelLogger.WriteLog("PULLED NEW DEVICES IN WITHOUT ISSUES!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList)}", LogType.InfoLog);
-                return new ObservableCollection<string>(PulledDeviceList);
+
+                return new ObservableCollection<string>(PulledDeviceList.Distinct());
             }
             catch (Exception FindEx)
             {
