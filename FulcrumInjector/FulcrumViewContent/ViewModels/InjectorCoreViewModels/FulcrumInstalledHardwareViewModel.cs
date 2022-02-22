@@ -27,6 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private Control Values
         private J2534Dll _selectedDLL;
+        private string _selectedDevice;
         private ObservableCollection<J2534Dll> _installedDLLs;
         private ObservableCollection<string> _installedDevices;
 
@@ -41,6 +42,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 InstalledDevices = this.PopulateDevicesForDLL(value);
             }
         }
+        // Selected Device Object
+        public string SelectedDevice { get => _selectedDevice; set => PropertyUpdated(value); }
 
         // Current Installed DLL List object and installed Devices for Said DLL
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
@@ -64,8 +67,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Pull in our DLL Entries and our device entries now.
             ViewModelLogger.WriteLog("UPDATING AND IMPORTING CURRENT DLL LIST FOR THIS SYSTEM NOW...", LogType.WarnLog);
             this.InstalledDLLs = new ObservableCollection<J2534Dll>(new PassThruImportDLLs().LocatedJ2534DLLs);
-            if (this.InstalledDLLs.Any(DLLObj => DLLObj.Name.Contains("CarDAQ Plus 3"))) {
-                this.SelectedDLL = this.InstalledDLLs.FirstOrDefault(DLLObj => DLLObj.Name.Contains("CarDAQ Plus 3"));
+            if (this.InstalledDLLs.Any(DLLObj => DLLObj.Name.Contains("CarDAQ-Plus 3"))) {
+                this.SelectedDLL = this.InstalledDLLs.FirstOrDefault(DLLObj => DLLObj.Name.Contains("CarDAQ-Plus 3"));
                 ViewModelLogger.WriteLog("STORED OUR DEFAULT CDP3 DLL INSTANCE OK!", LogType.InfoLog);
             }
 
@@ -107,6 +110,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             InstalledDevices.Add(StateChangedArgs.DeviceName);
             InstalledDevices = InstalledDevices;
             ViewModelLogger.WriteLog("UPDATED NEW LIST OF DEVICES WITH EVENT TRIGGERED DEVICE VALUE!", LogType.WarnLog);
+            
+            // Check if the selected device is null or not.
+            if (this.SelectedDevice != null) { return; }
+            if (this.InstalledDevices.Count == 0) { return; }
+            ViewModelLogger.WriteLog("SELECTING A NEW DEVICE INSTANCE OBJECT NOW!", LogType.InfoLog);
+            this.SelectedDevice = InstalledDevices[0];
+            ViewModelLogger.WriteLog($"PULLED NEW DEVICE NAMED {this.SelectedDevice} FOR OUR NEW DEVICE SELECTION OK!", LogType.InfoLog);
         }
         /// <summary>
         /// Populates an observable collection of J2534 Devices for a given input J2534 DLL
@@ -125,8 +135,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 var PulledDeviceList = DllEntry.FindConnectedDeviceNames();
                 if (PulledDeviceList.Count == 0)
                     throw new InvalidOperationException("FAILED TO FIND ANY DEVICES TO USE FOR OUR J2534 INSTANCE!");
-                        
+
                 // Log information about pulling and return values.
+                this.SelectedDevice = PulledDeviceList[0];
                 ViewModelLogger.WriteLog("PULLED NEW DEVICES IN WITHOUT ISSUES!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList)}", LogType.InfoLog);
 
