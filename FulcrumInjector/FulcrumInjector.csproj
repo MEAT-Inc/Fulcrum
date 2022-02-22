@@ -183,6 +183,9 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml.cs">
+      <DependentUpon>FulcrumVehicleConnectionInfoView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
@@ -193,6 +196,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumLogReviewView.xaml.cs">
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
@@ -273,6 +277,10 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
+    <Page Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -330,6 +338,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

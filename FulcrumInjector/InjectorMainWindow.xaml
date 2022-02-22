@@ -12,7 +12,7 @@
         xmlns:injectorOptionViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
-        Height="725" Width="1200" 
+        Height="800" Width="1200" 
         AllowsTransparency="True"
         ResizeMode="CanMinimize"
         Loaded="InjectorMainWindow_OnLoaded"
@@ -55,7 +55,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height=".6*"/>
                         <RowDefinition Height=".6*"/>
-                        <RowDefinition Height="525"/>
+                        <RowDefinition Height="625"/>
                     </Grid.RowDefinitions>
 
                     <!-- Splitting Borders -->
@@ -77,6 +77,8 @@
                     <!-- OE Apps Installed -->
                     <views1:FulcrumInstalledOeAppsView
                         Grid.Row="2"
+                        Height="625"
+                        VerticalContentAlignment="Stretch"
                         x:Name="FulcrumInstalledOeApps"/>
                 </Grid>
             </Viewbox>
@@ -85,10 +87,20 @@
             <Border Grid.Column="1" Margin="3,0,0,0" Opacity=".75" BorderThickness="0,0,3,0" BorderBrush="{StaticResource TextColorBase}"/>
 
             <!-- Main Content View Box -->
-            <injectorCoreViews:FulcrumHamburgerCoreView 
-                x:Name="FulcrumHamburgerCore"  
-                Grid.Column="2" Margin="5,5"
-                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <Grid Grid.Column="2" Margin="5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height=".15*"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <contentViews:FulcrumVehicleConnectionInfoView 
+                    Grid.Row="0" 
+                    Margin="5,5"
+                    x:Name="FulcrumVehicleConnectionInfo"/>
+                <injectorCoreViews:FulcrumHamburgerCoreView 
+                    Margin="0,5,0,0"
+                    x:Name="FulcrumHamburgerCore"  
+                    Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Grid>
         </Grid>
 
         <!-- About this application flyout -->

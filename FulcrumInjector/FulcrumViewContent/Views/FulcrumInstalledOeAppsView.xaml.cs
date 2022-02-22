@@ -50,6 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
