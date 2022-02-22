@@ -57,21 +57,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP HARDWARE INSTANCE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
-            // Pull refresh times out of the settings file
-            int DLLRefreshTime = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorHardwareRefresh.RefreshDLLsInterval");
-            int DeviceRefreshTime = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorHardwareRefresh.RefreshDevicesInterval");
-
-            // Build new Watchdog for PTDevice instance helpers
+            // Store event handler object
             JBoxEventWatchdog.JBoxStateChanged += StateChangeEventHandler;
-            JBoxEventWatchdog.StartBackgroundRefresh(JVersion.ALL_VERSIONS, DeviceRefreshTime, DLLRefreshTime);
-            ViewModelLogger.WriteLog("STARTING BACKGROUND REFRESH INSTANCE FOR HARDWARE MONITORING NOW...", LogType.InfoLog);
+            ViewModelLogger.WriteLog("SETUP NEW EVENT HANDLER FOR DEVICE SELECTION INPUT CHANGED VALUES!", LogType.InfoLog);
 
             // Pull in our DLL Entries and our device entries now.
             ViewModelLogger.WriteLog("UPDATING AND IMPORTING CURRENT DLL LIST FOR THIS SYSTEM NOW...", LogType.WarnLog);
             this.InstalledDLLs = new ObservableCollection<J2534Dll>(new PassThruImportDLLs().LocatedJ2534DLLs);
-            ViewModelLogger.WriteLog("DLL ENTRIES UPDATED OK! STORED THEM TO OUR VIEWMODEL FOR DLL IMPORTING CORRECTLY", LogType.InfoLog);
+            if (this.InstalledDLLs.Any(DLLObj => DLLObj.Name.Contains("CarDAQ Plus 3"))) {
+                this.SelectedDLL = this.InstalledDLLs.FirstOrDefault(DLLObj => DLLObj.Name.Contains("CarDAQ Plus 3"));
+                ViewModelLogger.WriteLog("STORED OUR DEFAULT CDP3 DLL INSTANCE OK!", LogType.InfoLog);
+            }
 
             // Log completed setup.
+            ViewModelLogger.WriteLog("DLL ENTRIES UPDATED OK! STORED THEM TO OUR VIEWMODEL FOR DLL IMPORTING CORRECTLY", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETUP NEW VIEW MODEL FOR HARDWARE INSTANCE VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("CONTENT ON THE VIEW SHOULD REFLECT THE SHARPWRAP HARDWARE LISTING!", LogType.InfoLog);
         }
@@ -86,7 +85,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private void StateChangeEventHandler(object StateChangedHandler, JBoxStateEventArgs StateChangedArgs)
         {
             // Check if the device is connected or not first and see if the DLL is in our list of installed DLLs.
-            Tuple<J2534Dll, PassThruStructs.SDevice[]> SenderCast = (Tuple<J2534Dll, PassThruStructs.SDevice[]>)StateChangedHandler;
+            Tuple<J2534Dll, string[]> SenderCast = (Tuple<J2534Dll, string[]>)StateChangedHandler;
             
             // If the current DLL is not matching the DLL of the sending device, return.
             if (!_installedDLLs.Contains(SenderCast.Item1)) _installedDLLs.Add(SenderCast.Item1);
@@ -118,7 +117,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         {
             // Log information and pull in our new Device entries for the DLL given if any exist.
             if (DllEntry == null) ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
-
+            
             // Try and get devices here.
             try
             {
@@ -131,6 +130,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("PULLED NEW DEVICES IN WITHOUT ISSUES!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList)}", LogType.InfoLog);
 
+                // Pull refresh times out of the settings file
+                int DLLRefreshTime = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorHardwareRefresh.RefreshDLLsInterval");
+                int DeviceRefreshTime = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorHardwareRefresh.RefreshDevicesInterval");
+
+                // Build new Watchdog for PTDevice instance helpers
+                JBoxEventWatchdog.StartBackgroundRefresh(this.SelectedDLL.Name, JVersion.ALL_VERSIONS, DeviceRefreshTime, DLLRefreshTime);
+                ViewModelLogger.WriteLog("STARTING BACKGROUND REFRESH INSTANCE FOR HARDWARE MONITORING NOW...", LogType.InfoLog);
+
+                // Return our build list of objects here
                 return new ObservableCollection<string>(PulledDeviceList.Distinct());
             }
             catch (Exception FindEx)

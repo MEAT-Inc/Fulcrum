@@ -91,14 +91,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         /// <summary>
         /// Begins a background refreshing operation for the given params
         /// </summary>
+        /// <param name="DLLNameFilter">Name of the DLL to filter device entries with</param>
         /// <param name="Version">Filter by this version only</param>
         /// <param name="DeviceRefreshInterval">Refresh delay after each loop</param>
         /// <param name="DLLRefreshInterval">Refresh time for DLL Entries on the system</param>
-        public static void StartBackgroundRefresh(JVersion Version = JVersion.ALL_VERSIONS, int DeviceRefreshInterval = 500, int DLLRefreshInterval = 0)
+        public static void StartBackgroundRefresh(string DLLNameFilter = "*", JVersion Version = JVersion.ALL_VERSIONS, int DeviceRefreshInterval = 2500, int DLLRefreshInterval = 0)
         {
             // Check to see if this is running or not.
             if (_refreshTokenSource != null) {
-                JBoxSniffLogger.WriteLog("CAN NOT INVOKE A NEW REFRESH METHOD WHILE OLD ONES ARE RUNNING! STOP THIS TASK FIRST!", LogType.ErrorLog);
+                JBoxSniffLogger.WriteLog("STOPPING PREVIOUS SESSION FIRST!", LogType.WarnLog);
+                _refreshTokenSource.Cancel();
+
+                // Build new token sources
+                StopBackgroundRefresh(); 
+                JBoxSniffLogger.WriteLog("BUILT NEW TOKEN OBJECTS FOR TASK SESSION CORRECTLY!", LogType.InfoLog);
                 return;
             }
 
@@ -111,13 +117,24 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
             JBoxSniffLogger.WriteLog("--> REFRESHING DEVICE AND DLL LIST CONTENTS NOW...", LogType.InfoLog);
             var DllInstanceList = RefreshInstalledDllInstances(Version);
             var DeviceInstanceList = DllInstanceList.Select(DllObj =>
-                    new Tuple<J2534Dll, PassThruStructs.SDevice[]>(DllObj, DllObj.FindConnectedSDevices().ToArray()))
-                .ToArray();
+            {
+                // Check for filtering in use or not.
+                if (DLLNameFilter != "*" && !DllObj.Name.Contains(DLLNameFilter))
+                    return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
+
+                // If we're on the Fulcrum DLL, return nothing to avoid spamming PopupBoxes
+                if (DllObj.Name.Contains("Fulcrum") || DllObj.Name.Contains("BlueLink"))
+                    return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
+
+                // Find our connected Device list here
+                var DeviceListBuilt = DllObj.FindConnectedDeviceNames() ?? new List<string>();
+                return new Tuple<J2534Dll, string[]>(DllObj, DeviceListBuilt.ToArray());
+            }).ToArray();
 
             // Fire events for ALL DEVICES ON first loop event
             foreach (var DeviceSet in DeviceInstanceList) 
                 foreach (var DevObj in DeviceSet.Item2) 
-                    _fireDeviceStateEvent(DeviceSet, DevObj.DeviceName, true);
+                    _fireDeviceStateEvent(DeviceSet, DevObj, true);
             JBoxSniffLogger.WriteLog("--> INVOKED BASE EVENT OBJECTS FOR ALL CURRENT DEVICES OK!", LogType.InfoLog);
 
             // Now kickoff our background task instance
@@ -134,18 +151,27 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
                     // Check DLL Refresh requirement
                     if (DLLRefreshInterval != 0 && TimeSinceLastDLLRefresh >= DLLRefreshInterval)
                     {
-                        // Log info about DLL Refresh and run it
+                        // Reset timer for the DLL Updating routine. Log information and move on.
+                        TimeSinceLastDLLRefresh = 0;
                         JBoxSniffLogger.WriteLog($"--> REFRESHING DLLS AT INTERVAL OF {DLLRefreshInterval}! TRIGGERING UPDATE NOW...", LogType.TraceLog);
                         DllInstanceList = RefreshInstalledDllInstances(Version);
-
-                        // Reset timer for the DLL Updating routine
-                        TimeSinceLastDLLRefresh = 0;
                     }
 
                     // Update the devices list now
                     var UpdatedDeviceList = DllInstanceList.Select(DllObj =>
-                            new Tuple<J2534Dll, PassThruStructs.SDevice[]>(DllObj, DllObj.FindConnectedSDevices().ToArray()))
-                        .ToArray();
+                    {
+                        // Check for filtering in use or not.
+                        if (DLLNameFilter != "*" && !DllObj.Name.Contains(DLLNameFilter))
+                            return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
+
+                        // If we're on the Fulcrum DLL, return nothing to avoid spamming PopupBoxes
+                        if (DllObj.Name.Contains("Fulcrum") || DllObj.Name.Contains("BlueLink"))
+                            return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
+
+                        // Find our connected Device list here
+                        var DeviceListBuilt = DllObj.FindConnectedDeviceNames() ?? new List<string>();
+                        return new Tuple<J2534Dll, string[]>(DllObj, DeviceListBuilt.ToArray());
+                    }).ToArray();
 
                     // Pull out JUST our device objects.
                     if (UpdatedDeviceList.Length == DeviceInstanceList.Length) { Thread.Sleep(DeviceRefreshInterval); continue; }
@@ -164,7 +190,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
                     {
                         // Build object to be used as our sender and then build event args objects
                         var SendingObject = UpdatedDeviceList.FirstOrDefault(DevSet => DevSet.Item2.Contains(DeviceObj));
-                        _fireDeviceStateEvent(SendingObject, DeviceObj.DeviceName, true);
+                        _fireDeviceStateEvent(SendingObject, DeviceObj, true);
                     }
 
                     // Fire event objects for changed state values for removed instances
@@ -172,7 +198,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
                     {
                         // Build object to be used as our sender and then build event args objects
                         var SendingObject = DeviceInstanceList.FirstOrDefault(DevSet => DevSet.Item2.Contains(DeviceObj));
-                        _fireDeviceStateEvent(SendingObject, DeviceObj.DeviceName, false);
+                        _fireDeviceStateEvent(SendingObject, DeviceObj, false);
                     }
 
                     // Log fired events, wait, and continue on.
@@ -205,7 +231,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         /// </summary>
         /// <param name="SenderObject">DLL And All SDevices for this DLL instance</param>
         /// <param name="DeviceName">Name of device firing our event</param>
-        private static void _fireDeviceStateEvent(Tuple<J2534Dll, PassThruStructs.SDevice[]> SenderObject, string DeviceName, bool IsConnected)
+        private static void _fireDeviceStateEvent(Tuple<J2534Dll, string[]> SenderObject, string DeviceName, bool IsConnected)
         {
             // Setup new Event and fire it off.
             EventHandler<JBoxStateEventArgs> StateHandler = JBoxStateChanged;
