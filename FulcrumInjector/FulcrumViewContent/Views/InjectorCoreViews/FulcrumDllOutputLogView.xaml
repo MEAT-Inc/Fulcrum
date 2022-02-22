@@ -28,7 +28,7 @@
     <!-- Logging Output Content View -->
     <Grid Margin="5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="110"/>
+            <RowDefinition Height="95"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -36,7 +36,7 @@
         <!-- Title and information -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height=".50*"/>
+                <RowDefinition Height=".40*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid>

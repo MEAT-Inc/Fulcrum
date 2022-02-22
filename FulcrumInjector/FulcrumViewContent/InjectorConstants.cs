@@ -49,6 +49,18 @@ namespace FulcrumInjector.FulcrumViewContent
             set => FulcrumTitleView.ViewModel = value;
         }
 
+        // Connected Vehicle information View and ViewModel
+        public static FulcrumVehicleConnectionInfoView FulcrumVehicleConnectionInfoView
+        {
+            get => InjectorMainWindow.FulcrumVehicleConnectionInfo;
+            set => InjectorMainWindow.FulcrumVehicleConnectionInfo = value;
+        }
+        public static FulcrumVehicleConnectionInfoViewModel FulcrumVehicleConnectionInfoViewModel
+        {
+            get => FulcrumVehicleConnectionInfoView.ViewModel;
+            set => FulcrumVehicleConnectionInfoView.ViewModel = value;
+        }
+
         // Test DLL Injector View and ViewModel
         public static FulcrumDllInjectionTestView FulcrumDllInjectionTestView
         {
