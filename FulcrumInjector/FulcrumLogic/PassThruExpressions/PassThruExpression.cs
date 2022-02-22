@@ -66,6 +66,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruExpressions
                 FieldInfo InvokerField = (FieldInfo)MemberObj;
                 string CurrentValue = InvokerField.GetValue(this).ToString().Trim();
 
+                // Trim the length of the string for our output here. If the values are larger than 60 chars across.
+                // Show they are being truncated here as well
+                if (CurrentValue.Length >= 60) CurrentValue = CurrentValue.Substring(0, 49) + " (Truncated)";
+
                 // Now cast the result attribute of the member and store the value of it.
                 var ResultValue = (PtExpressionProperty)MemberObj
                     .GetCustomAttributes(typeof(PtExpressionProperty))

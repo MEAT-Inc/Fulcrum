@@ -80,6 +80,7 @@
 
                 <!-- DLL Entries -->
                 <ListBox Grid.IsSharedSizeScope="True" Grid.Row="1" 
+                         SelectedItem="{Binding SelectedDLL}"
                          x:Name="InstalledDLLsListBox" Margin="0,5,0,0" 
                          SelectionChanged="InstalledDLLsListBox_OnSelectionChanged"
                          Style="{StaticResource HardwareContentsListBoxStyle}"
