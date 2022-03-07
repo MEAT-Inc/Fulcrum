@@ -12,6 +12,7 @@ using SharpLogger.LoggerSupport;
 using SharpWrap2534;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruImport;
+using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
@@ -84,10 +85,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
         /// <summary>
         /// Consumes our active device and begins a voltage reading routine.
-        /// <param name="RefreshSource">Cancel source for stopping the refreshing routine.</param>
         /// </summary>
         /// <returns>True if consumed, false if not.</returns>
-        public bool ConsumeSelectedDevice()
+        public bool StartVoltageMonitoring()
         {
             // Check if the refresh source is null or not. If it's not, we stop the current instance object.
             if (this.InstanceSession != null && this.RefreshSource != null) {
@@ -114,19 +114,37 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
                 while (!this.RefreshSource.IsCancellationRequested)
                 {
+                    // Issue a PTClose, PTOpen, PTConnect, and read our voltage. Wait 500ms, run again
+                    this.DeviceVoltage = this.RefreshDeviceVoltage();
+                    Thread.Sleep(500);
+                };
+            }, this.RefreshSource.Token);
 
-                }
-            }
+            // TODO: PULL IN VIN NUMBER FROM OUR CAR HERE!
+            //       This block will call our AutoID routine to pull in the VIN of the currently connected car.
+            //       Once pulled, we ping an API For decoding our VIN Numbers and then return the YMM info string of it.
+            //       From here, we can then configure this instance to try and only show OE apps for the given device and vehicle.
+
+            // Log started, return true.
+            ViewModelLogger.WriteLog("LOGGING VOLTAGE TO OUR LOG FILES AND PREPARING TO READ TO VIEW MODEL", LogType.InfoLog);
+            return true;
         }
-
         /// <summary>
         /// Updates our device voltage value based on our currently selected device information
         /// </summary>
         /// <returns>Voltage of the device connected and selected</returns>
-        public double RefreshDeviceVoltage() 
+        private double RefreshDeviceVoltage() 
         {
             // Try and open the device to pull our voltage reading here
-            return 0.00;
+            uint ChannelIdToUse;
+            if (this.InstanceSession.DeviceChannels.All(ChannelObj => ChannelObj == null)) 
+                this.InstanceSession.PTConnect(0, ProtocolId.ISO15765, 0x00, 50000, out ChannelIdToUse);
+            else ChannelIdToUse = this.InstanceSession.DeviceChannels.FirstOrDefault(ChannelObj => ChannelObj != null)!.ChannelId;
+
+            // Now with our new channel ID, we open an instance and pull the channel voltage.
+            this.InstanceSession.PTReadVoltage(out var DoubleVoltage, (int)ChannelIdToUse, true); this.DeviceVoltage = DoubleVoltage;
+            ViewModelLogger.WriteLog($"[{this.InstanceSession.DeviceName}] ::: VOLTAGE: {this.DeviceVoltage}", LogType.TraceLog);
+            return DoubleVoltage;
         }
     }
 }
