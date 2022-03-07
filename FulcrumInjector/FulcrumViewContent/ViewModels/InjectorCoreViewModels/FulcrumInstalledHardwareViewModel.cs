@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
+using FulcrumInjector.FulcrumViewContent.Models.EventModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -40,14 +41,37 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Update property value. Setup new List of DLLs.
                 PropertyUpdated(value);
                 InstalledDevices = this.PopulateDevicesForDLL(value);
+
+                // Fire off updated event 
+                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDevice ?? "No Device!", value.Name ?? "Invalid DLL!"));
+                ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
+
         // Selected Device Object
-        public string SelectedDevice { get => _selectedDevice; set => PropertyUpdated(value); }
+        public string SelectedDevice
+        {
+            get => _selectedDevice;
+            set
+            {
+                // Store class value
+                PropertyUpdated(value);
+
+                // Fire an event for device changed, and set the property value
+                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value ?? "No Device!", this.SelectedDLL.Name ?? "Invalid DLL!"));
+                ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
+            }
+        }
 
         // Current Installed DLL List object and installed Devices for Said DLL
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
         public ObservableCollection<string> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
+
+        // -------------------------------------------------------------------------------------------------------------------------
+
+        // Event triggers for device selection changed data input
+        public event EventHandler<DeviceChangedEventArgs> DeviceOrDllChanged;
+        protected void OnSelectedDeviceChanged(DeviceChangedEventArgs EventArgs) { DeviceOrDllChanged?.Invoke(this, EventArgs); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +93,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.InstalledDLLs = new ObservableCollection<J2534Dll>(new PassThruImportDLLs().LocatedJ2534DLLs);
             if (this.InstalledDLLs.Any(DLLObj => DLLObj.Name.Contains("CarDAQ-Plus 3"))) {
                 this.SelectedDLL = this.InstalledDLLs.FirstOrDefault(DLLObj => DLLObj.Name.Contains("CarDAQ-Plus 3"));
-                ViewModelLogger.WriteLog("STORED OUR DEFAULT CDP3 DLL INSTANCE OK!", LogType.InfoLog);
+                ViewModelLogger.WriteLog("STORED OUR DEFAULT CDP3 DLL AND DEVICE INSTANCE OK!", LogType.InfoLog);
             }
 
             // Log completed setup.
