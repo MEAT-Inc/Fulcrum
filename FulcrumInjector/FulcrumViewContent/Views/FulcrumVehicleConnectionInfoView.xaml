@@ -27,7 +27,7 @@
     <!-- Content For Vehicle Connection -->
     <Grid Background="{StaticResource PrimaryColor_Darker_65}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width=".75*"/>
+            <ColumnDefinition Width=".5*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Border Grid.ColumnSpan="2" BorderBrush="{StaticResource SecondaryColor_Lighter_35}" BorderThickness="3" CornerRadius="2"/>
@@ -40,32 +40,23 @@
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" Margin="1">
                 <TextBlock
-                    FontSize="18" FontWeight="DemiBold"
+                    FontSize="15" FontWeight="DemiBold"
                     Text="J2534 Device:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=SelectedDevice}" 
-                           FontSize="18" FontStyle="Italic"
+                           FontSize="15"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </DockPanel>
             <DockPanel Grid.Row="1" Margin="1">
                 <TextBlock
-                    FontSize="18" FontWeight="DemiBold"
+                    FontSize="15" FontWeight="DemiBold"
                     Text="OBD Voltage:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=DeviceVoltage, StringFormat={}{0:F2}v}" 
-                           FontSize="18" FontStyle="Italic"
+                           FontSize="15"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding SelectedDevice}" Value="">
-                                    <Setter Property="Text" Value="N/A"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
                 </TextBlock>
             </DockPanel>
         </Grid>
@@ -81,25 +72,71 @@
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" Margin="1">
                 <TextBlock
-                    FontSize="18" FontWeight="DemiBold"
+                    FontSize="15" FontWeight="DemiBold"
                     Text="VIN:  " Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=VehicleVIN}" 
-                           FontSize="18" FontStyle="Italic"
+                           FontSize="15"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </DockPanel>
             <DockPanel Grid.Row="1" Margin="1">
                 <TextBlock
-                    FontSize="18" FontWeight="DemiBold"
+                    FontSize="15" FontWeight="DemiBold"
                     Text="YMM:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding Path=VehicleInfoString}" 
-                           FontSize="18" FontStyle="Italic"
+                <TextBlock Text="{Binding Path=VehicleInfo}" 
+                           FontSize="15"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center">
                 </TextBlock>
             </DockPanel>
+
+            <!-- Button for icon to start/stop auto id manually -->
+            <Button Grid.Row="0" HorizontalAlignment="Right" 
+                    VerticalAlignment="Center" Grid.RowSpan="2" ToolTip="Auto ID Connected Vehicle"
+                    Width="25" Margin="0,0,15,0" Grid.Column="0" Click="ToggleAutoIdRoutine_Click" 
+                    IsEnabled="{Binding CanManualId}" Background="Transparent">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AutoIdRunning}" Value="True">
+                                <Setter Property="Background" Value="DarkGreen"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding AutoIdRunning}" Value="False">
+                                <Setter Property="Background" Value="Transparent"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Path Margin="0,1,0,0">
+                    <Path.Style>
+                        <Style TargetType="Path">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AutoIdRunning}" Value="True">
+                                    <Setter Property="Fill" Value="Yellow"/>
+                                    <Setter Property="Data">
+                                        <Setter.Value>
+                                            <PathGeometry Figures="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zm-6.106 4.5L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding AutoIdRunning}" Value="False">
+                                    <Setter Property="Fill" Value="{DynamicResource TextColorBase}"/>
+                                    <Setter Property="Data">
+                                        <Setter.Value>
+                                            <PathGeometry Figures="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                        </Setter.Value>
+                                    </Setter>                                
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Path.Style>
+                </Path>
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                </Button.LayoutTransform>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

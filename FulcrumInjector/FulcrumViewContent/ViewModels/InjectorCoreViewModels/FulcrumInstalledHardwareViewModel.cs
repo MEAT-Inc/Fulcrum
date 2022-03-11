@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 InstalledDevices = this.PopulateDevicesForDLL(value);
 
                 // Fire off updated event 
-                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDevice ?? "No Device!", value.Name ?? "Invalid DLL!"));
+                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value, this.SelectedDevice ?? "No Device!"));
                 ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
@@ -59,7 +59,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 PropertyUpdated(value);
 
                 // Fire an event for device changed, and set the property value
-                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value ?? "No Device!", this.SelectedDLL.Name ?? "Invalid DLL!"));
+                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value ?? "No Device!"));
                 ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }

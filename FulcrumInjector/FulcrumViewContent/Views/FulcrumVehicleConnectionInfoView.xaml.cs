@@ -56,9 +56,23 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
+
+            // Setup Default values.
+            this.ViewModel.AutoIdRunning = false;
+            this.ViewLogger.WriteLog("SETUP DEFAULT AUTO ID VALUES FOR MANUAL INVOCATION OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Button control click for when we toggle auto ID on or off manually.
+        /// This does NOT control the setting value for it.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void ToggleAutoIdRoutine_Click(object Sender, RoutedEventArgs E)
+        {
+            // TODO: WRITE LOGIC FOR CONTROLLING AUTO ID ROUTINES
+        }  
     }
 }

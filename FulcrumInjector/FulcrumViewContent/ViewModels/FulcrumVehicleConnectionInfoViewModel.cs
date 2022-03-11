@@ -39,25 +39,52 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private CancellationTokenSource RefreshSource;
 
         // Private control values
+        private JVersion _versionType;         // J2534 Version in use
         private string _selectedDLL;           // Name of the currently selected DLL
         private string _selectedDevice;        // Name of the currently connected and consumed Device
         private double _deviceVoltage;         // Last known voltage value. If no device found, this returns 0.00
         private string _vehicleVIN;            // VIN Of the current vehicle connected
-        private string _vehicleInfoString;     // YMM String of the current vehicle
+        private string _vehicleInfo;           // YMM String of the current vehicle
+        private bool _autoIdRunning;           // Sets if AUTO Id routines are running at this time or not.
+        private bool _canManualId = true;      // Sets if we can start a new manual ID value
 
         // Public values for our view to bind onto 
-        public string SelectedDevice { get => _selectedDevice; set => PropertyUpdated(value); }
-        public double DeviceVoltage { get => _deviceVoltage; set => PropertyUpdated(value); }
         public string VehicleVIN
         {
-            get => _vehicleVIN ?? "No VIN Number"; 
+            get => string.IsNullOrWhiteSpace(_vehicleVIN) ? "No VIN Number" : _vehicleVIN; 
             set => PropertyUpdated(value);
         }            
-        public string VehicleInfoString
+        public string VehicleInfo
         {
-            get => _vehicleInfoString ?? "No VIN Number To Decode"; 
+            get => string.IsNullOrWhiteSpace(_vehicleInfo) ? "No VIN Number To Decode" : _vehicleInfo; 
             set => PropertyUpdated(value);
         }
+        public string SelectedDevice
+        {
+            get => string.IsNullOrWhiteSpace(_selectedDevice) ? "No Device Selected" : _selectedDevice;
+            set 
+            {
+                // Update private value, setup if we can Auto ID now or not.
+                PropertyUpdated(value);
+                this.CanManualId = value == null ? false :   // Enable our Button as long as 
+                    !value.Contains("in use") &&             // Device name does not have in use in it
+                    AutoIdRunning == false;                  // AutoId is not running currently.
+            }
+        }
+        public double DeviceVoltage { get => _deviceVoltage; set => PropertyUpdated(value); }
+
+        // Auto ID control values
+        public bool AutoIdRunning
+        {
+            get => _autoIdRunning;
+            set
+            {
+                // Set the new value and set Can ID to false if value is now true
+                PropertyUpdated(value);
+                this.CanManualId = !value;
+            }
+        }
+        public bool CanManualId { get => _canManualId; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -79,11 +106,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // Build new listener object here.
                 ViewModelLogger.WriteLog("NEW DEVICE CHANGED EVENT PROCESSED!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"--> API VERSION:       {Args.VersionType.ToDescriptionString()}");
                 ViewModelLogger.WriteLog($"--> DEVICE NAME FOUND: {Args.DeviceName}");
                 ViewModelLogger.WriteLog($"--> DLL NAME FOUND:    {Args.DeviceDLL}");
 
                 // Store device and DLL info.
                 this._selectedDLL = Args.DeviceDLL;
+                this._versionType = Args.VersionType;
                 this.SelectedDevice = Args.DeviceName;
                 ViewModelLogger.WriteLog("STORED NEW DEVICE NAME AND DLL NAME OK!", LogType.InfoLog);
 
@@ -115,20 +144,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Consumes our active device and begins a voltage reading routine.
         /// </summary>
         /// <returns>True if consumed, false if not.</returns>
-        public bool StartVehicleMonitoring()
+        public bool StartVehicleMonitoring(bool ForceStart = false)
         {
             // Check if the refresh source is null or not. If it's not, we stop the current instance object.
             if (this.InstanceSession != null && this.RefreshSource != null)
             {
-                ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
-                this.RefreshSource.Cancel();
-                this.InstanceSession.PTClose();
-                this.InstanceSession = null;
-                ViewModelLogger.WriteLog("STOPPED REFRESHING AND KILLED OUR INSTANCE OK!", LogType.InfoLog);
+                // If Force Start is off, then return out.
+                if (!ForceStart) {
+                    ViewModelLogger.WriteLog("UNABLE TO FORCE START A NEW SESSION SINCE AN EXISTING ONE IS CURRENTLY ON!", LogType.ErrorLog);
+                    return false;
+                }
 
-                // Reset the voltage value to nothing.
-                ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
-                this.VehicleVIN = null; this.VehicleInfoString = null; this.DeviceVoltage = 0.00;
+                // If we can do a force start, issue a stop then start again
+                if (!this.StopVehicleMonitoring()) return false;
+                ViewModelLogger.WriteLog("STOPPED VEHICLE AUTO ID SESSION OK! STARTING A NEW ONE NOW...", LogType.InfoLog);
             }
 
             // Check to see if our device is usable or not.
@@ -138,7 +167,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             }
 
             // Now build a new instance for refreshing.
-            this.InstanceSession = new Sharp2534Session(JVersion.V0404, this._selectedDLL, this._selectedDevice);
+            this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
             ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
 
             // Begin refreshing here.
@@ -172,7 +201,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                             // Tick the refresh timer so we don't constantly spam the log once we found a VIN
                             RefreshTimer = 1500;
                             this.VehicleVIN = VinFound;
-                            this.VehicleInfoString = "Not Yet Coded";
+                            this.VehicleInfo = "Not Yet Coded";
                             ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
                             ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
                             ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
@@ -185,7 +214,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         // Log failures and move on. This only happens when a VIN is not found.
                         ViewModelLogger.WriteLog("FAILED TO FIND A NEW VIN NUMBER FOR OUR VEHICLE!", LogType.ErrorLog);
                         this.VehicleVIN = "VIN REQUEST ERROR!";
-                        this.VehicleInfoString = "N/A";
+                        this.VehicleInfo = "N/A";
                     }
 
                     // Check for voltage lost instead of connected.
@@ -197,7 +226,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         // Clear class values here.
                         RefreshTimer = 250;
                         this.VehicleVIN = null;
-                        this.VehicleInfoString = null;
+                        this.VehicleInfo = null;
                         this.DeviceVoltage = NextVoltage;
                         ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
                     }
@@ -210,6 +239,33 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             // Log started, return true.
             ViewModelLogger.WriteLog("LOGGING VOLTAGE TO OUR LOG FILES AND PREPARING TO READ TO VIEW MODEL", LogType.InfoLog);
+            return true;
+        }
+        /// <summary>
+        /// Stops a refresh session. 
+        /// </summary>
+        /// <returns>True if stopped ok. False if not.</returns>
+        public bool StopVehicleMonitoring()
+        {
+            // Check if the refresh source is null or not. If it's not, we stop the current instance object.
+            if (this.InstanceSession == null || this.RefreshSource == null) {
+                ViewModelLogger.WriteLog($"CAN NOT STOP REFRESHING FOR A SESSION THAT IS NOT STARTED!", LogType.ErrorLog);
+                return false;
+            }
+
+            // Reset all values here.
+            ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
+            this.RefreshSource.Cancel();
+            this.InstanceSession.PTClose();
+            ViewModelLogger.WriteLog("STOPPED REFRESHING AND KILLED OUR INSTANCE OK!", LogType.InfoLog);
+
+            // Setup task objects again.
+            this.RefreshSource = null;
+            this.InstanceSession = null;
+
+            // Reset the voltage value to nothing.
+            ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
+            this.VehicleVIN = null; this.VehicleInfo = null; this.DeviceVoltage = 0.00;
             return true;
         }
 
@@ -240,7 +296,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             }
 
             // Now with our new channel ID, we open an instance and pull the channel voltage.
-            this.InstanceSession.PTReadVoltage(out var DoubleVoltage, (int)ChannelIdToUse, true); this.DeviceVoltage = DoubleVoltage;
+            this.InstanceSession.PTReadVoltage(16, out var DoubleVoltage, true); this.DeviceVoltage = DoubleVoltage;
             if (Debugger.IsAttached) ViewModelLogger.WriteLog($"[{this.InstanceSession.DeviceName}] ::: VOLTAGE: {this.DeviceVoltage}", LogType.TraceLog);
 
             // TODO: FIND OUT IF THIS DISCONNECT ROUTINE IS REALLY NEEDED
