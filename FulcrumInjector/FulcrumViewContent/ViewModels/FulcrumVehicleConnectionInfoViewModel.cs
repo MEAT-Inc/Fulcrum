@@ -9,6 +9,7 @@ using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruAutoID;
 using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
 using FulcrumInjector.FulcrumViewContent.Models.EventModels;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -71,6 +72,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             // Attach listeners to our device changed events.
             ViewModelLogger.WriteLog("HOOKED NEW EVENT INSTANCE INTO OUR LISTENER FOR DEVICE CHANGED EVENTS OK!", LogType.InfoLog);
             this.SelectedDevice = InjectorConstants.FulcrumInstalledHardwareViewModel.SelectedDevice;
+
+            // Setup voltage monitoring watchdog event here.
             InjectorConstants.FulcrumInstalledHardwareViewModel.DeviceOrDllChanged += (Sender, Args) =>
             {
                 // Build new listener object here.
@@ -88,8 +91,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ViewModelLogger.WriteLog("STARTING VOLTAGE MONITORING ROUTINE NOW...", LogType.InfoLog);
                 ViewModelLogger.WriteLog("ONCE A VOLTAGE OVER 11.0 IS FOUND, WE WILL TRY TO READ THE VIN OF THE CONNECTED VEHICLE", LogType.InfoLog);
 
+                // Check if we want to use voltage monitoring or not.
+                if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Voltage Monitoring", true))
+                    ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+
                 // Start monitoring. Throw if this fails.
-                if (!this.StartVehicleMonitoring()) throw new InvalidOperationException("FAILED TO START VEHICLE MONITORING ROUTINE!");
+                if (!this.StartVehicleMonitoring()) 
+                    throw new InvalidOperationException("FAILED TO START VEHICLE MONITORING ROUTINE!");
             };
         }
 
@@ -138,6 +146,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         // Log information, pull our vin number, then restart this process using the OnLost value.
                         this.DeviceVoltage = NextVoltage;
                         ViewModelLogger.WriteLog("PULLED NEW VOLTAGE VALUE AND DETECTED INPUT FROM 12V OBD!", LogType.InfoLog);
+
+                        // Make sure we want to use our Auto ID routines
+                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Enable Auto ID", true))
+                            ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+
+                        // Pull our Vin number of out the vehicle now.
                         if (this.RequestVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
                         {
                             // Log information, store these values.
