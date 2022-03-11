@@ -190,7 +190,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                             // Log information, store these values.
                             // Tick the refresh timer so we don't constantly spam the log once we found a VIN
                             this.VehicleVin = VinFound;
-                            this.VehicleInfo = "Not Yet Coded";
                             ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
                             ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
                             ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
@@ -203,7 +202,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         // Log failures and move on. This only happens when a VIN is not found.
                         ViewModelLogger.WriteLog("FAILED TO FIND A NEW VIN NUMBER FOR OUR VEHICLE!", LogType.ErrorLog);
                         this.VehicleVin = "VIN REQUEST ERROR!";
-                        this.VehicleInfo = "N/A";
                     }
 
                     // Check for voltage lost instead of connected.
@@ -215,7 +213,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         // Clear class values here.
                         RefreshTimer = 250;
                         this.VehicleVin = null;
-                        this.VehicleInfo = null;
                         this.DeviceVoltage = NextVoltage;
                         ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
                     }
@@ -250,7 +247,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             // Reset the voltage value to nothing.
             ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
-            this.VehicleVin = null; this.VehicleInfo = null; this.DeviceVoltage = 0.00;
+            this.VehicleVin = null; this.DeviceVoltage = 0.00;
             return true;
         }
 
