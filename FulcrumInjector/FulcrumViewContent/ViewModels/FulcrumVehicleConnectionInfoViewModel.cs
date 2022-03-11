@@ -87,7 +87,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ViewModelLogger.WriteLog("STORED NEW DEVICE NAME AND DLL NAME OK!", LogType.InfoLog);
 
                 // Check to see if the device is usable or not.
-                if (this.SelectedDevice.Contains("in use")) ViewModelLogger.WriteLog("NOT RUNNING ROUTINE FOR VIN PULLING SINCE DEVICE IS IN USE!", LogType.InfoLog);
                 ViewModelLogger.WriteLog("STARTING VOLTAGE MONITORING ROUTINE NOW...", LogType.InfoLog);
                 ViewModelLogger.WriteLog("ONCE A VOLTAGE OVER 11.0 IS FOUND, WE WILL TRY TO READ THE VIN OF THE CONNECTED VEHICLE", LogType.InfoLog);
 
@@ -96,8 +95,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
 
                 // Start monitoring. Throw if this fails.
-                if (!this.StartVehicleMonitoring()) 
-                    throw new InvalidOperationException("FAILED TO START VEHICLE MONITORING ROUTINE!");
+                if (this.StartVehicleMonitoring()) {
+                    ViewModelLogger.WriteLog("STARTED MONITORING ROUTINE OK!", LogType.InfoLog);
+                    ViewModelLogger.WriteLog("WHEN A VOLTAGE OVER 11.0 IS FOUND, A VIN REQUEST WILL BE MADE!", LogType.InfoLog);
+                    return;
+                }
+
+                // Log failures for starting routine here
+                ViewModelLogger.WriteLog("FAILED TO START OUR MONITORING ROUTINES!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("THIS IS LIKELY DUE TO A DEVICE IN USE OR SOMETHING CONSUMING OUR PT INTERFACE!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("IF THE DEVICE IS NOT IN USE AND THIS IS HAPPENING, IT'S LIKELY A BAD DEVICE", LogType.ErrorLog);
             };
         }
 
@@ -121,6 +128,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 // Reset the voltage value to nothing.
                 ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
                 this.VehicleVIN = null; this.VehicleInfoString = null; this.DeviceVoltage = 0.00;
+            }
+
+            // Check to see if our device is usable or not.
+            if (this.SelectedDevice.Contains("in use")) {
+                ViewModelLogger.WriteLog("NOT RUNNING ROUTINE FOR VIN PULLING SINCE DEVICE IS IN USE!", LogType.ErrorLog);
+                return false;
             }
 
             // Now build a new instance for refreshing.
@@ -148,7 +161,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         ViewModelLogger.WriteLog("PULLED NEW VOLTAGE VALUE AND DETECTED INPUT FROM 12V OBD!", LogType.InfoLog);
 
                         // Make sure we want to use our Auto ID routines
-                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Enable Auto ID", true))
+                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true))
                             ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
 
                         // Pull our Vin number of out the vehicle now.
