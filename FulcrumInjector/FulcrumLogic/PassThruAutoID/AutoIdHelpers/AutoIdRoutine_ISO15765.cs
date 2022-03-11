@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdModels;
 using Newtonsoft.Json;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
 
@@ -14,7 +15,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
     /// <summary>
     /// Auto ID routine for an ISO15765 Routine configuration
     /// </summary>
-    public class AutoIdRoutine_ISO15765 : AutoIdInvoker
+    public class AutoIdRoutine_ISO15765 : AutoIdIRoutine
     {
         /// <summary>
         /// Builds a new AutoID routine for ISO15765 channels
@@ -40,12 +41,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
         /// </summary>
         ~AutoIdRoutine_ISO15765()
         {
-            // Log information, close session.
-            this.AutoIdLogger.WriteLog($"DISPOSING INSTANCE OF A {this.GetType().Name} AUTO ID ROUTINE INVOKER NOW...", LogType.WarnLog);
-
             try
             {
-                // Close the session and return.
+                // Log information, close session.
+                this.AutoIdLogger.WriteLog($"DISPOSING INSTANCE OF A {this.GetType().Name} AUTO ID ROUTINE INVOKER NOW...", LogType.WarnLog);
                 if (this.CloseSession()) this.AutoIdLogger.WriteLog("CLOSED SESSION OK! RETURNING NOW...", LogType.InfoLog);
                 else throw new InvalidOperationException("FAILED TO CLOSE SESSION INSTANCE DOWN FOR OUR AUTO ID ROUTINE! THIS IS ODD!");
             }
@@ -84,6 +83,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
             {
                 // Store our types for filters here.
                 FilterDef FilterType = FilterObj.FilterType;
+                ProtocolId FilterProtocol = FilterObj.FilterProtocol;
                 string FilterMask = FilterObj.FilterMask.MessageData;
                 string FilterPattern = FilterObj.FilterPattern.MessageData;
                 string FilterFlowControl = FilterType == FilterDef.FLOW_CONTROL_FILTER ? FilterObj.FilterFlowControl.MessageData : null;
@@ -92,7 +92,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
                 {
                     // Log filter details out and append it into our list of filters.
                     this.AutoIdLogger.WriteLog($"BUILDING FILTER WITH CONTENT: {JsonConvert.SerializeObject(FilterObj, Formatting.None)}", LogType.TraceLog);
-                    var NewFilter = this.SessionInstance.PTStartMessageFilter(FilterType, FilterMask, FilterPattern, FilterFlowControl, (uint)FilterObj.FilterFlags);
+                    var NewFilter = this.SessionInstance.PTStartMessageFilter(
+                        FilterType,                         // Filter Definition
+                        FilterMask,                         // Filter Mask
+                        FilterPattern,                      // Filter Pattern
+                        FilterFlowControl,                  // Filter Flow Control
+                        (uint)FilterObj.FilterFlags,        // Filter Flags
+                        (uint)FilterProtocol                // Filter Protocol
+                    );
 
                     // Log new filter ID, append it into our filter list, and return it.
                     this.AutoIdLogger.WriteLog($"NEW FILTER OBJECT BUILT OK! FILTER ID IS: {NewFilter.FilterId}", LogType.InfoLog);
@@ -131,8 +138,79 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
         /// <returns>True if a VIN is pulled, false if it isn't</returns>
         public override bool RetrieveVinNumber(out string VinNumber)
         {
-            // TODO: Write method content for pulling a VIN on an ISO15765 Channel
-            throw new NotImplementedException();
+            // Assign the VIN number a default blank value
+            VinNumber = null;
+
+            // Start by pulling in our message command contents. Assume the final command issued is the one which will return us a VIN Number.
+            var MessageObjects = this.AutoIdCommands.RoutineCommands.Select(CommandObj =>
+            {
+                // Build a new PT Message from the content of this object
+                var MessageBuilt = J2534Device.CreatePTMsgFromString(
+                    CommandObj.MessageProtocol,
+                    (uint)CommandObj.MessageFlags,
+                    CommandObj.MessageData
+                );
+
+                // Log information, append this object into the list of new messages and move on.
+                this.AutoIdLogger.WriteLog($"BUILT A NEW PASSTHRU COMMAND WITH MESSAGE CONTENT OF {CommandObj.MessageData} OK!", LogType.InfoLog);
+                return MessageBuilt;
+            }).ToArray();
+
+            // Log information and the built messages here.
+            this.AutoIdLogger.WriteLog("BUILT NEW PASSTHUR MESSAGES CORRECTLY! MESSAGES ARE SHOWN BELOW", LogType.InfoLog);
+            this.AutoIdLogger.WriteLog(JsonConvert.SerializeObject(MessageObjects, Formatting.None));
+
+            // Loop all our messages and send them out here.
+            var ResponseMessages = new List<PassThruStructs.PassThruMsg>();
+            foreach (var MessageObject in MessageObjects)
+            {
+                // Send the message, read back 10 messages, and wait for 250ms timeout.
+                if (!this.SessionInstance.PTWriteMessages(MessageObject))
+                    throw new Exception($"FAILED TO SEND MESSAGE ON {this.AutoIdType} CHANNEL!");
+
+                // Print information about our sent message 
+                string SentDataString = BitConverter.ToString(MessageObject.Data);
+                this.AutoIdLogger.WriteLog($"SENT MESSAGE: {SentDataString}", LogType.InfoLog);
+
+                // Read the message back here and store them on our class.
+                var MessagesRead = this.SessionInstance.PTReadMessages(10, 250);
+                this.AutoIdLogger.WriteLog($"READ IN A TOTAL OF {MessagesRead.Length} MESSAGES!", LogType.InfoLog);
+                ResponseMessages.AddRange(MessagesRead);
+
+                // Print out the message contents here.
+                if (MessagesRead.Length == 0) this.AutoIdLogger.WriteLog("ERROR! NO MESSAGES WERE PROCESSED!", LogType.ErrorLog);
+                else
+                {
+                    // Check if the message in use is null or not and print it
+                    int MessageCount = 0;
+                    foreach (var Message in MessagesRead)
+                    {
+                        // Build string value, print it out, tick our counter
+                        var ReadDataString = string.Join(" ", BitConverter.ToString(Message.Data)
+                            .Replace("-", " ")
+                            .Split(' ')
+                            .Select(MsgPart => $"0x{MsgPart}")
+                            .ToArray()
+                        );
+
+                        // Print message contents here.
+                        this.AutoIdLogger.WriteLog($"--> READ MESSAGE {MessageCount}: {ReadDataString}");
+                    }
+                }
+            }
+
+            // Now see if any of our messages are usable for our VIN Number.
+            // 00 00 07 DF 49 02 01 XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+            // Bytes 0-6 are for the response. 7-24 are our VIN Number values.
+            var UsableMessages = ResponseMessages.Where(MsgObj => MsgObj.DataSize >= 24).ToArray();
+            if (UsableMessages.Length == 0) throw new InvalidOperationException("NO USABLE VIN NUMBER RESPONSE WAS FOUND!");
+
+            // Store our VIN Message, convert it to a string, and print it out
+            var VinMessage = UsableMessages[0];
+            string VINValue = Encoding.Default.GetString(VinMessage.Data.Skip(7).ToArray());
+            this.AutoIdLogger.WriteLog($"VIN NUMBER VALUE PULLED: {VINValue}", LogType.InfoLog);
+            this.VinNumberLocated = VINValue;
+            return true;
         }
     }
 }

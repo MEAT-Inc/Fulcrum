@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
     /// Interface base for Auto ID routines which can be used by our connection routine.
     /// This interface lays out a Open, Connect, Read VIN, and Close command.
     /// </summary>
-    public abstract class AutoIdInvoker
+    public abstract class AutoIdIRoutine
     {
         // Logger object for monitoring logger outputs
         protected internal readonly SubServiceLogger AutoIdLogger;
@@ -37,14 +37,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         protected internal Sharp2534Session SessionInstance;
 
         // Result values from our instance.
-        public string VinNumberLocated { get; }
+        public string VinNumberLocated { get; protected set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new connection instance for AutoID
         /// </summary>
-        protected AutoIdInvoker(JVersion ApiVersion, string DllName, string DeviceName, ProtocolId ProtocolValue)
+        protected AutoIdIRoutine(JVersion ApiVersion, string DllName, string DeviceName, ProtocolId ProtocolValue)
         {
             // Store class values here and build our new logger object.
             this.DLL = DllName;
@@ -135,7 +135,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
                 return false;
             }
         }
-
 
         /// <summary>
         /// Connects to a given channel instance using the protocol value given in the class type and the 
