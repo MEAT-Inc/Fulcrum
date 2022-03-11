@@ -178,9 +178,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     {
                         // Log information, pull our vin number, then restart this process using the OnLost value.
                         this.DeviceVoltage = NextVoltage; RefreshTimer = 1500;
-                        ViewModelLogger.WriteLog("PULLED NEW VOLTAGE VALUE AND DETECTED INPUT FROM 12V OBD!", LogType.InfoLog);
-
-                        // Make sure we want to use our Auto ID routines
                         if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true)) {
                             ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
                             continue;
@@ -254,6 +251,59 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Event action for processing a new device state changed event
+        /// </summary>
+        /// <param name="Sender">Sending object</param>
+        /// <param name="Args">Args for changed device</param>
+        private void ProcessDeviceChangedEvent(object Sender, DeviceChangedEventArgs Args)
+        {
+            // Build new listener object here.
+            ViewModelLogger.WriteLog("NEW DEVICE CHANGED EVENT PROCESSED!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"--> API VERSION:       {Args.VersionType.ToDescriptionString()}");
+            ViewModelLogger.WriteLog($"--> DLL NAME FOUND:    {Args.DeviceDLL}");
+            ViewModelLogger.WriteLog($"--> DEVICE NAME FOUND: {Args.DeviceName}");
+
+            // Make sure a device is picked here now.
+            if (Args.DeviceName == null)
+            {
+                ViewModelLogger.WriteLog("NO DEVICE ENTRY PROVIDED! WAITING FOR ONE TO BE GIVEN BEFORE MOVING ON!", LogType.WarnLog);
+                return;
+            }
+
+            // Store device and DLL info then prepare for refresh
+            this._selectedDLL = Args.DeviceDLL;
+            this._versionType = Args.VersionType;
+            this.SelectedDevice = Args.DeviceName;
+            ViewModelLogger.WriteLog("STORED NEW DEVICE NAME AND DLL NAME OK!", LogType.InfoLog);
+
+            // Check if we want to use voltage monitoring or not.
+            if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Vehicle Monitoring", true))
+            {
+                ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+                ViewModelLogger.WriteLog("TRYING TO PULL A VOLTAGE READING ONCE!", LogType.InfoLog);
+                return;
+            }
+
+            // Check to see if the device is usable or not.
+            ViewModelLogger.WriteLog("STARTING VOLTAGE MONITORING ROUTINE NOW...", LogType.InfoLog);
+            ViewModelLogger.WriteLog("ONCE A VOLTAGE OVER 11.0 IS FOUND, WE WILL TRY TO READ THE VIN OF THE CONNECTED VEHICLE", LogType.InfoLog);
+
+            // Start monitoring. Throw if this fails.
+            if (this.StartVehicleMonitoring())
+            {
+                ViewModelLogger.WriteLog("STARTED MONITORING ROUTINE OK!", LogType.InfoLog);
+                ViewModelLogger.WriteLog("WHEN A VOLTAGE OVER 11.0 IS FOUND, A VIN REQUEST WILL BE MADE!", LogType.InfoLog);
+                return;
+            }
+
+            // Log failures for starting routine here
+            ViewModelLogger.WriteLog("FAILED TO START OUR MONITORING ROUTINES!", LogType.ErrorLog);
+            ViewModelLogger.WriteLog("THIS IS LIKELY DUE TO A DEVICE IN USE OR SOMETHING CONSUMING OUR PT INTERFACE!", LogType.ErrorLog);
+            ViewModelLogger.WriteLog("IF THE DEVICE IS NOT IN USE AND THIS IS HAPPENING, IT'S LIKELY A BAD DEVICE", LogType.ErrorLog);
+        }
+
 
         /// <summary>
         /// Updates our device voltage value based on our currently selected device information
@@ -355,58 +405,5 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog($"FAILED TO FIND A VIN NUMBER AFTER SCANNING {UsableTypes.Length} DIFFERENT TYPE PROTOCOLS!", LogType.ErrorLog);
             return false;
         }
-
-        /// <summary>
-        /// Event action for processing a new device state changed event
-        /// </summary>
-        /// <param name="Sender">Sending object</param>
-        /// <param name="Args">Args for changed device</param>
-        private void ProcessDeviceChangedEvent(object Sender, DeviceChangedEventArgs Args)
-        {
-            // Build new listener object here.
-            ViewModelLogger.WriteLog("NEW DEVICE CHANGED EVENT PROCESSED!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"--> API VERSION:       {Args.VersionType.ToDescriptionString()}");
-            ViewModelLogger.WriteLog($"--> DLL NAME FOUND:    {Args.DeviceDLL}");
-            ViewModelLogger.WriteLog($"--> DEVICE NAME FOUND: {Args.DeviceName}");
-
-            // Make sure a device is picked here now.
-            if (Args.DeviceName == null)
-            {
-                ViewModelLogger.WriteLog("NO DEVICE ENTRY PROVIDED! WAITING FOR ONE TO BE GIVEN BEFORE MOVING ON!", LogType.WarnLog);
-                return;
-            }
-
-            // Store device and DLL info then prepare for refresh
-            this._selectedDLL = Args.DeviceDLL;
-            this._versionType = Args.VersionType;
-            this.SelectedDevice = Args.DeviceName;
-            ViewModelLogger.WriteLog("STORED NEW DEVICE NAME AND DLL NAME OK!", LogType.InfoLog);
-
-            // Check if we want to use voltage monitoring or not.
-            if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Vehicle Monitoring", true))
-            {
-                ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
-                ViewModelLogger.WriteLog("TRYING TO PULL A VOLTAGE READING ONCE!", LogType.InfoLog);
-                return;
-            }
-
-            // Check to see if the device is usable or not.
-            ViewModelLogger.WriteLog("STARTING VOLTAGE MONITORING ROUTINE NOW...", LogType.InfoLog);
-            ViewModelLogger.WriteLog("ONCE A VOLTAGE OVER 11.0 IS FOUND, WE WILL TRY TO READ THE VIN OF THE CONNECTED VEHICLE", LogType.InfoLog);
-
-            // Start monitoring. Throw if this fails.
-            if (this.StartVehicleMonitoring())
-            {
-                ViewModelLogger.WriteLog("STARTED MONITORING ROUTINE OK!", LogType.InfoLog);
-                ViewModelLogger.WriteLog("WHEN A VOLTAGE OVER 11.0 IS FOUND, A VIN REQUEST WILL BE MADE!", LogType.InfoLog);
-                return;
-            }
-
-            // Log failures for starting routine here
-            ViewModelLogger.WriteLog("FAILED TO START OUR MONITORING ROUTINES!", LogType.ErrorLog);
-            ViewModelLogger.WriteLog("THIS IS LIKELY DUE TO A DEVICE IN USE OR SOMETHING CONSUMING OUR PT INTERFACE!", LogType.ErrorLog);
-            ViewModelLogger.WriteLog("IF THE DEVICE IS NOT IN USE AND THIS IS HAPPENING, IT'S LIKELY A BAD DEVICE", LogType.ErrorLog);
-        }
-
     }
 }
