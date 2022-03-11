@@ -39,12 +39,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDLL;
             set
             {
-                // Check for value matching or not.
-                if (value == this._selectedDLL) return;
-                JBoxEventWatchdog.StopBackgroundRefresh();
-
                 // Update property value. Setup new List of DLLs.
                 PropertyUpdated(value);
+                JBoxEventWatchdog.StopBackgroundRefresh();
                 InstalledDevices = this.PopulateDevicesForDLL(value);
 
                 // Removed this event since it was causing everything to fire off for no reason.

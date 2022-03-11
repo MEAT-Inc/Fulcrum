@@ -100,7 +100,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
             // Check to see if this is running or not.
             if (_refreshTokenSource != null) {
                 JBoxSniffLogger.WriteLog("STOPPING PREVIOUS SESSION FIRST!", LogType.WarnLog);
-                _refreshTokenSource.Cancel();
 
                 // Build new token sources
                 StopBackgroundRefresh(); 

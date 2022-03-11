@@ -73,16 +73,16 @@
             <DockPanel Grid.Row="0" Margin="1">
                 <TextBlock
                     FontSize="14" FontWeight="DemiBold"
-                    Text="VIN:   " Padding="10"
+                    Text="VIN:  " Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=VehicleVin}" 
-                           FontSize="15"
+                           FontSize="14"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </DockPanel>
             <DockPanel Grid.Row="1" Margin="1">
                 <TextBlock
-                    FontSize="15" FontWeight="DemiBold"
+                    FontSize="14" FontWeight="DemiBold"
                     Text="YMM:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=VehicleInfo}" 
