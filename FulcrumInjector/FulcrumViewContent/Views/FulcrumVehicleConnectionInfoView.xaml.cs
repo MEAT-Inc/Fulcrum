@@ -56,10 +56,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
             this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
-
-            // Setup Default values.
-            this.ViewModel.AutoIdRunning = false;
-            this.ViewLogger.WriteLog("SETUP DEFAULT AUTO ID VALUES FOR MANUAL INVOCATION OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -72,7 +68,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <param name="E"></param>
         private void ToggleAutoIdRoutine_Click(object Sender, RoutedEventArgs E)
         {
-            // TODO: WRITE LOGIC FOR CONTROLLING AUTO ID ROUTINES
-        }  
+            // Trigger our updating routine.
+            this.ViewLogger.WriteLog("ATTEMPTING MANUAL TRIGGER FOR AUTO ID NOW...", LogType.InfoLog);
+            if (!this.ViewModel.ReadVoltageAndVin()) this.ViewLogger.WriteLog("FAILED TO PULL VIN OR VOLTAGE VALUE!", LogType.ErrorLog);
+            else this.ViewLogger.WriteLog("PULLED AND POPULATED NEW VOLTAGE AND VIN VALUES OK!", LogType.InfoLog);
+        }
     }
 }

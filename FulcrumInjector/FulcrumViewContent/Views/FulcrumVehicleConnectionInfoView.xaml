@@ -27,7 +27,7 @@
     <!-- Content For Vehicle Connection -->
     <Grid Background="{StaticResource PrimaryColor_Darker_65}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width=".5*"/>
+            <ColumnDefinition Width=".75*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Border Grid.ColumnSpan="2" BorderBrush="{StaticResource SecondaryColor_Lighter_35}" BorderThickness="3" CornerRadius="2"/>
@@ -40,21 +40,21 @@
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" Margin="1">
                 <TextBlock
-                    FontSize="15" FontWeight="DemiBold"
+                    FontSize="14" FontWeight="DemiBold"
                     Text="J2534 Device:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=SelectedDevice}" 
-                           FontSize="15"
+                           FontSize="14"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </DockPanel>
             <DockPanel Grid.Row="1" Margin="1">
                 <TextBlock
-                    FontSize="15" FontWeight="DemiBold"
-                    Text="OBD Voltage:" Padding="10"
+                    FontSize="14" FontWeight="DemiBold"
+                    Text="OBD Voltage: " Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=DeviceVoltage, StringFormat={}{0:F2}v}" 
-                           FontSize="15"
+                           FontSize="14"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center">
                 </TextBlock>
@@ -72,10 +72,10 @@
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" Margin="1">
                 <TextBlock
-                    FontSize="15" FontWeight="DemiBold"
-                    Text="VIN:  " Padding="10"
+                    FontSize="14" FontWeight="DemiBold"
+                    Text="VIN:   " Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding Path=VehicleVIN}" 
+                <TextBlock Text="{Binding Path=VehicleVin}" 
                            FontSize="15"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -86,7 +86,7 @@
                     Text="YMM:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=VehicleInfo}" 
-                           FontSize="15"
+                           FontSize="14"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center">
                 </TextBlock>

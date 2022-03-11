@@ -39,13 +39,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDLL;
             set
             {
+                // Check for value matching or not.
+                if (value == this._selectedDLL) return;
+                JBoxEventWatchdog.StopBackgroundRefresh();
+
                 // Update property value. Setup new List of DLLs.
                 PropertyUpdated(value);
                 InstalledDevices = this.PopulateDevicesForDLL(value);
 
+                // Removed this event since it was causing everything to fire off for no reason.
+                // Really this was an issue when we had no device but did have a DLL picked
+
                 // Fire off updated event 
-                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value, this.SelectedDevice ?? "No Device!"));
-                ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
+                // this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value, this.SelectedDevice ?? "No Device!"));
+                // ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
 
@@ -55,8 +62,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDevice;
             set
             {
-                // Store class value
+                // Check if we lost our value or not. This will setup a new refresh routine on the DLL
+                if (value == null) {
+                    this.SelectedDLL = this._selectedDLL;
+                    return;
+                }
+
+                // Store class value. Stop background refreshing once we find a device
                 PropertyUpdated(value);
+                JBoxEventWatchdog.StopBackgroundRefresh();
 
                 // Fire an event for device changed, and set the property value
                 this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value ?? "No Device!"));
@@ -170,7 +184,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     throw new InvalidOperationException("FAILED TO FIND ANY DEVICES TO USE FOR OUR J2534 INSTANCE!");
 
                 // Log information about pulling and return values.
-                this.SelectedDevice = PulledDeviceList[0];
+                // this.SelectedDevice = PulledDeviceList[0];
                 ViewModelLogger.WriteLog("PULLED NEW DEVICES IN WITHOUT ISSUES!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList)}", LogType.InfoLog);
 
