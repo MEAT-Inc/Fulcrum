@@ -239,12 +239,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ChannelIdToUse = ChannelObject.ChannelId;
             }
 
-            // Now with our new channel ID, we open an instance and pull the channel voltage, then disconnect and return voltage value
+            // Now with our new channel ID, we open an instance and pull the channel voltage.
             this.InstanceSession.PTReadVoltage(out var DoubleVoltage, (int)ChannelIdToUse, true); this.DeviceVoltage = DoubleVoltage;
             if (Debugger.IsAttached) ViewModelLogger.WriteLog($"[{this.InstanceSession.DeviceName}] ::: VOLTAGE: {this.DeviceVoltage}", LogType.TraceLog);
-            this.InstanceSession.PTDisconnect(ChannelIndex);
 
-            // Return the new voltage value as a double (Example: 11.1)
+            // TODO: FIND OUT IF THIS DISCONNECT ROUTINE IS REALLY NEEDED
+            // Disconnect channel, and return the new voltage value as a double (Example: 11.1)
+            this.InstanceSession.PTDisconnect(ChannelIndex);
             return DoubleVoltage;
         }
         /// <summary>
