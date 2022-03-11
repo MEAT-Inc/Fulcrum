@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         // Task objects and events
-        private static CancellationToken _refreshToken;
+        private static bool _isRefreshing;
         private static CancellationTokenSource _refreshTokenSource;
         public static event EventHandler<JBoxStateEventArgs> JBoxStateChanged;
 
@@ -98,18 +98,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         public static void StartBackgroundRefresh(string DLLNameFilter = "*", JVersion Version = JVersion.ALL_VERSIONS, int DeviceRefreshInterval = 2500, int DLLRefreshInterval = 0)
         {
             // Check to see if this is running or not.
-            if (_refreshTokenSource != null) {
-                JBoxSniffLogger.WriteLog("STOPPING PREVIOUS SESSION FIRST!", LogType.WarnLog);
-
-                // Build new token sources
-                StopBackgroundRefresh(); 
-                JBoxSniffLogger.WriteLog("BUILT NEW TOKEN OBJECTS FOR TASK SESSION CORRECTLY!", LogType.InfoLog);
+            if (_isRefreshing) {
+                JBoxSniffLogger.WriteLog("YOU MUST STOP THE PREVIOUS SESSION FIRST!", LogType.WarnLog);
                 return;
             }
 
             // Build a list of our parameters for search refresh objects 
-            DateTime TimeStarted = DateTime.Now;
-            _refreshTokenSource = new CancellationTokenSource(); _refreshToken = _refreshTokenSource.Token;
+            _isRefreshing = true;
+            DateTime TimeStarted = DateTime.Now; 
+            _refreshTokenSource = new CancellationTokenSource();
             JBoxSniffLogger.WriteLog("BUILDING UP NEW BACKGROUND REFRESH INSTANCE FOR OUR JBOX FINDER NOW...", LogType.WarnLog);
 
             // Now Fill in our DLL List and begin checking for devices.
@@ -141,7 +138,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
             {
                 // Now begin looping value refreshing
                 var TimeSinceLastDLLRefresh = 0;
-                while (!_refreshToken.IsCancellationRequested)
+                while (!_refreshTokenSource.Token.IsCancellationRequested && _isRefreshing)
                 {
                     // Pull device instances, check if any exist. If they do, fire off new events
                     var ElapsedTime = DateTime.Now - TimeStarted;
@@ -205,7 +202,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
                     JBoxSniffLogger.WriteLog($"--> WAITING FOR {DeviceRefreshInterval}ms BEFORE MOVING TO NEXT REFRESH ITERATION...", LogType.TraceLog);
                     Thread.Sleep(DeviceRefreshInterval);
                 }
-            }, _refreshToken);
+            }, _refreshTokenSource.Token);
         }
         /// <summary>
         /// Stops our refresh operation for the new 
@@ -213,14 +210,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         public static void StopBackgroundRefresh()
         {           
             // Check to see if this is running or not.
-            if (_refreshTokenSource == null) {
+            if (!_isRefreshing) {
                 JBoxSniffLogger.WriteLog("CAN NOT STOP A REFRESH METHOD THAT HAS NEVER BEEN STARTED!", LogType.ErrorLog);
                 return;
             }
 
             // Stop the method here.
             JBoxSniffLogger.WriteLog("STOPPING REFRESH OPERATIONS NOW...", LogType.InfoLog);
-            _refreshTokenSource.Cancel(); _refreshTokenSource = null; _refreshToken = default;
+            _refreshTokenSource.Cancel(); _isRefreshing = false;
             JBoxSniffLogger.WriteLog("STOPPED OPERATIONS WITHOUT ISSUES! READY TO STARTUP ANOTHER ONE!", LogType.InfoLog);
         }
 

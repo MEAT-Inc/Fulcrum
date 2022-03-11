@@ -41,15 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Update property value. Setup new List of DLLs.
                 PropertyUpdated(value);
-                JBoxEventWatchdog.StopBackgroundRefresh();
                 InstalledDevices = this.PopulateDevicesForDLL(value);
-
-                // Removed this event since it was causing everything to fire off for no reason.
-                // Really this was an issue when we had no device but did have a DLL picked
-
-                // Fire off updated event 
-                // this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value, this.SelectedDevice ?? "No Device!"));
-                // ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
 
@@ -70,7 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 JBoxEventWatchdog.StopBackgroundRefresh();
 
                 // Fire an event for device changed, and set the property value
-                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value ?? "No Device!"));
+                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value));
                 ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
@@ -154,13 +146,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             InstalledDevices.Add(StateChangedArgs.DeviceName);
             InstalledDevices = InstalledDevices;
             ViewModelLogger.WriteLog("UPDATED NEW LIST OF DEVICES WITH EVENT TRIGGERED DEVICE VALUE!", LogType.WarnLog);
-            
-            // Check if the selected device is null or not.
-            if (this.SelectedDevice != null) { return; }
-            if (this.InstalledDevices.Count == 0) { return; }
-            ViewModelLogger.WriteLog("SELECTING A NEW DEVICE INSTANCE OBJECT NOW!", LogType.InfoLog);
-            this.SelectedDevice = InstalledDevices[0];
-            ViewModelLogger.WriteLog($"PULLED NEW DEVICE NAMED {this.SelectedDevice} FOR OUR NEW DEVICE SELECTION OK!", LogType.InfoLog);
         }
         /// <summary>
         /// Populates an observable collection of J2534 Devices for a given input J2534 DLL
