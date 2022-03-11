@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -220,15 +221,30 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <returns>Voltage of the device connected and selected</returns>
         private double RefreshDeviceVoltage() 
         {
-            // Try and open the device to pull our voltage reading here
-            uint ChannelIdToUse;
-            if (this.InstanceSession.DeviceChannels.All(ChannelObj => ChannelObj == null)) 
-                this.InstanceSession.PTConnect(0, ProtocolId.ISO15765, 0x00, 50000, out ChannelIdToUse);
-            else ChannelIdToUse = this.InstanceSession.DeviceChannels.FirstOrDefault(ChannelObj => ChannelObj != null)!.ChannelId;
+            // TODO: FIND OUT IF WE CAN ISSUE VOLTAGE COMMANDS WITHOUT OPENING A CHANNEL!
+            // If this is possible, our reading routine will clear out quite nicely.
 
-            // Now with our new channel ID, we open an instance and pull the channel voltage.
+            // Try and open the device to pull our voltage reading here
+            uint ChannelIdToUse; int ChannelIndex = 0;
+            if (this.InstanceSession.DeviceChannels.All(ChannelObj => ChannelObj == null)) 
+                this.InstanceSession.PTConnect(ChannelIndex, ProtocolId.ISO15765, 0x00, 50000, out ChannelIdToUse);
+            else 
+            {
+                // Store channel object values based on current instance.
+                var ChannelObject = this.InstanceSession.DeviceChannels.FirstOrDefault(ChannelObj => ChannelObj != null);
+                if (ChannelObject == null) throw new NullReferenceException("ERROR! FAILED TO FIND A CHANNEL THAT WAS NOT NULL FOR OUR DEVICE INSTANCE!");
+
+                // Once the channel passes our null check, store values
+                ChannelIndex = ChannelObject.ChannelIndex;
+                ChannelIdToUse = ChannelObject.ChannelId;
+            }
+
+            // Now with our new channel ID, we open an instance and pull the channel voltage, then disconnect and return voltage value
             this.InstanceSession.PTReadVoltage(out var DoubleVoltage, (int)ChannelIdToUse, true); this.DeviceVoltage = DoubleVoltage;
-            ViewModelLogger.WriteLog($"[{this.InstanceSession.DeviceName}] ::: VOLTAGE: {this.DeviceVoltage}", LogType.TraceLog);
+            if (Debugger.IsAttached) ViewModelLogger.WriteLog($"[{this.InstanceSession.DeviceName}] ::: VOLTAGE: {this.DeviceVoltage}", LogType.TraceLog);
+            this.InstanceSession.PTDisconnect(ChannelIndex);
+
+            // Return the new voltage value as a double (Example: 11.1)
             return DoubleVoltage;
         }
         /// <summary>
