@@ -114,9 +114,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             // Now build our session instance and pull voltage first.
             if (this.IsMonitoring) this.StopVehicleMonitoring();
             this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
-            ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog); 
+            ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
 
             // Store voltage value, log information. If voltage is less than 11.0, then exit.
+            this.InstanceSession.PTOpen();
             this.DeviceVoltage = this.ReadDeviceVoltage();
             if (this.DeviceVoltage < 11.0) {
                 ViewModelLogger.WriteLog("ERROR! VOLTAGE VALUE IS LESS THAN THE ACCEPTABLE 11.0V CUTOFF! NOT AUTO IDENTIFYING THIS CAR!", LogType.ErrorLog);
@@ -163,6 +164,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             Task.Run(() =>
             {
                 // Log starting and refresh voltage at an interval of 500ms while the task is valid.
+                this.InstanceSession.PTOpen();
                 int RefreshTimer = 500; IsMonitoring = true;
                 ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
                 while (!this.RefreshSource.IsCancellationRequested)
@@ -259,11 +261,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <returns>Voltage of the device connected and selected</returns>
         private double ReadDeviceVoltage() 
         {
-            // TODO: FIND OUT IF WE CAN ISSUE VOLTAGE COMMANDS WITHOUT OPENING A CHANNEL!
-            // If this is possible, our reading routine will clear out quite nicely.
+            // Make sure our device is opened here.
+            uint ChannelIdToUse; int ChannelIndex = 0;
 
             // Try and open the device to pull our voltage reading here
-            uint ChannelIdToUse; int ChannelIndex = 0;
+            if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
             if (this.InstanceSession.DeviceChannels.All(ChannelObj => ChannelObj == null)) 
                 this.InstanceSession.PTConnect(ChannelIndex, ProtocolId.ISO15765, 0x00, 50000, out ChannelIdToUse);
 
