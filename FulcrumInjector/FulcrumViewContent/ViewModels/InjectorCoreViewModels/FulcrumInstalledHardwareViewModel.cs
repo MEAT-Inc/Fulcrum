@@ -51,14 +51,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDevice;
             set
             {
-                // Check if we lost our value or not. This will setup a new refresh routine on the DLL
-                if (value == null) {
-                    this.SelectedDLL = this._selectedDLL;
-                    return;
-                }
-
                 // Store class value. Stop background refreshing once we find a device
-                PropertyUpdated(value);
+                PropertyUpdated(value); 
                 JBoxEventWatchdog.StopBackgroundRefresh();
 
                 // Fire an event for device changed, and set the property value
