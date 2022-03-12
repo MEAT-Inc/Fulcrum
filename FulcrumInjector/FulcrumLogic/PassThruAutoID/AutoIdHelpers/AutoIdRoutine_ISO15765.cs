@@ -71,7 +71,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
                 this.AutoIdType,                            // Type of protocol for scanning
                 (uint)this.AutoIdCommands.ConnectFlags,     // Connection Flags
                 (uint)this.AutoIdCommands.ConnectBaud,      // BaudRate value (ISO15765_50000)
-                out ChannelId                       // Channel ID pulled from the open routine
+                out ChannelId                               // Channel ID pulled from the open routine
             );
 
             // Log information about the newly issued command objects.
