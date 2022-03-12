@@ -260,18 +260,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog($"--> DLL NAME FOUND:    {Args.DeviceDLL}");
             ViewModelLogger.WriteLog($"--> DEVICE NAME FOUND: {Args.DeviceName}");
 
-            // Make sure a device is picked here now.
-            if (Args.DeviceName == null) {
-                ViewModelLogger.WriteLog("NO DEVICE ENTRY PROVIDED! WAITING FOR ONE TO BE GIVEN BEFORE MOVING ON!", LogType.WarnLog);
-                return;
-            }
-
-            // Make sure a NEW name is given here.
-            if (Args.DeviceName == this.SelectedDevice) {
-                ViewModelLogger.WriteLog("NOT FIRING A NEW DEVICE EVENT ARG SINCE THE SAME DEVICE ENTRY ALREADY IS SELECTED!", LogType.WarnLog);
-                return;
-            }
-
             // Store device and DLL info then prepare for refresh
             this._selectedDLL = Args.DeviceDLL;
             this._versionType = Args.VersionType;
@@ -290,7 +278,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("ONCE A VOLTAGE OVER 11.0 IS FOUND, WE WILL TRY TO READ THE VIN OF THE CONNECTED VEHICLE", LogType.InfoLog);
 
             // Start monitoring. Throw if this fails.
-            if (IsMonitoring) return;
+            if (IsMonitoring) this.StopVehicleMonitoring();
             if (this.StartVehicleMonitoring()) {
                 ViewModelLogger.WriteLog("STARTED MONITORING ROUTINE OK!", LogType.InfoLog);
                 ViewModelLogger.WriteLog("WHEN A VOLTAGE OVER 11.0 IS FOUND, A VIN REQUEST WILL BE MADE!", LogType.InfoLog);
