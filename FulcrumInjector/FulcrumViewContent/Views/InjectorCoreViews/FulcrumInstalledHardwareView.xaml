@@ -35,7 +35,7 @@
         <!-- Title and information block -->
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="35"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Installed J2534 Hardware" Style="{StaticResource TitleStringText}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -67,7 +67,7 @@
                 <!-- Information Text and title -->
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="25"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Located DLLs" Style="{StaticResource HardwareTypeTitleStyle}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -173,7 +173,7 @@
                 <!-- Information Text and title -->
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="25"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Detected Devices" Style="{StaticResource HardwareTypeTitleStyle}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -186,12 +186,23 @@
 
                 <!-- Device Entries -->
                 <ListBox Grid.Row="1" Margin="0,5,0,0" 
-                         x:Name="InstalledDevicesListBox"
-                         Style="{StaticResource HardwareContentsListBoxStyle}"
-                         ItemsSource="{Binding InstalledDevices}">
+                             x:Name="InstalledDevicesListBox"
+                             SelectedItem="{Binding SelectedDevice}"
+                             Style="{StaticResource HardwareContentsListBoxStyle}"
+                             ItemsSource="{Binding InstalledDevices}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
+                            <!-- 
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width=".5*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding}" FontSize="14" Padding="5"/>
+                                <Button Grid.Column="1" Content="Release Device" Style="{StaticResource ActionButtonStyle}"/>
+                            </Grid>
+                            -->
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

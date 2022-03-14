@@ -112,13 +112,13 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.2.10.7.120\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.2.14.5.134\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.2.10.7.120\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.2.14.5.134\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=2.10.7.122, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.2.10.7.120\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=2.14.5.134, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534.2.14.5.134\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
@@ -158,6 +158,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdHelpers\AutoIdRoutine_ISO15765.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdRoutine.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdObjects.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdIRoutine.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
@@ -169,6 +173,7 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruWatchdog\JBoxEventWatchdog.cs" />
     <Compile Include="FulcrumLogic\PassThruWatchdog\JBoxStateEventArgs.cs" />
+    <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
@@ -183,6 +188,9 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml.cs">
+      <DependentUpon>FulcrumVehicleConnectionInfoView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
@@ -193,6 +201,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumLogReviewView.xaml.cs">
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
@@ -273,6 +282,10 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
+    <Page Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -330,6 +343,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
