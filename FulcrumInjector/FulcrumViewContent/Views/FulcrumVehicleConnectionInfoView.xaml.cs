@@ -60,5 +60,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Button control click for when we toggle auto ID on or off manually.
+        /// This does NOT control the setting value for it.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void ToggleAutoIdRoutine_Click(object Sender, RoutedEventArgs E)
+        {
+            // Trigger our updating routine.
+            this.ViewLogger.WriteLog("ATTEMPTING MANUAL TRIGGER FOR AUTO ID NOW...", LogType.InfoLog);
+            if (!this.ViewModel.ReadVoltageAndVin()) this.ViewLogger.WriteLog("FAILED TO PULL VIN OR VOLTAGE VALUE!", LogType.ErrorLog);
+            else this.ViewLogger.WriteLog("PULLED AND POPULATED NEW VOLTAGE AND VIN VALUES OK!", LogType.InfoLog);
+
+            // Log routine done and exit out.
+            this.ViewLogger.WriteLog("ROUTINE COMPLETED! CHECK UI CONTENT AND LOG ENTRIES ABOVE TO SEE HOW THE OUTPUT LOOKS", LogType.InfoLog);
+        }
     }
 }

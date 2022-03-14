@@ -101,5 +101,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             ViewLogger.WriteLog("CLOSING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
             this.JsonViewerFlyout.IsOpen = false;
         }
+        /// <summary>
+        /// Saves values on the settings view onto our JSON configuration file.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void SaveSettingsButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: WRITE A SETTINGS SAVE ROUTINE TO STORE VALUES BACK INTO JSON!
+        }
     }
 }

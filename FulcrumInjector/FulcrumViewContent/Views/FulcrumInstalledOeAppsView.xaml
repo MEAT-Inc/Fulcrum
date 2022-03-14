@@ -26,9 +26,9 @@
     <!-- Content for showing OE Apps -->
     <Grid Margin="0,5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".15*"/>
+            <RowDefinition Height=".10*"/>
             <RowDefinition/>
-            <RowDefinition Height=".140*"/>
+            <RowDefinition Height=".125*"/>
         </Grid.RowDefinitions>
         
         <!-- Title Value -->

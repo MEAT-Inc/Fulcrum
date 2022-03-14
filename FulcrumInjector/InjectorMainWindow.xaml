@@ -89,7 +89,7 @@
             <!-- Main Content View Box -->
             <Grid Grid.Column="2" Margin="5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height=".15*"/>
+                    <RowDefinition Height=".125*"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <contentViews:FulcrumVehicleConnectionInfoView 

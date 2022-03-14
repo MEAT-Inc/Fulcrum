@@ -98,6 +98,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
             {
                 // Build a new SharpSession object here.
                 this.SessionInstance = new Sharp2534Session(this.Version, this.DLL, this.Device);
+                this.SessionInstance.PTOpen();
                 this.AutoIdLogger.WriteLog("BUILT NEW SHARP SESSION FOR ROUTINE OK! SHOWING RESULTS BELOW", LogType.InfoLog);
                 this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString());
                 SessionBuilt = this.SessionInstance; return true;

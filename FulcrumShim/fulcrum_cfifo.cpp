@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include <memory>
 #include <tchar.h>
-#include <varargs.h>
 #include <stdexcept>
 
 // Fulcrum Resource Imports
@@ -36,13 +35,13 @@ void fulcrum_cfifo::Put(LPCTSTR szMsg)
 
 	// If the string doesn't fit, start later to get the final maxSize characters
 	if (nSize > m_nSize) {
-		szMsg = &szMsg[nSize - m_nSize];	 // start later, in order to get last m_nSize samples
-		nSize = m_nSize;					 // limit the length to the buffer's length
+		szMsg = &szMsg[nSize - m_nSize];	 // Start later, in order to get last m_nSize samples
+		nSize = m_nSize;					 // Limit the length to the buffer's length
 	}
 
 	// Wrap around buffer end
-	if (m_iWriteNext + nSize > m_nSize) {
-
+	if (m_iWriteNext + nSize > m_nSize)
+	{
 		// Fill the end of the buffer then restart filling from the beginning of the buffer
 		bool bReadWasBeforeWrite = m_iReadNext < m_iWriteNext;
 		memcpy((m_pBuffer + m_iWriteNext), szMsg, (m_nSize - m_iWriteNext) * sizeof(szMsg[0]));
@@ -53,7 +52,8 @@ void fulcrum_cfifo::Put(LPCTSTR szMsg)
 		if (bReadWasBeforeWrite && (m_iReadNext < m_iWriteNext))
 			m_iReadNext = m_iWriteNext;
 	}
-	else {
+	else
+	{
 		// Copy the entire szMsg to the first free location
 		bool bReadWasAfterWrite = m_iReadNext > m_iWriteNext;
 		memcpy((m_pBuffer + m_iWriteNext), szMsg, nSize * sizeof(szMsg[0]));
@@ -78,8 +78,17 @@ void fulcrum_cfifo::Get(FILE* fp)
 	if ((m_iReadNext + n) <= m_nSize) {
 		fwrite(m_pBuffer + m_iReadNext, 1, n * sizeof(TCHAR), fp);
 		m_iReadNext = (m_iReadNext + n) % m_nSize;
+
+		// Write to our pipe output here if it's connected
+		if (!CFulcrumShim::fulcrumPiper->OutputConnected) return;
+
+		// Convert to wstring then to string and write our output
+		std::wstring cstring(m_pBuffer); 
+		std::string outputString(cstring.begin(), cstring.end());
+		CFulcrumShim::fulcrumPiper->WriteStringOut(outputString);
 	}
-	else {
+	else
+	{
 		// Build part values by substring splitting
 		size_t nPart1 = m_nSize - m_iReadNext;
 		size_t nPart2 = n - nPart1;
@@ -88,6 +97,20 @@ void fulcrum_cfifo::Get(FILE* fp)
 		fwrite(m_pBuffer + m_iReadNext, sizeof(TCHAR), nPart1, fp);
 		fwrite(m_pBuffer, sizeof(TCHAR), nPart2, fp);
 		m_iReadNext = nPart2;
+
+		// Write to our pipe output here if it's connected
+		if (CFulcrumShim::fulcrumPiper->OutputConnected)
+		{
+			// Convert to wstring then to string and write our output
+			std::wstring cstring_part2(m_pBuffer);
+			std::wstring cstring_part1(m_pBuffer + m_iReadNext);
+			std::string outputString_part1(cstring_part1.begin(), cstring_part1.end());
+			std::string outputString_part2(cstring_part2.begin(), cstring_part2.end());
+
+			// Write these outputs to our pipe instance.
+			CFulcrumShim::fulcrumPiper->WriteStringOut(outputString_part1);
+			CFulcrumShim::fulcrumPiper->WriteStringOut(outputString_part2);
+		}
 	}
 
 	// Remove the item from our queue of outputs

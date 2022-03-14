@@ -42,10 +42,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Update property value. Setup new List of DLLs.
                 PropertyUpdated(value);
                 InstalledDevices = this.PopulateDevicesForDLL(value);
-
-                // Fire off updated event 
-                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDevice ?? "No Device!", value.Name ?? "Invalid DLL!"));
-                ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
 
@@ -55,11 +51,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDevice;
             set
             {
-                // Store class value
-                PropertyUpdated(value);
+                // Store class value. Stop background refreshing once we find a device
+                PropertyUpdated(value); 
+                JBoxEventWatchdog.StopBackgroundRefresh();
 
                 // Fire an event for device changed, and set the property value
-                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(value ?? "No Device!", this.SelectedDLL.Name ?? "Invalid DLL!"));
+                this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value));
                 ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
             }
         }
@@ -143,13 +140,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             InstalledDevices.Add(StateChangedArgs.DeviceName);
             InstalledDevices = InstalledDevices;
             ViewModelLogger.WriteLog("UPDATED NEW LIST OF DEVICES WITH EVENT TRIGGERED DEVICE VALUE!", LogType.WarnLog);
-            
-            // Check if the selected device is null or not.
-            if (this.SelectedDevice != null) { return; }
-            if (this.InstalledDevices.Count == 0) { return; }
-            ViewModelLogger.WriteLog("SELECTING A NEW DEVICE INSTANCE OBJECT NOW!", LogType.InfoLog);
-            this.SelectedDevice = InstalledDevices[0];
-            ViewModelLogger.WriteLog($"PULLED NEW DEVICE NAMED {this.SelectedDevice} FOR OUR NEW DEVICE SELECTION OK!", LogType.InfoLog);
         }
         /// <summary>
         /// Populates an observable collection of J2534 Devices for a given input J2534 DLL
@@ -170,7 +160,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     throw new InvalidOperationException("FAILED TO FIND ANY DEVICES TO USE FOR OUR J2534 INSTANCE!");
 
                 // Log information about pulling and return values.
-                this.SelectedDevice = PulledDeviceList[0];
+                // this.SelectedDevice = PulledDeviceList[0];
                 ViewModelLogger.WriteLog("PULLED NEW DEVICES IN WITHOUT ISSUES!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"DEVICES FOUND: {string.Join(",", PulledDeviceList)}", LogType.InfoLog);
 
