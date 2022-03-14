@@ -63,12 +63,46 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         }
         public string SelectedDevice
         {
-            get => string.IsNullOrWhiteSpace(_selectedDevice) ? "No Device Selected" : _selectedDevice;
-            set 
+            get => _selectedDevice ?? "No Device Selected";
+            set
             {
-                // Update private value, setup if we can Auto ID now or not.
-                PropertyUpdated(value); 
-                this.CanManualId = value != null && AutoIdRunning == false;
+                // Check if it's new 
+                bool NewDevice = value != this._selectedDevice;
+
+                // Update private value
+                PropertyUpdated(value); PropertyUpdated(value);
+                this.CanManualId = this._selectedDevice != "No Device Selected";
+                if (value == null) this.InstanceSession?.PTClose();
+                if (value == null || !NewDevice) return;
+                    
+                // Setup a new Session if the new value is not the same as our current value
+                this.InstanceSession?.PTClose();
+                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, value);
+                this.InstanceSession?.PTOpen();
+                ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
+
+                try
+                {
+                    // Check if we want to use voltage monitoring or not.
+                    if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Vehicle Monitoring", true)) {
+                        ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+                        ViewModelLogger.WriteLog("TRYING TO PULL A VOLTAGE READING ONCE!", LogType.InfoLog);
+                        return;
+                    }
+
+                    // Start monitoring. Throw if this fails.
+                    if (!this.StartVehicleMonitoring()) throw new InvalidOperationException("FAILED TO START OUR MONITORING ROUTINE!");
+                    ViewModelLogger.WriteLog("STARTED MONITORING ROUTINE OK!", LogType.InfoLog);
+                    ViewModelLogger.WriteLog("WHEN A VOLTAGE OVER 11.0 IS FOUND, A VIN REQUEST WILL BE MADE!", LogType.InfoLog);
+                }
+                catch (Exception SetupSessionEx)
+                {
+                    // Log failures for starting routine here
+                    ViewModelLogger.WriteLog("FAILED TO START OUR MONITORING ROUTINES!", LogType.ErrorLog);
+                    ViewModelLogger.WriteLog("THIS IS LIKELY DUE TO A DEVICE IN USE OR SOMETHING CONSUMING OUR PT INTERFACE!", LogType.ErrorLog);
+                    ViewModelLogger.WriteLog("IF THE DEVICE IS NOT IN USE AND THIS IS HAPPENING, IT'S LIKELY A BAD DEVICE", LogType.ErrorLog);
+                    ViewModelLogger.WriteLog("EXCEPTION THROWN DURING SETUP ROUTINE!", SetupSessionEx);
+                }
             }
         }
         public double DeviceVoltage { get => _deviceVoltage; set => PropertyUpdated(value); }
@@ -99,74 +133,60 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP HARDWARE INSTANCE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Attach listeners to our device changed events.
-            InjectorConstants.FulcrumInstalledHardwareViewModel.DeviceOrDllChanged += ProcessDeviceChangedEvent;
+            InjectorConstants.FulcrumInstalledHardwareViewModel.DeviceSelectionChanged += ProcessDeviceChangedEvent;
             ViewModelLogger.WriteLog("HOOKED NEW EVENT INSTANCE INTO OUR LISTENER FOR DEVICE CHANGED EVENTS OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Pulls out the VIN number of the current vehicle and stores the voltage of it.
+        /// Event action for processing a new device state changed event
         /// </summary>
-        /// <returns>True if pulled ok. False if not.</returns>
-        public bool ReadVoltageAndVin()
+        /// <param name="Sender">Sending object</param>
+        /// <param name="Args">Args for changed device</param>
+        private void ProcessDeviceChangedEvent(object Sender, DeviceChangedEventArgs Args)
         {
-            // Now build our session instance and pull voltage first.
-            if (this.IsMonitoring) this.StopVehicleMonitoring();
-            this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this.SelectedDevice);
-            ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
+            // Build new listener object here.
+            if (Args.DeviceName == null || Args.DeviceName.Contains("No Device")) {
+                ViewModelLogger.WriteLog("NO DEVICE NAME PROVIDED! RETURNING OUT FROM THIS ROUTINE", LogType.WarnLog);
 
-            // Store voltage value, log information. If voltage is less than 11.0, then exit.
-            if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
-            this.DeviceVoltage = this.ReadDeviceVoltage();
-            if (this.DeviceVoltage < 11.0) {
-                ViewModelLogger.WriteLog("ERROR! VOLTAGE VALUE IS LESS THAN THE ACCEPTABLE 11.0V CUTOFF! NOT AUTO IDENTIFYING THIS CAR!", LogType.ErrorLog);
-                return false;
+                // Check for monitoring state
+                if (this.IsMonitoring) this.StopVehicleMonitoring();
+                else { this.InstanceSession?.PTClose(); }
+
+                // Clear out selected device entry.
+                this.SelectedDevice = null;
+                return;
             }
 
-            // Return passed and store our new values
-            bool VinResult = this.ReadVehicleVin(out string NewVin, out var ProcPulled);
-            if (!VinResult) { ViewModelLogger.WriteLog("FAILED TO PULL A VIN VALUE!", LogType.ErrorLog); }
-            else 
-            {
-                // Log information, store new values.
-                this.VehicleVin = NewVin;
-                ViewModelLogger.WriteLog($"VOLTAGE VALUE PULLED OK! READ IN NEW VALUE {this.DeviceVoltage:F2}!", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {this.VehicleVin} WITH PROTOCOL ID: {ProcPulled}!", LogType.InfoLog);
-            }
+            // Log information about newly built device
+            ViewModelLogger.WriteLog("NEW DEVICE CHANGED EVENT PROCESSED!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"--> API VERSION:       {Args.VersionType.ToDescriptionString()}");
+            ViewModelLogger.WriteLog($"--> DLL NAME FOUND:    {Args.DeviceDLL}");
+            ViewModelLogger.WriteLog($"--> DEVICE NAME FOUND: {Args.DeviceName}");
 
-            // Kill our session here
-            ViewModelLogger.WriteLog("CLOSING REQUEST SESSION MANUALLY NOW...", LogType.WarnLog);
-            this.InstanceSession.PTClose();
-            this.InstanceSession = null;
-
-            // Return the result of our VIN Request
-            ViewModelLogger.WriteLog("SESSION CLOSED AND NULLIFIED OK!", LogType.InfoLog);
-            return VinResult;
+            // Store device and DLL info then prepare for refresh
+            this._selectedDLL = Args.DeviceDLL;
+            this._versionType = Args.VersionType;
+            this.SelectedDevice = Args.DeviceName;
+            ViewModelLogger.WriteLog("STORED NEW DEVICE NAME AND DLL NAME OK!", LogType.InfoLog);
         }
 
         /// <summary>
         /// Consumes our active device and begins a voltage reading routine.
         /// </summary>
         /// <returns>True if consumed, false if not.</returns>
-        public bool StartVehicleMonitoring()
+        private bool StartVehicleMonitoring()
         {
             // Try and kill old sessions then begin refresh routine
-            if (IsMonitoring) this.StopVehicleMonitoring();
-            this.RefreshSource?.Cancel(); this.RefreshSource = new CancellationTokenSource();
+            this.RefreshSource = new CancellationTokenSource();
+            
+            // Make sure our JBox is open here
+            int RefreshTimer = 500; IsMonitoring = true;
+            ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
-            // Task thread for this operation
+            // Run as a task to avoid locking up UI
             Task.Run(() =>
             {
-                // Open the instance object again, begin working here.
-                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
-                ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
-
-                // Make sure our JBox is open here
-                int RefreshTimer = 500; IsMonitoring = true;
-                if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
-                ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
-
                 // Do this as long as we need to keep reading based on the token
                 while (!this.RefreshSource.IsCancellationRequested)
                 {
@@ -214,6 +234,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         this.VehicleVin = null;
                         this.DeviceVoltage = NextVoltage;
                         ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
+
+                        // Wait and continue
+                        Thread.Sleep(RefreshTimer);
+                        continue;
                     }
 
                     // Wait 1500ms if VIN found, or 250ms if VIN not found.
@@ -231,76 +255,56 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Stops a refresh session. 
         /// </summary>
         /// <returns>True if stopped ok. False if not.</returns>
-        public bool StopVehicleMonitoring()
+        private void StopVehicleMonitoring()
         {
             // Reset all values here.
             ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
             this.RefreshSource?.Cancel();
-            this.InstanceSession?.PTClose();
 
             // Setup task objects again.
-            IsMonitoring = false; this.RefreshSource = null; this.VehicleVin = null; this.DeviceVoltage = 0.00;
+            IsMonitoring = false; this.VehicleVin = null; this.DeviceVoltage = 0.00;
             ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
             ViewModelLogger.WriteLog("STOPPED REFRESHING AND KILLED OUR INSTANCE OK!", LogType.InfoLog);
-            return true;
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Event action for processing a new device state changed event
+        /// Pulls out the VIN number of the current vehicle and stores the voltage of it.
         /// </summary>
-        /// <param name="Sender">Sending object</param>
-        /// <param name="Args">Args for changed device</param>
-        private void ProcessDeviceChangedEvent(object Sender, DeviceChangedEventArgs Args)
+        /// <returns>True if pulled ok. False if not.</returns>
+        public bool ReadVoltageAndVin()
         {
-            // Build new listener object here.
-            ViewModelLogger.WriteLog("NEW DEVICE CHANGED EVENT PROCESSED!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"--> API VERSION:       {Args.VersionType.ToDescriptionString()}");
-            ViewModelLogger.WriteLog($"--> DLL NAME FOUND:    {Args.DeviceDLL}");
-            ViewModelLogger.WriteLog($"--> DEVICE NAME FOUND: {Args.DeviceName}");
+            // Now build our session instance and pull voltage first.
+            if (this.IsMonitoring) this.StopVehicleMonitoring(); 
+            ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
 
-            // Make sure a device is picked here now.
-            if (Args.DeviceName == null) {
-                ViewModelLogger.WriteLog("NO DEVICE ENTRY PROVIDED! WAITING FOR ONE TO BE GIVEN BEFORE MOVING ON!", LogType.WarnLog);
-                return;
+            // Store voltage value, log information. If voltage is less than 11.0, then exit.
+            if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
+            this.DeviceVoltage = this.ReadDeviceVoltage();
+            if (this.DeviceVoltage < 11.0) {
+                ViewModelLogger.WriteLog("ERROR! VOLTAGE VALUE IS LESS THAN THE ACCEPTABLE 11.0V CUTOFF! NOT AUTO IDENTIFYING THIS CAR!", LogType.ErrorLog);
+                return false;
             }
 
-            // Make sure a NEW name is given here.
-            if (Args.DeviceName == this.SelectedDevice) {
-                ViewModelLogger.WriteLog("NOT FIRING A NEW DEVICE EVENT ARG SINCE THE SAME DEVICE ENTRY ALREADY IS SELECTED!", LogType.WarnLog);
-                return;
+            // Return passed and store our new values
+            bool VinResult = this.ReadVehicleVin(out string NewVin, out var ProcPulled);
+            if (!VinResult) { ViewModelLogger.WriteLog("FAILED TO PULL A VIN VALUE!", LogType.ErrorLog); }
+            else 
+            {
+                // Log information, store new values.
+                this.VehicleVin = NewVin;
+                ViewModelLogger.WriteLog($"VOLTAGE VALUE PULLED OK! READ IN NEW VALUE {this.DeviceVoltage:F2}!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {this.VehicleVin} WITH PROTOCOL ID: {ProcPulled}!", LogType.InfoLog);
             }
 
-            // Store device and DLL info then prepare for refresh
-            this._selectedDLL = Args.DeviceDLL;
-            this._versionType = Args.VersionType;
-            this.SelectedDevice = Args.DeviceName;
-            ViewModelLogger.WriteLog("STORED NEW DEVICE NAME AND DLL NAME OK!", LogType.InfoLog);
+            // Kill our session here
+            ViewModelLogger.WriteLog("CLOSING REQUEST SESSION MANUALLY NOW...", LogType.WarnLog); 
+            this.InstanceSession.PTClose();
 
-            // Check if we want to use voltage monitoring or not.
-            if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Vehicle Monitoring", true)) {
-                ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
-                ViewModelLogger.WriteLog("TRYING TO PULL A VOLTAGE READING ONCE!", LogType.InfoLog);
-                return;
-            }
-
-            // Check to see if the device is usable or not.
-            ViewModelLogger.WriteLog("STARTING VOLTAGE MONITORING ROUTINE NOW...", LogType.InfoLog);
-            ViewModelLogger.WriteLog("ONCE A VOLTAGE OVER 11.0 IS FOUND, WE WILL TRY TO READ THE VIN OF THE CONNECTED VEHICLE", LogType.InfoLog);
-
-            // Start monitoring. Throw if this fails.
-            if (IsMonitoring) return;
-            if (this.StartVehicleMonitoring()) {
-                ViewModelLogger.WriteLog("STARTED MONITORING ROUTINE OK!", LogType.InfoLog);
-                ViewModelLogger.WriteLog("WHEN A VOLTAGE OVER 11.0 IS FOUND, A VIN REQUEST WILL BE MADE!", LogType.InfoLog);
-                return;
-            }
-
-            // Log failures for starting routine here
-            ViewModelLogger.WriteLog("FAILED TO START OUR MONITORING ROUTINES!", LogType.ErrorLog);
-            ViewModelLogger.WriteLog("THIS IS LIKELY DUE TO A DEVICE IN USE OR SOMETHING CONSUMING OUR PT INTERFACE!", LogType.ErrorLog);
-            ViewModelLogger.WriteLog("IF THE DEVICE IS NOT IN USE AND THIS IS HAPPENING, IT'S LIKELY A BAD DEVICE", LogType.ErrorLog);
+            // Return the result of our VIN Request
+            ViewModelLogger.WriteLog("SESSION CLOSED AND NULLIFIED OK!", LogType.InfoLog);
+            return VinResult;
         }
 
         /// <summary>
@@ -309,25 +313,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <returns>Voltage of the device connected and selected</returns>
         private double ReadDeviceVoltage() 
         {
-            // Make sure our device is opened here.
+            // Return nothing if the session instance is null
             if (this.InstanceSession == null) {
-                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
-                ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
+                ViewModelLogger.WriteLog("NO SESSION INSTANCE WAS FOUND! THIS IS FATAL!", LogType.ErrorLog);
+                return 0.00;
             }
 
-            // Try and open the device to pull our voltage reading here
-            uint ChannelIdToUse; int ChannelIndex = 0;
-            if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
-            if (this.InstanceSession.DeviceChannels.All(ChannelObj => ChannelObj == null)) 
-                this.InstanceSession.PTConnect(ChannelIndex, ProtocolId.ISO15765, 0x00, 50000, out ChannelIdToUse);
-
-            // Now with our new channel ID, we open an instance and pull the channel voltage.
-            this.InstanceSession.PTReadVoltage(16, out var DoubleVoltage, true); this.DeviceVoltage = DoubleVoltage;
-            if (Debugger.IsAttached) ViewModelLogger.WriteLog($"[{this.InstanceSession.DeviceName}] ::: VOLTAGE: {this.DeviceVoltage}", LogType.TraceLog);
-
-            // Disconnect channel, and return the new voltage value as a double (Example: 11.1)
-            this.InstanceSession.PTDisconnect(ChannelIndex);
-            return DoubleVoltage;
+            try
+            {
+                // Now with our new channel ID, we open an instance and pull the channel voltage.
+                this.InstanceSession.PTReadVoltage(16, out var DoubleVoltage, true); this.DeviceVoltage = DoubleVoltage;
+                return DoubleVoltage;
+            }
+            catch
+            {
+                // Log failed to read value, return 0.00v
+                ViewModelLogger.WriteLog("FAILED TO READ NEW VOLTAGE VALUE!", LogType.ErrorLog);
+                return 0.00;
+            }
         }
         /// <summary>
         /// Pulls a VIN From a vehicle connected to our car
@@ -339,8 +342,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         {
             // Make sure our device exists.
             if (this.InstanceSession == null) {
-                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
-                ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
+                VinString = "-----------------"; ProtocolUsed = default;
+                ViewModelLogger.WriteLog("NO SESSION INSTANCE WAS FOUND! THIS IS FATAL!", LogType.ErrorLog);
+                return false;
             }
 
             // Get a list of all supported protocols and then pull in all the types of auto ID routines we can use
