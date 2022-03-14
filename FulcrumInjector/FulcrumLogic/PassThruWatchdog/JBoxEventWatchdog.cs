@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -108,6 +109,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
 
             // Now Fill in our DLL List and begin checking for devices.
             JBoxSniffLogger.WriteLog("--> REFRESHING DEVICE AND DLL LIST CONTENTS NOW...", LogType.InfoLog);
+            var IgnoredDLLs = ValueLoaders.GetConfigValue<string[]>("FulcrumInjectorConstants.InjectorHardwareRefresh.IgnoredDLLNames");
             var DllInstanceList = RefreshInstalledDllInstances(Version);
             var DeviceInstanceList = DllInstanceList.Select(DllObj =>
             {
@@ -115,8 +117,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
                 if (DLLNameFilter != "*" && !DllObj.Name.Contains(DLLNameFilter))
                     return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
 
-                // If we're on the Fulcrum DLL, return nothing to avoid spamming PopupBoxes
-                if (DllObj.Name.Contains("Fulcrum") || DllObj.Name.Contains("BlueLink"))
+                // If we're on the Fulcrum DLL or any ignored DLL, return nothing to avoid spamming PopupBoxes
+                if (IgnoredDLLs.Contains(DllObj.Name))
                     return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
 
                 // Find our connected Device list here
@@ -157,8 +159,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
                         if (DLLNameFilter != "*" && !DllObj.Name.Contains(DLLNameFilter))
                             return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
 
-                        // If we're on the Fulcrum DLL, return nothing to avoid spamming PopupBoxes
-                        if (DllObj.Name.Contains("Fulcrum") || DllObj.Name.Contains("BlueLink"))
+                        // If we're on the Fulcrum DLL or any ignored DLL, return nothing to avoid spamming PopupBoxes
+                        if (IgnoredDLLs.Contains(DllObj.Name))
                             return new Tuple<J2534Dll, string[]>(DllObj, Array.Empty<string>());
 
                         // Find our connected Device list here
