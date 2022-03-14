@@ -52,12 +52,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             set
             {
                 // Store class value. Stop background refreshing once we find a device
-                PropertyUpdated(value); 
+                PropertyUpdated(value);
                 JBoxEventWatchdog.StopBackgroundRefresh();
-
+                
                 Task.Run(() =>
                 {
-                    // Fire an event for device changed, and set the property value
+                    // Run this inside a task to avoid snagging UI Content
                     this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value));
                     ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
                 });
