@@ -66,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void ToggleAutoIdRoutine_Click(object Sender, RoutedEventArgs E)
+        private void TriggerAutoIdRoutine_OnClick(object Sender, RoutedEventArgs E)
         {
             // Trigger our updating routine.
             this.ViewLogger.WriteLog("ATTEMPTING MANUAL TRIGGER FOR AUTO ID NOW...", LogType.InfoLog);

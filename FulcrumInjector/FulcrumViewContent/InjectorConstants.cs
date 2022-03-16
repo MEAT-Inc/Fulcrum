@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534;
 using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent
@@ -155,8 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // Debug logging output user control and view model object
         public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)FulcrumDebugLoggingSingleton?.SingletonUserControl;
         public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)FulcrumDebugLoggingSingleton?.SingletonViewModel;
-
-
+        
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
