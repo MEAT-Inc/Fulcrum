@@ -53,7 +53,7 @@
                     FontSize="14" FontWeight="DemiBold"
                     Text="OBD Voltage: " Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding Path=DeviceVoltage, StringFormat={}{0:F2}v}" 
+                <TextBlock Text="{Binding Path=DeviceVoltage, StringFormat={}{0:F2}v, Mode=OneWay}" 
                            FontSize="14"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -96,15 +96,20 @@
             <Button Grid.Row="0" HorizontalAlignment="Right" 
                     VerticalAlignment="Center" Grid.RowSpan="2" ToolTip="Auto ID Connected Vehicle"
                     Width="25" Margin="0,0,15,0" Grid.Column="0" Click="TriggerAutoIdRoutine_OnClick" 
-                    IsEnabled="{Binding CanManualId}" Background="Transparent">
+                    IsEnabled="False" Background="Transparent">
                 <Button.Style>
                     <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding AutoIdRunning}" Value="True">
                                 <Setter Property="Background" Value="DarkGreen"/>
+                                <Setter Property="IsEnabled" Value="True"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding AutoIdRunning}" Value="False">
                                 <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CanManualId}" Value="False">
+                                <Setter Property="IsEnabled" Value="False"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
