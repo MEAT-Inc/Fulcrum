@@ -95,7 +95,7 @@
             <!-- Button for icon to start/stop auto id manually -->
             <Button Grid.Row="0" HorizontalAlignment="Right" 
                     VerticalAlignment="Center" Grid.RowSpan="2" ToolTip="Auto ID Connected Vehicle"
-                    Width="25" Margin="0,0,15,0" Grid.Column="0" Click="ToggleAutoIdRoutine_Click" 
+                    Width="25" Margin="0,0,15,0" Grid.Column="0" Click="TriggerAutoIdRoutine_OnClick" 
                     IsEnabled="{Binding CanManualId}" Background="Transparent">
                 <Button.Style>
                     <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
