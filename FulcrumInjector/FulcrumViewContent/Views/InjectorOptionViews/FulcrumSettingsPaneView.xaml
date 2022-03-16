@@ -146,7 +146,7 @@
             <Grid>
                 <TextBlock Style="{StaticResource TitleStringText}"  FontWeight="Bold" Margin="10,0" HorizontalAlignment="Left">
                     <Run Text="Injector Settings"/>
-                    <Run Foreground="Yellow" FontStyle="Normal" Text="(Work In Progress)"/>
+                    <Run Foreground="Yellow" FontStyle="Normal" Text="(Almost Perfect...)"/>
                 </TextBlock>
             </Grid>
 
