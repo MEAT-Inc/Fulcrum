@@ -72,11 +72,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 // Update private value
                 PropertyUpdated(value); PropertyUpdated(value);
                 this.CanManualId = this._selectedDevice != "No Device Selected";
-                if (value == null) this.InstanceSession?.PTClose();
-                if (value == null || !NewDevice) return;
-                    
+
                 // Setup a new Session if the new value is not the same as our current value
-                this.InstanceSession?.PTClose();
                 this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, value);
                 this.InstanceSession?.PTOpen();
                 ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
@@ -319,14 +316,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 return 0.00;
             }
 
-            try
-            {
+            try {
                 // Now with our new channel ID, we open an instance and pull the channel voltage.
-                this.InstanceSession.PTReadVoltage(16, out var DoubleVoltage, true); this.DeviceVoltage = DoubleVoltage;
+                this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true); this.DeviceVoltage = DoubleVoltage;
                 return DoubleVoltage;
             }
-            catch
-            {
+            catch {
                 // Log failed to read value, return 0.00v
                 ViewModelLogger.WriteLog("FAILED TO READ NEW VOLTAGE VALUE!", LogType.ErrorLog);
                 return 0.00;

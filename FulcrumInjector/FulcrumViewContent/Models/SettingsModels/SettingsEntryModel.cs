@@ -63,6 +63,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 // Checkbox Control
                 case ControlTypes.CHECKBOX_CONTROL: 
                     this.SettingControlType = typeof(CheckBox);
+                    this.SettingValue = bool.Parse(Value.ToString());
                     break;
 
                 // TextBox
