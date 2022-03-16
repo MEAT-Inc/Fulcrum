@@ -64,7 +64,6 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Syntax Settings")
             ) ?? new SettingsEntryCollectionModel("PassThru Syntax Settings", Array.Empty<SettingsEntryModel>());
 
-        // TODO: FINISH DEBUG SYNTAX SETTINGS HERE
         // Settings for color output during formatting for PT Output
         public static SettingsEntryCollectionModel InjectorDebugSyntaxSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>

@@ -1,7 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Routing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
+using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -101,14 +110,72 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             ViewLogger.WriteLog("CLOSING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
             this.JsonViewerFlyout.IsOpen = false;
         }
+
+
         /// <summary>
-        /// Saves values on the settings view onto our JSON configuration file.
+        /// Force saves all settings values from our view model onto the settings share for this application
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
         private void SaveSettingsButton_OnClick(object Sender, RoutedEventArgs E)
         {
-            // TODO: WRITE A SETTINGS SAVE ROUTINE TO STORE VALUES BACK INTO JSON!
+            // Log information, save all settings objects to our JSON file now.
+            Button SendButton = (Button)Sender;
+            this.ViewLogger.WriteLog("SAVING SETTINGS VALUES MANUALLY NOW...", LogType.InfoLog);
+
+            // Store new values from our ViewModel onto the share and into JSON 
+            ValueSetters.SetValue("FulcrumUserSettings", this.ViewModel.SettingsEntrySets);
+            FulcrumSettingsShare.GenerateSettingsModels(); this.ViewModel.SettingsEntrySets = FulcrumSettingsShare.SettingsEntrySets;
+            this.ViewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
+
+            // Change Color and Set to Saved! on the content here.
+            string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;
+            SendButton.Content = "Saved OK!"; SendButton.Background = Brushes.DarkGreen;
+            Task.Run(() =>
+            {
+                // Wait 3 Seconds. Then reset content.
+                Thread.Sleep(3000);
+                Dispatcher.Invoke(() => SendButton.Content = OriginalContent); 
+                Dispatcher.Invoke(() => SendButton.Background = OriginalBackground);
+                this.ViewLogger.WriteLog("RESET CONTENT AND COLOR OF SENDING SAVE BUTTON OK!", LogType.TraceLog);
+            }); 
+        }
+        /// <summary>
+        /// Triggered when an event is processed by a setting value changed.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void SettingValueChanged_OnTrigger(object Sender, RoutedEventArgs E)
+        {
+            // Log processing content value here.
+            this.ViewLogger.WriteLog("PROCESSING SETTING CONTENT VALUE CHANGED EVENT!", LogType.InfoLog);
+
+            // Get our type values and context here. Then modify the new value of our setting as needed.
+            Control SendingControl = (Control)Sender;
+            SettingsEntryModel SenderContext = SendingControl.DataContext as SettingsEntryModel;
+            if (SenderContext == null) { this.ViewLogger.WriteLog("FAILED TO BUILD CONTEXT FOR OUR SETTING OBJECT!", LogType.ErrorLog); return; }
+
+            // Store the setting value back onto our view model content and save it's JSON Value.
+            this.ViewLogger.WriteLog($"SETTING VALUE BEING WRITTEN OUT: {JsonConvert.SerializeObject(SenderContext, Formatting.None)}", LogType.TraceLog);
+            var LocatedSettingSet = this.ViewModel.SettingsEntrySets
+                .FirstOrDefault(SettingSet => SettingSet.SettingsEntries
+                    .Any(SettingObj => SettingObj.SettingName == SenderContext.SettingName));
+
+            // Find the location of the setting value.
+            if (LocatedSettingSet == null) { this.ViewLogger.WriteLog("FAILED TO FIND SETTING ENTRY SET WITH SETTING VALUE!", LogType.ErrorLog); return; }
+            LocatedSettingSet.UpdateSetting(new[] { SenderContext });
+
+            // Now write the new setting value to our JSON configuration and refresh values.
+            int SettingSetIndex = this.ViewModel.SettingsEntrySets
+                .ToList()
+                .FindIndex(ImportedSettingSet => ImportedSettingSet.SettingSectionTitle == LocatedSettingSet.SettingSectionTitle);
+            var SettingObjects = FulcrumSettingsShare.SettingsEntrySets;
+            SettingObjects[SettingSetIndex] = LocatedSettingSet;
+
+            // Store our value in the JSON configuration files now.
+            ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
+            FulcrumSettingsShare.GenerateSettingsModels(); this.ViewModel.SettingsEntrySets = FulcrumSettingsShare.SettingsEntrySets;
+            this.ViewLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
         }
     }
 }
