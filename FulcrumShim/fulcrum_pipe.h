@@ -1,5 +1,26 @@
+/*
+**
+** Copyright (C) 2022 MEAT Inc
+** Author: Zack Walsh <neo.smith@motorengineeringandtech.com>
+**
+** This library is free software; you can redistribute it and/or modify
+** it under the terms of the GNU Lesser General Public License as published
+** by the Free Software Foundation, either version 3 of the License, or (at
+** your option) any later version.
+**
+** This library is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Lesser General Public License for more details.
+**
+** You should have received a copy of the GNU Lesser General Public
+** License along with this library; if not, <http://www.gnu.org/licenses/>.
+**
+*/
+
 #pragma once
 
+// Standard Imports
 #include <string>
 
 class CPipeException : public CSimpleException
@@ -21,31 +42,41 @@ public:
 
 class fulcrum_pipe {
 public:
-	fulcrum_pipe();
-	~fulcrum_pipe();
-	bool IsLoaded();
+	// Methods for pipe object setup and shutdown.
+	fulcrum_pipe(); ~fulcrum_pipe();
+
+	// Bools for states of pipes.
+	bool InputConnected = false;
+	bool OutputConnected = false;
+
+	// Connect Pipe Routines
+	bool PipesConnected();
 	bool ConnectInputPipe();
 	bool ConnectOutputPipe();
-	void ShutdownPipe();
+
+	// Shut down pipe routines.
+	void ShutdownPipes();
+	void ShutdownInputPipe();
+	void ShutdownOutputPipe();
 
 	// Writing operations
-	void WriteStringOut(std::string str);
-	void WriteFormattedStringOut(LPCSTR format, ...);
-	void WriteStringOut100(std::string str);
-	void WriteBytesOut(byte b[], int b_len);
+	void Writeint32(int writeNumber);
+	void WriteStringOut(std::string msgString);
+	void WriteUint32(unsigned int writeNumber);
+	void WriteBytesOut(byte byteValues[], int byteLength);
+	void WriteUint32(unsigned int* writeNumber, unsigned int uintLen);
 
 	// Reading Operations
-	std::string ReadStringIn();
-	void ReadBytesIn(byte b[], int* b_len);
-	void ReadBytes(byte b[], int num);			
-	unsigned int ReadUint32();
 	int ReadInt32();
-	void WriteUint32(unsigned int num);
-	void WriteUint32(unsigned int* a, unsigned int len);
-	void Writeint32(int num);
+	unsigned int ReadUint32();
+	std::string ReadStringIn();
+	void ReadBytes(byte inputByteBuffer[], int bufferLength);
+	void ReadBytesIn(byte inputByteBuffer[], int* bufferLength);
 
 private:
-	bool Loaded = false;
-	HANDLE hPipe1, hPipe2;
+	// Pipe state values.
+	bool _pipesConnected = false;
+	HANDLE hFulcrumWriter, hFulcrumReader;
 };
+
 

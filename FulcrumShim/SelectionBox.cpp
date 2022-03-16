@@ -1,17 +1,37 @@
+/*
+**
+** Copyright (C) 2022 MEAT Inc
+** Author: Zack Walsh <neo.smith@motorengineeringandtech.com>
+**
+** This library is free software; you can redistribute it and/or modify
+** it under the terms of the GNU Lesser General Public License as published
+** by the Free Software Foundation, either version 3 of the License, or (at
+** your option) any later version.
+**
+** This library is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Lesser General Public License for more details.
+**
+** You should have received a copy of the GNU Lesser General Public
+** License along with this library; if not, <http://www.gnu.org/licenses/>.
+**
+*/
+
 // SelectionBox.cpp : implementation file
+using namespace std;
 
+// Standard Imports
 #include "stdafx.h"
-
 #include <set>
 #include <sstream>
 #include <string>
 #include <tchar.h>
 
+// Fulcrum Resource Imports
 #include "FulcrumShim.h"
 #include "SelectionBox.h"
 #include "fulcrum_output.h"
-
-using namespace std;
 
 // SelectionBox dialog
 IMPLEMENT_DYNAMIC(CSelectionBox, CDialog)
@@ -56,18 +76,19 @@ BOOL CSelectionBox::OnInitDialog()
 	SYSTEMTIME LocalTime;
 	GetLocalTime(&LocalTime);
 
+	// Start logging information
+	CFulcrumShim::StartupPipes();
+
 	// Build the log filder dir.
 	CString logDir;
 	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
 	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) 
 		fulcrum_output::fulcrumDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
-	else 
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
-
+	else fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
 
 	// Build the log file path using the log dir above
 	CString cstrPath;
-	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%02d%02d%04d-%02d%02d%02d.txt"),
+	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%02d%02d%04d-%02d%02d%02d.shimLog"),
 		szPath,
 		LocalTime.wMonth,
 		LocalTime.wDay,
@@ -77,16 +98,15 @@ BOOL CSelectionBox::OnInitDialog()
 		LocalTime.wSecond
 	);
 
-	// Log new file name output.
+	// Log new file name output and open the selection box entry object.
 	fulcrum_output::fulcrumDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
+	fulcrum_output::fulcrumDebug(_T("%.3fs    Session Log File: %s\n"), GetTimeSinceInit(), cstrPath);
 
 	// Set information about the new output file
 	m_logfilename.SetWindowText(cstrPath);
 	DoPopulateRegistryListbox();
 	ShowWindow(SW_SHOW);
 	BringWindowToTop();
-
-	// Return TRUE unless you set focus to a control
 	return TRUE;
 }
 
@@ -183,12 +203,6 @@ void CSelectionBox::OnBnClickedOk()
 	DWORD_PTR item_data = m_listview.GetItemData(nItem);
 	sel = (cPassThruInfo *) item_data;
 	m_logfilename.GetWindowText(cstrDebugFile);
-
-	// Boot the pipes and start the fulcrum injector
-	CFulcrumShim* fulcrum_app = static_cast<CFulcrumShim*>(AfxGetApp());
-	if (!fulcrum_app->pipesLoaded) { fulcrum_app->InitPipes(); }
-
-	// Check if passed output. If so move on.
 	OnOK();
 }
 

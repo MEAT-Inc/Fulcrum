@@ -12,7 +12,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
 
                 <!-- Themes and Styles for Views -->
-                <ResourceDictionary Source="AppStyles/AppStyleSheets/AppColorTheme.xaml"/>
+                <ResourceDictionary Source="FulcrumViewSupport/AppStyleSheets/AppColorTheme.xaml"/>
 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

@@ -5,14 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FulcrumInjector"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:views="clr-namespace:FulcrumInjector.ViewControl.Views"
+        xmlns:views="clr-namespace:FulcrumInjector"
+        xmlns:contentViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views"
+        xmlns:views1="clr-namespace:FulcrumInjector.FulcrumViewContent.Views"
+        xmlns:injectorCoreViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews"
+        xmlns:injectorOptionViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
-        Height="600" Width="1000" 
-        MaxHeight="650" MaxWidth="1125"
-        MinHeight="550" MinWidth="875"
+        Height="800" Width="1200" 
         AllowsTransparency="True"
-        Loaded="InjectorMainWindow_OnLoaded">
+        ResizeMode="CanMinimize"
+        Loaded="InjectorMainWindow_OnLoaded"
+        Closed="InjectorMainWindow_OnClosed">
     
     <!-- Dark Semi Transparent Background -->
     <Window.Background>
@@ -20,41 +24,38 @@
     </Window.Background>
 
     <Window.Resources>
-        <ResourceDictionary Source="AppStyles/AppStyleSheets/CommonControlStyles.xaml"/>
+        <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
     </Window.Resources>
 
     <Grid Margin="0">
         <!-- Row Layout for content -->
         <Grid.RowDefinitions>
-            <RowDefinition Height=".175*"/>
+            <RowDefinition Height=".15*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <!-- Top border and the title information for this app -->
         <Border Grid.Row="0" Grid.RowSpan="2" BorderBrush="{StaticResource TextColorBase}" Style="{StaticResource TransparentBackgroundBorder}"/>
         <Grid Grid.Row="0">
-            <views:FulcrumTitleView x:Name="FulcrumTitle"/>
+            <views1:FulcrumTitleView x:Name="FulcrumTitle"/>
             <Border BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
         </Grid>
 
         <!-- All Other App Content Goes Down Here -->
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".35*"/>
+                <ColumnDefinition Width="275"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Splitting Border -->
-            <Border Grid.Column="1" Margin="0,0" Opacity=".50" BorderThickness="5,0" BorderBrush="{StaticResource PrimaryColor_Lighter_35}"/>
-
             <!-- Left Side Pane View -->
-            <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,5">
+            <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,10,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height=".6*"/>
                         <RowDefinition Height=".6*"/>
-                        <RowDefinition Height="425"/>
+                        <RowDefinition Height="625"/>
                     </Grid.RowDefinitions>
 
                     <!-- Splitting Borders -->
@@ -62,85 +63,104 @@
                     <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
 
                     <!-- DLL Loading Test Pane -->
-                    <views:FulcrumDllInjectionTestView
+                    <views1:FulcrumDllInjectionTestView
                         Grid.Row="0" 
                         Height="105"
                         x:Name="FulcrumDllInjectionTest"/>
 
                     <!-- Pipe State And Information Pane -->
-                    <views:FulcrumPipeStatusView 
+                    <views1:FulcrumPipeStatusView 
                         Grid.Row="1" 
                         Height="150"
                         x:Name="FulcrumPipeStatus"/>
 
                     <!-- OE Apps Installed -->
-                    <views:FulcrumInstalledOeAppsView
+                    <views1:FulcrumInstalledOeAppsView
                         Grid.Row="2"
+                        Height="625"
+                        VerticalContentAlignment="Stretch"
                         x:Name="FulcrumInstalledOeApps"/>
                 </Grid>
             </Viewbox>
 
+            <!-- Splitting Border -->
+            <Border Grid.Column="1" Margin="3,0,0,0" Opacity=".75" BorderThickness="0,0,3,0" BorderBrush="{StaticResource TextColorBase}"/>
+
             <!-- Main Content View Box -->
-            <Viewbox Grid.Column="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition MinWidth="150"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition MinWidth="500"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- TODO: PUT SOMETHING IN THIS LEFT PANE? NOT SURE WHAT BUT SOMETHIN HAS TO AT SOME POINT -->
-                    <!-- A Thing -->
-
-                    <!-- Splitting Border Output object -->
-                    <GridSplitter Grid.Column="1"/>
-
-                    <!-- Content for the injector output -->
-                    <views:FulcrumDllOutputLogView 
-                        Grid.Column="1"
-                        x:Name="FulcrumDllOutputLog"/>
-                </Grid>
-            </Viewbox>
-
-            <!-- Flyouts for Main Window -->
-            <mah:FlyoutsControl Grid.Column="2" Margin="10,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <mah:Flyout
-                    IsOpen="False"
-                    x:Name="SettingsViewFlyout" 
-                    VerticalContentAlignment="Stretch" 
-                    HorizontalContentAlignment="Stretch" 
-                    Header="FulcrumInjector Settings"
-                    mah:HeaderedControlHelper.HeaderFontSize="22"
-                    mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
-                    mah:HeaderedControlHelper.HeaderMargin="5"
-                    TitleVisibility="Collapsed"
-                    BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
-                    
-                    <!-- Empty header content -->
-                    <mah:Flyout.HeaderTemplate>
-                        <DataTemplate></DataTemplate>
-                    </mah:Flyout.HeaderTemplate>
-    
-                    <!-- Content for Settings -->
-                    <views:FulcrumSettingsPaneView x:Name="FulcrumSettingsPane"/>
-                </mah:Flyout>
-                <mah:Flyout
-                    IsOpen="False" 
-                    x:Name="DebugViewFlyout"
-                    VerticalContentAlignment="Stretch" 
-                    HorizontalContentAlignment="Stretch" 
-                    Header="FulcrumInjector Debugging"
-                    mah:HeaderedControlHelper.HeaderFontSize="22"
-                    mah:HeaderedControlHelper.HeaderFontWeight="DemiBold"
-                    mah:HeaderedControlHelper.HeaderMargin="5"
-                    BorderThickness="3" BorderBrush="{StaticResource SecondaryColor_Lighter_35}">
-                    <!-- Content for Debugging -->
-                    <Grid>
-                        <Border BorderBrush="{StaticResource SecondaryColor_Lighter_35}" BorderThickness="0,3,0,0"/>
-                        <views:FulcrumDebugLoggingView x:Name="FulcrumDebugLogging"/>
-                    </Grid>
-                </mah:Flyout>
-            </mah:FlyoutsControl>
+            <Grid Grid.Column="2" Margin="5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height=".125*"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <contentViews:FulcrumVehicleConnectionInfoView 
+                    Grid.Row="0" 
+                    Margin="5,5"
+                    x:Name="FulcrumVehicleConnectionInfo"/>
+                <injectorCoreViews:FulcrumHamburgerCoreView 
+                    Margin="0,5,0,0"
+                    x:Name="FulcrumHamburgerCore"  
+                    Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Grid>
         </Grid>
+
+        <!-- About this application flyout -->
+        <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <mah:Flyout 
+                Margin="55,25,0,0"
+                Position="Top"
+                x:Name="InformationFlyout"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="600"
+                Height="520"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+
+                <!-- Content View -->
+                <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="210"/>
+                        <RowDefinition/>
+                        <RowDefinition Height=".30*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Meat INC turbo logo goes here -->
+                    <Image Grid.Row="0">
+                        <Image.Source>
+                            <BitmapImage UriSource="FulcrumResources/MeatIncTurboLogo.jpg" />
+                        </Image.Source>
+                    </Image>
+                    <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryColor}" BorderThickness="5" Width="220" CornerRadius="3"/>
+
+                    <!-- Information about this app goes here -->
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center" TextWrapping="Wrap" Width="500" FontSize="15">
+                        <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
+                        <LineBreak/>
+                        <Run Text="Any questions, comments, or concerns with this application can be directed to either neo.smith@motorengineeringandtech.com or by submitting a bug or issue report on the repository for this application."/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software."/>
+                    </TextBlock>
+
+                    <!-- Close out button -->
+                    <Button Grid.Row="2" 
+                            FontSize="18"
+                            x:Name="CloseInfoFlyoutButton"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource ActionButtonStyle}"
+                            Content="Close" Width="250" Height="35" />
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+
     </Grid>
 </mah:MetroWindow>

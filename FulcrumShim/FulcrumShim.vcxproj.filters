@@ -45,12 +45,16 @@
     <ClCompile Include="FulcrumShim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fulcrum_cfifo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fulcrum_shim.def">
       <Filter>Source Files</Filter>
     </None>
     <None Include="FulcrumVersionTick.py" />
+    <None Include="MEAT_FulcrumInjector_DEBUG.reg" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -96,6 +100,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fulcrum_cfifo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
