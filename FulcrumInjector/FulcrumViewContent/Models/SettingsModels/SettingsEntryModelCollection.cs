@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         /// </summary>
         /// <param name="SettingsToAdd"></param>
         /// <returns></returns>
-        public SettingsEntryModel[] AddNewSetting(params SettingsEntryModel[] SettingsToAdd)
+        public SettingsEntryModel[] UpdateSetting(params SettingsEntryModel[] SettingsToAdd)
         {
             // Add one by one and replacing dupes.
             var TempList = SettingsEntries.ToList();
