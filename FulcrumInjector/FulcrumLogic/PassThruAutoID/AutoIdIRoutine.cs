@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         public readonly string Device;
         public readonly JVersion Version;
         public readonly ProtocolId AutoIdType;
-        public readonly AutoIdModels.AutoIdConfiguration AutoIdCommands;
+        public readonly AutoIdConfiguration AutoIdCommands;
 
         // Runtime Instance Values (private only)
         protected internal uint[] FilterIds;
@@ -69,18 +69,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
             if (!SupportedProtocols.Contains(this.AutoIdType)) throw new InvalidOperationException($"CAN NOT USE PROTOCOL TYPE {this.AutoIdType} FOR AUTO ID ROUTINE!");
 
             // JSON Parse our input objects
-            var SupportedRoutines = ValueLoaders.GetConfigValue<object[]>("FulcrumAutoIdRoutines.CommandRoutines").Select(InputObj =>
-            {
-                // Convert into JSON here.
-                string ObjectString = JsonConvert.SerializeObject(InputObj);
-                AutoIdModels.AutoIdConfiguration ConfigurationObject = (AutoIdModels.AutoIdConfiguration)JsonConvert.DeserializeObject(ObjectString, typeof(AutoIdModels.AutoIdConfiguration));
-                this.AutoIdLogger.WriteLog($"--> BUILT NEW SETTINGS ROUTINE OBJECT FOR PROTOCOL {ConfigurationObject.AutoIdType} OK!", LogType.InfoLog);
-                return ConfigurationObject;
-            });
-
-            // Store our auto ID type routine
+            var SupportedRoutines = ValueLoaders.GetConfigValue<AutoIdConfiguration[]>("FulcrumAutoIdRoutines.CommandRoutines");
             this.AutoIdCommands = SupportedRoutines.FirstOrDefault(RoutineObj => RoutineObj.AutoIdType == this.AutoIdType);
-            if (this.AutoIdCommands == null) throw new NullReferenceException($"FAILED TO FIND AUTO ID ROUTINE COMMANDS FOR PROTOCOL {this.AutoIdType}!");
+            
+            // Make sure our instance exists
+            if (this.AutoIdCommands == null)
+                throw new NullReferenceException($"FAILED TO FIND AUTO ID ROUTINE COMMANDS FOR PROTOCOL {this.AutoIdType}!");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -88,26 +82,24 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         /// <summary>
         /// Opens a new session for J2534 sessions.
         /// </summary>
-        /// <param name="DllName">Name of DLL</param>
-        /// <param name="DeviceName">Name of Device</param>
-        /// <param name="SessionInstance">Instance built</param>
+        /// <param name="InputSession">Instance built</param>
         /// <returns>True if the session is built ok. False if it is not.</returns>
-        public bool OpenSession(Sharp2534Session InputSession = null)
+        public bool OpenSession(Sharp2534Session InputSession)
         {
             try
             {
                 // Store our instance session
-                this.SessionInstance = InputSession ?? new Sharp2534Session(this.Version, this.DLL, this.Device);
+                this.SessionInstance = InputSession;
                 this.AutoIdLogger.WriteLog("STORED INSTANCE SESSION OK! READY TO BEGIN AN AUTO ID ROUTINE WITH IT NOW...");
 
                 // Open our session object and begin connecting
                 this.SessionInstance.PTOpen();
                 this.AutoIdLogger.WriteLog("BUILT NEW SHARP SESSION FOR ROUTINE OK! SHOWING RESULTS BELOW", LogType.InfoLog);
-                this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString());
 
                 // Now connect our channel object
                 if (this.ConnectChannel(out this.ChannelIdOpened)) this.AutoIdLogger.WriteLog("CONNECTED TO OUR CHANNEL INSTANCE OK!", LogType.InfoLog);
                 else throw new InvalidOperationException($"FAILED TO CONNECT TO NEW {this.AutoIdType} CHANNEL!");
+                this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString());
                 return true;
             }
             catch (Exception SessionEx)

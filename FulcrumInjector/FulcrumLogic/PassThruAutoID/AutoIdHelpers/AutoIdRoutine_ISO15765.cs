@@ -78,9 +78,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
                 // Store our types for filters here.
                 FilterDef FilterType = FilterObj.FilterType;
                 ProtocolId FilterProtocol = FilterObj.FilterProtocol;
-                string FilterMask = FilterObj.FilterMask.MessageData;
-                string FilterPattern = FilterObj.FilterPattern.MessageData;
-                string FilterFlowControl = FilterType == FilterDef.FLOW_CONTROL_FILTER ? FilterObj.FilterFlowControl.MessageData : null;
+                string FilterMask = FilterObj.FilterMask.MessageData.Replace("0x", "");
+                string FilterPattern = FilterObj.FilterPattern.MessageData.Replace("0x", ""); ;
+                string FilterFlowControl = FilterType == FilterDef.FLOW_CONTROL_FILTER ? 
+                    FilterObj.FilterFlowControl.MessageData.Replace("0x", "") :
+                    null;
 
                 try
                 {
@@ -142,7 +144,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
                 var MessageBuilt = J2534Device.CreatePTMsgFromString(
                     CommandObj.MessageProtocol,
                     (uint)CommandObj.MessageFlags,
-                    CommandObj.MessageData
+                    CommandObj.MessageData.Replace("0x", "")
                 );
 
                 // Log information, append this object into the list of new messages and move on.
