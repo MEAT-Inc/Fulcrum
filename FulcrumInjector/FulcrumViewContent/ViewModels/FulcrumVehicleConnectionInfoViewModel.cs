@@ -247,7 +247,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         if (VinReadRun) continue;
 
                         // Log information, pull our vin number, then restart this process using the OnLost value.
-                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true)) {
+                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true))
+                        {
                             ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
                             continue;
                         }
@@ -256,7 +257,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         {
                             // Pull our Vin number of out the vehicle now.
                             if (LoopsRun != 1 && LoopsRun % 4 != 0) continue;
-                            if (!this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
+                            if (this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
                             {
                                 // Log information, store these values.
                                 this.VehicleVin = VinFound; VinReadRun = true;
@@ -266,6 +267,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                                 // Store class values, cancel task, and restart it for on lost.
                                 ViewModelLogger.WriteLog("STARTING NEW TASK TO WAIT FOR VOLTAGE BEING LOST NOW...", LogType.WarnLog);
+                                continue;
                             }
                             else
                             {
@@ -273,6 +275,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                                 this.VehicleVin = "Failed to Read VIN!";
                                 ViewModelLogger.WriteLog("ROUTINE RAN CORRECTLY BUT NO VIN NUMBER WAS FOUND! THIS MEANS THERE'S SOMETHING ELSE WRONG...", LogType.ErrorLog);
                                 ViewModelLogger.WriteLog("VIN REQUEST ROUTINE WILL RERUN AFTER 4X THE DELAY TIME...", LogType.WarnLog);
+                                continue;
                             }
                         }
                         catch (Exception VinEx)
@@ -286,7 +289,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     }
 
                     // Check for voltage lost instead of connected.
-                    if (this.VehicleVin.Contains("Voltage") || this.DeviceVoltage != 0) continue;
+                    if (this.VehicleVin.Contains("Voltage")) continue;
                     this.VehicleVin = "No Vehicle Voltage!";
                     ViewModelLogger.WriteLog("LOST OBD 12V INPUT! CLEARING OUT STORED VALUES NOW...", LogType.InfoLog);
                     ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
