@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         public readonly string Device;
         public readonly JVersion Version;
         public readonly ProtocolId AutoIdType;
-        public readonly AutoIdModels.AutoIdRoutine AutoIdCommands;
+        public readonly AutoIdModels.AutoIdConfiguration AutoIdCommands;
 
         // Runtime Instance Values (private only)
         protected internal uint[] FilterIds;
@@ -73,9 +73,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
             {
                 // Convert into JSON here.
                 string ObjectString = JsonConvert.SerializeObject(InputObj);
-                AutoIdModels.AutoIdRoutine RoutineObject = (AutoIdModels.AutoIdRoutine)JsonConvert.DeserializeObject(ObjectString, typeof(AutoIdModels.AutoIdRoutine));
-                this.AutoIdLogger.WriteLog($"--> BUILT NEW SETTINGS ROUTINE OBJECT FOR PROTOCOL {RoutineObject.AutoIdType} OK!", LogType.InfoLog);
-                return RoutineObject;
+                AutoIdModels.AutoIdConfiguration ConfigurationObject = (AutoIdModels.AutoIdConfiguration)JsonConvert.DeserializeObject(ObjectString, typeof(AutoIdModels.AutoIdConfiguration));
+                this.AutoIdLogger.WriteLog($"--> BUILT NEW SETTINGS ROUTINE OBJECT FOR PROTOCOL {ConfigurationObject.AutoIdType} OK!", LogType.InfoLog);
+                return ConfigurationObject;
             });
 
             // Store our auto ID type routine

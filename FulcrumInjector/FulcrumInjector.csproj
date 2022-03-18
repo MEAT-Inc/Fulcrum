@@ -164,7 +164,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdHelpers\AutoIdRoutine_ISO15765.cs" />
-    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdRoutine.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdConfiguration.cs" />
     <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdObjects.cs" />
     <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdIRoutine.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
