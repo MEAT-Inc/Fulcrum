@@ -28,12 +28,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledHardwareViewModelLogger")) ?? new SubServiceLogger("InstalledHardwareViewModelLogger");
 
         // Private Control Values
+        private bool _isIgnoredDLL;
         private J2534Dll _selectedDLL;
         private string _selectedDevice;
         private ObservableCollection<J2534Dll> _installedDLLs;
         private ObservableCollection<string> _installedDevices;
 
         // Selected DLL object
+        public bool IsIgnoredDLL { get => _isIgnoredDLL; set => PropertyUpdated(value); }
         public J2534Dll SelectedDLL
         {
             get => _selectedDLL;
@@ -147,11 +149,21 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
         {
             // Log information and pull in our new Device entries for the DLL given if any exist.
-            if (DllEntry == null) ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
-            
+            if (DllEntry == null) return new ObservableCollection<string>();
+            ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
+
+            // Check for not supported DLL Values.
+            var IgnoredDLLs = ValueLoaders.GetConfigValue<string[]>("FulcrumInjectorConstants.InjectorHardwareRefresh.IgnoredDLLNames");
+            if (IgnoredDLLs.Contains(DllEntry.Name)) {
+                IsIgnoredDLL = true;
+                ViewModelLogger.WriteLog("NOT UPDATING DEVICES FOR A DLL WHICH IS KNOWN TO NOT BE USABLE WITH THE FULCRUM!", LogType.WarnLog);
+                return new ObservableCollection<string>();
+            }
+
             try
             {
                 // Pull devices, list count, and return values.
+                IsIgnoredDLL = false;
                 var PulledDeviceList = DllEntry.FindConnectedDeviceNames();
                 if (PulledDeviceList.Count == 0) throw new InvalidOperationException("FAILED TO FIND ANY DEVICES TO USE FOR OUR J2534 INSTANCE!");
 
