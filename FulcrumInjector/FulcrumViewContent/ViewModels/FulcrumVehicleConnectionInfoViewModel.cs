@@ -75,22 +75,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     return;
                 }
 
-                // Update our private property value here
-                PropertyUpdated(value);
-
                 // Check for a null device name or no device name provided.
                 if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected") {
                     if (this.IsMonitoring) { this.StopVehicleMonitoring(); } this.InstanceSession.Dispose();
                     ViewModelLogger.WriteLog("STOPPED SESSION INSTANCE OK AND CLEARED OUT DEVICE NAME!", LogType.InfoLog);
 
-                    // Null out the instance and return.
-                    this.InstanceSession = null;
+                    // Populate private values here.
+                    PropertyUpdated(value);
                     return;
                 }
 
                 // If our new device name is not null, then we can build a new object.
+                PropertyUpdated(value);
                 if (this.IsMonitoring) { this.StopVehicleMonitoring(); } this.InstanceSession?.Dispose(); 
-                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, value);
+                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
                 ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
 
                 try
@@ -158,89 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             // Build our session instance here.
             this.SelectedDevice = InjectorConstants.FulcrumInstalledHardwareViewModel?.SelectedDevice;
-        }
-
-        /// <summary>
-        /// Consumes our active device and begins a voltage reading routine.
-        /// </summary>
-        /// <returns>True if consumed, false if not.</returns>
-        private bool StartVehicleMonitoring()
-        {
-            // Try and kill old sessions then begin refresh routine
-            this.RefreshSource = new CancellationTokenSource();
-            
-            // Make sure our JBox is open here
-            int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false;
-            ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
-
-            // Run as a task to avoid locking up UI
-            Task.Run(() =>
-            {
-                // Do this as long as we need to keep reading based on the token
-                this.InstanceSession.PTOpen();
-                while (!this.RefreshSource.IsCancellationRequested)
-                {
-                    // Pull in our next voltage value here. Check for voltage gained or removed
-                    Thread.Sleep(RefreshTimer);
-                    if (this.ReadDeviceVoltage() >= 11 && !VinReadRun)
-                    {
-                        // Log information, pull our vin number, then restart this process using the OnLost value.
-                        RefreshTimer = 1500;
-                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true)) {
-                            ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
-                            continue;
-                        }
-
-                        // Pull our Vin number of out the vehicle now.
-                        if (this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
-                        {
-                            // Log information, store these values.
-                            this.VehicleVin = VinFound; VinReadRun = true;
-                            ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
-                            ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
-                            ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
-
-                            // Store class values, cancel task, and restart it for on lost.
-                            ViewModelLogger.WriteLog("STARTING NEW TASK TO WAIT FOR VOLTAGE BEING LOST NOW...", LogType.WarnLog);
-                            continue;
-                        }
-
-                        // Log failures and move on. This only happens when a VIN is not found.
-                        ViewModelLogger.WriteLog("FAILED TO FIND A NEW VIN NUMBER FOR OUR VEHICLE!", LogType.ErrorLog);
-                        this.VehicleVin = "VIN REQUEST ERROR!"; VinReadRun = true;
-                        continue;
-                    }
-
-                    // Check for voltage lost instead of connected.
-                    RefreshTimer = 250; this.VehicleVin = null;
-                    ViewModelLogger.WriteLog("LOST OBD 12V INPUT! CLEARING OUT STORED VALUES NOW...", LogType.InfoLog);
-                    ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
-                };
-            }, this.RefreshSource.Token);
-
-            // Log started, return true.
-            ViewModelLogger.WriteLog("LOGGING VOLTAGE TO OUR LOG FILES AND PREPARING TO READ TO VIEW MODEL", LogType.InfoLog);
-            return true;
-        }
-        /// <summary>
-        /// Stops a refresh session. 
-        /// </summary>
-        /// <returns>True if stopped ok. False if not.</returns>
-        private void StopVehicleMonitoring()
-        {
-            // Reset all values here.
-            ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
-            this.RefreshSource?.Cancel();
-
-            // Dispose our instance object here
-            this.InstanceSession.Dispose();
-            this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this.SelectedDevice);
-            ViewModelLogger.WriteLog("DISPOSING PASSED FOR SHARP SESSION! KILLED OUR INSTANCE WITHOUT ISSUES!", LogType.InfoLog);
-
-            // Setup task objects again.
-            IsMonitoring = false; this.VehicleVin = null; this.DeviceVoltage = 0.00;
-            ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
-            ViewModelLogger.WriteLog("STOPPED REFRESHING AND KILLED OUR INSTANCE OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"STORED NEW DEVICE VALUE OF {this.SelectedDevice}", LogType.InfoLog);
         }
 
         // -------------------------------------------------------------------------------------------------------------------------
@@ -283,20 +199,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             if (NeedsMonitoringReset) this.StartVehicleMonitoring();
             return VinResult;
         }
-
-
         /// <summary>
         /// Updates our device voltage value based on our currently selected device information
         /// </summary>
         /// <returns>Voltage of the device connected and selected</returns>
         private double ReadDeviceVoltage() 
         {
-            try {
+            try 
+            {
                 // Now with our new channel ID, we open an instance and pull the channel voltage.
-                this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true); this.DeviceVoltage = DoubleVoltage;
+                this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true); 
                 return DoubleVoltage;
             }
-            catch {
+            catch 
+            {
                 // Log failed to read value, return 0.00v
                 ViewModelLogger.WriteLog("FAILED TO READ NEW VOLTAGE VALUE!", LogType.ErrorLog);
                 return 0.00;
@@ -378,6 +294,92 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             VinString = null; ProtocolUsed = default;
             ViewModelLogger.WriteLog($"FAILED TO FIND A VIN NUMBER AFTER SCANNING {UsableTypes.Length} DIFFERENT TYPE PROTOCOLS!", LogType.ErrorLog);
             return false;
+        }
+
+        
+        /// <summary>
+        /// Consumes our active device and begins a voltage reading routine.
+        /// </summary>
+        /// <returns>True if consumed, false if not.</returns>
+        private bool StartVehicleMonitoring()
+        {
+            // Try and kill old sessions then begin refresh routine
+            this.RefreshSource = new CancellationTokenSource();
+            int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false;
+            ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
+
+            // Run as a task to avoid locking up UI
+            Task.Run(() =>
+            {
+                // Do this as long as we need to keep reading based on the token
+                this.InstanceSession.PTOpen();
+                while (!this.RefreshSource.IsCancellationRequested)
+                {
+                    // Pull in our next voltage value here. Check for voltage gained or removed
+                    Thread.Sleep(RefreshTimer);
+                    this.DeviceVoltage = this.ReadDeviceVoltage();
+
+                    // Check our voltage value. Perform actions based on value pulled
+                    if (this.DeviceVoltage >= 11 && !VinReadRun)
+                    {
+                        // Log information, pull our vin number, then restart this process using the OnLost value.
+                        RefreshTimer = 1500;
+                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true)) {
+                            ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+                            continue;
+                        }
+
+                        // Pull our Vin number of out the vehicle now.
+                        if (this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
+                        {
+                            // Log information, store these values.
+                            this.VehicleVin = VinFound; VinReadRun = true;
+                            ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
+                            ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
+                            ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
+
+                            // Store class values, cancel task, and restart it for on lost.
+                            ViewModelLogger.WriteLog("STARTING NEW TASK TO WAIT FOR VOLTAGE BEING LOST NOW...", LogType.WarnLog);
+                            continue;
+                        }
+
+                        // Log failures and move on. This only happens when a VIN is not found.
+                        ViewModelLogger.WriteLog("FAILED TO FIND A NEW VIN NUMBER FOR OUR VEHICLE!", LogType.ErrorLog);
+                        this.VehicleVin = "VIN REQUEST ERROR!"; VinReadRun = true;
+                        continue;
+                    }
+
+                    // Check for voltage lost instead of connected.
+                    RefreshTimer = 250; this.VehicleVin = null;
+                    ViewModelLogger.WriteLog("LOST OBD 12V INPUT! CLEARING OUT STORED VALUES NOW...", LogType.InfoLog);
+                    ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
+                };
+            }, this.RefreshSource.Token);
+
+            // Log started, return true.
+            ViewModelLogger.WriteLog("LOGGING VOLTAGE TO OUR LOG FILES AND PREPARING TO READ TO VIEW MODEL", LogType.InfoLog);
+            return true;
+        }
+        /// <summary>
+        /// Stops a refresh session. 
+        /// </summary>
+        /// <returns>True if stopped ok. False if not.</returns>
+        private void StopVehicleMonitoring()
+        {
+            // Reset all values here.
+            ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
+            this.RefreshSource?.Cancel();
+
+            // Dispose our instance object here
+            this.InstanceSession.Dispose();
+            if (this.SelectedDevice != "No Device Selected") 
+                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this.SelectedDevice);
+            ViewModelLogger.WriteLog("DISPOSING AND RECREATION PASSED FOR SHARP SESSION! KILLED OUR INSTANCE WITHOUT ISSUES!", LogType.InfoLog);
+
+            // Setup task objects again.
+            IsMonitoring = false; this.VehicleVin = null; this.DeviceVoltage = 0.00;
+            ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
+            ViewModelLogger.WriteLog("STOPPED REFRESHING AND KILLED OUR INSTANCE OK!", LogType.InfoLog);
         }
     }
 }
