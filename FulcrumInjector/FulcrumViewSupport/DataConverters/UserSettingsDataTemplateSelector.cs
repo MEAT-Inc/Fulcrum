@@ -39,7 +39,8 @@ namespace FulcrumInjector.FulcrumViewSupport.DataConverters
                     // Found control type
                     case ControlTypes.CHECKBOX_CONTROL: return InputElement.FindResource("CheckboxSettingEntryDataTemplate") as DataTemplate;
                     case ControlTypes.TEXTBOX_CONTROL: return InputElement.FindResource("TextBoxSettingEntryDataTemplate") as DataTemplate;
-                    
+                    case ControlTypes.COMBOBOX_CONTROL: return InputElement.FindResource("ComboBoxSettingEntryDataTemplate") as DataTemplate;
+
                     // If failed
                     case ControlTypes.NOT_DEFINED:
                         TemplateLogger.WriteLog($"FAILED TO FIND NEW CONTROL TYPE FOR VALUE {SettingModelObject.TypeOfControl}!", LogType.ErrorLog);

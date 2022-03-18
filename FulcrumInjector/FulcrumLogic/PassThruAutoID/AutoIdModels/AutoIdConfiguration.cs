@@ -5,7 +5,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdModels
     /// <summary>
     /// Class object used to declare types for auto id routines
     /// </summary>
-    public class AutoIdRoutine
+    public class AutoIdConfiguration
     {
         // Class values for pulling in new information about an AutoID routine
         public BaudRate ConnectBaud { get; set; }

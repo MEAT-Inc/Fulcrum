@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdModels;
 using Newtonsoft.Json;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
@@ -15,25 +16,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
     /// <summary>
     /// Auto ID routine for an ISO15765 Routine configuration
     /// </summary>
-    public class AutoIdRoutine_ISO15765 : AutoIdIRoutine
+    public class AutoIdRoutine_ISO15765 : AutoIdRoutine
     {
         /// <summary>
         /// Builds a new AutoID routine for ISO15765 channels
         /// </summary>
-        /// <param name="ApiVersion">J2534 Version</param>
-        /// <param name="DllName">DLL Name to use</param>
-        /// <param name="DeviceName">Device Name to use</param>
-        /// <param name="ProtocolValue">ProtocolValue to use</param>
-        public AutoIdRoutine_ISO15765(JVersion ApiVersion, string DllName, string DeviceName) :
-            base(ApiVersion, DllName, DeviceName, ProtocolId.ISO15765)
+        /// <param name="InstanceSession">A SharpSession object which is used to do our scanning.</param>
+        public AutoIdRoutine_ISO15765(Sharp2534Session InstanceSession) :
+            base(InstanceSession.DeviceVersion, InstanceSession.DllName, InstanceSession.DeviceName, ProtocolId.ISO15765)
         {
             // Open the Session and store it here.
-            this.OpenSession(out this.SessionInstance);
+            this.OpenSession(InstanceSession);
             this.AutoIdLogger.WriteLog($"SETUP SESSION FOR INSTANCE PROTOCOL TYPE {this.AutoIdType} OK!", LogType.InfoLog);
-
-            // Now open our channel and prepare to run commands. If this method passes, then we can just issue the connect/Vin pull method
-            if (this.ConnectChannel(out this.ChannelIdOpened)) this.AutoIdLogger.WriteLog("CONNECTED TO OUR CHANNEL INSTANCE OK!", LogType.InfoLog);
-            else throw new InvalidOperationException($"FAILED TO CONNECT TO NEW {this.AutoIdType} CHANNEL!");
         }
         /// <summary>
         /// Deconstruction for this instance object type.
@@ -75,7 +69,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
             );
 
             // Log information about the newly issued command objects.
-            this.AutoIdLogger.WriteLog($"ISSUES A PT CONNECT REQUEST FOR PROTOCOL {this.AutoIdType}!", LogType.InfoLog);
+            this.AutoIdLogger.WriteLog($"ISSUED A PT CONNECT REQUEST FOR PROTOCOL {this.AutoIdType}!", LogType.InfoLog);
             this.AutoIdLogger.WriteLog($"CHANNEL ID OPENED WAS SEEN TO BE: {this.ChannelIdOpened}", LogType.WarnLog);
 
             // Build our filter objects here and apply them all.
@@ -84,9 +78,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
                 // Store our types for filters here.
                 FilterDef FilterType = FilterObj.FilterType;
                 ProtocolId FilterProtocol = FilterObj.FilterProtocol;
-                string FilterMask = FilterObj.FilterMask.MessageData;
-                string FilterPattern = FilterObj.FilterPattern.MessageData;
-                string FilterFlowControl = FilterType == FilterDef.FLOW_CONTROL_FILTER ? FilterObj.FilterFlowControl.MessageData : null;
+                string FilterMask = FilterObj.FilterMask.MessageData.Replace("0x", "");
+                string FilterPattern = FilterObj.FilterPattern.MessageData.Replace("0x", ""); ;
+                string FilterFlowControl = FilterType == FilterDef.FLOW_CONTROL_FILTER ? 
+                    FilterObj.FilterFlowControl.MessageData.Replace("0x", "") :
+                    null;
 
                 try
                 {
@@ -148,7 +144,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
                 var MessageBuilt = J2534Device.CreatePTMsgFromString(
                     CommandObj.MessageProtocol,
                     (uint)CommandObj.MessageFlags,
-                    CommandObj.MessageData
+                    CommandObj.MessageData.Replace("0x", "")
                 );
 
                 // Log information, append this object into the list of new messages and move on.
