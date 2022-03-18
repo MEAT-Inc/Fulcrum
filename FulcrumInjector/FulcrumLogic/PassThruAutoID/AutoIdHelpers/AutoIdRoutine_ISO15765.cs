@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdModels;
 using Newtonsoft.Json;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
@@ -15,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
     /// <summary>
     /// Auto ID routine for an ISO15765 Routine configuration
     /// </summary>
-    public class AutoIdRoutine_ISO15765 : AutoIdIRoutine
+    public class AutoIdRoutine_ISO15765 : AutoIdRoutine
     {
         /// <summary>
         /// Builds a new AutoID routine for ISO15765 channels
@@ -24,11 +25,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
         /// <param name="DllName">DLL Name to use</param>
         /// <param name="DeviceName">Device Name to use</param>
         /// <param name="ProtocolValue">ProtocolValue to use</param>
-        public AutoIdRoutine_ISO15765(JVersion ApiVersion, string DllName, string DeviceName) :
-            base(ApiVersion, DllName, DeviceName, ProtocolId.ISO15765)
+        public AutoIdRoutine_ISO15765(Sharp2534Session InstanceSession) :
+            base(InstanceSession.DeviceVersion, InstanceSession.DllName, InstanceSession.DeviceName, ProtocolId.ISO15765)
         {
             // Open the Session and store it here.
-            this.OpenSession(out this.SessionInstance);
+            this.OpenSession(this.SessionInstance);
             this.AutoIdLogger.WriteLog($"SETUP SESSION FOR INSTANCE PROTOCOL TYPE {this.AutoIdType} OK!", LogType.InfoLog);
 
             // Now open our channel and prepare to run commands. If this method passes, then we can just issue the connect/Vin pull method

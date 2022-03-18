@@ -42,6 +42,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Update property value. Setup new List of DLLs.
                 PropertyUpdated(value);
                 InstalledDevices = this.PopulateDevicesForDLL(value);
+
+                // Update the connection view model values here
+                if (InjectorConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
+                InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = value.Name;
             }
         }
 
@@ -54,25 +58,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Store class value. Stop background refreshing once we find a device
                 PropertyUpdated(value);
                 JBoxEventWatchdog.StopBackgroundRefresh();
-                
-                Task.Run(() =>
-                {
-                    // Run this inside a task to avoid snagging UI Content
-                    this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value));
-                    ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
-                });
+
+                // Update the connection view model values here. Don't set if the device is the same.
+                var ConnectionVm = InjectorConstants.FulcrumVehicleConnectionInfoViewModel;
+                if (ConnectionVm == null || ConnectionVm?.SelectedDevice == value) return;
+                InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDevice = value;
             }
         }
 
         // Current Installed DLL List object and installed Devices for Said DLL
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
         public ObservableCollection<string> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
-
-        // -------------------------------------------------------------------------------------------------------------------------
-
-        // Event triggers for device selection changed data input
-        public event EventHandler<DeviceChangedEventArgs> DeviceSelectionChanged;
-        protected void OnSelectedDeviceChanged(DeviceChangedEventArgs EventArgs) { DeviceSelectionChanged?.Invoke(this, EventArgs); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 

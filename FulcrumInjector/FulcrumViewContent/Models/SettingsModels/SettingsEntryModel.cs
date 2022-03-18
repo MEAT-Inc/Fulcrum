@@ -17,6 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         NOT_DEFINED,        // Bad enum type parse
         CHECKBOX_CONTROL,   // Checkbox
         TEXTBOX_CONTROL,    // Textbox
+        COMBOBOX_CONTROL,   // Combobox
     }
 
     // --------------------------------------------------------------------------------------------------------------------------
@@ -64,6 +65,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 case ControlTypes.CHECKBOX_CONTROL: 
                     this.SettingControlType = typeof(CheckBox);
                     this.SettingValue = bool.Parse(Value.ToString());
+                    break;
+
+                // ComboBox
+                case ControlTypes.COMBOBOX_CONTROL:
+                    this.SettingControlType = typeof(ComboBox);
+                    this.SettingValue = Value.ToString().Split(',');
                     break;
 
                 // TextBox

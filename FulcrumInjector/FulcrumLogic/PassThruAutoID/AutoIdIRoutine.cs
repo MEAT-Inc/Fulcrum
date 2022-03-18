@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
     /// Interface base for Auto ID routines which can be used by our connection routine.
     /// This interface lays out a Open, Connect, Read VIN, and Close command.
     /// </summary>
-    public abstract class AutoIdIRoutine
+    public abstract class AutoIdRoutine
     {
         // Logger object for monitoring logger outputs
         protected internal readonly SubServiceLogger AutoIdLogger;
@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         public readonly string Device;
         public readonly JVersion Version;
         public readonly ProtocolId AutoIdType;
-        public readonly AutoIdRoutine AutoIdCommands;
+        public readonly AutoIdModels.AutoIdRoutine AutoIdCommands;
 
         // Runtime Instance Values (private only)
         protected internal uint[] FilterIds;
@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         /// <summary>
         /// Builds a new connection instance for AutoID
         /// </summary>
-        protected AutoIdIRoutine(JVersion ApiVersion, string DllName, string DeviceName, ProtocolId ProtocolValue)
+        protected internal AutoIdRoutine(JVersion ApiVersion, string DllName, string DeviceName, ProtocolId ProtocolValue)
         {
             // Store class values here and build our new logger object.
             this.DLL = DllName;
@@ -73,7 +73,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
             {
                 // Convert into JSON here.
                 string ObjectString = JsonConvert.SerializeObject(InputObj);
-                AutoIdRoutine RoutineObject = (AutoIdRoutine)JsonConvert.DeserializeObject(ObjectString, typeof(AutoIdRoutine));
+                AutoIdModels.AutoIdRoutine RoutineObject = (AutoIdModels.AutoIdRoutine)JsonConvert.DeserializeObject(ObjectString, typeof(AutoIdModels.AutoIdRoutine));
                 this.AutoIdLogger.WriteLog($"--> BUILT NEW SETTINGS ROUTINE OBJECT FOR PROTOCOL {RoutineObject.AutoIdType} OK!", LogType.InfoLog);
                 return RoutineObject;
             });
@@ -92,23 +92,26 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
         /// <param name="DeviceName">Name of Device</param>
         /// <param name="SessionInstance">Instance built</param>
         /// <returns>True if the session is built ok. False if it is not.</returns>
-        public bool OpenSession(out Sharp2534Session SessionBuilt)
+        public bool OpenSession(Sharp2534Session InputSession = null)
         {
             try
             {
-                // Build a new SharpSession object here.
-                this.SessionInstance = new Sharp2534Session(this.Version, this.DLL, this.Device);
+                // Store our instance session
+                this.SessionInstance = InputSession ?? new Sharp2534Session(this.Version, this.DLL, this.Device);
+                this.AutoIdLogger.WriteLog("STORED INSTANCE SESSION OK! READY TO BEGIN AN AUTO ID ROUTINE WITH IT NOW...");
+
+                // Open our session object and begin connecting
                 this.SessionInstance.PTOpen();
                 this.AutoIdLogger.WriteLog("BUILT NEW SHARP SESSION FOR ROUTINE OK! SHOWING RESULTS BELOW", LogType.InfoLog);
-                this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString());
-                SessionBuilt = this.SessionInstance; return true;
+                this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString()); 
+                return true;
             }
             catch (Exception SessionEx)
             {
                 // Log our exception and throw failures.
                 this.AutoIdLogger.WriteLog($"FAILED TO BUILD AUTO ID ROUTINE SESSION FOR PROTOCOL TYPE {this.AutoIdType}!", LogType.ErrorLog);
                 this.AutoIdLogger.WriteLog("EXCEPTION THROWN DURING SESSION CONFIGURATION METHOD", SessionEx);
-                SessionBuilt = null; return false;
+                return false;
             }
         }
         /// <summary>
