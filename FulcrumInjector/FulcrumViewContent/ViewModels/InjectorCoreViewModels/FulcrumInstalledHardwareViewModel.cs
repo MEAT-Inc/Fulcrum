@@ -28,20 +28,29 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledHardwareViewModelLogger")) ?? new SubServiceLogger("InstalledHardwareViewModelLogger");
 
         // Private Control Values
+        private bool _isIgnoredDLL;
         private J2534Dll _selectedDLL;
         private string _selectedDevice;
         private ObservableCollection<J2534Dll> _installedDLLs;
         private ObservableCollection<string> _installedDevices;
 
         // Selected DLL object
+        public bool IsIgnoredDLL { get => _isIgnoredDLL; set => PropertyUpdated(value); }
         public J2534Dll SelectedDLL
         {
             get => _selectedDLL;
             set
             {
-                // Update property value. Setup new List of DLLs.
-                PropertyUpdated(value);
-                InstalledDevices = this.PopulateDevicesForDLL(value);
+                // Check if we need to stop background operations or not.
+                if (value == null || value != this._selectedDLL) {
+                    JBoxEventWatchdog.StopBackgroundRefresh(); 
+                    if (value == null) return;
+                }
+
+                // Update the connection view model values here
+                PropertyUpdated(value); InstalledDevices = this.PopulateDevicesForDLL(value);
+                if (InjectorConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
+                InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = value.Name;
             }
         }
 
@@ -51,28 +60,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDevice;
             set
             {
-                // Store class value. Stop background refreshing once we find a device
+                // Update private properties and set new values on other components
                 PropertyUpdated(value);
-                JBoxEventWatchdog.StopBackgroundRefresh();
-                
-                Task.Run(() =>
-                {
-                    // Run this inside a task to avoid snagging UI Content
-                    this.OnSelectedDeviceChanged(new DeviceChangedEventArgs(this.SelectedDLL, value));
-                    ViewModelLogger?.WriteLog("SET NEW SELECTED DLL AND FIRED EVENT FOR LISTENING TARGETS OK!", LogType.InfoLog);
-                });
+                if (!string.IsNullOrWhiteSpace(value)) JBoxEventWatchdog.StopBackgroundRefresh();
+
+                // Update the connection view model values here. Don't set if the device is the same.
+                var ConnectionVm = InjectorConstants.FulcrumVehicleConnectionInfoViewModel;
+                if (ConnectionVm == null || ConnectionVm?.SelectedDevice == value) return;
+                InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDevice = value;
             }
         }
 
         // Current Installed DLL List object and installed Devices for Said DLL
         public ObservableCollection<J2534Dll> InstalledDLLs { get => _installedDLLs; set => PropertyUpdated(value); }
         public ObservableCollection<string> InstalledDevices { get => _installedDevices; set => PropertyUpdated(value); }
-
-        // -------------------------------------------------------------------------------------------------------------------------
-
-        // Event triggers for device selection changed data input
-        public event EventHandler<DeviceChangedEventArgs> DeviceSelectionChanged;
-        protected void OnSelectedDeviceChanged(DeviceChangedEventArgs EventArgs) { DeviceSelectionChanged?.Invoke(this, EventArgs); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -151,11 +152,21 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private ObservableCollection<string> PopulateDevicesForDLL(J2534Dll DllEntry)
         {
             // Log information and pull in our new Device entries for the DLL given if any exist.
-            if (DllEntry == null) ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
-            
+            if (DllEntry == null) return new ObservableCollection<string>();
+            ViewModelLogger.WriteLog($"FINDING DEVICE ENTRIES FOR DLL NAMED {DllEntry.Name} NOW", LogType.WarnLog);
+
+            // Check for not supported DLL Values.
+            var IgnoredDLLs = ValueLoaders.GetConfigValue<string[]>("FulcrumInjectorConstants.InjectorHardwareRefresh.IgnoredDLLNames");
+            if (IgnoredDLLs.Contains(DllEntry.Name)) {
+                IsIgnoredDLL = true;
+                ViewModelLogger.WriteLog("NOT UPDATING DEVICES FOR A DLL WHICH IS KNOWN TO NOT BE USABLE WITH THE FULCRUM!", LogType.WarnLog);
+                return new ObservableCollection<string>();
+            }
+
             try
             {
                 // Pull devices, list count, and return values.
+                IsIgnoredDLL = false;
                 var PulledDeviceList = DllEntry.FindConnectedDeviceNames();
                 if (PulledDeviceList.Count == 0) throw new InvalidOperationException("FAILED TO FIND ANY DEVICES TO USE FOR OUR J2534 INSTANCE!");
 

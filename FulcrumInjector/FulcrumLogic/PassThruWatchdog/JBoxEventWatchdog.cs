@@ -99,7 +99,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         public static void StartBackgroundRefresh(string DLLNameFilter = "*", JVersion Version = JVersion.ALL_VERSIONS, int DeviceRefreshInterval = 2500, int DLLRefreshInterval = 0)
         {
             // Check to see if this is running or not.
-            if (_isRefreshing) { return; }
+            if (_isRefreshing) { StopBackgroundRefresh(); }
 
             // Build a list of our parameters for search refresh objects 
             _isRefreshing = true;
@@ -209,10 +209,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruWatchdog
         public static void StopBackgroundRefresh()
         {           
             // Check to see if this is running or not.
-            if (!_isRefreshing) {
-                JBoxSniffLogger.WriteLog("CAN NOT STOP A REFRESH METHOD THAT HAS NEVER BEEN STARTED!", LogType.ErrorLog);
-                return;
-            }
+            if (!_isRefreshing) { return; }
 
             // Stop the method here.
             JBoxSniffLogger.WriteLog("STOPPING REFRESH OPERATIONS NOW...", LogType.InfoLog);

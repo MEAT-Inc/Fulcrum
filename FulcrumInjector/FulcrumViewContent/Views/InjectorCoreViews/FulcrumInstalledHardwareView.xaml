@@ -189,7 +189,8 @@
                              x:Name="InstalledDevicesListBox"
                              SelectedItem="{Binding SelectedDevice}"
                              Style="{StaticResource HardwareContentsListBoxStyle}"
-                             ItemsSource="{Binding InstalledDevices}">
+                             ItemsSource="{Binding InstalledDevices}"
+                             SelectionChanged="InstalledDevicesListBox_OnSelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
@@ -237,6 +238,9 @@
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="No DLL Selected!"/>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
+                                            <Setter Property="Text" Value="Unsupported DLL!"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
@@ -251,6 +255,9 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="Ensure at least one device for the selected DLL has been connected to this machine before trying to view the details of it."/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
+                                            <Setter Property="Text" Value="The currently selected DLL is not supported by the Fulcrum. Please select a different DLL entry from the list to the left."/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
