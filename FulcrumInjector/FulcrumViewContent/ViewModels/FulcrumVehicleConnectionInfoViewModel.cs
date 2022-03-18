@@ -164,6 +164,46 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // -------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Pulls out the VIN number of the current vehicle and stores the voltage of it.
+        /// </summary>
+        /// <returns>True if pulled ok. False if not.</returns>
+        internal bool ReadVoltageAndVin()
+        {
+            // Now build our session instance and pull voltage first.
+            bool NeedsMonitoringReset = this.IsMonitoring;
+            if (NeedsMonitoringReset) this.StopVehicleMonitoring();
+            ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
+
+            // Store voltage value, log information. If voltage is less than 11.0, then exit.
+            this.InstanceSession.PTOpen();
+            this.DeviceVoltage = this.ReadDeviceVoltage();
+            if (this.DeviceVoltage < 11.0) {
+                ViewModelLogger.WriteLog("ERROR! VOLTAGE VALUE IS LESS THAN THE ACCEPTABLE 11.0V CUTOFF! NOT AUTO IDENTIFYING THIS CAR!", LogType.ErrorLog);
+                return false;
+            }
+
+            // Return passed and store our new values
+            bool VinResult = this.ReadVehicleVin(out string NewVin, out var ProcPulled);
+            if (!VinResult) { ViewModelLogger.WriteLog("FAILED TO PULL A VIN VALUE!", LogType.ErrorLog); }
+            else
+            {
+                // Log information, store new values.
+                this.VehicleVin = NewVin;
+                ViewModelLogger.WriteLog($"VOLTAGE VALUE PULLED OK! READ IN NEW VALUE {this.DeviceVoltage:F2}!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {this.VehicleVin} WITH PROTOCOL ID: {ProcPulled}!", LogType.InfoLog);
+            }
+
+            // Kill our session here
+            ViewModelLogger.WriteLog("CLOSING REQUEST SESSION MANUALLY NOW...", LogType.WarnLog);
+
+            // Return the result of our VIN Request
+            ViewModelLogger.WriteLog("SESSION CLOSED AND NULLIFIED OK!", LogType.InfoLog);
+            if (NeedsMonitoringReset) this.StartVehicleMonitoring();
+            return VinResult;
+        }
+
+
+        /// <summary>
         /// Consumes our active device and begins a voltage reading routine.
         /// </summary>
         /// <returns>True if consumed, false if not.</returns>
@@ -263,44 +303,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
 
         /// <summary>
-        /// Pulls out the VIN number of the current vehicle and stores the voltage of it.
-        /// </summary>
-        /// <returns>True if pulled ok. False if not.</returns>
-        internal bool ReadVoltageAndVin()
-        {
-            // Now build our session instance and pull voltage first.
-            bool NeedsMonitoringReset = this.IsMonitoring;
-            if (NeedsMonitoringReset) this.StopVehicleMonitoring();
-            ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
-
-            // Store voltage value, log information. If voltage is less than 11.0, then exit.
-            this.InstanceSession.PTOpen();
-            this.DeviceVoltage = this.ReadDeviceVoltage();
-            if (this.DeviceVoltage < 11.0) {
-                ViewModelLogger.WriteLog("ERROR! VOLTAGE VALUE IS LESS THAN THE ACCEPTABLE 11.0V CUTOFF! NOT AUTO IDENTIFYING THIS CAR!", LogType.ErrorLog);
-                return false;
-            }
-
-            // Return passed and store our new values
-            bool VinResult = this.ReadVehicleVin(out string NewVin, out var ProcPulled);
-            if (!VinResult) { ViewModelLogger.WriteLog("FAILED TO PULL A VIN VALUE!", LogType.ErrorLog); }
-            else 
-            {
-                // Log information, store new values.
-                this.VehicleVin = NewVin;
-                ViewModelLogger.WriteLog($"VOLTAGE VALUE PULLED OK! READ IN NEW VALUE {this.DeviceVoltage:F2}!", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {this.VehicleVin} WITH PROTOCOL ID: {ProcPulled}!", LogType.InfoLog);
-            }
-
-            // Kill our session here
-            ViewModelLogger.WriteLog("CLOSING REQUEST SESSION MANUALLY NOW...", LogType.WarnLog); 
-
-            // Return the result of our VIN Request
-            ViewModelLogger.WriteLog("SESSION CLOSED AND NULLIFIED OK!", LogType.InfoLog);
-            if (NeedsMonitoringReset) this.StartVehicleMonitoring();
-            return VinResult;
-        }
-        /// <summary>
         /// Updates our device voltage value based on our currently selected device information
         /// </summary>
         /// <returns>Voltage of the device connected and selected</returns>
@@ -343,7 +345,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ViewModelLogger.WriteLog($"--> TYPE ARGUMENTS: {JsonConvert.SerializeObject(this.InstanceSession, Formatting.None)}", LogType.TraceLog);
 
                 // Generate our instance here and try to store our VIN
-                AutoIdRoutine AutoIdInstance = (AutoIdRoutine)Activator.CreateInstance(TypeValue, new[] { this.InstanceSession });
+                AutoIdRoutine AutoIdInstance = (AutoIdRoutine)Activator.CreateInstance(TypeValue, this.InstanceSession);
                 ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {TypeValue} OK!", LogType.InfoLog);
                 ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
 

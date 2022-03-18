@@ -103,7 +103,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
                 // Open our session object and begin connecting
                 this.SessionInstance.PTOpen();
                 this.AutoIdLogger.WriteLog("BUILT NEW SHARP SESSION FOR ROUTINE OK! SHOWING RESULTS BELOW", LogType.InfoLog);
-                this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString()); 
+                this.AutoIdLogger.WriteLog(this.SessionInstance.ToDetailedString());
+
+                // Now connect our channel object
+                if (this.ConnectChannel(out this.ChannelIdOpened)) this.AutoIdLogger.WriteLog("CONNECTED TO OUR CHANNEL INSTANCE OK!", LogType.InfoLog);
+                else throw new InvalidOperationException($"FAILED TO CONNECT TO NEW {this.AutoIdType} CHANNEL!");
                 return true;
             }
             catch (Exception SessionEx)
@@ -123,12 +127,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID
             try
             {
                 // Start by issuing a PTClose method.
-                this.SessionInstance.PTClose();
+                this.SessionInstance.PTDisconnect(0);
                 this.AutoIdLogger.WriteLog("CLOSED SESSION INSTANCE OK!", LogType.InfoLog);
-
-                // Close out the session object now.
-                this.SessionInstance = null;
-                this.AutoIdLogger.WriteLog("RELEASED SESSION INSTANCE OK!", LogType.InfoLog);
                 return true;
             }
             catch (Exception SessionEx)

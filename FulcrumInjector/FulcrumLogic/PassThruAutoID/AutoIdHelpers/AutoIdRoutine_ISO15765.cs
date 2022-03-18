@@ -21,20 +21,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
         /// <summary>
         /// Builds a new AutoID routine for ISO15765 channels
         /// </summary>
-        /// <param name="ApiVersion">J2534 Version</param>
-        /// <param name="DllName">DLL Name to use</param>
-        /// <param name="DeviceName">Device Name to use</param>
-        /// <param name="ProtocolValue">ProtocolValue to use</param>
+        /// <param name="InstanceSession">A SharpSession object which is used to do our scanning.</param>
         public AutoIdRoutine_ISO15765(Sharp2534Session InstanceSession) :
             base(InstanceSession.DeviceVersion, InstanceSession.DllName, InstanceSession.DeviceName, ProtocolId.ISO15765)
         {
             // Open the Session and store it here.
             this.OpenSession(this.SessionInstance);
             this.AutoIdLogger.WriteLog($"SETUP SESSION FOR INSTANCE PROTOCOL TYPE {this.AutoIdType} OK!", LogType.InfoLog);
-
-            // Now open our channel and prepare to run commands. If this method passes, then we can just issue the connect/Vin pull method
-            if (this.ConnectChannel(out this.ChannelIdOpened)) this.AutoIdLogger.WriteLog("CONNECTED TO OUR CHANNEL INSTANCE OK!", LogType.InfoLog);
-            else throw new InvalidOperationException($"FAILED TO CONNECT TO NEW {this.AutoIdType} CHANNEL!");
         }
         /// <summary>
         /// Deconstruction for this instance object type.
