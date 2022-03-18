@@ -67,7 +67,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="SendingDllObject"></param>
         /// <param name="DllChangedEventArgs"></param>
-
         private void InstalledDLLsListBox_OnSelectionChanged(object SendingDllObject, SelectionChangedEventArgs DllChangedEventArgs)
         {
             // Log info, find the currently selected DLL object, cast it, and run the VM Method.
@@ -76,15 +75,40 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Convert sender and cast our DLL object
             ListBox SendingBox = (ListBox)SendingDllObject;
             J2534Dll SelectedDLL = (J2534Dll)SendingBox.SelectedItem;
+
+            // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
             this.ViewLogger.WriteLog(
                 SelectedDLL == null ? "NO DLL ENTRY SELECTED! CLEARING" : $"DLL ENTRY PULLED: {SelectedDLL.Name}",
-                LogType.TraceLog);
+                LogType.TraceLog
+            );
 
             // Log and populate devices
-            this.ViewLogger.WriteLog("POPULATING VALUES FROM VIEW MODEL ROUTINE NOW"); 
-            this.ViewModel.InstalledDevices = this.ViewModel.PopulateDevicesForDLL(SelectedDLL);
-            this.InstalledDevicesListBox.ItemsSource = this.ViewModel.InstalledDevices;
+            this.ViewModel.SelectedDLL = SelectedDLL;
             this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Configures a new device selection value on the instance of our view model
+        /// </summary>
+        /// <param name="SendingDeviceObject"></param>
+        /// <param name="DeviceChangedEventArgs"></param>
+        private void InstalledDevicesListBox_OnSelectionChanged(object SendingDeviceObject, SelectionChangedEventArgs DeviceChangedEventArgs)
+        {
+            // Log info, find the currently selected DLL object, cast it, and run the VM Method.
+            this.ViewLogger.WriteLog("PROCESSED A DEVICE SELECTION CHANGED EVENT!", LogType.InfoLog);
+
+            // Convert sender and cast our DLL object
+            ListBox SendingBox = (ListBox)SendingDeviceObject;
+            string SelectedDevice = SendingBox.SelectedItem.ToString();
+
+            // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
+            this.ViewLogger.WriteLog(
+                string.IsNullOrWhiteSpace(SelectedDevice) ? "NO DLL ENTRY SELECTED! CLEARING" : $"DEVICE ENTRY PULLED: {SelectedDevice}",
+                LogType.TraceLog
+            );
+
+            // Log and populate devices
+            this.ViewModel.SelectedDevice = SelectedDevice;
+            this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
         }
     }
 }

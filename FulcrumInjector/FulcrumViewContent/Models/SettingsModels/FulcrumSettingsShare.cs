@@ -33,6 +33,13 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 
         // ---------------------------------------------------------------------------------------------------------------------
 
+        // General Application Settings (or an empty model if null)
+        public static SettingsEntryCollectionModel InjectorGeneralSettings =>
+            SettingsEntrySets?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Fulcrum Injector Settings")
+            ) ?? new SettingsEntryCollectionModel("Fulcrum Injector Settings", Array.Empty<SettingsEntryModel>());
+
+
         // Settings for Debug log viewing (Or an empty settings model if null)
         public static SettingsEntryCollectionModel DebugLogViewerSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
@@ -48,16 +55,15 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         // Settings for Regex Objects during parsing.
         public static SettingsEntryCollectionModel InjectorRegexSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
-                SettingObj.SettingSectionTitle.Contains("PassThru Regex Settings")
+                SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Regex Settings")
             ) ?? new SettingsEntryCollectionModel("PassThru Regex Settings", Array.Empty<SettingsEntryModel>());
 
         // Settings for color output during formatting for PT Output
         public static SettingsEntryCollectionModel InjectorDllSyntaxSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
-                SettingObj.SettingSectionTitle.Contains("PassThru Syntax Settings")
+                SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Syntax Settings")
             ) ?? new SettingsEntryCollectionModel("PassThru Syntax Settings", Array.Empty<SettingsEntryModel>());
 
-        // TODO: FINISH DEBUG SYNTAX SETTINGS HERE
         // Settings for color output during formatting for PT Output
         public static SettingsEntryCollectionModel InjectorDebugSyntaxSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>

@@ -35,7 +35,7 @@
         <!-- Title and information block -->
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="35"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Installed J2534 Hardware" Style="{StaticResource TitleStringText}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -67,7 +67,7 @@
                 <!-- Information Text and title -->
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="25"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Located DLLs" Style="{StaticResource HardwareTypeTitleStyle}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -80,6 +80,7 @@
 
                 <!-- DLL Entries -->
                 <ListBox Grid.IsSharedSizeScope="True" Grid.Row="1" 
+                         SelectedItem="{Binding SelectedDLL}"
                          x:Name="InstalledDLLsListBox" Margin="0,5,0,0" 
                          SelectionChanged="InstalledDLLsListBox_OnSelectionChanged"
                          Style="{StaticResource HardwareContentsListBoxStyle}"
@@ -172,7 +173,7 @@
                 <!-- Information Text and title -->
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="25"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Detected Devices" Style="{StaticResource HardwareTypeTitleStyle}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -185,12 +186,24 @@
 
                 <!-- Device Entries -->
                 <ListBox Grid.Row="1" Margin="0,5,0,0" 
-                         x:Name="InstalledDevicesListBox"
-                         Style="{StaticResource HardwareContentsListBoxStyle}"
-                         ItemsSource="{Binding InstalledDevices}">
+                             x:Name="InstalledDevicesListBox"
+                             SelectedItem="{Binding SelectedDevice}"
+                             Style="{StaticResource HardwareContentsListBoxStyle}"
+                             ItemsSource="{Binding InstalledDevices}"
+                             SelectionChanged="InstalledDevicesListBox_OnSelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
+                            <!-- 
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width=".5*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding}" FontSize="14" Padding="5"/>
+                                <Button Grid.Column="1" Content="Release Device" Style="{StaticResource ActionButtonStyle}"/>
+                            </Grid>
+                            -->
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -225,6 +238,9 @@
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="No DLL Selected!"/>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
+                                            <Setter Property="Text" Value="Unsupported DLL!"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
@@ -239,6 +255,9 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="Ensure at least one device for the selected DLL has been connected to this machine before trying to view the details of it."/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
+                                            <Setter Property="Text" Value="The currently selected DLL is not supported by the Fulcrum. Please select a different DLL entry from the list to the left."/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

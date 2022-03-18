@@ -23,6 +23,159 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumSettingsPaneViewStyles.xaml"/>
+                <ResourceDictionary>
+                    <DataTemplate x:Key="CheckboxSettingEntryDataTemplate">
+                        <Border Margin="0,5,5,5" 
+                                HorizontalAlignment="Stretch"
+                                BorderBrush="{StaticResource SecondaryColor}"
+                                BorderThickness="1.5" 
+                                CornerRadius="3"
+                                Background="{StaticResource SecondaryColor_Darker_65}">
+                            <Grid Margin="20" Width="700">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height=".5*"/>
+                                    <RowDefinition Height="10"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width=".25*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock 
+                                    Grid.Row="0" 
+                                    Grid.Column="0" 
+                                    Style="{StaticResource SettingNameTextBlockStyle}"
+                                    Text="{Binding Path=SettingName}"/>
+                                <Border 
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"                    
+                                    Margin="5,0"
+                                    BorderThickness="0,1,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource DarkGreyThemeColor}"/>
+                               
+                                <CheckBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsEnabled="True"
+                                    HorizontalAlignment="Right"
+                                    x:Name="SettingValueCheckBox"
+                                    Checked="SettingValueChanged_OnTrigger"
+                                    IsChecked="{Binding Path=SettingValue}"/>
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    x:Name="SettingNameTextBlock"
+                                    Text="{Binding Path=SettingDescription}"
+                                    Style="{StaticResource DescriptionTextBlockStyle}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                    <DataTemplate x:Key="TextBoxSettingEntryDataTemplate">
+                            <Border Margin="5" 
+                                HorizontalAlignment="Stretch"
+                                BorderBrush="{StaticResource SecondaryColor}"
+                                BorderThickness="1.5" 
+                                CornerRadius="3"
+                                Background="{StaticResource SecondaryColor_Darker_65}">
+                            <Grid Margin="20" Width="700">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height=".5*"/>
+                                    <RowDefinition Height="10"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock 
+                                    Grid.Row="0" 
+                                    Grid.Column="0" 
+                                    Style="{StaticResource SettingNameTextBlockStyle}"
+                                    Text="{Binding Path=SettingName}"/>
+                                <Border 
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"                    
+                                    Margin="5,0,5,-2"
+                                    BorderThickness="0,1,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource DarkGreyThemeColor}"/>
+
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsEnabled="True"
+                                    Margin="0,0,5,5"
+                                    Padding="10,0,10,0"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    LostFocus="SettingValueChanged_OnTrigger"
+                                    Text="{Binding Path=SettingValue}"
+                                    Style="{StaticResource StaticBackgroundInputTextBox}"/>
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    Text="{Binding Path=SettingDescription}"
+                                    Style="{StaticResource DescriptionTextBlockStyle}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                    <DataTemplate x:Key="ComboBoxSettingEntryDataTemplate">
+                        <Border Margin="5" 
+                                HorizontalAlignment="Stretch"
+                                BorderBrush="{StaticResource SecondaryColor}"
+                                BorderThickness="1.5" 
+                                CornerRadius="3"
+                                Background="{StaticResource SecondaryColor_Darker_65}">
+                            <Grid Margin="20" Width="700">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height=".5*"/>
+                                    <RowDefinition Height="10"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock 
+                                    Grid.Row="0" 
+                                    Grid.Column="0" 
+                                    Style="{StaticResource SettingNameTextBlockStyle}"
+                                    Text="{Binding Path=SettingName}"/>
+                                <Border 
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"                    
+                                    Margin="5,0,5,-2"
+                                    BorderThickness="0,1,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource DarkGreyThemeColor}"/>
+
+                                <ComboBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsEnabled="True"
+                                    SelectedIndex="0"
+                                    Margin="0,0,5,5"
+                                    Padding="10,0,10,0"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    LostFocus="SettingValueChanged_OnTrigger"
+                                    ItemsSource="{Binding Path=SettingValue}"/>
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    Text="{Binding Path=SettingDescription}"
+                                    Style="{StaticResource DescriptionTextBlockStyle}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -30,7 +183,7 @@
         <!-- Settings items -->
     <Grid Margin="5,10,5,5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".25*"/>
+            <RowDefinition Height=".275*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -43,16 +196,23 @@
             <Grid>
                 <TextBlock Style="{StaticResource TitleStringText}"  FontWeight="Bold" Margin="10,0" HorizontalAlignment="Left">
                     <Run Text="Injector Settings"/>
-                    <Run Foreground="Yellow" FontStyle="Normal" Text="(Work In Progress)"/>
+                    <Run Foreground="Yellow" FontStyle="Normal" Text="(Almost Perfect...)"/>
                 </TextBlock>
             </Grid>
 
             <!-- Advances Options Gear -->
-            <Button HorizontalAlignment="Right"
-                    Content="Show Advanced Settings" Grid.Row="0"
-                    Style="{StaticResource ActionButtonStyle}" Margin="0,5,15,5"
-                    Click="OpenJsonViewerFlyoutButton_OnClick" Width="175">
-            </Button>
+            <DockPanel Grid.Row="0" HorizontalAlignment="Right">
+                <Button HorizontalAlignment="Stretch"
+                        Content="Show Advanced Settings"
+                        Style="{StaticResource ActionButtonStyle}" Margin="0,5,15,5"
+                        Click="OpenJsonViewerFlyoutButton_OnClick" Width="175">
+                </Button>
+                <Button HorizontalAlignment="Right"
+                        Content="Save Settings"
+                        Style="{StaticResource ActionButtonStyle}" Margin="0,5,15,5"
+                        Click="SaveSettingsButton_OnClick" Width="150">
+                </Button>
+            </DockPanel>
 
             <!-- Information Text -->
             <TextBlock Grid.Row="1" Margin="10,0" TextWrapping="Wrap" Foreground="{StaticResource TextColorBase}" FontSize="14">
@@ -70,59 +230,61 @@
                 BorderBrush="{StaticResource  TextColorBase}"/>
 
         <!-- Content for the settings objects goes in here -->
-        <ScrollViewer Grid.Row="1" Background="Black" Margin="10,-5,10,5">
-            <ListBox x:Name="SettingsListBoxView"
+        <Border Grid.Row="1" Margin="10,-5,15,5" BorderBrush="White" BorderThickness="3" CornerRadius="5">
+            <ScrollViewer Background="Black">
+                <ListBox x:Name="SettingsListBoxView"
                      HorizontalContentAlignment="Stretch"
                      VerticalContentAlignment="Stretch"
                      VerticalAlignment="Stretch"
                      ItemsSource="{Binding Path=SettingsEntrySets}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
-                            <Grid Margin="0, 5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="50"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Grid.Background>
-                                    <SolidColorBrush Color="#020202" Opacity=".85"/>
-                                </Grid.Background>
-                                <TextBlock
-                                Margin="5,5,10,0"
-                                Style="{StaticResource SettingSectionTitleStyle}"
-                                Text="{Binding Path=SettingSectionTitle}"/>
-                                <ListBox
-                                Grid.Row="1" 
-                                Height="Auto"
-                                Padding="0"
-                                Margin="0,0,5,0"
-                                BorderThickness="0"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                                ItemsSource="{Binding}"
-                                Style="{StaticResource ListBoxSettingsStyle}"
-                                DataContext="{Binding Path=SettingsEntries}">
-                                    <ListBox.Background>
-                                        <SolidColorBrush Color="Gray" Opacity=".50"/>
-                                    </ListBox.Background>
-                                    <ListBox.ItemTemplateSelector>
-                                        <dataConverters:UserSettingsDataTemplateSelector/>
-                                    </ListBox.ItemTemplateSelector>
-                                </ListBox>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </ScrollViewer>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
+                                <Grid Margin="0, 5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.Background>
+                                        <SolidColorBrush Color="#020202" Opacity=".85"/>
+                                    </Grid.Background>
+                                    <TextBlock
+                                        Margin="5,5,10,0"
+                                        Style="{StaticResource SettingSectionTitleStyle}"
+                                        Text="{Binding Path=SettingSectionTitle}"/>
+                                    <ListBox
+                                        Grid.Row="1" 
+                                        Height="Auto"
+                                        Padding="0"
+                                        Margin="0,0,5,0"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                        ItemsSource="{Binding}"
+                                        Style="{StaticResource ListBoxSettingsStyle}"
+                                        DataContext="{Binding Path=SettingsEntries}">
+                                        <ListBox.Background>
+                                            <SolidColorBrush Color="Gray" Opacity=".50"/>
+                                        </ListBox.Background>
+                                        <ListBox.ItemTemplateSelector>
+                                            <dataConverters:UserSettingsDataTemplateSelector/>
+                                        </ListBox.ItemTemplateSelector>
+                                    </ListBox>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </Border>
 
         <!-- Viewing Json Flyout -->
         <mah:FlyoutsControl Grid.Row="1">
             <mah:Flyout x:Name="JsonViewerFlyout" 
                         IsOpen="False"
-                        Margin="10"
+                        Margin="10,-5,10,5"
                         Position="Top"
                         BorderThickness="2"
                         mah:HeaderedControlHelper.HeaderMargin="5"
@@ -145,7 +307,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height=".20*"/>
                         <RowDefinition/>
-                        <RowDefinition Height=".175*"/>
+                        <RowDefinition Height=".15*"/>
                     </Grid.RowDefinitions>
 
                     <!-- Warning Text Block -->

@@ -86,6 +86,7 @@
 									<File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\AppColorTheme.xaml" />
 									<File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumControlStyles.xaml" />
 									<File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
+									<File Id="FULCRUMVEHICLECONNECTIONINFOSTYLES.XAML" Name="FulcrumVehicleConnectionInfoStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml" />
 									<File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml" />
 									<File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml" />
 									<File Id="FULCRUMHAMBURGERCOREVIEWSTYLES.XAML" Name="FulcrumHamburgerCoreViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml" />

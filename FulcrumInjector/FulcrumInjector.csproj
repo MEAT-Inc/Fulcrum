@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -34,13 +34,14 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Debug\FulcrumInjector.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -93,40 +94,41 @@
     <ApplicationManifest>FulcrumInjector.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
+    <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.5.0.1\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
-    <Reference Include="Fizzler, Version=1.2.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fizzler.1.2.1\lib\netstandard2.0\Fizzler.dll</HintPath>
+    <Reference Include="Fizzler, Version=1.3.0.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fizzler.1.3.0\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.2.30, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
-      <HintPath>..\packages\AvalonEdit.6.1.2.30\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.3.50, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvalonEdit.6.1.3.50\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.2.4.9\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.2.10.5.111\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.3.2.11.250\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.2.10.5.111\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.3.2.11.250\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=2.10.5.112, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.2.10.5.111\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=3.2.11.250, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534.3.2.11.250\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
-      <HintPath>..\packages\Svg.3.3.0\lib\net461\Svg.dll</HintPath>
+      <HintPath>..\packages\Svg.3.4.0\lib\net461\Svg.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
@@ -137,11 +139,14 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -158,7 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PtExpressionExtensions.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdHelpers\AutoIdRoutine_ISO15765.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdConfiguration.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdModels\AutoIdObjects.cs" />
+    <Compile Include="FulcrumLogic\PassThruAutoID\AutoIdIRoutine.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruConnectExpression.cs" />
@@ -168,9 +176,12 @@
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruWatchdog\JBoxEventWatchdog.cs" />
+    <Compile Include="FulcrumLogic\PassThruWatchdog\JBoxStateEventArgs.cs" />
+    <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\ReportEmailBroker.cs" />
-    <Compile Include="FulcrumLogic\TextTableGenerator.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\InjectorLogExports.cs" />
     <Compile Include="FulcrumLogic\PassThruExpressions\PassThruOpenExpression.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
@@ -182,6 +193,9 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml.cs">
+      <DependentUpon>FulcrumVehicleConnectionInfoView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
@@ -192,6 +206,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumLogReviewView.xaml.cs">
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
@@ -272,6 +287,10 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
+    <Page Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -329,6 +348,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
@@ -18,6 +19,8 @@ using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534;
+using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent
 {
@@ -45,6 +48,18 @@ namespace FulcrumInjector.FulcrumViewContent
         {
             get => FulcrumTitleView.ViewModel;
             set => FulcrumTitleView.ViewModel = value;
+        }
+
+        // Connected Vehicle information View and ViewModel
+        public static FulcrumVehicleConnectionInfoView FulcrumVehicleConnectionInfoView
+        {
+            get => InjectorMainWindow.FulcrumVehicleConnectionInfo;
+            set => InjectorMainWindow.FulcrumVehicleConnectionInfo = value;
+        }
+        public static FulcrumVehicleConnectionInfoViewModel FulcrumVehicleConnectionInfoViewModel
+        {
+            get => FulcrumVehicleConnectionInfoView.ViewModel;
+            set => FulcrumVehicleConnectionInfoView.ViewModel = value;
         }
 
         // Test DLL Injector View and ViewModel
@@ -141,8 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // Debug logging output user control and view model object
         public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)FulcrumDebugLoggingSingleton?.SingletonUserControl;
         public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)FulcrumDebugLoggingSingleton?.SingletonViewModel;
-
-
+        
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -161,8 +175,8 @@ namespace FulcrumInjector.FulcrumViewContent
             bool SetConstants = FulcrumTitleView.SetFlyoutBindings(
                 InjectorMainWindow.InformationFlyout, 
                 InjectorMainWindow.CloseInfoFlyoutButton
-            ); 
-            
+            );
+
             // Check result
             if (SetConstants) ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
