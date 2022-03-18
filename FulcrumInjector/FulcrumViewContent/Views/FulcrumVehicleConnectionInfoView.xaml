@@ -44,7 +44,7 @@
                     Text="J2534 Device:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=SelectedDevice, Mode=OneWay}" 
-                           FontSize="14"
+                           FontSize="14" x:Name="SelectedDeviceTextBlock"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </DockPanel>

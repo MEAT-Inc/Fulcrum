@@ -53,25 +53,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // Public values for our view to bind onto 
         public string VehicleVin
         {
-            get => string.IsNullOrWhiteSpace(_vehicleVIN) ? "No VIN Number" : _vehicleVIN; 
+            get => string.IsNullOrWhiteSpace(_vehicleVIN) ? "No VIN Number" : _vehicleVIN;
             set => PropertyUpdated(value);
-        }            
+        }
         public string VehicleInfo
         {
-            get => string.IsNullOrWhiteSpace(_vehicleInfo) ? "No VIN Number To Decode" : _vehicleInfo; 
+            get => string.IsNullOrWhiteSpace(_vehicleInfo) ? "No VIN Number To Decode" : _vehicleInfo;
             set => PropertyUpdated(value);
         }
 
         // Device Information
         public string SelectedDLL { get => _selectedDLL; set => PropertyUpdated(value); }
-        public double DeviceVoltage { get => _deviceVoltage; set => PropertyUpdated(value); }
         public string SelectedDevice
         {
             get => _selectedDevice ?? "No Device Selected";
             set
             {
                 // Check for the same value passed in again or nothing passed at all.
-                if (value == this._selectedDevice) {
+                if (value == this.SelectedDevice) {
                     PropertyUpdated(value);
                     ViewModelLogger.WriteLog("NOT BUILDING NEW SESSION FOR IDENTICAL DEVICE NAME!", LogType.TraceLog);
                     return;
@@ -79,7 +78,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                 // Check for a null device name or no device name provided.
                 PropertyUpdated(value);
-                if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected") 
+                if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected")
                 {
                     // Update private values, dispose the instance.
                     if (this.IsMonitoring) this.StopVehicleMonitoring();
@@ -87,19 +86,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     return;
                 }
 
-                // Update private values, dispose of the instance
-                if (this.IsMonitoring) this.StopVehicleMonitoring();
-                this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
-                ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
+                // Check if we want to use voltage monitoring or not.
+                bool UseMonitoring = FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Vehicle Monitoring", true);
+                if (!UseMonitoring) {
+                    ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+                    ViewModelLogger.WriteLog("TRYING TO PULL A VOLTAGE READING ONCE!", LogType.InfoLog);
+                    return;
+                }
 
                 try
                 {
-                    // Check if we want to use voltage monitoring or not.
-                    if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Vehicle Monitoring", true)) {
-                        ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
-                        ViewModelLogger.WriteLog("TRYING TO PULL A VOLTAGE READING ONCE!", LogType.InfoLog);
-                        return;
-                    }
+                    // Update private values, dispose of the instance
+                    if (this.IsMonitoring) this.StopVehicleMonitoring(); this.InstanceSession?.DisposeSharpSession();
+                    this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
+                    ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
 
                     // Start monitoring. Throw if this fails.
                     if (!this.StartVehicleMonitoring()) throw new InvalidOperationException("FAILED TO START OUR MONITORING ROUTINE!");
@@ -125,7 +125,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // Set the new value and set Can ID to false if value is now true
                 PropertyUpdated(value);
-                this.CanManualId = !value;
+                this.SelectedDevice = _selectedDevice;
+                this.CanManualId = value == false &&
+                                   this.DeviceVoltage >= 11 &&
+                                   this.SelectedDevice != "No Device Selected!";
+            }
+        }
+        public double DeviceVoltage
+        {
+            get => _deviceVoltage;
+            set
+            {
+                PropertyUpdated(value);
+                this.SelectedDevice = _selectedDevice;
+                this.CanManualId = value >= 11 &&
+                                   !this.AutoIdRunning &&
+                                   this.SelectedDevice != "No Device Selected";
             }
         }
         public bool CanManualId { get => _canManualId; set => PropertyUpdated(value); }
@@ -175,7 +190,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog($"BUILT NEW SESSION INSTANCE FOR DEVICE NAME {this.SelectedDevice} OK!", LogType.InfoLog);
 
             // Store voltage value, log information. If voltage is less than 11.0, then exit.
-            this.InstanceSession.PTOpen();
             this.DeviceVoltage = this.ReadDeviceVoltage();
             if (this.DeviceVoltage < 11.0) {
                 ViewModelLogger.WriteLog("ERROR! VOLTAGE VALUE IS LESS THAN THE ACCEPTABLE 11.0V CUTOFF! NOT AUTO IDENTIFYING THIS CAR!", LogType.ErrorLog);
@@ -211,7 +225,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         {
             // Try and kill old sessions then begin refresh routine
             this.RefreshSource = new CancellationTokenSource();
-            int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false;
+            int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false; int LoopsRun = 0;
             ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
             // Run as a task to avoid locking up UI
@@ -222,7 +236,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 while (!this.RefreshSource.IsCancellationRequested)
                 {
                     // Pull in our next voltage value here. Check for voltage gained or removed
-                    Thread.Sleep(RefreshTimer);
+                    Thread.Sleep(RefreshTimer); LoopsRun += 1;
                     this.DeviceVoltage = this.ReadDeviceVoltage();
                     RefreshTimer = this.DeviceVoltage >= 11 ? 5000 : 2500;
 
@@ -241,23 +255,30 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         try
                         {
                             // Pull our Vin number of out the vehicle now.
+                            if (LoopsRun != 1 && LoopsRun % 4 != 0) continue;
                             if (!this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
-                                throw new InvalidOperationException("FAILED TO PULL VEHICLE VIN NUMBER OUT OF THIS SESSION!");
+                            {
+                                // Log information, store these values.
+                                this.VehicleVin = VinFound; VinReadRun = true;
+                                ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
+                                ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
+                                ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
 
-                            // Log information, store these values.
-                            this.VehicleVin = VinFound; VinReadRun = true;
-                            ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
-                            ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
-                            ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
-
-                            // Store class values, cancel task, and restart it for on lost.
-                            ViewModelLogger.WriteLog("STARTING NEW TASK TO WAIT FOR VOLTAGE BEING LOST NOW...", LogType.WarnLog);
-                            continue;
+                                // Store class values, cancel task, and restart it for on lost.
+                                ViewModelLogger.WriteLog("STARTING NEW TASK TO WAIT FOR VOLTAGE BEING LOST NOW...", LogType.WarnLog);
+                            }
+                            else
+                            {
+                                // Log failed to pull but not thrown exception
+                                this.VehicleVin = "Failed to Read VIN!";
+                                ViewModelLogger.WriteLog("ROUTINE RAN CORRECTLY BUT NO VIN NUMBER WAS FOUND! THIS MEANS THERE'S SOMETHING ELSE WRONG...", LogType.ErrorLog);
+                                ViewModelLogger.WriteLog("VIN REQUEST ROUTINE WILL RERUN AFTER 4X THE DELAY TIME...", LogType.WarnLog);
+                            }
                         }
                         catch (Exception VinEx)
                         {
                             // Log failures generated by VIN Request routine. Fall out of here and try to run again
-                            this.VehicleVin = "Failed to Read!"; VinReadRun = true;
+                            this.VehicleVin = "Failed to Read VIN!"; VinReadRun = true;
                             ViewModelLogger.WriteLog("FAILED TO PULL IN A NEW VIN NUMBER DUE TO AN UNHANDLED EXCEPTION!", LogType.ErrorLog);
                             ViewModelLogger.WriteLog("LOGGING EXCEPTION THROWN DOWN BELOW", VinEx);
                             continue;
@@ -265,13 +286,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     }
 
                     // Check for voltage lost instead of connected.
-                    if (!this.VehicleVin.Contains("Voltage")) {
-                        ViewModelLogger.WriteLog("LOST OBD 12V INPUT! CLEARING OUT STORED VALUES NOW...", LogType.InfoLog);
-                        ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
-                    }
-
-                    // Update timer value and the VIN Value. Run again
+                    if (this.VehicleVin.Contains("Voltage") || this.DeviceVoltage != 0) continue;
                     this.VehicleVin = "No Vehicle Voltage!";
+                    ViewModelLogger.WriteLog("LOST OBD 12V INPUT! CLEARING OUT STORED VALUES NOW...", LogType.InfoLog);
+                    ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
                 };
             }, this.RefreshSource.Token);
 
@@ -300,15 +318,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Updates our device voltage value based on our currently selected device information
         /// </summary>
         /// <returns>Voltage of the device connected and selected</returns>
-        private double ReadDeviceVoltage() 
+        private double ReadDeviceVoltage()
         {
-            try 
+            try
             {
                 // Now with our new channel ID, we open an instance and pull the channel voltage.
-                this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true); 
+                if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
+                this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true);
                 return DoubleVoltage;
             }
-            catch 
+            catch
             {
                 // Log failed to read value, return 0.00v
                 // ViewModelLogger.WriteLog("FAILED TO READ NEW VOLTAGE VALUE!", LogType.ErrorLog);
@@ -334,40 +353,38 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             foreach (var TypeValue in UsableTypes)
             {
                 // Generate our instance here and try to store our VIN
-                this.InstanceSession?.PTClose(); this.InstanceSession?.Dispose();
                 ViewModelLogger.WriteLog($"--> BUILDING AUTO ID ROUTINE FOR TYPE {TypeValue.Name}");
-                using (this.InstanceSession = new Sharp2534Session(this._versionType, this.SelectedDLL, this.SelectedDevice))
+                this.InstanceSession ??= new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
+
+                try
                 {
-                    try
-                    {
-                        // Using instance configuration here.
-                        AutoIdRoutine AutoIdInstance = (AutoIdRoutine)Activator.CreateInstance(TypeValue, this.InstanceSession);
-                        ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {TypeValue} OK!", LogType.InfoLog);
-                        ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
+                    // Using instance configuration here.
+                    AutoIdRoutine AutoIdInstance = (AutoIdRoutine)Activator.CreateInstance(TypeValue, this.InstanceSession);
+                    ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {TypeValue} OK!", LogType.InfoLog);
+                    ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
 
-                        // Connect our channel, read the vin, and then close it.
-                        ProtocolUsed = AutoIdInstance.AutoIdType;
-                        bool VinRequestPassed = AutoIdInstance.RetrieveVinNumber(out VinString); AutoIdInstance.CloseSession();
-                        if (!VinRequestPassed) ViewModelLogger.WriteLog($"NO VIN NUMBER WAS FOUND WITH PROTOCOL {ProtocolUsed}! MOVING ONTO NEXT PROTOCOL...", LogType.WarnLog);
-                        else
-                        {
-                            // Log information about our pulled out VIN Number
-                            ViewModelLogger.WriteLog("VIN REQUEST ROUTINE AND CONNECTION PASSED!", LogType.InfoLog);
-                            ViewModelLogger.WriteLog($"USED CHANNEL ID: {AutoIdInstance.ChannelIdOpened}", LogType.TraceLog);
-
-                            // Log our new vin number pulled, return out of this method
-                            ViewModelLogger.WriteLog($"VIN VALUE LOCATED: {VinString}", LogType.InfoLog);
-                            ViewModelLogger.WriteLog("VIN NUMBER WAS PULLED CORRECTLY! STORING IT ONTO OUR CLASS INSTANCE NOW...", LogType.InfoLog);
-                            this.AutoIdRunning = false;
-                            return true;
-                        }
-                    }
-                    catch (Exception GenerateRoutineEx)
+                    // Connect our channel, read the vin, and then close it.
+                    ProtocolUsed = AutoIdInstance.AutoIdType;
+                    bool VinRequestPassed = AutoIdInstance.RetrieveVinNumber(out VinString);
+                    if (!VinRequestPassed) ViewModelLogger.WriteLog($"NO VIN NUMBER WAS FOUND WITH PROTOCOL {ProtocolUsed}! MOVING ONTO NEXT PROTOCOL...", LogType.WarnLog);
+                    else
                     {
-                        // Log failures, move onto next protocol
-                        ViewModelLogger.WriteLog($"FAILED TO BUILD INSTANCE OF OUR PROTOCOL ID ROUTINE FOR {TypeValue.Name}!", LogType.ErrorLog);
-                        ViewModelLogger.WriteLog("EXCEPTIONS ARE BEING LOGGED BELOW. MOVING ONTO NEXT AUTO ID PROTOCOL ROUTINE TYPE", GenerateRoutineEx);
+                        // Log information about our pulled out VIN Number
+                        ViewModelLogger.WriteLog("VIN REQUEST ROUTINE AND CONNECTION PASSED!", LogType.InfoLog);
+                        ViewModelLogger.WriteLog($"USED CHANNEL ID: {AutoIdInstance.ChannelIdOpened}", LogType.TraceLog);
+
+                        // Log our new vin number pulled, return out of this method
+                        ViewModelLogger.WriteLog($"VIN VALUE LOCATED: {VinString}", LogType.InfoLog);
+                        ViewModelLogger.WriteLog("VIN NUMBER WAS PULLED CORRECTLY! STORING IT ONTO OUR CLASS INSTANCE NOW...", LogType.InfoLog);
+                        this.AutoIdRunning = false;
+                        return true;
                     }
+                }
+                catch (Exception GenerateRoutineEx)
+                {
+                    // Log failures, move onto next protocol
+                    ViewModelLogger.WriteLog($"FAILED TO BUILD INSTANCE OF OUR PROTOCOL ID ROUTINE FOR {TypeValue.Name}!", LogType.ErrorLog);
+                    ViewModelLogger.WriteLog("EXCEPTIONS ARE BEING LOGGED BELOW. MOVING ONTO NEXT AUTO ID PROTOCOL ROUTINE TYPE", GenerateRoutineEx);
                 }
             }
 

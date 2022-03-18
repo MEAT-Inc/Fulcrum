@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
             base(InstanceSession.DeviceVersion, InstanceSession.DllName, InstanceSession.DeviceName, ProtocolId.ISO15765)
         {
             // Open the Session and store it here.
-            this.OpenSession(this.SessionInstance);
+            this.OpenSession(InstanceSession);
             this.AutoIdLogger.WriteLog($"SETUP SESSION FOR INSTANCE PROTOCOL TYPE {this.AutoIdType} OK!", LogType.InfoLog);
         }
         /// <summary>
@@ -69,7 +69,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruAutoID.AutoIdHelpers
             );
 
             // Log information about the newly issued command objects.
-            this.AutoIdLogger.WriteLog($"ISSUES A PT CONNECT REQUEST FOR PROTOCOL {this.AutoIdType}!", LogType.InfoLog);
+            this.AutoIdLogger.WriteLog($"ISSUED A PT CONNECT REQUEST FOR PROTOCOL {this.AutoIdType}!", LogType.InfoLog);
             this.AutoIdLogger.WriteLog($"CHANNEL ID OPENED WAS SEEN TO BE: {this.ChannelIdOpened}", LogType.WarnLog);
 
             // Build our filter objects here and apply them all.
