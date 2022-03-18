@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -34,13 +34,14 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Debug\FulcrumInjector.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -112,13 +113,13 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.3.2.7.246\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.3.2.9.247\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.4.9.108, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.3.2.7.246\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.3.2.9.247\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=3.2.7.246, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.3.2.7.246\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=3.2.9.248, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534.3.2.9.247\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.0\lib\net461\Svg.dll</HintPath>

@@ -76,18 +76,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 }
 
                 // Check for a null device name or no device name provided.
-                if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected") {
-                    if (this.IsMonitoring) { this.StopVehicleMonitoring(); } this.InstanceSession.Dispose();
-                    ViewModelLogger.WriteLog("STOPPED SESSION INSTANCE OK AND CLEARED OUT DEVICE NAME!", LogType.InfoLog);
-
-                    // Populate private values here.
+                if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected") 
+                {
+                    // Update private values, dispose the instance.
                     PropertyUpdated(value);
+                    if (this.IsMonitoring) this.StopVehicleMonitoring();
+                    
+                    // Log information and return output.
+                    ViewModelLogger.WriteLog("STOPPED SESSION INSTANCE OK AND CLEARED OUT DEVICE NAME!", LogType.InfoLog);
                     return;
                 }
 
-                // If our new device name is not null, then we can build a new object.
+                // Update private values, dispose of the instance
                 PropertyUpdated(value);
-                if (this.IsMonitoring) { this.StopVehicleMonitoring(); } this.InstanceSession?.Dispose(); 
+                if (this.IsMonitoring) this.StopVehicleMonitoring();
+ 
+                // If our new device name is not null, then we can build a new object.
                 this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
                 ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
 
@@ -309,10 +313,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
             // Run as a task to avoid locking up UI
+            this.InstanceSession.PTOpen();
             Task.Run(() =>
             {
                 // Do this as long as we need to keep reading based on the token
-                this.InstanceSession.PTOpen();
                 while (!this.RefreshSource.IsCancellationRequested)
                 {
                     // Pull in our next voltage value here. Check for voltage gained or removed

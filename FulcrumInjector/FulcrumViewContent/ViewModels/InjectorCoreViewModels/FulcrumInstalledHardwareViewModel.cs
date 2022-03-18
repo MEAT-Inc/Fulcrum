@@ -41,11 +41,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDLL;
             set
             {
-                // Update property value. Setup new List of DLLs.
-                PropertyUpdated(value);
-                InstalledDevices = this.PopulateDevicesForDLL(value);
+                // Check if we need to stop background operations or not.
+                if (value == null || value != this._selectedDLL) {
+                    JBoxEventWatchdog.StopBackgroundRefresh(); 
+                    if (value == null) return;
+                }
 
                 // Update the connection view model values here
+                PropertyUpdated(value); InstalledDevices = this.PopulateDevicesForDLL(value);
                 if (InjectorConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
                 InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = value.Name;
             }
@@ -57,9 +60,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             get => _selectedDevice;
             set
             {
-                // Store class value. Stop background refreshing once we find a device
+                // Update private properties and set new values on other components
                 PropertyUpdated(value);
-                JBoxEventWatchdog.StopBackgroundRefresh();
+                if (!string.IsNullOrWhiteSpace(value)) JBoxEventWatchdog.StopBackgroundRefresh();
 
                 // Update the connection view model values here. Don't set if the device is the same.
                 var ConnectionVm = InjectorConstants.FulcrumVehicleConnectionInfoViewModel;

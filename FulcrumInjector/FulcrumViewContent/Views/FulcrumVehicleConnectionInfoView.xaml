@@ -43,7 +43,7 @@
                     FontSize="14" FontWeight="DemiBold"
                     Text="J2534 Device:" Padding="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding Path=SelectedDevice}" 
+                <TextBlock Text="{Binding Path=SelectedDevice, Mode=OneWay}" 
                            FontSize="14"
                            FontWeight="Normal" Foreground="Yellow"
                            HorizontalAlignment="Left" VerticalAlignment="Center"/>

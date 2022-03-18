@@ -189,7 +189,8 @@
                              x:Name="InstalledDevicesListBox"
                              SelectedItem="{Binding SelectedDevice}"
                              Style="{StaticResource HardwareContentsListBoxStyle}"
-                             ItemsSource="{Binding InstalledDevices}">
+                             ItemsSource="{Binding InstalledDevices}"
+                             SelectionChanged="InstalledDevicesListBox_OnSelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
