@@ -225,7 +225,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         {
             // Try and kill old sessions then begin refresh routine
             this.RefreshSource = new CancellationTokenSource();
-            int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false; int LoopsRun = 0;
+            int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false;
             ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
             // Run as a task to avoid locking up UI
@@ -236,7 +236,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 while (!this.RefreshSource.IsCancellationRequested)
                 {
                     // Pull in our next voltage value here. Check for voltage gained or removed
-                    Thread.Sleep(RefreshTimer); LoopsRun += 1;
+                    Thread.Sleep(RefreshTimer);
                     this.DeviceVoltage = this.ReadDeviceVoltage();
                     RefreshTimer = this.DeviceVoltage >= 11 ? 5000 : 2500;
 
@@ -247,8 +247,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         if (VinReadRun) continue;
 
                         // Log information, pull our vin number, then restart this process using the OnLost value.
-                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true))
-                        {
+                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true)) {
                             ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
                             continue;
                         }
@@ -256,7 +255,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         try
                         {
                             // Pull our Vin number of out the vehicle now.
-                            if (LoopsRun != 1 && LoopsRun % 4 != 0) continue;
                             if (this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
                             {
                                 // Log information, store these values.
@@ -269,14 +267,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                                 ViewModelLogger.WriteLog("STARTING NEW TASK TO WAIT FOR VOLTAGE BEING LOST NOW...", LogType.WarnLog);
                                 continue;
                             }
-                            else
-                            {
-                                // Log failed to pull but not thrown exception
-                                this.VehicleVin = "Failed to Read VIN!";
-                                ViewModelLogger.WriteLog("ROUTINE RAN CORRECTLY BUT NO VIN NUMBER WAS FOUND! THIS MEANS THERE'S SOMETHING ELSE WRONG...", LogType.ErrorLog);
-                                ViewModelLogger.WriteLog("VIN REQUEST ROUTINE WILL RERUN AFTER 4X THE DELAY TIME...", LogType.WarnLog);
-                                continue;
-                            }
+
+                            // Log failed to pull but not thrown exception
+                            this.VehicleVin = "Failed to Read VIN!"; VinReadRun = true;
+                            ViewModelLogger.WriteLog("ROUTINE RAN CORRECTLY BUT NO VIN NUMBER WAS FOUND! THIS MEANS THERE'S SOMETHING ELSE WRONG...", LogType.ErrorLog);
+                            ViewModelLogger.WriteLog("VIN REQUEST WILL ONLY RUN IF MANUALLY CALLED NOW!", LogType.WarnLog);
+                            continue;
                         }
                         catch (Exception VinEx)
                         {
