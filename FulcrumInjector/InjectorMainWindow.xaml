@@ -106,7 +106,7 @@
         <!-- About this application flyout -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <mah:Flyout 
-                Margin="55,25,0,0"
+                Margin="70,85,0,0"
                 Position="Top"
                 x:Name="InformationFlyout"
                 HorizontalAlignment="Center"
