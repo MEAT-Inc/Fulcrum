@@ -59,32 +59,30 @@ void fulcrum_output::fulcrumDebug(LPCTSTR format_string, ...)
 	va_list str_args; va_start(str_args, format_string);	// Args formating for log output. List of args and setup command
 
 	// If logging directly to file write it out here.
-	if (!fLogToFile) { logFifo.Put(bufferOutputArray); }
-	else 
-	{
-		// Write Directly to our log file. If the pipe is closed, return
-		_vftprintf_s(fp, format_string, str_args);
-		if (!CFulcrumShim::fulcrumPiper->OutputConnected) {
-			va_end(str_args);
-			return;
-		}
+	if (!fLogToFile) logFifo.Put(bufferOutputArray);
+	else _vftprintf_s(fp, format_string, str_args); 
 
-		// Now built our output string and write it to our pipe
-		size_t bufferSize = sizeof(bufferOutputArray) / sizeof(bufferOutputArray[0]);
-		_vsntprintf_s(
-			bufferOutputArray,	// Output Array
-			bufferSize,			// Size to add in
-			_TRUNCATE,			// Truncate Mode.
-			format_string,		// Format input string
-			str_args			// Args being formatted.
-		);
-
-		// Send to pipe server only if our pipe instances are currently open and connected
-		std::wstring charString(bufferOutputArray);
-		std::string outputString(charString.begin(), charString.end());
-		CFulcrumShim::fulcrumPiper->WriteStringOut(outputString);
-
-		// End our argument formatting.
-		va_end(str_args);										
+	// Write Directly to our log file. If the pipe is closed, return
+	if (!CFulcrumShim::fulcrumPiper->OutputConnected) {
+		va_end(str_args);
+		return;
 	}
+
+	// Now build our output string and write it to our pipe
+	size_t bufferSize = sizeof(bufferOutputArray) / sizeof(bufferOutputArray[0]);
+	_vsntprintf_s(
+		bufferOutputArray,	// Output Array
+		bufferSize,			// Size to add in
+		_TRUNCATE,			// Truncate Mode.
+		format_string,		// Format input string
+		str_args			// Args being formatted.
+	);
+
+	// Send to pipe server only if our pipe instances are currently open and connected
+	std::wstring charString(bufferOutputArray);
+	std::string outputString(charString.begin(), charString.end());
+	CFulcrumShim::fulcrumPiper->WriteStringOut(outputString);
+
+	// End our argument formatting.
+	va_end(str_args);
 }
