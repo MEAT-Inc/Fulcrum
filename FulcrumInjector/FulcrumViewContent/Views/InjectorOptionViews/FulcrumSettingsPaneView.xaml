@@ -193,12 +193,10 @@
                 <RowDefinition Height=".475*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid>
-                <TextBlock Style="{StaticResource TitleStringText}"  FontWeight="Bold" Margin="10,0" HorizontalAlignment="Left">
-                    <Run Text="Injector Settings"/>
-                    <Run Foreground="Yellow" FontStyle="Normal" Text="(Almost Perfect...)"/>
-                </TextBlock>
-            </Grid>
+                <TextBlock 
+                    HorizontalAlignment="Left"
+                    Text="Injector Settings" Margin="10,0"                           
+                    Style="{StaticResource TitleStringText}"/>
 
             <!-- Advances Options Gear -->
             <DockPanel Grid.Row="0" HorizontalAlignment="Right">
@@ -233,10 +231,10 @@
         <Border Grid.Row="1" Margin="10,-5,15,5" BorderBrush="White" BorderThickness="3" CornerRadius="5">
             <ScrollViewer Background="Black">
                 <ListBox x:Name="SettingsListBoxView"
-                     HorizontalContentAlignment="Stretch"
-                     VerticalContentAlignment="Stretch"
-                     VerticalAlignment="Stretch"
-                     ItemsSource="{Binding Path=SettingsEntrySets}">
+                        VerticalAlignment="Stretch" 
+                        VerticalContentAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=SettingsEntrySets}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
