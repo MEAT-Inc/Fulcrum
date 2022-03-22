@@ -1,6 +1,6 @@
 # FulcrumInjector
 
-![Injector_HardwareOverview](https://user-images.githubusercontent.com/62027458/150359554-159cc76f-e989-417c-b052-9acab40f1718.PNG)
+![Injector_MainView](https://user-images.githubusercontent.com/62027458/159094953-dffce034-5254-498e-8ef7-02c57c7a3726.PNG)
 
 ---
 
@@ -41,4 +41,3 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 ![Injector_SettingsPage](https://user-images.githubusercontent.com/62027458/150359686-88da0940-78ea-4754-9121-41c4172a5844.PNG)
 
 ![Injector_DebuggingView](https://user-images.githubusercontent.com/62027458/150594178-d65d1535-ddd8-4a2d-a5d1-d0feca2e19f9.PNG)
-
