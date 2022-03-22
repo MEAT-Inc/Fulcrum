@@ -64,7 +64,10 @@ void fulcrum_output::fulcrumDebug(LPCTSTR format_string, ...)
 	{
 		// Write Directly to our log file. If the pipe is closed, return
 		_vftprintf_s(fp, format_string, str_args);
-		if (!CFulcrumShim::fulcrumPiper->OutputConnected) return;
+		if (!CFulcrumShim::fulcrumPiper->OutputConnected) {
+			va_end(str_args);
+			return;
+		}
 
 		// Now built our output string and write it to our pipe
 		size_t bufferSize = sizeof(bufferOutputArray) / sizeof(bufferOutputArray[0]);

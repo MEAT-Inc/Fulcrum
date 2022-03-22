@@ -79,13 +79,15 @@ void fulcrum_cfifo::Get(FILE* fp)
 		fwrite(m_pBuffer + m_iReadNext, 1, n * sizeof(TCHAR), fp);
 		m_iReadNext = (m_iReadNext + n) % m_nSize;
 
-		// Write to our pipe output here if it's connected
-		if (!CFulcrumShim::fulcrumPiper->OutputConnected) return;
-
-		// Convert to wstring then to string and write our output
-		std::wstring cstring(m_pBuffer); 
-		std::string outputString(cstring.begin(), cstring.end());
-		CFulcrumShim::fulcrumPiper->WriteStringOut(outputString);
+		// BUG: THIS IS CAUSING NO FILE OUTPUT TO BE GENERATED!
+		//	Write to our pipe output here if it's connected
+		//	if (CFulcrumShim::fulcrumPiper->OutputConnected)
+		//	{
+		//		// Convert to wstring then to string and write our output
+		//		std::wstring cstring(m_pBuffer);
+		//		std::string outputString(cstring.begin(), cstring.end());
+		//		CFulcrumShim::fulcrumPiper->WriteStringOut(outputString);
+		//	}
 	}
 	else
 	{
@@ -98,19 +100,20 @@ void fulcrum_cfifo::Get(FILE* fp)
 		fwrite(m_pBuffer, sizeof(TCHAR), nPart2, fp);
 		m_iReadNext = nPart2;
 
-		// Write to our pipe output here if it's connected
-		if (CFulcrumShim::fulcrumPiper->OutputConnected)
-		{
-			// Convert to wstring then to string and write our output
-			std::wstring cstring_part2(m_pBuffer);
-			std::wstring cstring_part1(m_pBuffer + m_iReadNext);
-			std::string outputString_part1(cstring_part1.begin(), cstring_part1.end());
-			std::string outputString_part2(cstring_part2.begin(), cstring_part2.end());
-
-			// Write these outputs to our pipe instance.
-			CFulcrumShim::fulcrumPiper->WriteStringOut(outputString_part1);
-			CFulcrumShim::fulcrumPiper->WriteStringOut(outputString_part2);
-		}
+		// BUG: THIS IS CAUSING NO FILE OUTPUT TO BE GENERATED!
+		//	Write to our pipe output here if it's connected
+		//	if (CFulcrumShim::fulcrumPiper->OutputConnected)
+		//	{
+		//		// Convert to wstring then to string and write our output
+		//		std::wstring cstring_part2(m_pBuffer);
+		//		std::wstring cstring_part1(m_pBuffer + m_iReadNext);
+		//		std::string outputString_part1(cstring_part1.begin(), cstring_part1.end());
+		//		std::string outputString_part2(cstring_part2.begin(), cstring_part2.end());
+		//	
+		//		// Write these outputs to our pipe instance.
+		//		CFulcrumShim::fulcrumPiper->WriteStringOut(outputString_part1);
+		//		CFulcrumShim::fulcrumPiper->WriteStringOut(outputString_part2);
+		//	}
 	}
 
 	// Remove the item from our queue of outputs
