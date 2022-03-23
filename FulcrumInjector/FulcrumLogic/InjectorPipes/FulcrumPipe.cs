@@ -121,9 +121,12 @@ namespace FulcrumInjector.FulcrumLogic.InjectorPipes
         /// <param name="PipeId">ID Of the pipe in use for this object</param>
         private protected FulcrumPipe(FulcrumPipeType PipeId)
         {
+            // Find our value for the async state
+            bool UseAsyncPipes = ValueLoaders.GetConfigValue<bool>("FulcrumInjectorConstants.FulcrumInjectorLogging.UseAsyncPipeLoggers");
+
             // Configure logger object.
             this.PipeState = FulcrumPipeState.Faulted;
-            this.PipeLogger = new SubServiceLogger($"{PipeId}");
+            this.PipeLogger = new SubServiceLogger($"{PipeId}", UseAsync: UseAsyncPipes);
             this.PipeLogger.WriteLog($"BUILT NEW PIPE LOGGER FOR PIPE TYPE {PipeId} OK!", LogType.InfoLog);
 
             // Store information about the pipe being configured
