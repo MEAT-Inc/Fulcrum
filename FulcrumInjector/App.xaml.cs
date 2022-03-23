@@ -238,7 +238,7 @@ namespace FulcrumInjector
                 // Generate our singleton object here.
                 var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(ViewType, ViewModelType);
                 LogBroker.Logger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().Name} WAS BUILT OK!", LogType.TraceLog);
+                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
             }
 
             // Log completed building and exit routine
