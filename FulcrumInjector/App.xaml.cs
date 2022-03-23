@@ -122,9 +122,11 @@ namespace FulcrumInjector
             // Start by building a new logging configuration object and init the broker.
             string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath");
+            int FlushTriggerValue = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.AsyncFlushCountTrigger");
 
             // Make logger and build global logger object.
             LogBroker.ConfigureLoggingSession(AppName, LoggingPath);
+            SubServiceLogger.SetFlushTrigger(FlushTriggerValue);
             LogBroker.BrokerInstance.FillBrokerPool();
 
             // Log information and current application version.
@@ -230,13 +232,13 @@ namespace FulcrumInjector
                 // Pull type values here
                 Type ViewType = ViewTypes[IndexValue]; Type ViewModelType = ViewModelTypes[IndexValue];
                 LogBroker.Logger?.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Namespace}", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Namespace}", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
 
                 // Generate our singleton object here.
                 var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(ViewType, ViewModelType);
                 LogBroker.Logger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().Name} WAS BUILT OK!", LogType.TraceLog);
+                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
             }
 
             // Log completed building and exit routine

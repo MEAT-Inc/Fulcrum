@@ -265,6 +265,10 @@ namespace FulcrumInjector.FulcrumViewContent
             LogBroker.Logger?.WriteLog("PROCESSED APP ENVIRONMENT OBJECT SHUTDOWN COMMAND OK!", LogType.WarnLog);
             LogBroker.Logger?.WriteLog("CLOSING THIS INSTANCE CLEANLY AND THEN FORCE RUNNING A TERMINATION COMMAND!", LogType.InfoLog);
 
+            // Flush async targets
+            LogBroker.Logger?.WriteLog("FLUSHING ASYNC OUTPUT TARGETS NOW...", LogType.WarnLog);
+            LogBroker.BrokerInstance.FlushAllAsyncTargets();
+
             // Now build a process object. Simple bat file that runs a Taskkill instance on this app after waiting 3 seconds.
             string TempBat = Path.ChangeExtension(Path.GetTempFileName(), "bat");
             string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
