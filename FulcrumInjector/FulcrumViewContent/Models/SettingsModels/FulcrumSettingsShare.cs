@@ -36,9 +36,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         // General Application Settings (or an empty model if null)
         public static SettingsEntryCollectionModel InjectorGeneralSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
-                SettingObj.SettingSectionTitle.Contains("Fulcrum Injector Settings")
-            ) ?? new SettingsEntryCollectionModel("Fulcrum Injector Settings", Array.Empty<SettingsEntryModel>());
-
+                SettingObj.SettingSectionTitle.Contains("Hardware Configuration Settings")
+            ) ?? new SettingsEntryCollectionModel("Hardware Configuration Settings", Array.Empty<SettingsEntryModel>());
 
         // Settings for Debug log viewing (Or an empty settings model if null)
         public static SettingsEntryCollectionModel DebugLogViewerSettings =>

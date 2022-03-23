@@ -238,6 +238,9 @@
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="No DLL Selected!"/>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
+                                            <Setter Property="Text" Value="Refreshing Devices...!"/>
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
                                             <Setter Property="Text" Value="Unsupported DLL!"/>
                                         </DataTrigger>
@@ -258,6 +261,9 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
                                             <Setter Property="Text" Value="The currently selected DLL is not supported by the Fulcrum. Please select a different DLL entry from the list to the left."/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
+                                            <Setter Property="Text" Value="Please wait while devices for the selected DLL are populated..."/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

@@ -83,8 +83,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             );
 
             // Log and populate devices
-            this.ViewModel.SelectedDLL = SelectedDLL;
-            this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
+            Task.Run(() => {
+                this.ViewModel.SelectedDLL = SelectedDLL;
+                this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Configures a new device selection value on the instance of our view model

@@ -28,6 +28,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledHardwareViewModelLogger")) ?? new SubServiceLogger("InstalledHardwareViewModelLogger");
 
         // Private Control Values
+        private bool _isRefreshing;
         private bool _isIgnoredDLL;
         private J2534Dll _selectedDLL;
         private string _selectedDevice;
@@ -36,6 +37,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Selected DLL object
         public bool IsIgnoredDLL { get => _isIgnoredDLL; set => PropertyUpdated(value); }
+        public bool IsRefreshing { get => _isRefreshing; set => PropertyUpdated(value); }
         public J2534Dll SelectedDLL
         {
             get => _selectedDLL;
@@ -48,7 +50,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
 
                 // Update the connection view model values here
+                IsRefreshing = true;
                 PropertyUpdated(value); InstalledDevices = this.PopulateDevicesForDLL(value);
+                IsRefreshing = false;
+
+                // Check our values here. 
                 if (InjectorConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
                 InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = value.Name;
             }
