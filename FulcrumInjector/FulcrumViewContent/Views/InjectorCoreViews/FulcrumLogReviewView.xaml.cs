@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = FulcrumViewConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
+            this.ViewModel = FulcrumConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 

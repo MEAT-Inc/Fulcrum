@@ -69,13 +69,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // For app setup and loading values
                 if (this.WriterPipeState == "Connected" && this.ReaderPipeState == "Connected")
-                    FulcrumViewConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed = true;
+                    FulcrumConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed = true;
 
                 // Check Values of pipe states and build UI content accordingly
-                if (FulcrumViewConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed) {
-                    FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
-                    FulcrumViewConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult = "Injection Passed!";
-                    FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                if (FulcrumConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed) {
+                    FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+                    FulcrumConstants.FulcrumDllInjectionTestViewModel.InjectorTestResult = "Injection Passed!";
+                    FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
 
                     // Stop updating values here once we get a good injection test to run.
                     this._testInjectionButtonWatchdog.PropertyUpdateTimer.Stop();
@@ -84,7 +84,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 
                 // For app setup and loading values
                 if (this.WriterPipeState == "Loading..." || this.ReaderPipeState == "Loading...") {
-                    FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;                    
+                    FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;                    
                     return; 
                 }
 
@@ -93,14 +93,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 {
                     // If injector is connecting
                     case true:
-                        FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
-                        FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Working...";
+                        FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+                        FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Working...";
                         break;
 
                     // If not connected and not run yet
-                    case false when FulcrumViewConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed == false:
-                        FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
-                        FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
+                    case false when FulcrumConstants.FulcrumDllInjectionTestViewModel.InjectionLoadPassed == false:
+                        FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = true;
+                        FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.Content = "Test Injection";
                         break;
                 }
             });

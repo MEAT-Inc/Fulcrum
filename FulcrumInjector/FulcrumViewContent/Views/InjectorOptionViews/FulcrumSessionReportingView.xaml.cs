@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = FulcrumViewConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
+            this.ViewModel = FulcrumConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
             // Build event broker for session logging output

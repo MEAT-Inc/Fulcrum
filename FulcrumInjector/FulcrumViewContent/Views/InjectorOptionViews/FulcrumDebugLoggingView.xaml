@@ -19,8 +19,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumDebugLoggingViewStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumDebugLoggingViewStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

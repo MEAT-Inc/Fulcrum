@@ -107,7 +107,7 @@ namespace FulcrumInjector
         private void ConfigureAppExitRoutine()
         {
             // Build event helper, Log done and return out.
-            Application.Current.Exit += FulcrumViewConstants.ProcessAppExit;
+            Application.Current.Exit += FulcrumConstants.ProcessAppExit;
             LogBroker.Logger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
             LogBroker.Logger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }

@@ -164,7 +164,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumPipes
                         {
                             // Throw exception and return out assuming window content has been built now
                             this.PipeState = FulcrumPipeState.Faulted;
-                            if (FulcrumViewConstants.InjectorMainWindow != null) throw ConnectEx;
+                            if (FulcrumConstants.InjectorMainWindow != null) throw ConnectEx;
                             throw new Exception("FAILED TO CONFIGURE PIPE READER DUE TO NULL MAIN WINDOW INSTANCE! IS THE APP RUNNING?", ConnectEx);
                         }
 
