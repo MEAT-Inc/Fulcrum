@@ -63,6 +63,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic
             ConstantsLogger.WriteLog($"SESSION PARAMS PROVIDED:\n\tVersion: {InitParams.Version}\n\tDLL:    {InitParams.DLLName}\n\tDevice: {InitParams.DeviceName}");
 
             // Now build our new session object for our given input values.
+            return true;
         }
     }
 }
