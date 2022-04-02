@@ -7,9 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
-using FulcrumInjector.FulcrumLogic.PassThruAutoID;
-using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruAutoID;
 using FulcrumInjector.FulcrumViewContent.Models.EventModels;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using Newtonsoft.Json;
@@ -232,6 +230,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.InstanceSession.PTOpen();
             Task.Run(() =>
             {
+                // Find out VIN Number values here.
+                bool CheckVinNumber = FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true);
+                if (!CheckVinNumber) ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
+
                 // Do this as long as we need to keep reading based on the token
                 while (!this.RefreshSource.IsCancellationRequested)
                 {
@@ -243,15 +245,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     // Check our voltage value. Perform actions based on value pulled
                     if (this.DeviceVoltage >= 11)
                     {
-                        // Check our Vin Read status
-                        if (VinReadRun) continue;
-
-                        // Log information, pull our vin number, then restart this process using the OnLost value.
-                        if (!FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true)) {
-                            ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
-                            continue;
-                        }
-
+                        // Check our Vin Read status and if we need to Auto ID at all
+                        if (VinReadRun || !CheckVinNumber) continue;
+    
                         try
                         {
                             // Pull our Vin number of out the vehicle now.
@@ -303,10 +299,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private void StopVehicleMonitoring()
         {
             // Reset all values here.
-            ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
-            this.RefreshSource?.Cancel();
+            if (this.SelectedDevice != "No Device Selected") 
+                ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
 
             // Dispose our instance object here
+            this.RefreshSource?.Cancel(); this.IsMonitoring = false;
             this.InstanceSession.PTClose(); this.VehicleVin = null; this.DeviceVoltage = 0.00; IsMonitoring = false;
             ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
             ViewModelLogger.WriteLog("STOPPED REFRESHING AND KILLED OUR INSTANCE OK!", LogType.InfoLog);

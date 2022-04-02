@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
-using FulcrumInjector.FulcrumLogic.JsonConverters;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
