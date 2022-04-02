@@ -45,8 +45,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("PassThruConstantsLogger")) ?? new SubServiceLogger("PassThruConstantsLogger");
 
         // SharpWrap Sessions. Two of them total. One for the AutoID routines, one for the Simulation running
-        public static Sharp2534Session SharpSessionAlpha;
-        public static Sharp2534Session SharpSessionBravo;
+        public static Sharp2534Session SharpSessionAlpha { get; private set; }
+        public static Sharp2534Session SharpSessionBravo { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
