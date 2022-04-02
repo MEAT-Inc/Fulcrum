@@ -5,9 +5,10 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic;
-using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.FulcrumPipes.PipeEvents;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -27,12 +28,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         // Private Control Values
         private bool _canModifyMessage = true;
         private bool _showEmailInfoText = true;
-        private ReportEmailBroker _sessionReportSender;
+        private FulcrumEmailBroker _sessionReportSender;
 
         // Public values for our view to bind onto 
         public bool CanModifyMessage { get => _canModifyMessage; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public ReportEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        public FulcrumEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         /// </summary>
         /// <param name="BuiltSender">Sender object built</param>
         /// <returns>True if built ok. False if not.</returns>
-        private bool GenerateEmailBroker(out ReportEmailBroker BuiltSender)
+        private bool GenerateEmailBroker(out FulcrumEmailBroker BuiltSender)
         {
             try
             {
@@ -79,7 +80,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
                 // Build broker first
                 ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
-                BuiltSender = new ReportEmailBroker(SendName, SendEmail, SendPassword);
+                BuiltSender = new FulcrumEmailBroker(SendName, SendEmail, SendPassword);
 
                 // Now try and authorize the client for a google address.
                 ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
@@ -127,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         {
             // Log information, pull view from constants and get values.
             ViewModelLogger.WriteLog("PULLING IN DLL SESSION LOG FILE ENTRIES NOW...", LogType.InfoLog);
-            var FilesLocated = InjectorConstants.FulcrumDllOutputLogViewModel?.SessionLogs;
+            var FilesLocated = FulcrumViewConstants.FulcrumDllOutputLogViewModel?.SessionLogs;
             if (FilesLocated == null) {
                 ViewModelLogger.WriteLog("ERROR! SESSION LOG OBJECT WAS NULL!", LogType.ErrorLog);
                 return Array.Empty<string>();

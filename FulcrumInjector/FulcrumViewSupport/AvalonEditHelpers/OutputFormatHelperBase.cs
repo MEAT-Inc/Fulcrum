@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
-using FulcrumInjector.FulcrumViewSupport.DataConverters;
+using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Rendering;
 using NLog.Targets;

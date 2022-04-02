@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Threading;
-using FulcrumInjector.FulcrumLogic.InjectorPipes.PipeEvents;
+using FulcrumInjector.FulcrumLogic.FulcrumPipes.PipeEvents;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;

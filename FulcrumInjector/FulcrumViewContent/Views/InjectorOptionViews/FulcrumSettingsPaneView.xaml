@@ -7,7 +7,7 @@
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:viewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels"
              xmlns:injectorOptionViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels"
-             xmlns:dataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.DataConverters"
+             xmlns:dataContentHelpers="clr-namespace:FulcrumInjector.FulcrumViewSupport.DataContentHelpers"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
              Loaded="FulcrumSettingsPaneView_OnLoaded">
@@ -267,7 +267,7 @@
                                             <SolidColorBrush Color="Gray" Opacity=".50"/>
                                         </ListBox.Background>
                                         <ListBox.ItemTemplateSelector>
-                                            <dataConverters:UserSettingsDataTemplateSelector/>
+                                            <dataContentHelpers:UserSettingsDataTemplateSelector/>
                                         </ListBox.ItemTemplateSelector>
                                     </ListBox>
                                 </Grid>
