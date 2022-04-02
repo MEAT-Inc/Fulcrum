@@ -85,8 +85,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // Log info and build return values
                 ViewModelLogger.WriteLog("PREVIOUS TEST WAS SUCCESSFUL! RETURNING VALUES ACCORDINGLY NOW...", LogType.InfoLog);
-                FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
-                FulcrumViewConstants.FulcrumDllInjectionTestView.TestInjectionButton.ToolTip = "To retry injection, please restart this application";
+                FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.IsEnabled = false;
+                FulcrumConstants.FulcrumDllInjectionTestView.TestInjectionButton.ToolTip = "To retry injection, please restart this application";
 
                 // Return output values
                 ResultString = this.InjectorTestResult;

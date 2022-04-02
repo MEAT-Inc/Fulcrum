@@ -62,7 +62,7 @@ namespace FulcrumInjector
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Store view objects for the UI
-            FulcrumViewConstants.ConfigureViewControls(this);
+            FulcrumConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
 
             // Set title to DEBUG if the app is inside our debug directory
@@ -90,7 +90,7 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("THIS EXIT COMMAND STARTED FROM WITHIN OUR MAIN WINDOW INSTANCE! THIS WAS LIKELY A CLOSE BUTTON CALL", LogType.InfoLog);
 
             // Now call the routine in the constants file.
-            FulcrumViewConstants.ProcessAppExit(null, null);
+            FulcrumConstants.ProcessAppExit(null, null);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

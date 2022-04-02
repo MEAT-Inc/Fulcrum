@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Applies a blur to a window.

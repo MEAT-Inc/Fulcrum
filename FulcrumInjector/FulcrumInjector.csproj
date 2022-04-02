@@ -167,6 +167,7 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdModels\AutoIdConfiguration.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdModels\AutoIdObjects.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdIRoutine.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\PassThruConstants.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruConnectExpression.cs" />
@@ -235,11 +236,11 @@
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToObjectConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToVisibilityConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\FrameAnimator.cs" />
+    <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\HamburgerNavService.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\ColorMatchingHelper.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\CustomColorShader.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\WindowBlurSetup.cs" />
+    <Compile Include="FulcrumViewSupport\WindowBlurSetup.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\AppThemeConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomColorConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomColorValueJsonConverter.cs" />
@@ -280,7 +281,7 @@
     <Compile Include="FulcrumViewContent\Views\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\FulcrumViewConstants.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumConstants.cs" />
     <Compile Include="FulcrumViewContent\Views\FulcrumDllInjectionTestView.xaml.cs">
       <DependentUpon>FulcrumDllInjectionTestView.xaml</DependentUpon>
     </Compile>

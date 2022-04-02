@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent
     /// <summary>
     /// Static class which holds all the View constants for our application.
     /// </summary>
-    public static class FulcrumViewConstants
+    public static class FulcrumConstants
     {
         // Logger object.
         private static SubServiceLogger ConstantsLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)

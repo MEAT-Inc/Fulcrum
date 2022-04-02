@@ -3,13 +3,16 @@ using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using MahApps.Metro.Controls;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Animates frame objects
     /// </summary>
     public class FrameAnimator
     {
+        /// <summary>
+        /// Navigation helper which pulls our Storyboard and metadata contents on request
+        /// </summary>
         public static readonly DependencyProperty FrameNavigationStoryboardProperty
             = DependencyProperty.RegisterAttached(
                 "FrameNavigationStoryboard",

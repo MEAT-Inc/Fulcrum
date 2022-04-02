@@ -21,8 +21,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumSettingsPaneViewStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumSettingsPaneViewStyles.xaml"/>
                 <ResourceDictionary>
                     <DataTemplate x:Key="CheckboxSettingEntryDataTemplate">
                         <Border Margin="0,5,5,5" 

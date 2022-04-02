@@ -3,7 +3,7 @@
                     xmlns:mahApps="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewSupport="clr-namespace:FulcrumInjector.FulcrumViewSupport"
                     xmlns:injectorCoreModels="clr-namespace:FulcrumInjector.FulcrumViewContent.Models"
-                    xmlns:fulcrumStyles="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumStyles">
+                    xmlns:fulcrumStyles="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSheets">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
@@ -86,7 +86,7 @@
             <!-- Style for the frame objects -->
             <Style BasedOn="{StaticResource {x:Type Frame}}"
                    TargetType="{x:Type Frame}">
-                <Setter Property="fulcrumStyles:FrameAnimator.FrameNavigationStoryboard"
+                <Setter Property="viewSupport:FrameAnimator.FrameNavigationStoryboard"
                         Value="{StaticResource NavigationStoryboard}" />
                 <Setter Property="RenderTransform">
                     <Setter.Value>

@@ -128,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         {
             // Log information, pull view from constants and get values.
             ViewModelLogger.WriteLog("PULLING IN DLL SESSION LOG FILE ENTRIES NOW...", LogType.InfoLog);
-            var FilesLocated = FulcrumViewConstants.FulcrumDllOutputLogViewModel?.SessionLogs;
+            var FilesLocated = FulcrumConstants.FulcrumDllOutputLogViewModel?.SessionLogs;
             if (FilesLocated == null) {
                 ViewModelLogger.WriteLog("ERROR! SESSION LOG OBJECT WAS NULL!", LogType.ErrorLog);
                 return Array.Empty<string>();

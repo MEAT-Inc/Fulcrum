@@ -41,7 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = FulcrumViewConstants.FulcrumDllOutputLogViewModel ?? new FulcrumDllOutputLogViewModel();
+            this.ViewModel = FulcrumConstants.FulcrumDllOutputLogViewModel ?? new FulcrumDllOutputLogViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
             // Build event for our pipe objects to process new pipe content into our output box
