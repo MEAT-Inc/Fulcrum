@@ -12,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using SharpLogger;
@@ -43,7 +42,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = InjectorConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel();
+            this.ViewModel = FulcrumViewConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 

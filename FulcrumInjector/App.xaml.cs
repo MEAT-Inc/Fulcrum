@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using ControlzEx.Theming;
-using FulcrumInjector.FulcrumLogic.InjectorPipes;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
+using FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport;
 using NLog;
 using NLog.Fluent;
 using SharpLogger;
@@ -107,7 +107,7 @@ namespace FulcrumInjector
         private void ConfigureAppExitRoutine()
         {
             // Build event helper, Log done and return out.
-            Application.Current.Exit += InjectorConstants.ProcessAppExit;
+            Application.Current.Exit += FulcrumViewConstants.ProcessAppExit;
             LogBroker.Logger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
             LogBroker.Logger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }

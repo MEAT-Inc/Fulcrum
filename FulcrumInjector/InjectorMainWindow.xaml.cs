@@ -14,11 +14,10 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.FulcrumLogic.InjectorPipes;
-using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using MahApps.Metro.Controls;
 using NLog;
 using NLog.Config;
@@ -63,7 +62,7 @@ namespace FulcrumInjector
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Store view objects for the UI
-            InjectorConstants.ConfigureViewControls(this);
+            FulcrumViewConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
 
             // Set title to DEBUG if the app is inside our debug directory
@@ -91,7 +90,7 @@ namespace FulcrumInjector
             InjectorMainLogger.WriteLog("THIS EXIT COMMAND STARTED FROM WITHIN OUR MAIN WINDOW INSTANCE! THIS WAS LIKELY A CLOSE BUTTON CALL", LogType.InfoLog);
 
             // Now call the routine in the constants file.
-            InjectorConstants.ProcessAppExit(null, null);
+            FulcrumViewConstants.ProcessAppExit(null, null);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

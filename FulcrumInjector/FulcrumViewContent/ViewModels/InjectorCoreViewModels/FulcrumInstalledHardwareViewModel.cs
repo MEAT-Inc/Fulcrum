@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
-using FulcrumInjector.FulcrumLogic.PassThruWatchdog;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruWatchdog;
 using FulcrumInjector.FulcrumViewContent.Models.EventModels;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger;
@@ -55,8 +55,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 IsRefreshing = false;
 
                 // Check our values here. 
-                if (InjectorConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
-                InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = value.Name;
+                if (FulcrumViewConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
+                FulcrumViewConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = value.Name;
             }
         }
 
@@ -71,9 +71,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 if (!string.IsNullOrWhiteSpace(value)) JBoxEventWatchdog.StopBackgroundRefresh();
 
                 // Update the connection view model values here. Don't set if the device is the same.
-                var ConnectionVm = InjectorConstants.FulcrumVehicleConnectionInfoViewModel;
+                var ConnectionVm = FulcrumViewConstants.FulcrumVehicleConnectionInfoViewModel;
                 if (ConnectionVm == null || ConnectionVm?.SelectedDevice == value) return;
-                InjectorConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDevice = value;
+                FulcrumViewConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDevice = value;
             }
         }
 
