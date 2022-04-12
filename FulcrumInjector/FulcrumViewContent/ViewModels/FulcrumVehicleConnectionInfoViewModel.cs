@@ -62,7 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
         // Device Information
         public string SelectedDLL { get => _selectedDLL; set => PropertyUpdated(value); }
-        public string SelectedDevice
+        public string SelectedDevice 
         {
             get => _selectedDevice ?? "No Device Selected";
             set
@@ -95,8 +95,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 try
                 {
                     // Update private values, dispose of the instance
-                    if (this.IsMonitoring) this.StopVehicleMonitoring(); this.InstanceSession?.DisposeSharpSession();
-                    this.InstanceSession = new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
+                    if (this.IsMonitoring) this.StopVehicleMonitoring(); Sharp2534Session.CloseSession(this.InstanceSession);
+                    this.InstanceSession = Sharp2534Session.OpenSession(this._versionType, this._selectedDLL, this._selectedDevice);
                     ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
 
                     // Start monitoring. Throw if this fails.
@@ -350,7 +350,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // Generate our instance here and try to store our VIN
                 ViewModelLogger.WriteLog($"--> BUILDING AUTO ID ROUTINE FOR TYPE {TypeValue.Name}");
-                this.InstanceSession ??= new Sharp2534Session(this._versionType, this._selectedDLL, this._selectedDevice);
+                this.InstanceSession ??= Sharp2534Session.OpenSession(this._versionType, this._selectedDLL, this._selectedDevice);
 
                 try
                 {
