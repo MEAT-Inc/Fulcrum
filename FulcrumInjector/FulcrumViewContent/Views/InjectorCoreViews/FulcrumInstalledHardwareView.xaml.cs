@@ -72,17 +72,23 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("PULLING IN NEW DEVICES FOR DLL ENTRY NOW...", LogType.InfoLog);
 
             // Convert sender and cast our DLL object
-            ListBox SendingBox = (ListBox)SendingDllObject;
-            J2534Dll SelectedDLL = (J2534Dll)SendingBox.SelectedItem;
+            J2534Dll SelectedDLL = (J2534Dll)(DllChangedEventArgs.AddedItems.Count == 0 ?
+                DllChangedEventArgs.RemovedItems[0] :
+                DllChangedEventArgs.AddedItems[0]);
 
-            // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
-            this.ViewLogger.WriteLog(
-                SelectedDLL == null ? "NO DLL ENTRY SELECTED! CLEARING" : $"DLL ENTRY PULLED: {SelectedDLL.Name}",
-                LogType.TraceLog
-            );
+            // Clear out the Devices if Needed
+            this.ViewLogger.WriteLog($"DLL OBJECT BEING MODIFIED: {SelectedDLL.Name}", LogType.WarnLog);
+            if (DllChangedEventArgs.RemovedItems.Contains(SelectedDLL))
+            {
+                // Remove the devices listed
+                InstalledDevicesListBox.ItemsSource = null;
+                this.ViewLogger.WriteLog("CLEARED OUT OLD DLL VALUES OK!", LogType.InfoLog);
+            }
 
             // Log and populate devices
-            Task.Run(() => {
+            Task.Run(() =>
+            {
+                // Populate the DLL entry and let devices flow in
                 this.ViewModel.SelectedDLL = SelectedDLL;
                 this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
             });
@@ -99,7 +105,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Convert sender and cast our DLL object
             ListBox SendingBox = (ListBox)SendingDeviceObject;
-            string SelectedDevice = SendingBox.SelectedItem.ToString();
+            string SelectedDevice = SendingBox.SelectedItem?.ToString();
 
             // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
             this.ViewLogger.WriteLog(
@@ -109,7 +115,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Log and populate devices
             this.ViewModel.SelectedDevice = SelectedDevice;
-            this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
+            if (SelectedDevice != null) this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
         }
     }
 }

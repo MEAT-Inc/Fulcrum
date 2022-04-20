@@ -94,8 +94,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                 try
                 {
-                    // Update private values, dispose of the instance
-                    if (this.IsMonitoring) this.StopVehicleMonitoring(); Sharp2534Session.CloseSession(this.InstanceSession);
+                    // Close device out and dispose of the session object instance
+                    if (this.InstanceSession != null) {
+                        this.InstanceSession.PTClose();
+                        Sharp2534Session.CloseSession(this.InstanceSession);
+
+                        // Null out the session
+                        this.InstanceSession = null;
+                        ViewModelLogger.WriteLog("SET CURRENT INSTANCE SESSION TO NULL VALUE!", LogType.WarnLog);
+                    }
+
+                    // Build a new session object here now.
                     this.InstanceSession = Sharp2534Session.OpenSession(this._versionType, this._selectedDLL, this._selectedDevice);
                     ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
 
