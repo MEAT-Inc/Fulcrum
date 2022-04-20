@@ -239,7 +239,7 @@
                                             <Setter Property="Text" Value="No DLL Selected!"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
-                                            <Setter Property="Text" Value="Refreshing Devices...!"/>
+                                            <Setter Property="Text" Value="Refreshing Devices..."/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
                                             <Setter Property="Text" Value="Unsupported DLL!"/>
@@ -254,7 +254,7 @@
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=InstalledDevicesListBox, Path=HasItems}" Value="False">
-                                            <Setter Property="Text" Value="No J2534 DLLs were found on this system! Please make sure one or more PassThru Drivers are installed then restart this app."/>
+                                            <Setter Property="Text" Value="No J2534 Devices were found on this system! Please make sure one or more PassThru Drivers are installed then restart this app."/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="Ensure at least one device for the selected DLL has been connected to this machine before trying to view the details of it."/>
