@@ -52,8 +52,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         public string VehicleVin
         {
             get => string.IsNullOrWhiteSpace(_vehicleVIN) ? "No VIN Number" : _vehicleVIN;
-            set => PropertyUpdated(value);
+            set
+            {
+                PropertyUpdated(value);
+                this.VehicleInfo = value.Length == 17 ? "Not Yet Supported" : "No VIN Number";
+            }
         }
+
         public string VehicleInfo
         {
             get => string.IsNullOrWhiteSpace(_vehicleInfo) ? "No VIN Number To Decode" : _vehicleInfo;
@@ -372,11 +377,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 }
 
                 // Check our Vin Value
+                AutoIdInstance.CloseAutoIdSession();
                 ViewModelLogger.WriteLog("PULLED A VIN NUMBER VALUE OK!");
                 ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {VinString}", LogType.WarnLog);
 
                 // Store values and exit out.
                 ProtocolUsed = ProcObject;
+                this.AutoIdRunning = false;
                 return true;
             }
 
