@@ -113,13 +113,16 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.4.1.0.254\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.4.1.8.275\lib\net472\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpAutoId, Version=0.2.10.11, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.2.10.12\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.7.4.122, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.4.1.0.254\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.4.1.8.275\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=4.1.0.254, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.4.1.0.254\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=4.1.7.274, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534.4.1.8.275\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.0\lib\net461\Svg.dll</HintPath>
@@ -163,10 +166,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdHelpers\AutoIdRoutine_ISO15765.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdModels\AutoIdConfiguration.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdModels\AutoIdObjects.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruAutoID\AutoIdIRoutine.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruConnectExpression.cs" />
@@ -176,13 +175,11 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruWatchdog\JBoxEventWatchdog.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruWatchdog\JBoxStateEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\FulcrumEmailBroker.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruImports\FulcrumWin32Logging.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\FulcrumWin32Logging.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruOpenExpression.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PtExpressionProperty.cs" />
@@ -220,7 +217,7 @@
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\LogLevelColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\LoggerNameColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\TimeColorFormatter.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruImports\FulcrumWin32Setup.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\FulcrumWin32Setup.cs" />
     <Compile Include="FulcrumLogic\FulcrumPipes\FulcrumPipe.cs" />
     <Compile Include="FulcrumLogic\FulcrumPipes\PipeEvents\FulcrumPipeDataReadEventArgs.cs" />
     <Compile Include="FulcrumLogic\FulcrumPipes\FulcrumPipeReader.cs" />

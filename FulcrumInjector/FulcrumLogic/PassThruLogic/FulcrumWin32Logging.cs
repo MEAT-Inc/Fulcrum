@@ -7,7 +7,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruImports
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic
 {
     /// <summary>
     /// Log heading type values
