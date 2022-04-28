@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic;
 using SharpLogger;
 using SharpLogger.LoggerObjects;

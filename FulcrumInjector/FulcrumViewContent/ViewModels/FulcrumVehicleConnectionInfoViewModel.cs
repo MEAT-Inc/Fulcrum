@@ -375,7 +375,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {VinString}", LogType.WarnLog);
 
                 // Store values and exit out.
-                this.VehicleVin = VinString;
                 ProtocolUsed = ProcObject; this.AutoIdRunning = false;
                 AutoIdInstance.CloseAutoIdSession();
                 return true;
