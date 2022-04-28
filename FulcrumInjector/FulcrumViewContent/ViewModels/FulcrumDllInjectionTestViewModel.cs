@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruImports;
+using FulcrumInjector.FulcrumLogic.PassThruLogic;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
