@@ -52,16 +52,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         public string VehicleVin
         {
             get => string.IsNullOrWhiteSpace(_vehicleVIN) ? "No VIN Number" : _vehicleVIN;
-            set
-            {
-                PropertyUpdated(value);
-                this.VehicleInfo = value.Length == 17 ? "Not Yet Supported" : "No VIN Number";
-            }
+            set => PropertyUpdated(value);
         }
 
         public string VehicleInfo
         {
-            get => string.IsNullOrWhiteSpace(_vehicleInfo) ? "No VIN Number To Decode" : _vehicleInfo;
+            get => string.IsNullOrWhiteSpace(_vehicleInfo) ? "Not Yet Supported" : _vehicleInfo;
             set => PropertyUpdated(value);
         }
 
@@ -223,11 +219,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             }
 
             // Kill our session here
-            ViewModelLogger.WriteLog("CLOSING REQUEST SESSION MANUALLY NOW...", LogType.WarnLog);
-
-            // Return the result of our VIN Request
-            ViewModelLogger.WriteLog("SESSION CLOSED AND NULLIFIED OK!", LogType.InfoLog);
             if (NeedsMonitoringReset) this.StartVehicleMonitoring();
+            ViewModelLogger.WriteLog("CLOSING REQUEST SESSION MANUALLY NOW...", LogType.WarnLog);
+            ViewModelLogger.WriteLog("SESSION CLOSED AND NULLIFIED OK!", LogType.InfoLog);
             return VinResult;
         }
 
@@ -316,15 +310,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private void StopVehicleMonitoring()
         {
             // Reset all values here.
-            if (this.SelectedDevice != "No Device Selected") 
-                ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {SelectedDevice} NOW...", LogType.WarnLog);
+            // if (this?.SelectedDevice != "No Device Selected") 
+            //     ViewModelLogger.WriteLog($"STOPPING REFRESH SESSION TASK FOR DEVICE {this.SelectedDevice} NOW...", LogType.WarnLog);
 
             // Dispose our instance object here
             this.VehicleVin = null;
             this.IsMonitoring = false;
             this.DeviceVoltage = 0.00;
             this.RefreshSource?.Cancel();
-            this.InstanceSession.PTClose();
+            this.InstanceSession?.PTClose();
 
             // Log information output
             ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);
@@ -377,13 +371,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 }
 
                 // Check our Vin Value
-                AutoIdInstance.CloseAutoIdSession();
                 ViewModelLogger.WriteLog("PULLED A VIN NUMBER VALUE OK!");
                 ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {VinString}", LogType.WarnLog);
 
                 // Store values and exit out.
-                ProtocolUsed = ProcObject;
-                this.AutoIdRunning = false;
+                ProtocolUsed = ProcObject; this.AutoIdRunning = false;
+                AutoIdInstance.CloseAutoIdSession();
                 return true;
             }
 
