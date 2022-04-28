@@ -34,8 +34,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         internal static SingletonContentControl<TViewType, TViewModelType> CreateSingletonInstance(Type ViewType, Type ViewModelType)
         {
             // Build new instance of this singleton helper and return it
-            SingletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewType.GetType().Name}...", LogType.WarnLog);
-            SingletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelType.GetType().Name}", LogType.InfoLog);
+            SingletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewType.Name}...", LogType.WarnLog);
+            SingletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelType.Name}", LogType.InfoLog);
             var LocatedSingleton = LocateSingletonViewInstance(ViewType);
             if (LocatedSingleton != null)
             {
@@ -68,7 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         internal static SingletonContentControl<TViewType, TViewModelType> RegisterAsSingleton(TViewType ViewObject, TViewModelType ViewModelObject)
         {
             // Build new instance of this singleton helper and return it
-            SingletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewObject.GetType().Name}...", LogType.WarnLog);
+            SingletonLogger.WriteLog($"TRYING TO REGISTER NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewObject.GetType().Name}...", LogType.WarnLog);
             SingletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelObject.GetType().Name}", LogType.InfoLog);
             var LocatedSingleton = LocateSingletonViewInstance(ViewObject.GetType());
             if (LocatedSingleton != null)

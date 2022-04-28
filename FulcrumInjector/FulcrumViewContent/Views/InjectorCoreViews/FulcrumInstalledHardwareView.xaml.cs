@@ -12,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using SharpLogger;
@@ -43,7 +42,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = InjectorConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel();
+            this.ViewModel = FulcrumConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
@@ -73,18 +72,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("PULLING IN NEW DEVICES FOR DLL ENTRY NOW...", LogType.InfoLog);
 
             // Convert sender and cast our DLL object
-            ListBox SendingBox = (ListBox)SendingDllObject;
-            J2534Dll SelectedDLL = (J2534Dll)SendingBox.SelectedItem;
+            J2534Dll SelectedDLL = (J2534Dll)(DllChangedEventArgs.AddedItems.Count == 0 ?
+                DllChangedEventArgs.RemovedItems[0] :
+                DllChangedEventArgs.AddedItems[0]);
 
-            // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
-            this.ViewLogger.WriteLog(
-                SelectedDLL == null ? "NO DLL ENTRY SELECTED! CLEARING" : $"DLL ENTRY PULLED: {SelectedDLL.Name}",
-                LogType.TraceLog
-            );
+            // Clear out the Devices if Needed
+            this.ViewLogger.WriteLog($"DLL OBJECT BEING MODIFIED: {SelectedDLL.Name}", LogType.WarnLog);
+            if (DllChangedEventArgs.RemovedItems.Contains(SelectedDLL))
+            {
+                // Remove the devices listed
+                InstalledDevicesListBox.ItemsSource = null;
+                this.ViewLogger.WriteLog("CLEARED OUT OLD DLL VALUES OK!", LogType.InfoLog);
+            }
 
             // Log and populate devices
-            this.ViewModel.SelectedDLL = SelectedDLL;
-            this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
+            Task.Run(() =>
+            {
+                // Populate the DLL entry and let devices flow in
+                this.ViewModel.SelectedDLL = SelectedDLL;
+                this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Configures a new device selection value on the instance of our view model
@@ -98,7 +105,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Convert sender and cast our DLL object
             ListBox SendingBox = (ListBox)SendingDeviceObject;
-            string SelectedDevice = SendingBox.SelectedItem.ToString();
+            string SelectedDevice = SendingBox.SelectedItem?.ToString();
 
             // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
             this.ViewLogger.WriteLog(
@@ -108,7 +115,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Log and populate devices
             this.ViewModel.SelectedDevice = SelectedDevice;
-            this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
+            if (SelectedDevice != null) this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
         }
     }
 }

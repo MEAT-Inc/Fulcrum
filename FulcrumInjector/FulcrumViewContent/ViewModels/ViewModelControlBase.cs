@@ -103,13 +103,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private void UpdateViewModelPropertyValue(ViewModelControlBase ViewModelObject)
         {
             // Get the types on the globals first.
-            var AppViewStoreType = typeof(InjectorConstants);
+            var AppViewStoreType = typeof(FulcrumConstants);
             var ViewModelTypeName = Type.GetType(ViewModelObject.ToString());
-            if (AppViewStoreType == null) { throw new NullReferenceException($"THE TYPE {typeof(InjectorConstants).ToString()} COULD NOT BE FOUND!"); }
+            if (AppViewStoreType == null) { throw new NullReferenceException($"THE TYPE {typeof(FulcrumConstants).ToString()} COULD NOT BE FOUND!"); }
 
             // Gets all the members and sets one to update
             var AppStoreMembers = AppViewStoreType.GetMembers();
-            if (InjectorConstants.InjectorMainWindow == null) { return; }
+            if (FulcrumConstants.InjectorMainWindow == null) { return; }
 
             // If the main window isn't null keep going.
             var MemberToUpdate = AppStoreMembers.FirstOrDefault((MemberObj) =>

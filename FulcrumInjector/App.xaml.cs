@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using ControlzEx.Theming;
-using FulcrumInjector.FulcrumLogic.InjectorPipes;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.AppStyleSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
+using FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport;
 using NLog;
 using NLog.Fluent;
 using SharpLogger;
@@ -107,7 +107,7 @@ namespace FulcrumInjector
         private void ConfigureAppExitRoutine()
         {
             // Build event helper, Log done and return out.
-            Application.Current.Exit += InjectorConstants.ProcessAppExit;
+            Application.Current.Exit += FulcrumConstants.ProcessAppExit;
             LogBroker.Logger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
             LogBroker.Logger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
@@ -122,9 +122,11 @@ namespace FulcrumInjector
             // Start by building a new logging configuration object and init the broker.
             string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath");
+            int FlushTriggerValue = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.AsyncFlushCountTrigger");
 
             // Make logger and build global logger object.
             LogBroker.ConfigureLoggingSession(AppName, LoggingPath);
+            SubServiceLogger.SetFlushTrigger(FlushTriggerValue);
             LogBroker.BrokerInstance.FillBrokerPool();
 
             // Log information and current application version.
@@ -230,13 +232,13 @@ namespace FulcrumInjector
                 // Pull type values here
                 Type ViewType = ViewTypes[IndexValue]; Type ViewModelType = ViewModelTypes[IndexValue];
                 LogBroker.Logger?.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Namespace}", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Namespace}", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
+                LogBroker.Logger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
 
                 // Generate our singleton object here.
                 var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(ViewType, ViewModelType);
                 LogBroker.Logger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().Name} WAS BUILT OK!", LogType.TraceLog);
+                LogBroker.Logger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
             }
 
             // Log completed building and exit routine

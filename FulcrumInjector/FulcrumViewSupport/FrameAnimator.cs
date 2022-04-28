@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using MahApps.Metro.Controls;
@@ -15,6 +10,9 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// </summary>
     public class FrameAnimator
     {
+        /// <summary>
+        /// Navigation helper which pulls our Storyboard and metadata contents on request
+        /// </summary>
         public static readonly DependencyProperty FrameNavigationStoryboardProperty
             = DependencyProperty.RegisterAttached(
                 "FrameNavigationStoryboard",

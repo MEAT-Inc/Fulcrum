@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumLogic.JsonHelpers;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using Newtonsoft.Json;
@@ -41,7 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = InjectorConstants.FulcrumSettingsPaneViewModel ?? new FulcrumSettingsPaneViewModel();
+            this.ViewModel = FulcrumConstants.FulcrumSettingsPaneViewModel ?? new FulcrumSettingsPaneViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 

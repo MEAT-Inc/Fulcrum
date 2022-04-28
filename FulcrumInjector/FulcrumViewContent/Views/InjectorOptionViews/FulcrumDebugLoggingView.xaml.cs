@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Build new ViewModel object
             InitializeComponent();
-            this.ViewModel = InjectorConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
+            this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
             // Configure the new Logging Output Target.

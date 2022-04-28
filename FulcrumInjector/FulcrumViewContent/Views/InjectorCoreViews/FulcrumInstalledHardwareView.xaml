@@ -18,8 +18,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
-                <ResourceDictionary Source="../../../FulcrumViewSupport/AppStyleSheets/FulcrumInstalledHardwareViewStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumInstalledHardwareViewStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -238,6 +238,9 @@
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="No DLL Selected!"/>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
+                                            <Setter Property="Text" Value="Refreshing Devices..."/>
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
                                             <Setter Property="Text" Value="Unsupported DLL!"/>
                                         </DataTrigger>
@@ -251,13 +254,16 @@
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=InstalledDevicesListBox, Path=HasItems}" Value="False">
-                                            <Setter Property="Text" Value="No J2534 DLLs were found on this system! Please make sure one or more PassThru Drivers are installed then restart this app."/>
+                                            <Setter Property="Text" Value="No J2534 Devices were found on this system! Please make sure one or more PassThru Drivers are installed then restart this app."/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding ElementName=InstalledDLLsListBox, Path=SelectedIndex}" Value="-1">
                                             <Setter Property="Text" Value="Ensure at least one device for the selected DLL has been connected to this machine before trying to view the details of it."/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsIgnoredDLL}" Value="True">
                                             <Setter Property="Text" Value="The currently selected DLL is not supported by the Fulcrum. Please select a different DLL entry from the list to the left."/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsRefreshing}" Value="True">
+                                            <Setter Property="Text" Value="Please wait while devices for the selected DLL are populated..."/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
