@@ -382,7 +382,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             // If we got here, no vin was found on the network
             this.AutoIdRunning = false; VinString = null; ProtocolUsed = default;
-            ViewModelLogger.WriteLog($"FAILED TO FIND A VIN NUMBER AFTER SCANNING {UsableTypes.Length} DIFFERENT TYPE PROTOCOLS!", LogType.ErrorLog);
+            ViewModelLogger.WriteLog($"FAILED TO FIND A VIN NUMBER AFTER SCANNING ALL POSSIBLE PROTOCOLS!", LogType.ErrorLog);
             return false;
         }
     }
