@@ -168,16 +168,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("STARTING PROCESSING FOR PARSE CONTENT VALUES NOW...");
 
             // Run this as a task to keep our UI Alive
-            bool ParseResult = Task.Run(() =>
-            {
-                // Log information and parse content output.
-                this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
-                return this.ViewModel.ParseLogContents(out _);
-            }).Result;
-
-            // Reset values for buttons now
-            this.ProcessingActionFinished(ParseResult, SendingButton, Defaults);
+            this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+            var ParseResult = Task.Run(() => this.ViewModel.ParseLogContents(out _)).Result;
             this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+
+            // Log information and parse content output.
+            this.ProcessingActionFinished(ParseResult, SendingButton, Defaults);
         }
         /// <summary>
         /// Builds a simulation out of the currently processed log file contents.
@@ -187,20 +183,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void BuildSimulationButton_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
         {
             // Start by pulling in the expression values from our view model object and then pass them into our parser
-            var Defaults = this.ProcessingActionStarted(SendingButton); 
+            var Defaults = this.ProcessingActionStarted(SendingButton);
             this.ViewLogger.WriteLog("BUILDING SIMULATION FILE NOW...");
 
             // TODO: RUN THE CURRENT CONTENTS INTO THE SIMULATION HELPER PROCESSES AND BUILD OUTPUT!
-            bool SimulationResult = Task.Run(() =>
-            {
-                // Log information and parse content output.
-                this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
-                return true;
-            }).Result;
-
-            // Stop the processing action triggers
-            this.ProcessingActionFinished(SimulationResult, SendingButton, Defaults);
+            this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+            var ParseResult = Task.Run(() => true).Result;
             this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
+
+            // Log information and parse content output.
+            this.ProcessingActionFinished(ParseResult, SendingButton, Defaults);
         }
 
         /// <summary>
