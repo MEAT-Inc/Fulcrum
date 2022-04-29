@@ -107,14 +107,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 return;
             }
 
-            // Get Grid object and toggle buttons
-            ToggleViewTextButton.IsEnabled = false;
-            Grid ParentGrid = SenderButton.Parent as Grid;
-            SenderButton.Content = "Loading..."; ParentGrid.IsEnabled = false;
-
             // Run this in the background for smoother operation
             Task.Run(() =>
             {
+                // Invoke this to keep UI Alive
+                Grid ParentGrid = SenderButton.Parent as Grid;
+                Dispatcher.Invoke(() =>
+                {
+                    // Get Grid object and toggle buttons
+                    ParentGrid.IsEnabled = false;
+                    SenderButton.Content = "Loading...";
+                    ToggleViewTextButton.IsEnabled = false;
+                });
+
                 // Check if we have multiple files. 
                 string FileToLoad = SelectAttachmentDialog.FileNames.Length == 1 ?
                     SelectAttachmentDialog.FileName :
@@ -169,11 +174,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Run this as a task to keep our UI Alive
             this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
-            var ParseResult = Task.Run(() => this.ViewModel.ParseLogContents(out _)).Result;
-            this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+            Task.Run(() =>
+            {
+                // Store result from processing
+                bool ParseResult = this.ViewModel.ParseLogContents(out _);
+                this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
-            // Log information and parse content output.
-            this.ProcessingActionFinished(ParseResult, SendingButton, Defaults);
+                // Invoke via dispatcher
+                Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
+                this.ViewLogger.WriteLog("INPUT CONTENT PARSING IS NOW COMPLETE!", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Builds a simulation out of the currently processed log file contents.
@@ -188,11 +198,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // TODO: RUN THE CURRENT CONTENTS INTO THE SIMULATION HELPER PROCESSES AND BUILD OUTPUT!
             this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
-            var ParseResult = Task.Run(() => true).Result;
-            this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
+            Task.Run(() =>
+            {
+                // Store result from processing
+                bool ParseResult = this.ViewModel.ParseLogContents(out _);
+                this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
-            // Log information and parse content output.
-            this.ProcessingActionFinished(ParseResult, SendingButton, Defaults);
+                // Invoke via dispatcher
+                Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
+                this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
+            });
         }
 
         /// <summary>
