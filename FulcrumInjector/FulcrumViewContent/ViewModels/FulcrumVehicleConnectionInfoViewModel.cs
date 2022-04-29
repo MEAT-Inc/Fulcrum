@@ -71,7 +71,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 // Check for the same value passed in again or nothing passed at all.
                 if (value == this.SelectedDevice) {
                     PropertyUpdated(value);
-                    ViewModelLogger.WriteLog("NOT BUILDING NEW SESSION FOR IDENTICAL DEVICE NAME!", LogType.TraceLog);
                     return;
                 }
 
@@ -79,6 +78,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 PropertyUpdated(value);
                 if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected")
                 {
+                    // Set view content values
+                    this.DeviceVoltage = 0.00;
+                    this.VehicleVin = "No VIN Number";
+
                     // Update private values, dispose the instance.
                     if (this.IsMonitoring) this.StopVehicleMonitoring(); 
                     if (this.InstanceSession != null) Sharp2534Session.CloseSession(this.InstanceSession);
@@ -136,7 +139,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             {
                 // Set the new value and set Can ID to false if value is now true
                 PropertyUpdated(value);
-                this.SelectedDevice = _selectedDevice;
                 this.CanManualId = value == false &&
                                    this.DeviceVoltage >= 11 &&
                                    this.SelectedDevice != "No Device Selected!";
@@ -148,7 +150,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             set
             {
                 PropertyUpdated(value);
-                this.SelectedDevice = _selectedDevice;
                 this.CanManualId = value >= 11 &&
                                    !this.AutoIdRunning &&
                                    this.SelectedDevice != "No Device Selected";
@@ -335,8 +336,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             try
             {
                 // Now with our new channel ID, we open an instance and pull the channel voltage.
-                if (!this.InstanceSession.JDeviceInstance.IsOpen) this.InstanceSession.PTOpen();
+                this.InstanceSession.PTOpen();
+                if (!this.InstanceSession.JDeviceInstance.IsOpen) return 0.00;
+
+                // Only read our voltage if our device was opened ok
                 this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true);
+                this.InstanceSession.PTClose();
                 return DoubleVoltage;
             }
             catch

@@ -77,9 +77,18 @@
                         </Button.Style>
                     </Button>
                     <Button
-                        Margin="5,2"
-                        Style="{StaticResource ActionButtonStyle}" Grid.Column="2"
-                        IsEnabled="False" Content="Build Simulation" VerticalAlignment="Stretch"/>
+                        Margin="5,2" Grid.Column="2" Content="Build Simulation" 
+                        VerticalAlignment="Stretch" Click="BuildSimulationButton_OnClick">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLogLoaded}" Value="false">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                           </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
