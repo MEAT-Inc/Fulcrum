@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,10 +24,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
         // Input objects for this class instance to build simulations
         public readonly string SimulationName;
+        public readonly string SimulationFile;
         public readonly PassThruExpression[] InputExpressions;
 
         // Grouping Objects built out.
-        public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
+        public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -35,10 +37,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// </summary>
         public ExpressionSimulationGenerator(string SimName, PassThruExpression[] Expressions)
         {
+            // Build our new file name here.
+            string InputFilePath = Path.GetDirectoryName(SimName);
+            string InputFileName = Path.ChangeExtension(Path.GetFileName(SimName), ".ptSim");
+
             // Store name of simulation and the input expressions here.
-            this.SimulationName = SimName;
+            this.SimulationName = InputFileName;
             this.InputExpressions = Expressions;
-            this.SimLogger.WriteLog($"BUILDING NEW SIMULATION FOR FILE NAMED {SimName} WITH A TOTAL OF {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
+            this.SimulationFile = Path.Combine(InputFilePath, InputFileName);
+            this.SimLogger.WriteLog($"BUILDING NEW SIMULATION FOR FILE NAMED {SimulationName} WITH A TOTAL OF {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
 
             // Run the Grouping command on the input expressions here.
             Expressions.ExtractChannelIds();

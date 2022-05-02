@@ -246,8 +246,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
                 return true;
             } 
-            catch {
+            catch (Exception BuildSimEx) 
+            {
+                // Log failures out and return nothing 
                 ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
                 GeneratorBuilt = null; return false;
             }
         }
