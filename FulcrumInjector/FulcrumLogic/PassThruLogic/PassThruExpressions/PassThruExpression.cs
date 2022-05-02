@@ -221,6 +221,26 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             return PropertiesLocated;
         }
         /// <summary>
+        /// Finds a property name and pulls the value of it if possible
+        /// </summary>
+        /// <typeparam name="TValueType">Type of value to pull</typeparam>
+        /// <param name="PropertyName">Name of the property to extract</param>
+        /// <returns>Cast value of the property</returns>
+        protected internal TValueType GetPropertyValue<TValueType>(string PropertyName) where TValueType : new()
+        {
+            // Find all properties of the expression set.
+            var ExpressionValues = this.GetExpressionProperties();
+            var DesiredProperty = ExpressionValues
+                .FirstOrDefault(FieldObj => FieldObj.Name
+                    .Replace(" ", string.Empty).ToUpper()
+                    .Contains(PropertyName.ToUpper()));
+
+            // Now make sure we have a property to use here.
+            return DesiredProperty == null ? new TValueType() : (TValueType)DesiredProperty.GetValue(this);
+        }
+
+
+        /// <summary>
         /// Sets the values of the output regex strings onto this class object ptExpression values
         /// </summary>
         /// <param name="FieldValueStrings">Strings to store</param>

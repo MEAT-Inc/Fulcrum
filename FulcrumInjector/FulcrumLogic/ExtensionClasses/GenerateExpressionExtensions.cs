@@ -18,7 +18,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class ExpressionExtensions
+    public static class GenerateExpressionExtensions
     {
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
