@@ -313,14 +313,14 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 {
                     // If we can't find the status close message, try and find it using the next command startup.
                     var NextTime = TimeRegex.Match(FileContents, TimeStartIndex + 1).Index;
-                    ErrorCloseStart = NextTime; ErrorCloseLength = 1;
+                    ErrorCloseStart = NextTime; ErrorCloseLength = 0;
                 }
 
                 // Now find the end of our length for the match object
                 int ErrorCloseIndex = ErrorCloseStart + ErrorCloseLength;
 
                 // Take the difference in End/Start as our string length value.
-                if (ErrorCloseIndex < CharIndex) ErrorCloseIndex = CharIndex;
+                if (ErrorCloseIndex - TimeStartIndex < 0) ErrorCloseIndex = FileContents.Length;
                 string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
                 if (OutputLines.Contains(NextCommand)) break;
 
