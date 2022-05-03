@@ -166,6 +166,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumLogic\ExtensionClasses\GenerateSimulationExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruCommandType.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruConnectExpression.cs" />
@@ -175,13 +176,14 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\ExpressionSimulationGenerator.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\FulcrumEmailBroker.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\FulcrumWin32Logging.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruOpenExpression.cs" />
-    <Compile Include="FulcrumLogic\ExtensionClasses\ExpressionExtensions.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\GenerateExpressionExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PtExpressionProperty.cs" />
     <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
