@@ -107,19 +107,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 return;
             }
 
+            // Invoke this to keep UI Alive
+            Grid ParentGrid = SenderButton.Parent as Grid;
+            Dispatcher.Invoke(() =>
+            {
+                // Get Grid object and toggle buttons
+                ParentGrid.IsEnabled = false;
+                SenderButton.Content = "Loading...";
+                ToggleViewTextButton.IsEnabled = false;
+            });
+
             // Run this in the background for smoother operation
             Task.Run(() =>
             {
-                // Invoke this to keep UI Alive
-                Grid ParentGrid = SenderButton.Parent as Grid;
-                Dispatcher.Invoke(() =>
-                {
-                    // Get Grid object and toggle buttons
-                    ParentGrid.IsEnabled = false;
-                    SenderButton.Content = "Loading...";
-                    ToggleViewTextButton.IsEnabled = false;
-                });
-
                 // Check if we have multiple files. 
                 string FileToLoad = SelectAttachmentDialog.FileNames.Length == 1 ?
                     SelectAttachmentDialog.FileName :
@@ -200,12 +200,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
             Task.Run(() =>
             {
-                // Store result from processing
-                bool ParseResult = this.ViewModel.ParseLogContents(out _);
+                // Store result from processing if it's not yet done on the view model
+                if (this.ViewModel.InputParsed == false) 
+                    if (!this.ViewModel.ParseLogContents(out _)) {
+                        this.ProcessingActionFinished(false, SendingButton, Defaults);
+                        return;
+                    }
+
+                // Now build our simulation object here
+                bool SimResult = this.ViewModel.BuildLogSimulation(out var SimGenerator); 
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
-                Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
+                Dispatcher.Invoke(() => this.ProcessingActionFinished(SimResult, SendingButton, Defaults));
                 this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }

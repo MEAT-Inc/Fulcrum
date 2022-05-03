@@ -18,7 +18,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class ExpressionExtensions
+    public static class GenerateExpressionExtensions
     {
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
@@ -308,15 +308,26 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Find the first index of a time entry and the close command index.
                 int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
                 var ErrorCloseMatch = StatusRegex.Match(FileContents, TimeStartIndex);
-                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
+                int ErrorCloseStart = ErrorCloseMatch.Index; int ErrorCloseLength = ErrorCloseMatch.Length;
+                if (!ErrorCloseMatch.Success)
+                {
+                    // If we can't find the status close message, try and find it using the next command startup.
+                    var NextTime = TimeRegex.Match(FileContents, TimeStartIndex + 1).Index;
+                    ErrorCloseStart = NextTime; ErrorCloseLength = 0;
+                }
+
+                // Now find the end of our length for the match object
+                int ErrorCloseIndex = ErrorCloseStart + ErrorCloseLength;
 
                 // Take the difference in End/Start as our string length value.
+                if (TimeStartIndex == 0) break;
+                if (ErrorCloseIndex - TimeStartIndex < 0) ErrorCloseIndex = FileContents.Length;
                 string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
                 if (OutputLines.Contains(NextCommand)) break;
 
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                if (ErrorCloseIndex < CharIndex) break;
-                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
+                CharIndex = ErrorCloseIndex;
+                OutputLines.Add(NextCommand);
             }
 
             // Return the built set of commands.
@@ -332,13 +343,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // First build our output location for our file.
             string OutputFolder = Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions");
             string FinalOutputPath =
-                BaseFileName.Contains(Path.DirectorySeparatorChar) ?
-                    Path.ChangeExtension(Path.Combine(
-                        Path.GetDirectoryName(BaseFileName), $"FulcrumExpressions_{Path.GetFileName(BaseFileName)}"),
-                "ptExp") :
-                    BaseFileName.Length == 0 ?
-                        Path.Combine(OutputFolder, $"FulcrumExpressions_{DateTime.Now:MMddyyyy-HHmmss}.ptExp") :
-                        Path.Combine(OutputFolder, $"FulcrumExpressions_{Path.GetFileNameWithoutExtension(BaseFileName)}.ptExp");
+                Path.Combine(OutputFolder, Path.GetFileNameWithoutExtension(BaseFileName)) + ".ptExp";
 
             // Get a logger object for saving expression sets.
             string LoggerName = $"{Path.GetFileNameWithoutExtension(BaseFileName)}_ExpressionsLogger";
@@ -367,6 +372,19 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
                 File.WriteAllText(FinalOutputPath, string.Join("\n", OutputExpressionStrings));
 
+                // Check to see if we aren't in the default location
+                if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
+                {
+                    // Find the base path, get the file name, and copy it into here.
+                    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
+                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
+                    File.Copy(FinalOutputPath, CopyLocation);
+
+                    // Remove the Expressions Logger. Log done and return
+                    ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+                    return CopyLocation;
+                }
+
                 // Remove the Expressions Logger. Log done and return
                 ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
                 return FinalOutputPath;
@@ -393,7 +411,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         {
             // Pull the description string and get type of regex class.
             string ClassType = $"{typeof(PassThruExpression).Namespace}.{InputType.ToDescriptionString()}";
-            if (Type.GetType(ClassType) == null) return new PassThruExpression(string.Join(string.Empty, InputLines), InputType);
+            if (Type.GetType(ClassType) == null) 
+                try { return new PassThruExpression(string.Join(string.Empty, InputLines), InputType); }
+                catch { return null; }
 
             // Find our output type value here.
             Type OutputType = Type.GetType(ClassType);

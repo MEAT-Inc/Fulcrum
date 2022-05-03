@@ -10,6 +10,7 @@ using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
@@ -43,6 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private bool _inputParsed = false;
         private bool _showingParsed = false;
         private string _lastBuiltExpressionsFile;
+        private ObservableCollection<PassThruExpression> _lastBuiltExpressions;
 
         // Public values for our view to bind onto 
         public bool IsLogLoaded { get => _isLogLoaded; set => PropertyUpdated(value); }
@@ -176,6 +178,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;   
             }
         }
+
+
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
@@ -187,7 +191,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = ExpressionExtensions.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = GenerateExpressionExtensions.SplitLogToCommands(LogFileContents);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -199,12 +203,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     string[] SplitLines = LineSet.Split('\n');
                     var ExpressionType = SplitLines.GetTypeFromLines();
 
-                    // Build expression class object and tick our progress
-                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
-                    this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
-
-                    // Return the built expression object
-                    return NextClassObject;
+                    try
+                    {
+                        // Build expression class object and tick our progress
+                        var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
+                        this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
+                        return NextClassObject;
+                    }
+                    catch (Exception ParseEx)
+                    {
+                        // Log failures out and find out why the fails happen
+                        ViewModelLogger.WriteLog($"FAILED TO PARSE A COMMAND ENTRY! FIRST LINE OF COMMANDS {SplitLines[0]}", LogType.WarnLog);
+                        ViewModelLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ParseEx, new[] { LogType.WarnLog, LogType.TraceLog });
+                        return null;
+                    }
                 }).Where(ExpObj => ExpObj != null).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
@@ -213,7 +225,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 if (this._lastBuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._lastBuiltExpressionsFile}!", LogType.InfoLog);
-                OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet); this.InputParsed = true;
+                _lastBuiltExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet);
+                this.InputParsed = true; OutputExpressions = this._lastBuiltExpressions;
                 return true;
             }
             catch (Exception Ex)
@@ -223,6 +236,30 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
                 OutputExpressions = null; this.InputParsed = false;
                 return false;
+            }
+        }
+        /// <summary>
+        /// Builds out a set of expression objects for the simulator generation helper
+        /// </summary>
+        /// <param name="GeneratorBuilt">Built generation helper</param>
+        /// <returns>True if built ok. False if not</returns>
+        internal bool BuildLogSimulation(out ExpressionSimulationGenerator GeneratorBuilt)
+        {
+            // Log information about this instance.
+            ViewModelLogger.WriteLog("BUILDING SIMULATION REQUEST PROCESSED! STARTING JOB NOW...", LogType.InfoLog);
+            try
+            {
+                // Try to build our generator here
+                GeneratorBuilt = new ExpressionSimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
+                ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
+                return true;
+            } 
+            catch (Exception BuildSimEx) 
+            {
+                // Log failures out and return nothing 
+                ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
+                GeneratorBuilt = null; return false;
             }
         }
 
