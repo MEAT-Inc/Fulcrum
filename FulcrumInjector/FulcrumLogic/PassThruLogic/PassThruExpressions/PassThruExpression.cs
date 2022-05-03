@@ -185,13 +185,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             // Find command issue request values. (Pull using Base Class)
             var FieldsToSet = this.GetExpressionProperties(true);
             bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
-            bool StatusCodeResult = this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings);
-            if (!StatusCodeResult)
+            if (!this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings))
             {
                 // Try and find the end of the command in a different way
+                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+                StatusCodeStrings = new[]
+                {
+                    $"{TimeStrings[2]} 0:STATUS_NOERROR",
+                    $"{TimeStrings[2]}",
+                    "0:STATUS_NOERROR"
+                };
             }
 
-            if (!ExecutionTimeResult || !StatusCodeResult) 
+            // Check our output values
+            if (!ExecutionTimeResult) 
                 this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.

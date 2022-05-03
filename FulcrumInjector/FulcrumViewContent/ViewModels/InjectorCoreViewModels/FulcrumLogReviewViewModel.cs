@@ -203,12 +203,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     string[] SplitLines = LineSet.Split('\n');
                     var ExpressionType = SplitLines.GetTypeFromLines();
 
-                    // Build expression class object and tick our progress
-                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
-                    this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
-
-                    // Return the built expression object
-                    return NextClassObject;
+                    try
+                    {
+                        // Build expression class object and tick our progress
+                        var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
+                        this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
+                        return NextClassObject;
+                    }
+                    catch (Exception ParseEx)
+                    {
+                        // Log failures out and find out why the fails happen
+                        ViewModelLogger.WriteLog($"FAILED TO PARSE A COMMAND ENTRY! FIRST LINE OF COMMANDS {SplitLines[0]}", LogType.WarnLog);
+                        ViewModelLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ParseEx, new[] { LogType.WarnLog, LogType.TraceLog });
+                        return null;
+                    }
                 }).Where(ExpObj => ExpObj != null).ToArray();
 
                 // Convert the expression set into a list of file strings now and return list built.
