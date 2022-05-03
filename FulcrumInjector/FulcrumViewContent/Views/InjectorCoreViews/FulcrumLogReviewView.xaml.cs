@@ -107,10 +107,15 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 return;
             }
 
-            // Get Grid object and toggle buttons
-            ToggleViewTextButton.IsEnabled = false;
+            // Invoke this to keep UI Alive
             Grid ParentGrid = SenderButton.Parent as Grid;
-            SenderButton.Content = "Loading..."; ParentGrid.IsEnabled = false;
+            Dispatcher.Invoke(() =>
+            {
+                // Get Grid object and toggle buttons
+                ParentGrid.IsEnabled = false;
+                SenderButton.Content = "Loading...";
+                ToggleViewTextButton.IsEnabled = false;
+            });
 
             // Run this in the background for smoother operation
             Task.Run(() =>
@@ -163,67 +168,124 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <param name="ButtonEventArgs"></param>
         private void ProcessLogFileContent_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
         {
+            // Setup default values and parse out content values
+            var Defaults = this.ProcessingActionStarted(SendingButton);
+            this.ViewLogger.WriteLog("STARTING PROCESSING FOR PARSE CONTENT VALUES NOW...");
+
+            // Run this as a task to keep our UI Alive
+            this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+            Task.Run(() =>
+            {
+                // Store result from processing
+                bool ParseResult = this.ViewModel.ParseLogContents(out _);
+                this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+
+                // Invoke via dispatcher
+                Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
+                this.ViewLogger.WriteLog("INPUT CONTENT PARSING IS NOW COMPLETE!", LogType.InfoLog);
+            });
+        }
+        /// <summary>
+        /// Builds a simulation out of the currently processed log file contents.
+        /// </summary>
+        /// <param name="SendingButton"></param>
+        /// <param name="ButtonEventArgs"></param>
+        private void BuildSimulationButton_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
+        {
+            // Start by pulling in the expression values from our view model object and then pass them into our parser
+            var Defaults = this.ProcessingActionStarted(SendingButton);
+            this.ViewLogger.WriteLog("BUILDING SIMULATION FILE NOW...");
+
+            // TODO: RUN THE CURRENT CONTENTS INTO THE SIMULATION HELPER PROCESSES AND BUILD OUTPUT!
+            this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+            Task.Run(() =>
+            {
+                // Store result from processing if it's not yet done on the view model
+                if (this.ViewModel.InputParsed == false) 
+                    if (!this.ViewModel.ParseLogContents(out _)) {
+                        this.ProcessingActionFinished(false, SendingButton, Defaults);
+                        return;
+                    }
+
+                // Now build our simulation object here
+                bool SimResult = this.ViewModel.BuildLogSimulation(out var SimGenerator); 
+                this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+
+                // Invoke via dispatcher
+                Dispatcher.Invoke(() => this.ProcessingActionFinished(SimResult, SendingButton, Defaults));
+                this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
+            });
+        }
+
+        /// <summary>
+        /// Sets up a processing window to show while an operation is processing
+        /// </summary>
+        /// <param name="SendingButton"></param>
+        private object[] ProcessingActionStarted(object SendingButton)
+        {
             // Start by turning off the grid for all sending buttons.
-            this.ViewLogger.WriteLog("PROCESSED CLICK FOR LOG PARSE COMMAND! DISABLING BUTTONS AND PREPARING TO PROCESS FILE NOW", LogType.WarnLog);
+            this.ViewLogger.WriteLog("PROCESSED CLICK FOR PROCESSING COMMAND! DISABLING BUTTONS AND PREPARING TO PROCESS FILE NOW", LogType.WarnLog);
 
             // Pull the button object
             Button SenderButton = (Button)SendingButton;
             string DefaultContent = SenderButton.Content.ToString();
-            var DefaultColor = SenderButton.Background;
-            SenderButton.Content = "Processing...";
+            var DefaultColor = SenderButton.Background; SenderButton.Content = "Processing...";
 
             // Open the processing flyout
             this.ProcessingFlyout.IsOpen = true;
+            Grid ParentGrid = SenderButton.Parent as Grid;
+            ToggleViewTextButton.IsEnabled = false; ParentGrid.IsEnabled = false;
+
+            // Return the built object values for shutdown later on
+            return new object[] { DefaultContent, DefaultColor };
+        }
+        /// <summary>
+        /// Processing action stopped or ended
+        /// </summary>
+        /// <param name="ProcessResult">Result of processing</param>
+        /// <param name="SendingButton"></param>
+        /// <param name="DefaultValues"></param>
+        private void ProcessingActionFinished(bool ProcessResult, object SendingButton, object[] DefaultValues)
+        {
+            // Get Button Contents
+            Button SenderButton = (Button)SendingButton;
+            var DefaultColor = DefaultValues[1];
+            var DefaultContent = DefaultValues[0];
 
             // Get Grid object
             Grid ParentGrid = SenderButton.Parent as Grid;
             ToggleViewTextButton.IsEnabled = false; ParentGrid.IsEnabled = false;
 
-            // Parse Contents out now on the VM and show the please wait operation.
+            // Enable grid, remove click command.
             Task.Run(() =>
             {
-                // Log information and parse content output.
-                this.ViewLogger.WriteLog($"LOADED INPUT LOG FILE OBJECT: {ViewModel.LoadedLogFile}", LogType.TraceLog);
-                this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
-
-                // TODO: Pop open a flyout view here to show progress of these operations
-
-                // Run the parse operation here.
-                bool ProcessResult = this.ViewModel.ParseLogContents(out _);
-                this.ViewLogger.WriteLog("DONE PROCESSING OUTPUT CONTENT FOR OUR EXPRESSION OBJECTS! READY TO DISPLAY ON OUR VIEW CONTENT", LogType.InfoLog);
-
-                // Enable grid, remove click command.
-                Task.Run(() =>
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
                 {
-                    // Invoke via Dispatcher
-                    Dispatcher.Invoke(() =>
-                    {
-                        // Close the processing flyout
-                        this.ProcessingFlyout.IsOpen = false;
+                    // Close the processing flyout
+                    this.ProcessingFlyout.IsOpen = false;
 
-                        // Enable grid, show result on buttons
-                        ParentGrid.IsEnabled = true;
-                        ToggleViewTextButton.IsEnabled = true;  
-                        SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
-                        SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
-                        SenderButton.Click -= ProcessLogFileContent_OnClick;
-                    });
+                    // Enable grid, show result on buttons
+                    ParentGrid.IsEnabled = true;
+                    ToggleViewTextButton.IsEnabled = true;
+                    SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
+                    SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                });
 
-                    // Wait for 3.5 Seconds
-                    Thread.Sleep(3500);
+                // Wait for 3.5 Seconds
+                Thread.Sleep(3500);
 
-                    // Invoke via Dispatcher
-                    Dispatcher.Invoke(() =>
-                    {
-                        // Reset values and log information
-                        SenderButton.Content = DefaultContent;
-                        SenderButton.Background = DefaultColor;
-                        SenderButton.Click += ProcessLogFileContent_OnClick;
-                        this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
-                    });
+                // Invoke via Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    // Reset values and log information
+                    SenderButton.Content = DefaultContent;
+                    SenderButton.Background = (Brush)DefaultColor;
+                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                 });
             });
         }
+
 
         /// <summary>
         /// Searches for the provided text values
@@ -322,5 +384,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Log toggle result.
             this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
         }
+
     }
 }
