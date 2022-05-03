@@ -201,10 +201,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Task.Run(() =>
             {
                 // Store result from processing if it's not yet done on the view model
-                if (this.ViewModel.InputParsed == false && !this.ViewModel.ParseLogContents(out _)) {
-                    this.ProcessingActionFinished(false, SendingButton, Defaults);
-                    return;
-                }
+                if (this.ViewModel.InputParsed == false) 
+                    if (!this.ViewModel.ParseLogContents(out _)) {
+                        this.ProcessingActionFinished(false, SendingButton, Defaults);
+                        return;
+                    }
 
                 // Now build our simulation object here
                 bool SimResult = this.ViewModel.BuildLogSimulation(out var SimGenerator); 

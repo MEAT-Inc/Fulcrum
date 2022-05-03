@@ -28,7 +28,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         public readonly PassThruExpression[] InputExpressions;
 
         // Grouping Objects built out.
-        public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; }
+        public Tuple<int, List<PassThruExpression>>[] GroupedChannelExpressions { get; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             this.SimLogger.WriteLog($"BUILDING NEW SIMULATION FOR FILE NAMED {SimulationName} WITH A TOTAL OF {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
 
             // Run the Grouping command on the input expressions here.
-            Expressions.ExtractChannelIds();
+            this.GroupedChannelExpressions = Expressions.ExtractChannelIds();
             this.SimLogger.WriteLog("BUILT GROUPED SIMULATION COMMANDS OK!", LogType.InfoLog);
         }
     }

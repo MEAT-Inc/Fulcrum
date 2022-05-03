@@ -308,15 +308,25 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Find the first index of a time entry and the close command index.
                 int TimeStartIndex = TimeRegex.Match(FileContents, CharIndex).Index;
                 var ErrorCloseMatch = StatusRegex.Match(FileContents, TimeStartIndex);
-                int ErrorCloseIndex = ErrorCloseMatch.Index + ErrorCloseMatch.Length;
+                int ErrorCloseStart = ErrorCloseMatch.Index; int ErrorCloseLength = ErrorCloseMatch.Length;
+                if (!ErrorCloseMatch.Success)
+                {
+                    // If we can't find the status close message, try and find it using the next command startup.
+                    var NextTime = TimeRegex.Match(FileContents, TimeStartIndex + 1).Index;
+                    ErrorCloseStart = NextTime; ErrorCloseLength = 1;
+                }
+
+                // Now find the end of our length for the match object
+                int ErrorCloseIndex = ErrorCloseStart + ErrorCloseLength;
 
                 // Take the difference in End/Start as our string length value.
+                if (ErrorCloseIndex < CharIndex) ErrorCloseIndex = CharIndex;
                 string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
                 if (OutputLines.Contains(NextCommand)) break;
 
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                if (ErrorCloseIndex < CharIndex) break;
-                CharIndex = ErrorCloseIndex; OutputLines.Add(NextCommand);
+                CharIndex = ErrorCloseIndex;
+                OutputLines.Add(NextCommand);
             }
 
             // Return the built set of commands.

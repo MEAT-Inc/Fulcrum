@@ -186,7 +186,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             var FieldsToSet = this.GetExpressionProperties(true);
             bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
             bool StatusCodeResult = this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings);
-            if (!ExecutionTimeResult || !StatusCodeResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+            if (!StatusCodeResult)
+            {
+                // Try and find the end of the command in a different way
+            }
+
+            if (!ExecutionTimeResult || !StatusCodeResult) 
+                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string>();
@@ -220,26 +226,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             // Return them here.
             return PropertiesLocated;
         }
-        /// <summary>
-        /// Finds a property name and pulls the value of it if possible
-        /// </summary>
-        /// <typeparam name="TValueType">Type of value to pull</typeparam>
-        /// <param name="PropertyName">Name of the property to extract</param>
-        /// <returns>Cast value of the property</returns>
-        protected internal TValueType GetPropertyValue<TValueType>(string PropertyName) where TValueType : new()
-        {
-            // Find all properties of the expression set.
-            var ExpressionValues = this.GetExpressionProperties();
-            var DesiredProperty = ExpressionValues
-                .FirstOrDefault(FieldObj => FieldObj.Name
-                    .Replace(" ", string.Empty).ToUpper()
-                    .Contains(PropertyName.ToUpper()));
-
-            // Now make sure we have a property to use here.
-            return DesiredProperty == null ? new TValueType() : (TValueType)DesiredProperty.GetValue(this);
-        }
-
-
         /// <summary>
         /// Sets the values of the output regex strings onto this class object ptExpression values
         /// </summary>
