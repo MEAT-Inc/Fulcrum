@@ -28,7 +28,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         public readonly PassThruExpression[] InputExpressions;
 
         // Grouping Objects built out.
-        public Tuple<int, List<PassThruExpression>>[] GroupedChannelExpressions { get; }
+        public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
+        public Tuple<int, SimulationChannel>[] BuiltSimulationChannels { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -45,11 +46,60 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             this.SimulationName = InputFileName;
             this.InputExpressions = Expressions;
             this.SimulationFile = Path.Combine(InputFilePath, InputFileName);
-            this.SimLogger.WriteLog($"BUILDING NEW SIMULATION FOR FILE NAMED {SimulationName} WITH A TOTAL OF {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
+            this.SimLogger.WriteLog($"READY TO BUILD NEW SIMULATION NAMED {SimulationName} WITH {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
+        }
 
-            // Run the Grouping command on the input expressions here.
-            this.GroupedChannelExpressions = Expressions.ExtractChannelIds();
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+ 
+        /// <summary>
+        /// Generates our grouped ID values for out input expression objects
+        /// </summary>
+        /// <returns>Build ID groupings</returns>
+        public Tuple<int, PassThruExpression[]>[] GenerateGroupedIds()
+        {
+            // List for return output objects
+            List<Tuple<int, PassThruExpression[]>> BuiltExpressions = new List<Tuple<int, PassThruExpression[]>>();
+
+            // Store the ID Values here
+            this.SimLogger.WriteLog("GROUPING COMMANDS BY CHANNEL ID VALUES NOW...", LogType.WarnLog);
+            var GroupedAsLists = this.InputExpressions.GroupByChannelIds();
+            Parallel.ForEach(GroupedAsLists, (GroupList) => {
+                BuiltExpressions.Add(new Tuple<int, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
+                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROPUING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
+            });
+
+            // Log done grouping, return the built ID values here.
             this.SimLogger.WriteLog("BUILT GROUPED SIMULATION COMMANDS OK!", LogType.InfoLog);
+            this.GroupedChannelExpressions = BuiltExpressions.ToArray();
+            return this.GroupedChannelExpressions;
+        }
+        /// <summary>
+        /// Builds our simulation channel objects for our input expressions on this object
+        /// </summary>
+        /// <returns>The set of built expression objects</returns>
+        public Tuple<int, SimulationChannel>[] GenerateSimulationChannels()
+        {
+            // Start by building return list object. Then build our data
+            List<Tuple<int, SimulationChannel>> BuiltChannelsList = new List<Tuple<int, SimulationChannel>>();
+            this.SimLogger.WriteLog("BUILDING CHANNEL OBJECTS FROM CHANNEL ID VALUES NOW...", LogType.WarnLog);
+
+            // Make sure the channel objects exist here first. 
+            this.GroupedChannelExpressions ??= Array.Empty<Tuple<int, PassThruExpression[]>>();
+            Parallel.ForEach(this.GroupedChannelExpressions, (ChannelObjectExpressions) =>
+            {
+                // Pull the Channel ID, build our output contents
+                int ChannelId = ChannelObjectExpressions.Item1;
+                var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId).Item2;
+
+                // Append it into our list of output here
+                BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel));
+                this.SimLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
+            });
+
+            // Log information and exit out of this routine
+            this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
+            this.BuiltSimulationChannels = BuiltChannelsList.ToArray();
+            return this.BuiltSimulationChannels;
         }
     }
 }

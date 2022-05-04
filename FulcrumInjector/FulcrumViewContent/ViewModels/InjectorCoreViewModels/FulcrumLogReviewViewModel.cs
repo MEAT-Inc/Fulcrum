@@ -250,13 +250,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             try
             {
                 // Try to build our generator here
+                this.ParsingProgress = 25;
                 GeneratorBuilt = new ExpressionSimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
                 ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
+
+                // Now Build our simulation content objects for this generator
+                var BuiltIdValues = GeneratorBuilt.GenerateGroupedIds(); this.ParsingProgress = 50;
+                var GeneratedChannels = GeneratorBuilt.GenerateSimulationChannels(); this.ParsingProgress = 75;
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! --> {BuiltIdValues.Length} ID PAIRS", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! --> {GeneratedChannels.Length} ID PAIRS", LogType.InfoLog);
+
+                // Return passed and move out of here.
+                this.ParsingProgress = 100;
                 return true;
             } 
             catch (Exception BuildSimEx) 
             {
-                // Log failures out and return nothing 
+                // Log failures out and return nothing
+                this.ParsingProgress = 100;
                 ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
                 GeneratorBuilt = null; return false;

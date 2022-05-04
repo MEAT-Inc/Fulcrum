@@ -177,6 +177,7 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\ExpressionSimulationGenerator.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\SimulationChannel.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\FulcrumEmailBroker.cs" />
