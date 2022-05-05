@@ -83,14 +83,16 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                     .Where(StringObj => !string.IsNullOrEmpty(StringObj))
                     .ToArray();
 
-                // Format our message data content to include a 0x before the data byte and caps lock message bytes.
+                // Try and replace the double spaced comms in the CarDAQ Log into single spaces
                 int LastStringIndex = SelectedStrings.Length - 1;
-                SelectedStrings[LastStringIndex] = string.Join(" ",
-                    SelectedStrings[LastStringIndex]
-                        .Split(' ')
-                        .Select(StringPart => $"0x{StringPart.Trim().ToUpper()}")
-                        .ToArray()
-                    );
+                SelectedStrings[SelectedStrings.Length - 1] = SelectedStrings[SelectedStrings.Length - 1]
+                    .Replace("  ", " ");
+
+                // Format our message data content to include a 0x before the data byte and caps lock message bytes.
+                string MessageData = SelectedStrings[LastStringIndex];
+                string[] SplitMessageData = MessageData.Split(' ');
+                string RebuiltMessageData = string.Join(" ", SplitMessageData.Select(StringPart => $"0x{StringPart.Trim().ToUpper()}"));
+                SelectedStrings[LastStringIndex] = RebuiltMessageData;
 
                 // Now loop each part of the matched content and add values into our output tuple set.
                 RegexResultTuples.AddRange(SelectedStrings
@@ -383,7 +385,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                     // Find the base path, get the file name, and copy it into here.
                     string LocalDirectory = Path.GetDirectoryName(BaseFileName);
                     string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
-                    File.Copy(FinalOutputPath, CopyLocation);
+                    File.Copy(FinalOutputPath, CopyLocation, true);
 
                     // Remove the Expressions Logger. Log done and return
                     ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
