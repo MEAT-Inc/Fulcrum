@@ -48,9 +48,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         { 
             // Find command issue request values
             var FieldsToSet = this.GetExpressionProperties();
-            bool PtConnectResult = this.PtWriteMessagesRegex.Evaluate(CommandInput, out var PassThruWriteMsgsStrings);
-            bool MessagesReadResult = this.MessagesWrittenRegex.Evaluate(CommandInput, out var MessagesSentStrings);
-            if (!PtConnectResult || !MessagesReadResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+            bool PtWriteMsgsResult = this.PtWriteMessagesRegex.Evaluate(CommandInput, out var PassThruWriteMsgsStrings);
+            bool MessagesWrittenResult = this.MessagesWrittenRegex.Evaluate(CommandInput, out var MessagesSentStrings);
+            if (!PtWriteMsgsResult || !MessagesWrittenResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string> { PassThruWriteMsgsStrings[0] };
