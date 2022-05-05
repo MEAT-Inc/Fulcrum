@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -95,8 +96,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 CheckPathExists = true,
                 RestoreDirectory = true,
                 AutoUpgradeEnabled = true,
-                Filter = "Injector Logs (*.shimLog)|*.shimLog|All Files (*.*)|*.*",
-                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath")
+                Filter = Debugger.IsAttached ? "All Files (*.*)|*.*" : "Injector Logs (*.shimLog)|*.shimLog|All Files (*.*)|*.*",
+                InitialDirectory = Debugger.IsAttached ?
+                    "C:\\Drewtech\\logs" :
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath")
             };
 
             // Now open the dialog and allow the user to pick some new files.

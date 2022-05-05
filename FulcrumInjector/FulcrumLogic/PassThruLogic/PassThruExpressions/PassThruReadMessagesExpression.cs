@@ -50,6 +50,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             var FieldsToSet = this.GetExpressionProperties();
             bool PtReadMsgsResult = this.PtReadMessagesRegex.Evaluate(CommandInput, out var PassThruReadMsgsStrings);
             bool MessagesReadResult = this.MessagesReadRegex.Evaluate(CommandInput, out var MessagesReadStrings);
+
+            // If we failed to pull our read count just send out ? and ?. If it's a complete read count, then we know we're passed so just do 0/0
+            if (!MessagesReadResult) MessagesReadStrings = CommandInput.Contains("PTReadMsgs() complete") ? new[] { "?", "?" } : new[] { "0", "0" };
             if (!PtReadMsgsResult || !MessagesReadResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
