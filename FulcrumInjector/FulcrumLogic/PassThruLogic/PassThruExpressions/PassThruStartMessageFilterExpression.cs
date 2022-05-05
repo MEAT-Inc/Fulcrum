@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         [PtExpressionProperty("Filter Type")] public readonly string FilterType;
         [PtExpressionProperty("Mask Pointer")] public readonly string MaskPointer;
         [PtExpressionProperty("Pattern Pointer")] public readonly string PatternPointer;
-        [PtExpressionProperty("Flow Control Pointer")] public readonly string FLowCtlPointer;
+        [PtExpressionProperty("Flow Control Pointer")] public readonly string FlowCtlPointer;
         [PtExpressionProperty("Filter Pointer (Struct)")] public readonly string FilterPointer;
         [PtExpressionProperty("Filter ID")] public readonly string FilterID;
 
