@@ -322,10 +322,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 int ErrorCloseIndex = ErrorCloseStart + ErrorCloseLength;
 
                 // Take the difference in End/Start as our string length value.
-                if (TimeStartIndex == 0) break;
                 if (ErrorCloseIndex - TimeStartIndex < 0) ErrorCloseIndex = FileContents.Length;
                 string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
-                if (OutputLines.Contains(NextCommand)) break;
 
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
                 CharIndex = ErrorCloseIndex;
@@ -333,8 +331,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
                 // Progress Updating Action if the bool is set to do so.
                 if (!UpdateParseProgress) continue;
-                int CurrentProgress = ((CharIndex / FileContents.Length) * 100);
-                FulcrumConstants.FulcrumLogReviewViewModel.ParsingProgress = CurrentProgress;
+                double CurrentProgress = ((double)CharIndex / (double)FileContents.Length) * 100.00;
+                FulcrumConstants.FulcrumLogReviewViewModel.ParsingProgress = (int)CurrentProgress;
             }
 
             // Return the built set of commands.
