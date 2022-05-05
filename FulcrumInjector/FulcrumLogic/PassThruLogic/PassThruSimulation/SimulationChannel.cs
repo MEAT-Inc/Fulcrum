@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -48,15 +49,25 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         public J2534Filter StoreMessageFilter(PassThruStartMessageFilterExpression ExpressionToStore)
         {
             // Store the Pattern, Mask, and Flow Ctl objects if they exist.
+            ExpressionToStore.FindFilterContents(out List<string[]> FilterContent);
             var FilterType = ExpressionToStore.FilterType;
-            var FilterPatten = ExpressionToStore.MessageFilterContents[0];
-            var FilterMask = ExpressionToStore.MessageFilterContents[1];
-            var FilterFlow = ExpressionToStore.MessageFilterContents.Count == 3 ?
-                ExpressionToStore.MessageFilterContents[2] : Array.Empty<string>();
+            var FilterPatten = FilterContent[0].Last();
+            var FilterMask = FilterContent[1].Last();
+            var FilterFlow = FilterContent.Count == 3 ? FilterContent[2].Last() : "";
 
             // Now convert our information into string values.
             ExpressionToStore.ExpressionLogger.WriteLog($"--> FILTER {ExpressionToStore.FilterID}: CONVERTING TEXT TO MESSAGES NOW...", LogType.TraceLog);
-            return null;
+            return new J2534Filter()
+            {
+                // Build a new filter object form the given values and return it.
+                FilterType = FilterType,
+                FilterMask = FilterPatten,
+                FilterPattern = FilterMask,
+                FilterFlowCtl = FilterFlow,
+
+                // TODO FIX FILTER FLAGS BY USING CONTENTS OF THE LISTS
+                FilterFlags = 0x00
+            };
         }
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object
@@ -68,8 +79,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => {
+            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => 
+            {
+                // Build the filter, log it's ID value out, and move on.
                 BuiltFilters.Add(this.StoreMessageFilter(FilterExpression));
+                this.SimChannelLogger.WriteLog($"--> BUILT NEW FILTER WITH ID {BuiltFilters.Last().FilterId}", LogType.TraceLog);
             });
 
             // Reorder the list and return it out

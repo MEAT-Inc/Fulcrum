@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using NLog.Targets;
 using SharpLogger;
@@ -294,8 +295,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
         /// </summary>
         /// <param name="FileContents">Input file object content</param>
+        /// <param name="UpdateParseProgress">Action for progress updating</param>
         /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        public static string[] SplitLogToCommands(string FileContents)
+        public static string[] SplitLogToCommands(string FileContents, bool UpdateParseProgress = false)
         {
             // Build regex objects to help split input content into sets.
             var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
@@ -328,6 +330,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
                 CharIndex = ErrorCloseIndex;
                 OutputLines.Add(NextCommand);
+
+                // Progress Updating Action if the bool is set to do so.
+                if (!UpdateParseProgress) continue;
+                int CurrentProgress = ((CharIndex / FileContents.Length) * 100);
+                FulcrumConstants.FulcrumLogReviewViewModel.ParsingProgress = CurrentProgress;
             }
 
             // Return the built set of commands.

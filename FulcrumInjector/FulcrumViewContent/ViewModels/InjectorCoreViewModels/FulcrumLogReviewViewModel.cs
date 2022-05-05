@@ -191,7 +191,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = GenerateExpressionExtensions.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = GenerateExpressionExtensions.SplitLogToCommands(LogFileContents, true);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -243,7 +243,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="GeneratorBuilt">Built generation helper</param>
         /// <returns>True if built ok. False if not</returns>
-        internal bool BuildLogSimulation(out ExpressionSimulationGenerator GeneratorBuilt)
+        internal bool BuildLogSimulation(out SimulationGenerator GeneratorBuilt)
         {
             // Log information about this instance.
             ViewModelLogger.WriteLog("BUILDING SIMULATION REQUEST PROCESSED! STARTING JOB NOW...", LogType.InfoLog);
@@ -251,7 +251,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Try to build our generator here
                 this.ParsingProgress = 25;
-                GeneratorBuilt = new ExpressionSimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
+                GeneratorBuilt = new SimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
                 ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
 
                 // Now Build our simulation content objects for this generator

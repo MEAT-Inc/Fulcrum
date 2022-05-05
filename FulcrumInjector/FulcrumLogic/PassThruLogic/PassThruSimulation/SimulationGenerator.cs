@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
     /// <summary>
     /// Takes a set of PT Expression objects and converts them into simulation ready commands.
     /// </summary>
-    public class ExpressionSimulationGenerator
+    public class SimulationGenerator
     {
         // Logger object.
         private SubServiceLogger SimLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
@@ -36,7 +36,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// <summary>
         /// Builds a new simulation object generator from the given input expressions
         /// </summary>
-        public ExpressionSimulationGenerator(string SimName, PassThruExpression[] Expressions)
+        public SimulationGenerator(string SimName, PassThruExpression[] Expressions)
         {
             // Build our new file name here.
             string InputFilePath = Path.GetDirectoryName(SimName);
