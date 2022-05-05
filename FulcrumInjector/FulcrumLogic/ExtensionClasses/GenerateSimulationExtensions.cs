@@ -92,11 +92,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             );
 
             // List of our built J2534 Filters
-            SimulationChannel NextChannel = new SimulationChannel(ChannelId);
-            var ConvertedFilters = NextChannel.StoreMessageFilters(PTFilterCommands);
+            var NextChannel = new SimulationChannel(ChannelId);
+            NextChannel.StoreMessageFilters(PTFilterCommands);
 
             // Temp null return
-            return null;
+            return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }
 }

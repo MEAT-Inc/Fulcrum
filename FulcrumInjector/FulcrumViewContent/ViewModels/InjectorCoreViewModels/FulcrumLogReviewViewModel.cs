@@ -207,7 +207,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     {
                         // Build expression class object and tick our progress
                         var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
-                        this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
+                        this.ParsingProgress = ((int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length)) * 2;
                         return NextClassObject;
                     }
                     catch (Exception ParseEx)

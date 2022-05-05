@@ -56,7 +56,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             var FilterFlow = FilterContent.Count == 3 ? FilterContent[2].Last() : "";
 
             // Now convert our information into string values.
-            ExpressionToStore.ExpressionLogger.WriteLog($"--> FILTER {ExpressionToStore.FilterID}: CONVERTING TEXT TO MESSAGES NOW...", LogType.TraceLog);
             return new J2534Filter()
             {
                 // Build a new filter object form the given values and return it.
@@ -79,20 +78,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            foreach (var FilterExpression in ExpressionsToStore)
-            {
-                // Build the filter, log it's ID value out, and move on.
-                BuiltFilters.Add(this.StoreMessageFilter(FilterExpression));
-                this.SimChannelLogger.WriteLog($"--> BUILT NEW FILTER WITH ID {BuiltFilters.Last().FilterId}", LogType.TraceLog);
-            }
-
-            // TODO: FIX THIS PARALLEL BUG AT SOME POINT IF PERFORMANCE BECOMES POOR
-            // Parallel.ForEach(ExpressionsToStore, (FilterExpression) => 
-            // {
-            //     // Build the filter, log it's ID value out, and move on.
-            //     BuiltFilters.Add(this.StoreMessageFilter(FilterExpression));
-            //     this.SimChannelLogger.WriteLog($"--> BUILT NEW FILTER WITH ID {BuiltFilters.Last().FilterId}", LogType.TraceLog);
-            // });
+            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(this.StoreMessageFilter(FilterExpression)));
 
             // Reorder the list and return it out
             BuiltFilters = BuiltFilters
