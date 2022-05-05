@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object
         /// </summary>
-        /// <param name="">Expressions to extract and store</param>
+        /// <param name="ExpressionToStore">Expressions to extract and store</param>
         /// <returns>The Filters built</returns>
         public J2534Filter StoreMessageFilter(PassThruStartMessageFilterExpression ExpressionToStore)
         {
@@ -79,12 +79,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => 
+            foreach (var FilterExpression in ExpressionsToStore)
             {
                 // Build the filter, log it's ID value out, and move on.
                 BuiltFilters.Add(this.StoreMessageFilter(FilterExpression));
                 this.SimChannelLogger.WriteLog($"--> BUILT NEW FILTER WITH ID {BuiltFilters.Last().FilterId}", LogType.TraceLog);
-            });
+            }
+
+            // TODO: FIX THIS PARALLEL BUG AT SOME POINT IF PERFORMANCE BECOMES POOR
+            // Parallel.ForEach(ExpressionsToStore, (FilterExpression) => 
+            // {
+            //     // Build the filter, log it's ID value out, and move on.
+            //     BuiltFilters.Add(this.StoreMessageFilter(FilterExpression));
+            //     this.SimChannelLogger.WriteLog($"--> BUILT NEW FILTER WITH ID {BuiltFilters.Last().FilterId}", LogType.TraceLog);
+            // });
 
             // Reorder the list and return it out
             BuiltFilters = BuiltFilters
