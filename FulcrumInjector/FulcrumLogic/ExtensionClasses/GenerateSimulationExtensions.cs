@@ -6,9 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534.J2534Objects;
 
 namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {
@@ -26,20 +28,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// <summary>
         /// Pulls out channel id values from a set of input content expressions
         /// </summary>
-        /// <param name="Expressions">Expressions to pull from</param>
-        /// <param name="ChannelId">Channel ID To filter by</param>
-        /// <returns>Filtered output sets</returns>
-        public static Tuple<int, List<PassThruExpression>> ExtractChannelIds(this PassThruExpression[] Expressions, int ChannelId)
-        {
-            // Extract and filter our output results
-            return ExtractChannelIds(Expressions).FirstOrDefault(ExpSet => ExpSet.Item1 == ChannelId);
-        }
-        /// <summary>
-        /// Pulls out channel id values from a set of input content expressions
-        /// </summary>
         /// <param name="Expressions">Input Expressions</param>
         /// <returns>All Grouped output sets</returns>
-        public static Tuple<int, List<PassThruExpression>>[] ExtractChannelIds(this PassThruExpression[] Expressions)
+        public static Tuple<int, List<PassThruExpression>>[] GroupByChannelIds(this PassThruExpression[] Expressions)
         {
             // Now Split out our list in a for loop.
             var PairedExpressions = new List<Tuple<int, List<PassThruExpression>>>();
@@ -68,6 +59,44 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Return the built list of object values here.
             SimExtensionLogger.WriteLog($"BUILT A TOTAL OF {PairedExpressions.Count} EXPRESSION CHANNEL SETS OK!", LogType.WarnLog);
             return PairedExpressions.ToArray();
+        }
+
+        /// <summary>
+        /// Builds a Channel object from a set of input expressions
+        /// </summary>
+        /// <param name="GroupedExpression">Expression set to convert</param>
+        /// <returns>Builds a channel session object to simulate (converted to JSON)</returns>
+        public static Tuple<int, SimulationChannel> BuildChannelsFromExpressions(this PassThruExpression[] GroupedExpression, int ChannelId)
+        {
+            // Find all the PTFilter commands first and invert them.
+            var PTFilterCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTStartMsgFilter)
+                .Cast<PassThruStartMessageFilterExpression>()
+                .ToArray();
+            var PTReadCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTReadMsgs)
+                .Cast<PassThruReadMessagesExpression>()
+                .ToArray();
+            var PTWriteCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTWriteMsgs)
+                .Cast<PassThruWriteMessagesExpression>()
+                .ToArray();
+
+            // Log information about the built out command objects.
+            SimExtensionLogger.WriteLog(
+                $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS:" +
+                $"\n--> {PTFilterCommands.Length} FILTERS" +
+                $"\n--> {PTReadCommands.Length} READ COMMANDS" +
+                $"\n--> {PTWriteCommands} WRITE COMMANDS", 
+            LogType.InfoLog
+            );
+
+            // List of our built J2534 Filters
+            SimulationChannel NextChannel = new SimulationChannel(ChannelId);
+            var ConvertedFilters = NextChannel.StoreMessageFilters(PTFilterCommands);
+
+            // Temp null return
+            return null;
         }
     }
 }

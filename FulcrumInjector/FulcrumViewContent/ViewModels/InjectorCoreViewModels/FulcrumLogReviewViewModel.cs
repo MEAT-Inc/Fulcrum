@@ -191,7 +191,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = GenerateExpressionExtensions.SplitLogToCommands(LogFileContents);
+                var SplitLogContent = GenerateExpressionExtensions.SplitLogToCommands(LogFileContents, true);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
@@ -243,20 +243,31 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="GeneratorBuilt">Built generation helper</param>
         /// <returns>True if built ok. False if not</returns>
-        internal bool BuildLogSimulation(out ExpressionSimulationGenerator GeneratorBuilt)
+        internal bool BuildLogSimulation(out SimulationGenerator GeneratorBuilt)
         {
             // Log information about this instance.
             ViewModelLogger.WriteLog("BUILDING SIMULATION REQUEST PROCESSED! STARTING JOB NOW...", LogType.InfoLog);
             try
             {
                 // Try to build our generator here
-                GeneratorBuilt = new ExpressionSimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
+                this.ParsingProgress = 25;
+                GeneratorBuilt = new SimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
                 ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
+
+                // Now Build our simulation content objects for this generator
+                var BuiltIdValues = GeneratorBuilt.GenerateGroupedIds(); this.ParsingProgress = 50;
+                var GeneratedChannels = GeneratorBuilt.GenerateSimulationChannels(); this.ParsingProgress = 75;
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! --> {BuiltIdValues.Length} ID PAIRS", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! --> {GeneratedChannels.Length} ID PAIRS", LogType.InfoLog);
+
+                // Return passed and move out of here.
+                this.ParsingProgress = 100;
                 return true;
             } 
             catch (Exception BuildSimEx) 
             {
-                // Log failures out and return nothing 
+                // Log failures out and return nothing
+                this.ParsingProgress = 100;
                 ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
                 GeneratorBuilt = null; return false;

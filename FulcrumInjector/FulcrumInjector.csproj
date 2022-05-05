@@ -113,16 +113,16 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.4.1.8.275\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.4.1.9.276\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="SharpAutoId, Version=0.2.10.11, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpAutoId.0.2.10.12\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.7.4.122, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.4.1.8.275\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpWrap2534.4.1.9.276\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=4.1.7.274, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.4.1.8.275\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=4.1.9.276, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrap2534.4.1.9.276\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.0\lib\net461\Svg.dll</HintPath>
@@ -176,7 +176,8 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruWriteMessagesExpression.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\ExpressionSimulationGenerator.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\SimulationGenerator.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\SimulationChannel.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\FulcrumEmailBroker.cs" />

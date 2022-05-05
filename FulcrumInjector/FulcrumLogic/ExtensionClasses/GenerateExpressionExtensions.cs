@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using NLog.Targets;
 using SharpLogger;
@@ -82,14 +83,16 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                     .Where(StringObj => !string.IsNullOrEmpty(StringObj))
                     .ToArray();
 
-                // Format our message data content to include a 0x before the data byte and caps lock message bytes.
+                // Try and replace the double spaced comms in the CarDAQ Log into single spaces
                 int LastStringIndex = SelectedStrings.Length - 1;
-                SelectedStrings[LastStringIndex] = string.Join(" ",
-                    SelectedStrings[LastStringIndex]
-                        .Split(' ')
-                        .Select(StringPart => $"0x{StringPart.Trim().ToUpper()}")
-                        .ToArray()
-                    );
+                SelectedStrings[SelectedStrings.Length - 1] = SelectedStrings[SelectedStrings.Length - 1]
+                    .Replace("  ", " ");
+
+                // Format our message data content to include a 0x before the data byte and caps lock message bytes.
+                string MessageData = SelectedStrings[LastStringIndex];
+                string[] SplitMessageData = MessageData.Split(' ');
+                string RebuiltMessageData = string.Join(" ", SplitMessageData.Select(StringPart => $"0x{StringPart.Trim().ToUpper()}"));
+                SelectedStrings[LastStringIndex] = RebuiltMessageData;
 
                 // Now loop each part of the matched content and add values into our output tuple set.
                 RegexResultTuples.AddRange(SelectedStrings
@@ -294,8 +297,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
         /// </summary>
         /// <param name="FileContents">Input file object content</param>
+        /// <param name="UpdateParseProgress">Action for progress updating</param>
         /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        public static string[] SplitLogToCommands(string FileContents)
+        public static string[] SplitLogToCommands(string FileContents, bool UpdateParseProgress = false)
         {
             // Build regex objects to help split input content into sets.
             var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
@@ -320,14 +324,17 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 int ErrorCloseIndex = ErrorCloseStart + ErrorCloseLength;
 
                 // Take the difference in End/Start as our string length value.
-                if (TimeStartIndex == 0) break;
                 if (ErrorCloseIndex - TimeStartIndex < 0) ErrorCloseIndex = FileContents.Length;
                 string NextCommand = FileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
-                if (OutputLines.Contains(NextCommand)) break;
 
                 // If it was found in the list already, then we break out of this loop to stop adding dupes.
                 CharIndex = ErrorCloseIndex;
                 OutputLines.Add(NextCommand);
+
+                // Progress Updating Action if the bool is set to do so.
+                if (!UpdateParseProgress) continue;
+                double CurrentProgress = ((double)CharIndex / (double)FileContents.Length) * 100.00;
+                FulcrumConstants.FulcrumLogReviewViewModel.ParsingProgress = (int)CurrentProgress;
             }
 
             // Return the built set of commands.
@@ -378,7 +385,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                     // Find the base path, get the file name, and copy it into here.
                     string LocalDirectory = Path.GetDirectoryName(BaseFileName);
                     string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
-                    File.Copy(FinalOutputPath, CopyLocation);
+                    File.Copy(FinalOutputPath, CopyLocation, true);
 
                     // Remove the Expressions Logger. Log done and return
                     ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
