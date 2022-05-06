@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 {
     /// <summary>
     /// Result Attribute for a Regex command operation

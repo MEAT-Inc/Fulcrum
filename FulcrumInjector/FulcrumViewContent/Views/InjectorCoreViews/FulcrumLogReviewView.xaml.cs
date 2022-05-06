@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
@@ -26,6 +27,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using Button = System.Windows.Controls.Button;
+using ComboBox = System.Windows.Controls.ComboBox;
 using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -112,13 +114,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Invoke this to keep UI Alive
             Grid ParentGrid = SenderButton.Parent as Grid;
-            Dispatcher.Invoke(() =>
-            {
-                // Get Grid object and toggle buttons
-                ParentGrid.IsEnabled = false;
-                SenderButton.Content = "Loading...";
-                ToggleViewTextButton.IsEnabled = false;
-            });
+            ParentGrid.IsEnabled = false;
+            SenderButton.Content = "Loading...";
 
             // Run this in the background for smoother operation
             Task.Run(() =>
@@ -136,20 +133,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Enable grid, remove click command.
                 Task.Run(() =>
                 {
-                    // Invoke via Dispatcher
+                    // Show new temp state
                     Dispatcher.Invoke(() =>
                     {
-                        // Show new temp state
                         ParentGrid.IsEnabled = true;
                         SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
                         SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
                         SenderButton.Click -= LoadInjectorLogFile_OnClick;
+                        this.ViewerContentComboBox.SelectedIndex = 0;
                     });
 
                     // Wait for 3.5 Seconds
                     Thread.Sleep(3500);
-
-                    // Invoke via Dispatcher
                     Dispatcher.Invoke(() =>
                     {
                         // Reset button values 
@@ -161,7 +156,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                     });
                 });
-
             });
         }
         /// <summary>
@@ -169,7 +163,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="SendingButton"></param>
         /// <param name="ButtonEventArgs"></param>
-        private void ProcessLogFileContent_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
+        private void BuildExpressionsButton_OnClick(object SendingButton, RoutedEventArgs ButtonEventArgs)
         {
             // Setup default values and parse out content values
             var Defaults = this.ProcessingActionStarted(SendingButton);
@@ -204,7 +198,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Task.Run(() =>
             {
                 // Store result from processing if it's not yet done on the view model
-                if (this.ViewModel.InputParsed == false) 
+                if (this.ViewModel.ExpressionsBuilt == false) 
                     if (!this.ViewModel.ParseLogContents(out _)) {
                         this.ProcessingActionFinished(false, SendingButton, Defaults);
                         return;
@@ -219,6 +213,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }
+
 
         /// <summary>
         /// Sets up a processing window to show while an operation is processing
@@ -237,7 +232,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Open the processing flyout
             this.ProcessingFlyout.IsOpen = true;
             Grid ParentGrid = SenderButton.Parent as Grid;
-            ToggleViewTextButton.IsEnabled = false; ParentGrid.IsEnabled = false;
+            ViewerContentComboBox.IsEnabled = false; ParentGrid.IsEnabled = false;
 
             // Return the built object values for shutdown later on
             return new object[] { DefaultContent, DefaultColor };
@@ -257,32 +252,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Get Grid object
             Grid ParentGrid = SenderButton.Parent as Grid;
-            ToggleViewTextButton.IsEnabled = false; ParentGrid.IsEnabled = false;
+            ViewerContentComboBox.IsEnabled = false; ParentGrid.IsEnabled = false;
+
+            // Close the processing flyout
+            this.ProcessingFlyout.IsOpen = false;
+
+            // Enable grid, show result on buttons
+            ParentGrid.IsEnabled = true;
+            ViewerContentComboBox.IsEnabled = true;
+            SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
+            SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
 
             // Enable grid, remove click command.
             Task.Run(() =>
             {
-                // Invoke via Dispatcher
-                Dispatcher.Invoke(() =>
-                {
-                    // Close the processing flyout
-                    this.ProcessingFlyout.IsOpen = false;
-
-                    // Enable grid, show result on buttons
-                    ParentGrid.IsEnabled = true;
-                    ToggleViewTextButton.IsEnabled = true;
-                    SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
-                    SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
-                });
-
                 // Wait for 3.5 Seconds
                 Thread.Sleep(3500);
-
-                // Invoke via Dispatcher
                 Dispatcher.Invoke(() =>
                 {
-                    // Reset values and log information
-                    SenderButton.Content = DefaultContent;
+                        // Reset values and log information
+                        SenderButton.Content = DefaultContent;
                     SenderButton.Background = (Brush)DefaultColor;
                     this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                 });
@@ -311,55 +300,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             });
         }
         /// <summary>
-        /// Shows or hides the content inside the TextEditor to either show the parsed content view or the raw log input view.
-        /// </summary>
-        /// <param name="SenderButton"></param>
-        /// <param name="E"></param>
-        private void ToggleParsedContentButton_OnClick(object SenderButton, RoutedEventArgs E)
-        {
-            // Setup basic control values.
-            MainActionLoadButtons.IsEnabled = false;
-            Button ParseToggleButton = (Button)SenderButton;
-            Brush DefaultColor = ParseToggleButton.Background;
-
-            // Run the switch to show the new content value type here.
-            ParseToggleButton.IsEnabled = false;
-            bool LoadResult = this.ViewModel.ToggleViewerContents();
-            this.ViewLogger.WriteLog("TOGGLED VIEW CONTENTS ON THE TEXTBOX VIEWER OBJECT OK!", LogType.InfoLog);
-
-            // Enable grid, remove click command.
-            Task.Run(() =>
-            {
-                // Invoke via Dispatcher
-                Dispatcher.Invoke(() =>
-                {
-                    // Enable grid, show result on buttons
-                    ParseToggleButton.IsEnabled = true;
-                    MainActionLoadButtons.IsEnabled = true;
-                    ParseToggleButton.Content = LoadResult ? "Loaded!" : "Failed!";
-                    ParseToggleButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
-                    ParseToggleButton.Click -= ToggleParsedContentButton_OnClick;
-                });
-
-                // Wait for 3.5 Seconds
-                Thread.Sleep(3500);
-
-                // Invoke via Dispatcher
-                Dispatcher.Invoke(() =>
-                {
-                    // Reset values and log information
-                    ParseToggleButton.Background = DefaultColor;
-                    ParseToggleButton.Click += ToggleParsedContentButton_OnClick;
-                    ParseToggleButton.Content = this.ViewModel.ShowingParsed ? "Show Raw Log Contents" : "Show Parsed Content";
-                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
-                });
-            });
-
-            // Log failed. Return.
-            this.ViewLogger.WriteLog("PROCESSED TOGGLE REQUEST OK! SHOWING DEFAULT VALUES AFTER CONTENT UPDATING IS COMPLETE!", LogType.WarnLog);
-        }
-
-        /// <summary>
         /// Toggles format output for syntax outlining when writing new entries into our log files.
         /// </summary>
         /// <param name="Sender"></param>
@@ -387,6 +327,33 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Log toggle result.
             this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
         }
+        /// <summary>
+        /// Changes the processing output actions of the comobox so it can show new values in the viewer
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void ViewerContentComboBox_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        {
+            // Start by finding what value is selected in our combobox.
+            ComboBox CastBox = (ComboBox)Sender;
+            int SelectedBoxIndex = CastBox.SelectedIndex;
+            this.ViewLogger?.WriteLog("TOGGLING VIEW CONTENTS FOR PROCESSING OUTPUT VIEWER NOW...", LogType.InfoLog);
 
+            // Now apply the new content based on what's in the box.
+            FulcrumLogReviewViewModel.ViewerStateType DesiredState = FulcrumLogReviewViewModel.ViewerStateType.NoContent;
+            if (SelectedBoxIndex == 0) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingLogFile;
+            if (SelectedBoxIndex == 1) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingExpressions;
+            if (SelectedBoxIndex == 2) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingSimulation;
+
+            // Now toggle the state value
+            if (this.ViewModel.ToggleViewerContents(DesiredState)) this.ViewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
+            else
+            {
+                // Set to failed 
+                FilteringLogFileTextBox.Foreground = Brushes.Red;
+                FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
+                FilteringLogFileTextBox.Text = $"Failed To Load {DesiredState.ToDescriptionString()}! Did you build it?";
+            }
+        }
     }
 }

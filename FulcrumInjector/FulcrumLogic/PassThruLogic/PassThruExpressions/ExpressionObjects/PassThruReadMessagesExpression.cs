@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects
 {
     /// <summary>
-    /// Class object used for our PTWrite Message command parsing output
+    /// Regex object class for a PTReadMessages command
     /// </summary>
-    public class PassThruWriteMessagesExpression : PassThruExpression
+    public class PassThruReadMessagesExpression : PassThruExpression
     {
-        // Command for the write command it self
-        public readonly PassThruRegexModel MessagesWrittenRegex = PassThruRegexModelShare.NumberOfMessages;
-        public readonly PassThruRegexModel PtWriteMessagesRegex = PassThruRegexModelShare.PassThruWriteMessages;
+        // Command for the open command it self
+        public readonly PassThruRegexModel MessagesReadRegex = PassThruRegexModelShare.NumberOfMessages;
+        public readonly PassThruRegexModel PtReadMessagesRegex = PassThruRegexModelShare.PassThruReadMessages;
 
         // Strings of the command and results from the command output.
         [PtExpressionProperty("Command Line")] public readonly string PtCommand;
@@ -23,7 +22,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         [PtExpressionProperty("Channel Pointer")] public readonly string ChannelPointer;
         [PtExpressionProperty("Message Pointer")] public readonly string MessagePointer;
         [PtExpressionProperty("Timeout")] public readonly string TimeoutTime;
-        [PtExpressionProperty("Sent Count")] public readonly string MessageCountSent;
+        [PtExpressionProperty("Read Count")] public readonly string MessageCountRead;
         [PtExpressionProperty("Expected Count")] public readonly string MessageCountTotal;
 
         // Contents of message objects located. Shown as a set of tuples and values.
@@ -41,25 +40,30 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         // ----------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Builds a new PTWrite Messages Command instance.
+        /// Builds a new Regex helper to search for our PTRead Messages Command
         /// </summary>
-        /// <param name="CommandInput">Input Command Lines</param>
-        public PassThruWriteMessagesExpression(string CommandInput) : base(CommandInput, PassThruCommandType.PTWriteMsgs)
-        { 
+        /// <param name="CommandInput">Input text for the command to find.</param>
+        public PassThruReadMessagesExpression(string CommandInput) : base(CommandInput, PassThruCommandType.PTReadMsgs)
+        {
             // Find command issue request values
             var FieldsToSet = this.GetExpressionProperties();
-            bool PtWriteMsgsResult = this.PtWriteMessagesRegex.Evaluate(CommandInput, out var PassThruWriteMsgsStrings);
-            bool MessagesWrittenResult = this.MessagesWrittenRegex.Evaluate(CommandInput, out var MessagesSentStrings);
-            if (!PtWriteMsgsResult || !MessagesWrittenResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+            bool PtReadMsgsResult = this.PtReadMessagesRegex.Evaluate(CommandInput, out var PassThruReadMsgsStrings);
+            bool MessagesReadResult = this.MessagesReadRegex.Evaluate(CommandInput, out var MessagesReadStrings);
+
+            // If we failed to pull our read count just send out ? and ?. If it's a complete read count, then we know we're passed so just do 0/0
+            if (!PtReadMsgsResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+            if (!MessagesReadResult) MessagesReadStrings = CommandInput.Contains("PTReadMsgs() complete") ?
+                new[] { "Read ?/?", "?", "?" } : 
+                new[] { "Read ? of ? messages", "?", "?" };
 
             // Find our values to store here and add them to our list of values.
-            List<string> StringsToApply = new List<string> { PassThruWriteMsgsStrings[0] };
-            StringsToApply.AddRange(from NextIndex in this.PtWriteMessagesRegex.ExpressionValueGroups where NextIndex <= PassThruWriteMsgsStrings.Length select PassThruWriteMsgsStrings[NextIndex]);
-            StringsToApply.AddRange(from NextIndex in this.MessagesWrittenRegex.ExpressionValueGroups where NextIndex <= MessagesSentStrings.Length select MessagesSentStrings[NextIndex]);
-
+            List<string> StringsToApply = new List<string> { PassThruReadMsgsStrings[0] };
+            StringsToApply.AddRange(from NextIndex in this.PtReadMessagesRegex.ExpressionValueGroups where NextIndex <= PassThruReadMsgsStrings.Length select PassThruReadMsgsStrings[NextIndex]);
+            StringsToApply.AddRange(from NextIndex in this.MessagesReadRegex.ExpressionValueGroups where NextIndex <= MessagesReadStrings.Length select MessagesReadStrings[NextIndex]);
+         
             // Find our message content values here.
             string MessageTable = this.FindMessageContents(out this.MessageProperties);
-            if (MessageTable is "" or "No Messages Found!") 
+            if (MessageTable is "" or "No Messages Found!")
                 this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR EXPRESSION TYPE {this.GetType().Name}!", LogType.WarnLog);
 
             // Now apply values using base method and exit out of this routine

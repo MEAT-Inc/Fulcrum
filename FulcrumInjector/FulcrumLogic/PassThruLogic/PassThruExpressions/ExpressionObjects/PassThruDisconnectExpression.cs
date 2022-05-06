@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects
 {
     /// <summary>
     /// Class object used to find a PTDisconnect command instance from an input line set.
