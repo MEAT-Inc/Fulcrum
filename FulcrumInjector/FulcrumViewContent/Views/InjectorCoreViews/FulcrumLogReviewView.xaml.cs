@@ -346,6 +346,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (SelectedBoxIndex == 2) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingSimulation;
 
             // Now toggle the state value
+            string DefaultValue = FilteringLogFileTextBox.Text;
             if (this.ViewModel.ToggleViewerContents(DesiredState)) this.ViewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
             else
             {
@@ -353,6 +354,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 FilteringLogFileTextBox.Foreground = Brushes.Red;
                 FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
                 FilteringLogFileTextBox.Text = $"Failed To Load {DesiredState.ToDescriptionString()}! Did you build it?";
+
+                // Reset the selected item value
+                ComboBoxItem CastItem = (ComboBoxItem)E.RemovedItems[0];
+                int IndexToSet = CastBox.Items.IndexOf(CastItem);
+                CastBox.SelectedIndex = IndexToSet;
+
+                // Now Reset values
+                Task.Run(() =>
+                {
+                    Thread.Sleep(3500);
+                    Dispatcher.Invoke(() => FilteringLogFileTextBox.Text = DefaultValue);
+                });
             }
         }
     }

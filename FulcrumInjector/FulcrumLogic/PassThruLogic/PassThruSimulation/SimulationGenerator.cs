@@ -29,8 +29,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         public readonly PassThruExpression[] InputExpressions;
 
         // Grouping Objects built out.
+        public SimulationChannel[] BuiltSimulationChannels { get; private set; }
         public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
-        public Tuple<int, SimulationChannel>[] BuiltSimulationChannels { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -99,8 +99,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
             // Log information and exit out of this routine
             this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
-            this.BuiltSimulationChannels = BuiltChannelsList.ToArray();
-            return this.BuiltSimulationChannels;
+            this.BuiltSimulationChannels = BuiltChannelsList.Select(ChannelSet => ChannelSet.Item2).ToArray();
+            return BuiltChannelsList.ToArray();
         }
     }
 }
