@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 {
     /// <summary>
     /// The names of the command types.

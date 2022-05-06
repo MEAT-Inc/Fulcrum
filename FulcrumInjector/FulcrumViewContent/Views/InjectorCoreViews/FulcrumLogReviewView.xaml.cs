@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
@@ -68,9 +69,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
 
-            // Process Combobox Selection Helper 
-            this.ViewerContentComboBox.SelectionChanged += ViewerContentComboBox_OnSelectionChanged;
-
             // Setup coloring helper.
             this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.ReplayLogInputContent);
             this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
@@ -118,7 +116,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Grid ParentGrid = SenderButton.Parent as Grid;
             ParentGrid.IsEnabled = false;
             SenderButton.Content = "Loading...";
-            ViewerContentComboBox.IsEnabled = false;
 
             // Run this in the background for smoother operation
             Task.Run(() =>
@@ -133,16 +130,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
                 else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
-                // Show new temp state
-                ParentGrid.IsEnabled = true;
-                this.ViewerContentComboBox_OnSelectionChanged(null, null);
-                SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
-                SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
-                SenderButton.Click -= LoadInjectorLogFile_OnClick;
-
                 // Enable grid, remove click command.
                 Task.Run(() =>
                 {
+                    // Show new temp state
+                    Dispatcher.Invoke(() =>
+                    {
+                        ParentGrid.IsEnabled = true;
+                        SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
+                        SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                        SenderButton.Click -= LoadInjectorLogFile_OnClick;
+                        this.ViewerContentComboBox.SelectedIndex = 0;
+                    });
+
                     // Wait for 3.5 Seconds
                     Thread.Sleep(3500);
                     Dispatcher.Invoke(() =>
@@ -213,6 +213,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }
+
 
         /// <summary>
         /// Sets up a processing window to show while an operation is processing
@@ -348,35 +349,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (this.ViewModel.ToggleViewerContents(DesiredState)) this.ViewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
             else
             {
-                // Reset values and log information
-                string DefaultContent = FilteringLogFileTextBox.Text;
-                var DefaultWeight = FilteringLogFileTextBox.FontWeight;
-                Brush DefaultColor = FilteringLogFileTextBox.Background;
-
-                // Show no content values
-                this.ViewModel.ToggleViewerContents(FulcrumLogReviewViewModel.ViewerStateType.NoContent);
-
                 // Set to failed 
                 FilteringLogFileTextBox.Foreground = Brushes.Red;
                 FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
-                FilteringLogFileTextBox.Text = "Failed To Load File!";
-
-                // Enable grid, remove click command.
-                Task.Run(() =>
-                {
-                    // Wait for 3.5 Seconds
-                    Thread.Sleep(3500);
-                    Dispatcher.Invoke(() =>
-                    {
-                        // Reset values and log information
-                        FilteringLogFileTextBox.Text = DefaultContent;
-                        FilteringLogFileTextBox.Foreground = DefaultColor;
-                        FilteringLogFileTextBox.FontWeight = DefaultWeight;
-                        this.ViewLogger?.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
-                    });
-                });
+                FilteringLogFileTextBox.Text = $"Failed To Load {DesiredState.ToDescriptionString()}! Did you build it?";
             }
         }
-
     }
 }
