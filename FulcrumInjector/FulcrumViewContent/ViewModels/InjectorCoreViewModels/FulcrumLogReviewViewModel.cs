@@ -220,6 +220,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             try
             {
                 // Build command split log contents first. 
+                this.ProcessingProgress = 0;
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog); 
                 GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
                 var SplitLogContent = GeneratorBuilt.SplitLogToCommands(true);
@@ -255,6 +256,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         internal bool BuildLogSimulation(out SimulationGenerator GeneratorBuilt)
         {
             // Log information about this instance.
+            this.ProcessingProgress = 0;
             ViewModelLogger.WriteLog("BUILDING SIMULATION REQUEST PROCESSED! STARTING JOB NOW...", LogType.InfoLog);
             try
             {
