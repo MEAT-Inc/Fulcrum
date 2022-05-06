@@ -176,6 +176,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Store result from processing
                 bool ParseResult = this.ViewModel.ParseLogContents(out _);
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+                this.ViewerContentComboBox.SelectedIndex = 1;
 
                 // Invoke via dispatcher
                 Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
@@ -207,6 +208,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Now build our simulation object here
                 bool SimResult = this.ViewModel.BuildLogSimulation(out var SimGenerator); 
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+                this.ViewerContentComboBox.SelectedIndex = 2;
 
                 // Invoke via dispatcher
                 Dispatcher.Invoke(() => this.ProcessingActionFinished(SimResult, SendingButton, Defaults));
