@@ -42,7 +42,7 @@
             </Grid.RowDefinitions>
             <Grid Margin="0,0,15,0" x:Name="MainActionLoadButtons">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".60*"/>
+                    <ColumnDefinition Width=".665*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
@@ -64,7 +64,7 @@
                         Content="Load Log File" VerticalAlignment="Stretch"/>
                     <Button
                         Margin="5,2" 
-                        Grid.Column="1" Click="ProcessLogFileContent_OnClick"
+                        Grid.Column="1" Click="BuildExpressionsButton_OnClick"
                         Content="Process Content" VerticalAlignment="Stretch">
                         <Button.Style>
                             <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
@@ -112,9 +112,9 @@
             <!-- Currently Loaded file -->
             <Grid Grid.Row="0" Margin="10,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="175"/>
-                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width=".5*"/>
+                    <ColumnDefinition Width=".5*"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" x:Name="FilteringLogFileTextBox"
                              Style="{StaticResource InputTextWithHolder}" 
@@ -128,10 +128,30 @@
                             IsEnabled="{Binding Path=IsLogLoaded}"
                             Style="{StaticResource ActionButtonStyle}">
                 </Button>
-                <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
-                            Margin="5,5,0,2"
-                            IsEnabled="{Binding InputParsed}" x:Name="ToggleViewTextButton" 
-                            Content="Show Parsed Contents" Click="ToggleParsedContentButton_OnClick"/>
+
+                <ComboBox Grid.Column="2" Text="Raw Log Contents"
+                          x:Name="ViewerContentComboBox"
+                          FontSize="14" Margin="5,5,0,2"
+                          IsEnabled="{Binding Path=IsLogLoaded}"
+                          SelectionChanged="ViewerContentComboBox_OnSelectionChanged"
+                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    <ComboBox.Items>
+                        <ComboBoxItem>Raw Log Contents</ComboBoxItem>
+                        <ComboBoxItem>Expressions File</ComboBoxItem>
+                        <ComboBoxItem>Simulation File</ComboBoxItem>
+                    </ComboBox.Items>
+                </ComboBox>
+
+                <!-- 
+                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="2" 
+                            Margin="5,5,0,2" x:Name="ToggleExpressionsTextButton" 
+                            IsEnabled="{Binding ExpressionsBuilt}"
+                            Content="Show Expressions" Click="ToggleViewerContentButton_OnClick"/>
+                    <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="3" 
+                            Margin="5,5,0,2" x:Name="ToggleSimulationsTextButton" 
+                            IsEnabled="{Binding SimulationBuilt}"
+                            Content="Show Simulations" Click="ToggleViewerContentButton_OnClick"/>
+                -->
             </Grid>
 
             <!-- Content for output -->

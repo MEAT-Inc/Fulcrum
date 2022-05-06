@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -23,13 +25,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimGeneratorLogger")) ?? new SubServiceLogger("SimGeneratorLogger");
 
         // Input objects for this class instance to build simulations
-        public readonly string SimulationName;
-        public readonly string SimulationFile;
-        public readonly PassThruExpression[] InputExpressions;
+        public string SimulationName;
+        public string SimulationFile;
+        public PassThruExpression[] InputExpressions;
 
         // Grouping Objects built out.
+        public SimulationChannel[] BuiltSimulationChannels { get; private set; }
         public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
-        public Tuple<int, SimulationChannel>[] BuiltSimulationChannels { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -98,8 +100,74 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
             // Log information and exit out of this routine
             this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
-            this.BuiltSimulationChannels = BuiltChannelsList.ToArray();
-            return this.BuiltSimulationChannels;
+            this.BuiltSimulationChannels = BuiltChannelsList.Select(ChannelSet => ChannelSet.Item2).ToArray();
+            return BuiltChannelsList.ToArray();
+        }
+        /// <summary>
+        /// Takes an input set of PTExpressions and writes them to a file object desired.
+        /// </summary>
+        /// <param name="InputExpressions">Expression input objects</param>
+        /// <returns>Path of our built expression file</returns>
+        public string SaveSimulationFile(string BaseFileName = "")
+        {
+            // First build our output location for our file.
+            string OutputFolder = Path.Combine(LogBroker.BaseOutputPath, "FulcrumSimulations");
+            string FinalOutputPath =
+                Path.Combine(OutputFolder, Path.GetFileNameWithoutExtension(BaseFileName)) + ".ptSim";
+
+            // Get a logger object for saving expression sets.
+            string LoggerName = $"{Path.GetFileNameWithoutExtension(BaseFileName)}_SimulationsLogger";
+            var ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith(LoggerName)) ?? new SubServiceLogger(LoggerName);
+
+            // Find output path and then build final path value.             
+            Directory.CreateDirectory(Path.Combine(LogBroker.BaseOutputPath, "FulcrumSimulations"));
+            if (!Directory.Exists(Path.GetDirectoryName(FinalOutputPath))) { Directory.CreateDirectory(Path.GetDirectoryName(FinalOutputPath)); }
+            ExpressionLogger.WriteLog($"BASE OUTPUT LOCATION FOR SIMULATIONS IS SEEN TO BE {Path.GetDirectoryName(FinalOutputPath)}", LogType.InfoLog);
+
+            // Log information about the expression set and output location
+            ExpressionLogger.WriteLog($"SAVING A TOTAL OF {this.BuiltSimulationChannels.Length} SIMULATION OBJECTS NOW...", LogType.InfoLog);
+            ExpressionLogger.WriteLog($"EXPRESSION SET IS BEING SAVED TO OUTPUT FILE: {FinalOutputPath}", LogType.InfoLog);
+
+            try
+            {
+                // Now Build output string content from each expression object.
+                ExpressionLogger.WriteLog("CONVERTING TO STRINGS NOW...", LogType.WarnLog);
+                string OutputJsonValues = JsonConvert.SerializeObject(this.BuiltSimulationChannels, Formatting.Indented);
+
+                // Log information and write output.
+                ExpressionLogger.WriteLog($"CONVERTED INPUT OBJECTS INTO A JSON OUTPUT STRING OK!", LogType.WarnLog);
+                ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
+                File.WriteAllText(FinalOutputPath,OutputJsonValues);
+
+                // Check to see if we aren't in the default location
+                if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
+                {
+                    // Find the base path, get the file name, and copy it into here.
+                    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
+                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
+                    File.Copy(FinalOutputPath, CopyLocation, true);
+
+                    // Remove the Expressions Logger. Log done and return
+                    ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+                    this.SimulationFile = CopyLocation;
+                    return CopyLocation;
+                }
+
+                // Remove the Expressions Logger. Log done and return
+                ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+                this.SimulationFile = FinalOutputPath;
+                return FinalOutputPath;
+            }
+            catch (Exception WriteEx)
+            {
+                // Log failures. Return an empty string.
+                ExpressionLogger.WriteLog("FAILED TO SAVE OUR OUTPUT EXPRESSION SETS! THIS IS FATAL!", LogType.FatalLog);
+                ExpressionLogger.WriteLog("EXCEPTION FOR THIS INSTANCE IS BEING LOGGED BELOW", WriteEx);
+
+                // Return nothing.
+                return string.Empty;
+            }
         }
     }
 }
