@@ -88,6 +88,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 .ToArray();
 
             // Log information about the built out command objects.
+            if (PTConnectCommands.Length == 0) return null;
             SimExtensionLogger.WriteLog(
                 $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS:" +
                 $"\n--> {PTConnectCommands.Length} PT CONNECTS" +
