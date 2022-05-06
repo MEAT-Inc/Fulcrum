@@ -50,6 +50,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         {
             // Store the Pattern, Mask, and Flow Ctl objects if they exist.
             ExpressionToStore.FindFilterContents(out List<string[]> FilterContent);
+            if (FilterContent.Count == 0) {
+                ExpressionToStore.ExpressionLogger.WriteLog("FILTER CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
+                ExpressionToStore.ExpressionLogger.WriteLog($"FILTER COMMAND LINES ARE SHOWN BELOW:\n{ExpressionToStore.CommandLines}", LogType.TraceLog);
+                return new J2534Filter();
+            }
+
+            // Build filter output contents
             var FilterType = ExpressionToStore.FilterType;
             var FilterPatten = FilterContent[0].Last();
             var FilterMask = FilterContent[1].Last();

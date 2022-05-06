@@ -334,7 +334,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Progress Updating Action if the bool is set to do so.
                 if (!UpdateParseProgress) continue;
                 double CurrentProgress = ((double)CharIndex / (double)FileContents.Length) * 100.00;
-                FulcrumConstants.FulcrumLogReviewViewModel.ParsingProgress = (int)CurrentProgress;
+                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
             }
 
             // Return the built set of commands.
