@@ -266,11 +266,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Now Build our simulation content objects for this generator
                 var BuiltIdValues = GeneratorBuilt.GenerateGroupedIds(); this.ProcessingProgress = 50;
                 var GeneratedChannels = GeneratorBuilt.GenerateSimulationChannels(); this.ProcessingProgress = 75;
-                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! --> {BuiltIdValues.Length} ID PAIRS", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! --> {GeneratedChannels.Length} ID PAIRS", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! {BuiltIdValues.Length} ID PAIRS", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! {GeneratedChannels.Length} ID PAIRS", LogType.InfoLog);
+
+                // Save simulation object here.
+                ViewModelLogger.WriteLog("SAVING SIMULATION FILE OUTPUT NOW...", LogType.InfoLog);
+                this.SimulationFile = GeneratorBuilt.SaveSimulationFile(this.LoadedLogFile);
+                ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {this.SimulationFile} OK!", LogType.InfoLog);
 
                 // Return passed and move out of here.
                 this.ProcessingProgress = 100;
+                this.SimulationBuilt = true;
                 return true;
             } 
             catch (Exception BuildSimEx) 

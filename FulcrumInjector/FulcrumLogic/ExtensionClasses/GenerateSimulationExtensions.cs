@@ -11,6 +11,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpWrap2534.J2534Objects;
+using SharpWrap2534.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {
@@ -69,6 +70,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static Tuple<int, SimulationChannel> BuildChannelsFromExpressions(this PassThruExpression[] GroupedExpression, int ChannelId)
         {
             // Find all the PTFilter commands first and invert them.
+            var PTConnectCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTConnect)
+                .Cast<PassThruConnectExpression>()
+                .ToArray();
             var PTFilterCommands = GroupedExpression
                 .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTStartMsgFilter)
                 .Cast<PassThruStartMessageFilterExpression>()
@@ -85,17 +90,20 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Log information about the built out command objects.
             SimExtensionLogger.WriteLog(
                 $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS:" +
+                $"\n--> {PTConnectCommands.Length} PT CONNECTS" +
                 $"\n--> {PTFilterCommands.Length} FILTERS" +
                 $"\n--> {PTReadCommands.Length} READ COMMANDS" +
                 $"\n--> {PTWriteCommands} WRITE COMMANDS", 
             LogType.InfoLog
             );
 
-            // List of our built J2534 Filters
-            var NextChannel = new SimulationChannel(ChannelId);
-            NextChannel.StoreMessageFilters(PTFilterCommands);
+            // Find the ProtocolID and Current Channel ID. Then build a sim channel
+            var ConnectCommand = PTConnectCommands.FirstOrDefault();
+            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId);
 
-            // Temp null return
+            // Build simulation channel here and return it out
+            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse);
+            NextChannel.StoreMessageFilters(PTFilterCommands); 
             return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }

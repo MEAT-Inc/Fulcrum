@@ -20,10 +20,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
     {
         // Channel ID Built and Logger
         public readonly uint ChannelId;
+        public readonly ProtocolId ChannelProtocol;
         private readonly SubServiceLogger SimChannelLogger;
 
         // Class Values for a channel to simulate
-        public ProtocolId ChannelProtocol;
         public J2534Filter[] MessageFilters;
         public PassThruStructs.PassThruMsg[] MessagesSent;
         public PassThruStructs.PassThruMsg[] MessagesRead;
@@ -32,10 +32,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Builds a new Channel Simulation object from the given channel ID
         /// </summary>
         /// <param name="ChannelId"></param>
-        public SimulationChannel(int ChannelId)
+        public SimulationChannel(int ChannelId, ProtocolId ProtocolInUse)
         {
             // Store the Channel ID
             this.ChannelId = (uint)ChannelId;
+            this.ChannelProtocol = ProtocolInUse;
             this.SimChannelLogger = new SubServiceLogger($"SimChannelLogger_ID-{this.ChannelId}");
             this.SimChannelLogger.WriteLog($"BUILT NEW SIM CHANNEL OBJECT FOR CHANNEL ID {this.ChannelId}!", LogType.InfoLog);
         }

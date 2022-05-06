@@ -176,6 +176,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Store result from processing
                 bool ParseResult = this.ViewModel.ParseLogContents(out _);
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+                this.ViewerContentComboBox.SelectedIndex = 1;
 
                 // Invoke via dispatcher
                 Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
@@ -207,6 +208,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Now build our simulation object here
                 bool SimResult = this.ViewModel.BuildLogSimulation(out var SimGenerator); 
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+                this.ViewerContentComboBox.SelectedIndex = 2;
 
                 // Invoke via dispatcher
                 Dispatcher.Invoke(() => this.ProcessingActionFinished(SimResult, SendingButton, Defaults));
@@ -346,6 +348,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (SelectedBoxIndex == 2) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingSimulation;
 
             // Now toggle the state value
+            string DefaultValue = FilteringLogFileTextBox.Text;
             if (this.ViewModel.ToggleViewerContents(DesiredState)) this.ViewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
             else
             {
@@ -353,6 +356,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 FilteringLogFileTextBox.Foreground = Brushes.Red;
                 FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
                 FilteringLogFileTextBox.Text = $"Failed To Load {DesiredState.ToDescriptionString()}! Did you build it?";
+
+                // Reset the selected item value
+                ComboBoxItem CastItem = (ComboBoxItem)E.RemovedItems[0];
+                int IndexToSet = CastBox.Items.IndexOf(CastItem);
+                CastBox.SelectedIndex = IndexToSet;
+
+                // Now Reset values
+                Task.Run(() =>
+                {
+                    Thread.Sleep(3500);
+                    Dispatcher.Invoke(() => FilteringLogFileTextBox.Text = DefaultValue);
+                });
             }
         }
     }
