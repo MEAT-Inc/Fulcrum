@@ -131,7 +131,7 @@
 
                 <ComboBox Grid.Column="2" Text="Raw Log Contents"
                           x:Name="ViewerContentComboBox"
-                          FontSize="14" Margin="5,5,5,2"
+                          FontSize="14" Margin="5,5,0,2"
                           IsEnabled="{Binding Path=IsLogLoaded}"
                           SelectionChanged="ViewerContentComboBox_OnSelectionChanged"
                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
