@@ -145,7 +145,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 {
                     // Find the base path, get the file name, and copy it into here.
                     string LocalDirectory = Path.GetDirectoryName(BaseFileName);
-                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
+                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptSim";
                     File.Copy(FinalOutputPath, CopyLocation, true);
 
                     // Remove the Expressions Logger. Log done and return

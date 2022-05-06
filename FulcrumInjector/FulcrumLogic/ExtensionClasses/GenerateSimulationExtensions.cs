@@ -99,7 +99,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Find the ProtocolID and Current Channel ID. Then build a sim channel
             var ConnectCommand = PTConnectCommands.FirstOrDefault();
-            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId);
+            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse);
