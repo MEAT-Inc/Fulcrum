@@ -341,7 +341,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                 // Only read our voltage if our device was opened ok
                 this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true);
-                this.InstanceSession.PTClose();
                 return DoubleVoltage;
             }
             catch
