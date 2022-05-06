@@ -229,7 +229,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Start by building PTExpressions from input string object sets.
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
                 var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
-                this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
+                this.ExpressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 
                 // Convert the expression set into a list of file strings now and return list built.
@@ -334,7 +334,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // For showing simulations
                     case ViewerStateType.ShowingSimulation:
                         if (!this.SimulationBuilt) return false;
-                        if (_currentState == ViewerStateType.ShowingSimulation) { return true; }
+                        if (_currentState == StateToSet) { return true; }
 
                         // Store new values
                         NewViewerFileName = this.SimulationFile;
@@ -344,7 +344,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // For showing raw log contents
                     case ViewerStateType.ShowingLogFile:
-                        if (_currentState == ViewerStateType.ShowingLogFile) { return true; }
+                        if (_currentState == StateToSet) { return true; }
 
                         // Store new values
                         NewViewerFileName = this.LoadedLogFile;
