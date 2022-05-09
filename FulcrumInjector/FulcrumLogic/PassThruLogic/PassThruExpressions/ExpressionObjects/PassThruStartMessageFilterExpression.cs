@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects
 {
     /// <summary>
     /// Class object for our PTStart filter regex methods.
@@ -23,7 +22,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         [PtExpressionProperty("Filter Type")] public readonly string FilterType;
         [PtExpressionProperty("Mask Pointer")] public readonly string MaskPointer;
         [PtExpressionProperty("Pattern Pointer")] public readonly string PatternPointer;
-        [PtExpressionProperty("Flow Control Pointer")] public readonly string FLowCtlPointer;
+        [PtExpressionProperty("Flow Control Pointer")] public readonly string FlowCtlPointer;
         [PtExpressionProperty("Filter Pointer (Struct)")] public readonly string FilterPointer;
         [PtExpressionProperty("Filter ID")] public readonly string FilterID;
 

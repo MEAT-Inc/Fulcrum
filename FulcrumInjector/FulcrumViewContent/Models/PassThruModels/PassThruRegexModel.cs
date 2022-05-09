@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using Newtonsoft.Json;
 

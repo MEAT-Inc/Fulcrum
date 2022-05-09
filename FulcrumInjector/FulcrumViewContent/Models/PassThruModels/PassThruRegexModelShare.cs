@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger;

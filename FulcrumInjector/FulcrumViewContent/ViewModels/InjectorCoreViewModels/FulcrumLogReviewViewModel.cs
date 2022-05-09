@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
@@ -29,28 +31,60 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     /// </summary>
     public class FulcrumLogReviewViewModel : ViewModelControlBase
     {
+        /// <summary>
+        /// Enum used to set our viewer current state value
+        /// </summary>
+        public enum ViewerStateType
+        {
+            [Description("No Content")] NoContent,
+            [Description("Input Log File")] ShowingLogFile,
+            [Description("Expressions File")] ShowingExpressions,
+            [Description("Simulation File")] ShowingSimulation
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogReviewViewModelLogger")) ?? new SubServiceLogger("InjectorLogReviewViewModelLogger");
 
         // Private control values
-        private int _parsingProgress = 0;
-        private bool _isLogLoaded = false;
         private string _loadedLogFile = "";
+        private string _simulationFile = "";
+        private string _expressionsFile = "";
+
+        // Values for content strings to pull in
         private string _logFileContents = "";
+        private string _simulationFileContents = "";
+        private string _expressionsFileContents = "";
 
         // Private string for last built expressions file.
-        private bool _inputParsed = false;
-        private bool _showingParsed = false;
-        private string _lastBuiltExpressionsFile;
+        private bool _isLogLoaded = false;
+        private bool _simulationBuilt = false;
+        private bool _expressionsBuilt = false;
+        private ViewerStateType _currentState;
 
-        // Public values for our view to bind onto 
+        // Progress Of Viewer actions
+        private int _processingProgress = 0;
+        private ObservableCollection<SimulationChannel> _lastBuiltSimulation;
+        private ObservableCollection<PassThruExpression> _lastBuiltExpressions;
+
         public bool IsLogLoaded { get => _isLogLoaded; set => PropertyUpdated(value); }
-        public bool InputParsed { get => _inputParsed; set => PropertyUpdated(value); }
-        public bool ShowingParsed { get => _showingParsed; set => PropertyUpdated(value); }
         public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
-        public int ParsingProgress { get => _parsingProgress; set => PropertyUpdated(value); }
+        public string SimulationFile { get => _simulationFile; set => PropertyUpdated(value); }
+        public string ExpressionsFile { get => _expressionsFile; set => PropertyUpdated(value); }
+
+        // File Content Values
         public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
+        public string SimulationFileContents { get => _simulationFileContents; set => PropertyUpdated(value); }
+        public string ExpressionsFileContents { get => _expressionsFileContents; set => PropertyUpdated(value); }
+
+        // View boolean toggles
+        public bool ExpressionsBuilt { get => _expressionsBuilt; set => PropertyUpdated(value); }
+        public bool SimulationBuilt { get => _simulationBuilt; set => PropertyUpdated(value); }
+
+        // Progress for parse
+        public int ProcessingProgress { get => _processingProgress; set => PropertyUpdated(value); }
 
         // Helper for syntax formatting and filtering
         public LogOutputFilteringHelper LogFilteringHelper;
@@ -68,8 +102,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog("SETTING UP INJECTOR LOG REVIEW VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Toggle parsed value based on contents.
-            this.InputParsed = false;
             this.IsLogLoaded = false;
+            this.ExpressionsBuilt = false;
             ViewModelLogger.WriteLog("TOGGLED ENABLED STATUS OF TOGGLE BUTTON OK!", LogType.InfoLog);
 
             // This is turned off for now. No need to dupe import all of these objects
@@ -139,22 +173,28 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Copy to our new output location and set that as our new log file value.
                 string OutputFileName = Path.Combine(OutputPath, Path.GetFileName(NewLogFile));
                 this.LoadedLogFile = NewLogFile;
-                if (!string.IsNullOrWhiteSpace(this.LoadedLogFile)) { File.Copy(NewLogFile, OutputFileName); }
+                if (!string.IsNullOrWhiteSpace(this.LoadedLogFile)) { File.Copy(NewLogFile, OutputFileName, true); }
                 else {
                     ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
                     throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
                 }
 
                 // Log passed and return output. Store onto view content.
+                this.LoadedLogFile = OutputFileName;
                 this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
+                if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
+                    throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                // Store our new log file contents
                 CastView.Dispatcher.Invoke(() => {
-                    CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
                     CastView.ReplayLogInputContent.Text = this.LogFileContents;
+                    CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
                 });
 
                 // Return passed
-                this._lastBuiltExpressionsFile = null;
-                this.IsLogLoaded = true; this.InputParsed = false;
+                this._simulationFile = null; this._simulationFileContents = null;
+                this._expressionsFile = null; this._expressionsFileContents = null;
+                this.IsLogLoaded = true; this.ExpressionsBuilt = false; this.SimulationBuilt = false;
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
             }
@@ -176,44 +216,34 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;   
             }
         }
+
+
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
         /// <param name="OutputExpressions"></param>
         /// <returns></returns>
-        internal bool ParseLogContents(out ObservableCollection<PassThruExpression> OutputExpressions)
+        internal bool ParseLogContents(out ExpressionsGenerator GeneratorBuilt)
         {
             try
             {
                 // Build command split log contents first. 
-                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var SplitLogContent = ExpressionExtensions.SplitLogToCommands(LogFileContents);
+                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog); 
+                GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
+                var SplitLogContent = GeneratorBuilt.SplitLogToCommands(true);
                 ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
 
                 // Start by building PTExpressions from input string object sets.
-                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
-                var ExpressionSet = SplitLogContent.Select(LineSet =>
-                {
-                    // Split our output content here and then build a type for the expressions
-                    if (LineSet.Length == 0) return null;
-                    string[] SplitLines = LineSet.Split('\n');
-                    var ExpressionType = SplitLines.GetTypeFromLines();
-
-                    // Build expression class object and tick our progress
-                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
-                    this.ParsingProgress = (int)(SplitLogContent.ToList().IndexOf(LineSet) + 1 / (double)SplitLogContent.Length);
-
-                    // Return the built expression object
-                    return NextClassObject;
-                }).Where(ExpObj => ExpObj != null).ToArray();
+                ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
+                var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
+                this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
+                this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 
                 // Convert the expression set into a list of file strings now and return list built.
-                this.ParsingProgress = 100;
-                this._lastBuiltExpressionsFile = ExpressionSet.SaveExpressionsFile(this.LoadedLogFile);
-                if (this._lastBuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
-                ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {ExpressionSet.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._lastBuiltExpressionsFile}!", LogType.InfoLog);
-                OutputExpressions = new ObservableCollection<PassThruExpression>(ExpressionSet); this.InputParsed = true;
+                if (this._expressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
+                ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._expressionsFile}!", LogType.InfoLog);
+                this.ProcessingProgress = 100; this.ExpressionsBuilt = true;
                 return true;
             }
             catch (Exception Ex)
@@ -221,8 +251,50 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Log failures, return nothing
                 ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
-                OutputExpressions = null; this.InputParsed = false;
+                GeneratorBuilt = null; this.ExpressionsBuilt = false;
                 return false;
+            }
+        }
+        /// <summary>
+        /// Builds out a set of expression objects for the simulator generation helper
+        /// </summary>
+        /// <param name="GeneratorBuilt">Built generation helper</param>
+        /// <returns>True if built ok. False if not</returns>
+        internal bool BuildLogSimulation(out SimulationGenerator GeneratorBuilt)
+        {
+            // Log information about this instance.
+            this.ProcessingProgress = 0;
+            ViewModelLogger.WriteLog("BUILDING SIMULATION REQUEST PROCESSED! STARTING JOB NOW...", LogType.InfoLog);
+            try
+            {
+                // Try to build our generator here
+                this.ProcessingProgress = 25;
+                GeneratorBuilt = new SimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
+                ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
+
+                // Now Build our simulation content objects for this generator
+                var BuiltIdValues = GeneratorBuilt.GenerateGroupedIds(); this.ProcessingProgress = 50;
+                var GeneratedChannels = GeneratorBuilt.GenerateSimulationChannels(); this.ProcessingProgress = 75;
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! {BuiltIdValues.Length} ID PAIRS", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! {GeneratedChannels.Length} ID PAIRS", LogType.InfoLog);
+
+                // Save simulation object here.
+                ViewModelLogger.WriteLog("SAVING SIMULATION FILE OUTPUT NOW...", LogType.InfoLog);
+                this.SimulationFile = GeneratorBuilt.SaveSimulationFile(this.LoadedLogFile);
+                ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {this.SimulationFile} OK!", LogType.InfoLog);
+
+                // Return passed and move out of here.
+                this.ProcessingProgress = 100;
+                this.SimulationBuilt = true;
+                return true;
+            } 
+            catch (Exception BuildSimEx) 
+            {
+                // Log failures out and return nothing
+                this.ProcessingProgress = 100;
+                ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
+                GeneratorBuilt = null; return false;
             }
         }
 
@@ -239,23 +311,68 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.LogFilteringHelper.SearchForText(TextToFind);
         }
         /// <summary>
-        /// Toggles the current contents of the log viewer based on the bool trigger for it.
+        /// Toggles the current view contents around the processing output viewer
         /// </summary>
-        internal bool ToggleViewerContents()
+        /// <param name="StateToSet">State to apply</param>
+        /// <returns></returns>
+        internal bool ToggleViewerContents(ViewerStateType StateToSet)
         {
             try
             {
                 // Start by getting our string values needed for the desired file.
                 ViewModelLogger.WriteLog("PULLING IN NEW CONTENT FOR A DESIRED FILE OBJECT OUTPUT NOW!", LogType.WarnLog);
-                string NewLogContents = this.ShowingParsed ? File.ReadAllText(this.LoadedLogFile) : File.ReadAllText(this._lastBuiltExpressionsFile);
 
                 // Once pulled in, load our content values out.
-                this.ShowingParsed = !this.ShowingParsed;
+                string NewViewerContents = string.Empty;
+                string NewViewerFileName = string.Empty;
+                switch (StateToSet)
+                {
+                    // For showing expressions
+                    case ViewerStateType.ShowingExpressions:
+                        if (!this.ExpressionsBuilt) return false;
+                        if (_currentState == StateToSet) { return true; }
+
+                        // Store new values
+                        NewViewerFileName = this.ExpressionsFile;
+                        NewViewerContents = File.ReadAllText(this.ExpressionsFile);
+                        this.ExpressionsFileContents = NewViewerContents;
+                        break;
+
+                    // For showing simulations
+                    case ViewerStateType.ShowingSimulation:
+                        if (!this.SimulationBuilt) return false;
+                        if (_currentState == StateToSet) { return true; }
+
+                        // Store new values
+                        NewViewerFileName = this.SimulationFile;
+                        NewViewerContents = File.ReadAllText(this.SimulationFile);
+                        this.SimulationFileContents = NewViewerContents;
+                        break;
+
+                    // For showing raw log contents
+                    case ViewerStateType.ShowingLogFile:
+                        if (_currentState == StateToSet) { return true; }
+
+                        // Store new values
+                        NewViewerFileName = this.LoadedLogFile;
+                        NewViewerContents = File.ReadAllText(this.LoadedLogFile);
+                        this.LogFileContents = NewViewerContents;
+                        break;
+
+                    // For showing nothing in the viewer
+                    case ViewerStateType.NoContent:
+                        NewViewerFileName = "No Log File!";
+                        NewViewerContents = string.Empty;
+                        break;
+                }
+
+                // Store our contents out here
+                this._currentState = StateToSet;
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
                 ViewModelLogger.WriteLog("FILE CONTENT PARSED OK! STORING TO VIEW NOW...", LogType.InfoLog);
                 CastView.Dispatcher.Invoke(() => {
-                    CastView.ReplayLogInputContent.Text = NewLogContents;
-                    CastView.FilteringLogFileTextBox.Text = this.ShowingParsed ? this._lastBuiltExpressionsFile : this.LoadedLogFile;
+                    CastView.ReplayLogInputContent.Text = NewViewerContents;
+                    CastView.FilteringLogFileTextBox.Text = NewViewerFileName;
                 });
 
                 // Toggle the showing parsed value.

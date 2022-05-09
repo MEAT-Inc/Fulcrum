@@ -18,8 +18,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../FulcrumViewSupport/AppStyleSheets/FulcrumControlStyles.xaml"/>
-                <ResourceDictionary Source="../../FulcrumViewSupport/AppStyleSheets/FulcrumVehicleConnectionInfoStyles.xaml"/>
+                <ResourceDictionary Source="../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumVehicleConnectionInfoStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

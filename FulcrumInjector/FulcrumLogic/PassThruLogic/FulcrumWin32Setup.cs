@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruImports
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic
 {
     /// <summary>
     /// Model object used to contain our loading methods for the C++ DLL

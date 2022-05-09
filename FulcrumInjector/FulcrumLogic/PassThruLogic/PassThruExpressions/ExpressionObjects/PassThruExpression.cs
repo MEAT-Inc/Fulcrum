@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
+namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects
 {
     // --------------------------------------------------------------------------------------------------------------
 
@@ -185,8 +184,21 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             // Find command issue request values. (Pull using Base Class)
             var FieldsToSet = this.GetExpressionProperties(true);
             bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
-            bool StatusCodeResult = this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings);
-            if (!ExecutionTimeResult || !StatusCodeResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+            if (!this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings))
+            {
+                // Try and find the end of the command in a different way
+                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+                StatusCodeStrings = new[]
+                {
+                    $"{TimeStrings[2]} 0:STATUS_NOERROR",
+                    $"{TimeStrings[2]}",
+                    "0:STATUS_NOERROR"
+                };
+            }
+
+            // Check our output values
+            if (!ExecutionTimeResult) 
+                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string>();
