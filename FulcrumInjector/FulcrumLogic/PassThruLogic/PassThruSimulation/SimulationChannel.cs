@@ -60,9 +60,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
             // Build filter output contents
             var FilterType = ExpressionToStore.FilterType;
-            var FilterPatten = FilterContent[0].Last();
-            var FilterMask = FilterContent[1].Last();
-            var FilterFlow = FilterContent.Count == 3 ? FilterContent[2].Last() : "";
+            var FilterFlags = uint.Parse(FilterContent[0][4]);
+            var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
+            var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
+            var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
 
             // Now convert our information into string values.
             return new J2534Filter()
@@ -74,7 +75,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 FilterFlowCtl = FilterFlow,
 
                 // TODO FIX FILTER FLAGS BY USING CONTENTS OF THE LISTS
-                FilterFlags = 0x00
+                FilterFlags = FilterFlags
             };
         }
         /// <summary>
