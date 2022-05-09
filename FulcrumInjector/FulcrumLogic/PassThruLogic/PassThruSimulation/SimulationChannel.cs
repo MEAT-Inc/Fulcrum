@@ -91,7 +91,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
         /// </summary>
         /// <returns>List of messages stored</returns>
-        public PassThruStructs.PassThruMsg[] StoreWrittenAsReadMsgs(PassThruWriteMessagesExpression[] ExpressionsToStore)
+        public PassThruStructs.PassThruMsg[] StoreMessagesWritten(PassThruWriteMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
@@ -130,7 +130,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
         /// </summary>
         /// <returns>List of messages stored</returns>
-        public PassThruStructs.PassThruMsg[] StoreReadAsWrittenMsgs(PassThruReadMessagesExpression[] ExpressionsToStore)
+        public PassThruStructs.PassThruMsg[] StoreMessagesRead(PassThruReadMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
