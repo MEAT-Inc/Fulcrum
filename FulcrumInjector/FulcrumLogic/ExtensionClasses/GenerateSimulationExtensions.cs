@@ -104,7 +104,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse);
-            NextChannel.StoreMessageFilters(PTFilterCommands); 
+            NextChannel.StoreMessagesRead(PTReadCommands);
+            NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesWritten(PTWriteCommands);
+
+            // Return a new tuple of our object for the command output
             return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }
