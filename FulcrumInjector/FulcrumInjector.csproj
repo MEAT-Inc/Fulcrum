@@ -452,6 +452,7 @@
   <ItemGroup>
     <Resource Include="FulcrumResources\UnicornSoftwareList.txt" />
     <Resource Include="FulcrumResources\MeatIncTurboLogo.jpg" />
+    <Resource Include="FulcrumResources\FulcrumShimDLLConfig.txt" />
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
@@ -483,6 +484,7 @@ copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumI
 copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.xcf" $(TargetDir)FulcrumImages"
 copy /Y "$(ProjectDir)FulcrumResources\MeatIncTurboLogo.jpg" $(TargetDir)FulcrumImages"
 copy /Y "$(ProjectDir)FulcrumResources\UnicornSoftwareList.txt" $(TargetDir)FulcrumResources"
+copy /Y "$(ProjectDir)FulcrumResources\FulcrumShimDLLConfig.txt" $(TargetDir)FulcrumResources"
 copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)FulcrumResources\$(ProjectName)Settings.json"</PostBuildEvent>
   </PropertyGroup>
 </Project>

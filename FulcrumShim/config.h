@@ -4,4 +4,4 @@
 // #define DREWTECHONLY 1
 
 // Define to get nice selection form to choose the Interface
-#define ALLOW_POPUP 1
+#define ALLOW_POPUP 0

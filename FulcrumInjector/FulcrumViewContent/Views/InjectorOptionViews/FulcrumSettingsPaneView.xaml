@@ -62,6 +62,7 @@
                                     HorizontalAlignment="Right"
                                     x:Name="SettingValueCheckBox"
                                     Checked="SettingValueChanged_OnTrigger"
+                                    Unchecked="SettingValueChanged_OnTrigger"
                                     IsChecked="{Binding Path=SettingValue}"/>
                                 <TextBlock
                                     Grid.Row="2"

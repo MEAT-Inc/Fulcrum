@@ -63,6 +63,7 @@ void fulcrum_output::fulcrumDebug(LPCTSTR format_string, ...)
 	else _vftprintf_s(fp, format_string, str_args); 
 
 	// Write Directly to our log file. If the pipe is closed, return
+	if (CFulcrumShim::fulcrumPiper == NULL) CFulcrumShim::StartupPipes();
 	if (!CFulcrumShim::fulcrumPiper->OutputConnected) {
 		va_end(str_args);
 		return;
