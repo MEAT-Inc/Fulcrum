@@ -8,7 +8,6 @@
 #define IDC_SYSLINK1                    1004
 #define IDC_EDIT1                       1005
 #define IDC_BUTTON2                     1006
-#define ALLOW_POPUP						   1
 
 // Next default values for new objects
 #ifdef APSTUDIO_INVOKED

@@ -88,6 +88,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 .ToArray();
 
             // Log information about the built out command objects.
+            if (PTConnectCommands.Length == 0) return null;
             SimExtensionLogger.WriteLog(
                 $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS:" +
                 $"\n--> {PTConnectCommands.Length} PT CONNECTS" +
@@ -103,7 +104,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse);
-            NextChannel.StoreMessageFilters(PTFilterCommands); 
+            NextChannel.StoreMessagesRead(PTReadCommands);
+            NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesWritten(PTWriteCommands);
+
+            // Return a new tuple of our object for the command output
             return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }

@@ -101,6 +101,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             int SettingSetIndex = this.SettingsEntrySets
                 .ToList()
                 .FindIndex(ImportedSettingSet => ImportedSettingSet.SettingSectionTitle == LocatedSettingSet.SettingSectionTitle);
+
+            // Store the settings value here.
             var SettingObjects = FulcrumSettingsShare.SettingsEntrySets;
             SettingObjects[SettingSetIndex] = LocatedSettingSet;
 
@@ -108,6 +110,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
             FulcrumSettingsShare.GenerateSettingsModels(); this.SettingsEntrySets = FulcrumSettingsShare.SettingsEntrySets;
             ViewModelLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
+
+            // If we've got a special setting value, then store it here.
+            if (LocatedSettingSet.SettingSectionTitle != "FulcrumShim DLL Settings") return;
+            ViewModelLogger.WriteLog("STORING SETTINGS FOR SHIM CONFIGURATION IN A TEMP TEXT FILE NOW...", LogType.WarnLog);
+            string ConfigFilePath = Path.GetDirectoryName(JsonConfigFiles.AppConfigFile);
+            ConfigFilePath = Path.Combine(ConfigFilePath, "FulcrumShimDLLConfig.txt");
+
+            // Store the value of the settings and their names in here.
+            string[] ValuesPulled = LocatedSettingSet.SettingsEntries
+                .Select(SettingObj => SettingObj.SettingValue.ToString())
+                .Prepend("FulcrumShimDLLConfig.txt")
+                .ToArray();
+
+            // Write final output values here.
+            File.WriteAllText(ConfigFilePath, string.Join("|", ValuesPulled));
+            ViewModelLogger.WriteLog($"WROTE OUT VALUES FOR SETTINGS TITLED {string.Join(" -- ", ValuesPulled)}");
         }
     }
 }

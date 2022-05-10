@@ -95,7 +95,8 @@ extern "C" long J2534_API PassThruLoadLibrary(char * szFunctionLibrary)
     AFX_MANAGE_STATE(AfxGetStaticModuleState()); auto_lock lock;
 
 	// Boot pipes if the need to be started up.
-	CFulcrumShim::StartupPipes();
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Clear out old error values and print init for method
 	fulcrum_clearInternalError();
@@ -129,10 +130,20 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState()); auto_lock lock;
 
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
+
 	// Unload our library here
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("++ %.3fs PTUnloadLibrary()\n"), GetTimeSinceInit());
 	fulcrum_unloadLibrary();
+
+	// Unload pipe outputs
+	// fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
+	// CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
+	// CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
+	// fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
 
 	// Print output result from call
 	fulcrum_printretval(STATUS_NOERROR);
@@ -147,7 +158,8 @@ extern "C" long J2534_API PassThruWriteToLogA(char *szMsg)
 	CStringW cstrMsg(szMsg);
 
 	// Boot pipes if the need to be started up.
-	CFulcrumShim::StartupPipes();
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Write output information for the log
 	fulcrum_output::fulcrumDebug(_T("** %.3fs '%s'\n"), GetTimeSinceInit(), cstrMsg);
@@ -159,7 +171,8 @@ extern "C" long J2534_API PassThruWriteToLogW(wchar_t *szMsg)
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	// Boot pipes if the need to be started up.
-	CFulcrumShim::StartupPipes();
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Write output information for the log
 	fulcrum_output::fulcrumDebug(_T("** %.3fs '%s'\n"), GetTimeSinceInit(), szMsg);
@@ -170,6 +183,10 @@ extern "C" long J2534_API PassThruSaveLog(char *szFilename)
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Clear out old errors and print init for method
 	fulcrum_clearInternalError();
@@ -192,7 +209,8 @@ extern "C" long J2534_API PassThruGetNextCarDAQ(unsigned long* pName, unsigned l
 	auto_lock lock; unsigned long retval;
 
 	// Boot pipes if the need to be started up.
-	CFulcrumShim::StartupPipes();
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Clear out old error. Ensure DLL supports this method
 	fulcrum_clearInternalError();
@@ -211,7 +229,8 @@ extern "C" long J2534_API PassThruReadDetails(unsigned long* pName)
 	auto_lock lock; unsigned long retval;
 
 	// Boot pipes if the need to be started up.
-	CFulcrumShim::StartupPipes();
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Clear out old error. Ensure DLL supports this method
 	fulcrum_clearInternalError();
@@ -230,10 +249,11 @@ extern "C" long J2534_API PassThruOpen(void *pName, unsigned long *pDeviceID)
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock; unsigned long retval;
-
-	// Boot pipes if the need to be started up.
-	CFulcrumShim::StartupPipes();
 	
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
+
 	// Now clear out old errors and log method init state then validate it can be run
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("++ %.3fs PTOpen(%s, 0x%08X)\n"), GetTimeSinceInit(), (pName==NULL)?_T("*NULL*"):_T("")/*pName*/, pDeviceID);
@@ -251,6 +271,10 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock; long retval;
 
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
+
 	// Clear existing error, validate method can be run or not.
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("-- %.3fs PTClose(%ld)\n"), GetTimeSinceInit(), DeviceID);
@@ -259,13 +283,13 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 
 	// Close input pipe instance
 	retval = _PassThruClose(DeviceID);
-	fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
-	CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
-
-	// Close output pipe instance.
-	CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
-	fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
 	fulcrum_printretval(retval);
+
+	// Unload pipe outputs
+	// fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
+	// CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
+	// fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
+	// CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
 
 	// Get output value and return it here
 	return retval;
@@ -277,6 +301,10 @@ extern "C" long J2534_API PassThruConnect(unsigned long DeviceID, unsigned long 
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto_lock lock;	long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// Clear existing error, validate method can be run or not.
 	fulcrum_clearInternalError();
@@ -298,8 +326,11 @@ extern "C" long J2534_API PassThruDisconnect(unsigned long ChannelID)
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock;	long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("-- %.3fs PTDisconnect(%ld)\n"), GetTimeSinceInit(), ChannelID);
@@ -316,9 +347,11 @@ extern "C" long J2534_API PassThruReadMsgs(unsigned long ChannelID, PASSTHRU_MSG
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
-	unsigned long reqNumMsgs;
+	auto_lock lock;	long retval; unsigned long reqNumMsgs;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("<< %.3fs PTReadMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
@@ -337,9 +370,11 @@ extern "C" long J2534_API PassThruWriteMsgs(unsigned long ChannelID, PASSTHRU_MS
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
-	unsigned long reqNumMsgs = *pNumMsgs;
+	auto_lock lock; long retval; unsigned long reqNumMsgs = *pNumMsgs;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T(">> %.3fs PTWriteMsgs(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pNumMsgs, Timeout);
@@ -359,8 +394,11 @@ extern "C" long J2534_API PassThruStartPeriodicMsg(unsigned long ChannelID, PASS
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("++ %.3fs PTStartPeriodicMsg(%ld, 0x%08X, 0x%08X, %ld)\n"), GetTimeSinceInit(), ChannelID, pMsg, pMsgID, TimeInterval);
@@ -378,8 +416,11 @@ extern "C" long J2534_API PassThruStopPeriodicMsg(unsigned long ChannelID, unsig
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("-- %.3fs PTStopPeriodicMsg(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
@@ -398,8 +439,11 @@ extern "C" long J2534_API PassThruStartMsgFilter(unsigned long ChannelID,
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("++ %.3fs PTStartMsgFilter(%ld, %s, 0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, fulcrumDebug_filter(FilterType).c_str(),
@@ -420,8 +464,11 @@ extern "C" long J2534_API PassThruStopMsgFilter(unsigned long ChannelID, unsigne
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock;	long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("-- %.3fs PTStopMsgFilter(%ld, %ld)\n"), GetTimeSinceInit(), ChannelID, MsgID);
@@ -438,8 +485,11 @@ extern "C" long J2534_API PassThruSetProgrammingVoltage(unsigned long DeviceID, 
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("** %.3fs PTSetProgrammingVoltage(%ld, %ld, %ld)\n"), GetTimeSinceInit(), DeviceID, Pin, Voltage);
@@ -467,8 +517,11 @@ extern "C" long J2534_API PassThruReadVersion(unsigned long DeviceID, char *pFir
 {
 	// Ensure the module is running in static state and acquire a lock for it.
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("** %.3fs PTReadVersion(%ld, 0x%08X, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), DeviceID, pFirmwareVersion, pDllVersion, pApiVersion);
@@ -492,8 +545,11 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	fulcrum_clearInternalError();
 	fulcrum_output::fulcrumDebug(_T("** %.3fs PTIoctl(%ld, %s, 0x%08X, 0x%08X)\n"), GetTimeSinceInit(), ChannelID, fulcrumDebug_ioctl(IoctlID).c_str(), pInput, pOutput);
@@ -567,6 +623,10 @@ extern "C" long J2534_API PassThruIoctl(unsigned long ChannelID, unsigned long I
 // Error Reporting Commands and converter for error codes
 long fulcrum_PassThruGetLastError(char* pErrorDescription)
 {
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
+
 	if (fulcrum_hadInternalError())
 	{
 		if (pErrorDescription == NULL)
@@ -593,8 +653,11 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 {
 	// Ensure the module is running in static state and acquire a lock for it.
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto_lock lock;
-	long retval;
+	auto_lock lock; long retval;
+
+	// Boot pipes if the need to be started up.
+	if (CFulcrumShim::fulcrumPiper == NULL)
+		CFulcrumShim::StartupPipes();
 
 	// pErrorDescription returns the text description for an error detected
 	// during the last function call (EXCEPT PassThruGetLastError). This
@@ -617,6 +680,6 @@ extern "C" long J2534_API PassThruGetLastError(char* pErrorDescription)
 	// Log the return value for this function without using dbg_printretval().
 	// Even if an error occured inside this function, the error text was not
 	// updated to describe the error.
-	fulcrum_output::fulcrumDebug(_T(" % %.3fss\n"), GetTimeSinceInit(), fulcrumDebug_return(retval).c_str());
+	fulcrum_output::fulcrumDebug(_T("  %.3fs %s\n"), GetTimeSinceInit(), fulcrumDebug_return(retval).c_str());
 	return retval;
 }

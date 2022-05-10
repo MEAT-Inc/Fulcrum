@@ -180,8 +180,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
 
                 // Log passed and return output. Store onto view content.
+                this.LoadedLogFile = OutputFileName;
+                this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
                 if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
                     throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                // Store our new log file contents
+                CastView.Dispatcher.Invoke(() => {
+                    CastView.ReplayLogInputContent.Text = this.LogFileContents;
+                    CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
+                });
 
                 // Return passed
                 this._simulationFile = null; this._simulationFileContents = null;
@@ -220,7 +228,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             try
             {
                 // Build command split log contents first. 
-                this.ProcessingProgress = 0;
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog); 
                 GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
                 var SplitLogContent = GeneratorBuilt.SplitLogToCommands(true);
@@ -229,7 +236,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Start by building PTExpressions from input string object sets.
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
                 var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
-                this.ExpressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
+                this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 
                 // Convert the expression set into a list of file strings now and return list built.

@@ -22,6 +22,12 @@
 #include "stdafx.h"
 #include "config.h"
 #include <afxmt.h>
+#include <fstream>
+#include <string>
+#include <streambuf>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 // Fulcrum Resource Imports
 #include "SelectionBox.h"
@@ -29,6 +35,10 @@
 #include "fulcrum_debug.h"
 #include "fulcrum_loader.h"
 #include "fulcrum_output.h"
+#include "FulcrumShim.h"
+
+// Using callout
+using namespace std;
 
 // Pointers to J2534 API functions in the loaded library
 PTOPEN _PassThruOpen = 0;
@@ -267,59 +277,74 @@ bool fulcrum_checkAndAutoload(void)
 	if (fLibLoaded)
 		return true;
 
-	// Define ALLOW_POPUP if you want this function to continue by scaning the registry, presenting
-	// a dialog, and allowing the user to pick a J2534 DLL. Leave it undefined if you want to force
-	// the app to call PassThruLoadLibrary
-
-#ifndef ALLOW_POPUP
-	return false;
+	// Read the JSON Configuration file out of the FulcrumInjector Application
+#if _DEBUG
+	TCHAR szPath[MAX_PATH]; CString dll_config_path;
+	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, szPath);
+	dll_config_path.Format(_T("%s\\source\\repos\\MEAT-Inc\\FulcrumShim\\FulcrumInjector\\bin\\Debug\\FulcrumResources\\FulcrumShimDLLConfig.txt"), szPath);
+#else 
+	TCHAR szPath[MAX_PATH]; CString dll_config_path;
+	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
+	dll_config_path.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumInjector\\FulcrumResources\\FulcrumShimDLLConfig.txt"), szPath);
 #endif
 
-	// Check the registry for J2534 interfaces
-	std::set<cPassThruInfo> interfaceList;
-	EnumPassThruInterfaces(interfaceList);
+	// Read in file contents here.
+	std::ifstream config_file_stream(dll_config_path);
+	std::string config_file_content(
+		(std::istreambuf_iterator<char>(config_file_stream)),
+		std::istreambuf_iterator<char>()
+	);
 
-	if (interfaceList.size() == 0) {
-		// No interfaces listed in the registry? Failure!
-		return false;
-	}
-#if 0
-	// This would be a nice optimization, but then the user doesn't get to pick
-	// a log output destination?? That's bad. For now keep it disabled
-	else if (interfaceList.size() == 1)
+	// Split contents out into line values. Store settings as needed.
+	std::vector<std::string> tokens; size_t prev = 0, pos = 0;
+	do
 	{
-		// One interface? Pick it automatically! But 
-		std::set<cPassThruInfo>::iterator iInterface;
-		iInterface = interfaceList.begin();
-		LoadJ2534DLL(iInterface->FunctionLibrary.c_str());
-	
-		fLibLoaded = true;
+		// Find our split content value locations here.
+		pos = config_file_content.find("|", prev);
+		if (pos == std::string::npos) pos = config_file_content.length();
+		std::string token = config_file_content.substr(prev, pos - prev);
+		if (!token.empty()) tokens.push_back(token); prev = pos + 1;
+	} while (pos < config_file_content.length() && prev < config_file_content.length());
+
+	// Now using our built values, we can setup some settings
+	if (tokens[1] == "False") {
+		CString function_lib(tokens[2].c_str());
+		return fulcrum_loadLibrary(function_lib);
 	}
-#endif
 	else
 	{
-		// Multiple interfaces? Popup a selection box!
-		INT_PTR retval;
-		CSelectionBox Dlg(interfaceList);
-
-		retval = Dlg.DoModal();
-		if (retval == IDCANCEL) { return false; }
-		cPassThruInfo * tmp = Dlg.GetSelectedPassThru();
-
-		bool fSuccess;
-		fSuccess = fulcrum_loadLibrary(tmp->FunctionLibrary.c_str());
-		if (fSuccess) fLibLoaded = true;
-		else 
-		{
-			fulcrum_setInternalError(_T("Failed to open '%s'"), tmp->FunctionLibrary.c_str());
-			fulcrum_printretval(ERR_FAILED);
+		// Check the registry for J2534 interfaces
+		std::set<cPassThruInfo> interfaceList;
+		EnumPassThruInterfaces(interfaceList);
+		if (interfaceList.size() == 0) {
+			// No interfaces listed in the registry? Failure!
 			return false;
 		}
+		else
+		{
+			// Multiple interfaces? Popup a selection box!
+			INT_PTR retval;
+			CSelectionBox Dlg(interfaceList);
 
-		// The user specified a debug output file in the dialog. Write any buffered text to this file
-		// and start using it from now on
-		fulcrum_output::writeNewLogFile(Dlg.GetDebugFilename(), true);
-		return true;
+			retval = Dlg.DoModal();
+			if (retval == IDCANCEL) { return false; }
+			cPassThruInfo* tmp = Dlg.GetSelectedPassThru();
+
+			bool fSuccess;
+			fSuccess = fulcrum_loadLibrary(tmp->FunctionLibrary.c_str());
+			if (fSuccess) fLibLoaded = true;
+			else
+			{
+				fulcrum_setInternalError(_T("Failed to open '%s'"), tmp->FunctionLibrary.c_str());
+				fulcrum_printretval(ERR_FAILED);
+				return false;
+			}
+
+			// The user specified a debug output file in the dialog. Write any buffered text to this file
+			// and start using it from now on
+			fulcrum_output::writeNewLogFile(Dlg.GetDebugFilename(), true);
+			return true;
+		}
 	}
 }
 

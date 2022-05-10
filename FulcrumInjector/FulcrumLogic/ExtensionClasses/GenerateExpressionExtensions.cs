@@ -229,11 +229,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Add this string to our list of messages.
                 OutputMessages.Add(RegexValuesOutputString + "\n");
                 FilterProperties.Add(OutputMessageTuple.Select(TupleObj => TupleObj.Item2).ToArray());
-                ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.InfoLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.InfoLog);
             }
 
             // Return built table string object.
-            ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE FILTER CONTENTS OK!", LogType.InfoLog);
+            // ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE FILTER CONTENTS OK!", LogType.InfoLog);
             return string.Join("\n", OutputMessages);
         }
         /// <summary>

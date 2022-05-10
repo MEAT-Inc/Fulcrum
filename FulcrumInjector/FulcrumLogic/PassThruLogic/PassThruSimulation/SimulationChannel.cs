@@ -46,40 +46,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object
         /// </summary>
-        /// <param name="ExpressionToStore">Expressions to extract and store</param>
-        /// <returns>The Filters built</returns>
-        public J2534Filter StoreMessageFilter(PassThruStartMessageFilterExpression ExpressionToStore)
-        {
-            // Store the Pattern, Mask, and Flow Ctl objects if they exist.
-            ExpressionToStore.FindFilterContents(out List<string[]> FilterContent);
-            if (FilterContent.Count == 0) {
-                ExpressionToStore.ExpressionLogger.WriteLog("FILTER CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
-                ExpressionToStore.ExpressionLogger.WriteLog($"FILTER COMMAND LINES ARE SHOWN BELOW:\n{ExpressionToStore.CommandLines}", LogType.TraceLog);
-                return new J2534Filter();
-            }
-
-            // Build filter output contents
-            var FilterType = ExpressionToStore.FilterType;
-            var FilterPatten = FilterContent[0].Last();
-            var FilterMask = FilterContent[1].Last();
-            var FilterFlow = FilterContent.Count == 3 ? FilterContent[2].Last() : "";
-
-            // Now convert our information into string values.
-            return new J2534Filter()
-            {
-                // Build a new filter object form the given values and return it.
-                FilterType = FilterType,
-                FilterMask = FilterPatten,
-                FilterPattern = FilterMask,
-                FilterFlowCtl = FilterFlow,
-
-                // TODO FIX FILTER FLAGS BY USING CONTENTS OF THE LISTS
-                FilterFlags = 0x00
-            };
-        }
-        /// <summary>
-        /// Stores a set of Expressions into messages on the given channel object
-        /// </summary>
         /// <param name="ExpressionsToStore">Expressions to extract and store</param>
         /// <returns>The Filters built</returns>
         public J2534Filter[] StoreMessageFilters(PassThruStartMessageFilterExpression[] ExpressionsToStore)
@@ -87,16 +53,131 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(this.StoreMessageFilter(FilterExpression)));
+            Parallel.ForEach(ExpressionsToStore, (FilterExpression) =>
+            {
+                // Store the Pattern, Mask, and Flow Ctl objects if they exist.
+                FilterExpression.FindFilterContents(out List<string[]> FilterContent);
+                if (FilterContent.Count == 0) {
+                    FilterExpression.ExpressionLogger.WriteLog("FILTER CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
+                    FilterExpression.ExpressionLogger.WriteLog($"FILTER COMMAND LINES ARE SHOWN BELOW:\n{FilterExpression.CommandLines}", LogType.TraceLog);
+                    return;
+                }
 
-            // Reorder the list and return it out
-            BuiltFilters = BuiltFilters
-                .OrderBy(FilterObj => FilterObj.FilterId)
-                .ToList();
+                // Build filter output contents
+                var FilterType = FilterExpression.FilterType;
+                var FilterFlags = uint.Parse(FilterContent[0][4]);
+                var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
+                var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
+                var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
+
+                // Now convert our information into string values.
+                BuiltFilters.Add(new J2534Filter()
+                {
+                    // Build a new filter object form the given values and return it.
+                    FilterType = FilterType,
+                    FilterMask = FilterPatten,
+                    FilterPattern = FilterMask,
+                    FilterFlowCtl = FilterFlow,
+                    FilterFlags = FilterFlags,
+                });
+            });
 
             // Return the built filter objects here.
             this.MessageFilters = BuiltFilters.ToArray();
             return this.MessageFilters;
+        }
+
+        /// <summary>
+        /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
+        /// </summary>
+        /// <returns>List of messages stored</returns>
+        public PassThruStructs.PassThruMsg[] StoreMessagesWritten(PassThruWriteMessagesExpression[] ExpressionsToStore)
+        {
+            // Loop each of these filter objects in parallel and update contents.
+            this.SimChannelLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
+            List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
+            Parallel.ForEach(ExpressionsToStore, (MessageExpression) =>
+            {
+                // Store the Message Data and the values of the message params.
+                MessageExpression.FindMessageContents(out List<string[]> MessageContents);
+                if (MessageContents.Count == 0) {
+                    MessageExpression.ExpressionLogger.WriteLog("MESSAGE CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
+                    MessageExpression.ExpressionLogger.WriteLog($"MESSAGE COMMAND LINES ARE SHOWN BELOW:\n{MessageExpression.CommandLines}", LogType.TraceLog);
+                    return;
+                }
+
+                // Loop all the message values located and append them into the list of output
+                foreach (var MessageSet in MessageContents)
+                {
+                    // Store message values here.
+                    var MessageData = MessageSet.Last();
+                    var MessageFlags = uint.Parse(MessageSet[3]);
+                    var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[4].Split(':')[0]);
+
+                    // Build a message and then return it.
+                    MessageData = MessageData.Replace("0x", string.Empty);
+                    var MsgFromBytes = J2534Device.CreatePTMsgFromString(ProtocolId, MessageFlags, MessageData);
+                    BuiltMessages.Add(MsgFromBytes);
+                }
+            });
+
+            // Return the built filter objects here.
+            this.MessagesSent = BuiltMessages.ToArray();
+            return this.MessagesSent;
+        }
+
+        /// <summary>
+        /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
+        /// </summary>
+        /// <returns>List of messages stored</returns>
+        public PassThruStructs.PassThruMsg[] StoreMessagesRead(PassThruReadMessagesExpression[] ExpressionsToStore)
+        {
+            // Loop each of these filter objects in parallel and update contents.
+            this.SimChannelLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
+            List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
+            Parallel.ForEach(ExpressionsToStore, (MessageExpression) =>
+            {
+                // Store the Message Data and the values of the message params.
+                MessageExpression.FindMessageContents(out List<string[]> MessageContents);
+                if (MessageContents.Count == 0) {
+                    MessageExpression.ExpressionLogger.WriteLog("MESSAGE CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
+                    MessageExpression.ExpressionLogger.WriteLog($"MESSAGE COMMAND LINES ARE SHOWN BELOW:\n{MessageExpression.CommandLines}", LogType.TraceLog);
+                    return;
+                }
+
+                // Loop all the message values located and append them into the list of output
+                foreach (var MessageSet in MessageContents)
+                {
+                    // Store message values here.
+                    var MessageData = MessageSet.Last();
+                    if (MessageData.Contains("[") || MessageData.Contains("]"))
+                    {
+                        // Format for framepad output
+                        MessageData = MessageData.Replace("0x", string.Empty);
+                        string[] SplitData = MessageData
+                            .Split(']')
+                            .Select(SplitPart => SplitPart.Replace("[", string.Empty))
+                            .Where(SplitPart => SplitPart.Length != 0)
+                            .ToArray();
+
+                        // Now restore message values
+                        MessageData = string.Join(" ", SplitData);
+                    }
+
+                    // If it's not a frame pad message, add to our simulation
+                    var MessageFlags = uint.Parse(MessageSet[4]);
+                    var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[2].Split(':')[0]);
+
+                    // Build a message and then return it.
+                    MessageData = MessageData.Replace("0x", string.Empty);
+                    var MsgFromBytes = J2534Device.CreatePTMsgFromString(ProtocolId, MessageFlags, MessageData);
+                    BuiltMessages.Add(MsgFromBytes);
+                }
+            });
+
+            // Return the built filter objects here.
+            this.MessagesRead = BuiltMessages.ToArray();
+            return this.MessagesRead;
         }
     }
 }
