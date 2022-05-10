@@ -75,8 +75,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 {
                     // Build a new filter object form the given values and return it.
                     FilterType = FilterType,
-                    FilterMask = FilterPatten,
-                    FilterPattern = FilterMask,
+                    FilterMask = FilterMask,
+                    FilterPattern = FilterPatten,
                     FilterFlowCtl = FilterFlow,
                     FilterFlags = FilterFlags,
                 });
