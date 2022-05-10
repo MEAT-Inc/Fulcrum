@@ -273,6 +273,9 @@ double GetTimeSinceInit()
 
 bool fulcrum_checkAndAutoload(void)
 {
+	// Boot pipes if the need to be started up.
+	CFulcrumShim::StartupPipes();
+
 	// We're OK if a library is loaded
 	if (fLibLoaded)
 		return true;
