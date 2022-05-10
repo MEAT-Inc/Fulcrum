@@ -290,21 +290,27 @@ bool fulcrum_checkAndAutoload(void)
 
 	// Read in file contents here.
 	std::ifstream config_file_stream(dll_config_path);
-	std::string config_file_content((std::istreambuf_iterator<char>(config_file_stream)), std::istreambuf_iterator<char>());
+	std::string config_file_content(
+		(std::istreambuf_iterator<char>(config_file_stream)),
+		std::istreambuf_iterator<char>()
+	);
 
 	// Split contents out into line values. Store settings as needed.
-	vector<string> tokens; size_t prev = 0, pos = 0;
+	std::vector<std::string> tokens; size_t prev = 0, pos = 0;
 	do
 	{
 		// Find our split content value locations here.
 		pos = config_file_content.find("|", prev);
-		if (pos == string::npos) pos = config_file_content.length();
-		string token = config_file_content.substr(prev, pos - prev);
+		if (pos == std::string::npos) pos = config_file_content.length();
+		std::string token = config_file_content.substr(prev, pos - prev);
 		if (!token.empty()) tokens.push_back(token); prev = pos + 1;
 	} while (pos < config_file_content.length() && prev < config_file_content.length());
 
 	// Now using our built values, we can setup some settings
-	if (tokens[1] == "False") return fulcrum_loadLibrary((LPCTSTR)tokens[2].c_str());
+	if (tokens[1] == "False") {
+		CString function_lib(tokens[2].c_str());
+		return fulcrum_loadLibrary(function_lib);
+	}
 	else
 	{
 		// Check the registry for J2534 interfaces

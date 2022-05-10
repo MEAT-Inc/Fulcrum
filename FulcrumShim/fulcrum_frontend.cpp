@@ -140,10 +140,10 @@ extern "C" long J2534_API PassThruUnloadLibrary()
 	fulcrum_unloadLibrary();
 
 	// Unload pipe outputs
-	fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
-	CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
-	CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
-	fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
+	// fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
+	// CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
+	// CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
+	// fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
 
 	// Print output result from call
 	fulcrum_printretval(STATUS_NOERROR);
@@ -286,10 +286,10 @@ extern "C" long J2534_API PassThruClose(unsigned long DeviceID)
 	fulcrum_printretval(retval);
 
 	// Unload pipe outputs
-	fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
-	CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
-	fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
-	CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
+	// fulcrum_output::fulcrumDebug(_T("-->       Calling pipe shutdown methods now...\n"));
+	// CFulcrumShim::fulcrumPiper->ShutdownInputPipe();
+	// fulcrum_output::fulcrumDebug(_T("-->       Pipe instances have been released OK!\n"));
+	// CFulcrumShim::fulcrumPiper->ShutdownOutputPipe();
 
 	// Get output value and return it here
 	return retval;
