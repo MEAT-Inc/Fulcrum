@@ -76,6 +76,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                 // Check for a null device name or no device name provided.
                 PropertyUpdated(value);
+                this.VehicleVin = "No VIN Number";
                 if (string.IsNullOrWhiteSpace(value) || value == "No Device Selected")
                 {
                     // Set view content values
@@ -214,7 +215,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             else
             {
                 // Log information, store new values.
-                this.VehicleVin = NewVin;
+                this.VehicleVin = NewVin; this.VehicleVin = NewVin;
                 ViewModelLogger.WriteLog($"VOLTAGE VALUE PULLED OK! READ IN NEW VALUE {this.DeviceVoltage:F2}!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {this.VehicleVin} WITH PROTOCOL ID: {ProcPulled}!", LogType.InfoLog);
             }
@@ -266,7 +267,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                             if (this.ReadVehicleVin(out var VinFound, out ProtocolId ProtocolUsed))
                             {
                                 // Log information, store these values.
-                                this.VehicleVin = VinFound; VinReadRun = true;
+                                this.VehicleVin = VinFound; this.VehicleVin = VinFound; VinReadRun = true;
                                 ViewModelLogger.WriteLog("PULLED NEW VIN NUMBER VALUE OK!", LogType.InfoLog);
                                 ViewModelLogger.WriteLog($"VIN PULLED: {VinFound}", LogType.InfoLog);
                                 ViewModelLogger.WriteLog($"PROTOCOL USED TO PULL VIN: {ProtocolUsed}", LogType.InfoLog);
@@ -294,7 +295,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                     // Check for voltage lost instead of connected.
                     if (this.VehicleVin.Contains("Voltage")) continue;
-                    this.VehicleVin = "No Vehicle Voltage!";
+                    if (this.SelectedDevice != "No Device Selected") this.VehicleVin = "No Vehicle Voltage!";
                     ViewModelLogger.WriteLog("LOST OBD 12V INPUT! CLEARING OUT STORED VALUES NOW...", LogType.InfoLog);
                     ViewModelLogger.WriteLog("CLEARED OUT LAST KNOWN VALUES FOR LOCATED VEHICLE VIN OK!", LogType.InfoLog);
                 };
@@ -335,6 +336,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         {
             try
             {
+                // If there is no device, don't read
+                if (this.SelectedDevice == "No Device Selected") return 0.00;
+
                 // Now with our new channel ID, we open an instance and pull the channel voltage.
                 this.InstanceSession.PTOpen();
                 if (!this.InstanceSession.JDeviceInstance.IsOpen) return 0.00;
@@ -379,13 +383,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {VinString}", LogType.WarnLog);
 
                 // Store values and exit out.
-                ProtocolUsed = ProcObject; this.AutoIdRunning = false;
+                ProtocolUsed = ProcObject;
+                this.AutoIdRunning = false; this.AutoIdRunning = false;
                 AutoIdInstance.CloseAutoIdSession();
                 return true;
             }
 
             // If we got here, no vin was found on the network
-            this.AutoIdRunning = false; VinString = null; ProtocolUsed = default;
+            this.AutoIdRunning = false; VinString = null; ProtocolUsed = default; this.AutoIdRunning = false;
             ViewModelLogger.WriteLog($"FAILED TO FIND A VIN NUMBER AFTER SCANNING ALL POSSIBLE PROTOCOLS!", LogType.ErrorLog);
             return false;
         }
