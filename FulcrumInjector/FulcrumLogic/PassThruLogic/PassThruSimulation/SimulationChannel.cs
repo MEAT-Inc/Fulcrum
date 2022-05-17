@@ -55,35 +55,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            Parallel.ForEach(ExpressionsToStore, (FilterExpression) =>
-            {
-                // Store the Pattern, Mask, and Flow Ctl objects if they exist.
-                FilterExpression.FindFilterContents(out List<string[]> FilterContent);
-                if (FilterContent.Count == 0) {
-                    FilterExpression.ExpressionLogger.WriteLog("FILTER CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
-                    FilterExpression.ExpressionLogger.WriteLog($"FILTER COMMAND LINES ARE SHOWN BELOW:\n{FilterExpression.CommandLines}", LogType.TraceLog);
-                    return;
-                }
-
-                // Build filter output contents
-                var FilterType = FilterExpression.FilterType;
-                var FilterFlags = uint.Parse(FilterContent[0][4]);
-                var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
-                var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
-                var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
-
-                // Now convert our information into string values.
-                BuiltFilters.Add(new J2534Filter()
-                {
-                    // Build a new filter object form the given values and return it.
-                    FilterType = FilterType,
-                    FilterMask = FilterMask,
-                    FilterPattern = FilterPatten,
-                    FilterFlowCtl = FilterFlow,
-                    FilterFlags = FilterFlags,
-                });
-            });
-
+            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ConvertFilterExpression(FilterExpression)));
+            
             // Return the built filter objects here.
             this.MessageFilters = BuiltFilters.ToArray();
             return BuiltFilters.ToArray();
@@ -199,6 +172,39 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Converts a J2534 Filter epxression into a filter object
+        /// </summary>
+        /// <param name="FilterExpression"></param>
+        /// <returns></returns>
+        public static J2534Filter ConvertFilterExpression(PassThruStartMessageFilterExpression FilterExpression)
+        {
+            // Store the Pattern, Mask, and Flow Ctl objects if they exist.
+            FilterExpression.FindFilterContents(out List<string[]> FilterContent);
+            if (FilterContent.Count == 0) {
+                FilterExpression.ExpressionLogger.WriteLog("FILTER CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
+                FilterExpression.ExpressionLogger.WriteLog($"FILTER COMMAND LINES ARE SHOWN BELOW:\n{FilterExpression.CommandLines}", LogType.TraceLog);
+                return null;
+            }
+
+            // Build filter output contents
+            var FilterType = FilterExpression.FilterType;
+            var FilterFlags = uint.Parse(FilterContent[0][4]);
+            var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
+            var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
+            var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
+
+            // Now convert our information into string values.
+            return new J2534Filter()
+            {
+                // Build a new filter object form the given values and return it.
+                FilterType = FilterType,
+                FilterMask = FilterMask,
+                FilterPattern = FilterPatten,
+                FilterFlowCtl = FilterFlow,
+                FilterFlags = FilterFlags,
+            };
+        }
         /// <summary>
         /// Converts a PTWrite Message Expression into a PTMessage
         /// </summary>
