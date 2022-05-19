@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             var GroupedAsLists = this.InputExpressions.GroupByChannelIds();
             Parallel.ForEach(GroupedAsLists, (GroupList) => {
                 BuiltExpressions.Add(new Tuple<int, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
-                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROPUING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
+                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
             });
 
             // Log done grouping, return the built ID values here.
