@@ -43,11 +43,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             return new J2534Filter()
             {
                 // Build a new filter object form the given values and return it.
-                FilterType = FilterType,
                 FilterMask = FilterMask,
                 FilterPattern = Inverted ? FilterFlow : FilterPatten,
                 FilterFlowCtl = Inverted ? FilterPatten : FilterFlow,
                 FilterFlags = FilterFlags,
+                FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType)
             };
         }
         /// <summary>
