@@ -21,6 +21,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
     {
         // Channel ID Built and Logger
         public readonly uint ChannelId;
+        public readonly uint ChannelBaudRate;
+        public readonly uint ChannelConnectFlags;
         public readonly ProtocolId ChannelProtocol;
         private readonly SubServiceLogger SimChannelLogger;
 
@@ -34,11 +36,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Builds a new Channel Simulation object from the given channel ID
         /// </summary>
         /// <param name="ChannelId"></param>
-        public SimulationChannel(int ChannelId, ProtocolId ProtocolInUse)
+        public SimulationChannel(int ChannelId, ProtocolId ProtocolInUse, uint ChannelBaud, uint ChannelFlags)
         {
             // Store the Channel ID
             this.ChannelId = (uint)ChannelId;
             this.ChannelProtocol = ProtocolInUse;
+            this.ChannelBaudRate = ChannelBaud;
+            this.ChannelConnectFlags = ChannelFlags;
+
+            // Log new information output
             this.SimChannelLogger = new SubServiceLogger($"SimChannelLogger_ID-{this.ChannelId}");
             this.SimChannelLogger.WriteLog($"BUILT NEW SIM CHANNEL OBJECT FOR CHANNEL ID {this.ChannelId}!", LogType.InfoLog);
         }
@@ -55,7 +61,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Loop each of these filter objects in parallel and update contents.
             this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJObject.ConvertFilterExpression(FilterExpression)));
+            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJObject.ConvertFilterExpression(FilterExpression, true)));
             
             // Return the built filter objects here.
             this.MessageFilters = BuiltFilters.ToArray();

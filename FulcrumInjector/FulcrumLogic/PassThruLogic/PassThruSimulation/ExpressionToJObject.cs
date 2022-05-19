@@ -21,7 +21,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// </summary>
         /// <param name="FilterExpression"></param>
         /// <returns></returns>
-        public static J2534Filter ConvertFilterExpression(PassThruStartMessageFilterExpression FilterExpression)
+        public static J2534Filter ConvertFilterExpression(PassThruStartMessageFilterExpression FilterExpression, bool Inverted = false)
         {
             // Store the Pattern, Mask, and Flow Ctl objects if they exist.
             FilterExpression.FindFilterContents(out List<string[]> FilterContent);
@@ -45,8 +45,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 // Build a new filter object form the given values and return it.
                 FilterType = FilterType,
                 FilterMask = FilterMask,
-                FilterPattern = FilterPatten,
-                FilterFlowCtl = FilterFlow,
+                FilterPattern = Inverted ? FilterFlow : FilterPatten,
+                FilterFlowCtl = Inverted ? FilterPatten : FilterFlow,
                 FilterFlags = FilterFlags,
             };
         }

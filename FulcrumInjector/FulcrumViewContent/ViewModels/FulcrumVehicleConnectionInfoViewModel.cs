@@ -366,31 +366,40 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.AutoIdRunning = true;
             foreach (var ProcObject in SharpAutoIdConfig.SupportedProtocols)
             {
-                // Build a new AutoID Session here
-                var AutoIdInstance = InstanceSession.SpawnAutoIdHelper(ProcObject);
-                ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {ProcObject} OK!", LogType.InfoLog);
-                ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
+                try
+                {
+                    // Build a new AutoID Session here
+                    var AutoIdInstance = InstanceSession.SpawnAutoIdHelper(ProcObject);
+                    ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {ProcObject} OK!", LogType.InfoLog);
+                    ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
 
-                // Open channel, read VIN, and close out
-                AutoIdInstance.ConnectChannel(out _);
-                if (!AutoIdInstance.RetrieveVinNumber(out VinString)) {
-                    ViewModelLogger.WriteLog($"NO VIN NUMBER PULLED FOR PROTOCOL VALUE {ProcObject}!", LogType.WarnLog);
-                    continue;
+                    // Open channel, read VIN, and close out
+                    AutoIdInstance.ConnectChannel(out _);
+                    if (!AutoIdInstance.RetrieveVinNumber(out VinString)) {
+                        ViewModelLogger.WriteLog($"NO VIN NUMBER PULLED FOR PROTOCOL VALUE {ProcObject}!", LogType.WarnLog);
+                        continue;
+                    }
+
+                    // Check our Vin Value
+                    ViewModelLogger.WriteLog("PULLED A VIN NUMBER VALUE OK!");
+                    ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {VinString}", LogType.WarnLog);
+
+                    // Store values and exit out.
+                    ProtocolUsed = ProcObject;
+                    AutoIdInstance.CloseAutoIdSession();
+                    this.AutoIdRunning = false;
+                    return true;
                 }
-
-                // Check our Vin Value
-                ViewModelLogger.WriteLog("PULLED A VIN NUMBER VALUE OK!");
-                ViewModelLogger.WriteLog($"PULLED VIN NUMBER: {VinString}", LogType.WarnLog);
-
-                // Store values and exit out.
-                ProtocolUsed = ProcObject;
-                this.AutoIdRunning = false; this.AutoIdRunning = false;
-                AutoIdInstance.CloseAutoIdSession();
-                return true;
+                catch (Exception VinEx)
+                {
+                    // Log Failure thrown during routine and move on
+                    ViewModelLogger.WriteLog("EXCEPTION THROWN DURING VIN ROUTINE! MOVING ONTO THE NEXT PROTOCOL!", LogType.ErrorLog);
+                    ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", VinEx);
+                }
             }
 
             // If we got here, no vin was found on the network
-            this.AutoIdRunning = false; VinString = null; ProtocolUsed = default; this.AutoIdRunning = false;
+            VinString = null; ProtocolUsed = default; this.AutoIdRunning = false;
             ViewModelLogger.WriteLog($"FAILED TO FIND A VIN NUMBER AFTER SCANNING ALL POSSIBLE PROTOCOLS!", LogType.ErrorLog);
             return false;
         }
