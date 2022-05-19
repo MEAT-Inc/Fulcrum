@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             var GroupedAsLists = this.InputExpressions.GroupByChannelIds();
             Parallel.ForEach(GroupedAsLists, (GroupList) => {
                 BuiltExpressions.Add(new Tuple<int, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
-                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROPUING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
+                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
             });
 
             // Log done grouping, return the built ID values here.
@@ -91,15 +91,17 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             {
                 // Pull the Channel ID, build our output contents
                 int ChannelId = ChannelObjectExpressions.Item1;
-                var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId).Item2;
+                var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId);
 
                 // Append it into our list of output here
-                BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel));
+                if (BuiltChannel == null) return;
+                BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel.Item2));
                 this.SimLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
-            });
+            }); 
 
             // Log information and exit out of this routine
             this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
+            BuiltChannelsList = BuiltChannelsList.Where(TupleOBj => TupleOBj != null).ToList();
             this.BuiltSimulationChannels = BuiltChannelsList.Select(ChannelSet => ChannelSet.Item2).ToArray();
             return BuiltChannelsList.ToArray();
         }

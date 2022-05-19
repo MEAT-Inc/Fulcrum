@@ -87,23 +87,33 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 .Cast<PassThruWriteMessagesExpression>()
                 .ToArray();
 
+            // Find the ProtocolID and Current Channel ID. Then build a sim channel
+            if (PTConnectCommands.Length == 0) return null;
+            var ConnectCommand = PTConnectCommands.FirstOrDefault();
+            var BaudRateInUse = uint.Parse(ConnectCommand.BaudRate);
+            var ChannelFlags = uint.Parse(ConnectCommand.ConnectFlags);
+            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
+
+
+            // Build simulation channel here and return it out
+            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, BaudRateInUse, ChannelFlags);
+            NextChannel.StoreMessagesRead(PTReadCommands);
+            NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesWritten(PTWriteCommands);
+            NextChannel.StorePassThruPairs(GroupedExpression);
+
             // Log information about the built out command objects.
             SimExtensionLogger.WriteLog(
-                $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS:" +
+                $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS (CHANNEL ID {ChannelId}):" +
                 $"\n--> {PTConnectCommands.Length} PT CONNECTS" +
                 $"\n--> {PTFilterCommands.Length} FILTERS" +
                 $"\n--> {PTReadCommands.Length} READ COMMANDS" +
-                $"\n--> {PTWriteCommands} WRITE COMMANDS", 
-            LogType.InfoLog
+                $"\n--> {PTWriteCommands.Length} WRITE COMMANDS" + 
+                $"\n--> {NextChannel.PairedMessageArray.Length}",
+                LogType.InfoLog
             );
 
-            // Find the ProtocolID and Current Channel ID. Then build a sim channel
-            var ConnectCommand = PTConnectCommands.FirstOrDefault();
-            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
-
-            // Build simulation channel here and return it out
-            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse);
-            NextChannel.StoreMessageFilters(PTFilterCommands); 
+            // Return a new tuple of our object for the command output
             return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }

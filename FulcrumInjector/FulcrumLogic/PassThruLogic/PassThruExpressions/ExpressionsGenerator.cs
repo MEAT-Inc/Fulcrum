@@ -114,8 +114,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                     if (!UpdateParseProgress) return NextClassObject;
 
                     // Update progress, return built object
-                    FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress =
-                        ((int)(LogFileContentsSplit.ToList().IndexOf(LineSet) + 1 / (double)LogFileContentsSplit.Length)) * 2;
+                    int IndexOfLine = LogFileContents.LastIndexOf(LineSet);
+                    double CurrentProgress = (IndexOfLine / (double)LogFileContents.Length) * 100.00;
+                    FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
                     return NextClassObject;
                 }
                 catch (Exception ParseEx)

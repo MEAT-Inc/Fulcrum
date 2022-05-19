@@ -37,6 +37,8 @@
                                 <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
                                 <File Id="SHARPWRAP2534.DLL" Name="SharpWrap2534.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrap2534.dll" />
+                                <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
+								<File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
                                 <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
                                 <File Id="SYSTEM.BUFFERS.DLL" Name="System.Buffers.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.dll" />
                                 <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
@@ -54,7 +56,6 @@
                                 <File Id="SYSTEM.MEMORY.XML" Name="System.Memory.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.xml" />
                                 <File Id="SYSTEM.NUMERICS.VECTORS.XML" Name="System.Numerics.Vectors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.xml" />
                                 <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.XML" Name="System.Runtime.CompilerServices.Unsafe.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.xml" />
-								<File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
                                 <!-- Injector EXE and Shortcuts -->
                                 <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
                                     <!-- Start Menu Shortcut -->
@@ -96,6 +97,7 @@
                                     <File Id="SHIMICONPROJECT.ICO" Name="ShimIconProject.ico" Source="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
                                     <File Id="SHIMICONPROJECT.XCF" Name="ShimIconProject.xcf" Source="..\FulcrumInjector\FulcrumResources\ShimIconProject.xcf" />
                                     <File Id="UNICORNSOFTWARELIST.TXT" Name="UnicornSoftwareList.txt" Source="..\FulcrumInjector\FulcrumResources\UnicornSoftwareList.txt" />
+                                    <File Id="FULCRUMSHIMDLLCONFIG.TXT" Name="FulcrumShimDLLConfig.txt" Source="..\FulcrumInjector\FulcrumResources\FulcrumShimDLLConfig.txt" />
                                     <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
                                 </Component>
                             </Directory>

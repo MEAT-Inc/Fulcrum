@@ -245,34 +245,40 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <param name="DefaultValues"></param>
         private void ProcessingActionFinished(bool ProcessResult, object SendingButton, object[] DefaultValues)
         {
-            // Get Button Contents
-            Button SenderButton = (Button)SendingButton;
-            var DefaultColor = DefaultValues[1];
-            var DefaultContent = DefaultValues[0];
-
-            // Get Grid object
-            Grid ParentGrid = SenderButton.Parent as Grid;
-            ViewerContentComboBox.IsEnabled = false; ParentGrid.IsEnabled = false;
-
-            // Close the processing flyout
-            this.ProcessingFlyout.IsOpen = false;
-
-            // Enable grid, show result on buttons
-            ParentGrid.IsEnabled = true;
-            ViewerContentComboBox.IsEnabled = true;
-            SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
-            SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
-
-            // Enable grid, remove click command.
-            Task.Run(() =>
+            // Dispatcher invoked for content
+            this.Dispatcher.Invoke(() =>
             {
-                // Wait for 3.5 Seconds
-                Thread.Sleep(3500);
-                Dispatcher.Invoke(() =>
+                // Get Button Contents
+                Button SenderButton = (Button)SendingButton;
+                var DefaultColor = DefaultValues[1];
+                var DefaultContent = DefaultValues[0];
+
+                // Get Grid object
+                Grid ParentGrid = SenderButton.Parent as Grid; 
+                ViewerContentComboBox.IsEnabled = false; ParentGrid.IsEnabled = false;
+
+                // Close the processing flyout
+                this.ProcessingFlyout.IsOpen = false;
+
+                // Enable grid, show result on buttons
+                ParentGrid.IsEnabled = true;
+                ViewerContentComboBox.IsEnabled = true;
+                SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
+                SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
+
+                // Reset values here.
+                Task.Run(() =>
                 {
+                    // Wait for 3.5 Seconds
+                    Thread.Sleep(3500);
+                    Dispatcher.Invoke(() =>
+                    {
                         // Reset values and log information
                         SenderButton.Content = DefaultContent;
-                    SenderButton.Background = (Brush)DefaultColor;
+                        SenderButton.Background = (Brush)DefaultColor;
+                    });
+
+                    // Log information about being done
                     this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                 });
             });

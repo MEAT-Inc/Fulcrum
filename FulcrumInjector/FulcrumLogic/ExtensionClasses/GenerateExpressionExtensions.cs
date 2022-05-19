@@ -38,7 +38,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 PassThruRegexModelShare.MessageReadInfo : PassThruRegexModelShare.MessageSentInfo;
 
             // Make our value lookup table here and output tuples
-            var RegexResultTuples = new List<Tuple<string, string>>();
             bool IsReadExpression = ExpressionObject.GetType() == typeof(PassThruReadMessagesExpression);
             List<string> ResultStringTable = new List<string>() { "Message Number" };
 
@@ -65,6 +64,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             foreach (var MsgLineSet in SplitMessageLines)
             {
                 // RegexMatch output here.
+                var RegexResultTuples = new List<Tuple<string, string>>();
                 bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
                 if (!MatchedContent) {
                     ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
@@ -86,7 +86,21 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Try and replace the double spaced comms in the CarDAQ Log into single spaces
                 int LastStringIndex = SelectedStrings.Length - 1;
                 SelectedStrings[SelectedStrings.Length - 1] = SelectedStrings[SelectedStrings.Length - 1]
-                    .Replace("  ", " ");
+                    .Replace('\r', ' ')
+                    .Replace('\n', ' ')
+                    .Replace(" ", string.Empty);
+
+                // Fix for when message contents span more than one line.
+                SelectedStrings[SelectedStrings.Length - 1] =
+                    string.Join(" ", Enumerable.Range(0, SelectedStrings[SelectedStrings.Length - 1].Length / 2)
+                        .Select(strIndex => SelectedStrings[SelectedStrings.Length - 1].Substring(strIndex * 2, 2)));
+
+                // Fix for framepad
+                if (SelectedStrings[SelectedStrings.Length - 1].Contains("["))
+                    SelectedStrings[SelectedStrings.Length - 1] = SelectedStrings[SelectedStrings.Length - 1].Replace(" ", "");
+                
+                // Force upper case on the data string values.
+                SelectedStrings[SelectedStrings.Length - 1] = SelectedStrings[SelectedStrings.Length - 1].ToUpper();
 
                 // Format our message data content to include a 0x before the data byte and caps lock message bytes.
                 string MessageData = SelectedStrings[LastStringIndex];
@@ -229,11 +243,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Add this string to our list of messages.
                 OutputMessages.Add(RegexValuesOutputString + "\n");
                 FilterProperties.Add(OutputMessageTuple.Select(TupleObj => TupleObj.Item2).ToArray());
-                ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.InfoLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.InfoLog);
             }
 
             // Return built table string object.
-            ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE FILTER CONTENTS OK!", LogType.InfoLog);
+            // ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE FILTER CONTENTS OK!", LogType.InfoLog);
             return string.Join("\n", OutputMessages);
         }
         /// <summary>
