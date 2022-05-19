@@ -40,14 +40,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
 
             // Now convert our information into string values.
+            // TODO: INCLUDE PROTOCOL VALUE FOR FILTER IN HERE!
             return new J2534Filter()
             {
                 // Build a new filter object form the given values and return it.
-                FilterType = FilterType,
                 FilterMask = FilterMask,
                 FilterPattern = Inverted ? FilterFlow : FilterPatten,
                 FilterFlowCtl = Inverted ? FilterPatten : FilterFlow,
                 FilterFlags = FilterFlags,
+                FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType)
             };
         }
         /// <summary>
