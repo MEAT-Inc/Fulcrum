@@ -4,9 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews"
+             xmlns:injectorCoreViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="FulcrumSimulationPlaybackView_OnLoaded">
+
+    <!-- DataContext Binding -->
+    <UserControl.DataContext>
+        <injectorCoreViewModels:FulcrumSimulationPlaybackViewModel/>
+    </UserControl.DataContext>
+
+    <!-- Style Sheets -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumSimulationPlaybackStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Main Content Grid -->
     <Grid>
-            
+
     </Grid>
 </UserControl>
