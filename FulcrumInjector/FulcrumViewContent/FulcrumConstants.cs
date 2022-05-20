@@ -120,6 +120,8 @@ namespace FulcrumInjector.FulcrumViewContent
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumLogReviewSingleton =>
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
+        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSimulationSingleton =>
+            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
 
 
         // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
@@ -143,6 +145,10 @@ namespace FulcrumInjector.FulcrumViewContent
         // Log Reviewing user control and view model object
         public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)FulcrumLogReviewSingleton?.SingletonUserControl;
         public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => (FulcrumLogReviewViewModel)FulcrumLogReviewSingleton?.SingletonViewModel;
+
+        // Simulation Playback user control and view model object
+        public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)FulcrumSimulationSingleton?.SingletonUserControl;
+        public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)FulcrumSimulationSingleton?.SingletonViewModel;
 
         // User settings and configuration user control and view model object
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)FulcrumSettingsPaneSingleton?.SingletonUserControl;

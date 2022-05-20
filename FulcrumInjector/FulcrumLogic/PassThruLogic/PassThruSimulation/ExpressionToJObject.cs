@@ -35,6 +35,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             // Build filter output contents
             var FilterType = FilterExpression.FilterType;
             var FilterFlags = uint.Parse(FilterContent[0][4]);
+            var FilterProtocol = (ProtocolId)uint.Parse(FilterContent[0][2].Split(':')[0]);
             var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
             var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
             var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
@@ -44,9 +45,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             {
                 // Build a new filter object form the given values and return it.
                 FilterMask = FilterMask,
+                FilterFlags = FilterFlags,
+                FilterProtocol = FilterProtocol,
                 FilterPattern = Inverted ? FilterFlow : FilterPatten,
                 FilterFlowCtl = Inverted ? FilterPatten : FilterFlow,
-                FilterFlags = FilterFlags,
                 FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType)
             };
         }

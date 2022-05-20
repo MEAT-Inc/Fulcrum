@@ -113,19 +113,19 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.3.2.10\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.4.1.33\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="SharpAutoId, Version=0.2.10.11, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpAutoId.0.2.10.12\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.7.4.122, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.3.2.10\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.4.1.33\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.3.2.12, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.3.2.10\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.4.1.33, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.4.1.33\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=5.0.1.307, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpSimulator.0.3.2.10\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=5.0.1.308, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpSimulator.0.4.1.33\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.0\lib\net461\Svg.dll</HintPath>
@@ -198,6 +198,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumSimulationPlaybackViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml.cs">
       <DependentUpon>FulcrumVehicleConnectionInfoView.xaml</DependentUpon>
@@ -213,6 +214,9 @@
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumSimulationPlaybackView.xaml.cs">
+      <DependentUpon>FulcrumSimulationPlaybackView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
@@ -309,6 +313,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumSimulationPlaybackView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -354,6 +362,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
