@@ -84,6 +84,7 @@
                                     <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
                                     <File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />
                                     <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumTitleViewStyles.xaml" />
+                                    <File Id="FULCRUMSIMULATIONPLAYBACKSTYLES.XAML" Name="FulcrumSimulationPlaybackStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
                                 </Component>
                             </Directory>
                             <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
