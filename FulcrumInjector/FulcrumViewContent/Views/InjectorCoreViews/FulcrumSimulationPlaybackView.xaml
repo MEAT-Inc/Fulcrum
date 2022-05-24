@@ -25,7 +25,7 @@
     </UserControl.Resources>
 
     <!-- Main Content Grid -->
-    <Grid Margin="10,10">
+    <Grid Margin="5,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="10"/>
