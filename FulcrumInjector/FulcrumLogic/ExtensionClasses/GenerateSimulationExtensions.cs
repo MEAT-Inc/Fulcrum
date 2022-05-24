@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
+using FulcrumInjector.FulcrumViewContent;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -37,6 +38,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var PairedExpressions = new List<Tuple<int, List<PassThruExpression>>>();
             foreach (var ExpressionObject in Expressions)
             {
+                // Store progress value
+                double CurrentProgress = (Expressions.ToList().IndexOf(ExpressionObject) / (double)Expressions.Length) * 100.00;
+                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
+
                 // Now store said channel ID value if we can pull it.
                 if (ExpressionObject.TypeOfExpression == PassThruCommandType.NONE) continue;
                     
@@ -87,6 +92,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 .Cast<PassThruWriteMessagesExpression>()
                 .ToArray();
 
+            // Store progress value
+            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 25;
+
             // Find the ProtocolID and Current Channel ID. Then build a sim channel
             if (PTConnectCommands.Length == 0) return null;
             var ConnectCommand = PTConnectCommands.FirstOrDefault();
@@ -94,6 +102,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var ChannelFlags = uint.Parse(ConnectCommand.ConnectFlags);
             var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
 
+            // Store progress value
+            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 50;
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, BaudRateInUse, ChannelFlags);
@@ -101,6 +111,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             NextChannel.StoreMessageFilters(PTFilterCommands);
             NextChannel.StoreMessagesWritten(PTWriteCommands);
             NextChannel.StorePassThruPairs(GroupedExpression);
+
+            // Store progress value
+            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 75;
 
             // Log information about the built out command objects.
             SimExtensionLogger.WriteLog(
@@ -114,6 +127,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             );
 
             // Return a new tuple of our object for the command output
+            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 100;
             return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }
