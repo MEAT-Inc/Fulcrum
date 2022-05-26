@@ -61,5 +61,48 @@
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
+        <!-- Main Content Box -->
+        <Grid Grid.Row="2" Margin="10,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".105*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Load File Box -->
+            <Grid Grid.Row="0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width=".25*"/>
+                    <ColumnDefinition Width=".25*"/>
+                </Grid.ColumnDefinitions>
+                    <TextBox
+                        Margin="0,5,0,5" 
+                        Style="{StaticResource InputTextWithHolder}"
+                        Tag="Load a Simulation using the Load Simulation button on the right" />
+                    <Button Grid.Column="1"
+                            Content="Load Simulation" Margin="5,5,0,5"
+                            Style="{StaticResource ActionButtonStyle}"/>
+                    <Button Grid.Column="2"
+                            Content="Start Simulation" Margin="5,5,0,5"
+                            Style="{StaticResource ActionButtonStyle}"/>
+            </Grid>
+
+            <!-- Content For Messages -->
+            <Grid Grid.Row="1" Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width=".25*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Messages Datagrid -->
+                <DataGrid Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource MessageContentListBoxStyle}">
+
+                </DataGrid>
+                
+                <!-- Splitting Border -->
+                <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="0,0,2,0" Grid.Column="0"></Border>
+            </Grid>
+        </Grid>
+
     </Grid>
 </UserControl>
