@@ -141,7 +141,6 @@ namespace FulcrumInjector.FulcrumLogic
 
                     // SSL Configuration
                     EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential(EmailSenderAddress.Address, this.EmailSenderPassword),
 
                     // BUG: This is causing some type of auth issues. Removing for testing.
