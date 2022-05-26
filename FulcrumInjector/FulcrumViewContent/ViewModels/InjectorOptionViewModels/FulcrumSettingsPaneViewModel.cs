@@ -22,13 +22,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsViewModelLogger")) ?? new SubServiceLogger("SettingsViewModelLogger");
 
-        // Private control values
+        // Settings entries to bind onto
         private ObservableCollection<SettingsEntryCollectionModel> _settingsEntrySets;
-
-        // Public values for our view to bind onto 
         public ObservableCollection<SettingsEntryCollectionModel> SettingsEntrySets
         {
-            get => _settingsEntrySets;
+            get => _settingsEntrySets ??= FulcrumSettingsShare.GenerateSettingsModels();
             set => PropertyUpdated(value);
         }
 
@@ -44,7 +42,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
 
             // Pull settings values in on startup
-            this.SettingsEntrySets = FulcrumSettingsShare.SettingsEntrySets ?? FulcrumSettingsShare.GenerateSettingsModels();
+            FulcrumSettingsShare.SettingsEntrySets ??= FulcrumSettingsShare.GenerateSettingsModels();
             ViewModelLogger.WriteLog("GENERATED NEW SETTINGS FOR VIEW MODEL CORRECTLY! SETTINGS IMPORTED TO OUR VIEW CONTENT FROM SHARE!", LogType.InfoLog);
 
             // Log completed setup.
@@ -89,7 +87,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         {
             // Store the setting value back onto our view model content and save it's JSON Value.
             ViewModelLogger.WriteLog($"SETTING VALUE BEING WRITTEN OUT: {JsonConvert.SerializeObject(SenderContext, Formatting.None)}", LogType.TraceLog);
-            var LocatedSettingSet = this.SettingsEntrySets
+            var LocatedSettingSet = FulcrumSettingsShare.SettingsEntrySets
                 .FirstOrDefault(SettingSet => SettingSet.SettingsEntries
                     .Any(SettingObj => SettingObj.SettingName == SenderContext.SettingName));
 
@@ -98,7 +96,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             LocatedSettingSet.UpdateSetting(new[] { SenderContext });
 
             // Now write the new setting value to our JSON configuration and refresh values.
-            int SettingSetIndex = this.SettingsEntrySets
+            int SettingSetIndex = FulcrumSettingsShare.SettingsEntrySets
                 .ToList()
                 .FindIndex(ImportedSettingSet => ImportedSettingSet.SettingSectionTitle == LocatedSettingSet.SettingSectionTitle);
 
@@ -107,25 +105,28 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
             SettingObjects[SettingSetIndex] = LocatedSettingSet;
 
             // Store our value in the JSON configuration files now.
-            ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
-            FulcrumSettingsShare.GenerateSettingsModels(); this.SettingsEntrySets = FulcrumSettingsShare.SettingsEntrySets;
-            ViewModelLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
+            Task.Run(() =>
+            {
+                ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
+                FulcrumSettingsShare.SettingsEntrySets = FulcrumSettingsShare.GenerateSettingsModels();
+                ViewModelLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
 
-            // If we've got a special setting value, then store it here.
-            if (LocatedSettingSet.SettingSectionTitle != "FulcrumShim DLL Settings") return;
-            ViewModelLogger.WriteLog("STORING SETTINGS FOR SHIM CONFIGURATION IN A TEMP TEXT FILE NOW...", LogType.WarnLog);
-            string ConfigFilePath = Path.GetDirectoryName(JsonConfigFiles.AppConfigFile);
-            ConfigFilePath = Path.Combine(ConfigFilePath, "FulcrumShimDLLConfig.txt");
+                // If we've got a special setting value, then store it here.
+                if (LocatedSettingSet.SettingSectionTitle != "FulcrumShim DLL Settings") return;
+                ViewModelLogger.WriteLog("STORING SETTINGS FOR SHIM CONFIGURATION IN A TEMP TEXT FILE NOW...", LogType.WarnLog);
+                string ConfigFilePath = Path.GetDirectoryName(JsonConfigFiles.AppConfigFile);
+                ConfigFilePath = Path.Combine(ConfigFilePath, "FulcrumShimDLLConfig.txt");
 
-            // Store the value of the settings and their names in here.
-            string[] ValuesPulled = LocatedSettingSet.SettingsEntries
-                .Select(SettingObj => SettingObj.SettingValue.ToString())
-                .Prepend("FulcrumShimDLLConfig.txt")
-                .ToArray();
+                // Store the value of the settings and their names in here.
+                string[] ValuesPulled = LocatedSettingSet.SettingsEntries
+                    .Select(SettingObj => SettingObj.SettingValue.ToString())
+                    .Prepend("FulcrumShimDLLConfig.txt")
+                    .ToArray();
 
-            // Write final output values here.
-            File.WriteAllText(ConfigFilePath, string.Join("|", ValuesPulled));
-            ViewModelLogger.WriteLog($"WROTE OUT VALUES FOR SETTINGS TITLED {string.Join(" -- ", ValuesPulled)}");
+                // Write final output values here.
+                File.WriteAllText(ConfigFilePath, string.Join("|", ValuesPulled));
+                ViewModelLogger.WriteLog($"WROTE OUT VALUES FOR SETTINGS TITLED {string.Join(" -- ", ValuesPulled)}");
+            });
         }
     }
 }
