@@ -283,7 +283,7 @@
         <mah:FlyoutsControl Grid.Row="1">
             <mah:Flyout x:Name="JsonViewerFlyout" 
                         IsOpen="False"
-                        Margin="10,-5,10,5"
+                        Margin="10,-5,15,5"
                         Position="Top"
                         BorderThickness="2"
                         mah:HeaderedControlHelper.HeaderMargin="5"

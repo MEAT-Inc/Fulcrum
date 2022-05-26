@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 JsonConfigFiles.ConfigLogger?.WriteLog("PULLED CONTENT FOR CONFIG FILE TO MODIFY OK!", LogType.TraceLog);
 
                 // Check missing value here now.
-                if (ConfigObjectLocated[SplitContentPath.FirstOrDefault()] == null && !AppendMissing)
+                if (ConfigObjectLocated[SplitContentPath.FirstOrDefault() ?? PropertyKey] == null && !AppendMissing)
                 {
                     // Log missing and return false.
                     JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! MISSING CONFIG FILE VALUE FOR OBJECT KEY NAME: {PropertyKey}!", LogType.ErrorLog);
@@ -64,21 +64,16 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 }
 
                 // Log info and loop values here.
-                ConfigObjectLocated[SplitContentPath.FirstOrDefault()] = JToken.FromObject(ValueObject);
-                JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!");
+                ConfigObjectLocated[SplitContentPath.FirstOrDefault() ?? PropertyKey] = JToken.FromObject(ValueObject);
 
                 // Set value into config file now.
                 JsonConfigFiles.ApplicationConfig.Remove(TypeOfConfig);
-                JsonConfigFiles.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated);
+                if (TypeOfConfig != "FulcrumUserSettings") JsonConfigFiles.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated); 
+                else { JsonConfigFiles.ApplicationConfig["FulcrumUserSettings"] = JArray.FromObject(ConfigObjectLocated["FulcrumUserSettings"]); }
+
+                // Write out our JSON values here
                 File.WriteAllText(OutputPath, JsonConfigFiles.ApplicationConfig.ToString(Formatting.Indented));
                 JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
-
-                // Log wrote out ok
-                string NewFileJson = ConfigObjectLocated.ToString(Formatting.Indented);
-                JsonConfigFiles.ConfigLogger?.WriteLog($"NEW FILE JSON VALUE:\n{NewFileJson}", LogType.TraceLog);
-
-                // Refresh the Config Main object now.
-                _ = JsonConfigFiles.ApplicationConfig;
                 return true;
             }
             catch (Exception SetEx)

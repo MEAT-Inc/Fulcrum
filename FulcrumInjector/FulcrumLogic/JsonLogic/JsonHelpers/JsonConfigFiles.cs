@@ -95,12 +95,10 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 bool FirstConfig = _applicationConfig == null;
 
                 // Build new here for the desired input file object.
-                if (FirstConfig)
-                {
-                    ConfigLogger?.WriteLog($"BUILDING NEW JCONFIG OBJECT NOW...", LogType.TraceLog);
-                    _applicationConfig = JObject.Parse(File.ReadAllText(AppConfigFile));
-                    ConfigLogger?.WriteLog($"GENERATED JSON CONFIG FILE OBJECT OK AND WROTE CONTENT TO {AppConfigFile} OK! RETURNED CONTENTS NOW...", LogType.TraceLog);
-                }
+                if (!FirstConfig) return _applicationConfig;
+                ConfigLogger?.WriteLog($"BUILDING NEW JCONFIG OBJECT NOW...", LogType.TraceLog);
+                _applicationConfig = JObject.Parse(File.ReadAllText(AppConfigFile));
+                ConfigLogger?.WriteLog($"GENERATED JSON CONFIG FILE OBJECT OK AND WROTE CONTENT TO {AppConfigFile} OK! RETURNED CONTENTS NOW...", LogType.TraceLog);
 
                 // Return the object.
                 return _applicationConfig;
