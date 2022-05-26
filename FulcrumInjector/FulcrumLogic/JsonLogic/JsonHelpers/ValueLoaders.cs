@@ -3,6 +3,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger.LoggerSupport;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
 {
@@ -33,20 +34,10 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 return (TValueType)new object();
             }
 
-            try 
-            {
-                // If not null, convert and return.
-                var ConvertedValue = ValueObject.ToObject<TValueType>();
-                JsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
-                return ConvertedValue;
-            }
-            catch
-            {
-                // Convert into a JArray instead possibly
-                return ValueObject.Type == JTokenType.Array ?
-                    JArray.FromObject(ValueObject).ToObject<TValueType>() : 
-                    JObject.FromObject(ValueObject).ToObject<TValueType>();
-            }
+            // If not null, convert and return.
+            var ConvertedValue = ValueObject.ToObject<TValueType>();
+            JsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
+            return ConvertedValue;
         }
 
         /// <summary>

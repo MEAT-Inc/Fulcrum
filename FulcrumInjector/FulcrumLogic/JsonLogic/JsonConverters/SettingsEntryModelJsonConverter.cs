@@ -33,9 +33,9 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
             // Build a dynamic output object
             var OutputObject = JObject.FromObject(new
             {
+                CastSettingEntry.TypeOfControl,         // Setting UI Control Type
                 CastSettingEntry.SettingName,           // Setting Name
                 CastSettingEntry.SettingValue,          // Setting Value
-                CastSettingEntry.TypeOfControl,         // Setting UI Control Type
                 CastSettingEntry.SettingDescription,    // Description of the setting
             });
 
@@ -57,10 +57,15 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
             if (InputObject.HasValues == false) { return default; }
 
             // Select the array of paths here.
-            string SettingName = InputObject["SettingName"].Value<string>();
-            object SettingValue = InputObject["SettingValue"].Value<object>();
-            string SettingDescription = InputObject["SettingDescription"].Value<string>();
-            Enum.TryParse(InputObject["SettingControlType"].Value<string>(), out ControlTypes SettingControlType);
+            string SettingName = InputObject["SettingName"]?.Value<string>();
+            object SettingValue = InputObject["SettingValue"]?.Value<object>();
+            string SettingDescription = InputObject["SettingDescription"]?.Value<string>();
+
+            // Pull the value for control type here
+            ControlTypes SettingControlType;
+            var TypeObject = InputObject["SettingControlType"].Value<object>();
+            if (TypeObject.GetType() == typeof(int)) SettingControlType = (ControlTypes)TypeObject;
+            else Enum.TryParse(InputObject["SettingControlType"]?.Value<string>(), out SettingControlType);
 
             // Return built output object
             return new SettingsEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
