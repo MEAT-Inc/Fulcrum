@@ -54,8 +54,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
             try
             {
                 // Try and get the current object. If failed, return null
-                string ConfigSection = JObjectKey.ToString();
-                var PulledJObject = JsonConfigFiles.ApplicationConfig[ConfigSection];
+                var PulledJObject = JsonConfigFiles.ApplicationConfig[JObjectKey];
                 JsonConfigFiles.ConfigLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {JObjectKey} OK!", LogType.TraceLog);
 
                 // Cast and return if needed
@@ -63,10 +62,10 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 {
                     // Build new object
                     JObject OutputObject = new JObject();
-                    OutputObject.Add(ConfigSection, JArray.FromObject(PulledJObject));
+                    OutputObject.Add(JObjectKey, JArray.FromObject(PulledJObject));
                     return OutputObject;
                 }
-             }
+            }
             catch (Exception PullEx)
             {
                 // Catch failure, log it, and return null
