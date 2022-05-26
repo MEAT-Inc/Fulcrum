@@ -31,12 +31,13 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
             SettingsEntryModel CastSettingEntry = ValueObject as SettingsEntryModel;
 
             // Build a dynamic output object
+            string TypeOfControlString = CastSettingEntry.TypeOfControl.ToString();
             var OutputObject = JObject.FromObject(new
             {
-                CastSettingEntry.TypeOfControl,         // Setting UI Control Type
-                CastSettingEntry.SettingName,           // Setting Name
-                CastSettingEntry.SettingValue,          // Setting Value
-                CastSettingEntry.SettingDescription,    // Description of the setting
+                CastSettingEntry.SettingName,                // Setting Name
+                CastSettingEntry.SettingValue,               // Setting Value
+                CastSettingEntry.SettingDescription,         // Description of the setting
+                SettingControlType = TypeOfControlString,    // Setting UI Control Type
             });
 
             // Now write this built object.
@@ -60,12 +61,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
             string SettingName = InputObject["SettingName"]?.Value<string>();
             object SettingValue = InputObject["SettingValue"]?.Value<object>();
             string SettingDescription = InputObject["SettingDescription"]?.Value<string>();
-
-            // Pull the value for control type here
-            ControlTypes SettingControlType;
-            var TypeObject = InputObject["SettingControlType"]?.Value<object>();
-            if (TypeObject?.GetType() == typeof(int)) SettingControlType = (ControlTypes)TypeObject;
-            else Enum.TryParse(InputObject["SettingControlType"]?.Value<string>(), out SettingControlType);
+            Enum.TryParse(InputObject["SettingControlType"]?.Value<object>()?.ToString(), out ControlTypes SettingControlType);
 
             // Return built output object
             return new SettingsEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
