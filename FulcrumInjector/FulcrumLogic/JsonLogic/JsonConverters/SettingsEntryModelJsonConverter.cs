@@ -64,7 +64,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
             // Pull the value for control type here
             ControlTypes SettingControlType;
             var TypeObject = InputObject["SettingControlType"]?.Value<object>();
-            if (TypeObject.GetType() == typeof(int)) SettingControlType = (ControlTypes)TypeObject;
+            if (TypeObject?.GetType() == typeof(int)) SettingControlType = (ControlTypes)TypeObject;
             else Enum.TryParse(InputObject["SettingControlType"]?.Value<string>(), out SettingControlType);
 
             // Return built output object
