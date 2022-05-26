@@ -69,7 +69,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 // Set value into config file now.
                 JsonConfigFiles.ApplicationConfig.Remove(TypeOfConfig);
                 if (TypeOfConfig != "FulcrumUserSettings") JsonConfigFiles.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated); 
-                else { JsonConfigFiles.ApplicationConfig["FulcrumUserSettings"] = ConfigObjectLocated["FulcrumUserSettings"]; }
+                else { JsonConfigFiles.ApplicationConfig["FulcrumUserSettings"] = JArray.FromObject(ConfigObjectLocated["FulcrumUserSettings"]); }
 
                 // Write out our JSON values here
                 File.WriteAllText(OutputPath, JsonConfigFiles.ApplicationConfig.ToString(Formatting.Indented));
