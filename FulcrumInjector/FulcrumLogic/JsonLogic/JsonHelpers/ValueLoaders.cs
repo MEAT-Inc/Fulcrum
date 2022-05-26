@@ -28,14 +28,25 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
             var ValueObject = JsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
             if (ValueObject == null)
             {
+                // If our output object is null, then just return a generic output of the type passed
                 JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
                 return (TValueType)new object();
             }
 
-            // If not null, convert and return.
-            var ConvertedValue = ValueObject.ToObject<TValueType>();
-            JsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
-            return ConvertedValue;
+            try 
+            {
+                // If not null, convert and return.
+                var ConvertedValue = ValueObject.ToObject<TValueType>();
+                JsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
+                return ConvertedValue;
+            }
+            catch
+            {
+                // Convert into a JArray instead possibly
+                return ValueObject.Type == JTokenType.Array ?
+                    JArray.FromObject(ValueObject).ToObject<TValueType>() : 
+                    JObject.FromObject(ValueObject).ToObject<TValueType>();
+            }
         }
 
         /// <summary>
