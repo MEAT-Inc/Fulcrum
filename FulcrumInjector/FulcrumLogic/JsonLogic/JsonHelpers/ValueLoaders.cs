@@ -50,20 +50,27 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 throw new InvalidOperationException("CAN NOT PULL CONFIG VALUES SINCE THE CONFIG FILE IS NOT YET BUILT!");
 
             // Check for full config.
-            string ConfigKeyString = JObjectKey.ToString();
-            JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {ConfigKeyString}", LogType.TraceLog);
+            JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {JObjectKey}", LogType.TraceLog);
             try
             {
                 // Try and get the current object. If failed, return null
-                string ConfigSection = ConfigKeyString.ToString();
-                var PulledObject = JObject.FromObject(JsonConfigFiles.ApplicationConfig[ConfigSection]);
-                JsonConfigFiles.ConfigLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {ConfigKeyString} OK!", LogType.TraceLog);
-                return PulledObject;
-            }
+                string ConfigSection = JObjectKey.ToString();
+                var PulledJObject = JsonConfigFiles.ApplicationConfig[ConfigSection];
+                JsonConfigFiles.ConfigLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {JObjectKey} OK!", LogType.TraceLog);
+
+                // Cast and return if needed
+                if (PulledJObject.Type != JTokenType.Array) return JObject.FromObject(PulledJObject);
+                {
+                    // Build new object
+                    JObject OutputObject = new JObject();
+                    OutputObject.Add(ConfigSection, JArray.FromObject(PulledJObject));
+                    return OutputObject;
+                }
+             }
             catch (Exception PullEx)
             {
                 // Catch failure, log it, and return null
-                JsonConfigFiles.ConfigLogger?.WriteLog($"FAILED TO PULL CONFIG FOR SECTION {ConfigKeyString}!", LogType.TraceLog);
+                JsonConfigFiles.ConfigLogger?.WriteLog($"FAILED TO PULL CONFIG FOR SECTION {JObjectKey}!", LogType.TraceLog);
                 JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL!", PullEx, new[] { LogType.TraceLog });
                 return null;
             }

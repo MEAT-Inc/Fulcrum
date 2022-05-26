@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 JsonConfigFiles.ConfigLogger?.WriteLog("PULLED CONTENT FOR CONFIG FILE TO MODIFY OK!", LogType.TraceLog);
 
                 // Check missing value here now.
-                if (ConfigObjectLocated[SplitContentPath.FirstOrDefault()] == null && !AppendMissing)
+                if (ConfigObjectLocated[SplitContentPath.FirstOrDefault() ?? PropertyKey] == null && !AppendMissing)
                 {
                     // Log missing and return false.
                     JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! MISSING CONFIG FILE VALUE FOR OBJECT KEY NAME: {PropertyKey}!", LogType.ErrorLog);
@@ -64,7 +64,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
                 }
 
                 // Log info and loop values here.
-                ConfigObjectLocated[SplitContentPath.FirstOrDefault()] = JToken.FromObject(ValueObject);
+                ConfigObjectLocated[SplitContentPath.FirstOrDefault() ?? PropertyKey] = JToken.FromObject(ValueObject);
                 JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!");
 
                 // Set value into config file now.
