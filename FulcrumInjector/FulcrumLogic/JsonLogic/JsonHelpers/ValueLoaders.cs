@@ -3,6 +3,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger.LoggerSupport;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
 {
@@ -28,6 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
             var ValueObject = JsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
             if (ValueObject == null)
             {
+                // If our output object is null, then just return a generic output of the type passed
                 JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
                 return (TValueType)new object();
             }
