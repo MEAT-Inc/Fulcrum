@@ -8,6 +8,7 @@ using System.Windows.Input;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumViewContent;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -66,8 +67,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             this.SimLogger.WriteLog("GROUPING COMMANDS BY CHANNEL ID VALUES NOW...", LogType.WarnLog);
             var GroupedAsLists = this.InputExpressions.GroupByChannelIds();
             Parallel.ForEach(GroupedAsLists, (GroupList) => {
+
+                // Build Expression
                 BuiltExpressions.Add(new Tuple<int, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
-                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROPUING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
+                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
+
+                // Store progress value
+                double CurrentProgress = (BuiltExpressions.Count / (double)GroupedAsLists.Length) * 100.00;
+                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
             });
 
             // Log done grouping, return the built ID values here.
@@ -91,15 +98,21 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             {
                 // Pull the Channel ID, build our output contents
                 int ChannelId = ChannelObjectExpressions.Item1;
-                var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId).Item2;
+                var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId);
 
                 // Append it into our list of output here
-                BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel));
+                if (BuiltChannel == null) return;
+                BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel.Item2));
                 this.SimLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
-            });
+
+                // Store progress value
+                double CurrentProgress = (BuiltChannelsList.Count / (double)this.GroupedChannelExpressions.Length) * 100.00;
+                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
+            }); 
 
             // Log information and exit out of this routine
             this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
+            BuiltChannelsList = BuiltChannelsList.Where(TupleOBj => TupleOBj != null).ToList();
             this.BuiltSimulationChannels = BuiltChannelsList.Select(ChannelSet => ChannelSet.Item2).ToArray();
             return BuiltChannelsList.ToArray();
         }

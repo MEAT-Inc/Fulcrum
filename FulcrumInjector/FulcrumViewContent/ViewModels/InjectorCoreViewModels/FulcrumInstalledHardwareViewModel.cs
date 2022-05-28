@@ -65,8 +65,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 
                 // Update the connection view model values here. Don't set if the device is the same.
                 var ConnectionVm = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
-                if (ConnectionVm == null || ConnectionVm?.SelectedDevice == value) return;
+                if (ConnectionVm == null) return;
+                
+                // Store values if the VM is not null
                 FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDevice = value;
+                if (value == null) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.DeviceVoltage = 0.00;
             }
         }
 

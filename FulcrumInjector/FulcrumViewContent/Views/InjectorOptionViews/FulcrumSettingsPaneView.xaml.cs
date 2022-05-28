@@ -104,20 +104,23 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewLogger.WriteLog("SAVING SETTINGS VALUES MANUALLY NOW...", LogType.InfoLog);
 
             // Store new values from our ViewModel onto the share and into JSON 
-            ValueSetters.SetValue("FulcrumUserSettings", this.ViewModel.SettingsEntrySets);
-            this.ViewModel.SettingsEntrySets = FulcrumSettingsShare.GenerateSettingsModels();
-            this.ViewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
-
-            // Change Color and Set to Saved! on the content here.
-            string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;
-            SendButton.Content = "Saved OK!"; SendButton.Background = Brushes.DarkGreen;
             Task.Run(() =>
             {
-                // Wait 3 Seconds. Then reset content.
-                Thread.Sleep(3000);
-                Dispatcher.Invoke(() => SendButton.Content = OriginalContent);
-                Dispatcher.Invoke(() => SendButton.Background = OriginalBackground);
-                this.ViewLogger.WriteLog("RESET CONTENT AND COLOR OF SENDING SAVE BUTTON OK!", LogType.TraceLog);
+                FulcrumSettingsShare.SettingsEntrySets = FulcrumSettingsShare.GenerateSettingsModels();
+                ValueSetters.SetValue("FulcrumUserSettings", FulcrumSettingsShare.SettingsEntrySets);
+                this.ViewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
+
+                // Change Color and Set to Saved! on the content here.
+                string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;
+                SendButton.Content = "Saved OK!"; SendButton.Background = Brushes.DarkGreen;
+                Task.Run(() =>
+                {
+                    // Wait 3 Seconds. Then reset content.
+                    Thread.Sleep(3000);
+                    Dispatcher.Invoke(() => SendButton.Content = OriginalContent);
+                    Dispatcher.Invoke(() => SendButton.Background = OriginalBackground);
+                    this.ViewLogger.WriteLog("RESET CONTENT AND COLOR OF SENDING SAVE BUTTON OK!", LogType.TraceLog);
+                });
             });
         }
 
@@ -134,6 +137,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Toggle view visibility
             ViewLogger.WriteLog("OPENING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
+            this.ViewModel.PopulateAppSettingJsonViewer(JsonSettingsViewEditor);
             this.JsonViewerFlyout.IsOpen = true;
         }
         /// <summary>

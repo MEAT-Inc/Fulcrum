@@ -111,7 +111,8 @@ BOOL CFulcrumShim::InitInstance()
 void CFulcrumShim::StartupPipes()
 {
 	// Check if pipes need to be configured
-	if (CFulcrumShim::fulcrumPiper == NULL) CFulcrumShim::fulcrumPiper = new fulcrum_jpipe();
+	if (CFulcrumShim::fulcrumPiper == NULL) 
+		CFulcrumShim::fulcrumPiper = new fulcrum_jpipe();
 
 	// If they're connected, drop out and stop working on connection routines
 	if (CFulcrumShim::fulcrumPiper->PipesConnected()) { return; }

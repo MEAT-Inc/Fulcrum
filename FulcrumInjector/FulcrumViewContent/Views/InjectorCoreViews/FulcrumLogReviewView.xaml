@@ -27,7 +27,7 @@
     </UserControl.Resources>
 
     <!-- Content For Log Reviewing -->
-    <Grid Margin="10,10">
+    <Grid Margin="5,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="105"/>
             <RowDefinition Height="10"/>

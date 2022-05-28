@@ -1,0 +1,1 @@
+﻿FulcrumShimDLLConfig|False|C:\Program Files (x86)\Drew Technologies, Inc\J2534\CarDAQ Plus 3\cardaqplus3_0404_32.dll
