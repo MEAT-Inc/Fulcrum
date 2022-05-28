@@ -224,6 +224,7 @@
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorDocFormatterBase.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\LogOutputFilteringHelper.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\CallStackColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\OutputFormatHelperBase.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\FilteringColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\SelectMatchesColorFormatter.cs" />
