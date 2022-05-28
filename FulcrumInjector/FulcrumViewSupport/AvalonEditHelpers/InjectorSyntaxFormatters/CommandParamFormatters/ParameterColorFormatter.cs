@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using ICSharpCode.AvalonEdit.Document;
-using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.CommandParamFormatters
 {
     /// <summary>
     /// Class instance used to help format color values for the command parameter values when pulled from the log lines.
     /// </summary>
-    public class CommandParameterColorFormatter : InjectorDocFormatterBase
+    public class ParameterColorFormatter : InjectorDocFormatterBase
     {
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public CommandParameterColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
+        public ParameterColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
         // --------------------------------------------------------------------------------------------------
 

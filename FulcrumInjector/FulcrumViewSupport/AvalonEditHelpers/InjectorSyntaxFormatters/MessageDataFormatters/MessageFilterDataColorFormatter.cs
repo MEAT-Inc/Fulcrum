@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using ICSharpCode.AvalonEdit.Document;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.MessageDataFormatters
 {
     /// <summary>
     /// Used to color and format message data contents out inside our injector log file outputs
     /// </summary>
-    public class MessageDataColorFormatter : InjectorDocFormatterBase
+    public class MessageFilterDataColorFormatter : InjectorDocFormatterBase
     {
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public MessageDataColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
+        public MessageFilterDataColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
         // --------------------------------------------------------------------------------------------------
 
@@ -28,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Find the message data values here
-            Regex MessageDataRegex = new(PassThruRegexModelShare.MessageDataContent.ExpressionPattern);
+            Regex MessageDataRegex = new(PassThruRegexModelShare.MessageFilterInfo.ExpressionPattern);
             Match FoundMatch = MessageDataRegex.Match(CurrentContext.Document.GetText(InputLine));
             if (!FoundMatch.Success) return;
 
