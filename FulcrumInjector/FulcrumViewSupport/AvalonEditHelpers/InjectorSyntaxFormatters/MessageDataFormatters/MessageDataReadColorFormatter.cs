@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using ICSharpCode.AvalonEdit.Document;
 
@@ -23,13 +25,29 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         /// <param name="InputLine"></param>
         protected override void ColorizeLine(DocumentLine InputLine)
         {
-            // Find the message data values here
-            Regex MessageDataRegex = new(PassThruRegexModelShare.MessageReadInfo.ExpressionPattern);
-            Match FoundMatch = MessageDataRegex.Match(CurrentContext.Document.GetText(InputLine));
-            if (!FoundMatch.Success) return;
+            // Convert input regex into a multiline ready expression
+            List<Regex> BuiltLineExpressions = new List<Regex>();
+            string MessageDataRegexString = PassThruRegexModelShare.MessageFilterInfo.ExpressionPattern;
+            MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
+            for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
+                BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));
 
-            // Now run our coloring definitions and return out
-            this.ColorNewMatches(InputLine, FoundMatch);
+            // Search for our matches here and then loop our doc lines to apply coloring
+            string CurrentLine = CurrentContext.Document.GetText(InputLine);
+            Match[] MatchesFound = BuiltLineExpressions
+                .Select(RegexPattern => RegexPattern.Match(CurrentLine))
+                .ToArray();
+
+            // See if anything matched up
+            if (!MatchesFound.All(MatchSet => MatchSet.Success)) return;
+
+            // Now color output values based on what we see here 
+            if (CurrentLine.Contains("Msg"))
+                foreach (var MatchValue in MatchesFound.Take(5).ToArray()) this.ColorNewMatches(InputLine, MatchValue);
+            if (CurrentLine.Contains("RxStatus"))
+                foreach (var MatchValue in MatchesFound.Skip(1).Take(2).ToArray()) this.ColorNewMatches(InputLine, MatchValue);
+            if (CurrentLine.Contains("\\__"))
+                foreach (var MatchValue in MatchesFound.Skip(6).ToArray()) this.ColorNewMatches(InputLine, MatchValue);
         }
     }
 }
