@@ -41,8 +41,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
                 // Add in our output objects now.
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));   // Time coloring
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new ParameterColorFormatter(this));     // Command value coloring 
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));          // Time coloring
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));     // Command value coloring 
 
                 // Add in the output objects for command types and information
                 this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataReadColorFormatter(this));      // Messages Read
