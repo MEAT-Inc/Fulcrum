@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.CommandParamFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.MessageDataFormatters;
 using ICSharpCode.AvalonEdit;
 using SharpLogger.LoggerSupport;
 
@@ -39,8 +41,13 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
                 // Add in our output objects now.
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));          // Time coloring
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));     // Command value coloring 
+
+                // Add in the output objects for command types and information
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataReadColorFormatter(this));      // Messages Read
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataSentColorFormatter(this));      // Messages Sent
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageFilterDataColorFormatter(this));    // Message Filters
             });
         }
         /// <summary>
