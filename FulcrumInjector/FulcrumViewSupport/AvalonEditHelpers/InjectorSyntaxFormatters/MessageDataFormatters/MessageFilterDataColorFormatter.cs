@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
@@ -38,15 +39,46 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
                 .ToArray();
 
             // See if anything matched up
-            if (!MatchesFound.All(MatchSet => MatchSet.Success)) return;
+            if (!MatchesFound.Any(MatchSet => MatchSet.Success)) return;
 
-            // Now color output values based on what we see here 
-            if (new[] { "Mask", "Pattern", "Flow" }.Any(CurrentLine.Contains)) 
-                foreach (var MatchValue in MatchesFound.Take(4).ToArray()) this.ColorNewMatches(InputLine, MatchValue);
-            if (CurrentLine.Contains("TxFlags"))
-                foreach (var MatchValue in MatchesFound.Skip(4).Take(2).ToArray()) this.ColorNewMatches(InputLine, MatchValue);
-            if (CurrentLine.Contains("\\__"))
-                foreach (var MatchValue in MatchesFound.Skip(6).ToArray()) this.ColorNewMatches(InputLine, MatchValue);
+            try
+            {
+                // Now color output values based on what we see here 
+                if (new[] { "Mask", "Pattern", "Flow" }.Any(CurrentLine.Contains)) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Take(4).ToArray());
+                if (CurrentLine.Contains("TxFlags")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(4).Take(2).ToArray());
+                if (CurrentLine.Contains("\\__")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(6).ToArray());
+            }
+            catch {
+                // Do nothing here since we don't want to fail on any color issues
+            }
+        }
+
+
+        /// <summary>
+        /// Colors a part of a match array for the given input matches found
+        /// </summary>
+        /// <param name="InputLine"></param>
+        /// <param name="AllMatches"></param>
+        /// <param name="SelectedMatchArray"></param>
+        private void ColorForMatchSet(DocumentLine InputLine, Match[] AllMatches, Match[] SelectedMatchArray)
+        {
+            // Store current line text value
+            string CurrentLine = CurrentContext.Document.GetText(InputLine);
+            foreach (var MatchValue in SelectedMatchArray)
+            {
+                // Set Index and get brushes. Then color output
+                int CurrentIndex = AllMatches.ToList().IndexOf(MatchValue);
+                var BrushSet = this._coloringBrushes[CurrentIndex];
+                int GroupPositionStart = InputLine.Offset + CurrentLine.IndexOf(MatchValue.Value);
+                int GroupPositionEnd = GroupPositionStart + MatchValue.Value.Length;
+
+                // Color line output here
+                this.ColorMatch(
+                    InputLine,
+                    new[] { BrushSet.Item1, BrushSet.Item2 },
+                    new[] { GroupPositionStart, GroupPositionEnd }
+                );
+            }
         }
     }
 }
