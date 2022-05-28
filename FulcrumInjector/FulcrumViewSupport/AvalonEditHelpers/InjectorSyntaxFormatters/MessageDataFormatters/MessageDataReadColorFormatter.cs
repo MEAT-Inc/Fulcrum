@@ -41,10 +41,16 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
             // See if anything matched up
             if (!MatchesFound.Any(MatchSet => MatchSet.Success)) return;
 
-            // Now color output values based on what we see here 
-            if (CurrentLine.Contains("Msg")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Take(5).ToArray());
-            if (CurrentLine.Contains("RxStatus")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(5).Take(1).ToArray());
-            if (CurrentLine.Contains("\\__")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(6).ToArray());
+            try
+            {
+                // Now color output values based on what we see here 
+                if (CurrentLine.Contains("Msg")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Take(5).ToArray());
+                if (CurrentLine.Contains("RxStatus")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(5).Take(1).ToArray());
+                if (CurrentLine.Contains("\\__")) this.ColorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(6).ToArray());
+            }
+            catch {
+                // Do nothing here since we don't want to fail on any color issues
+            }
         }
 
 
