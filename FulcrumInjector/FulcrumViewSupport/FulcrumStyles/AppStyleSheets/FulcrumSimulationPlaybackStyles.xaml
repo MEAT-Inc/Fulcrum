@@ -1,9 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
+
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
@@ -16,7 +18,26 @@
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
             </Style>
 
-        </ResourceDictionary>
+            <!-- Messages Listbox Style -->
+            <Style x:Key="MessageContentListBoxStyle" TargetType="DataGrid">
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+            </Style>
 
+            <!-- AVEdit Output Box Style -->
+            <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor_Lighter_35}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="Margin" Value="0,5"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="5,5,5,10"/>
+                <Setter Property="ShowLineNumbers" Value="True"/>
+            </Style>
+
+        </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

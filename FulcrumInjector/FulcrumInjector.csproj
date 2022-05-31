@@ -220,10 +220,13 @@
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParameterColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParamFormatters\CommandParameterColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorDocFormatterBase.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\LogOutputFilteringHelper.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\CallStackColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataFormatters\MessageFilterDataColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataFormatters\MessageDataReadColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataFormatters\MessageDataSentColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\OutputFormatHelperBase.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\FilteringColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\SelectMatchesColorFormatter.cs" />
@@ -240,7 +243,7 @@
     <Compile Include="FulcrumLogic\JsonLogic\JsonConverters\SettingsEntryModelJsonConverter.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruExpression.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\InjectorOutputSyntaxHelper.cs" />
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\TypeAndTimeColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParamFormatters\TypeAndTimeColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToObjectConverter.cs" />

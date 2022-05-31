@@ -3,8 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:FulcrumInjector.FulcrumViewSupport.DataContentHelpers"
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews"
              xmlns:injectorCoreViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="FulcrumSimulationPlaybackView_OnLoaded">
@@ -14,7 +17,7 @@
         <injectorCoreViewModels:FulcrumSimulationPlaybackViewModel/>
     </UserControl.DataContext>
 
-    <!-- Style Sheets -->
+    <!-- Style Sheets and Resources -->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -25,9 +28,9 @@
     </UserControl.Resources>
 
     <!-- Main Content Grid -->
-    <Grid Margin="10,10">
+    <Grid Margin="5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="80"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -35,10 +38,10 @@
         <!-- Title and information -->
         <Grid Margin="5,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height=".65*"/>
+                <RowDefinition Height="1*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid Margin="0,0,15,0" x:Name="MainActionLoadButtons">
+            <Grid Margin="0,0,15,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition/>
@@ -52,7 +55,7 @@
             </Grid>
             <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="5,0" FontSize="14">
                 <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to load and replay built simulation files (.ptSim) that were generated using this application. Both CarDAQ and Shim logs are currently supported for replaying."/>
-                <Run Foreground="Yellow" FontWeight="DemiBold" Text="NOTE! THIS IS STILL SUPER EARLY BETA! SOME OF THESE FEATURES MAY NOT WORK AT ALL!"/>
+                <Run Foreground="Yellow" FontWeight="DemiBold" Text="NOTE! THIS IS STILL SUPER EARLY BETA AND MAY BE BUGGY!"/>
             </TextBlock>
         </Grid>
 
@@ -61,6 +64,135 @@
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
+        <!-- Main Content Box -->
+        <Grid Grid.Row="2" Margin="10,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".10*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
+            <!-- Load File Box -->
+            <Grid Grid.Row="0" Margin="0,5,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.75*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    IsReadOnly="True"
+                    Grid.Column="0" Margin="0,0,-5,0"
+                    Style="{StaticResource InputTextWithHolder}"
+                    Text="{Binding LoadedSimFile}"
+                    Tag="Load a Simulation using the Load Simulation button"/>
+                <Button 
+                    Grid.Column="1"
+                    Click="LoadSimulationButton_OnClick"
+                    Content="Load Simulation" Margin="10,0,0,0"
+                    Style="{StaticResource ActionButtonStyle}"/>
+                <Button Grid.Column="2"
+                        Click="StartSimulationButton_OnClick"
+                        Content="Start Simulation" Margin="5,0,0,0"
+                        Style="{StaticResource ActionButtonStyle}"
+                        IsEnabled="{Binding Path=IsSimLoaded}"/>
+                <Button Grid.Column="3" Click="ToggleSimulationEditor_OnClick"
+                        Content="Edit Simulation" Margin="5,0,0,0"
+                        Style="{StaticResource ActionButtonStyle}"
+                        IsEnabled="{Binding Path=IsSimLoaded}"/>
+            </Grid>
+
+            <!-- Content For Messages -->
+            <Grid Grid.Row="1" Margin="0,5,0,0">
+
+                <!-- Messages Datagrid -->
+                <DataGrid x:Name="MainMessagesDataGrid" Style="{StaticResource MessageContentListBoxStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Messages Read" Width="*"/>
+                        <DataGridTextColumn Header="Messages Sent" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- No Sim File Loaded View or No Messages Loaded view -->
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Border Opacity=".50" BorderThickness="3"
+                            BorderBrush="{StaticResource TextColorBase}"
+                            Background="{StaticResource SecondaryColor_Darker_65}"/>
+                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                               Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Simulation File Loaded!"/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run FontSize="16" Text="Load a simulation file using the Load Simulation button at the top of this page. Once loaded, When loaded, all features on this page will become enabled. Once a simulation file is played back, the messages read from our interface will be logged along with the responses given."/>
+                    </TextBlock>
+                </Grid>
+                
+                <!-- Edit for simulation -->
+                <mah:FlyoutsControl>
+                    <mah:Flyout
+                        HorizontalAlignment="Stretch" 
+                        x:Name="SimulationEditorFlyout"
+                        BorderThickness="2" BorderBrush="{StaticResource PrimaryColor}"
+                        Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}">
+
+                        <!-- Semi Transparent Background -->
+                        <mah:Flyout.Background>
+                            <SolidColorBrush Color="#020202" Opacity=".85"/>
+                        </mah:Flyout.Background>
+
+                        <!-- Empty Header Template -->
+                        <mah:Flyout.HeaderTemplate>
+                            <DataTemplate/>
+                        </mah:Flyout.HeaderTemplate>
+
+                        <!-- Flyout Content -->
+                        <Grid Margin="5,-30,5,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height=".50*"/>
+                                <RowDefinition Height="5"/>
+                                <RowDefinition Height="1.5*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="2.15*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Text="Simulation Editor" Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch" HorizontalAlignment="Left" 
+                                    Style="{StaticResource TitleStringText}" Foreground="Yellow"/>
+                                <TextBlock 
+                                    Grid.Row="1" TextWrapping="Wrap" FontSize="13"
+                                    Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"
+                                    Text="Use this view to edit simulation files loaded into our simulation replaying view. This editor will provide access to the raw .ptSim JSON contents for easy modifications and changes on the fly.  When this editor is closed, file changes are saved automatically but the simulation must be reloaded using the Reload Simulation button on the bottom right corner of this view.">
+                                </TextBlock>
+                            </Grid>
+
+                            <!-- Splitting Border -->
+                            <Border Grid.Row="1" Margin="0,0,0,0"
+                                    BorderBrush="{StaticResource TextColorBase}" 
+                                    BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
+
+                            <!-- Editor Contents -->
+                            <avalonedit:TextEditor
+                                Grid.Row="2"
+                                IsReadOnly="True"
+                                x:Name="ReplayLogInputContent"
+                                Style="{StaticResource LoggingOutputBoxStyle}"/>
+                        </Grid>
+                    </mah:Flyout>
+                </mah:FlyoutsControl>
+
+            </Grid>
+
+        </Grid>
     </Grid>
 </UserControl>

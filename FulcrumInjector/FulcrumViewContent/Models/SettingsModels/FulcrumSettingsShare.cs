@@ -29,6 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 _settingsEntrySets ??= GenerateSettingsModels();
                 return _settingsEntrySets;
             }
+            set => _settingsEntrySets = value;
         }
 
         // ---------------------------------------------------------------------------------------------------------------------
