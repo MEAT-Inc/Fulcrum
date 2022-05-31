@@ -1,23 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using Button = System.Windows.Controls.Button;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 {
@@ -58,5 +64,122 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Loads in a new simulation file from our file box and stores it onto our view model
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void LoadSimulationButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Start by setting the sending button content to "Loading..." and disable it.
+            Button SenderButton = (Button)Sender;
+            string DefaultContent = SenderButton.Content.ToString();
+            var DefaultColor = SenderButton.Background;
+
+            // Log information about opening appending box and begin selection
+            this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
+            using OpenFileDialog SelectAttachmentDialog = new OpenFileDialog()
+            {
+                Multiselect = true,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                RestoreDirectory = true,
+                AutoUpgradeEnabled = true,
+                Filter = Debugger.IsAttached ? "All Files (*.*)|*.*" : "Injector Simulations (*.ptSim)|*.ptSim|All Files (*.*)|*.*",
+                InitialDirectory = Debugger.IsAttached ?
+                    "C:\\Drewtech\\logs" :
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultSimulationsPath")
+            };
+
+            // Now open the dialog and allow the user to pick some new files.
+            this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
+            if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
+                // Log failed, set no file, reset sending button and return.
+                this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
+                return;
+            }
+
+            // Invoke this to keep UI Alive
+            Grid ParentGrid = SenderButton.Parent as Grid;
+            ParentGrid.IsEnabled = false;
+            SenderButton.Content = "Loading...";
+
+            // Run this in the background for smoother operation
+            Task.Run(() =>
+            {
+                // Check if we have multiple files. 
+                string FileToLoad = SelectAttachmentDialog.FileName;
+
+                // Store new file object value. Validate it on the ViewModel object first.
+                bool LoadResult = this.ViewModel.LoadSimulation(FileToLoad);
+                if (LoadResult) this.ViewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
+                else this.ViewLogger.WriteLog("FAILED TO LOAD NEW SIMULATION FILE! THIS IS FATAL", LogType.ErrorLog);
+
+                // Enable grid, remove click command.
+                Task.Run(() =>
+                {
+                    // Show new temp state
+                    Dispatcher.Invoke(() =>
+                    {
+                        ParentGrid.IsEnabled = true;
+                        SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
+                        SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                        SenderButton.Click -= this.LoadSimulationButton_OnClick;
+                    });
+
+                    // Wait for 3.5 Seconds
+                    Thread.Sleep(3500);
+                    Dispatcher.Invoke(() =>
+                    {
+                        // Reset button values 
+                        SenderButton.Content = DefaultContent;
+                        SenderButton.Background = DefaultColor;
+                        SenderButton.Click += this.LoadSimulationButton_OnClick;
+
+                        // Log information
+                        this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                    });
+                });
+            });
+        }
+        /// <summary>
+        /// Toggles the view of our editor for flyout values
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void ToggleSimulationEditor_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Toggle the view for our simulation editor flyout
+            this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
+            this.ViewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
+
+            // Toggle the content of the sending button
+            Button SendButton = (Button)Sender;
+            SendButton.Content = this.SimulationEditorFlyout.IsOpen ?
+                "Hide Editor" : "Edit Simulation";
+            this.ViewLogger.WriteLog("TOGGLED EDITOR TOGGLE SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
+        }
+
+
+        /// <summary>
+        /// Executes a new simulation playback routine
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void StartSimulationButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Start by checking if we have hardware selected for simulations on the hardware view page.
+            this.ViewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
+            var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
+            if (CurrentHwInfo.SelectedDevice == "No Device Selected") 
+            {
+                // Log that we can't simulate with no hardware picked, then show the flyout/info to tell the user this is not possible.
+                this.ViewLogger.WriteLog("NO HARDWARE CONFIGURATION FOUND! SHOWING ERROR FLYOUT TO INFORM USER TO SELECT HARDWARE TO USE FOR HOSTING!", LogType.InfoLog);
+
+                // TODO: SHOW FLYOUT FOR NO POSSIBE INTERFACES!
+            }
+        }
     }
 }
