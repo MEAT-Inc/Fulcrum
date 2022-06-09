@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpSimulator;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {

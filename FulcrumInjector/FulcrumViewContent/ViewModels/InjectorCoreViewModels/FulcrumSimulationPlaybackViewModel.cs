@@ -8,6 +8,7 @@ using System.Windows;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+using Newtonsoft.Json.Linq;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -64,6 +65,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 this.IsSimLoaded = false;
                 return false;
             }
+
+            // Build a new Simulation Loader and parse contents of the sim file into it.
+            this._simLoader = new SimulationLoader();
+            SimulationChannel[] InputSimChannels = JArray.Parse(File.ReadAllText(SimFile)).ToObject<SimulationChannel[]>();
+            ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
+            foreach (var SimChannel in InputSimChannels) { this._simLoader.AddSimChannel(SimChannel); }
+            ViewModelLogger.WriteLog($"PULLED ALL {InputSimChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
 
             // Load file contents and store name of file on our view model
             this.IsSimLoaded = true;
