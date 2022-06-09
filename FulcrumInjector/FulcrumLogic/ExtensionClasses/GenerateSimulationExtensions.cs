@@ -11,6 +11,7 @@ using FulcrumInjector.FulcrumViewContent;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpSimulator.SimulationObjects;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 
@@ -122,7 +123,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 $"\n--> {PTFilterCommands.Length} FILTERS" +
                 $"\n--> {PTReadCommands.Length} READ COMMANDS" +
                 $"\n--> {PTWriteCommands.Length} WRITE COMMANDS" + 
-                $"\n--> {NextChannel.PairedMessageArray.Length}",
+                $"\n--> {NextChannel.MessagePairs.Length}",
                 LogType.InfoLog
             );
 

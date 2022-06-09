@@ -1,121 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
+using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpSimulator;
+using SharpSimulator.SimulationObjects;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 
-namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
+namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {
     /// <summary>
     /// Class object which contains messages and filters for a simulation channel object
     /// </summary>
-    public class SimulationChannel
+    public static class SimChannelExtensions
     {
-        // Channel ID Built and Logger
-        public readonly uint ChannelId;
-        public readonly uint ChannelBaudRate;
-        public readonly uint ChannelConnectFlags;
-        public readonly ProtocolId ChannelProtocol;
-        private readonly SubServiceLogger SimChannelLogger;
-
-        // Class Values for a channel to simulate
-        public J2534Filter[] MessageFilters;
-        public PassThruStructs.PassThruMsg[] MessagesSent;
-        public PassThruStructs.PassThruMsg[] MessagesRead;
-        public Tuple<PassThruStructs.PassThruMsg, PassThruStructs.PassThruMsg[]>[] PairedMessageArray;
-
-        /// <summary>
-        /// Builds a new Channel Simulation object from the given channel ID
-        /// </summary>
-        /// <param name="ChannelId"></param>
-        public SimulationChannel(int ChannelId, ProtocolId ProtocolInUse, uint ChannelBaud, uint ChannelFlags)
-        {
-            // Store the Channel ID
-            this.ChannelId = (uint)ChannelId;
-            this.ChannelProtocol = ProtocolInUse;
-            this.ChannelBaudRate = ChannelBaud;
-            this.ChannelConnectFlags = ChannelFlags;
-
-            // Log new information output
-            this.SimChannelLogger = new SubServiceLogger($"SimChannelLogger_ID-{this.ChannelId}");
-            this.SimChannelLogger.WriteLog($"BUILT NEW SIM CHANNEL OBJECT FOR CHANNEL ID {this.ChannelId}!", LogType.InfoLog);
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
+        // Logger object for this extension class
+        private static SubServiceLogger _simExtensionLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimExtensionLogger")) ?? new SubServiceLogger("SimExtensionLogger");
 
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object
         /// </summary>
         /// <param name="ExpressionsToStore">Expressions to extract and store</param>
         /// <returns>The Filters built</returns>
-        public J2534Filter[] StoreMessageFilters(PassThruStartMessageFilterExpression[] ExpressionsToStore)
+        public static J2534Filter[] StoreMessageFilters(this SimulationChannel InputChannel, PassThruStartMessageFilterExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            this.SimChannelLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
+            _simExtensionLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
             Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJObject.ConvertFilterExpression(FilterExpression, true)));
             
             // Return the built filter objects here.
-            this.MessageFilters = BuiltFilters.ToArray();
+            InputChannel.MessageFilters = BuiltFilters.ToArray();
             return BuiltFilters.ToArray();
         }
         /// <summary>
         /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
         /// </summary>
         /// <returns>List of messages stored</returns>
-        public PassThruStructs.PassThruMsg[] StoreMessagesWritten(PassThruWriteMessagesExpression[] ExpressionsToStore)
+        public static PassThruStructs.PassThruMsg[] StoreMessagesWritten(this SimulationChannel InputChannel, PassThruWriteMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            this.SimChannelLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
+            _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
             Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.Add(ExpressionToJObject.ConvertWriteExpression(MessageExpression)));
 
             // Return the built filter objects here.
-            var CombinedMessagesSet = (this.MessagesSent ?? Array.Empty<PassThruStructs.PassThruMsg>()).ToList();
+            var CombinedMessagesSet = (InputChannel.MessagesSent ?? Array.Empty<PassThruStructs.PassThruMsg>()).ToList();
             CombinedMessagesSet.AddRange(BuiltMessages);
             CombinedMessagesSet = CombinedMessagesSet
                 .Distinct()
                 .ToList();
 
             // Return the distinct combinations
-            this.MessagesSent = CombinedMessagesSet.ToArray();
+            InputChannel.MessagesSent = CombinedMessagesSet.ToArray();
             return CombinedMessagesSet.ToArray();
         }
         /// <summary>
         /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
         /// </summary>
         /// <returns>List of messages stored</returns>
-        public PassThruStructs.PassThruMsg[] StoreMessagesRead(PassThruReadMessagesExpression[] ExpressionsToStore)
+        public static PassThruStructs.PassThruMsg[] StoreMessagesRead(this SimulationChannel InputChannel, PassThruReadMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            this.SimChannelLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
+            _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
             Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.Add(ExpressionToJObject.ConvertReadExpression(MessageExpression)));
 
             // Return the built filter objects here.
-            var CombinedMessagesSet = (this.MessagesRead ?? Array.Empty<PassThruStructs.PassThruMsg>()).ToList();
+            var CombinedMessagesSet = (InputChannel.MessagesRead ?? Array.Empty<PassThruStructs.PassThruMsg>()).ToList();
             CombinedMessagesSet.AddRange(BuiltMessages.ToList());
             CombinedMessagesSet = CombinedMessagesSet
                 .Distinct()
                 .ToList();
 
             // Return the distinct combinations
-            this.MessagesRead = CombinedMessagesSet.ToArray();
+            InputChannel.MessagesRead = CombinedMessagesSet.ToArray();
             return CombinedMessagesSet.ToArray();
         }
         /// <summary>
         /// Pairs off a set of input Expressions to find their pairings
         /// </summary>
         /// <param name="GroupedExpression">Expressions to search thru</param>
-        public Tuple<PassThruStructs.PassThruMsg, PassThruStructs.PassThruMsg[]>[] StorePassThruPairs(PassThruExpression[] GroupedExpression)
+        public static SimulationMessagePair[] StorePassThruPairs(this SimulationChannel InputChannel, PassThruExpression[] GroupedExpression)
         {
             // Pull out our pairs
             var MessagesPaired = new List<Tuple<PassThruWriteMessagesExpression, PassThruReadMessagesExpression[]>>();
@@ -155,7 +128,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             }
 
             // Using each item in the built array, convert them all into 
-            var TempPairsCast = new List<Tuple<PassThruStructs.PassThruMsg, PassThruStructs.PassThruMsg[]>>();
+            var TempPairsCast = new List<SimulationMessagePair>();
             foreach (var PairedMessageSet in MessagesPaired)
             {
                 // Convert the Send command into a message here
@@ -165,15 +138,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     .ToArray();
 
                 // Build a new Tuple and append it
-                TempPairsCast.Add(new Tuple<PassThruStructs.PassThruMsg, PassThruStructs.PassThruMsg[]>(
-                    SendExpressionAsMessage,
-                    ReadExpressionsAsMessages
-                ));
+                TempPairsCast.Add(new SimulationMessagePair(SendExpressionAsMessage, ReadExpressionsAsMessages));
             }
 
             // Store onto the class, return built values
-            this.PairedMessageArray = TempPairsCast.ToArray();
-            return this.PairedMessageArray;
+            InputChannel.MessagePairs = TempPairsCast.ToArray();
+            return InputChannel.MessagePairs;
         }
     }
 }

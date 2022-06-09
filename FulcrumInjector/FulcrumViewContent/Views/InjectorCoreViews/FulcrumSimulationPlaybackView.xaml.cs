@@ -178,8 +178,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Log that we can't simulate with no hardware picked, then show the flyout/info to tell the user this is not possible.
                 this.ViewLogger.WriteLog("NO HARDWARE CONFIGURATION FOUND! SHOWING ERROR FLYOUT TO INFORM USER TO SELECT HARDWARE TO USE FOR HOSTING!", LogType.InfoLog);
 
-                // TODO: SHOW FLYOUT FOR NO POSSIBE INTERFACES!
+                // TODO: SHOW FLYOUT FOR NO POSSIBLE INTERFACES AND NEED TO SELECT ONE FOR USE
+                return;
             }
+
+            // Now using the given hardware, run our start simulation 
         }
     }
 }
