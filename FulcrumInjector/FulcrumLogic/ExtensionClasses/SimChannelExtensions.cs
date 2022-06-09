@@ -9,6 +9,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
+using SharpSimulator.SimulationObjects;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 
@@ -28,7 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="ExpressionsToStore">Expressions to extract and store</param>
         /// <returns>The Filters built</returns>
-        public static J2534Filter[] StoreMessageFilters(this SharpSimulator.SimulationChannel InputChannel, PassThruStartMessageFilterExpression[] ExpressionsToStore)
+        public static J2534Filter[] StoreMessageFilters(this SimulationChannel InputChannel, PassThruStartMessageFilterExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
             _simExtensionLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
@@ -87,7 +88,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// Pairs off a set of input Expressions to find their pairings
         /// </summary>
         /// <param name="GroupedExpression">Expressions to search thru</param>
-        public static SimulationMessagePair[] StorePassThruPairs(this SharpSimulator.SimulationChannel InputChannel, PassThruExpression[] GroupedExpression)
+        public static SimulationMessagePair[] StorePassThruPairs(this SimulationChannel InputChannel, PassThruExpression[] GroupedExpression)
         {
             // Pull out our pairs
             var MessagesPaired = new List<Tuple<PassThruWriteMessagesExpression, PassThruReadMessagesExpression[]>>();
