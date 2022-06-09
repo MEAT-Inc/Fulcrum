@@ -24,6 +24,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
+using SharpSimulator.SimulationObjects;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
