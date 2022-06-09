@@ -38,7 +38,7 @@
         <!-- Title and information -->
         <Grid Margin="5,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1.0*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid Margin="0,0,15,0">
@@ -67,7 +67,7 @@
         <!-- Main Content Box -->
         <Grid Grid.Row="2" Margin="10,0,10,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height=".10*"/>
+                <RowDefinition Height=".11*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
@@ -90,13 +90,13 @@
                     Click="LoadSimulationButton_OnClick"
                     Content="Load Simulation" Margin="10,0,0,0"
                     Style="{StaticResource ActionButtonStyle}"/>
-                <Button Grid.Column="2"
-                        Click="StartSimulationButton_OnClick"
-                        Content="Start Simulation" Margin="5,0,0,0"
+                <Button Grid.Column="2" Click="ToggleSimulationEditor_OnClick"
+                        Content="Setup Simulation" Margin="5,0,0,0"
                         Style="{StaticResource ActionButtonStyle}"
                         IsEnabled="{Binding Path=IsSimLoaded}"/>
-                <Button Grid.Column="3" Click="ToggleSimulationEditor_OnClick"
-                        Content="Edit Simulation" Margin="5,0,0,0"
+                <Button Grid.Column="3"
+                        Click="StartSimulationButton_OnClick"
+                        Content="Start Simulation" Margin="5,0,0,0"
                         Style="{StaticResource ActionButtonStyle}"
                         IsEnabled="{Binding Path=IsSimLoaded}"/>
             </Grid>
@@ -177,13 +177,6 @@
                             <Border Grid.Row="1" Margin="0,0,0,0"
                                     BorderBrush="{StaticResource TextColorBase}" 
                                     BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
-
-                            <!-- Editor Contents -->
-                            <avalonedit:TextEditor
-                                Grid.Row="2"
-                                IsReadOnly="True"
-                                x:Name="ReplayLogInputContent"
-                                Style="{StaticResource LoggingOutputBoxStyle}"/>
                         </Grid>
                     </mah:Flyout>
                 </mah:FlyoutsControl>

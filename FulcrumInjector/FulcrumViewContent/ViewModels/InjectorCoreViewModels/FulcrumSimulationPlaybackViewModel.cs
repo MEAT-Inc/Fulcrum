@@ -29,16 +29,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Simulation Helper objects
         private SimulationLoader _simLoader;
-        private SimulationGenerator _simGenerator;
 
         // Private control values
         private bool _isSimLoaded;
         private string _loadedSimFile;
+        private string _loadedSimFileContent;
 
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
         public string LoadedSimFile { get => this._loadedSimFile; set => PropertyUpdated(value); }
-
+        public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
             // Build a new Simulation Loader and parse contents of the sim file into it.
             this._simLoader = new SimulationLoader();
-            SimulationChannel[] InputSimChannels = JArray.Parse(File.ReadAllText(SimFile)).ToObject<SimulationChannel[]>();
+            this.LoadedSimFileContent = File.ReadAllText(SimFile);
+            SimulationChannel[] InputSimChannels = JArray.Parse(File.ReadAllText(this.LoadedSimFileContent)).ToObject<SimulationChannel[]>();
             ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
             foreach (var SimChannel in InputSimChannels) { this._simLoader.AddSimChannel(SimChannel); }
             ViewModelLogger.WriteLog($"PULLED ALL {InputSimChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);

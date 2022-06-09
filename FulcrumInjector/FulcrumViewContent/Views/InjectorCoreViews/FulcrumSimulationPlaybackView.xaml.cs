@@ -158,7 +158,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Toggle the content of the sending button
             Button SendButton = (Button)Sender;
             SendButton.Content = this.SimulationEditorFlyout.IsOpen ?
-                "Hide Editor" : "Edit Simulation";
+                "Hide Setup" : "Setup Simulation";
             this.ViewLogger.WriteLog("TOGGLED EDITOR TOGGLE SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
         }
 
