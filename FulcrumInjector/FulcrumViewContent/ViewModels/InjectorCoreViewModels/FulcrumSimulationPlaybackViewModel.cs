@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation.DefaultSimConfig;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using Newtonsoft.Json.Linq;
@@ -28,7 +29,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorSimPlaybackViewModelLogger")) ?? new SubServiceLogger("InjectorSimPlaybackViewModelLogger");
 
         // Simulation Helper objects
-        private SimulationLoader _simLoader;
+        public SimulationLoader SimLoader;
+        public SimulationPlayer SimPlayer;
 
         // Private control values
         private bool _isSimLoaded;
@@ -68,11 +70,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Build a new Simulation Loader and parse contents of the sim file into it.
-            this._simLoader = new SimulationLoader();
+            this.SimLoader = new SimulationLoader();
             this.LoadedSimFileContent = File.ReadAllText(SimFile);
             SimulationChannel[] InputSimChannels = JArray.Parse(File.ReadAllText(this.LoadedSimFileContent)).ToObject<SimulationChannel[]>();
             ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
-            foreach (var SimChannel in InputSimChannels) { this._simLoader.AddSimChannel(SimChannel); }
+            foreach (var SimChannel in InputSimChannels) { this.SimLoader.AddSimChannel(SimChannel); }
             ViewModelLogger.WriteLog($"PULLED ALL {InputSimChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
 
             // Load file contents and store name of file on our view model
@@ -91,8 +93,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <returns></returns>
         public bool StartSimulation(JVersion Version, string DllName, string DeviceName)
         {
-            // TODO: BUILD IN LOGIC FOR RUNNING SIMULATIONS!
-            return false;
+            // Setup the simulation player
+            // TODO: BUILD LOGIC TO IMPORT VALUES FROM THE SIM SETUP VIEW
+            ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
+            this.SimPlayer = new SimulationPlayer(this.SimLoader, Version, DllName, DeviceName);
+            this.SimPlayer.SetResponsesEnabled(true);
+            this.SimPlayer.SetDefaultMessageValues(100, 1);
+            this.SimPlayer.SetDefaultConfigurations(ISO15765SimConfig.ReaderConfigs);
+            this.SimPlayer.SetDefaultMessageFilters(ISO15765SimConfig.ReaderFilters);
+            this.SimPlayer.SetDefaultConnectionType(ISO15765SimConfig.ReaderProtocol, ISO15765SimConfig.ReaderChannelFlags, ISO15765SimConfig.ReaderBaudRate);
+            ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
+
+            // Run the init routine and start reading output here
+            this.SimPlayer.InitializeSimReader(); 
+            this.SimPlayer.StartSimulationReader(); 
+            ViewModelLogger.WriteLog("STARTED SIMULATION PLAYER FOR OUR LOADED SIMULATION OK! MESSAGE DATA IS BEING PROCESSED TILL THIS TASK IS KILLED!");
+
+            // Return done.
+            return true;
         }
     }
 }

@@ -61,6 +61,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+
+            // Try and import the sim loader from the view model for our simulation creation view
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
