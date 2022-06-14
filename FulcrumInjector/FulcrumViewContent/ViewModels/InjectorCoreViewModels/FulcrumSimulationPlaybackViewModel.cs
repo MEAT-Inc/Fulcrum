@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
@@ -107,11 +108,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public bool StartSimulation(JVersion Version, string DllName, string DeviceName)
         {
             // Setup the simulation player
-            // TODO: BUILD LOGIC TO IMPORT VALUES FROM THE SIM SETUP VIEW
             ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
 
             // Pull in a base configuration and build a new reader
-            var SimConfig = SimulationConfig.BuildConfigForProtocol(ProtocolId.ISO15765);
+            // TODO: CONFIGURE THIS TO USE INPUT VALUES FROM SETUP
+            var SimConfig = SimulationConfigLoader.LoadSimulationConfig(ProtocolId.ISO15765);
             this.SimPlayer = new SimulationPlayer(this.SimLoader, Version, DllName, DeviceName);
 
             // Configure our simulation player here
