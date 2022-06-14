@@ -175,16 +175,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Start by checking if we have hardware selected for simulations on the hardware view page.
             this.ViewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
+            
+            // TODO: BUILD LOGIC FOR SHOWING NO DEVICE CURRENTLY IN USE!
             if (CurrentHwInfo.SelectedDevice == "No Device Selected") 
             {
                 // Log that we can't simulate with no hardware picked, then show the flyout/info to tell the user this is not possible.
-                this.ViewLogger.WriteLog("NO HARDWARE CONFIGURATION FOUND! SHOWING ERROR FLYOUT TO INFORM USER TO SELECT HARDWARE TO USE FOR HOSTING!", LogType.InfoLog);
-
                 // TODO: SHOW FLYOUT FOR NO POSSIBLE INTERFACES AND NEED TO SELECT ONE FOR USE
+                this.ViewLogger.WriteLog("NO HARDWARE CONFIGURATION FOUND! SHOWING ERROR FLYOUT TO INFORM USER TO SELECT HARDWARE TO USE FOR HOSTING!", LogType.InfoLog);
                 return;
             }
 
             // Now using the given hardware, run our start simulation 
+            CurrentHwInfo.StopVehicleMonitoring();
+            this.ViewModel.StartSimulation(CurrentHwInfo.VersionType, CurrentHwInfo.SelectedDLL, CurrentHwInfo.SelectedDevice);
         }
     }
 }

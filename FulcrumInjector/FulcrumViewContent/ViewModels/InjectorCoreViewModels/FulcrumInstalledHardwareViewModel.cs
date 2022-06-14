@@ -51,6 +51,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 if (FulcrumConstants.FulcrumVehicleConnectionInfoViewModel == null) return;
                 FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.SelectedDLL = 
                     value == null ? "No DLL Selected" : value.Name;
+                FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.VersionType =
+                    value?.DllVersion ?? JVersion.ALL_VERSIONS;
             }
         }
 
