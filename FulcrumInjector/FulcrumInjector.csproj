@@ -181,7 +181,7 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruStartMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruStopMessageFilterExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruWriteMessagesExpression.cs" />
-    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\ExpressionToJObject.cs" />
+    <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\ExpressionToJ2534Object.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\SimulationGenerator.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\SimChannelExtensions.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />

@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
     /// <summary>
     /// Static class used to convert expressions into J2534 objects
     /// </summary>
-    public class ExpressionToJObject
+    public class ExpressionToJ2534Object
     {
         /// <summary>
         /// Converts a J2534 Filter expression into a filter object
