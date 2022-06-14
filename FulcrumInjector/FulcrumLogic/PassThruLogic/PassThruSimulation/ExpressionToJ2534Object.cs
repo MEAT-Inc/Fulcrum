@@ -77,8 +77,45 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 var MessageFlags = uint.Parse(MessageSet[3]);
                 var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[4].Split(':')[0]);
 
-                // Build a message and then return it.
-                MessageData = MessageData.Replace("0x", string.Empty);
+                // TODO: FORMAT THIS CODE TO WORK FOR DIFFERENT PROTOCOL VALUE TYPES!
+
+                // ISO15765 11 Bit
+                if (MessageData.StartsWith("00 00"))      
+                {
+                    // 11 Bit messages need to be converted according to this format
+                    // 00 00 07 DF 01 00 -- 00 00 07 DF 02 01 00 00 00 00 00 00
+                    // Take first 4 bytes 
+                    //      00 00 07 DF
+                    // Count the number of bytes left
+                    //      01 00 -- 2 bytes
+                    // Insert the number of bytes (02) and the data sent
+                    //      00 00 07 DF 02 01 00
+                    // Take the number of bytes now and append 0s till it's 12 long
+                    //      00 00 07 DF 02 01 00 00 00 00 00 00
+
+                    // Build a message and then return it.
+                    string[] MessageDataSplit = MessageData.Split(' ').ToArray();
+                    string[] FormattedData = MessageDataSplit.Take(4).ToArray();                           // 00 00 07 DF
+                    string[] DataSentOnly = MessageDataSplit.Skip(4).ToArray();                            // 01 00
+                    string[] FinalData = FormattedData
+                        .Concat(new string[] { "0x" + DataSentOnly.Length.ToString("X") })
+                        .Concat(DataSentOnly)
+                        .ToArray();                                                                        // 00 00 07 DF 02 01 00                                                           
+                    string[] TrailingZeros = Enumerable.Repeat("0x00", 12 - FinalData.Length).ToArray();
+                    FinalData = FinalData.Concat(TrailingZeros).ToArray();                                 // 00 00 07 DF 02 01 00 00 00 00 00
+
+                    // Convert back into a string value and format
+                    MessageData = string.Join(" ", FinalData);
+                    MessageData = MessageData.Replace("0x", string.Empty);
+                }
+
+                // ISO15765 29 Bit
+                if (MessageData.StartsWith("18 db"))
+                {
+                    // TODO: BUILD FORMATTING ROUTINE FOR 29 BIT CAN!
+                }
+
+                // Build our final output message.
                 MessageBuilt = J2534Device.CreatePTMsgFromString(ProtocolId, MessageFlags, MessageData);
             }
 
