@@ -146,7 +146,7 @@
                     <TextBlock Grid.Row="1" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center" TextWrapping="Wrap" Width="500" FontSize="15">
                         <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
                         <LineBreak/>
-                        <Run Text="Any questions, comments, or concerns with this application can be directed to either neo.smith@motorengineeringandtech.com or by submitting a bug or issue report on the repository for this application."/>
+                        <Run Text="Any questions, comments, or concerns with this application can be directed to either neo.smith@meatinc.autos or by submitting a bug or issue report on the repository for this application."/>
                         <LineBreak/>
                         <LineBreak/>
                         <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software."/>

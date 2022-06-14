@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
@@ -14,6 +15,7 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using SharpSimulator.SimulationObjects;
+using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
@@ -28,17 +30,18 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorSimPlaybackViewModelLogger")) ?? new SubServiceLogger("InjectorSimPlaybackViewModelLogger");
 
         // Simulation Helper objects
-        private SimulationLoader _simLoader;
-        private SimulationGenerator _simGenerator;
+        public SimulationLoader SimLoader;
+        public SimulationPlayer SimPlayer;
 
         // Private control values
         private bool _isSimLoaded;
         private string _loadedSimFile;
+        private string _loadedSimFileContent;
 
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
         public string LoadedSimFile { get => this._loadedSimFile; set => PropertyUpdated(value); }
-
+        public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -68,17 +71,31 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Build a new Simulation Loader and parse contents of the sim file into it.
-            this._simLoader = new SimulationLoader();
-            SimulationChannel[] InputSimChannels = JArray.Parse(File.ReadAllText(SimFile)).ToObject<SimulationChannel[]>();
-            ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
-            foreach (var SimChannel in InputSimChannels) { this._simLoader.AddSimChannel(SimChannel); }
-            ViewModelLogger.WriteLog($"PULLED ALL {InputSimChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
+            this.SimLoader = new SimulationLoader();
+            this.LoadedSimFileContent = File.ReadAllText(SimFile);
+            try
+            {
+                SimulationChannel[] InputSimChannels = JArray.Parse(this.LoadedSimFileContent).ToObject<SimulationChannel[]>();
+                ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
+                foreach (var SimChannel in InputSimChannels) { this.SimLoader.AddSimChannel(SimChannel); }
+                ViewModelLogger.WriteLog($"PULLED ALL {InputSimChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
 
-            // Load file contents and store name of file on our view model
-            this.IsSimLoaded = true;
-            this.LoadedSimFile = SimFile;
-            ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
-            return true;
+                // Load file contents and store name of file on our view model
+                this.IsSimLoaded = true;
+                this.LoadedSimFile = SimFile;
+                ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
+                return true;
+            }
+            catch (Exception LoadSimEx)
+            {
+                // Log failure out and return false
+                ViewModelLogger.WriteLog($"FAILED TO LOAD IN SIMULATION FILE {SimFile}!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("SIMULATION LOAD EXCEPTION IS BEING LOGGED BELOW!", LoadSimEx);
+
+                // Set Loaded to false and return false
+                this.IsSimLoaded = false;
+                return false;
+            }
         }
 
         /// <summary>
@@ -90,8 +107,29 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <returns></returns>
         public bool StartSimulation(JVersion Version, string DllName, string DeviceName)
         {
-            // TODO: BUILD IN LOGIC FOR RUNNING SIMULATIONS!
-            return false;
+            // Setup the simulation player
+            ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
+
+            // Pull in a base configuration and build a new reader
+            // TODO: CONFIGURE THIS TO USE INPUT VALUES FROM SETUP
+            var SimConfig = SimulationConfigLoader.LoadSimulationConfig(ProtocolId.ISO15765);
+            this.SimPlayer = new SimulationPlayer(this.SimLoader, Version, DllName, DeviceName);
+
+            // Configure our simulation player here
+            this.SimPlayer.SetResponsesEnabled(true);
+            this.SimPlayer.SetDefaultConfigurations(SimConfig.ReaderConfigs);
+            this.SimPlayer.SetDefaultMessageFilters(SimConfig.ReaderFilters);
+            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount);
+            this.SimPlayer.SetDefaultConnectionType(SimConfig.ReaderProtocol, SimConfig.ReaderChannelFlags, SimConfig.ReaderBaudRate);
+            ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
+
+            // Run the init routine and start reading output here
+            this.SimPlayer.InitializeSimReader(); 
+            this.SimPlayer.StartSimulationReader(); 
+            ViewModelLogger.WriteLog("STARTED SIMULATION PLAYER FOR OUR LOADED SIMULATION OK! MESSAGE DATA IS BEING PROCESSED TILL THIS TASK IS KILLED!");
+
+            // Return done.
+            return true;
         }
     }
 }
