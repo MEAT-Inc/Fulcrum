@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
         /// </summary>
         /// <param name="ObjectType"></param>
         /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType.GetType() == typeof(SettingsEntryModel); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(SettingsEntryModel); }
 
         /// <summary>
         /// Writes JSON output
