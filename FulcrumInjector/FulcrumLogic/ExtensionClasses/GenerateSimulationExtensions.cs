@@ -123,7 +123,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 $"\n--> {PTFilterCommands.Length} FILTERS" +
                 $"\n--> {PTReadCommands.Length} READ COMMANDS" +
                 $"\n--> {PTWriteCommands.Length} WRITE COMMANDS" + 
-                $"\n--> {NextChannel.MessagePairs.Length}",
+                $"\n--> {NextChannel.MessagePairs.Length} MESSAGE PAIRS TOTAL",
                 LogType.InfoLog
             );
 
