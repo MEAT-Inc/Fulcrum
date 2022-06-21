@@ -257,14 +257,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 Grid ParentGrid = SenderButton.Parent as Grid; 
                 ViewerContentComboBox.IsEnabled = false; ParentGrid.IsEnabled = false;
 
-                // Close the processing flyout
-                this.ProcessingFlyout.IsOpen = false;
-
                 // Enable grid, show result on buttons
                 ParentGrid.IsEnabled = true;
                 ViewerContentComboBox.IsEnabled = true;
                 SenderButton.Content = ProcessResult ? "Processed!" : "Failed!";
                 SenderButton.Background = ProcessResult ? Brushes.DarkGreen : Brushes.DarkRed;
+
+                // Wait for 2 seconds and close our flyout
+                Task.Run(() =>
+                {
+                    Thread.Sleep(1000);
+                    Dispatcher.Invoke(() => this.ProcessingFlyout.IsOpen = false);
+                });
 
                 // Reset values here.
                 Task.Run(() =>

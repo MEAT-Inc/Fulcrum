@@ -31,12 +31,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 FilterExpression.ExpressionLogger.WriteLog($"FILTER COMMAND LINES ARE SHOWN BELOW:\n{FilterExpression.CommandLines}", LogType.TraceLog);
                 return null;
             }
-
+            
             // Build filter output contents
+            // BUG: NOT ALL EXTRACTED REGEX OUTPUT IS THE SAME! THIS RESULTS IN SOME POOR INDEXING ROUTINES
             try
             {
-                var FilterFlags = uint.Parse(FilterContent[0].Last());
                 var FilterType = FilterExpression.FilterType.Split(':')[1];
+                var FilterFlags = uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
                 var FilterProtocol = (ProtocolId)uint.Parse(FilterContent[0][2].Split(':')[0]);
                 var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
                 var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
@@ -65,6 +66,37 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         }
         /// <summary>
         /// Converts a PTWrite Message Expression into a PTMessage
+        /// Some additional info about this conversion routine
+        ///
+        /// This method starts by pulling out the data of our message and finding out how many parts we need to split it into
+        /// Sample Input Data:
+        ///      0x00 0x00 0x07 0xE8 0x49 0x02 0x01 0x31 0x47 0x31 0x46 0x42 0x33 0x44 0x53 0x33 0x4B 0x30 0x31 0x31 0x37 0x32 0x32 0x38
+        ///
+        /// Using the input message size (24 in this case) we need to built N Number of messages with a max size of 12 bytes for each one
+        /// We also need to include the changes needed to make sure the message count bytes are included
+        /// So with that in mind, our 24 bytes of data gets 3 bytes removed and included in our first message out
+        /// First message value would be as follows
+        ///      00 00 07 E8 10 14 49 02 01 31 47 31
+        ///          00 00 07 E8 -> Response Address
+        ///          10 14 -> Indicates a multiple part message and the number of bytes left to read
+        ///          49 02 -> 09 + 40 means positive response and 02 is the command issues
+        ///          01 -> Indicates data begins
+        ///          31 47 31 -> First three bytes of data
+        /// 
+        /// Then all following messages follow the format of 00 00 0X XX TC DD DD DD DD DD DD DD
+        ///      00 00 0X -> Padding plus the address start byte
+        ///      XX -> Address byte two
+        ///      TC -> T - Total messages and C - Current Message number
+        ///      DD DD DD DD DD DD DD -> Data of the message value
+        /// 
+        /// We also need to include a frame pad indicator output. This message is just 00 00 07 and  the input address byte two 
+        /// minus 8. So for 00 00 07 E8, we would get 00 00 07 E0
+        ///
+        /// This means for our input message value in this block of text, our output must look like the following
+        ///      00 00 07 E8 10 14 49 02 01 31 47 31     --> Start of message and first three bytes
+        ///      00 00 07 E0 00 00 00 00 00 00 00 00     --> Frame pad message
+        ///      00 00 07 E8 21 46 42 33 44 53 33 4B     --> Bytes 4-10
+        ///      00 00 07 E8 22 30 31 31 37 32 32 38     --> Bytes 11-17
         /// </summary>
         /// <param name="MessageExpression"></param>
         /// <returns></returns>
@@ -74,9 +106,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             MessageExpression.FindMessageContents(out List<string[]> MessageContents);
             if (MessageContents.Count == 0)
             {
+                // Return an empty array of output objects
                 MessageExpression.ExpressionLogger.WriteLog("MESSAGE CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
                 MessageExpression.ExpressionLogger.WriteLog($"MESSAGE COMMAND LINES ARE SHOWN BELOW:\n{MessageExpression.CommandLines}", LogType.TraceLog);
-                return default;
+                return Array.Empty<PassThruStructs.PassThruMsg>();
             }
 
             // Loop all the message values located and append them into the list of output
@@ -84,6 +117,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             foreach (var MessageSet in MessageContents)
             {
                 // Wrap inside a try catch to ensure we get something back
+                // TODO: FORMAT THIS CODE TO WORK FOR DIFFERENT PROTOCOL VALUE TYPES!
                 try
                 {
                     // Store message values here.
@@ -91,10 +125,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     var MessageFlags = uint.Parse(MessageSet[3]);
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[4].Split(':')[0]);
 
-                    // TODO: FORMAT THIS CODE TO WORK FOR DIFFERENT PROTOCOL VALUE TYPES!
-
                     // ISO15765 11 Bit
-                    if (MessageData.StartsWith("00 00"))
+                    if (MessageData.StartsWith("0x00 0x00"))
                     {
                         // 11 Bit messages need to be converted according to this format
                         // 00 00 07 DF 01 00 -- 00 00 07 DF 02 01 00 00 00 00 00 00
@@ -112,7 +144,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                         string[] FormattedData = MessageDataSplit.Take(4).ToArray();                           // 00 00 07 DF   --   Padding + Send Address
                         string[] DataSentOnly = MessageDataSplit.Skip(4).ToArray();                            // 01 00         --   Actual data transmission
                         string[] FinalData = FormattedData
-                            .Concat(new string[] { "0x" + DataSentOnly.Length.ToString("X") })
+                            .Concat(new string[] { "0x" + DataSentOnly.Length.ToString("X2") })
                             .Concat(DataSentOnly)
                             .ToArray();                                                                        // 00 00 07 DF 02 01 00   --   Padding + Send Addr + Size + Data                                                         
                         string[] TrailingZeros = Enumerable.Repeat("0x00", 12 - FinalData.Length).ToArray();
@@ -156,9 +188,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             MessageExpression.FindMessageContents(out List<string[]> MessageContents);
             if (MessageContents.Count == 0)
             {
+                // Return an empty array of output objects
                 MessageExpression.ExpressionLogger.WriteLog("MESSAGE CONTENTS WERE NOT ABLE TO BE EXTRACTED!", LogType.ErrorLog);
                 MessageExpression.ExpressionLogger.WriteLog($"MESSAGE COMMAND LINES ARE SHOWN BELOW:\n{MessageExpression.CommandLines}", LogType.TraceLog);
-                return default;
+                return Array.Empty<PassThruStructs.PassThruMsg>();
             }
 
             // Loop all the message values located and append them into the list of output
@@ -185,12 +218,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     }
 
                     // If it's not a frame pad message, add to our simulation
-                    var MessageFlags = uint.Parse(MessageSet[4]);
+                    var RxStatus = uint.Parse(MessageSet[4].Replace("RxS=", string.Empty));
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[2].Split(':')[0]);
 
                     // Build a message and then return it.
                     MessageData = MessageData.Replace("0x", string.Empty);
-                    var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, MessageFlags, MessageData);
+                    var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, RxStatus, MessageData);
                     MessagesBuilt = MessagesBuilt.Append(NextMessage).ToArray();
                 }
                 catch (Exception ConversionEx)

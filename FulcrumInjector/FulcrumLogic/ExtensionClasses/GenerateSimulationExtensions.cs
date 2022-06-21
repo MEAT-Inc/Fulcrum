@@ -94,7 +94,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 .ToArray();
 
             // Store progress value
-            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 25;
+            // FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 25;
 
             // Find the ProtocolID and Current Channel ID. Then build a sim channel
             if (PTConnectCommands.Length == 0) return null;
@@ -104,7 +104,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
 
             // Store progress value
-            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 50;
+            // FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 50;
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, BaudRateInUse, ChannelFlags);
@@ -114,7 +114,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             NextChannel.StorePassThruPairs(GroupedExpression);
 
             // Store progress value
-            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 75;
+            // FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 75;
 
             // Log information about the built out command objects.
             SimExtensionLogger.WriteLog(
@@ -123,12 +123,12 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 $"\n--> {PTFilterCommands.Length} FILTERS" +
                 $"\n--> {PTReadCommands.Length} READ COMMANDS" +
                 $"\n--> {PTWriteCommands.Length} WRITE COMMANDS" + 
-                $"\n--> {NextChannel.MessagePairs.Length}",
+                $"\n--> {NextChannel.MessagePairs.Length} MESSAGE PAIRS TOTAL",
                 LogType.InfoLog
             );
 
             // Return a new tuple of our object for the command output
-            FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 100;
+            // FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 100;
             return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
         }
     }
