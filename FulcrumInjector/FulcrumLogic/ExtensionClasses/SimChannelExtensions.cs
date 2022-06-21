@@ -37,8 +37,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJ2534Object.ConvertFilterExpression(FilterExpression, true)));
             
             // Return the built filter objects here.
-            InputChannel.MessageFilters = BuiltFilters.ToArray();
-            return BuiltFilters.ToArray();
+            InputChannel.MessageFilters = BuiltFilters.Where(FilterObj => FilterObj != null).ToArray();
+            return BuiltFilters.Where(FilterObj => FilterObj != null).ToArray();
         }
         /// <summary>
         /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
@@ -128,16 +128,22 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             }
 
             // Store onto the class, return built values.
-            // Do this with my UNGODLY LINQ expression I built here
-            InputChannel.MessagePairs = (from PairedMessageSet in MessagesPaired
-                let SendExpressionAsMessage = ExpressionToJ2534Object.ConvertWriteExpression(PairedMessageSet.Item1)
-                let ReadExpressionsAsMessages = PairedMessageSet.Item2.Select(ExpressionToJ2534Object.ConvertReadExpression)
-                    .ToArray()
-                from MessageObject in SendExpressionAsMessage
-                let IndexOfMessageSet = SendExpressionAsMessage.ToList().IndexOf(MessageObject)
-                select new SimulationMessagePair(MessageObject, ReadExpressionsAsMessages[IndexOfMessageSet])).ToArray();
+            List<SimulationMessagePair> List = new List<SimulationMessagePair>();
+            foreach (var PairedMessageSet in MessagesPaired)
+            {
+                // Store basic values for contents here
+                PassThruStructs.PassThruMsg[] SendExpressionAsMessage = ExpressionToJ2534Object.ConvertWriteExpression(PairedMessageSet.Item1);
+                PassThruStructs.PassThruMsg[][] ReadExpressionsAsMessages = PairedMessageSet.Item2.Select(ExpressionToJ2534Object.ConvertReadExpression).ToArray();
 
-            // Return the built output contents.
+                // Loop and built output tuples
+                foreach (var MessageObject in SendExpressionAsMessage) {
+                    int IndexOfMessageSet = SendExpressionAsMessage.ToList().IndexOf(MessageObject);
+                    List.Add(new SimulationMessagePair(MessageObject, ReadExpressionsAsMessages[IndexOfMessageSet]));
+                }
+            }
+
+            // Store values for the input channel and return output
+            InputChannel.MessagePairs = List.ToArray();
             return InputChannel.MessagePairs;
         }
     }

@@ -113,19 +113,19 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.7.0.73\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.7.2.77\lib\net472\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.3.2.55, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.3.2.55\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.3.3.56, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.3.3.56\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.7.4.122, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.7.0.73\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.7.2.77\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.7.0.73, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.7.0.73\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.7.2.77, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.7.2.77\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=5.0.2.310, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpSimulator.0.7.0.73\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=5.1.1.315, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpSimulator.0.7.2.77\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.3.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.0\lib\net461\Svg.dll</HintPath>
@@ -170,7 +170,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FulcrumLogic\ExtensionClasses\GenerateSimulationExtensions.cs" />
-    <Compile Include="FulcrumLogic\ExtensionClasses\PassThruMessageExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionsGenerator.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruCloseExpression.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PassThruCommandType.cs" />
