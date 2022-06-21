@@ -39,9 +39,19 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 var FilterType = FilterExpression.FilterType.Split(':')[1];
                 var FilterFlags = uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
                 var FilterProtocol = (ProtocolId)uint.Parse(FilterContent[0][2].Split(':')[0]);
-                var FilterPatten = FilterContent[0].Last().Replace("0x ", string.Empty);
-                var FilterMask = FilterContent[1].Last().Replace("0x ", string.Empty);
-                var FilterFlow = FilterContent.Count != 3 ? "" : FilterContent[2].Last().Replace("0x ", string.Empty);
+                var FilterPatten = FilterContent
+                    .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Pattern")))
+                    .Last()
+                    .Replace("0x ", string.Empty);
+                var FilterMask = FilterContent
+                    .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Mask")))
+                    .Last()
+                    .Replace("0x ", string.Empty);
+                var FilterFlow = 
+                    FilterContent.Count != 3 ? "" : 
+                    FilterContent.FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Flow")))
+                        .Last()
+                        .Replace("0x ", string.Empty);
 
                 // Now convert our information into string values.
                 return new J2534Filter()
