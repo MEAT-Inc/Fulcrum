@@ -75,7 +75,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 this.SimLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
 
                 // Store progress value
-                double CurrentProgress = (BuiltExpressions.Count / (double)GroupedAsLists.Length) * 100.00;
+                double CurrentProgress = BuiltExpressions.Count / (double)GroupedAsLists.Length * 100.00;
                 FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
             });
 
@@ -96,21 +96,21 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
             // Make sure the channel objects exist here first. 
             this.GroupedChannelExpressions ??= Array.Empty<Tuple<int, PassThruExpression[]>>();
-            Parallel.ForEach(this.GroupedChannelExpressions, (ChannelObjectExpressions) =>
+            foreach (var ChannelObjectExpressions in this.GroupedChannelExpressions)
             {
                 // Pull the Channel ID, build our output contents
                 int ChannelId = ChannelObjectExpressions.Item1;
                 var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId);
 
+                // Store progress value
+                double CurrentProgress = BuiltChannelsList.Count / (double)this.GroupedChannelExpressions.Length * 100.00;
+                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
+
                 // Append it into our list of output here
-                if (BuiltChannel == null) return;
+                if (BuiltChannel == null) continue;
                 BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel.Item2));
                 this.SimLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
-
-                // Store progress value
-                double CurrentProgress = (BuiltChannelsList.Count / (double)this.GroupedChannelExpressions.Length) * 100.00;
-                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
-            }); 
+            }
 
             // Log information and exit out of this routine
             this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);

@@ -123,7 +123,6 @@ namespace FulcrumInjector.FulcrumViewContent
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSimulationSingleton =>
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
 
-
         // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSettingsPaneSingleton =>
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));

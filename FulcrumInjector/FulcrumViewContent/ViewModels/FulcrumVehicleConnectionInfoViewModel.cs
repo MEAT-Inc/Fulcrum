@@ -62,6 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         }
 
         // Device Information
+        public JVersion VersionType { get => _versionType; set => PropertyUpdated(value); }
         public string SelectedDLL { get => _selectedDLL; set => PropertyUpdated(value); }
         public string SelectedDevice 
         {
@@ -195,7 +196,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Pulls out the VIN number of the current vehicle and stores the voltage of it.
         /// </summary>
         /// <returns>True if pulled ok. False if not.</returns>
-        internal bool ReadVoltageAndVin()
+        public bool ReadVoltageAndVin()
         {
             // Now build our session instance and pull voltage first.
             bool NeedsMonitoringReset = this.IsMonitoring;
@@ -232,7 +233,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Consumes our active device and begins a voltage reading routine.
         /// </summary>
         /// <returns>True if consumed, false if not.</returns>
-        private bool StartVehicleMonitoring()
+        public bool StartVehicleMonitoring()
         {
             // Try and kill old sessions then begin refresh routine
             this.RefreshSource = new CancellationTokenSource();
@@ -309,7 +310,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Stops a refresh session. 
         /// </summary>
         /// <returns>True if stopped ok. False if not.</returns>
-        private void StopVehicleMonitoring()
+        public void StopVehicleMonitoring()
         {
             // Reset all values here.
             // if (this?.SelectedDevice != "No Device Selected") 

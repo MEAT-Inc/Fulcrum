@@ -34,11 +34,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Loop each of these filter objects in parallel and update contents.
             _simExtensionLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
-            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJObject.ConvertFilterExpression(FilterExpression, true)));
+            Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJ2534Object.ConvertFilterExpression(FilterExpression, true)));
             
             // Return the built filter objects here.
-            InputChannel.MessageFilters = BuiltFilters.ToArray();
-            return BuiltFilters.ToArray();
+            InputChannel.MessageFilters = BuiltFilters.Where(FilterObj => FilterObj != null).ToArray();
+            return BuiltFilters.Where(FilterObj => FilterObj != null).ToArray();
         }
         /// <summary>
         /// Stores a set of PTWrite Message commands into the current sim channel as messages to READ IN
@@ -49,7 +49,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Loop each of these filter objects in parallel and update contents.
             _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
-            Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.Add(ExpressionToJObject.ConvertWriteExpression(MessageExpression)));
+            Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.AddRange(ExpressionToJ2534Object.ConvertWriteExpression(MessageExpression)));
 
             // Return the built filter objects here.
             var CombinedMessagesSet = (InputChannel.MessagesSent ?? Array.Empty<PassThruStructs.PassThruMsg>()).ToList();
@@ -71,7 +71,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Loop each of these filter objects in parallel and update contents.
             _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
-            Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.Add(ExpressionToJObject.ConvertReadExpression(MessageExpression)));
+            Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.AddRange(ExpressionToJ2534Object.ConvertReadExpression(MessageExpression)));
 
             // Return the built filter objects here.
             var CombinedMessagesSet = (InputChannel.MessagesRead ?? Array.Empty<PassThruStructs.PassThruMsg>()).ToList();
@@ -98,7 +98,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 if (ExpressionObject.TypeOfExpression != PassThruCommandType.PTWriteMsgs) { continue; }
 
                 // Store the next expression
-                int IndexOfExpression = GroupedExpression.ToList().IndexOf(ExpressionObject);
+                var IndexOfExpression = GroupedExpression.ToList().IndexOf(ExpressionObject);
                 if ((IndexOfExpression + 1) > GroupedExpression.Length) continue;
 
                 // Find the next expression and get all future ones
@@ -127,22 +127,23 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 ));
             }
 
-            // Using each item in the built array, convert them all into 
-            var TempPairsCast = new List<SimulationMessagePair>();
+            // Store onto the class, return built values.
+            List<SimulationMessagePair> List = new List<SimulationMessagePair>();
             foreach (var PairedMessageSet in MessagesPaired)
             {
-                // Convert the Send command into a message here
-                var SendExpressionAsMessage = ExpressionToJObject.ConvertWriteExpression(PairedMessageSet.Item1);
-                var ReadExpressionsAsMessages = PairedMessageSet.Item2
-                    .Select(ExpressionToJObject.ConvertReadExpression)
-                    .ToArray();
+                // Store basic values for contents here
+                PassThruStructs.PassThruMsg[] SendExpressionAsMessage = ExpressionToJ2534Object.ConvertWriteExpression(PairedMessageSet.Item1);
+                PassThruStructs.PassThruMsg[][] ReadExpressionsAsMessages = PairedMessageSet.Item2.Select(ExpressionToJ2534Object.ConvertReadExpression).ToArray();
 
-                // Build a new Tuple and append it
-                TempPairsCast.Add(new SimulationMessagePair(SendExpressionAsMessage, ReadExpressionsAsMessages));
+                // Loop and built output tuples
+                foreach (var MessageObject in SendExpressionAsMessage) {
+                    int IndexOfMessageSet = SendExpressionAsMessage.ToList().IndexOf(MessageObject);
+                    List.Add(new SimulationMessagePair(MessageObject, ReadExpressionsAsMessages[IndexOfMessageSet]));
+                }
             }
 
-            // Store onto the class, return built values
-            InputChannel.MessagePairs = TempPairsCast.ToArray();
+            // Store values for the input channel and return output
+            InputChannel.MessagePairs = List.ToArray();
             return InputChannel.MessagePairs;
         }
     }
