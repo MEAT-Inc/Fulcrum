@@ -15,6 +15,7 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using SharpSimulator.SimulationObjects;
+using SharpSimulator.SupportingLogic;
 using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
 
