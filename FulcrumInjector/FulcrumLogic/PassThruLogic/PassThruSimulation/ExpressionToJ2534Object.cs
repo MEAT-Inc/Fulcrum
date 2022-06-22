@@ -8,6 +8,7 @@ using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionO
 using SharpLogger.LoggerSupport;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
+using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {
@@ -59,10 +60,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     // Build a new filter object form the given values and return it.
                     FilterFlags = (TxFlags)FilterFlags,
                     FilterProtocol = FilterProtocol,
-                    FilterMask = FilterFlow != "" ? FilterMask : Inverted ? FilterPatten : FilterMask,
+                    FilterMask = FilterMask,
                     FilterPattern = FilterFlow != "" ? FilterPatten : Inverted ? FilterMask : FilterPatten,
                     FilterFlowCtl = FilterType == "FLOW_CONTROL_FILTER" ? Inverted ? FilterPatten : FilterFlow : string.Empty,
-                    FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType)
+                    FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType),
+                    FilterStatus = PTInstanceStatus.INITIALIZED,
                 };
             }
             catch (Exception ConversionEx)
