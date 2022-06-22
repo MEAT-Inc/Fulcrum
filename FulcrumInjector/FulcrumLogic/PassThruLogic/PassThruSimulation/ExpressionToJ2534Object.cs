@@ -8,6 +8,7 @@ using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionO
 using SharpLogger.LoggerSupport;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
+using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {
@@ -37,33 +38,53 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             try
             {
                 var FilterType = FilterExpression.FilterType.Split(':')[1];
-                var FilterFlags = uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
+                var FilterFlags = (TxFlags)uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
                 var FilterProtocol = (ProtocolId)uint.Parse(FilterContent[0][2].Split(':')[0]);
                 var FilterPatten = FilterContent
                     .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Pattern")))
                     .Last()
-                    .Replace("0x ", string.Empty);
+                    .Replace("0x", string.Empty)
+                    .Replace("  ", " ");
                 var FilterMask = FilterContent
                     .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Mask")))
                     .Last()
-                    .Replace("0x ", string.Empty);
+                    .Replace("0x", string.Empty)
+                    .Replace("  ", " ");
                 var FilterFlow = 
                     FilterContent.Count != 3 ? "" : 
                     FilterContent.FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Flow")))
                         .Last()
-                        .Replace("0x ", string.Empty);
+                        .Replace("0x", string.Empty)
+                        .Replace("  ", " ");
 
                 // Now convert our information into string values.
-                return new J2534Filter()
+                FilterDef FilterTypeCast = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType);
+                J2534Filter OutputFilter = new J2534Filter()
                 {
-                    // Build a new filter object form the given values and return it.
-                    FilterMask = FilterMask,
-                    FilterFlags = FilterFlags,
-                    FilterProtocol = FilterProtocol,
-                    FilterPattern = Inverted ? FilterFlow : FilterPatten,
-                    FilterFlowCtl = Inverted ? FilterPatten : FilterFlow,
-                    FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType)
+                    FilterFlags = FilterFlags, 
+                    FilterProtocol = FilterProtocol, 
+                    FilterType = FilterTypeCast, 
+                    FilterStatus = PTInstanceStatus.INITIALIZED
                 };
+                
+                // Now store the values for the message itself.
+                if (FilterTypeCast == FilterDef.FLOW_CONTROL_FILTER)
+                {
+                    // Store a mask, pattern, and flow control value here
+                    OutputFilter.FilterMask = FilterMask;
+                    OutputFilter.FilterPattern = Inverted ? FilterFlow : FilterPatten;
+                    OutputFilter.FilterFlowCtl = Inverted ? FilterPatten : FilterFlow;
+                }
+                else
+                {
+                    // Store ONLY a mask and a pattern here
+                    OutputFilter.FilterMask = Inverted ? FilterPatten : FilterMask;
+                    OutputFilter.FilterPattern = Inverted ? FilterMask : FilterPatten;
+                    OutputFilter.FilterFlowCtl = string.Empty;
+                }
+
+                // Return the built J2534 filter object
+                return OutputFilter;
             }
             catch (Exception ConversionEx)
             {
@@ -131,11 +152,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 try
                 {
                     // Store message values here.
-                    var MessageData = MessageSet.Last();
                     var MessageFlags = uint.Parse(MessageSet[3]);
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[4].Split(':')[0]);
 
                     // ISO15765 11 Bit
+                    var MessageData = MessageSet.Last();
                     if (MessageData.StartsWith("0x00 0x00"))
                     {
                         // 11 Bit messages need to be converted according to this format
@@ -162,7 +183,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
                         // Convert back into a string value and format
                         MessageData = string.Join(" ", FinalData);
-                        MessageData = MessageData.Replace("0x", string.Empty);
+                        MessageData = MessageData
+                            .Replace("0x", string.Empty)
+                            .Replace("  ", " ");
                     }
 
                     // ISO15765 29 Bit
@@ -232,7 +255,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[2].Split(':')[0]);
 
                     // Build a message and then return it.
-                    MessageData = MessageData.Replace("0x", string.Empty);
+                    MessageData = MessageData.Replace("0x", string.Empty).Replace("  ", " ");
                     var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, RxStatus, MessageData);
                     MessagesBuilt = MessagesBuilt.Append(NextMessage).ToArray();
                 }

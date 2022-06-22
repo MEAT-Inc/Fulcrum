@@ -128,22 +128,19 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             }
 
             // Store onto the class, return built values.
-            List<SimulationMessagePair> List = new List<SimulationMessagePair>();
+            List<SimulationMessagePair> MessagePairOutput = new List<SimulationMessagePair>();
             foreach (var PairedMessageSet in MessagesPaired)
             {
                 // Store basic values for contents here
-                PassThruStructs.PassThruMsg[] SendExpressionAsMessage = ExpressionToJ2534Object.ConvertWriteExpression(PairedMessageSet.Item1);
+                PassThruStructs.PassThruMsg SendExpressionAsMessage = ExpressionToJ2534Object.ConvertWriteExpression(PairedMessageSet.Item1).FirstOrDefault();
                 PassThruStructs.PassThruMsg[][] ReadExpressionsAsMessages = PairedMessageSet.Item2.Select(ExpressionToJ2534Object.ConvertReadExpression).ToArray();
 
-                // Loop and built output tuples
-                foreach (var MessageObject in SendExpressionAsMessage) {
-                    int IndexOfMessageSet = SendExpressionAsMessage.ToList().IndexOf(MessageObject);
-                    List.Add(new SimulationMessagePair(MessageObject, ReadExpressionsAsMessages[IndexOfMessageSet]));
-                }
+                // Append all messages into our list here
+                MessagePairOutput.Add(new SimulationMessagePair(SendExpressionAsMessage, ReadExpressionsAsMessages.SelectMany(MsgObj => MsgObj).ToArray()));
             }
 
             // Store values for the input channel and return output
-            InputChannel.MessagePairs = List.ToArray();
+            InputChannel.MessagePairs = MessagePairOutput.ToArray();
             return InputChannel.MessagePairs;
         }
     }

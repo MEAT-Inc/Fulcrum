@@ -9,12 +9,14 @@ using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using SharpSimulator.SimulationObjects;
+using SharpSimulator.SupportingLogic;
 using SharpWrap2534.PassThruTypes;
 using SharpWrap2534.SupportingLogic;
 
@@ -74,16 +76,37 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.SimLoader = new SimulationLoader();
             this.LoadedSimFileContent = File.ReadAllText(SimFile);
             try
-            {
-                SimulationChannel[] InputSimChannels = JArray.Parse(this.LoadedSimFileContent).ToObject<SimulationChannel[]>();
-                ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
-                foreach (var SimChannel in InputSimChannels) { this.SimLoader.AddSimChannel(SimChannel); }
-                ViewModelLogger.WriteLog($"PULLED ALL {InputSimChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
+            { 
+                // Testing JSON conversion
+                var PulledChannels = JArray.Parse(this.LoadedSimFileContent);
+                foreach (var ChildToken in PulledChannels.Children())
+                {
+                    try
+                    {            
+                        // Try and build our channel here
+                        SimulationChannel BuiltChannel = ChildToken.ToObject<SimulationChannel>();
+                        this.SimLoader.AddSimChannel(BuiltChannel);
+                    }
+                    catch (Exception ConvertEx)
+                    {
+                        // Log failures out here
+                        ViewModelLogger.WriteLog("FAILED TO CONVERT SIMULATION CHANNEL FROM JSON TO OBJECT!", LogType.ErrorLog);
+                        ViewModelLogger.WriteLog("EXCEPTION AND CHANNEL OBJECT ARE BEING LOGGED BELOW...", LogType.WarnLog);
+                        ViewModelLogger.WriteLog($"SIM CHANNEL JSON:\n{ChildToken.ToString(Formatting.Indented)}", LogType.TraceLog);
+                        ViewModelLogger.WriteLog("EXCEPTION THROWN:", ConvertEx);
+                    }
+                }
+
+                // BUG: THIS IS BROKEN WHEN PULLING THE WHOLE ARRAY!!
+                // SimulationChannel[] InputSimChannels = JArray.Parse(this.LoadedSimFileContent).ToObject<SimulationChannel[]>();
+                // ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
+                // foreach (var SimChannel in InputSimChannels) { this.SimLoader.AddSimChannel(SimChannel); }
 
                 // Load file contents and store name of file on our view model
                 this.IsSimLoaded = true;
                 this.LoadedSimFile = SimFile;
                 ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
+                ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {this.SimLoader.SimulationChannels.Length} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
                 return true;
             }
             catch (Exception LoadSimEx)
