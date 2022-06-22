@@ -208,7 +208,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     });
                 }
                 // Check for a simulation input file
-                if (OutputFileName.EndsWith(".ptSim"))
+                else if (OutputFileName.EndsWith(".ptSim"))
                 {
                     // Store contents for simulations only
                     this.SimulationBuilt = true;
@@ -234,7 +234,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // Pull in the log file for default processing routines
                     this.IsLogLoaded = false;
                     this.LoadedLogFile = OutputFileName;
-                    this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
+
+                    // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 

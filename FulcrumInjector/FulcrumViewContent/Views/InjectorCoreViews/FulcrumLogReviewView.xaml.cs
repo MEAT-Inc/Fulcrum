@@ -141,19 +141,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
                         SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
                         SenderButton.Click -= LoadInjectorLogFile_OnClick;
-                        
-                        // Setup for when we load an expression into here
-                        if (FileToLoad.EndsWith(".ptExp")) {
-                            this.ViewerContentComboBox.SelectedIndex = 1;
-                            this.BuildExpressionsButton.IsEnabled = false;
-                        }
 
-                        // Setup for when we load a simulation file into here
-                        if (FileToLoad.EndsWith(".ptSim")) {
-                            this.ViewerContentComboBox.SelectedIndex = 2;
-                            this.BuildSimulationButton.IsEnabled = false;
-                            this.BuildExpressionsButton.IsEnabled = false;
-                        }
+                        // Disable input buttons
+                        this.BuildExpressionsButton.IsEnabled = false;
+                        this.BuildSimulationButton.IsEnabled = false;
+
+                        // Setup for when we load an expression into here or a Simulation
+                        if (FileToLoad.EndsWith(".ptExp"))  this.ViewerContentComboBox.SelectedIndex = 1;
+                        else if (FileToLoad.EndsWith(".ptSim")) this.ViewerContentComboBox.SelectedIndex = 2;
 
                         // Allow all buttons on and set them up to show index 0
                         else {

@@ -65,8 +65,7 @@
                     <Button
                         Margin="5,2" x:Name="BuildExpressionsButton"
                         Grid.Column="1" Click="BuildExpressionsButton_OnClick"
-                        Content="
-                        Content" VerticalAlignment="Stretch">
+                        Content="Process Content" VerticalAlignment="Stretch">
                         <Button.Style>
                             <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                                 <Style.Triggers>
