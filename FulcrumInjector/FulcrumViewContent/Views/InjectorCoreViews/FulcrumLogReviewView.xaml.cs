@@ -136,11 +136,31 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     // Show new temp state
                     Dispatcher.Invoke(() =>
                     {
+                        // Control values for grid contents
                         ParentGrid.IsEnabled = true;
                         SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
                         SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
                         SenderButton.Click -= LoadInjectorLogFile_OnClick;
-                        this.ViewerContentComboBox.SelectedIndex = 0;
+                        
+                        // Setup for when we load an expression into here
+                        if (FileToLoad.EndsWith(".ptExp")) {
+                            this.ViewerContentComboBox.SelectedIndex = 1;
+                            this.BuildExpressionsButton.IsEnabled = false;
+                        }
+
+                        // Setup for when we load a simulation file into here
+                        if (FileToLoad.EndsWith(".ptSim")) {
+                            this.ViewerContentComboBox.SelectedIndex = 2;
+                            this.BuildSimulationButton.IsEnabled = false;
+                            this.BuildExpressionsButton.IsEnabled = false;
+                        }
+
+                        // Allow all buttons on and set them up to show index 0
+                        else {
+                            this.ViewerContentComboBox.SelectedIndex = 0;
+                            this.BuildExpressionsButton.IsEnabled = true;
+                            this.BuildSimulationButton.IsEnabled = true;
+                        }
                     });
 
                     // Wait for 3.5 Seconds
