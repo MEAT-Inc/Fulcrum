@@ -43,16 +43,19 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 var FilterPatten = FilterContent
                     .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Pattern")))
                     .Last()
-                    .Replace("0x ", string.Empty);
+                    .Replace("0x", string.Empty)
+                    .Replace("  ", " ");
                 var FilterMask = FilterContent
                     .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Mask")))
                     .Last()
-                    .Replace("0x ", string.Empty);
+                    .Replace("0x", string.Empty)
+                    .Replace("  ", " ");
                 var FilterFlow = 
                     FilterContent.Count != 3 ? "" : 
                     FilterContent.FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Flow")))
                         .Last()
-                        .Replace("0x ", string.Empty);
+                        .Replace("0x", string.Empty)
+                        .Replace("  ", " ");
 
                 // Now convert our information into string values.
                 FilterDef FilterTypeCast = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType);
@@ -149,11 +152,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 try
                 {
                     // Store message values here.
-                    var MessageData = MessageSet.Last();
                     var MessageFlags = uint.Parse(MessageSet[3]);
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[4].Split(':')[0]);
 
                     // ISO15765 11 Bit
+                    var MessageData = MessageSet.Last();
                     if (MessageData.StartsWith("0x00 0x00"))
                     {
                         // 11 Bit messages need to be converted according to this format
@@ -180,7 +183,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
                         // Convert back into a string value and format
                         MessageData = string.Join(" ", FinalData);
-                        MessageData = MessageData.Replace("0x", string.Empty);
+                        MessageData = MessageData
+                            .Replace("0x", string.Empty)
+                            .Replace("  ", " ");
                     }
 
                     // ISO15765 29 Bit
@@ -250,7 +255,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[2].Split(':')[0]);
 
                     // Build a message and then return it.
-                    MessageData = MessageData.Replace("0x", string.Empty);
+                    MessageData = MessageData.Replace("0x", string.Empty).Replace("  ", " ");
                     var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, RxStatus, MessageData);
                     MessagesBuilt = MessagesBuilt.Append(NextMessage).ToArray();
                 }

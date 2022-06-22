@@ -232,7 +232,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 else
                 {
                     // Pull in the log file for default processing routines
-                    this.IsLogLoaded = false;
+                    this.IsLogLoaded = true;
                     this.LoadedLogFile = OutputFileName;
 
                     // Toggle the viewer to show out output
