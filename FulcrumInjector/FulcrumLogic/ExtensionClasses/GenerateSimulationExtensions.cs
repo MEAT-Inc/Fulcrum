@@ -33,10 +33,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="Expressions">Input Expressions</param>
         /// <returns>All Grouped output sets</returns>
-        public static Tuple<int, List<PassThruExpression>>[] GroupByChannelIds(this PassThruExpression[] Expressions)
+        public static Tuple<uint, List<PassThruExpression>>[] GroupByChannelIds(this PassThruExpression[] Expressions)
         {
             // Now Split out our list in a for loop.
-            var PairedExpressions = new List<Tuple<int, List<PassThruExpression>>>();
+            var PairedExpressions = new List<Tuple<uint, List<PassThruExpression>>>();
             foreach (var ExpressionObject in Expressions)
             {
                 // Store progress value
@@ -55,12 +55,12 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
                 // Check out for the null value possibility
                 if (DesiredProperty == null) continue;
-                int ChannelIdProperty = int.Parse(DesiredProperty.GetValue(ExpressionObject).ToString());
+                uint ChannelIdProperty = uint.Parse(DesiredProperty.GetValue(ExpressionObject).ToString());
                 int IndexOfChannelId = PairedExpressions.FindIndex(ExpSet => ExpSet.Item1 == ChannelIdProperty);
                 
                 // Find our current ChannelID object and append if possible
                 if (IndexOfChannelId != -1) PairedExpressions[IndexOfChannelId].Item2.Add(ExpressionObject);
-                else PairedExpressions.Add(new Tuple<int, List<PassThruExpression>>(ChannelIdProperty, new List<PassThruExpression> { ExpressionObject }));
+                else PairedExpressions.Add(new Tuple<uint, List<PassThruExpression>>(ChannelIdProperty, new List<PassThruExpression> { ExpressionObject }));
             }
 
             // Return the built list of object values here.
@@ -73,7 +73,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="GroupedExpression">Expression set to convert</param>
         /// <returns>Builds a channel session object to simulate (converted to JSON)</returns>
-        public static Tuple<int, SimulationChannel> BuildChannelsFromExpressions(this PassThruExpression[] GroupedExpression, int ChannelId)
+        public static Tuple<uint, SimulationChannel> BuildChannelsFromExpressions(this PassThruExpression[] GroupedExpression, uint ChannelId)
         {
             // Find all the PTFilter commands first and invert them.
             var PTConnectCommands = GroupedExpression
@@ -99,17 +99,17 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Find the ProtocolID and Current Channel ID. Then build a sim channel
             if (PTConnectCommands.Length == 0) return null;
             var ConnectCommand = PTConnectCommands.FirstOrDefault();
-            var BaudRateInUse = uint.Parse(ConnectCommand.BaudRate);
-            var ChannelFlags = uint.Parse(ConnectCommand.ConnectFlags);
+            var BaudRateInUse = (BaudRate)uint.Parse(ConnectCommand.BaudRate);
+            var ChannelFlags = (PassThroughConnect)uint.Parse(ConnectCommand.ConnectFlags);
             var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
 
             // Store progress value
             // FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 50;
 
             // Build simulation channel here and return it out
-            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, BaudRateInUse, ChannelFlags);
-            NextChannel.StoreMessagesRead(PTReadCommands);
+            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, BaudRateInUse);
             NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesRead(PTReadCommands);
             NextChannel.StoreMessagesWritten(PTWriteCommands);
             NextChannel.StorePassThruPairs(GroupedExpression);
 
@@ -129,7 +129,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Return a new tuple of our object for the command output
             // FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 100;
-            return new Tuple<int, SimulationChannel>(ChannelId, NextChannel);
+            return new Tuple<uint, SimulationChannel>(ChannelId, NextChannel);
         }
     }
 }

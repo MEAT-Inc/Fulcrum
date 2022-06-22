@@ -8,6 +8,7 @@ using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionO
 using SharpLogger.LoggerSupport;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
+using SharpWrap2534.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {
@@ -37,7 +38,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             try
             {
                 var FilterType = FilterExpression.FilterType.Split(':')[1];
-                var FilterFlags = uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
+                var FilterFlags = (TxFlags)uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
                 var FilterProtocol = (ProtocolId)uint.Parse(FilterContent[0][2].Split(':')[0]);
                 var FilterPatten = FilterContent
                     .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Pattern")))
@@ -54,16 +55,33 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                         .Replace("0x ", string.Empty);
 
                 // Now convert our information into string values.
-                return new J2534Filter()
+                FilterDef FilterTypeCast = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType);
+                J2534Filter OutputFilter = new J2534Filter()
                 {
-                    // Build a new filter object form the given values and return it.
-                    FilterMask = FilterMask,
-                    FilterFlags = FilterFlags,
-                    FilterProtocol = FilterProtocol,
-                    FilterPattern = Inverted ? FilterFlow : FilterPatten,
-                    FilterFlowCtl = Inverted ? FilterPatten : FilterFlow,
-                    FilterType = (FilterDef)Enum.Parse(typeof(FilterDef), FilterType)
+                    FilterFlags = FilterFlags, 
+                    FilterProtocol = FilterProtocol, 
+                    FilterType = FilterTypeCast, 
+                    FilterStatus = PTInstanceStatus.INITIALIZED
                 };
+                
+                // Now store the values for the message itself.
+                if (FilterTypeCast == FilterDef.FLOW_CONTROL_FILTER)
+                {
+                    // Store a mask, pattern, and flow control value here
+                    OutputFilter.FilterMask = FilterMask;
+                    OutputFilter.FilterPattern = Inverted ? FilterFlow : FilterPatten;
+                    OutputFilter.FilterFlowCtl = Inverted ? FilterPatten : FilterFlow;
+                }
+                else
+                {
+                    // Store ONLY a mask and a pattern here
+                    OutputFilter.FilterMask = Inverted ? FilterPatten : FilterMask;
+                    OutputFilter.FilterPattern = Inverted ? FilterMask : FilterPatten;
+                    OutputFilter.FilterFlowCtl = string.Empty;
+                }
+
+                // Return the built J2534 filter object
+                return OutputFilter;
             }
             catch (Exception ConversionEx)
             {

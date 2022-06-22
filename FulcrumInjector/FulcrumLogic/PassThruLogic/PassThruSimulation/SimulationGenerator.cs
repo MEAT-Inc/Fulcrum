@@ -34,7 +34,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
         // Grouping Objects built out.
         public SimulationChannel[] BuiltSimulationChannels { get; private set; }
-        public Tuple<int, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
+        public Tuple<uint, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -60,10 +60,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Generates our grouped ID values for out input expression objects
         /// </summary>
         /// <returns>Build ID groupings</returns>
-        public Tuple<int, PassThruExpression[]>[] GenerateGroupedIds()
+        public Tuple<uint, PassThruExpression[]>[] GenerateGroupedIds()
         {
             // List for return output objects
-            List<Tuple<int, PassThruExpression[]>> BuiltExpressions = new List<Tuple<int, PassThruExpression[]>>();
+            List<Tuple<uint, PassThruExpression[]>> BuiltExpressions = new List<Tuple<uint, PassThruExpression[]>>();
 
             // Store the ID Values here
             this.SimLogger.WriteLog("GROUPING COMMANDS BY CHANNEL ID VALUES NOW...", LogType.WarnLog);
@@ -71,7 +71,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             Parallel.ForEach(GroupedAsLists, (GroupList) => {
 
                 // Build Expression
-                BuiltExpressions.Add(new Tuple<int, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
+                BuiltExpressions.Add(new Tuple<uint, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
                 this.SimLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
 
                 // Store progress value
@@ -88,18 +88,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Builds our simulation channel objects for our input expressions on this object
         /// </summary>
         /// <returns>The set of built expression objects</returns>
-        public Tuple<int, SimulationChannel>[] GenerateSimulationChannels()
+        public Tuple<uint, SimulationChannel>[] GenerateSimulationChannels()
         {
             // Start by building return list object. Then build our data
-            List<Tuple<int, SimulationChannel>> BuiltChannelsList = new List<Tuple<int, SimulationChannel>>();
+            List<Tuple<uint, SimulationChannel>> BuiltChannelsList = new List<Tuple<uint, SimulationChannel>>();
             this.SimLogger.WriteLog("BUILDING CHANNEL OBJECTS FROM CHANNEL ID VALUES NOW...", LogType.WarnLog);
 
             // Make sure the channel objects exist here first. 
-            this.GroupedChannelExpressions ??= Array.Empty<Tuple<int, PassThruExpression[]>>();
+            this.GroupedChannelExpressions ??= Array.Empty<Tuple<uint, PassThruExpression[]>>();
             foreach (var ChannelObjectExpressions in this.GroupedChannelExpressions)
             {
                 // Pull the Channel ID, build our output contents
-                int ChannelId = ChannelObjectExpressions.Item1;
+                uint ChannelId = ChannelObjectExpressions.Item1;
                 var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId);
 
                 // Store progress value
@@ -108,7 +108,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
                 // Append it into our list of output here
                 if (BuiltChannel == null) continue;
-                BuiltChannelsList.Add(new Tuple<int, SimulationChannel>(ChannelId, BuiltChannel.Item2));
+                BuiltChannelsList.Add(new Tuple<uint, SimulationChannel>(ChannelId, BuiltChannel.Item2));
                 this.SimLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
             }
 
