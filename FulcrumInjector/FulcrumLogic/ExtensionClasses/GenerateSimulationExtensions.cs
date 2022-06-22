@@ -108,8 +108,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, BaudRateInUse);
-            NextChannel.StoreMessagesRead(PTReadCommands);
             NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesRead(PTReadCommands);
             NextChannel.StoreMessagesWritten(PTWriteCommands);
             NextChannel.StorePassThruPairs(GroupedExpression);
 
