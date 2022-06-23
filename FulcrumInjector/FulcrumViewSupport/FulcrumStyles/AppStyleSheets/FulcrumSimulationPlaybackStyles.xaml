@@ -19,11 +19,18 @@
             </Style>
 
             <!-- Messages Listbox Style -->
-            <Style x:Key="MessageContentListBoxStyle" TargetType="DataGrid">
+            <Style x:Key="MessageContentListBoxStyle" TargetType="ListBox">
                 <Setter Property="Background" Value="Black"/>
                 <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
                 <Setter Property="BorderThickness" Value="2"/>
             </Style>
+
+            <!-- Message Listbox DataTemplate -->
+            <DataTemplate x:Key="MessageContentTemplate">
+                <Grid Margin="2">
+                    
+                </Grid>
+            </DataTemplate>
 
             <!-- AVEdit Output Box Style -->
             <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">

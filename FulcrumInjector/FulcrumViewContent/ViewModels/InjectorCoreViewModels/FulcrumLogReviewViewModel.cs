@@ -193,6 +193,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     this.ExpressionsBuilt = true;
                     this.ExpressionsFile = OutputFileName;
 
+                    // Generate our contents for the default log file content
+                    this.LoadedLogFile = GenerateExpressionExtensions.ImportExpressionSet(this.ExpressionsFile);
+                    this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
+                    this.BuildLogExpressions(out _);
+
                     // Set default log contents empty.
                     this.IsLogLoaded = true;
                     this.LoadedLogFile = OutputFileName;
@@ -275,7 +280,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="OutputExpressions"></param>
         /// <returns></returns>
-        internal bool ParseLogContents(out ExpressionsGenerator GeneratorBuilt)
+        internal bool BuildLogExpressions(out ExpressionsGenerator GeneratorBuilt)
         {
             try
             {

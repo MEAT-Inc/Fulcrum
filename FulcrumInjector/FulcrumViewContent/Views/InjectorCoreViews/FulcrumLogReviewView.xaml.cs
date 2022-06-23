@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -146,9 +147,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         this.BuildExpressionsButton.IsEnabled = false;
                         this.BuildSimulationButton.IsEnabled = false;
 
+                        // Setup content view for a simulation file input
+                        if (FileToLoad.EndsWith(".ptSim")) this.ViewerContentComboBox.SelectedIndex = 2;
+
                         // Setup for when we load an expression into here or a Simulation
-                        if (FileToLoad.EndsWith(".ptExp"))  this.ViewerContentComboBox.SelectedIndex = 1;
-                        else if (FileToLoad.EndsWith(".ptSim")) this.ViewerContentComboBox.SelectedIndex = 2;
+                        if (FileToLoad.EndsWith(".ptExp")) {
+                            this.BuildSimulationButton.IsEnabled = true;
+                            this.ViewerContentComboBox.SelectedIndex = 1;
+                        }
 
                         // Allow all buttons on and set them up to show index 0
                         else {
@@ -189,7 +195,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Task.Run(() =>
             {
                 // Store result from processing
-                bool ParseResult = this.ViewModel.ParseLogContents(out _);
+                bool ParseResult = this.ViewModel.BuildLogExpressions(out _);
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
@@ -214,7 +220,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Store result from processing if it's not yet done on the view model
                 if (this.ViewModel.ExpressionsBuilt == false) 
-                    if (!this.ViewModel.ParseLogContents(out _)) {
+                    if (!this.ViewModel.BuildLogExpressions(out _)) {
                         this.ProcessingActionFinished(false, SendingButton, Defaults);
                         return;
                     }
