@@ -151,7 +151,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith(LoggerName)) ?? new SubServiceLogger(LoggerName);
 
             // Find output path and then build final path value.             
-            Directory.CreateDirectory(OutputFolder);
             if (!Directory.Exists(Path.GetDirectoryName(FinalOutputPath))) { Directory.CreateDirectory(Path.GetDirectoryName(FinalOutputPath)); }
             ExpressionLogger.WriteLog($"BASE OUTPUT LOCATION FOR EXPRESSIONS IS SEEN TO BE {Path.GetDirectoryName(FinalOutputPath)}", LogType.InfoLog);
 
