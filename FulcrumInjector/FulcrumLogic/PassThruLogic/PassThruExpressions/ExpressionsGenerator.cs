@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
@@ -140,7 +141,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         public string SaveExpressionsFile(string BaseFileName = "")
         {
             // First build our output location for our file.
-            string OutputFolder = Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions");
+            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultExpressionsPath");
             string FinalOutputPath =
                 Path.Combine(OutputFolder, Path.GetFileNameWithoutExtension(BaseFileName)) + ".ptExp";
 
@@ -150,7 +151,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith(LoggerName)) ?? new SubServiceLogger(LoggerName);
 
             // Find output path and then build final path value.             
-            Directory.CreateDirectory(Path.Combine(LogBroker.BaseOutputPath, "FulcrumExpressions"));
+            Directory.CreateDirectory(OutputFolder);
             if (!Directory.Exists(Path.GetDirectoryName(FinalOutputPath))) { Directory.CreateDirectory(Path.GetDirectoryName(FinalOutputPath)); }
             ExpressionLogger.WriteLog($"BASE OUTPUT LOCATION FOR EXPRESSIONS IS SEEN TO BE {Path.GetDirectoryName(FinalOutputPath)}", LogType.InfoLog);
 
@@ -171,19 +172,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
                 File.WriteAllText(FinalOutputPath, string.Join("\n", OutputExpressionStrings));
 
+                // TODO: Figure out why I had this code in here...
                 // Check to see if we aren't in the default location
-                if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
-                {
-                    // Find the base path, get the file name, and copy it into here.
-                    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
-                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
-                    File.Copy(FinalOutputPath, CopyLocation, true);
-
-                    // Remove the Expressions Logger. Log done and return
-                    ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
-                    this.ExpressionsFile = CopyLocation;
-                    return CopyLocation;
-                }
+                //if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
+                //{
+                //    // Find the base path, get the file name, and copy it into here.
+                //    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
+                //    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
+                //    File.Copy(FinalOutputPath, CopyLocation, true);
+                //
+                //    // Remove the Expressions Logger. Log done and return
+                //    ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+                //    this.ExpressionsFile = CopyLocation;
+                //    return CopyLocation;
+                //}
 
                 // Remove the Expressions Logger. Log done and return
                 ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
