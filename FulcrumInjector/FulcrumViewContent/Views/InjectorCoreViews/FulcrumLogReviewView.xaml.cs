@@ -165,7 +165,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     });
 
                     // Wait for 3.5 Seconds
-                    Thread.Sleep(3500);
+                    Thread.Sleep(1500);
                     Dispatcher.Invoke(() =>
                     {
                         // Reset button values 
@@ -295,7 +295,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 Task.Run(() =>
                 {
                     // Wait for 3.5 Seconds
-                    Thread.Sleep(3500);
+                    Thread.Sleep(1500);
                     Dispatcher.Invoke(() =>
                     {
                         // Reset values and log information
