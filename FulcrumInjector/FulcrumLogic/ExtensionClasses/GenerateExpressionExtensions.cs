@@ -118,8 +118,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
                 // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
                 var TempList = MatchedMessageStrings.ToList();
-                int IndexOfZeroFlags = TempList.IndexOf("0x00000000");
-                if (IndexOfZeroFlags != -1) { TempList.Insert(IndexOfZeroFlags + 1, "No Value"); }
+                int IndexOfZeroFlags = TempList.FindLastIndex(StringObj => 
+                    StringObj.Contains("RxS=00000000") || 
+                    StringObj.Contains("TxF=00000000"));
+                if (IndexOfZeroFlags != -1) { TempList[IndexOfZeroFlags + 1] = "No Flag Value"; }
                 MatchedMessageStrings = TempList.ToArray();
 
                 // Remove any and all whitespace values from our output content here.

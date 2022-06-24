@@ -152,12 +152,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 try
                 {
                     // Store message values here.
-                    var MessageFlags = uint.Parse(MessageSet[3]);
-                    var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[4].Split(':')[0]);
+                    var MessageFlags = uint.Parse(MessageSet[3].Split('=')[1]);
+                    var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[1].Split(':')[0]);
 
                     // ISO15765 11 Bit
                     var MessageData = MessageSet.Last();
-                    if (MessageData.StartsWith("0x00 0x00"))
+                    if (MessageData.StartsWith("0x00 0x00") || MessageData.StartsWith("00 00"))
                     {
                         // 11 Bit messages need to be converted according to this format
                         // 00 00 07 DF 01 00 -- 00 00 07 DF 02 01 00 00 00 00 00 00
@@ -183,17 +183,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
                         // Convert back into a string value and format
                         MessageData = string.Join(" ", FinalData);
-                        MessageData = MessageData
-                            .Replace("0x", string.Empty)
-                            .Replace("  ", " ");
                     }
 
                     // ISO15765 29 Bit
-                    if (MessageData.StartsWith("18 db")) {
+                    else if (MessageData.StartsWith("0x18 0xdb") || MessageData.StartsWith("18 db")) {
                         // TODO: BUILD FORMATTING ROUTINE FOR 29 BIT CAN!
                     }
 
                     // Build our final output message.
+                    MessageData = MessageData.Replace("0x", string.Empty).Replace("  ", " ");
                     var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, MessageFlags, MessageData);
                     MessagesBuilt = MessagesBuilt.Append(NextMessage).ToArray();
                 }

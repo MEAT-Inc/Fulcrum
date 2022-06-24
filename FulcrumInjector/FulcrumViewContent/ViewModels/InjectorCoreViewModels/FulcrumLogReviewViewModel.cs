@@ -200,8 +200,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 
                     // Store expression objects here
-                    if (!this.BuildLogExpressions(out _))
-                        throw new InvalidOperationException("FAILED TO CONVERT INPUT LOG CONTENTS INTO AN EXPRESSION FROM A CONVERSION FILE!");
+                    var GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
+                    var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
+                    this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
+                    ViewModelLogger.WriteLog("BUILT IN NEW EXPRESSIONS FILES FROM OUR CONVERTED LOG FILE OK!");
                 }
                 // Check for a simulation input file
                 else if (OutputFileName.EndsWith(".ptSim"))

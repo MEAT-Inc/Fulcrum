@@ -287,7 +287,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // Wait for 2 seconds and close our flyout
                 Task.Run(() =>
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(750);
                     Dispatcher.Invoke(() => this.ProcessingFlyout.IsOpen = false);
                 });
 
