@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent;
@@ -126,7 +127,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         public string SaveSimulationFile(string BaseFileName = "")
         {
             // First build our output location for our file.
-            string OutputFolder = Path.Combine(LogBroker.BaseOutputPath, "FulcrumSimulations");
+            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultSimulationsPath");
             string FinalOutputPath =
                 Path.Combine(OutputFolder, Path.GetFileNameWithoutExtension(BaseFileName)) + ".ptSim";
 
@@ -136,7 +137,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith(LoggerName)) ?? new SubServiceLogger(LoggerName);
 
             // Find output path and then build final path value.             
-            Directory.CreateDirectory(Path.Combine(LogBroker.BaseOutputPath, "FulcrumSimulations"));
+            Directory.CreateDirectory(OutputFolder);
             if (!Directory.Exists(Path.GetDirectoryName(FinalOutputPath))) { Directory.CreateDirectory(Path.GetDirectoryName(FinalOutputPath)); }
             ExpressionLogger.WriteLog($"BASE OUTPUT LOCATION FOR SIMULATIONS IS SEEN TO BE {Path.GetDirectoryName(FinalOutputPath)}", LogType.InfoLog);
 
@@ -155,19 +156,20 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
                 File.WriteAllText(FinalOutputPath,OutputJsonValues);
 
+                // TODO: Figure out why I had this code in here...
                 // Check to see if we aren't in the default location
-                if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
-                {
-                    // Find the base path, get the file name, and copy it into here.
-                    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
-                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptSim";
-                    File.Copy(FinalOutputPath, CopyLocation, true);
-
-                    // Remove the Expressions Logger. Log done and return
-                    ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
-                    this.SimulationFile = CopyLocation;
-                    return CopyLocation;
-                }
+                // if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
+                // {
+                //     // Find the base path, get the file name, and copy it into here.
+                //     string LocalDirectory = Path.GetDirectoryName(BaseFileName);
+                //     string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptSim";
+                //     File.Copy(FinalOutputPath, CopyLocation, true);
+                // 
+                //     // Remove the Expressions Logger. Log done and return
+                //     ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+                //     this.SimulationFile = CopyLocation;
+                //     return CopyLocation;
+                // }
 
                 // Remove the Expressions Logger. Log done and return
                 ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");

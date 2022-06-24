@@ -148,10 +148,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         this.BuildSimulationButton.IsEnabled = false;
 
                         // Setup content view for a simulation file input
-                        if (FileToLoad.EndsWith(".ptSim")) this.ViewerContentComboBox.SelectedIndex = 2;
+                        if (FileToLoad.EndsWith(".ptSim"))
+                            this.ViewerContentComboBox.SelectedIndex = 2;
 
                         // Setup for when we load an expression into here or a Simulation
-                        if (FileToLoad.EndsWith(".ptExp")) {
+                        else if (FileToLoad.EndsWith(".ptExp")) {
                             this.BuildSimulationButton.IsEnabled = true;
                             this.ViewerContentComboBox.SelectedIndex = 1;
                         }

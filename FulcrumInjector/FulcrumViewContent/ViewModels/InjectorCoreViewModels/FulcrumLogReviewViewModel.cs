@@ -171,26 +171,19 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 this._expressionsFile = null; this._expressionsFileContents = null;
                 this.ExpressionsBuilt = false; this.SimulationBuilt = false;
 
-                // Copy new file to our expressions folder here.
-                string OutputPath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath")
-                );
-
-                // Copy to our new output location and set that as our new log file value.
-                string OutputFileName = Path.Combine(OutputPath, Path.GetFileName(NewLogFile));
-                if (!string.IsNullOrWhiteSpace(NewLogFile)) { File.Copy(NewLogFile, OutputFileName, true); }
-                else {
+                // Make sure the new log file exists
+                if (string.IsNullOrWhiteSpace(NewLogFile)) {
                     ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
                     throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
                 }
-                
+
                 // Check for an Expressions input file
-                if (OutputFileName.EndsWith(".ptExp"))
+                if (NewLogFile.EndsWith(".ptExp"))
                 {
                     // Store contents for expressions only
+                    this.IsLogLoaded = true;
                     this.ExpressionsBuilt = true;
-                    this.ExpressionsFile = OutputFileName;
+                    this.ExpressionsFile = NewLogFile;
                     this.LoadedLogFile = GenerateExpressionExtensions.ImportExpressionSet(this.ExpressionsFile);
                     this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
                     ViewModelLogger.WriteLog("PULLED IN A NEW EXPRESSIONS FILE AND CONVERTED IT INTO A RAW LOG OK!");
@@ -199,19 +192,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingExpressions))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 
-                    // Store expression objects here
+                    // Build a generator and set it up to read our new content values in
                     var GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
+                    ViewModelLogger.WriteLog("BUILT GENERATOR TO CONVERT OUR BUILT J2534 LOG FILE OK!");
+
+                    // Store expression objects here
+                    GeneratorBuilt.SplitLogToCommands(false);
                     var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
                     this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
                     ViewModelLogger.WriteLog("BUILT IN NEW EXPRESSIONS FILES FROM OUR CONVERTED LOG FILE OK!");
                 }
                 // Check for a simulation input file
-                else if (OutputFileName.EndsWith(".ptSim"))
+                else if (NewLogFile.EndsWith(".ptSim"))
                 {
                     // Store contents for simulations only
+                    this.IsLogLoaded = true;
                     this.SimulationBuilt = true;
-                    this.SimulationFile = OutputFileName;
-                    this.LoadedLogFile = OutputFileName;
+                    this.SimulationFile = NewLogFile;
+                    this.LoadedLogFile = NewLogFile;
 
                     // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingSimulation))
@@ -222,14 +220,21 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 {
                     // Pull in the log file for default processing routines
                     this.IsLogLoaded = true;
-                    this.LoadedLogFile = OutputFileName;
+                    this.LoadedLogFile = NewLogFile;
 
                     // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                    // Return passed and copy into our temp location
+                    string LogFileName = Path.GetFileName(NewLogFile);
+                    string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultImportFilePath");
+                    Directory.CreateDirectory(DefaultImportLocation);
+                    File.Copy(NewLogFile, Path.Combine(DefaultImportLocation, LogFileName), true);
+                    ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");
                 }
 
-                // Return passed
+                // Set log loaded to true
                 this.IsLogLoaded = true;
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
