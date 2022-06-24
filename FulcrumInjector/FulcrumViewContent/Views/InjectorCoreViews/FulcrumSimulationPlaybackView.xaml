@@ -105,9 +105,11 @@
             <Grid Grid.Row="1" Margin="0,5,0,0">
 
                 <!-- Messages Datagrid -->
-                <DataGrid x:Name="MainMessagesDataGrid" Style="{StaticResource MessageContentListBoxStyle}">
-
-                </DataGrid>
+                <ListBox
+                    x:Name="MainMessagesDataGrid" 
+                    Style="{StaticResource MessageContentListBoxStyle}"
+                    ItemTemplate="{StaticResource MessageContentTemplate}">
+                </ListBox>
 
                 <!-- No Sim File Loaded View or No Messages Loaded view -->
                 <Grid>

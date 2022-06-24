@@ -111,6 +111,11 @@
 			                        <CreateFolder />
 		                        </Component>
 	                        </Directory>
+	                        <Directory Id="FULCRUMCONVERSIONS" Name="FulcrumConversions">
+		                        <Component Id="CreateFulcrumConversionsFolder" Guid="A88D5BF2-516C-4838-B79F-BFDE9ACF6BD5">
+			                        <CreateFolder />
+		                        </Component>
+	                        </Directory>
                         </Directory>
                         <!-- DLL Files for the Fulcrum -->
                         <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
@@ -210,7 +215,8 @@
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
             <ComponentRef Id="CreateFulcrumExpressionsFolder" />
-            <ComponentRef Id="CreateFulcrumSimulationsFolder" />
+			<ComponentRef Id="CreateFulcrumSimulationsFolder" />
+			<ComponentRef Id="CreateFulcrumConversionsFolder" />
         </Feature>
         <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 

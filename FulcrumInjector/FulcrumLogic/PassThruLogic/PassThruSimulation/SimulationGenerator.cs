@@ -103,7 +103,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId);
 
                 // Store progress value
-                double CurrentProgress = BuiltChannelsList.Count / (double)this.GroupedChannelExpressions.Length * 100.00;
+                double CurrentProgress = (double)(BuiltChannelsList.Count / (double)this.GroupedChannelExpressions.Length) * 100.00;
                 FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
 
                 // Append it into our list of output here

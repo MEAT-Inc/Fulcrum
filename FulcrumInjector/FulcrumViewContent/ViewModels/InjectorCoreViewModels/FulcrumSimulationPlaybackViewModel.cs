@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
+using SharpSimulator.SimulationEvents;
 using SharpSimulator.SimulationObjects;
 using SharpSimulator.SupportingLogic;
 using SharpWrap2534.PassThruTypes;
@@ -39,11 +41,36 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private bool _isSimLoaded;
         private string _loadedSimFile;
         private string _loadedSimFileContent;
+        private ObservableCollection<SimMessageEventArgs> _simMessagesProcessed;
 
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
         public string LoadedSimFile { get => this._loadedSimFile; set => PropertyUpdated(value); }
         public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
+
+        // Lists of Messages that are being tracked by our simulation
+        public ObservableCollection<SimMessageEventArgs> SimMessagesProcessed { get => this._simMessagesProcessed; set => PropertyUpdated(value); }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Processes changes in events for message contents being pulled in
+        /// </summary>
+        /// <param name="SendingObject">Object that sent the event</param>
+        /// <param name="MessageEventArgs">Event arguments</param>
+        private void SimPlayer_SimMessageProcessed(object SendingObject, SimMessageEventArgs MessageEventArgs)
+        {
+
+        }
+        /// <summary>
+        /// Processes an event for a new Simulation channel being built or closed out
+        /// </summary>
+        /// <param name="SendingObject">Object firing this event</param>
+        /// <param name="ChannelEventArgs">Channel changed event arguments</param>
+        private void SimPlayer_SimChannelChanged(object SendingObject, SimChannelEventArgs ChannelEventArgs)
+        {
+
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -97,11 +124,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     }
                 }
 
-                // BUG: THIS IS BROKEN WHEN PULLING THE WHOLE ARRAY!!
-                // SimulationChannel[] InputSimChannels = JArray.Parse(this.LoadedSimFileContent).ToObject<SimulationChannel[]>();
-                // ViewModelLogger.WriteLog("PULLED IN NEW SIMULATION JSON CONTENTS WITHOUT ISSUES! STORING ONTO SIM LOADER NOW...", LogType.InfoLog);
-                // foreach (var SimChannel in InputSimChannels) { this.SimLoader.AddSimChannel(SimChannel); }
-
                 // Load file contents and store name of file on our view model
                 this.IsSimLoaded = true;
                 this.LoadedSimFile = SimFile;
@@ -137,6 +159,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // TODO: CONFIGURE THIS TO USE INPUT VALUES FROM SETUP
             var SimConfig = SimulationConfigLoader.LoadSimulationConfig(ProtocolId.ISO15765);
             this.SimPlayer = new SimulationPlayer(this.SimLoader, Version, DllName, DeviceName);
+            ViewModelLogger.WriteLog($"NEW SIMULATION PLAYER WITH FOR VERSION {Version} USING DEVICE {DeviceName} ({DllName}) HAS BEEN SETUP!", LogType.InfoLog);
+
+            // Subscribe to the player events and channel events
+            this.SimPlayer.SimChannelChanged += SimPlayer_SimChannelChanged;
+            this.SimPlayer.SimMessageProcessed += SimPlayer_SimMessageProcessed;
+            ViewModelLogger.WriteLog("SUBSCRIBED OUR VIEW MODEL TO OUR SIMULATION PLAYER OK!", LogType.InfoLog);
 
             // Configure our simulation player here
             this.SimPlayer.SetResponsesEnabled(true);
