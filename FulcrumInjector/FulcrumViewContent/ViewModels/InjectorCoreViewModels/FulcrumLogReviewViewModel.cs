@@ -169,7 +169,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Setup class values
                 this._simulationFile = null; this._simulationFileContents = null;
                 this._expressionsFile = null; this._expressionsFileContents = null;
-                this.IsLogLoaded = false; this.ExpressionsBuilt = false; this.SimulationBuilt = false;
+                this.ExpressionsBuilt = false; this.SimulationBuilt = false;
 
                 // Copy new file to our expressions folder here.
                 string OutputPath = Path.Combine(
@@ -179,8 +179,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                 // Copy to our new output location and set that as our new log file value.
                 string OutputFileName = Path.Combine(OutputPath, Path.GetFileName(NewLogFile));
-                this.LoadedLogFile = NewLogFile;
-                if (!string.IsNullOrWhiteSpace(this.LoadedLogFile)) { File.Copy(NewLogFile, OutputFileName, true); }
+                if (!string.IsNullOrWhiteSpace(NewLogFile)) { File.Copy(NewLogFile, OutputFileName, true); }
                 else {
                     ViewModelLogger.WriteLog("NO LOG FILE LOADED! LOAD A LOG FILE BEFORE TRYING TO USE THIS METHOD!", LogType.InfoLog);
                     throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
@@ -192,25 +191,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // Store contents for expressions only
                     this.ExpressionsBuilt = true;
                     this.ExpressionsFile = OutputFileName;
-
-                    // Generate our contents for the default log file content
                     this.LoadedLogFile = GenerateExpressionExtensions.ImportExpressionSet(this.ExpressionsFile);
                     this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
-                    this.BuildLogExpressions(out _);
-
-                    // Set default log contents empty.
-                    this.IsLogLoaded = true;
-                    this.LoadedLogFile = OutputFileName;
+                    ViewModelLogger.WriteLog("PULLED IN A NEW EXPRESSIONS FILE AND CONVERTED IT INTO A RAW LOG OK!");
 
                     // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingExpressions))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 
-                    // Store our new log file contents
-                    CastView.Dispatcher.Invoke(() => {
-                        CastView.ReplayLogInputContent.Text = this.ExpressionsFileContents;
-                        CastView.FilteringLogFileTextBox.Text = this.ExpressionsFile;
-                    });
+                    // Store expression objects here
+                    if (!this.BuildLogExpressions(out _))
+                        throw new InvalidOperationException("FAILED TO CONVERT INPUT LOG CONTENTS INTO AN EXPRESSION FROM A CONVERSION FILE!");
                 }
                 // Check for a simulation input file
                 else if (OutputFileName.EndsWith(".ptSim"))
@@ -218,20 +209,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // Store contents for simulations only
                     this.SimulationBuilt = true;
                     this.SimulationFile = OutputFileName;
-
-                    // Set default log contents empty.
-                    this.IsLogLoaded = true;
                     this.LoadedLogFile = OutputFileName;
 
                     // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingSimulation))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
-
-                    // Store our new log file contents
-                    CastView.Dispatcher.Invoke(() => {
-                        CastView.ReplayLogInputContent.Text = this.SimulationFileContents;
-                        CastView.FilteringLogFileTextBox.Text = this.SimulationFile;
-                    });
                 }
                 // All other file types
                 else
@@ -243,15 +225,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
-
-                    // Store our new log file contents
-                    CastView.Dispatcher.Invoke(() => {
-                        CastView.ReplayLogInputContent.Text = this.LogFileContents;
-                        CastView.FilteringLogFileTextBox.Text = this.LoadedLogFile;
-                    });
                 }
 
                 // Return passed
+                this.IsLogLoaded = true;
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
             }

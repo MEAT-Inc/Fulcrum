@@ -36,16 +36,15 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             string[] LogLinesPulled = ExpressionStringsSplit.Select(ExpressionEntrySet =>
             {
                 // Regex match our content values desired
-                string RegexLogLinesFound = Regex.Match(ExpressionEntrySet, @"\s+((?>[^=])+)").Groups[0].Value;
+                string RegexLogLinesFound = Regex.Replace(ExpressionEntrySet, @"=+|\+=+\+\s+(?>\|[^\r\n]+\s+)+\+=+\+\s+", string.Empty);
                 string[] SplitRegexLogLines = RegexLogLinesFound
                     .Split('\n')
-                    .Where(LogLine => !string.IsNullOrWhiteSpace(LogLine) && LogLine.Length > 3)
+                    .Where(LogLine =>
+                        LogLine.Length > 3 && 
+                        !LogLine.Contains("No Parameters") && 
+                        !LogLine.Contains("No Messages Found!") &&
+                        !string.IsNullOrWhiteSpace(LogLine))
                     .Select(LogLine => LogLine.Substring(3))
-                    .ToArray();
-
-                // Remove the final trailing + character that can be pulled in
-                SplitRegexLogLines = SplitRegexLogLines
-                    .Take(SplitRegexLogLines.Length - 1)
                     .ToArray();
 
                 // Now trim the padding edges off and return
@@ -57,6 +56,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             string CombinedOutputLogLines = string.Join("\n", LogLinesPulled);
             string OutputLogFileDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultConversionsPath");
             string ConvertedLogFilePath = Path.Combine(OutputLogFileDirectory, "ExpressionImport_" + Path.GetFileName(Path.ChangeExtension(InputFilePath, ".txt")));
+
+            // Remove old files and write out the new contents
+            if (File.Exists(ConvertedLogFilePath)) File.Delete(ConvertedLogFilePath);
+            if (!Directory.Exists(OutputLogFileDirectory)) Directory.CreateDirectory(OutputLogFileDirectory);
             File.WriteAllText(ConvertedLogFilePath, CombinedOutputLogLines);
             
             // Return the built file path
