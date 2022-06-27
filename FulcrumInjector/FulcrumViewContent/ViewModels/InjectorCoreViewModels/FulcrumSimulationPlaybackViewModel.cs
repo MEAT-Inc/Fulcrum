@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
+using FulcrumInjector.FulcrumViewContent.Models.SimulationModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using Newtonsoft.Json;
@@ -41,7 +42,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private bool _isSimLoaded;
         private string _loadedSimFile;
         private string _loadedSimFileContent;
-        private ObservableCollection<SimMessageEventArgs> _simMessagesProcessed;
+
+        // Control values for events processed
+        private ObservableCollection<SimChannelEventObject> _simChannelsProcessed;
+        private ObservableCollection<SimMessageEventObject> _simMessagesProcessed;
 
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
@@ -49,19 +53,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
 
         // Lists of Messages that are being tracked by our simulation
-        public ObservableCollection<SimMessageEventArgs> SimMessagesProcessed { get => this._simMessagesProcessed; set => PropertyUpdated(value); }
+        public ObservableCollection<SimChannelEventObject> SimChannelsProcessed { get => this._simChannelsProcessed; set => PropertyUpdated(value); }
+        public ObservableCollection<SimMessageEventObject> SimMessagesProcessed { get => this._simMessagesProcessed; set => PropertyUpdated(value); }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// Processes changes in events for message contents being pulled in
-        /// </summary>
-        /// <param name="SendingObject">Object that sent the event</param>
-        /// <param name="MessageEventArgs">Event arguments</param>
-        private void SimPlayer_SimMessageProcessed(object SendingObject, SimMessageEventArgs MessageEventArgs)
-        {
-
-        }
         /// <summary>
         /// Processes an event for a new Simulation channel being built or closed out
         /// </summary>
@@ -69,7 +65,30 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <param name="ChannelEventArgs">Channel changed event arguments</param>
         private void SimPlayer_SimChannelChanged(object SendingObject, SimChannelEventArgs ChannelEventArgs)
         {
+            // Convert and build new event to object. Store in temp copy to trigger property updated
+            var NextChannelObject = new SimChannelEventObject(ChannelEventArgs);
+            var TempCopy = this.SimChannelsProcessed;
+            TempCopy.Add(NextChannelObject);
 
+            // Reset value of the collection here. Log passed and return output
+            this.SimChannelsProcessed = TempCopy;
+            ViewModelLogger.WriteLog("BUILT NEW CONVERSION FOR SIMULATION CHANNEL INTO OBJECT FOR UI BINDING OK!", LogType.TraceLog);
+        }
+        /// <summary>
+        /// Processes changes in events for message contents being pulled in
+        /// </summary>
+        /// <param name="SendingObject">Object that sent the event</param>
+        /// <param name="MessageEventArgs">Event arguments</param>
+        private void SimPlayer_SimMessageProcessed(object SendingObject, SimMessageEventArgs MessageEventArgs)
+        {
+            // Convert and build new event to object. Store in temp copy to trigger property updated
+            var NextMessageObject = new SimMessageEventObject(MessageEventArgs);
+            var TempCopy = this.SimMessagesProcessed; 
+            TempCopy.Add(NextMessageObject);
+
+            // Reset value of the collection here. Log passed and return output
+            this.SimMessagesProcessed = TempCopy; 
+            ViewModelLogger.WriteLog("BUILT NEW CONVERSION FOR SIMULATION MESSAGE INTO OBJECT FOR UI BINDING OK!", LogType.TraceLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

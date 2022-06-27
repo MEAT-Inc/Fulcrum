@@ -184,6 +184,8 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\SimulationGenerator.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\SimChannelExtensions.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
+    <Compile Include="FulcrumViewContent\Models\SimulationModels\SimChannelEventObject.cs" />
+    <Compile Include="FulcrumViewContent\Models\SimulationModels\SimMessageEventObject.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
     <Compile Include="FulcrumLogic\FulcrumEmailBroker.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
@@ -194,6 +196,7 @@
     <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModelShare.cs" />
+    <Compile Include="FulcrumViewContent\Models\SimulationModels\SimulationEventObject.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
