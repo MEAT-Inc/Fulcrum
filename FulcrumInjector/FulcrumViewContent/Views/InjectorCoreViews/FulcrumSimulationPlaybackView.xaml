@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:converters="clr-namespace:FulcrumInjector.FulcrumViewSupport.DataContentHelpers"
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews"
              xmlns:injectorCoreViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:dataContentHelpers="clr-namespace:FulcrumInjector.FulcrumViewSupport.DataContentHelpers"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -23,6 +23,18 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumSimulationPlaybackStyles.xaml"/>
+                <ResourceDictionary>
+                    <DataTemplate x:Key="MessageContentTemplate">
+                        <Grid Margin="2">
+
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate x:Key="ChannelContentTemplate">
+                        <Grid Margin="2">
+
+                        </Grid>
+                    </DataTemplate>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -108,7 +120,10 @@
                 <ListBox
                     x:Name="MainMessagesDataGrid" 
                     Style="{StaticResource MessageContentListBoxStyle}"
-                    ItemTemplate="{StaticResource MessageContentTemplate}">
+                    ItemsSource="{Binding Path=SimEventsProcessed}">
+                    <ListBox.ItemTemplateSelector>
+                        <dataContentHelpers:SimEventDataTemplateSelector/>
+                    </ListBox.ItemTemplateSelector>
                 </ListBox>
 
                 <!-- No Sim File Loaded View or No Messages Loaded view -->
