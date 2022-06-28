@@ -201,5 +201,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Return done.
             return true;
         }
+        /// <summary>
+        /// Stops the simulation reader currently running
+        /// </summary>
+        /// <returns>True if stopped. False if not</returns>
+        public bool StopSimulation()
+        {
+            // Stop the reader object here if it's playing
+            if (!this.SimPlayer.SimulationReading) {
+                ViewModelLogger.WriteLog("CAN NOT STOP SIM READER SINCE IT IS NOT CURRENTLY RUNNING!", LogType.ErrorLog);
+                return false;
+            }
+
+            // Stop it now and log passed
+            this.SimPlayer.StopSimulationReader();
+            ViewModelLogger.WriteLog("STOPPED SIMULATION READER WITHOUT ISSUES!", LogType.InfoLog);
+            return false;
+        }
     }
 }
