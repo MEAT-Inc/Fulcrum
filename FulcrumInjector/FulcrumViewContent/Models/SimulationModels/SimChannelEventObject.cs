@@ -14,9 +14,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
     public class SimChannelEventObject : SimulationEventObject
     {
         // Content Values for new Channel
-        public readonly uint ChannelId;
-        public readonly BaudRate ChannelBaud;
-        public readonly ProtocolId ChannelProtocol;
+        public uint ChannelId { get; private set; }
+        public BaudRate ChannelBaud { get; private set; }
+        public ProtocolId ChannelProtocol { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

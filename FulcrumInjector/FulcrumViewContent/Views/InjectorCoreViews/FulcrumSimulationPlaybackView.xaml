@@ -26,12 +26,12 @@
                 <ResourceDictionary>
                     <DataTemplate x:Key="MessageContentTemplate">
                         <Grid Margin="2">
-
+                            <TextBlock Text="{Binding}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate x:Key="ChannelContentTemplate">
                         <Grid Margin="2">
-
+                            <TextBlock Text="{Binding}"/>
                         </Grid>
                     </DataTemplate>
                 </ResourceDictionary>
