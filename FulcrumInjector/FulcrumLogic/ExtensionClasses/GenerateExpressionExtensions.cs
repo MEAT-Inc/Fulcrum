@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent;
@@ -21,6 +22,50 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// </summary>
     public static class GenerateExpressionExtensions
     {
+        /// <summary>
+        /// Imports an expression file and converts it into a list of expression objects
+        /// </summary>
+        /// <returns>A temporary file name which contains the contents of our log file.</returns>
+        public static string ImportExpressionSet(string InputFilePath)
+        {
+            // Read the contents of the file and store them. Split them out based on the expression splitting line entries
+            string InputExpressionContent = File.ReadAllText(InputFilePath);
+            string[] ExpressionStringsSplit = Regex.Split(InputExpressionContent, @"=+\n\n=+");
+
+            // Now find JUST the log file content values and store them.
+            string[] LogLinesPulled = ExpressionStringsSplit.Select(ExpressionEntrySet =>
+            {
+                // Regex match our content values desired
+                string RegexLogLinesFound = Regex.Replace(ExpressionEntrySet, @"=+|\+=+\+\s+(?>\|[^\r\n]+\s+)+\+=+\+\s+", string.Empty);
+                string[] SplitRegexLogLines = RegexLogLinesFound
+                    .Split('\n')
+                    .Where(LogLine =>
+                        LogLine.Length > 3 && 
+                        !LogLine.Contains("No Parameters") && 
+                        !LogLine.Contains("No Messages Found!") &&
+                        !string.IsNullOrWhiteSpace(LogLine))
+                    .Select(LogLine => LogLine.Substring(3))
+                    .ToArray();
+
+                // Now trim the padding edges off and return
+                string OutputRegexStrings = string.Join("\n", SplitRegexLogLines);
+                return OutputRegexStrings;
+            }).ToArray();
+
+            // Convert pulled strings into one whole object. Convert the log content into an expression here
+            string CombinedOutputLogLines = string.Join("\n", LogLinesPulled);
+            string OutputLogFileDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultConversionsPath");
+            string ConvertedLogFilePath = Path.Combine(OutputLogFileDirectory, "ExpressionImport_" + Path.GetFileName(Path.ChangeExtension(InputFilePath, ".txt")));
+
+            // Remove old files and write out the new contents
+            if (File.Exists(ConvertedLogFilePath)) File.Delete(ConvertedLogFilePath);
+            if (!Directory.Exists(OutputLogFileDirectory)) Directory.CreateDirectory(OutputLogFileDirectory);
+            File.WriteAllText(ConvertedLogFilePath, CombinedOutputLogLines);
+            
+            // Return the built file path
+            return ConvertedLogFilePath;
+        }
+
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
         /// </summary>
@@ -73,8 +118,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
                 // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
                 var TempList = MatchedMessageStrings.ToList();
-                int IndexOfZeroFlags = TempList.IndexOf("0x00000000");
-                if (IndexOfZeroFlags != -1) { TempList.Insert(IndexOfZeroFlags + 1, "No Value"); }
+                int IndexOfZeroFlags = TempList.FindLastIndex(StringObj => 
+                    StringObj.Contains("RxS=00000000") || 
+                    StringObj.Contains("TxF=00000000"));
+                if (IndexOfZeroFlags != -1) { TempList[IndexOfZeroFlags + 1] = "No Flag Value"; }
                 MatchedMessageStrings = TempList.ToArray();
 
                 // Remove any and all whitespace values from our output content here.
