@@ -189,12 +189,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 });
 
                 // Exit out of this method here
-                // this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
+                this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
                 return;
             }
 
             // If the simulation was running already, then stop it.
-            this.ViewModel.StopSimulation();
+            Task.Run(() =>
+            {
+                this.ViewModel.StopSimulation();
+                CurrentHwInfo.StartVehicleMonitoring();
+            });
+
+            // Log done and exit out of this routine
             this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
         }
     }
