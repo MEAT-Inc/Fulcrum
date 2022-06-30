@@ -12,6 +12,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 - Full diagnostic J2534 information about any PassThru interface connected to a machine. If you don't see it listed in my app, then the head is broken. I'll bet big money on that.
 - Integrated session reporting to send me feedback or logs directly for reviewing. These emails are also automated so many times if it's an email with just logs, a simulation is built from the files attached to it. 
 - Settings configuration to tweak this app and it's behavior for different OEs. I've got it dialed in pretty well at this point but sometimes there's small changes that need to be made so you can do all of that without having to restart a diagnostic session.
+- The ability to import, parse, and convert J2534 logs from ANY J2534 interface. This means we can take a log from a previous scan session in a car, load it into this app, and the generate a simulation which can be played back using this application
 - And lastly, a debug log viewing window which is color coded, automatically refreshing, and supports regex searching for the fancy fancy people out there who know what they're looking for in the log files.
 
 ---
