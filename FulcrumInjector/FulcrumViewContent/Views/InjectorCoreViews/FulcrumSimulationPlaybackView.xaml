@@ -179,6 +179,9 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
@@ -244,6 +247,15 @@
                             <Border Grid.Row="1" Margin="0,0,0,0"
                                     BorderBrush="{StaticResource TextColorBase}" 
                                     BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
+
+                            <!-- Temporary Content -->
+                            <TextBlock
+                                Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Margin="50" FontWeight="DemiBold"
+                                Text="Oh look, yet another piece of this software Neo is yet to complete. Yeah, yeah, I know. I'll get here eventually" 
+                                Foreground="{StaticResource PrimaryColor_Lighter_35}"
+                                VerticalAlignment="Center" 
+                                HorizontalAlignment="Center"
+                                FontSize="24"/>
                         </Grid>
                     </mah:Flyout>
                 </mah:FlyoutsControl>
