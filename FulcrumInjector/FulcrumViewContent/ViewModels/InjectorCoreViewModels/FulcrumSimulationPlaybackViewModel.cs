@@ -193,8 +193,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.SimPlayer.SetResponsesEnabled(true);
             this.SimPlayer.SetDefaultConfigurations(SimConfig.ReaderConfigs);
             this.SimPlayer.SetDefaultMessageFilters(SimConfig.ReaderFilters);
-            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount);
             this.SimPlayer.SetDefaultConnectionType(SimConfig.ReaderProtocol, SimConfig.ReaderChannelFlags, SimConfig.ReaderBaudRate);
+            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount, 150);
             ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

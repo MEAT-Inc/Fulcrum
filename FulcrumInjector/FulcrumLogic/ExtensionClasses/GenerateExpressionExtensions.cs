@@ -272,6 +272,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 MatchedMessageStrings[LastStringIndex] = string.Join(" ",
                     MatchedMessageStrings[LastStringIndex]
                         .Split(' ')
+                        .Where(PartValue => !string.IsNullOrEmpty(PartValue))
                         .Select(StringPart => $"0x{StringPart.Trim().ToUpper()}")
                         .ToArray()
                 );
