@@ -62,7 +62,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
 
-            // Try and import the sim loader from the view model for our simulation creation view
+            // Check for hardware selection from the monitoring view
+            var HardwareConfigView = FulcrumConstants.FulcrumInstalledHardwareViewModel;
+            this.ViewModel.IsHardwareSetup = !(HardwareConfigView.SelectedDLL == null || string.IsNullOrEmpty(HardwareConfigView.SelectedDevice));
+            this.ViewLogger.WriteLog($"CURRENT HARDWARE STATE FOR SIMULATIONS: {this.ViewModel.IsHardwareSetup}");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -160,7 +163,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Toggle the content of the sending button
             Button SendButton = (Button)Sender;
             SendButton.Content = this.SimulationEditorFlyout.IsOpen ?
-                "Hide Setup" : "Setup Simulation";
+                "Close Editor" : "Setup Simulation";
             this.ViewLogger.WriteLog("TOGGLED EDITOR TOGGLE SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
         }
 
