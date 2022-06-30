@@ -76,6 +76,31 @@
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
+        <!-- No Hardware Selected Flyout-->
+        <mah:Flyout 
+            Grid.Row="0" IsOpen="False"
+            HorizontalAlignment="Stretch" 
+            x:Name="NoHardwareSelectedFlyout"
+            Margin="10,0" Position="Left"
+            BorderThickness="2" BorderBrush="{StaticResource PrimaryColor}"
+            Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}">
+
+            <!-- Semi Transparent Background -->
+            <mah:Flyout.Background>
+                <SolidColorBrush Color="#020202" Opacity=".85"/>
+            </mah:Flyout.Background>
+
+            <!-- Empty Header Template -->
+            <mah:Flyout.HeaderTemplate>
+                <DataTemplate>
+                    <Grid VerticalAlignment="Top" Margin="0,-20,0,0">
+                        <TextBlock Text="No Hardware Selected!" FontWeight="DemiBold" Foreground="Yellow" FontStyle="Italic"/>
+                    </Grid>
+                </DataTemplate>
+            </mah:Flyout.HeaderTemplate>
+
+        </mah:Flyout>
+
         <!-- Main Content Box -->
         <Grid Grid.Row="2" Margin="10,0,10,0">
             <Grid.RowDefinitions>
@@ -110,7 +135,7 @@
                         Click="StartSimulationButton_OnClick"
                         Content="Start Simulation" Margin="5,0,0,0"
                         Style="{StaticResource ActionButtonStyle}"
-                        IsEnabled="{Binding Path=IsSimLoaded}"/>
+                        IsEnabled="{Binding Path=IsHardwareSetup}"/>
             </Grid>
 
             <!-- Content For Messages -->
@@ -148,9 +173,34 @@
                         <Run FontSize="16" Text="Load a simulation file using the Load Simulation button at the top of this page. Once loaded, When loaded, all features on this page will become enabled. Once a simulation file is played back, the messages read from our interface will be logged along with the responses given."/>
                     </TextBlock>
                 </Grid>
-                
-                <!-- Edit for simulation -->
+
+                <!-- Sim File Loaded and No Hardware Selected -->
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Border Opacity=".50" BorderThickness="3"
+                            BorderBrush="{StaticResource TextColorBase}"
+                            Background="{StaticResource SecondaryColor_Darker_65}"/>
+                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                               Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Simulation Hardware Selected!"/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run FontSize="16" Text="Using the Fulcrum Hardware tab from the menu at the left, please select a DLL and J2534 Device you wish to use for this simulation. The device you select will NOT be usable inside any other software while this simulation is running. If you don't see your device or thing something is wrong, please contact Neo Smith."/>
+                    </TextBlock>
+                </Grid>
+
+                <!-- Flyouts for Content -->
                 <mah:FlyoutsControl>
+
+                    <!-- Edit for simulation -->
                     <mah:Flyout
                         HorizontalAlignment="Stretch" 
                         x:Name="SimulationEditorFlyout"
@@ -197,7 +247,6 @@
                         </Grid>
                     </mah:Flyout>
                 </mah:FlyoutsControl>
-
             </Grid>
 
         </Grid>

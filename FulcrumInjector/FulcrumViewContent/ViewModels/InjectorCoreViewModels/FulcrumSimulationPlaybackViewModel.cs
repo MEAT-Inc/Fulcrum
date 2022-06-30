@@ -40,12 +40,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private control values
         private bool _isSimLoaded;
+        private bool _isHardwareSetup;
         private string _loadedSimFile;
         private string _loadedSimFileContent;
         private SimulationEventObject[] _simEventsProcessed;
 
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
+        public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
         public string LoadedSimFile { get => this._loadedSimFile; set => PropertyUpdated(value); }
         public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
 

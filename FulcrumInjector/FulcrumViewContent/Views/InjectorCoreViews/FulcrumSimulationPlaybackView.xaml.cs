@@ -62,7 +62,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
 
-            // Try and import the sim loader from the view model for our simulation creation view
+            // Check for hardware selection from the monitoring view
+            this.ViewLogger.WriteLog("CONFIGURING HARDWARE STATUS VALUES NOW...", LogType.InfoLog);
+            var HardwareConfigView = FulcrumConstants.FulcrumInstalledHardwareViewModel;
+            this.ViewModel.IsHardwareSetup = !(HardwareConfigView.SelectedDLL == null || string.IsNullOrEmpty(HardwareConfigView.SelectedDevice));
+            this.ViewLogger.WriteLog($"CURRENT HARDWARE STATE FOR SIMULATIONS: {this.ViewModel.IsHardwareSetup}");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
