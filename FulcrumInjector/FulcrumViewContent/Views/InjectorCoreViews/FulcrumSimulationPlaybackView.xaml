@@ -25,14 +25,30 @@
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumSimulationPlaybackStyles.xaml"/>
                 <ResourceDictionary>
                     <DataTemplate x:Key="MessageContentTemplate">
-                        <Grid Margin="2">
-                            <TextBlock Text="{Binding}"/>
-                        </Grid>
+                        <Border Margin="-5,2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2" CornerRadius="0">
+                            <Grid Margin="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Message Event"/>
+                                <TextBlock Grid.Row="1" Text="{Binding MessageReadString}"/>
+                                <ListBox Grid.Row="2" ItemsSource="{Binding MessageResponseStrings}"/>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                     <DataTemplate x:Key="ChannelContentTemplate">
-                        <Grid Margin="2">
-                            <TextBlock Text="{Binding}"/>
-                        </Grid>
+                        <Border Margin="-5,2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2" CornerRadius="2">
+                            <Grid Margin="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Channel Event"/>
+                                <TextBlock Grid.Row="1" Text="{Binding ChannelId}"/>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -75,31 +91,6 @@
         <Border Grid.Row="1" Margin="10,3,10,2"
                 BorderBrush="{StaticResource TextColorBase}" 
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
-
-        <!-- No Hardware Selected Flyout-->
-        <mah:Flyout 
-            Grid.Row="0" IsOpen="False"
-            HorizontalAlignment="Stretch" 
-            x:Name="NoHardwareSelectedFlyout"
-            Margin="10,0" Position="Left"
-            BorderThickness="2" BorderBrush="{StaticResource PrimaryColor}"
-            Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}">
-
-            <!-- Semi Transparent Background -->
-            <mah:Flyout.Background>
-                <SolidColorBrush Color="#020202" Opacity=".85"/>
-            </mah:Flyout.Background>
-
-            <!-- Empty Header Template -->
-            <mah:Flyout.HeaderTemplate>
-                <DataTemplate>
-                    <Grid VerticalAlignment="Top" Margin="0,-20,0,0">
-                        <TextBlock Text="No Hardware Selected!" FontWeight="DemiBold" Foreground="Yellow" FontStyle="Italic"/>
-                    </Grid>
-                </DataTemplate>
-            </mah:Flyout.HeaderTemplate>
-
-        </mah:Flyout>
 
         <!-- Main Content Box -->
         <Grid Grid.Row="2" Margin="10,0,10,0">
