@@ -182,9 +182,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Now using the given hardware, run our start simulation 
             if (!this.ViewModel.IsSimulationRunning)
             {
-                CurrentHwInfo.StopVehicleMonitoring();
-                this.ViewModel.StartSimulation(CurrentHwInfo.VersionType, CurrentHwInfo.SelectedDLL, CurrentHwInfo.SelectedDevice);
-                this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
+                // Invoke this on a new thread
+                Task.Run(() => {
+                    CurrentHwInfo.StopVehicleMonitoring();
+                    this.ViewModel.StartSimulation(CurrentHwInfo.VersionType, CurrentHwInfo.SelectedDLL, CurrentHwInfo.SelectedDevice);
+                });
+
+                // Exit out of this method here
+                // this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
                 return;
             }
 

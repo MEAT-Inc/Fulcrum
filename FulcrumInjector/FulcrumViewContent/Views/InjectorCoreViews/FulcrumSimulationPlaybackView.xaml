@@ -132,20 +132,22 @@
                         Style="{StaticResource ActionButtonStyle}"
                         IsEnabled="{Binding Path=IsSimLoaded}"/>
                 <Button Grid.Column="3"
-                        Click="StartSimulationButton_OnClick"
-                        Content="Start Simulation" Margin="5,0,0,0">
+                        Click="StartSimulationButton_OnClick" Margin="5,0,0,0">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSimLoaded}" Value="false">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsHardwareSetup}" Value="false">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSimulationRunning}" Value="true">
+                                <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                     <Setter Property="Background" Value="DarkGreen"/>
                                     <Setter Property="Content" Value="Simulation Running"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Content" Value="Start Simulation"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="IsEnabled" Value="False"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
