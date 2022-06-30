@@ -133,9 +133,24 @@
                         IsEnabled="{Binding Path=IsSimLoaded}"/>
                 <Button Grid.Column="3"
                         Click="StartSimulationButton_OnClick"
-                        Content="Start Simulation" Margin="5,0,0,0"
-                        Style="{StaticResource ActionButtonStyle}"
-                        IsEnabled="{Binding Path=IsHardwareSetup}"/>
+                        Content="Start Simulation" Margin="5,0,0,0">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimLoaded}" Value="false">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsHardwareSetup}" Value="false">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimulationRunning}" Value="true">
+                                    <Setter Property="Background" Value="DarkGreen"/>
+                                    <Setter Property="Content" Value="Simulation Running"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </Grid>
 
             <!-- Content For Messages -->
