@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             try
             {
                 var FilterType = FilterExpression.FilterType.Split(':')[1];
-                var FilterFlags = (TxFlags)uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty));
+                var FilterFlags = (TxFlags)uint.Parse(FilterContent[0][4].Replace("TxF=", string.Empty), NumberStyles.HexNumber);
                 var FilterProtocol = (ProtocolId)uint.Parse(FilterContent[0][2].Split(':')[0]);
                 var FilterPatten = FilterContent
                     .FirstOrDefault(FilterSet => FilterSet.Any(FilterString => FilterString.Contains("Pattern")))
@@ -152,7 +153,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 try
                 {
                     // Store message values here.
-                    var MessageFlags = uint.Parse(MessageSet[3].Split('=')[1]);
+                    var MessageFlags = uint.Parse(MessageSet[3].Replace("TxF=", string.Empty), NumberStyles.HexNumber);
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[1].Split(':')[0]);
 
                     // ISO15765 11 Bit
@@ -249,12 +250,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                     }
 
                     // If it's not a frame pad message, add to our simulation
-                    var RxStatus = uint.Parse(MessageSet[4].Replace("RxS=", string.Empty));
+                    var RxStatus = uint.Parse(MessageSet[4].Replace("RxS=", string.Empty), NumberStyles.HexNumber);
                     var ProtocolId = (ProtocolId)Enum.Parse(typeof(ProtocolId), MessageSet[2].Split(':')[0]);
 
                     // Build a message and then return it.
                     MessageData = MessageData.Replace("0x", string.Empty).Replace("  ", " ");
-                    var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, RxStatus, MessageData);
+                    var NextMessage = J2534Device.CreatePTMsgFromString(ProtocolId, 0x00, MessageData);
+                    NextMessage.RxStatus = (RxStatus)RxStatus;
                     MessagesBuilt = MessagesBuilt.Append(NextMessage).ToArray();
                 }
                 catch (Exception ConversionEx)

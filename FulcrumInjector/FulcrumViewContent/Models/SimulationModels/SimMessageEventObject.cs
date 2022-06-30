@@ -28,9 +28,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
             // Store message content values here
             this.ResponsePassed = EventArgs.ResponsePassed;
             this.MessageReadString = EventArgs.ReadMessage.DataToHexString();
-            this.MessageResponseStrings = this.ResponsePassed ?
-                EventArgs.Responses.Select(RespMsg => RespMsg.DataToHexString()).ToArray() :
-                new[] { "Responses Failed!", "No Content Output Responses" };
+            string[] ContentMessages = EventArgs.Responses.Select(RespMsg => RespMsg.DataToHexString()).ToArray();
+            if (!ResponsePassed) ContentMessages = ContentMessages.Prepend("Responses Failed!").ToArray();
+            this.MessageResponseStrings = ContentMessages;
 
             // Store raw message objects here
             this.ReadMessage = EventArgs.ReadMessage;

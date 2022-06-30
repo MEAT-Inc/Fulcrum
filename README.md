@@ -1,6 +1,6 @@
 # FulcrumInjector
 
-![Injector_MainView](https://user-images.githubusercontent.com/62027458/159094953-dffce034-5254-498e-8ef7-02c57c7a3726.PNG)
+![Fulcrum_HomePage](https://user-images.githubusercontent.com/62027458/176723420-7d2c7228-a247-44d5-8928-0f1bb5aa171d.PNG)
 
 ---
 
@@ -12,6 +12,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 - Full diagnostic J2534 information about any PassThru interface connected to a machine. If you don't see it listed in my app, then the head is broken. I'll bet big money on that.
 - Integrated session reporting to send me feedback or logs directly for reviewing. These emails are also automated so many times if it's an email with just logs, a simulation is built from the files attached to it. 
 - Settings configuration to tweak this app and it's behavior for different OEs. I've got it dialed in pretty well at this point but sometimes there's small changes that need to be made so you can do all of that without having to restart a diagnostic session.
+- The ability to import, parse, and convert J2534 logs from ANY J2534 interface. This means we can take a log from a previous scan session in a car, load it into this app, and the generate a simulation which can be played back using this application
 - And lastly, a debug log viewing window which is color coded, automatically refreshing, and supports regex searching for the fancy fancy people out there who know what they're looking for in the log files.
 
 ---
@@ -32,12 +33,17 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 --- 
 
 ### Screenshots of The FulcrumInjector
-![Injector_DllLogging](https://user-images.githubusercontent.com/62027458/150359675-b8639413-fed9-4a25-84b3-8dba5ad96c50.PNG)
 
-![Injector_LogReviewing](https://user-images.githubusercontent.com/62027458/150359678-a0066a0f-980b-4a8d-a585-79cfb2dbd795.PNG)
+![Fulcrum_DllOutput](https://user-images.githubusercontent.com/62027458/176723498-299025eb-eb6d-4365-a10d-f31fd8e51e3d.PNG)
 
-![Injector_SessionReporting](https://user-images.githubusercontent.com/62027458/150359682-0a0a3b61-5e89-48a3-ae08-b15339ad0999.PNG)
+![Fulcrum_LogReview](https://user-images.githubusercontent.com/62027458/176723533-0199480c-3dfb-4f36-b0c3-c96ab5775429.PNG)
 
-![Injector_SettingsPage](https://user-images.githubusercontent.com/62027458/150359686-88da0940-78ea-4754-9121-41c4172a5844.PNG)
+![Fulcrum_SimPlayback](https://user-images.githubusercontent.com/62027458/176723582-7863910b-5ebe-43f4-a209-8bc1816e3281.PNG)
 
-![Injector_DebuggingView](https://user-images.githubusercontent.com/62027458/150594178-d65d1535-ddd8-4a2d-a5d1-d0feca2e19f9.PNG)
+![Fulcrum_EmailReport](https://user-images.githubusercontent.com/62027458/176723614-c6aefdc3-9579-4130-8533-60f46ebcd18b.PNG)
+
+![Fulcrum_SettingsPage](https://user-images.githubusercontent.com/62027458/176723657-ea7cb9aa-db55-48dd-b6a2-de9d841fd3ed.PNG)
+
+![Fulcrum_DebuggingView](https://user-images.githubusercontent.com/62027458/176723698-51e22e4c-8d9c-4120-8faa-e043050489bb.PNG)
+
+![Fulcrum_AboutView](https://user-images.githubusercontent.com/62027458/176723734-6742fce9-31bc-47fc-b69a-809d9e508929.PNG)
