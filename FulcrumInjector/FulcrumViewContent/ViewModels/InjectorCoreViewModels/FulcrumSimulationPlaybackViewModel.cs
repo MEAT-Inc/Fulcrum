@@ -40,12 +40,18 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private control values
         private bool _isSimLoaded;
+        private bool _isHardwareSetup;
+        private bool _isSimulationRunning;
         private string _loadedSimFile;
         private string _loadedSimFileContent;
         private SimulationEventObject[] _simEventsProcessed;
 
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
+        public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
+        public bool IsSimulationRunning { get => this._isSimulationRunning; set => PropertyUpdated(value); }
+
+        // Content for the current loaded simulation file
         public string LoadedSimFile { get => this._loadedSimFile; set => PropertyUpdated(value); }
         public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
 
@@ -197,6 +203,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog("STARTED SIMULATION PLAYER FOR OUR LOADED SIMULATION OK! MESSAGE DATA IS BEING PROCESSED TILL THIS TASK IS KILLED!");
 
             // Return done.
+            this.IsSimulationRunning = true;
             return true;
         }
         /// <summary>
@@ -206,15 +213,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public bool StopSimulation()
         {
             // Stop the reader object here if it's playing
-            if (!this.SimPlayer.SimulationReading) {
+            if (!this.SimPlayer.SimulationReading || !this.IsSimulationRunning) {
                 ViewModelLogger.WriteLog("CAN NOT STOP SIM READER SINCE IT IS NOT CURRENTLY RUNNING!", LogType.ErrorLog);
                 return false;
             }
 
             // Stop it now and log passed
+            this.IsSimulationRunning = false;
             this.SimPlayer.StopSimulationReader();
             ViewModelLogger.WriteLog("STOPPED SIMULATION READER WITHOUT ISSUES!", LogType.InfoLog);
-            return false;
+            return true;
         }
     }
 }
