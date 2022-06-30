@@ -180,16 +180,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
 
             // Now using the given hardware, run our start simulation 
-            if (!this.ViewModel.IsSimulationRunning) {
+            if (!this.ViewModel.IsSimulationRunning)
+            {
                 CurrentHwInfo.StopVehicleMonitoring();
                 this.ViewModel.StartSimulation(CurrentHwInfo.VersionType, CurrentHwInfo.SelectedDLL, CurrentHwInfo.SelectedDevice);
                 this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
+                return;
             }
-            else {
-                // If the simulation was running already, then stop it.
-                this.ViewModel.StopSimulation();
-                this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
-            }
+
+            // If the simulation was running already, then stop it.
+            this.ViewModel.StopSimulation();
+            this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
         }
     }
 }
