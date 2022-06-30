@@ -25,13 +25,6 @@
                 <Setter Property="BorderThickness" Value="2"/>
             </Style>
 
-            <!-- Message Listbox DataTemplate -->
-            <DataTemplate x:Key="MessageContentTemplate">
-                <Grid Margin="2">
-                    
-                </Grid>
-            </DataTemplate>
-
             <!-- AVEdit Output Box Style -->
             <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">
                 <Setter Property="FontFamily" Value="Consolas"/>

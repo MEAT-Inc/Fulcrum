@@ -131,7 +131,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Find the name of the first file and use it as our base.
             string OutputPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumExpressionsPath")
+                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultImportFilePath")
             );
 
             // Build file name here.

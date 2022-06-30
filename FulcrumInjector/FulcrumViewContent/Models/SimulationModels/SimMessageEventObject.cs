@@ -10,13 +10,13 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
     public class SimMessageEventObject : SimulationEventObject
     {
         // Message Content Values
-        public readonly bool ResponsePassed;
-        public readonly string MessageReadString;
-        public readonly string[] MessageResponseStrings;
+        public bool ResponsePassed { get; private set; }
+        public string MessageReadString { get; private set; }
+        public string[] MessageResponseStrings { get; private set; }
 
         // Message Objects themselves
-        public readonly PassThruStructs.PassThruMsg ReadMessage;
-        public readonly PassThruStructs.PassThruMsg[] SentMessages;
+        public PassThruStructs.PassThruMsg ReadMessage { get; private set; }
+        public PassThruStructs.PassThruMsg[] SentMessages { get; private set; }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
