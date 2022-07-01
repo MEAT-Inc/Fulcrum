@@ -125,9 +125,15 @@ namespace FulcrumInjector
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath");
             int FlushTriggerValue = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.AsyncFlushCountTrigger");
 
-            // Get Min and Max Logging Values. Default to trace logging for when debugging is setup/on
-            int MaxLoggingLevel = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMaxLoggingLevel");
-            int MinLoggingLevel = Debugger.IsAttached ? 0 : ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMinLoggingLevel");
+#if DEBUG
+            // If this is a debug build, ensure the logging output states are set to min 0 and max 5
+            var MinLoggingLevel = 0;
+            var MaxLoggingLevel = 5;
+#else
+            // If we're NOT in a debug build, check if there's a debugger on. If so, force to trace logging output
+            var MaxLoggingLevel = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMaxLoggingLevel");
+            var MinLoggingLevel = Debugger.IsAttached ? 0 : ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMinLoggingLevel");
+#endif
 
             // Make logger and build global logger object.
             LogBroker.ConfigureLoggingSession(AppName, LoggingPath, MinLoggingLevel, MaxLoggingLevel);
