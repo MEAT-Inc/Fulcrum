@@ -185,6 +185,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"NEW SIMULATION PLAYER WITH FOR VERSION {Version} USING DEVICE {DeviceName} ({DllName}) HAS BEEN SETUP!", LogType.InfoLog);
 
             // Subscribe to the player events and channel events
+            // BUG: WHEN WE TRIGGER TOO MANY EVENTS, SOME ARE BEING DROPPED!
             // this.SimPlayer.SimChannelChanged += SimPlayer_SimChannelChanged;
             this.SimPlayer.SimMessageProcessed += SimPlayer_SimMessageProcessed;
             ViewModelLogger.WriteLog("SUBSCRIBED OUR VIEW MODEL TO OUR SIMULATION PLAYER OK!", LogType.InfoLog);
@@ -194,7 +195,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.SimPlayer.SetDefaultConfigurations(SimConfig.ReaderConfigs);
             this.SimPlayer.SetDefaultMessageFilters(SimConfig.ReaderFilters);
             this.SimPlayer.SetDefaultConnectionType(SimConfig.ReaderProtocol, SimConfig.ReaderChannelFlags, SimConfig.ReaderBaudRate);
-            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount, 150);
+            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount, SimConfig.ResponseTimeout);
             ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

@@ -38,6 +38,8 @@
                             </Grid>
                         </Border>
                     </DataTemplate>
+
+                    <!-- Ignored for now. Trying to diagnose issues with events not populating -->
                     <DataTemplate x:Key="ChannelContentTemplate">
                         <Border Margin="-5,2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2" CornerRadius="2">
                             <Grid Margin="2">
@@ -50,6 +52,7 @@
                             </Grid>
                         </Border>
                     </DataTemplate>
+
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
