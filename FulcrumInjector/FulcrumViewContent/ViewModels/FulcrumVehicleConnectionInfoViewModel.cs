@@ -260,6 +260,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     if (this.DeviceVoltage >= 11)
                     {
                         // Check our Vin Read status and if we need to Auto ID at all
+                        if (this.VehicleVin == "No Vehicle Voltage!") this.VehicleVin = string.Empty;
                         if (VinReadRun || !CheckVinNumber) continue;
 
                         try
