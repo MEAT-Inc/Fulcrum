@@ -22,6 +22,7 @@ using NLog.Fluent;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using static SharpLogger.LoggerObjects.SubServiceLogger;
 
 namespace FulcrumInjector
 {
@@ -124,10 +125,13 @@ namespace FulcrumInjector
             string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath");
             int FlushTriggerValue = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.AsyncFlushCountTrigger");
 
+            // Get Min and Max Logging Values. Default to trace logging for when debugging is setup/on
+            int MaxLoggingLevel = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMaxLoggingLevel");
+            int MinLoggingLevel = Debugger.IsAttached ? 0 : ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMinLoggingLevel");
+
             // Make logger and build global logger object.
-            LogBroker.ConfigureLoggingSession(AppName, LoggingPath);
-            SubServiceLogger.SetFlushTrigger(FlushTriggerValue);
-            LogBroker.BrokerInstance.FillBrokerPool();
+            LogBroker.ConfigureLoggingSession(AppName, LoggingPath, MinLoggingLevel, MaxLoggingLevel);
+            BaseLogger.SetFlushTrigger(FlushTriggerValue); LogBroker.BrokerInstance.FillBrokerPool();
 
             // Log information and current application version.
             string CurrentAppVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();

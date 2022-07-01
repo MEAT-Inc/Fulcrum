@@ -185,7 +185,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"NEW SIMULATION PLAYER WITH FOR VERSION {Version} USING DEVICE {DeviceName} ({DllName}) HAS BEEN SETUP!", LogType.InfoLog);
 
             // Subscribe to the player events and channel events
-            this.SimPlayer.SimChannelChanged += SimPlayer_SimChannelChanged;
+            // this.SimPlayer.SimChannelChanged += SimPlayer_SimChannelChanged;
             this.SimPlayer.SimMessageProcessed += SimPlayer_SimMessageProcessed;
             ViewModelLogger.WriteLog("SUBSCRIBED OUR VIEW MODEL TO OUR SIMULATION PLAYER OK!", LogType.InfoLog);
 
