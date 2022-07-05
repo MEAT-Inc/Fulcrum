@@ -68,7 +68,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private void SimPlayer_SimChannelChanged(object SendingObject, SimChannelEventArgs ChannelEventArgs)
         {
             // Convert and build new event to object. Store in temp copy to trigger property updated
-            this.SimEventsProcessed = this.SimEventsProcessed.Append(new SimChannelEventObject(ChannelEventArgs)).ToArray();
+            var NextEvent = new SimChannelEventObject(ChannelEventArgs);
+            this.SimEventsProcessed = this.SimEventsProcessed.Append(NextEvent).ToArray();
             ViewModelLogger.WriteLog("BUILT NEW CONVERSION FOR SIMULATION CHANNEL INTO OBJECT FOR UI BINDING OK!", LogType.TraceLog);
         }
         /// <summary>
@@ -79,7 +80,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private void SimPlayer_SimMessageProcessed(object SendingObject, SimMessageEventArgs MessageEventArgs)
         {
             // Convert and build new event to object. Store in temp copy to trigger property updated
-            this.SimEventsProcessed = this.SimEventsProcessed.Append(new SimMessageEventObject(MessageEventArgs)).ToArray();
+            var NextEvent = new SimMessageEventObject(MessageEventArgs);
+            this.SimEventsProcessed = this.SimEventsProcessed.Append(NextEvent).ToArray();
             ViewModelLogger.WriteLog("BUILT NEW CONVERSION FOR SIMULATION MESSAGE INTO OBJECT FOR UI BINDING OK!", LogType.TraceLog);
         }
 
@@ -93,7 +95,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Setup empty list of our events here
             this.SimEventsProcessed ??= Array.Empty<SimulationEventObject>();
             ViewModelLogger.WriteLog("BUILT NEW SIMULATION EVENT QUEUE OBJECT WITHOUT ISSUES!");
-
+            
             // Log built VM OK and build a new sim loader/generator
             ViewModelLogger.WriteLog("BUILT NEW SIMULATION PLAYBACK VIEW MODEL LOGGER AND INSTANCE OK!", LogType.InfoLog);
         }
