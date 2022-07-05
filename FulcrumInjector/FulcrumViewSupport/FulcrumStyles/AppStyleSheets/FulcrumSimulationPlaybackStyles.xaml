@@ -24,16 +24,6 @@
                 <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
                 <Setter Property="BorderThickness" Value="2"/>
             </Style>
-            <Style x:Key="MessageContentListBoxItemStyle" TargetType="ListBoxItem">
-                <Style.Triggers>
-                    <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                        <Setter Property="Background" Value="#19f39611"></Setter>
-                    </Trigger>
-                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                        <Setter Property="Background" Value="#19000000"></Setter>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
 
             <!-- AVEdit Output Box Style -->
             <Style x:Key="LoggingOutputBoxStyle" TargetType="avalonedit:TextEditor">

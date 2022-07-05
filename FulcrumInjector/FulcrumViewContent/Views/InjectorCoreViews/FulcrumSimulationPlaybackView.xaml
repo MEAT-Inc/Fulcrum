@@ -47,13 +47,12 @@
                                     <TextBlock Text="Message Read:" 
                                                FontWeight="DemiBold" FontSize="14" 
                                                Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
-                                    <TextBox Grid.Column="1" Width="500" HorizontalAlignment="Left"
-                                             Style="{StaticResource StaticReadonlyTextBoxStyle}"
-                                             Text="{Binding MessageReadString}"/>
+                                    <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
+                                               Text="{Binding MessageReadString}"/>
                                 </Grid>
                                 <TextBlock Grid.Row="4" Text="Responses Sent" FontSize="14"
                                            FontWeight="DemiBold" Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
-                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_65}"
+                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_65}" Margin="0,5"
                                          BorderBrush="{StaticResource PrimaryColor_Darker_65}" BorderThickness="2"
                                          ItemsSource="{Binding MessageResponseStrings}"/>
                             </Grid>
