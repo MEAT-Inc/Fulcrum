@@ -203,6 +203,10 @@
                                 <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="false">
                                     <Setter Property="IsEnabled" Value="False"/>
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimStarting, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Background" Value="DarkOrange"/>
+                                    <Setter Property="Content" Value="Starting..."/>
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                     <Setter Property="Background" Value="DarkGreen"/>
                                     <Setter Property="Content" Value="Simulation Running"/>
@@ -224,7 +228,8 @@
                     x:Name="MainMessagesDataGrid" SelectionMode="Single"
                     Style="{StaticResource MessageContentListBoxStyle}"
                     ItemsSource="{Binding Path=SimEventsProcessed}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    IsSynchronizedWithCurrentItem="True">
                     <ListBox.ItemTemplateSelector>
                         <dataContentHelpers:SimEventDataTemplateSelector/>
                     </ListBox.ItemTemplateSelector>
