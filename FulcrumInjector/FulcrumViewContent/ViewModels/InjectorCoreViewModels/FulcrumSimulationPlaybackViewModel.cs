@@ -175,7 +175,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public bool StartSimulation(JVersion Version, string DllName, string DeviceName)
         {
             // Setup the simulation player
-            this.IsSimStarting = true; 
             ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
 
             // Pull in a base configuration and build a new reader
@@ -204,7 +203,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog("STARTED SIMULATION PLAYER FOR OUR LOADED SIMULATION OK! MESSAGE DATA IS BEING PROCESSED TILL THIS TASK IS KILLED!");
 
             // Return done.
-            this.IsSimStarting = false;
             this.IsSimulationRunning = true;
             return true;
         }
