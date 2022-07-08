@@ -86,7 +86,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
             using OpenFileDialog SelectAttachmentDialog = new OpenFileDialog()
             {
-                Multiselect = true,
+                Multiselect = false,
                 CheckFileExists = true,
                 CheckPathExists = true,
                 RestoreDirectory = true,
@@ -183,7 +183,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (!this.ViewModel.IsSimulationRunning)
             {
                 // Invoke this on a new thread
-                Task.Run(() => {
+                Task.Run(() =>
+                {
+                    // Stop monitoring and begin simulation reading
                     CurrentHwInfo.StopVehicleMonitoring();
                     this.ViewModel.StartSimulation(CurrentHwInfo.VersionType, CurrentHwInfo.SelectedDLL, CurrentHwInfo.SelectedDevice);
                 });
@@ -196,12 +198,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // If the simulation was running already, then stop it.
             Task.Run(() =>
             {
+                // Stop simulation playback and restart monitoring if needed
                 this.ViewModel.StopSimulation();
                 CurrentHwInfo.StartVehicleMonitoring();
-            });
 
-            // Log done and exit out of this routine
-            this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
+                // Log done and exit out of this routine
+                this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
+            });
         }
     }
 }

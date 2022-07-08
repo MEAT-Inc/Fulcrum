@@ -68,11 +68,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private void SimPlayer_SimChannelChanged(object SendingObject, SimChannelEventArgs ChannelEventArgs)
         {
             // Convert and build new event to object. Store in temp copy to trigger property updated
-            var NextChannelObject = new SimChannelEventObject(ChannelEventArgs);
-            var TempCopy = this.SimEventsProcessed;
-            this.SimEventsProcessed = TempCopy.Append(NextChannelObject).ToArray();
-
-            // Log passed and return output
+            var NextEvent = new SimChannelEventObject(ChannelEventArgs);
+            this.SimEventsProcessed = this.SimEventsProcessed.Append(NextEvent).ToArray();
             ViewModelLogger.WriteLog("BUILT NEW CONVERSION FOR SIMULATION CHANNEL INTO OBJECT FOR UI BINDING OK!", LogType.TraceLog);
         }
         /// <summary>
@@ -83,11 +80,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private void SimPlayer_SimMessageProcessed(object SendingObject, SimMessageEventArgs MessageEventArgs)
         {
             // Convert and build new event to object. Store in temp copy to trigger property updated
-            var NextMessageObject = new SimMessageEventObject(MessageEventArgs);
-            var TempCopy = this.SimEventsProcessed;
-            this.SimEventsProcessed = TempCopy.Append(NextMessageObject).ToArray();
-
-            // Log passed and return output
+            var NextEvent = new SimMessageEventObject(MessageEventArgs);
+            this.SimEventsProcessed = this.SimEventsProcessed.Append(NextEvent).ToArray();
             ViewModelLogger.WriteLog("BUILT NEW CONVERSION FOR SIMULATION MESSAGE INTO OBJECT FOR UI BINDING OK!", LogType.TraceLog);
         }
 
@@ -98,13 +92,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         public FulcrumSimulationPlaybackViewModel()
         {
-            // Log built VM OK and build a new sim loader/generator
-            this.IsSimLoaded = false;
-            ViewModelLogger.WriteLog("BUILT NEW SIMULATION PLAYBACK VIEW MODEL LOGGER AND INSTANCE OK!", LogType.InfoLog);
-
             // Setup empty list of our events here
-            this.SimEventsProcessed = Array.Empty<SimChannelEventObject>();
+            this.SimEventsProcessed ??= Array.Empty<SimulationEventObject>();
             ViewModelLogger.WriteLog("BUILT NEW SIMULATION EVENT QUEUE OBJECT WITHOUT ISSUES!");
+            
+            // Log built VM OK and build a new sim loader/generator
+            ViewModelLogger.WriteLog("BUILT NEW SIMULATION PLAYBACK VIEW MODEL LOGGER AND INSTANCE OK!", LogType.InfoLog);
         }
 
 
@@ -122,9 +115,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;
             }
 
+            // Clear out all of our old values first
+            this.IsSimLoaded = false; this.IsSimulationRunning = false;
+            this.LoadedSimFile = string.Empty; this.LoadedSimFileContent = string.Empty;
+
             // Build a new Simulation Loader and parse contents of the sim file into it.
             this.SimLoader = new SimulationLoader();
             this.LoadedSimFileContent = File.ReadAllText(SimFile);
+
             try
             { 
                 // Testing JSON conversion
@@ -148,6 +146,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
 
                 // Load file contents and store name of file on our view model
+                this.IsSimLoaded = true;
                 this.IsSimLoaded = true;
                 this.LoadedSimFile = SimFile;
                 ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
@@ -185,6 +184,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"NEW SIMULATION PLAYER WITH FOR VERSION {Version} USING DEVICE {DeviceName} ({DllName}) HAS BEEN SETUP!", LogType.InfoLog);
 
             // Subscribe to the player events and channel events
+            // BUG: WHEN WE TRIGGER TOO MANY EVENTS, SOME ARE BEING DROPPED!
             this.SimPlayer.SimChannelChanged += SimPlayer_SimChannelChanged;
             this.SimPlayer.SimMessageProcessed += SimPlayer_SimMessageProcessed;
             ViewModelLogger.WriteLog("SUBSCRIBED OUR VIEW MODEL TO OUR SIMULATION PLAYER OK!", LogType.InfoLog);
@@ -193,8 +193,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.SimPlayer.SetResponsesEnabled(true);
             this.SimPlayer.SetDefaultConfigurations(SimConfig.ReaderConfigs);
             this.SimPlayer.SetDefaultMessageFilters(SimConfig.ReaderFilters);
-            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount);
             this.SimPlayer.SetDefaultConnectionType(SimConfig.ReaderProtocol, SimConfig.ReaderChannelFlags, SimConfig.ReaderBaudRate);
+            this.SimPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount, SimConfig.ResponseTimeout);
             ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

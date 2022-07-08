@@ -11,11 +11,13 @@ using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumViewContent;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using SharpSimulator.SimulationObjects;
+using SharpWrap2534.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {
