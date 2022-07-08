@@ -25,22 +25,44 @@
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumSimulationPlaybackStyles.xaml"/>
                 <ResourceDictionary>
                     <DataTemplate x:Key="MessageContentTemplate">
-                        <Border Margin="-5,2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2" CornerRadius="0">
-                            <Grid Margin="2">
+                        <Border Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}"
+                                Margin="-5,0,-5,0" BorderBrush="{StaticResource TextColorBase}"
+                                BorderThickness="1" CornerRadius="0" Padding="5">
+                            <Grid Margin="0,0,0,0">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="5"/>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="5"/>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Message Event"/>
-                                <TextBlock Grid.Row="1" Text="{Binding MessageReadString}"/>
-                                <ListBox Grid.Row="2" ItemsSource="{Binding MessageResponseStrings}"/>
+                                <TextBlock Text="Message Event" FontSize="18" FontWeight="DemiBold"/>
+                                <Border Grid.Row="1" BorderBrush="{StaticResource PrimaryColor_Darker_35}" BorderThickness="0,1,0,0"/>
+                                <Grid Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Message Read:" 
+                                               FontWeight="DemiBold" FontSize="14" 
+                                               Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
+                                    <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
+                                               Text="{Binding MessageReadString}"/>
+                                </Grid>
+                                <TextBlock Grid.Row="4" Text="Responses Sent" FontSize="14"
+                                           FontWeight="DemiBold" Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
+                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_65}" Margin="0,5"
+                                         BorderBrush="{StaticResource PrimaryColor_Darker_65}" BorderThickness="2"
+                                         ItemsSource="{Binding MessageResponseStrings}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
                     <DataTemplate x:Key="ChannelContentTemplate">
-                        <Border Margin="-5,2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2" CornerRadius="2">
-                            <Grid Margin="2">
+                        <Border Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}"
+                                Margin="-5,0,-5,0" BorderBrush="{StaticResource TextColorBase}"
+                                BorderThickness="1" CornerRadius="0">
+                            <Grid Margin="5">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
@@ -148,10 +170,10 @@
 
             <!-- Content For Messages -->
             <Grid Grid.Row="1" Margin="0,5,0,0">
-
+                
                 <!-- Messages Datagrid -->
-                <ListBox
-                    x:Name="MainMessagesDataGrid" 
+                <ListBox 
+                    x:Name="MainMessagesDataGrid" SelectionMode="Single"
                     Style="{StaticResource MessageContentListBoxStyle}"
                     ItemsSource="{Binding Path=SimEventsProcessed}">
                     <ListBox.ItemTemplateSelector>

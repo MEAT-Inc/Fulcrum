@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
     public class SimulationEventObject
     {
         // Date and time sent along with the sharp session in use
-        public readonly DateTime TimeProcessed;
+        public DateTime TimeProcessed { get; private set; }
         public readonly J2534Device SendingDevice;
         public readonly J2534Channel SendingChannel;
         public readonly Sharp2534Session SendingSharpSession;

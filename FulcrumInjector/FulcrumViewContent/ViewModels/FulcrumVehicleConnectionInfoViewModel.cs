@@ -240,6 +240,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             int RefreshTimer = 500; IsMonitoring = true; bool VinReadRun = false;
             ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
+            // Close our device here if it's open currently.
+            if (this.InstanceSession.JDeviceInstance.IsOpen) 
+                this.InstanceSession.PTClose();
+
             // Find out VIN Number values here.
             this.InstanceSession.PTOpen();
             bool CheckVinNumber = FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true);
