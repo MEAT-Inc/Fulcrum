@@ -32,6 +32,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
             this.SendingSharpSession = SimEvent.Session;
             this.SendingDevice = SimEvent.SessionDevice;
             this.SendingChannel = SimEvent.SessionChannel;
+
+            // Set the time built
+            this.TimeProcessed = DateTime.Now;
         }
         /// <summary>
         /// Store values based on the input content type for a Channel Event
@@ -43,6 +46,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
             this.SendingSharpSession = SimEvent.Session;
             this.SendingDevice = SimEvent.SessionDevice;
             this.SendingChannel = SimEvent.SessionChannel;
+
+            // Set the time built
+            this.TimeProcessed = DateTime.Now;
         }
 
         /// <summary>
