@@ -183,11 +183,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             if (!this.ViewModel.IsSimulationRunning)
             {
                 // Invoke this on a new thread
+                this.ViewModel.IsSimStarting = true;
                 Task.Run(() =>
                 {
                     // Stop monitoring and begin simulation reading
                     CurrentHwInfo.StopVehicleMonitoring();
                     this.ViewModel.StartSimulation(CurrentHwInfo.VersionType, CurrentHwInfo.SelectedDLL, CurrentHwInfo.SelectedDevice);
+                    this.ViewModel.IsSimStarting = false;
                 });
 
                 // Exit out of this method here

@@ -41,6 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // Private control values
         private bool _isSimLoaded;
         private bool _isHardwareSetup;
+        private bool _isSimStarting;
         private bool _isSimulationRunning;
         private string _loadedSimFile;
         private string _loadedSimFileContent;
@@ -49,6 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // Public values to bind our UI onto
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
         public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
+        public bool IsSimStarting { get => this._isSimStarting; set => PropertyUpdated(value); }
         public bool IsSimulationRunning { get => this._isSimulationRunning; set => PropertyUpdated(value); }
 
         // Content for the current loaded simulation file
@@ -95,8 +97,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Setup empty list of our events here
             this.SimEventsProcessed ??= Array.Empty<SimulationEventObject>();
             ViewModelLogger.WriteLog("BUILT NEW SIMULATION EVENT QUEUE OBJECT WITHOUT ISSUES!");
-            
-            // Log built VM OK and build a new sim loader/generator
             ViewModelLogger.WriteLog("BUILT NEW SIMULATION PLAYBACK VIEW MODEL LOGGER AND INSTANCE OK!", LogType.InfoLog);
         }
 

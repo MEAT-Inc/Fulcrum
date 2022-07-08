@@ -197,18 +197,22 @@
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="false">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="true">
-                                    <Setter Property="Background" Value="DarkGreen"/>
-                                    <Setter Property="Content" Value="Simulation Running"/>
-                                </DataTrigger>
                                 <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="false">
                                     <Setter Property="Content" Value="Start Simulation"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimLoaded}" Value="false">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsHardwareSetup}" Value="false">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimStarting}" Value="true">
+                                    <Setter Property="Background" Value="DarkOrange"/>
+                                    <Setter Property="Content" Value="Starting..."/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimulationRunning}" Value="true">
+                                    <Setter Property="Background" Value="DarkGreen"/>
+                                    <Setter Property="Content" Value="Simulation Running"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -224,7 +228,8 @@
                     x:Name="MainMessagesDataGrid" SelectionMode="Single"
                     Style="{StaticResource MessageContentListBoxStyle}"
                     ItemsSource="{Binding Path=SimEventsProcessed}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    IsSynchronizedWithCurrentItem="True">
                     <ListBox.ItemTemplateSelector>
                         <dataContentHelpers:SimEventDataTemplateSelector/>
                     </ListBox.ItemTemplateSelector>
