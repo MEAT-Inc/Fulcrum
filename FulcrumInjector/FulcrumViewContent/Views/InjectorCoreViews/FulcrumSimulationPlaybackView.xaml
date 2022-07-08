@@ -30,45 +30,93 @@
                                 BorderThickness="1" CornerRadius="0" Padding="5">
                             <Grid Margin="0,0,0,0">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="25"/>
                                     <RowDefinition Height="5"/>
                                     <RowDefinition Height="20"/>
-                                    <RowDefinition Height="5"/>
+                                    <RowDefinition Height="20"/>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Message Event" FontSize="18" FontWeight="DemiBold"/>
+                                <TextBlock Text="Message Event" FontSize="14" FontWeight="DemiBold"/>
                                 <Border Grid.Row="1" BorderBrush="{StaticResource PrimaryColor_Darker_35}" BorderThickness="0,1,0,0"/>
                                 <Grid Grid.Row="2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Message Read:" 
-                                               FontWeight="DemiBold" FontSize="14" 
+                                    <TextBlock Text="Time Processed:" 
+                                               FontWeight="DemiBold" FontSize="12" 
                                                Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
-                                    <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
-                                               Text="{Binding MessageReadString}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding TimeProcessed}"
+                                               HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                 </Grid>
-                                <TextBlock Grid.Row="4" Text="Responses Sent" FontSize="14"
+                                <Grid Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Message Read:" 
+                                               FontWeight="DemiBold" FontSize="12" 
+                                               Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
+                                    <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               Text="{Binding MessageReadString}" FontFamily="Consolas"/>
+                                </Grid>
+                                <TextBlock Grid.Row="4" Text="Responses Sent:" FontSize="12" Width="100" HorizontalAlignment="Left"
                                            FontWeight="DemiBold" Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
-                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_65}" Margin="0,5"
-                                         BorderBrush="{StaticResource PrimaryColor_Darker_65}" BorderThickness="2"
-                                         ItemsSource="{Binding MessageResponseStrings}"/>
+                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_65}" Margin="0,5,10,5"
+                                         BorderBrush="{StaticResource PrimaryColor_Darker_65}" BorderThickness="2" 
+                                         Width="770" HorizontalAlignment="Left" ItemsSource="{Binding MessageResponseStrings}" 
+                                         FontFamily="Consolas"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
                     <DataTemplate x:Key="ChannelContentTemplate">
                         <Border Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}"
                                 Margin="-5,0,-5,0" BorderBrush="{StaticResource TextColorBase}"
-                                BorderThickness="1" CornerRadius="0">
-                            <Grid Margin="5">
+                                BorderThickness="1" CornerRadius="0" Background="#3333" Padding="5">
+                            <Grid Margin="0,0,0,0">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
+                                    <RowDefinition Height="25"/>
+                                    <RowDefinition Height="5"/>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="20"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Channel Event"/>
-                                <TextBlock Grid.Row="1" Text="{Binding ChannelId}"/>
+                                <TextBlock Text="Channel Event" FontSize="14" FontWeight="DemiBold"/>
+                                <Border Grid.Row="1" BorderBrush="{StaticResource PrimaryColor_Darker_35}" BorderThickness="0,1,0,0"/>
+                                <Grid Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Time Processed:" 
+                                               FontWeight="DemiBold" FontSize="12" 
+                                               Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding TimeProcessed}"
+                                               HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Channel ID:" 
+                                               FontWeight="DemiBold" FontSize="12" 
+                                               Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
+                                    <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
+                                               Text="{Binding ChannelId}" FontFamily="Consolas"/>
+                                </Grid>
+                                <Grid Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Protocol ID:" 
+                                               FontWeight="DemiBold" FontSize="12" 
+                                               Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
+                                    <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
+                                               Text="{Binding ChannelProtocol}" FontFamily="Consolas"/>
+                                </Grid>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -175,7 +223,8 @@
                 <ListBox 
                     x:Name="MainMessagesDataGrid" SelectionMode="Single"
                     Style="{StaticResource MessageContentListBoxStyle}"
-                    ItemsSource="{Binding Path=SimEventsProcessed}">
+                    ItemsSource="{Binding Path=SimEventsProcessed}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListBox.ItemTemplateSelector>
                         <dataContentHelpers:SimEventDataTemplateSelector/>
                     </ListBox.ItemTemplateSelector>
