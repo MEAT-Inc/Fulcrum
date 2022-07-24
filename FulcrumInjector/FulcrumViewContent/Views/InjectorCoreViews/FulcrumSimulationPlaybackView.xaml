@@ -284,6 +284,82 @@
                     </TextBlock>
                 </Grid>
 
+                <!-- Simulation Not Running -->
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                        <Condition Binding="{Binding Path=IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                        <Condition Binding="{Binding Path=IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="false"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Border Opacity=".50" BorderThickness="3"
+                            BorderBrush="{StaticResource TextColorBase}"
+                            Background="{StaticResource SecondaryColor_Darker_65}"/>
+                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                                   Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="Simulation is not running!"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run FontSize="16" Text="Start the simulation using the Start Simulation button at the top of this window."/>
+                    </TextBlock>
+                </Grid>
+
+                <!-- Idle simulation with no data output -->
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                        <Condition Binding="{Binding Path=IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                        <Condition Binding="{Binding Path=SimEventsProcessed.Length, UpdateSourceTrigger=PropertyChanged}" Value="0"/>
+                                        <Condition Binding="{Binding Path=IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Border Opacity=".50" BorderThickness="3"
+                            BorderBrush="{StaticResource TextColorBase}"
+                            Background="{StaticResource SecondaryColor_Darker_65}"/>
+                        <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                                   Margin="30,20" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Simulation Events Processed!"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run FontSize="16" Text="Once a simulation is running, events processed by the simulation reader will populate in this view here. If no events show up during execution, please contact Neo Smith for support."/>
+                        </TextBlock>
+                </Grid>
+
+
                 <!-- Flyouts for Content -->
                 <mah:FlyoutsControl>
 
@@ -335,7 +411,7 @@
                             <!-- Temporary Content -->
                             <TextBlock
                                 Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Margin="50" FontWeight="DemiBold"
-                                Text="Oh look, yet another piece of this software Neo is yet to complete. Yeah, yeah, I know. I'll get here eventually" 
+                                Text="Oh look, yet another piece of this software Neo is yet to complete. Yeah yeah I know. I'll get here eventually" 
                                 Foreground="{StaticResource PrimaryColor_Lighter_35}"
                                 VerticalAlignment="Center" 
                                 HorizontalAlignment="Center"

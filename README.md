@@ -7,7 +7,7 @@
 ### FulcrumInjector Features
 FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pipe data out from the native calls to any other location for super deep diagnostic logging.  This application has a TON of useful features in it. Some of the most notable ones are listed below. Not all features are complete at this time but all of the layouts for them are more than 90% complete on the UI side of things.
 - Full shim logging between a PassThru interface and my application
-- Dynamic realtime processing of log output to build simulations that can be replayed at any time using this app. (this is a WIP. It's like 40% done. I can build the sims but I can't replay them yet.)
+- Dynamic realtime processing of log output to build simulations that can be replayed at any time using this app.
 - Easy access to booting any OE app on a machine. This works for your Unicorn boxes as well. 
 - Full diagnostic J2534 information about any PassThru interface connected to a machine. If you don't see it listed in my app, then the head is broken. I'll bet big money on that.
 - Integrated session reporting to send me feedback or logs directly for reviewing. These emails are also automated so many times if it's an email with just logs, a simulation is built from the files attached to it. 
