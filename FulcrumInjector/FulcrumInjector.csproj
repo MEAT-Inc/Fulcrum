@@ -170,6 +170,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FulcrumLogic\ExtensionClasses\GenerateSimulationExtensions.cs" />
+    <Compile Include="FulcrumLogic\FulcrumUpdater\InjectorUpdater.cs" />
     <Compile Include="FulcrumLogic\FulcrumUpdater\InjectorVersionInfo.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionsGenerator.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruCloseExpression.cs" />
