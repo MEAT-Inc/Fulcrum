@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -17,9 +18,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("TitleViewModelLogger")) ?? new SubServiceLogger("TitleViewModelLogger");
 
         // Private control values
-        private string _titleTextString;          // Private value for title view title text
-        private string _injectorVersionString;    // Private value for title view version text
-        private string _shimDLLVersionString;     // Private value for title version for Shim DLL
+        private string _titleTextString;                    // Private value for title view title text
+        private string _injectorVersionString;              // Private value for title view version text
+        private string _shimDLLVersionString;               // Private value for title version for Shim DLL
 
         // Title string and the title view version bound values
         public string TitleTextString { get => _titleTextString; set => PropertyUpdated(value); }
