@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+
 
 namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
 {
