@@ -17,12 +17,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("TitleViewModelLogger")) ?? new SubServiceLogger("TitleViewModelLogger");
 
         // Private control values
-        private string _titleTextString;        // Private value for title view title text
-        private string _titleVersionString;     // Private value for title view version text
+        private string _titleTextString;          // Private value for title view title text
+        private string _injectorVersionString;    // Private value for title view version text
+        private string _shimDLLVersionString;     // Private value for title version for Shim DLL
 
         // Title string and the title view version bound values
         public string TitleTextString { get => _titleTextString; set => PropertyUpdated(value); }
-        public string TitleVersionString { get => _titleVersionString; set => PropertyUpdated(value); }
+        public string InjectorVersionString { get => _injectorVersionString; set => PropertyUpdated(value); }
+        public string ShimDLLVersionString { get => _shimDLLVersionString; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -36,11 +38,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Store title and version string values now.
-            this.TitleVersionString = $"Version: {Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+            this.ShimDLLVersionString = $"Shim Version: {FulcrumConstants.InjectorVersions.ShimVersionString}";
+            this.InjectorVersionString = $"Version: {FulcrumConstants.InjectorVersions.InjectorVersionString}";
             this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+
+            // Log output information
             ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"TITLE:    {TitleTextString}");
-            ViewModelLogger.WriteLog($"VERSION:  {TitleVersionString}");
+            ViewModelLogger.WriteLog($"VERSION:  {InjectorVersionString}");
+            ViewModelLogger.WriteLog($"SHIM:     {ShimDLLVersionString}");
 
             // Log completed setup.
             ViewModelLogger.WriteLog("SETUP NEW TITLE AND VERSION STRING VALUES OK!", LogType.InfoLog);
