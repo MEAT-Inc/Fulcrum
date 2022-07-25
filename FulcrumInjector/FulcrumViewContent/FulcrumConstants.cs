@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
@@ -33,6 +34,9 @@ namespace FulcrumInjector.FulcrumViewContent
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("WatchdogConstantsLogger")) ?? new SubServiceLogger("WatchdogConstantsLogger");
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        // Main Version object for this application
+        public static InjectorVersionInfo InjectorVersions => new();
 
         // View Constants for help with property bindings
         public static InjectorMainWindow InjectorMainWindow { get; private set; }

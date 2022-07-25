@@ -91,5 +91,15 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR ABOUT THIS APP FLYOUT OK!", LogType.InfoLog);
             }
         }
+
+        /// <summary>
+        /// Toggles which version information is currently shown on the title view
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void ToggleVersionInfoButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+
+        }
     }
 }

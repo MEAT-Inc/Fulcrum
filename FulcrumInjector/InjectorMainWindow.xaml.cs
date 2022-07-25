@@ -14,6 +14,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewSupport;
@@ -77,6 +78,9 @@ namespace FulcrumInjector
             // Log information output
             InjectorMainLogger.WriteLog("CONFIGURED NEW TITLE VALUE BASED ON OPERATIONAL CONDITIONS OK!", LogType.InfoLog);
             InjectorMainLogger.WriteLog($"NEW TITLE VALUE CONFIGURED: {this.Title}", LogType.InfoLog);
+
+            // Log Version information output
+            InjectorMainLogger.WriteLog("INJECTOR VERSION INFORMATION BUILT OK!", LogType.InfoLog);
         }
         /// <summary>
         /// Routine method for closing actions when the main window instance is closed out.
