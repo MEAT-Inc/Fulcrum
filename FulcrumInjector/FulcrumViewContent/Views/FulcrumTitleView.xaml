@@ -32,7 +32,20 @@
                     <RowDefinition Height=".5*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Style="{StaticResource TitleStringText}" Text="{Binding Path=TitleTextString, Mode=TwoWay}"/>
-                <TextBlock Grid.Row="1" Style="{StaticResource SubTitleStringText}" Text="{Binding Path=TitleVersionString, Mode=TwoWay}"/>
+                <TextBlock Grid.Row="1">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource SubTitleStringText}" TargetType="TextBlock">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="False">
+                                    <Setter Property="Text" Value="{Binding Path=InjectorVersionString}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Text" Value="{Binding Path=ShimDLLVersionString}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Grid>
         </Viewbox>
 
