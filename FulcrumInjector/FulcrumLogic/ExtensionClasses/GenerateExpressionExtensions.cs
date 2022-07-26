@@ -54,7 +54,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // Convert pulled strings into one whole object. Convert the log content into an expression here
             string CombinedOutputLogLines = string.Join("\n", LogLinesPulled);
-            string OutputLogFileDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultConversionsPath");
+            string OutputLogFileDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultConversionsPath");
             string ConvertedLogFilePath = Path.Combine(OutputLogFileDirectory, "ExpressionImport_" + Path.GetFileName(Path.ChangeExtension(InputFilePath, ".txt")));
 
             // Remove old files and write out the new contents

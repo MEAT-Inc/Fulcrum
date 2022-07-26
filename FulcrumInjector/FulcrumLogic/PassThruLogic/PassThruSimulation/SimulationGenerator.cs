@@ -129,7 +129,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         public string SaveSimulationFile(string BaseFileName = "")
         {
             // First build our output location for our file.
-            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultSimulationsPath");
+            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultSimulationsPath");
             string FinalOutputPath =
                 Path.Combine(OutputFolder, Path.GetFileNameWithoutExtension(BaseFileName)) + ".ptSim";
 

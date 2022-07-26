@@ -212,7 +212,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 CheckPathExists = true,
                 RestoreDirectory = true,
                 AutoUpgradeEnabled = true,
-                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath")
+                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultLoggingPath")
             };
 
             // Now open the dialog and allow the user to pick some new files.

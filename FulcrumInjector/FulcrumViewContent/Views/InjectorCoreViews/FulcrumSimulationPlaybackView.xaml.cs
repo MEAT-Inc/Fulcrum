@@ -94,7 +94,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 Filter = Debugger.IsAttached ? "All Files (*.*)|*.*" : "Injector Simulations (*.ptSim)|*.ptSim|All Files (*.*)|*.*",
                 InitialDirectory = Debugger.IsAttached ?
                     "C:\\Drewtech\\logs" :
-                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultSimulationsPath")
+                    ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultSimulationsPath")
             };
 
             // Now open the dialog and allow the user to pick some new files.
