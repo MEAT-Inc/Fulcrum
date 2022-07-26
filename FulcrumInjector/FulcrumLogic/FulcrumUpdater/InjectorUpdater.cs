@@ -93,7 +93,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             // Parse out the version information and return them out
             var ReleaseTagsFound = ReleasesFound.Select(ReleaseObj => ReleaseObj.TagName).ToArray();
             this._injectorUpdateLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
-            this._injectorUpdateLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join("\n\t", ReleaseTagsFound)}", LogType.TraceLog);
+            this._injectorUpdateLogger.WriteLog($"RELEASE TAGS BUILT:\n\t{string.Join("\n\t", ReleaseTagsFound)}", LogType.TraceLog);
 
             // Clean up tag names here to only contain version information
             this._injectorUpdateLogger.WriteLog("CLEANING UP RELEASE TAG VALUES NOW...", LogType.WarnLog);
