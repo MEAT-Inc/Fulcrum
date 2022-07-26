@@ -47,9 +47,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             // Log output information
             ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"TITLE:    {TitleTextString}");
-            ViewModelLogger.WriteLog($"VERSION:  {InjectorVersionString}");
-            ViewModelLogger.WriteLog($"SHIM:     {ShimDLLVersionString}");
+            ViewModelLogger.WriteLog($"INJECTOR:  {InjectorVersionString}");
+            ViewModelLogger.WriteLog($"SHIM:      {ShimDLLVersionString}");
         }
 
         /// <summary>
