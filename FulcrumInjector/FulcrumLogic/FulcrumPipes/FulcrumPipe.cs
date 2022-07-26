@@ -122,7 +122,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumPipes
         private protected FulcrumPipe(FulcrumPipeType PipeId)
         {
             // Find our value for the async state
-            bool UseAsyncPipes = ValueLoaders.GetConfigValue<bool>("FulcrumInjectorConstants.FulcrumInjectorLogging.UseAsyncPipeLoggers");
+            bool UseAsyncPipes = ValueLoaders.GetConfigValue<bool>("FulcrumInjectorConstants.InjectorLogging.UseAsyncPipeLoggers");
 
             // Configure logger object.
             this.PipeState = FulcrumPipeState.Faulted;

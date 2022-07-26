@@ -122,8 +122,8 @@ namespace FulcrumInjector
         {
             // Start by building a new logging configuration object and init the broker.
             string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
-            string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultLoggingPath");
-            int FlushTriggerValue = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.AsyncFlushCountTrigger");
+            string LoggingPath = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultLoggingPath");
+            int FlushTriggerValue = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorLogging.AsyncFlushCountTrigger");
 
 #if DEBUG
             // If this is a debug build, ensure the logging output states are set to min 0 and max 5
@@ -131,8 +131,8 @@ namespace FulcrumInjector
             var MaxLoggingLevel = 5;
 #else
             // If we're NOT in a debug build, check if there's a debugger on. If so, force to trace logging output
-            var MaxLoggingLevel = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMaxLoggingLevel");
-            var MinLoggingLevel = Debugger.IsAttached ? 0 : ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultMinLoggingLevel");
+            var MaxLoggingLevel = ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorLogging.DefaultMaxLoggingLevel");
+            var MinLoggingLevel = Debugger.IsAttached ? 0 : ValueLoaders.GetConfigValue<int>("FulcrumInjectorConstants.InjectorLogging.DefaultMinLoggingLevel");
 #endif
 
             // Make logger and build global logger object.
@@ -150,7 +150,7 @@ namespace FulcrumInjector
         private void ConfigureLogCleanup()
         {
             // Pull values for log archive trigger and set values
-            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.FulcrumInjectorLogging.LogArchiveSetup");
+            var ConfigObj = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.InjectorLogging.LogArchiveSetup");
 
             // Check to see if we need to archive or not.
             LogBroker.Logger?.WriteLog($"CLEANUP ARCHIVE FILE SETUP STARTED! CHECKING FOR {ConfigObj.ArchiveOnFileCount} OR MORE LOG FILES...");

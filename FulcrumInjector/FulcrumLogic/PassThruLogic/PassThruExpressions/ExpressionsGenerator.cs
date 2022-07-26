@@ -141,7 +141,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         public string SaveExpressionsFile(string BaseFileName = "")
         {
             // First build our output location for our file.
-            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.FulcrumInjectorLogging.DefaultExpressionsPath");
+            string OutputFolder = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultExpressionsPath");
             string FinalOutputPath =
                 Path.Combine(OutputFolder, Path.GetFileNameWithoutExtension(BaseFileName)) + ".ptExp";
 
