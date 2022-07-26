@@ -71,12 +71,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private void ConfigureInjectorUpdateHelper()
         {
             // Build a new update helper here
-            var DriveUpdateHelper = new InjectorUpdater();
-            DriveUpdateHelper.RefreshInjectorVersions();
+            var GitHubUpdateHelper = new InjectorUpdater();
+            GitHubUpdateHelper.RefreshInjectorVersions();
             ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 
             // Check for our updates now.
-            if (!DriveUpdateHelper.CheckAgainstVersion(this.InjectorVersionString)) {
+            if (!GitHubUpdateHelper.CheckAgainstVersion(this.InjectorVersionString)) {
                 ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
                 return;
             }
