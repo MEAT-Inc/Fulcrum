@@ -41,6 +41,7 @@
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Text" Value="{Binding Path=ShimDLLVersionString}"/>
+                                    <Setter Property="FontStyle" Value="Italic"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>

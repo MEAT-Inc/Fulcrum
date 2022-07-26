@@ -121,8 +121,8 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             }
 
             // Now compare the versions
-            Version InputVersionParsed = Version.Parse(InputVersion);
-            Version LatestVersionParsed = Version.Parse(this.LatestInjectorVersion);
+            Version InputVersionParsed = Version.Parse(Regex.Match(InputVersion, @"(\d+(?>\.|))+").Value);
+            Version LatestVersionParsed = Version.Parse(Regex.Match(this.LatestInjectorVersion, @"(\d+(?>\.|))+").Value);
             this._injectorUpdateLogger.WriteLog("PARSED VERSIONS CORRECTLY! READY TO COMPARE AND RETURN", LogType.InfoLog);
 
             // Compare and log result
