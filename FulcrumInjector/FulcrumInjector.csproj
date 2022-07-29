@@ -207,6 +207,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumSimulationPlaybackViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorMiscViewModels\FulcrumUpdaterViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\FulcrumVehicleConnectionInfoView.xaml.cs">
       <DependentUpon>FulcrumVehicleConnectionInfoView.xaml</DependentUpon>
@@ -224,6 +225,13 @@
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumSimulationPlaybackView.xaml.cs">
       <DependentUpon>FulcrumSimulationPlaybackView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorMiscViewModels\FulcrumAboutThisAppViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorMiscViews\FulcrumAboutThisAppView.xaml.cs">
+      <DependentUpon>FulcrumAboutThisAppView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FulcrumViewContent\Views\InjectorMiscViews\FulcrumUpdaterView.xaml.cs">
+      <DependentUpon>FulcrumUpdaterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml.cs">
       <DependentUpon>FulcrumSessionReportingView.xaml</DependentUpon>
@@ -329,7 +337,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorMiscViews\FulcrumAboutThisAppView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorMiscViews\FulcrumUpdaterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumSessionReportingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumAboutThisAppStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -378,6 +398,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

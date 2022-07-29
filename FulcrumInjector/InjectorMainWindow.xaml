@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FulcrumInjector"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:views="clr-namespace:FulcrumInjector"
         xmlns:contentViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views"
-        xmlns:views1="clr-namespace:FulcrumInjector.FulcrumViewContent.Views"
+        xmlns:views="clr-namespace:FulcrumInjector.FulcrumViewContent.Views"
         xmlns:injectorCoreViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews"
         xmlns:injectorOptionViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews"
+        xmlns:injectorMiscViews="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews"
         mc:Ignorable="d"
         Title="Fulcrum Injector" 
         Height="800" Width="1200" 
@@ -38,7 +38,7 @@
         <!-- Top border and the title information for this app -->
         <Border Grid.Row="0" Grid.RowSpan="2" BorderBrush="{StaticResource TextColorBase}" Style="{StaticResource TransparentBackgroundBorder}"/>
         <Grid Grid.Row="0">
-            <views1:FulcrumTitleView x:Name="FulcrumTitle"/>
+            <views:FulcrumTitleView x:Name="FulcrumTitle"/>
             <Border BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
         </Grid>
 
@@ -64,19 +64,19 @@
                     <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
 
                     <!-- DLL Loading Test Pane -->
-                    <views1:FulcrumDllInjectionTestView
+                    <views:FulcrumDllInjectionTestView
                         Grid.Row="0" 
                         Height="105"
                         x:Name="FulcrumDllInjectionTest"/>
 
                     <!-- Pipe State And Information Pane -->
-                    <views1:FulcrumPipeStatusView 
+                    <views:FulcrumPipeStatusView 
                         Grid.Row="1" 
                         Height="150"
                         x:Name="FulcrumPipeStatus"/>
 
                     <!-- OE Apps Installed -->
-                    <views1:FulcrumInstalledOeAppsView
+                    <views:FulcrumInstalledOeAppsView
                         Grid.Row="2"
                         Height="625"
                         VerticalContentAlignment="Stretch"
@@ -127,40 +127,8 @@
                     <DataTemplate/>
                 </mah:Flyout.HeaderTemplate>
 
-                <!-- Content View -->
-                <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="210"/>
-                        <RowDefinition/>
-                        <RowDefinition Height=".30*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Meat INC turbo logo goes here -->
-                    <Image Grid.Row="0">
-                        <Image.Source>
-                            <BitmapImage UriSource="FulcrumResources/MeatIncTurboLogo.jpg" />
-                        </Image.Source>
-                    </Image>
-                    <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryColor}" BorderThickness="5" Width="220" CornerRadius="3"/>
-
-                    <!-- Information about this app goes here -->
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center" TextWrapping="Wrap" Width="500" FontSize="15">
-                        <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
-                        <LineBreak/>
-                        <Run Text="Any questions, comments, or concerns with this application can be directed to either neo.smith@meatinc.autos or by submitting a bug or issue report on the repository for this application."/>
-                        <LineBreak/>
-                        <LineBreak/>
-                        <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software."/>
-                    </TextBlock>
-
-                    <!-- Close out button -->
-                    <Button Grid.Row="2" 
-                            FontSize="18"
-                            x:Name="CloseInfoFlyoutButton"
-                            VerticalAlignment="Top"
-                            Style="{StaticResource ActionButtonStyle}"
-                            Content="Close" Width="250" Height="35" />
-                </Grid>
+                <!-- Content for About this app-->
+                <injectorMiscViews:FulcrumAboutThisAppView x:Name="FulcrumAboutThisAppView"/>
             </mah:Flyout>
 
             <!-- Updates Flyout-->
@@ -183,25 +151,11 @@
                 <mah:Flyout.HeaderTemplate>
                     <DataTemplate/>
                 </mah:Flyout.HeaderTemplate>
-                
-                <!-- Content View -->
-                <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="210"/>
-                        <RowDefinition/>
-                        <RowDefinition Height=".30*"/>
-                    </Grid.RowDefinitions>
 
-                    <!-- Close out button -->
-                    <Button Grid.Row="2" 
-                        FontSize="18"
-                        x:Name="CloseUpdatesFlyoutButton"
-                        VerticalAlignment="Top"
-                        Style="{StaticResource ActionButtonStyle}"
-                        Content="Close" Width="250" Height="35" />
-                </Grid>
+
+                <!-- Content for About this app-->
+                <injectorMiscViews:FulcrumUpdaterView x:Name="FulcrumUpdaterView"/>
             </mah:Flyout>
         </mah:FlyoutsControl>
-
     </Grid>
 </mah:MetroWindow>
