@@ -182,7 +182,9 @@ namespace FulcrumInjector.FulcrumViewContent
             ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
             bool SetConstants = FulcrumTitleView.SetFlyoutBindings(
                 InjectorMainWindow.InformationFlyout, 
-                InjectorMainWindow.CloseInfoFlyoutButton
+                InjectorMainWindow.AppUpdatesFlyout,
+                InjectorMainWindow.CloseInfoFlyoutButton,
+                InjectorMainWindow.CloseUpdatesFlyoutButton
             );
 
             // Check result

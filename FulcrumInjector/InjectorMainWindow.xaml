@@ -104,8 +104,9 @@
             </Grid>
         </Grid>
 
-        <!-- About this application flyout -->
+        <!-- Flyouts for About and Updates -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- About this app flyout-->
             <mah:Flyout 
                 Margin="70,85,0,0"
                 Position="Top"
@@ -159,6 +160,45 @@
                             VerticalAlignment="Top"
                             Style="{StaticResource ActionButtonStyle}"
                             Content="Close" Width="250" Height="35" />
+                </Grid>
+            </mah:Flyout>
+
+            <!-- Updates Flyout-->
+            <mah:Flyout 
+                Margin="70,85,0,0"
+                Position="Top"
+                x:Name="AppUpdatesFlyout"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="600"
+                Height="520"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+                
+                <!-- Content View -->
+                <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="210"/>
+                        <RowDefinition/>
+                        <RowDefinition Height=".30*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Close out button -->
+                    <Button Grid.Row="2" 
+                        FontSize="18"
+                        x:Name="CloseUpdatesFlyoutButton"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource ActionButtonStyle}"
+                        Content="Close" Width="250" Height="35" />
                 </Grid>
             </mah:Flyout>
         </mah:FlyoutsControl>
