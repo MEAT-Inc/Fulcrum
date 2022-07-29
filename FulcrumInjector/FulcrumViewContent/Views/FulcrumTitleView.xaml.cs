@@ -30,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         public FulcrumTitleView()
         {
             InitializeComponent();
-            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumTitleViewModel());
+            this.ViewModel = new FulcrumTitleViewModel();
             this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
@@ -58,8 +58,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <summary>
         /// Configures flyouts for our view controls. 
         /// </summary>
-        /// <param name="Settings">View for settings</param>
-        /// <param name="Debug">View for debugging</param>
+        /// <param name="InformationFlyout">View for settings</param>
+        /// <param name="AppUpdatesFlyout">View for debugging</param>
+        /// <param name="CloseAboutButton">Button to close about view</param>
+        /// <param name="CloseAppUpdatesButton">Button to close updates</param>
         public bool SetFlyoutBindings(Flyout InformationFlyout, Flyout AppUpdatesFlyout, Button CloseAboutButton, Button CloseAppUpdatesButton)
         {
             // Store the flyout here and apply the button actions to it

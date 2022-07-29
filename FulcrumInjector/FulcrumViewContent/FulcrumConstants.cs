@@ -11,9 +11,11 @@ using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewContent.Views;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews;
 using Newtonsoft.Json;
 using SharpLogger;
@@ -101,6 +103,30 @@ namespace FulcrumInjector.FulcrumViewContent
             set => FulcrumInstalledOeAppsView.ViewModel = value;
         }
 
+        // About this app View and View Model
+        public static FulcrumAboutThisAppView FulcrumAboutThisAppView
+        {
+            get => InjectorMainWindow.FulcrumAboutThisAppView;
+            set => InjectorMainWindow.FulcrumAboutThisAppView = value;
+        }
+        public static FulcrumAboutThisAppViewModel FulcrumAboutThisAppViewModel
+        {
+            get => InjectorMainWindow.FulcrumAboutThisAppView.ViewModel;
+            set => InjectorMainWindow.FulcrumAboutThisAppView.ViewModel = value;
+        }
+
+        // Updater View and View Model
+        public static FulcrumUpdaterView FulcrumUpdaterView
+        {
+            get => InjectorMainWindow.FulcrumUpdaterView;
+            set => InjectorMainWindow.FulcrumUpdaterView = value;
+        }
+        public static FulcrumUpdaterViewModel FulcrumUpdaterViewModel
+        {
+            get => InjectorMainWindow.FulcrumUpdaterView.ViewModel;
+            set => InjectorMainWindow.FulcrumUpdaterView.ViewModel = value;
+        }
+
         // --------------------------------------------------------------------------------------------------------------------------
 
         // Injector Hamburger Output Views
@@ -164,7 +190,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // Debug logging output user control and view model object
         public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)FulcrumDebugLoggingSingleton?.SingletonUserControl;
         public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)FulcrumDebugLoggingSingleton?.SingletonViewModel;
-        
+
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -183,8 +209,8 @@ namespace FulcrumInjector.FulcrumViewContent
             bool SetConstants = FulcrumTitleView.SetFlyoutBindings(
                 InjectorMainWindow.InformationFlyout, 
                 InjectorMainWindow.AppUpdatesFlyout,
-                InjectorMainWindow.CloseInfoFlyoutButton,
-                InjectorMainWindow.CloseUpdatesFlyoutButton
+                FulcrumAboutThisAppView.CloseInfoFlyoutButton,
+                FulcrumUpdaterView.CloseUpdatesFlyoutButton
             );
 
             // Check result
