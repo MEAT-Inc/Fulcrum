@@ -52,25 +52,29 @@
         </Viewbox>
 
         <!-- Buttons for Settings/About and Updates -->
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="0" Width="235" Margin="0,0,15,0">
+        <Grid HorizontalAlignment="Right" Width="100" VerticalAlignment="Center" Grid.Row="0" Margin="0,0,15,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/> 
-                <ColumnDefinition Width="50"/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <!-- Update Button -->
-            <Button HorizontalAlignment="Right" VerticalAlignment="Center" 
-                    Visibility="{Binding Path=InjectorUpdateReady, Converter={StaticResource VisibilityConverter}}"
-                    Style="{DynamicResource ActionButtonStyle}" Content="Update Ready!" Margin="0,0,0,0" Grid.Column="0"
+            <Button HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Check for Updates"
+                    Style="{DynamicResource ActionButtonStyleTransparent}" Margin="0,0,0,0" Grid.Column="0"
                     Click="ToggleApplicationUpdateReadyView_OnClick"
-                    FontWeight="DemiBold" Width="120" Background="{StaticResource PrimaryColor_Darker_65}" Foreground="{StaticResource TextColorBase}">
+                    FontWeight="DemiBold" Width="25" Background="{StaticResource PrimaryColor_Darker_65}" Foreground="{StaticResource TextColorBase}">
+                <Path Fill="{DynamicResource TextColorBase}" Margin="0,1,1.5,0">
+                    <Path.Data>
+                        <PathGeometry Figures="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </Path.Data>
+                </Path>
                 <Button.LayoutTransform>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
                 </Button.LayoutTransform>
             </Button>
 
             <!-- About Button -->
-            <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+            <Button HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="About The Injector"
                     Style="{DynamicResource ActionButtonStyleTransparent}"
                     Width="25" Margin="0,0,0,0" Grid.Column="1" Click="AboutThisApplicationButton_OnClick">
                 <Path Fill="{DynamicResource TextColorBase}" Margin="0,1,0,0">
