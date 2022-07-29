@@ -38,6 +38,6 @@
                 x:Name="CloseUpdatesFlyoutButton"
                 VerticalAlignment="Top"
                 Style="{StaticResource ActionButtonStyle}"
-                Content="Close" Width="250" Height="35" />
+                Content="Close Updater" Width="250" Height="35" />
     </Grid>
 </UserControl>
