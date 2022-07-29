@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
@@ -74,8 +75,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             GitHubUpdateHelper.RefreshInjectorVersions();
             ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 
+            // Check for force update toggle
+            bool ForceUpdate = ValueLoaders.GetConfigValue<bool>("FulcrumInjectorConstants.InjectorUpdates.ForceUpdateReady");
+            if (ForceUpdate) ViewModelLogger.WriteLog("WARNING! FORCING UPDATES IS ON! ENSURING SHOW UPDATE BUTTON IS VISIBLE!", LogType.WarnLog);
+
             // Check for our updates now.
-            if (!GitHubUpdateHelper.CheckAgainstVersion(this.InjectorVersionString)) {
+            if (!GitHubUpdateHelper.CheckAgainstVersion(this.InjectorVersionString) && !ForceUpdate) {
                 ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
                 return;
             }

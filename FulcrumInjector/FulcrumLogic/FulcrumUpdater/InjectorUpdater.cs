@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using ControlzEx.Standard;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
+using Newtonsoft.Json;
 using Octokit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -60,6 +63,10 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             private set => _injectorVersionsFound = value;
         }
 
+        // Event for download progress
+        public Action UpdateDownloadProgressAction;
+        public Action DownloadCompleteProgressAction;
+
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -73,7 +80,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             this.UpdaterRepoName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterRepoName");
             this.UpdaterOrgName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterOrgName");
             this._injectorUpdateLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
-        
+
             // Configure updater here
             Credentials LoginCredentials = new Credentials(this.UpdaterSecretKey);
             this.UpdaterClient = new GitHubClient(new ProductHeaderValue(this.UpdaterUserName)) { Credentials = LoginCredentials };
@@ -81,19 +88,30 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         }
 
         /// <summary>
+        /// Pulls in all release objects from the injector repo
+        /// </summary>
+        /// <returns>A readonly list of objects used to index releases</returns>
+        private Release[] _acquireInjectorReleaseObjects()
+        {
+            // Pull in the releases and return them out
+            this._injectorUpdateLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
+            var ReleasesFound = this.UpdaterClient.Repository.Release.GetAll(this.UpdaterOrgName, this.UpdaterRepoName).Result.ToArray();
+            this._injectorUpdateLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+
+            // Return the release list here
+            return ReleasesFound;
+        }
+
+
+        /// <summary>
         /// Updates the injector version information on the class instance.
         /// </summary>
         public string[] RefreshInjectorVersions()
         {
-            // Pull in all the releases here
-            this._injectorUpdateLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            var ReleasesFound = this.UpdaterClient.Repository.Release.GetAll(this.UpdaterOrgName, this.UpdaterRepoName).Result;
-            this._injectorUpdateLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Count} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
-
             // Parse out the version information and return them out
-            var ReleaseTagsFound = ReleasesFound.Select(ReleaseObj => ReleaseObj.TagName).ToArray();
+            var ReleaseTagsFound = this._acquireInjectorReleaseObjects().Select(ReleaseObj => ReleaseObj.TagName).ToArray();
             this._injectorUpdateLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
-            this._injectorUpdateLogger.WriteLog($"RELEASE TAGS BUILT:\n\t{string.Join("\n\t", ReleaseTagsFound)}", LogType.TraceLog);
+            this._injectorUpdateLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", ReleaseTagsFound)}", LogType.TraceLog);
 
             // Clean up tag names here to only contain version information
             this._injectorUpdateLogger.WriteLog("CLEANING UP RELEASE TAG VALUES NOW...", LogType.WarnLog);
@@ -136,10 +154,42 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         /// </summary>
         /// <param name="ReleaseVersion">Version to download</param>
         /// <returns>The path of our output msi file for the injector application</returns>
-        public string DownloadInjectorRelease(string ReleaseVersion)
+        public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
         {
-            // TODO: BUILD LOGIC FOR DOWNLOADING NEW INJECTOR VERSIONS!
-            return null;
+            // First find our version to use using our version/release lookup tool
+            var ReleaseToUse = this._acquireInjectorReleaseObjects()
+                .FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
+            this._injectorUpdateLogger.WriteLog("PULLED IN A NEW RELEASE OBJECT TO UPDATE WITH!", LogType.InfoLog);
+            this._injectorUpdateLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
+
+            // Now get the asset url and download it here into a temp file
+            InjectorAssetUrl = ReleaseToUse.AssetsUrl;
+            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "zip");
+            this._injectorUpdateLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}");
+            this._injectorUpdateLogger.WriteLog($"TEMP PATH FOR ASSET BUILT:   {InjectorAssetPath}");
+
+            // Return the URL of the path to download here
+            WebClient AssetDownloadHelper = new WebClient();
+            AssetDownloadHelper.DownloadProgressChanged += (Sender, Args) =>
+            {
+                // Invoke the event for progress changed if it's not null
+                if (this.UpdateDownloadProgressAction == null) return;
+                this.UpdateDownloadProgressAction.Invoke();
+            };
+            AssetDownloadHelper.DownloadDataCompleted += (Sender, Args) =>
+            {
+                // Invoke the event for progress done if it's not null
+                if (this.DownloadCompleteProgressAction == null) return;
+                this.DownloadCompleteProgressAction.Invoke();
+            };
+
+            // Log done building setup and download the version output here
+            this._injectorUpdateLogger.WriteLog("BUILT NEW WEB CLIENT FOR DOWNLOADING ASSETS OK! STARTING DOWNLOAD NOW...", LogType.InfoLog);
+            AssetDownloadHelper.DownloadFile(InjectorAssetUrl, InjectorAssetPath);
+
+            // Return the path of our new asset
+            this._injectorUpdateLogger.WriteLog("DOWNLOADED UPDATES OK! RETURNING OUTPUT PATH FOR ASSETS NOW...");
+            return InjectorAssetPath;
         }
     }
 }
