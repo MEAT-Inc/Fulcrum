@@ -64,8 +64,8 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         }
 
         // Event for download progress
-        public Action UpdateDownloadProgressAction;
-        public Action DownloadCompleteProgressAction;
+        public Action<DownloadProgressChangedEventArgs> UpdateDownloadProgressAction;
+        public Action<DownloadDataCompletedEventArgs> DownloadCompleteProgressAction;
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         /// <returns>True if updates ready. False if not.</returns>
         public bool CheckAgainstVersion(string InputVersion)
         {
-            // TODO: WRITE LOGIC FOR CHECKING FOR UPDATES!
+            // Validate that the versions exist to compare
             if (this.InjectorVersionsFound == null || this.LatestInjectorVersion == null) {
                 this.RefreshInjectorVersions();
                 this._injectorUpdateLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
@@ -174,13 +174,13 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             {
                 // Invoke the event for progress changed if it's not null
                 if (this.UpdateDownloadProgressAction == null) return;
-                this.UpdateDownloadProgressAction.Invoke();
+                this.UpdateDownloadProgressAction.Invoke(Args);
             };
             AssetDownloadHelper.DownloadDataCompleted += (Sender, Args) =>
             {
                 // Invoke the event for progress done if it's not null
                 if (this.DownloadCompleteProgressAction == null) return;
-                this.DownloadCompleteProgressAction.Invoke();
+                this.DownloadCompleteProgressAction.Invoke(Args);
             };
 
             // Log done building setup and download the version output here

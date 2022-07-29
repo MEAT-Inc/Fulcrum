@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -21,11 +23,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("UpdaterViewModelLogger")) ?? new SubServiceLogger("UpdaterViewModelLogger");
 
         // Private control values
-        private bool _injectorUpdateReady;        // Sets if there's an update ready or not.
+        private bool _updateReady;                // Sets if there's an update ready or not.
+        private bool _isDownloading;              // Sets if the updater is currently pulling in a file or not.
+        private double _downloadProgress;         // Progress for when downloads are in the works
 
         // Public values for our view to bind onto 
         public readonly InjectorUpdater GitHubUpdateHelper;
-        public bool InjectorUpdateReady { get => _injectorUpdateReady; set => PropertyUpdated(value); }
+        public bool UpdateReady { get => _updateReady; set => PropertyUpdated(value); }
+        public bool IsDownloading { get => _isDownloading; set => PropertyUpdated(value); }
+        public double DownloadProgress { get => _downloadProgress; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +60,31 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             }
 
             // Now setup view content for update ready.
-            this.InjectorUpdateReady = true;
+            this.UpdateReady = true;
+            this.SetupUpdaterClientEvents();
+        }
+        /// <summary>
+        /// Configures updater event objects for when downloads are in the works
+        /// </summary>
+        private void SetupUpdaterClientEvents()
+        {
+            // Build action for downloading in progress
+            ViewModelLogger.WriteLog("BUILDING PROGRESS UPDATE EVENT FOR DOWNLOADS NOW", LogType.WarnLog);
+            this.GitHubUpdateHelper.UpdateDownloadProgressAction += new Action<DownloadProgressChangedEventArgs>((ProgressArgs) =>
+            {
+                // Start by getting the current progress update value and set is downloading to true
+            });
+
+            // Build action for downloading completed
+            ViewModelLogger.WriteLog("BUILDING PROGRESS DONE EVENT FOR DOWNLOADS NOW", LogType.WarnLog);
+            this.GitHubUpdateHelper.DownloadCompleteProgressAction += new Action<DownloadDataCompletedEventArgs>((ProgressArgs) =>
+            {
+                // Update current progress to 100% and set is downloading state to false.
+            });
+
+            // Log done and exit routine
+            ViewModelLogger.WriteLog("BUILT EVENTS FOR PROGRESS MONITORING CORRECTLY!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
         }
     }
 }
