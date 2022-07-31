@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             DataContext = ViewModel;
 
             // See if we need to open the updater view
-            if (this.ViewModel.InjectorUpdateReady) {
+            if (this.ViewModel.UpdateReady) {
                 this.ViewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
                 FulcrumConstants.InjectorMainWindow.AppUpdatesFlyout.IsOpen = true;
             }
