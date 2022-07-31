@@ -45,6 +45,8 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         private string[] _injectorVersionsFound;
 
         // Version information found
+        public Release LatestInjectorRelease { get; private set; }
+        public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
         public string LatestInjectorVersion
         {
             get => _latestInjectorVersion ?? this.RefreshInjectorVersions().FirstOrDefault();
@@ -64,7 +66,10 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             }
             private set => _injectorVersionsFound = value;
         }
-        public string DownloadTimeElapsed => this.DownloadTimer == null ? "00:00:00" : this.DownloadTimer.Elapsed.ToString("g");
+
+        // Time download elapsed and approximate time remaining
+        public string DownloadTimeElapsed => this.DownloadTimer == null ? "00:00" : this.DownloadTimer.Elapsed.ToString("mm:ss");
+        public string DownloadTimeRemaining { get; private set; }
 
         // Event for download progress
         public Action<DownloadProgressChangedEventArgs> UpdateDownloadProgressAction;
@@ -102,7 +107,11 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             var ReleasesFound = this.UpdaterClient.Repository.Release.GetAll(this.UpdaterOrgName, this.UpdaterRepoName).Result.ToArray();
             this._injectorUpdateLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
 
-            // Return the release list here
+            // Store our latest release object on this class
+            if (ReleasesFound?.Length != 0) 
+                this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
+
+            // Return the releases
             return ReleasesFound;
         }
 
@@ -167,8 +176,8 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             this._injectorUpdateLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
 
             // Now get the asset url and download it here into a temp file
-            InjectorAssetUrl = ReleaseToUse.AssetsUrl;
-            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "zip");
+            InjectorAssetUrl = ReleaseToUse.Assets.FirstOrDefault(AssetObj => AssetObj.BrowserDownloadUrl.EndsWith("msi")).BrowserDownloadUrl;
+            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "msi");
             this._injectorUpdateLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}");
             this._injectorUpdateLogger.WriteLog($"TEMP PATH FOR ASSET BUILT:   {InjectorAssetPath}");
 
@@ -179,6 +188,11 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
                 // Invoke the event for progress changed if it's not null
                 if (this.UpdateDownloadProgressAction == null) return;
                 this.UpdateDownloadProgressAction.Invoke(Args);
+
+                // Find our approximate time left
+                var ApproximateMillisLeft = this.DownloadTimer.ElapsedMilliseconds * Args.TotalBytesToReceive / Args.BytesReceived;
+                TimeSpan ApproximateToSpan = TimeSpan.FromMilliseconds(ApproximateMillisLeft);
+                this.DownloadTimeRemaining = ApproximateToSpan.ToString("mm:ss");
             };
             AssetDownloadHelper.DownloadDataCompleted += (Sender, Args) =>
             {

@@ -27,7 +27,7 @@
                     <Directory Id="DriverComponent" Name="FulcrumShim">
                         <!-- Injector App Files -->
                         <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
-                            <Component Id="FulcrumInjectorFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
+                            <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
                                 <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
                                 <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
@@ -38,7 +38,7 @@
                                 <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
                                 <File Id="SHARPWRAP2534.DLL" Name="SharpWrap2534.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrap2534.dll" />
                                 <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
-								<File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
+                                <File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
                                 <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
                                 <File Id="SYSTEM.BUFFERS.DLL" Name="System.Buffers.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.dll" />
                                 <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
@@ -49,7 +49,10 @@
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                                 <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
-                                <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
+								<File Id="MARKDIG.DLL" Name="Markdig.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.dll" />
+                                <File Id="MARKDIG.WPF.DLL" Name="Markdig.Wpf.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.Wpf.dll" />
+								<File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
+                                <File Id="OCTOKIT.DLL" Name="Octokit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.dll" />
                                 <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
                                 <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
                                 <File Id="SYSTEM.MEMORY.XML" Name="System.Memory.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.xml" />
@@ -66,6 +69,7 @@
                                         <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
                                     </Shortcut>
                                 </File>
+
                             </Component>
                             <Directory Id="FULCRUMXAML" Name="FulcrumXAML">
                                 <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
@@ -108,21 +112,21 @@
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-	                        <Directory Id="FULCRUMSIMULATIONS" Name="FulcrumSimulations">
-		                        <Component Id="CreateFulcrumSimulationsFolder" Guid="8776595B-41EE-47C8-844A-F0596C67F90B">
-			                        <CreateFolder />
-		                        </Component>
-	                        </Directory>
-	                        <Directory Id="FULCRUMCONVERSIONS" Name="FulcrumConversions">
-		                        <Component Id="CreateFulcrumConversionsFolder" Guid="A88D5BF2-516C-4838-B79F-BFDE9ACF6BD5">
-			                        <CreateFolder />
-		                        </Component>
-	                        </Directory>
-	                        <Directory Id="FULCRUMDEFAULTIMPORTS" Name="FulcrumImportedFiles">
-		                        <Component Id="CreateFulcrumImportedFilesFolder" Guid="77D91A92-6EF7-4E05-984E-9DA575EABEFD">
-			                        <CreateFolder />
-		                        </Component>
-	                        </Directory>
+                            <Directory Id="FULCRUMSIMULATIONS" Name="FulcrumSimulations">
+                                <Component Id="CreateFulcrumSimulationsFolder" Guid="8776595B-41EE-47C8-844A-F0596C67F90B">
+                                    <CreateFolder />
+                                </Component>
+                            </Directory>
+                            <Directory Id="FULCRUMCONVERSIONS" Name="FulcrumConversions">
+                                <Component Id="CreateFulcrumConversionsFolder" Guid="A88D5BF2-516C-4838-B79F-BFDE9ACF6BD5">
+                                    <CreateFolder />
+                                </Component>
+                            </Directory>
+                            <Directory Id="FULCRUMDEFAULTIMPORTS" Name="FulcrumImportedFiles">
+                                <Component Id="CreateFulcrumImportedFilesFolder" Guid="77D91A92-6EF7-4E05-984E-9DA575EABEFD">
+                                    <CreateFolder />
+                                </Component>
+                            </Directory>
                         </Directory>
                         <!-- DLL Files for the Fulcrum -->
                         <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
@@ -216,15 +220,15 @@
             <ComponentRef Id="V0500RegKey" />
             <ComponentRef Id="FulcrumXamlFiles" />
             <ComponentRef Id="FulcrumShimFiles" />
-            <ComponentRef Id="FulcrumInjectorFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
             <ComponentRef Id="CreateFulcrumIconsFolder" />
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
+            <ComponentRef Id="FulcrumInjectorProgramFiles" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
             <ComponentRef Id="CreateFulcrumExpressionsFolder" />
-			<ComponentRef Id="CreateFulcrumSimulationsFolder" />
-			<ComponentRef Id="CreateFulcrumConversionsFolder" />
-			<ComponentRef Id="CreateFulcrumImportedFilesFolder"/>
+            <ComponentRef Id="CreateFulcrumSimulationsFolder" />
+            <ComponentRef Id="CreateFulcrumConversionsFolder" />
+            <ComponentRef Id="CreateFulcrumImportedFilesFolder" />
         </Feature>
         <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 
