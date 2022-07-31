@@ -30,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         public FulcrumTitleView()
         {
             InitializeComponent();
-            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumTitleViewModel());
+            this.ViewModel = new FulcrumTitleViewModel();
             this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
@@ -53,22 +53,29 @@ namespace FulcrumInjector.FulcrumViewContent.Views
 
         // Flyout Models for the settings and debugging views
         public Flyout InformationFlyout { get; private set; }
+        public Flyout AppUpdatesFlyout { get; private set; }
 
         /// <summary>
         /// Configures flyouts for our view controls. 
         /// </summary>
-        /// <param name="Settings">View for settings</param>
-        /// <param name="Debug">View for debugging</param>
-        public bool SetFlyoutBindings(Flyout InformationFlyout, Button CloseButton)
+        /// <param name="InformationFlyout">View for settings</param>
+        /// <param name="AppUpdatesFlyout">View for debugging</param>
+        /// <param name="CloseAboutButton">Button to close about view</param>
+        /// <param name="CloseAppUpdatesButton">Button to close updates</param>
+        public bool SetFlyoutBindings(Flyout InformationFlyout, Flyout AppUpdatesFlyout, Button CloseAboutButton, Button CloseAppUpdatesButton)
         {
             // Store the flyout here and apply the button actions to it
             this.InformationFlyout = InformationFlyout;
-            CloseButton.Click += AboutThisApplicationButton_OnClick;
+            this.AppUpdatesFlyout = AppUpdatesFlyout;
+            CloseAboutButton.Click += AboutThisApplicationButton_OnClick;
+            CloseAppUpdatesButton.Click += ToggleApplicationUpdateReadyView_OnClick;
             ViewLogger.WriteLog("STORED NEW APP INFORMATION FLYOUT VALUE OK!", LogType.InfoLog);
+            ViewLogger.WriteLog("STORED NEW APP UPDATES FLYOUT VALUE OK!", LogType.InfoLog);
             ViewLogger.WriteLog("STORED NEW APP INFORMATION CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
+            ViewLogger.WriteLog("STORED NEW APP UPDATES CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
 
             // Log and return 
-            ViewLogger.WriteLog("INFORMATION FLYOUT AND CONTROL BUTTONS HAVE BEEN SETUP AND BOUND OK!");
+            ViewLogger.WriteLog("INFORMATION/UPDATES FLYOUT AND CONTROL BUTTONS HAVE BEEN SETUP AND BOUND OK!");
             return true;
         }
 
@@ -91,15 +98,22 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR ABOUT THIS APP FLYOUT OK!", LogType.InfoLog);
             }
         }
-
         /// <summary>
-        /// Toggles which version information is currently shown on the title view
+        /// Button click event for the updates view
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void ToggleVersionInfoButton_OnClick(object Sender, RoutedEventArgs E)
+        private void ToggleApplicationUpdateReadyView_OnClick(object Sender, RoutedEventArgs E)
         {
-
+            // Log processed and show if we have to.
+            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
+            if (this.AppUpdatesFlyout == null) { ViewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
+            else
+            {
+                // Toggle the information pane
+                this.AppUpdatesFlyout.IsOpen = !this.AppUpdatesFlyout.IsOpen;
+                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
+            }
         }
     }
 }
