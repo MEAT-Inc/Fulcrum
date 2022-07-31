@@ -51,6 +51,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
+            // Setup basic view bound values
+            this.DownloadProgress = 0;
+            this.DownloadTimeElapsed = "00:00";
+            this.DownloadTimeRemaining = "N/A";
+
             // Build new update helper
             this.GitHubUpdateHelper = new InjectorUpdater();
             GitHubUpdateHelper.RefreshInjectorVersions();
@@ -110,6 +115,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             // Log done and exit routine
             ViewModelLogger.WriteLog("BUILT EVENTS FOR PROGRESS MONITORING CORRECTLY!", LogType.InfoLog);
             ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
+        }
+
+
+        /// <summary>
+        /// Invokes a new download on the git hub helper to pull in the newest release of the injector
+        /// </summary>
+        public string InvokeInjectorDownload()
+        {
+            // Start by invoking a new download of the newest version
+            string LatestTag = this.GitHubUpdateHelper.LatestInjectorVersion;
+            ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
+            string OutputAssetPath = this.GitHubUpdateHelper.DownloadInjectorRelease(LatestTag, out string AssetUrl);
+
+            // Log done downloading and return the path
+            ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {OutputAssetPath} OK!", LogType.InfoLog);
+            return OutputAssetPath;
         }
     }
 }

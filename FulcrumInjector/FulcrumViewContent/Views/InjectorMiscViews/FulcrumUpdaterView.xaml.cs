@@ -18,6 +18,7 @@ using System.Xaml;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
 using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using Markdig;
+using Markdig.Syntax;
 using Markdig.Wpf;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -77,7 +78,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             var XamlReleaseNotes = Markdown.ToXaml(
                 this.ViewModel.GitHubUpdateHelper.LatestInjectorReleaseNotes,
                 new MarkdownPipelineBuilder()
-                    .UseSupportedExtensions()
+                    .UseAdvancedExtensions()
                     .Build()
                 );
 
@@ -99,5 +100,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenHyperlink(object sender, ExecutedRoutedEventArgs e) => Process.Start(e.Parameter.ToString());
+        
+        /// <summary>
+        /// Button click command to execute a new update install request
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StartUpdateFlyoutButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            // Invoke a download for our updater
+            this.ViewLogger.WriteLog("PULLING NEWEST INJECTOR RELEASE USING OUR VIEW MODEL HELPERS NOW...", LogType.WarnLog);
+            string OutputAssetFile = this.ViewModel.InvokeInjectorDownload();
+            this.ViewLogger.WriteLog($"ASSET PATH PULLED IN: {OutputAssetFile}");
+
+            // Now request a new install routine from the view model.
+            // TODO: BUILD LOGIC TO RUN INSTALLER
+        }
     }
 }

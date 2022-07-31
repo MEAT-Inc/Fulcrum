@@ -176,8 +176,8 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             this._injectorUpdateLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
 
             // Now get the asset url and download it here into a temp file
-            InjectorAssetUrl = ReleaseToUse.AssetsUrl;
-            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "zip");
+            InjectorAssetUrl = ReleaseToUse.Assets.FirstOrDefault(AssetObj => AssetObj.BrowserDownloadUrl.EndsWith("msi")).BrowserDownloadUrl;
+            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "msi");
             this._injectorUpdateLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}");
             this._injectorUpdateLogger.WriteLog($"TEMP PATH FOR ASSET BUILT:   {InjectorAssetPath}");
 

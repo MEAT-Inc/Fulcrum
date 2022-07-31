@@ -266,6 +266,7 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruExpression.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\InjectorOutputSyntaxHelper.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParamFormatters\TypeAndTimeColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\DataContentHelpers\InverseBoolConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\SimEventDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\MarkdownXamlSchemaContext.cs" />
