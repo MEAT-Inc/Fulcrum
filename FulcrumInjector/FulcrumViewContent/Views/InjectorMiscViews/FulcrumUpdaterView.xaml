@@ -5,9 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews"
              xmlns:viewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" 
              Loaded="FulcrumUpdaterView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <!-- Command bindings for hyperlinks -->
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
 
     <!-- DataContext for the Updater View -->
     <UserControl.DataContext>
@@ -20,24 +26,58 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumUpdaterStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Markdig.Wpf;component/Themes/generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <!-- Content View -->
-    <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
+    <Grid Margin="15,15,15,15" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="210"/>
+            <RowDefinition Height="100"/>
             <RowDefinition/>
-            <RowDefinition Height=".30*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
+        <!-- Title and Info For Updater -->
+        <Grid Grid.Row="0" Margin="10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Fulcrum Injector Updates Ready!" Style="{StaticResource TitleStringText}" FontWeight="DemiBold"/>
+            <TextBlock Grid.Row="1" Style="{StaticResource SubTitleStringText}" TextAlignment="Justify" FontWeight="Normal" FontSize="14"
+                       Text="There is a new version of the Fulcrum Injector and Fulcrum Shim package ready to be installed! Check out the release notes below and if you wish to install this update, click the install now button at the bottom of this window" />
+        </Grid>
+        
+        <!-- Release Notes Markdown Viewer -->
+        <FlowDocumentScrollViewer
+            Grid.Row="1" Margin="10,5,10,0"
+            BorderBrush="{StaticResource PrimaryColor_Darker_35}"
+            BorderThickness="2"
+            x:Name="ReleaseNotesViewer"/>
+
         <!-- Close out button -->
-        <Button Grid.Row="2" 
-                FontSize="18"
-                x:Name="CloseUpdatesFlyoutButton"
-                VerticalAlignment="Top"
-                Style="{StaticResource ActionButtonStyle}"
-                Content="Close Updater" Width="250" Height="35" />
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,10,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" 
+                    FontSize="18"
+                    x:Name="StartUpdateFlyoutButton"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource ActionButtonStyle}"
+                    Content="Install Update" Width="250" Height="35" />
+            <Button Grid.Column="1" 
+                    FontSize="18"
+                    x:Name="CloseUpdatesFlyoutButton"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource ActionButtonStyle}"
+                    Content="Close Updater" Width="250" Height="35" />
+
+        </Grid>
     </Grid>
 </UserControl>

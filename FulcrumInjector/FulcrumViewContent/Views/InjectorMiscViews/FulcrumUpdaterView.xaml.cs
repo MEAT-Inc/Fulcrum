@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +14,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xaml;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
+using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
+using Markdig;
+using Markdig.Wpf;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using Markdown = Markdig.Wpf.Markdown;
+using XamlReader = System.Windows.Markup.XamlReader;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
 {
@@ -43,6 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
+
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -55,15 +64,40 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             DataContext = ViewModel;
 
             // See if we need to open the updater view
-            if (this.ViewModel.UpdateReady) {
-                this.ViewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
-                FulcrumConstants.InjectorMainWindow.AppUpdatesFlyout.IsOpen = true;
+            if (!this.ViewModel.UpdateReady) {
+                this.ViewLogger.WriteLog("SETUP UPDATER VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+                return;
             }
 
-            // Log booted title view
-            this.ViewLogger.WriteLog("SETUP UPDATER VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+            // Log ready to show updates and build our XAML content output
+            this.ViewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
+            FulcrumConstants.InjectorMainWindow.AppUpdatesFlyout.IsOpen = true;
+
+            // Build in the release notes contents here
+            var XamlReleaseNotes = Markdown.ToXaml(
+                this.ViewModel.GitHubUpdateHelper.LatestInjectorReleaseNotes,
+                new MarkdownPipelineBuilder()
+                    .UseSupportedExtensions()
+                    .Build()
+                );
+
+            // Now append the contents of the markdown into our output viewer
+            using var MemStream = new MemoryStream(Encoding.UTF8.GetBytes(XamlReleaseNotes));
+            using (var XamlToXmlReader = new XamlXmlReader(MemStream, new MarkdownXamlSchemaContext()))
+                if (XamlReader.Load(XamlToXmlReader) is FlowDocument OutputDocument) 
+                    this.ReleaseNotesViewer.Document = OutputDocument;
+
+            // Log done building release notes
+            this.ViewLogger.WriteLog("RELEASE NOTES FOR UPDATER WERE BUILT AND ARE BEING SHOWN NOW!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Method to pop open hyperlinks from the converted markdown document
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenHyperlink(object sender, ExecutedRoutedEventArgs e) => Process.Start(e.Parameter.ToString());
     }
 }
