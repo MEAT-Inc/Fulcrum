@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,6 +32,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
 
         // Git Client object
         private readonly GitHubClient UpdaterClient;
+        private readonly Stopwatch DownloadTimer;
 
         // Updater configuration values
         private readonly string UpdaterUserName;
@@ -62,6 +64,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             }
             private set => _injectorVersionsFound = value;
         }
+        public string DownloadTimeElapsed => this.DownloadTimer == null ? "00:00:00" : this.DownloadTimer.Elapsed.ToString("g");
 
         // Event for download progress
         public Action<DownloadProgressChangedEventArgs> UpdateDownloadProgressAction;
@@ -82,6 +85,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             this._injectorUpdateLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
 
             // Configure updater here
+            this.DownloadTimer = new Stopwatch();
             Credentials LoginCredentials = new Credentials(this.UpdaterSecretKey);
             this.UpdaterClient = new GitHubClient(new ProductHeaderValue(this.UpdaterUserName)) { Credentials = LoginCredentials };
             this._injectorUpdateLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATING NOW USING MEAT INC BOT TOKEN ACCESS...", LogType.InfoLog);
@@ -184,8 +188,10 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
             };
 
             // Log done building setup and download the version output here
+            this.DownloadTimer.Start(); 
             this._injectorUpdateLogger.WriteLog("BUILT NEW WEB CLIENT FOR DOWNLOADING ASSETS OK! STARTING DOWNLOAD NOW...", LogType.InfoLog);
-            AssetDownloadHelper.DownloadFile(InjectorAssetUrl, InjectorAssetPath);
+            AssetDownloadHelper.DownloadFile(InjectorAssetUrl, InjectorAssetPath); this.DownloadTimer.Stop();
+            this._injectorUpdateLogger.WriteLog($"TOTAL DOWNLOAD TIME TAKEN: {this.DownloadTimeElapsed}");
 
             // Return the path of our new asset
             this._injectorUpdateLogger.WriteLog("DOWNLOADED UPDATES OK! RETURNING OUTPUT PATH FOR ASSETS NOW...");
