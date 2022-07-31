@@ -12,6 +12,7 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
+using Markdig.Wpf;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
 {
@@ -29,6 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
         private bool _isDownloading;              // Sets if the updater is currently pulling in a file or not.
         private double _downloadProgress;         // Progress for when downloads are in the works
         private string _downloadTimeElapsed;      // Time downloading spent so far
+        private string _downloadTimeRemaining;    // Approximate time left on the download
 
         // Public values for our view to bind onto 
         public readonly InjectorUpdater GitHubUpdateHelper;
@@ -36,6 +38,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
         public bool IsDownloading { get => _isDownloading; set => PropertyUpdated(value); }
         public double DownloadProgress { get => _downloadProgress; set => PropertyUpdated(value); }
         public string DownloadTimeElapsed { get => _downloadTimeElapsed; set => PropertyUpdated(value); }
+        public string DownloadTimeRemaining { get => _downloadTimeRemaining; set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -47,6 +50,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             // Log information and store values
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
+
+            // Setup basic view bound values
+            this.DownloadProgress = 0;
+            this.DownloadTimeElapsed = "00:00";
+            this.DownloadTimeRemaining = "N/A";
 
             // Build new update helper
             this.GitHubUpdateHelper = new InjectorUpdater();
@@ -60,6 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             // Check for our updates now.
             if (!GitHubUpdateHelper.CheckAgainstVersion(FulcrumConstants.InjectorVersions.InjectorVersionString) && !ForceUpdate) {
                 ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
+                ViewModelLogger.WriteLog("NOT CONFIGURING UPDATE EVENT ROUTINES FOR OUR UPDATER OBJECT!", LogType.WarnLog);
                 return;
             }
 
@@ -80,6 +89,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
                 this.IsDownloading = true;
                 this.DownloadProgress = ProgressArgs.ProgressPercentage;
                 this.DownloadTimeElapsed = GitHubUpdateHelper.DownloadTimeElapsed;
+                this.DownloadTimeRemaining = GitHubUpdateHelper.DownloadTimeRemaining;
 
                 // Log the current byte count output
                 string CurrentSize = ProgressArgs.BytesReceived.ToString();
@@ -95,6 +105,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
                 this.IsDownloading = false;
                 this.DownloadProgress = 100;
                 this.DownloadTimeElapsed = GitHubUpdateHelper.DownloadTimeElapsed;
+                this.DownloadTimeRemaining = "Download Done!";
 
                 // Log done downloading and update values for the view model
                 ViewModelLogger.WriteLog("DOWNLOADING COMPLETED WITHOUT ISSUES!", LogType.InfoLog);
@@ -104,6 +115,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             // Log done and exit routine
             ViewModelLogger.WriteLog("BUILT EVENTS FOR PROGRESS MONITORING CORRECTLY!", LogType.InfoLog);
             ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
+        }
+
+
+        /// <summary>
+        /// Invokes a new download on the git hub helper to pull in the newest release of the injector
+        /// </summary>
+        public string InvokeInjectorDownload()
+        {
+            // Start by invoking a new download of the newest version
+            string LatestTag = this.GitHubUpdateHelper.LatestInjectorVersion;
+            ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
+            string OutputAssetPath = this.GitHubUpdateHelper.DownloadInjectorRelease(LatestTag, out string AssetUrl);
+
+            // Log done downloading and return the path
+            ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {OutputAssetPath} OK!", LogType.InfoLog);
+            return OutputAssetPath;
         }
     }
 }
