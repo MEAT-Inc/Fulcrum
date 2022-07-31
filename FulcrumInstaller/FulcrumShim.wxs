@@ -27,7 +27,7 @@
                     <Directory Id="DriverComponent" Name="FulcrumShim">
                         <!-- Injector App Files -->
                         <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
-                            <Component Id="FULCRUMINJECTORPROGRAMFILES" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
+                            <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
                                 <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
                                 <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
@@ -220,10 +220,10 @@
             <ComponentRef Id="V0500RegKey" />
             <ComponentRef Id="FulcrumXamlFiles" />
             <ComponentRef Id="FulcrumShimFiles" />
-            <ComponentRef Id="FulcrumInjectorFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
             <ComponentRef Id="CreateFulcrumIconsFolder" />
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
+            <ComponentRef Id="FulcrumInjectorProgramFiles" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
             <ComponentRef Id="CreateFulcrumExpressionsFolder" />
             <ComponentRef Id="CreateFulcrumSimulationsFolder" />
