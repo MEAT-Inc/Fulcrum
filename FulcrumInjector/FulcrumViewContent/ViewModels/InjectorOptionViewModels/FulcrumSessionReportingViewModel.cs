@@ -76,7 +76,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
                 var EmailConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.InjectorEmailConfiguration.SenderConfiguration");
                 string SendName = EmailConfigObject.ReportSenderName;
                 string SendEmail = EmailConfigObject.ReportSenderEmail;
-                string SendPassword = EmailConfigObject.ReportSenderPassword;
+
+                // Convert our password in base64
+                byte[] SenderPasswordBytes = Convert.FromBase64String(EmailConfigObject.ReportSenderPassword);
+                string SendPassword = Encoding.UTF8.GetString(EmailConfigObject.ReportSenderPassword);
 
                 // Build broker first
                 ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);

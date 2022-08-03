@@ -84,9 +84,14 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         {
             // Store values for updater configuration variables here
             this.UpdaterUserName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterUserName");
-            this.UpdaterSecretKey = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterSecretKey");
             this.UpdaterRepoName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterRepoName");
             this.UpdaterOrgName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterOrgName");
+
+            // Pull in our API key here and decode it.
+            byte[] KeyBytes = Convert.FromBase64String(ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterSecretKey"));
+            this.UpdaterSecretKey = Encoding.UTF8.GetString(KeyBytes);
+
+            // Log pulled in all values ok and continue on
             this._injectorUpdateLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
 
             // Configure updater here
