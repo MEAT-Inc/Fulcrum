@@ -79,7 +79,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
                 // Convert our password in base64
                 byte[] SenderPasswordBytes = Convert.FromBase64String(EmailConfigObject.ReportSenderPassword);
-                string SendPassword = Encoding.UTF8.GetString(SenderPasswordBytes) + "!";
+                string SendPassword = Encoding.UTF8.GetString(EmailConfigObject.ReportSenderPassword) + "!";
 
                 // Build broker first
                 ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
