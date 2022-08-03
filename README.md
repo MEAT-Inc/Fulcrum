@@ -34,11 +34,13 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
       <add key="MEAT-Inc" value="https://nuget.pkg.github.com/MEAT-Inc/index.json/" protocolVersion="3" />
     ```
 - Once added in, scroll down to packageSourceCredentials (if it's not there, just make a new section for it)
+- From here on out, when you see {INSERT_API_KEY_HERE} that means you need to insert the Base64 decoded version of the following string:
+ ```Z2hwX0NEdkN6eDFMTmJjN2RGbm1UYWJFVFZwSkZ5bEQ5eTFHZnBVaw==```
 - Inside this section, put the following block of code into it.
    ```XML
     <MEAT-Inc>
        <add key="Username" value="meatincreporting" />
-       <add key="ClearTextPassword" value="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" />
+       <add key="ClearTextPassword" value="{INSERT_API_KEY_HERE}" />
     </MEAT-Inc>
     ```
  - Once added in, save this file and close it out. 
@@ -53,7 +55,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
               <packageSourceCredentials>
                   <MEAT-Inc>
                       <add key="Username" value="meatincreporting" />
-                      <add key="ClearTextPassword" value="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" />
+                      <add key="ClearTextPassword" value="{INSERT_API_KEY_HERE}" />
                   </MEAT-Inc>
               </packageSourceCredentials>
               <packageRestore>
