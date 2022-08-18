@@ -68,7 +68,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
         }
 
         // Time download elapsed and approximate time remaining
-        public string DownloadTimeElapsed => this.DownloadTimer == null ? "00:00" : this.DownloadTimer.Elapsed.ToString("mm:ss");
+        public string DownloadTimeElapsed => this.DownloadTimer == null ? "00:00" : this.DownloadTimer.Elapsed.ToString().Split('.')[0];
         public string DownloadTimeRemaining { get; private set; }
 
         // Event for download progress
