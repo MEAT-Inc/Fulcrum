@@ -212,6 +212,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumPeerToPeerViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumSimulationPlaybackViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorMiscViewModels\FulcrumUpdaterViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSessionReportingViewModel.cs" />
@@ -229,6 +230,9 @@
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumPeerToPeerView.xaml.cs">
+      <DependentUpon>FulcrumPeerToPeerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumSimulationPlaybackView.xaml.cs">
       <DependentUpon>FulcrumSimulationPlaybackView.xaml</DependentUpon>
     </Compile>
@@ -341,6 +345,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumPeerToPeerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumSimulationPlaybackView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -390,6 +398,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -523,7 +535,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="FulcrumLogic\FulcrumP2P\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"

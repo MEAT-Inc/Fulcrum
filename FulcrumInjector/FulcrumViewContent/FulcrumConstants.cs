@@ -152,6 +152,8 @@ namespace FulcrumInjector.FulcrumViewContent
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSimulationSingleton =>
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
+        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumPeerToPeerSingleton =>
+            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumPeerToPeerView));
 
         // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSettingsPaneSingleton =>
@@ -178,6 +180,9 @@ namespace FulcrumInjector.FulcrumViewContent
         // Simulation Playback user control and view model object
         public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)FulcrumSimulationSingleton?.SingletonUserControl;
         public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)FulcrumSimulationSingleton?.SingletonViewModel;
+        // P2P Communications user control and view model object
+        public static FulcrumPeerToPeerView FulcrumPeerToPeerView => (FulcrumPeerToPeerView)FulcrumPeerToPeerSingleton?.SingletonUserControl;
+        public static FulcrumPeerToPeerViewModel FulcrumPeerToPeerViewModel => (FulcrumPeerToPeerViewModel)FulcrumPeerToPeerSingleton?.SingletonViewModel;
 
         // User settings and configuration user control and view model object
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)FulcrumSettingsPaneSingleton?.SingletonUserControl;
