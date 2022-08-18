@@ -7,6 +7,7 @@
             
             <!-- Inverse Bool Converter-->
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
 
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">

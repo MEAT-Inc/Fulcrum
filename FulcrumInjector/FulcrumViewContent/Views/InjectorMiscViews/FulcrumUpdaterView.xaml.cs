@@ -65,6 +65,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             DataContext = ViewModel;
 
             // See if we need to open the updater view
+            this.UpdateReleaseNotesContents();
             if (!this.ViewModel.UpdateReady) {
                 this.ViewLogger.WriteLog("SETUP UPDATER VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
                 return;
@@ -73,26 +74,32 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             // Log ready to show updates and build our XAML content output
             this.ViewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
             FulcrumConstants.InjectorMainWindow.AppUpdatesFlyout.IsOpen = true;
+        }
 
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Updates the release notes viewer with the latest release notes
+        /// </summary>
+        private void UpdateReleaseNotesContents()
+        {
             // Build in the release notes contents here
             var XamlReleaseNotes = Markdown.ToXaml(
                 this.ViewModel.GitHubUpdateHelper.LatestInjectorReleaseNotes,
                 new MarkdownPipelineBuilder()
                     .UseAdvancedExtensions()
                     .Build()
-                );
+            );
 
             // Now append the contents of the markdown into our output viewer
             using var MemStream = new MemoryStream(Encoding.UTF8.GetBytes(XamlReleaseNotes));
             using (var XamlToXmlReader = new XamlXmlReader(MemStream, new MarkdownXamlSchemaContext()))
-                if (XamlReader.Load(XamlToXmlReader) is FlowDocument OutputDocument) 
+                if (XamlReader.Load(XamlToXmlReader) is FlowDocument OutputDocument)
                     this.ReleaseNotesViewer.Document = OutputDocument;
 
             // Log done building release notes
             this.ViewLogger.WriteLog("RELEASE NOTES FOR UPDATER WERE BUILT AND ARE BEING SHOWN NOW!", LogType.InfoLog);
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Method to pop open hyperlinks from the converted markdown document
@@ -100,7 +107,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenHyperlink(object sender, ExecutedRoutedEventArgs e) => Process.Start(e.Parameter.ToString());
-        
         /// <summary>
         /// Button click command to execute a new update install request
         /// </summary>
