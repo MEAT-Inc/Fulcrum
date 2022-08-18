@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -120,7 +121,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             this.ViewLogger.WriteLog($"ASSET PATH PULLED IN: {OutputAssetFile}");
 
             // Now request a new install routine from the view model.
-            // TODO: BUILD LOGIC TO RUN INSTALLER
+            this.ViewLogger.WriteLog("BOOTING NEW INSTALLER FOR THE FULCRUM INJECTOR NOW...", LogType.InfoLog);
+            this.ViewModel.InstallInjectorRelease(OutputAssetFile);
         }
     }
 }

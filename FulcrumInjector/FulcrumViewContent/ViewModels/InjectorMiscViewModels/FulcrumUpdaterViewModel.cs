@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -124,13 +125,49 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
         public string InvokeInjectorDownload()
         {
             // Start by invoking a new download of the newest version
+            this.IsDownloading = true;
             string LatestTag = this.GitHubUpdateHelper.LatestInjectorVersion;
             ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
             string OutputAssetPath = this.GitHubUpdateHelper.DownloadInjectorRelease(LatestTag, out string AssetUrl);
 
             // Log done downloading and return the path
             ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {OutputAssetPath} OK!", LogType.InfoLog);
+            this.IsDownloading = false;
             return OutputAssetPath;
+        }
+        /// <summary>
+        /// Installs a new version of the Injector application from the given MSI path
+        /// </summary>
+        /// <param name="PathToInstaller">Path to the installer to run</param>
+        /// <returns>True if started, false if not.</returns>
+        public bool InstallInjectorRelease(string PathToInstaller)
+        {
+            // Setup our string for the command to run.
+            string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {PathToInstaller}";
+            if (!File.Exists(PathToInstaller)) {
+                ViewModelLogger.WriteLog($"PATH {PathToInstaller} DOES NOT EXIST ON THE SYSTEM! UNABLE TO INSTALL A NEW VERSION!", LogType.ErrorLog);
+                return false; 
+            }
+
+            // Build a process object and setup a CMD line call to install our new version
+            Process InstallNewReleaseProcess = new Process();
+            InstallNewReleaseProcess.StartInfo = new ProcessStartInfo()
+            {
+                Verb = "runas",                   // Set this to run as admin
+                FileName = "cmd.exe",             // Boot a CMD window
+                CreateNoWindow = true,            // Create no window on output
+                UseShellExecute = false,          // Shell execution
+                Arguments = InvokeUpdateString,   // Args to invoke.
+            };
+
+            // Log starting updates and return true
+            ViewModelLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
+            ViewModelLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
+
+            // Boot the update and return true
+            InstallNewReleaseProcess.Start();
+            InstallNewReleaseProcess.CloseMainWindow();
+            return true;
         }
     }
 }
