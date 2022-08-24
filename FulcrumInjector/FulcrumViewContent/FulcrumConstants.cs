@@ -154,6 +154,8 @@ namespace FulcrumInjector.FulcrumViewContent
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumPeerToPeerSingleton =>
             SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumPeerToPeerView));
+        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumNetworkAnalysisSingleton =>
+            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumNetworkAnalysisView));
 
         // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
         public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSettingsPaneSingleton =>
@@ -180,9 +182,14 @@ namespace FulcrumInjector.FulcrumViewContent
         // Simulation Playback user control and view model object
         public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)FulcrumSimulationSingleton?.SingletonUserControl;
         public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)FulcrumSimulationSingleton?.SingletonViewModel;
+
         // P2P Communications user control and view model object
         public static FulcrumPeerToPeerView FulcrumPeerToPeerView => (FulcrumPeerToPeerView)FulcrumPeerToPeerSingleton?.SingletonUserControl;
         public static FulcrumPeerToPeerViewModel FulcrumPeerToPeerViewModel => (FulcrumPeerToPeerViewModel)FulcrumPeerToPeerSingleton?.SingletonViewModel;
+
+        // CAN Network Analysis user control and view model object
+        public static FulcrumNetworkAnalysisView FulcrumNetworkAnalysisView => (FulcrumNetworkAnalysisView)FulcrumNetworkAnalysisSingleton?.SingletonUserControl;
+        public static FulcrumNetworkAnalysisViewModel FulcrumNetworkAnalysisViewModel => (FulcrumNetworkAnalysisViewModel)FulcrumNetworkAnalysisSingleton?.SingletonViewModel;
 
         // User settings and configuration user control and view model object
         public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)FulcrumSettingsPaneSingleton?.SingletonUserControl;
