@@ -70,8 +70,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog("IMPORTED VALUES FROM JSON FILE OK!", LogType.InfoLog);
 
             // Ensure output icon path exists
-            if (!Directory.Exists(FulcrumIconPath))
-            {
+            if (!Directory.Exists(FulcrumIconPath)) {
                 Directory.CreateDirectory(FulcrumIconPath);
                 ViewModelLogger.WriteLog("WARNING! ICON PATH OUTPUT WAS NOT FOUND! IS HAS BEEN BUILT FOR US!", LogType.WarnLog);
             }
@@ -94,8 +93,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Pull values out of icon objects and check if option or not
                 string MenuEntryName = IconObjectEntry.MenuEntry;
-                if (IconObjectEntry.EntryType == "OptionEntry")
-                {
+
+                // Check if the menu object is enabled or not
+                bool MenuOptionEnabled = IconObjectEntry.IsEntryEnabled;
+                if (!MenuOptionEnabled) {
+                    ViewModelLogger.WriteLog($"--> WARNING! MENU ENTRY {MenuOptionEnabled} IS NOT ENABLED! SKIPPING ADDITION FOR IT!", LogType.WarnLog);
+                    continue;
+                }
+
+                // If it's an option entry skip it as well
+                if (IconObjectEntry.EntryType == "OptionEntry") {
                     ViewModelLogger.WriteLog($"   --> ENTRY OBJECT IS SEEN TO BE AN OPTION ENTRY! NOT INCLUDING THIS IN OUR MENU VALUES", LogType.InfoLog);
                     ViewModelLogger.WriteLog($"   --> SKIPPED ENTRY {MenuEntryName}", LogType.InfoLog);
                     continue;
@@ -128,14 +135,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Pull values out of icon objects and check if option or not
                 string MenuEntryName = IconObjectEntry.MenuEntry;
-                if (IconObjectEntry.EntryType == "MenuEntry")
-                {
+
+                // Check if the menu object is enabled or not
+                bool MenuOptionEnabled = IconObjectEntry.IsEntryEnabled;
+                if (!MenuOptionEnabled) {
+                    ViewModelLogger.WriteLog($"--> WARNING! MENU ENTRY {MenuOptionEnabled} IS NOT ENABLED! SKIPPING ADDITION FOR IT!", LogType.WarnLog);
+                    continue;
+                }
+
+                // If it's a menu entry skip it as well]
+                if (IconObjectEntry.EntryType == "MenuEntry") {
                     ViewModelLogger.WriteLog($"   --> ENTRY OBJECT IS SEEN TO BE AN MENU ENTRY! NOT INCLUDING THIS IN OUR OPTION VALUES", LogType.InfoLog);
                     ViewModelLogger.WriteLog($"   --> SKIPPED ENTRY {MenuEntryName}", LogType.InfoLog);
                     continue;
                 }
 
-                // If not an option entry, pull our other values and run the builder
+                // If not a menu entry, pull our other values and run the builder
                 string MenuViewType = IconObjectEntry.MenuViewType;
                 string MenuModelType = IconObjectEntry.MenuModelType;
                 string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;

@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     {
         // Logger object.
         private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorPeerToPeerViewLogger")) ?? new SubServiceLogger("InjectorPeerToPeerViewLogger");
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorNetworkAnalysisViewLogger")) ?? new SubServiceLogger("InjectorNetworkAnalysisViewLogger");
 
         // ViewModel object to bind onto
         public FulcrumNetworkAnalysisViewModel ViewModel { get; set; }
@@ -54,5 +54,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+
     }
 }

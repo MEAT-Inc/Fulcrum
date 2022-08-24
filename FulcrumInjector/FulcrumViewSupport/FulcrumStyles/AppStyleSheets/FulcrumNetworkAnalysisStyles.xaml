@@ -17,6 +17,18 @@
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
             </Style>
 
+            <!--Information Content Text-->
+            <Style x:Key="SubTitleText" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

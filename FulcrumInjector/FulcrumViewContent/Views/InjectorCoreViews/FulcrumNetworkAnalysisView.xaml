@@ -27,7 +27,7 @@
     <!-- Content for our P2P View -->
     <Grid Margin="5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="95"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -35,7 +35,7 @@
         <!-- Title and information -->
         <Grid Margin="5,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height=".65*"/>
+                <RowDefinition Height=".5*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid Margin="0,0,15,0">
@@ -46,14 +46,14 @@
                 <TextBlock 
                     Grid.Row="0"
                     Margin="5,0,0,0"
-                    Text="Injector P2P J2534 Communications" 
+                    Text="Injector CAN Network Tools" 
                     HorizontalAlignment="Left"
                     Style="{StaticResource TitleStringText}"/>
             </Grid>
             <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="5,0" FontSize="14">
-                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to configure and start up a new J2534 P2P communication routine between two machines running the Fulcrum Injector. This allows us to flow data between machines and invoke commands remotely"/>
+                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to control a PassThru device via a direct command line interface. This allows you to issue J2534 commands to a device exactly as they would be issued inside a J2534 app."/>
                 <LineBreak/>
-                <Run Foreground="Yellow" FontWeight="DemiBold" Text="NOTE! THIS IS STILL SUPER EARLY BETA AND MAY BE BUGGY!"/>
+                <Run Foreground="Yellow" FontWeight="DemiBold" Text="WARNING! THIS IS FOR ADVANCED USERS ONLY!"/>
             </TextBlock>
         </Grid>
 
@@ -63,5 +63,53 @@
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
         <!-- Main Content Grid -->
+        <Grid Grid.Row="2" Margin="5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width=".65*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/> 
+            </Grid.ColumnDefinitions>
+
+            <!-- Command input ListBox Content -->
+            <Grid Grid.Column="0" Margin="5,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="45"/>
+                </Grid.RowDefinitions>
+
+                <!-- Command Selection CombBox and configuration list -->
+                <ComboBox Grid.Row="0" x:Name="PassThruCommandComboBox" Margin="0,5,0,5"/>
+                <Border Grid.Row="1" Margin="0,5,0,0" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2">
+                    <ScrollViewer Background="{StaticResource PrimaryColor_Darker_35}">
+                        <ItemsControl x:Name="PassThruCommandArgsViewer"/>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Execute and Reset Buttons -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Execute" Margin="0,5,5,5" Grid.Column="0" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button Content="Queue" Margin="0,5,5,5" Grid.Column="1" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button Content="Run Queue" Margin="0,5,5,5" Grid.Column="2" Style="{StaticResource ActionButtonStyle}"/>
+                </Grid>
+
+                <!-- Content placeholders -->
+                
+
+            </Grid>
+
+            <!-- Splitting Border -->
+            <Border Grid.Column="1" Margin="0,0,0,0"
+                    BorderBrush="{StaticResource TextColorBase}" 
+                    BorderThickness="0,0,2,0" VerticalAlignment="Stretch"/>
+
+            <!-- Content Output -->
+
+        </Grid>
     </Grid>
 </UserControl>
