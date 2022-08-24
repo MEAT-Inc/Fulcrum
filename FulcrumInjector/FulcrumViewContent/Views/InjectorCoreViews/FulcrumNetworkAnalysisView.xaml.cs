@@ -57,6 +57,54 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Processes events for when the index of our command object is changed.
+        /// </summary>
+        /// <param name="Sender">Combobox sending this request</param>
+        /// <param name="E">Events fired along with the combobox changed</param>
+        private void PassThruCommandComboBox_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        {
+            // Start by checking the index. If it's 0 then disable our execute buttons
+            ComboBox SendingComboBox = (ComboBox)Sender;
+            this.NoCommandConfiguredPlaceholder.Visibility = SendingComboBox.SelectedIndex < 0 ?
+                Visibility.Visible : Visibility.Collapsed;
+            this.ViewLogger.WriteLog("TOGGLED VISIBILITY OF THE NO COMMAND PLACEHOLDER!", LogType.TraceLog);
 
+            // Generate our control set for the selected command object
+            this.ViewLogger.WriteLog("SETTING UP COMMAND CONFIG VALUES NOW...", LogType.InfoLog);
+            string CurrentCommandName = SendingComboBox.SelectedItem.ToString();
+            var BuiltUIControls =  this.ViewModel.GenerateCommandConfigElements(CurrentCommandName);
+
+            // Store the controls on our items collection inside the viewer object now
+            this.PassThruCommandArgsViewer.ItemsSource = BuiltUIControls;
+            this.ViewLogger.WriteLog($"BUILT A TOTAL OF {BuiltUIControls.Length} CONTROL SETS FOR OUR COMMAND CONFIG!");
+            this.ViewLogger.WriteLog("STORED CONTROLS OK! CONTENT SHOULD BE DISPLAYED ON OUR VIEW NOW...", LogType.InfoLog);
+        }
+
+
+        /// <summary>
+        /// Processes a command execution request for the network testing view
+        /// </summary>
+        /// <param name="Sender">Sending button for this command</param>
+        /// <param name="E">Event args fired along with the button click action</param>
+        private void ExecutePassThruCommand_Click(object Sender, RoutedEventArgs E)
+        {
+            // Stop the vehicle monitoring routine on the Connection View if it's currently running
+            var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
+            bool ShouldMonitor = CurrentHwInfo.IsMonitoring;
+            if (ShouldMonitor) CurrentHwInfo.StopVehicleMonitoring();
+
+            // Toggle the sending button to be disabled when the button is clicked
+            Button SendingButton = (Button)Sender;
+            SendingButton.IsEnabled = false;
+
+            // Now Execute our commands using the args built
+            // TODO: BUILD LOGIC FOR RUNNING COMMANDS!
+            var PopulatedArgControls = this.PassThruCommandArgsViewer.ItemsSource;
+
+            // Reset monitoring if needed here
+            if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();
+            SendingButton.IsEnabled = true;
+        }
     }
 }

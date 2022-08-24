@@ -27,7 +27,7 @@
     <!-- Content for our P2P View -->
     <Grid Margin="5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="95"/>
+            <RowDefinition Height="75"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -35,7 +35,7 @@
         <!-- Title and information -->
         <Grid Margin="5,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height=".5*"/>
+                <RowDefinition Height=".8*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid Margin="0,0,15,0">
@@ -51,8 +51,7 @@
                     Style="{StaticResource TitleStringText}"/>
             </Grid>
             <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="5,0" FontSize="14">
-                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to control a PassThru device via a direct command line interface. This allows you to issue J2534 commands to a device exactly as they would be issued inside a J2534 app."/>
-                <LineBreak/>
+                <Run Foreground="{StaticResource TextColorBase}" Text="This view is used to control a PassThru device via a direct command line interface. This allows you to issue J2534 commands to a device exactly as they would be issued inside a J2534 app. "/>
                 <Run Foreground="Yellow" FontWeight="DemiBold" Text="WARNING! THIS IS FOR ADVANCED USERS ONLY!"/>
             </TextBlock>
         </Grid>
@@ -63,7 +62,7 @@
                 BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
         <!-- Main Content Grid -->
-        <Grid Grid.Row="2" Margin="5,0">
+        <Grid Grid.Row="2" Margin="5,0" IsEnabled="{Binding IsHardwareSetup}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".65*"/>
                 <ColumnDefinition Width="10"/>
@@ -75,32 +74,78 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="45"/>
                     <RowDefinition/>
-                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="42"/>
                 </Grid.RowDefinitions>
 
                 <!-- Command Selection CombBox and configuration list -->
-                <ComboBox Grid.Row="0" x:Name="PassThruCommandComboBox" Margin="0,5,0,5"/>
+                <ComboBox Grid.Row="0" x:Name="PassThruCommandComboBox" Margin="0,5,0,5" FontSize="14"
+                          ItemsSource="{Binding Path=SupportedJ2534Commands}" HorizontalContentAlignment="Center"
+                          SelectionChanged="PassThruCommandComboBox_OnSelectionChanged"/>
                 <Border Grid.Row="1" Margin="0,5,0,0" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2">
-                    <ScrollViewer Background="{StaticResource PrimaryColor_Darker_35}">
+                    <ScrollViewer Background="Black">
                         <ItemsControl x:Name="PassThruCommandArgsViewer"/>
                     </ScrollViewer>
                 </Border>
 
                 <!-- Execute and Reset Buttons -->
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="2" Margin="0,5,-5,0" IsEnabled="{Binding Path=IsHardwareSetup}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Content="Execute" Margin="0,5,5,5" Grid.Column="0" Style="{StaticResource ActionButtonStyle}"/>
-                    <Button Content="Queue" Margin="0,5,5,5" Grid.Column="1" Style="{StaticResource ActionButtonStyle}"/>
-                    <Button Content="Run Queue" Margin="0,5,5,5" Grid.Column="2" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button Content="Execute" Click="ExecutePassThruCommand_Click" Margin="0,5,5,0" 
+                            Grid.Column="0" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button IsEnabled="False" Content="Queue" Margin="0,5,5,0" Grid.Column="1" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button IsEnabled="False" Content="Run Queue" Margin="0,5,5,0" Grid.Column="2" Style="{StaticResource ActionButtonStyle}"/>
                 </Grid>
 
                 <!-- Content placeholders -->
-                
-
+                <Grid Grid.Row="1" Margin="0,5,0,0" x:Name="NoHardwareConfiguredPlaceholder">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsHardwareSetup}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=IsHardwareSetup}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Border Opacity=".55" BorderThickness="3"
+                            BorderBrush="{StaticResource TextColorBase}"
+                            Background="{StaticResource PrimaryColor_Darker_65}"/>
+                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                               Margin="10,10" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Hardware Configured!"/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run FontSize="16" Text="Configure a J2534 device and DLL using the Hardware Configuration tab on the main menu."/>
+                    </TextBlock>
+                </Grid>
+                <Grid Grid.Row="1" Margin="0,5,0,0" x:Name="NoCommandConfiguredPlaceholder">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsHardwareSetup}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Border Opacity=".55" BorderThickness="3"
+                            BorderBrush="{StaticResource TextColorBase}"
+                            Background="{StaticResource PrimaryColor_Darker_65}"/>
+                    <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap" 
+                               Margin="10,10" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="Select a J2534 Command"/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run FontSize="16" Text="Configure a J2534 command using the dropdown menu above. When selected, optional configuration for the command will appear here"/>
+                    </TextBlock>
+                </Grid>
             </Grid>
 
             <!-- Splitting Border -->
@@ -109,7 +154,9 @@
                     BorderThickness="0,0,2,0" VerticalAlignment="Stretch"/>
 
             <!-- Content Output -->
+            <Grid Grid.Column="2">
 
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

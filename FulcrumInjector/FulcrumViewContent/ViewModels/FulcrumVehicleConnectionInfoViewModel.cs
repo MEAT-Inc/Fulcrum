@@ -34,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         // Task control for stopping refresh operations for our background voltage reading.
-        private Sharp2534Session InstanceSession;
+        public Sharp2534Session InstanceSession;
         private CancellationTokenSource RefreshSource;
 
         // Private control values
