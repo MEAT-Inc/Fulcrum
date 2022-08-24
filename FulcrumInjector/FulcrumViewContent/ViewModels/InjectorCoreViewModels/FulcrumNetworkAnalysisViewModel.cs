@@ -19,7 +19,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
             .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorNetworkAnalysisViewModelLogger")) ?? new SubServiceLogger("InjectorNetworkAnalysisViewModelLogger");
 
-
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
