@@ -212,6 +212,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumNetworkAnalysisViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumPeerToPeerViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumSimulationPlaybackViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorMiscViewModels\FulcrumUpdaterViewModel.cs" />
@@ -230,6 +231,9 @@
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumNetworkAnalysisView.xaml.cs">
+      <DependentUpon>FulcrumNetworkAnalysisView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumPeerToPeerView.xaml.cs">
       <DependentUpon>FulcrumPeerToPeerView.xaml</DependentUpon>
     </Compile>
@@ -345,6 +349,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumNetworkAnalysisView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumPeerToPeerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -400,6 +408,10 @@
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml">
       <SubType>Designer</SubType>

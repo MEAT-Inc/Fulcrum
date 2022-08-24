@@ -13,11 +13,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     /// <summary>
     /// View model logic for our Peer to Peer network configuration routines on the Injector app
     /// </summary>
-    public class FulcrumPeerToPeerViewModel : ViewModelControlBase
+    public class FulcrumNetworkAnalysisViewModel : ViewModelControlBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorPeerToPeerViewModelLogger")) ?? new SubServiceLogger("InjectorPeerToPeerViewModelLogger");
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorNetworkAnalysisViewModelLogger")) ?? new SubServiceLogger("InjectorNetworkAnalysisViewModelLogger");
 
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <summary>
         /// Builds a new simulation playback view model
         /// </summary>
-        public FulcrumPeerToPeerViewModel()
+        public FulcrumNetworkAnalysisViewModel()
         {
             // Setup empty list of our events here
             ViewModelLogger.WriteLog("BUILT NEW FULCRUM P2P VIEW MODEL OK!");
