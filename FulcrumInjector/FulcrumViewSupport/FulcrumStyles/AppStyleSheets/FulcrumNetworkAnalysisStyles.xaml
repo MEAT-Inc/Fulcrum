@@ -35,5 +35,62 @@
             </Style>
 
         </ResourceDictionary>
+        
+        <!-- Styles to be imported into the ViewModel for control generation -->
+        <ResourceDictionary>
+
+            <!-- No Arguments title text style -->
+            <Style x:Key="GeneratedNoArgsNeededTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="0,150,0,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+            </Style>
+
+            <!-- Argument title text style -->
+            <Style x:Key="GeneratedArgTitleTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
+            <!-- Optional argument title text style -->
+            <Style x:Key="GeneratedOptionalArgTitleTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+            </Style>
+
+            <!-- Input content TextBox style for values -->
+            <Style x:Key="GeneratedArgValueTextBoxStyle"  TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
+                <Setter Property="Margin" Value="0,5,0,5"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            </Style>
+
+            <!-- Input content ComboBox style for values -->
+            <Style x:Key="GeneratedArgValueComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                <Setter Property="Margin" Value="0,5,0,5"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+        </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

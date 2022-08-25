@@ -66,22 +66,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Start by checking the index. If it's 0 then disable our execute buttons
             ComboBox SendingComboBox = (ComboBox)Sender;
-            this.NoCommandConfiguredPlaceholder.Visibility = SendingComboBox.SelectedIndex < 0 ?
-                Visibility.Visible : Visibility.Collapsed;
-            this.ViewLogger.WriteLog("TOGGLED VISIBILITY OF THE NO COMMAND PLACEHOLDER!", LogType.TraceLog);
 
             // Generate our control set for the selected command object
             this.ViewLogger.WriteLog("SETTING UP COMMAND CONFIG VALUES NOW...", LogType.InfoLog);
-            string CurrentCommandName = SendingComboBox.SelectedItem.ToString();
-            var BuiltUIControls =  this.ViewModel.GenerateCommandConfigElements(CurrentCommandName);
+            this.ViewModel.CurrentJ2534CommandName = SendingComboBox.SelectedItem.ToString();
 
             // Store the controls on our items collection inside the viewer object now
-            this.PassThruCommandArgsViewer.ItemsSource = BuiltUIControls;
-            this.ViewLogger.WriteLog($"BUILT A TOTAL OF {BuiltUIControls.Length} CONTROL SETS FOR OUR COMMAND CONFIG!");
+            PassThruCommandArgsViewer.ItemsSource = this.ViewModel.GenerateCommandConfigElements();
+            this.ViewLogger.WriteLog($"STORED NEW COMMAND NAME: {this.ViewModel.CurrentJ2534CommandName}", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"BUILT A TOTAL OF {PassThruCommandArgsViewer.Items.Count} CONTROL SETS FOR OUR COMMAND CONFIG!");
             this.ViewLogger.WriteLog("STORED CONTROLS OK! CONTENT SHOULD BE DISPLAYED ON OUR VIEW NOW...", LogType.InfoLog);
         }
-
-
         /// <summary>
         /// Processes a command execution request for the network testing view
         /// </summary>
@@ -100,7 +95,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Now Execute our commands using the args built
             // TODO: BUILD LOGIC FOR RUNNING COMMANDS!
-            var PopulatedArgControls = this.PassThruCommandArgsViewer.ItemsSource;
 
             // Reset monitoring if needed here
             if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();

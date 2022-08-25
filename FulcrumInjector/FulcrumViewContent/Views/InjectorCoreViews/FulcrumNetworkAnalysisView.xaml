@@ -64,7 +64,7 @@
         <!-- Main Content Grid -->
         <Grid Grid.Row="2" Margin="5,0" IsEnabled="{Binding IsHardwareSetup}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".65*"/>
+                <ColumnDefinition Width=".70*"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition/> 
             </Grid.ColumnDefinitions>
@@ -72,9 +72,9 @@
             <!-- Command input ListBox Content -->
             <Grid Grid.Column="0" Margin="5,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition/>
-                    <RowDefinition Height="42"/>
+                    <RowDefinition Height="85"/>
                 </Grid.RowDefinitions>
 
                 <!-- Command Selection CombBox and configuration list -->
@@ -82,22 +82,35 @@
                           ItemsSource="{Binding Path=SupportedJ2534Commands}" HorizontalContentAlignment="Center"
                           SelectionChanged="PassThruCommandComboBox_OnSelectionChanged"/>
                 <Border Grid.Row="1" Margin="0,5,0,0" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2">
-                    <ScrollViewer Background="Black">
-                        <ItemsControl x:Name="PassThruCommandArgsViewer"/>
+                    <ScrollViewer Background="Black" HorizontalContentAlignment="Stretch">
+                        <ItemsControl 
+                            Margin="5"
+                            x:Name="PassThruCommandArgsViewer"
+                            HorizontalContentAlignment="Stretch"/>
                     </ScrollViewer>
                 </Border>
 
                 <!-- Execute and Reset Buttons -->
-                <Grid Grid.Row="2" Margin="0,5,-5,0" IsEnabled="{Binding Path=IsHardwareSetup}">
+                <Grid Grid.Row="2" Margin="0,5,-5,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
-                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Content="Execute" Click="ExecutePassThruCommand_Click" Margin="0,5,5,0" 
-                            Grid.Column="0" Style="{StaticResource ActionButtonStyle}"/>
-                    <Button IsEnabled="False" Content="Queue" Margin="0,5,5,0" Grid.Column="1" Style="{StaticResource ActionButtonStyle}"/>
-                    <Button IsEnabled="False" Content="Run Queue" Margin="0,5,5,0" Grid.Column="2" Style="{StaticResource ActionButtonStyle}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Execute Command" Grid.Column="0" Grid.Row="0" Click="ExecutePassThruCommand_Click" 
+                            Margin="0,5,5,5"  Style="{StaticResource ActionButtonStyle}"
+                            IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
+                    <Button Content="Queue Command" Grid.Row="0" Grid.Column="1"
+                            Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"
+                            IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
+                    <Button Content="Show Queue" Grid.Row="1" Grid.Column="0"
+                            Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button Content="Execute Queue" Grid.Row="1" Grid.Column="1" 
+                            Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"
+                            IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
                 </Grid>
 
                 <!-- Content placeholders -->
@@ -132,6 +145,24 @@
                                 <DataTrigger Binding="{Binding Path=IsHardwareSetup}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsHardwareSetup}" Value="True"/>
+                                        <Condition Binding="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsHardwareSetup}" Value="True"/>
+                                        <Condition Binding="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>

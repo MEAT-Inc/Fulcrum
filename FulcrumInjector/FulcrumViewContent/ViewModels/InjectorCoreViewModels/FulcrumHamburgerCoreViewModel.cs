@@ -82,6 +82,67 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Builds a hamburger entry object from a given set of values for a menu entry.
+        /// </summary>
+        /// <param name="IconPath">Path to icons folder</param>
+        /// <param name="IconObjectEntry">Icon object to use for set</param>
+        /// <returns></returns>
+        private FulcrumNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
+        {
+            // Replace Icon path with current text color value
+            var CurrentMerged = Application.Current.Resources.MergedDictionaries;
+            var ColorResources = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
+            MenuIconSvgPaths = MenuIconSvgPaths.Replace("currentColor", ColorResources["TextColorBase"].ToString());
+
+            // Log information about imported values
+            ViewModelLogger.WriteLog($"   --> PULLED NEW MENU OBJECT NAMED: {MenuEntryName}", LogType.TraceLog);
+            ViewModelLogger.WriteLog($"   --> ICON PATH VALUE LOCATED WAS: {MenuIconSvgPaths}", LogType.TraceLog);
+
+            // Read in the content of the SVG object, store it in a temp file, then convert to a PNG and store as a resource
+            string IconName = $"{MenuEntryName.Replace(' ', '-')}_Icon.png";
+            string OutputIconFileName = Path.Combine(this.FulcrumIconPath, IconName);
+            using (var SvgContentStream = new MemoryStream(Encoding.ASCII.GetBytes(MenuIconSvgPaths)))
+            {
+                // Read the SVG content input and store it as a stream object. Then draw it to a Bitmap
+                var SvgDocAsBitmap = SvgDocument.Open<SvgDocument>(SvgContentStream).Draw();
+
+                // BUG: THIS IS NOT SCALING CORRECTLY! AS A RESULT WE'RE JUST SCALING INPUT SVG FILES UP
+                // Resize bitmap by 200% to prevent scaling distortion on the output
+                // var ScaledSvgDoc = new Bitmap(SvgDocAsBitmap.Width * 2, SvgDocAsBitmap.Height * 2);
+                // using (Graphics SvgScaleGfx = Graphics.FromImage(SvgDocAsBitmap)) 
+                //     SvgScaleGfx.DrawImage(SvgDocAsBitmap, 0, 0, ScaledSvgDoc.Width, ScaledSvgDoc.Height);
+
+                // Overwrite the file object if needed and write new bitmap output to file
+                SvgDocAsBitmap.Save(OutputIconFileName, ImageFormat.Png);
+            }
+
+            // Build a new instance of each type quickly to store something in our view configuration
+            Type MenuContentType = Type.GetType(MenuViewTypeName);
+            Type MenuViewModelType = Type.GetType(MenuModelTypeName);
+            ViewModelLogger.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"   --> VIEW TYPE:       {MenuViewTypeName}", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"   --> VIEW MODEL TYPE: {MenuModelTypeName}", LogType.InfoLog);
+
+            // Generate output result object.
+            var NewResult = new FulcrumNavMenuItem()
+            {
+                // Stores the content type for view and view model
+                NavUserControlType = MenuContentType,
+                NavViewModelType = MenuViewModelType,
+
+                // Configure the label and the name of the menu entry
+                Label = MenuEntryName,
+                Glyph = new Uri(OutputIconFileName, UriKind.RelativeOrAbsolute).ToString(),
+            };
+
+            // Log the result of the binding actions
+            ViewModelLogger.WriteLog($"   --> CAST NEW OBJECT AND STORED NEW CONTENTS FOR ENTRY {MenuEntryName} OK!", LogType.InfoLog);
+            return NewResult;
+        }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
         /// Applies new hamburger menu items here
         /// </summary>
         internal FulcrumNavMenuItem[] SetupHamburgerMenuItems()
@@ -163,66 +224,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Return built output object values
             this.InjectorMenuOptions = new ObservableCollection<FulcrumNavMenuItem>(OutputOptionEntries);
             return OutputOptionEntries;
-        }
-
-
-        /// <summary>
-        /// Builds a hamburger entry object from a given set of values for a menu entry.
-        /// </summary>
-        /// <param name="IconPath">Path to icons folder</param>
-        /// <param name="IconObjectEntry">Icon object to use for set</param>
-        /// <returns></returns>
-        private FulcrumNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
-        {
-            // Replace Icon path with current text color value
-            var CurrentMerged = Application.Current.Resources.MergedDictionaries;
-            var ColorResources = CurrentMerged.FirstOrDefault(Dict => Dict.Source.ToString().Contains("AppColorTheme"));
-            MenuIconSvgPaths = MenuIconSvgPaths.Replace("currentColor", ColorResources["TextColorBase"].ToString());
-
-            // Log information about imported values
-            ViewModelLogger.WriteLog($"   --> PULLED NEW MENU OBJECT NAMED: {MenuEntryName}", LogType.TraceLog);
-            ViewModelLogger.WriteLog($"   --> ICON PATH VALUE LOCATED WAS: {MenuIconSvgPaths}", LogType.TraceLog);
-
-            // Read in the content of the SVG object, store it in a temp file, then convert to a PNG and store as a resource
-            string IconName = $"{MenuEntryName.Replace(' ', '-') }_Icon.png";
-            string OutputIconFileName = Path.Combine(this.FulcrumIconPath, IconName);
-            using (var SvgContentStream = new MemoryStream(Encoding.ASCII.GetBytes(MenuIconSvgPaths)))
-            {
-                // Read the SVG content input and store it as a stream object. Then draw it to a Bitmap
-                var SvgDocAsBitmap = SvgDocument.Open<SvgDocument>(SvgContentStream).Draw();
-
-                // BUG: THIS IS NOT SCALING CORRECTLY! AS A RESULT WE'RE JUST SCALING INPUT SVG FILES UP
-                // Resize bitmap by 200% to prevent scaling distortion on the output
-                // var ScaledSvgDoc = new Bitmap(SvgDocAsBitmap.Width * 2, SvgDocAsBitmap.Height * 2);
-                // using (Graphics SvgScaleGfx = Graphics.FromImage(SvgDocAsBitmap)) 
-                //     SvgScaleGfx.DrawImage(SvgDocAsBitmap, 0, 0, ScaledSvgDoc.Width, ScaledSvgDoc.Height);
-
-                // Overwrite the file object if needed and write new bitmap output to file
-                SvgDocAsBitmap.Save(OutputIconFileName, ImageFormat.Png);
-            }
-
-            // Build a new instance of each type quickly to store something in our view configuration
-            Type MenuContentType = Type.GetType(MenuViewTypeName); 
-            Type MenuViewModelType = Type.GetType(MenuModelTypeName);
-            ViewModelLogger.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"   --> VIEW TYPE:       {MenuViewTypeName}", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"   --> VIEW MODEL TYPE: {MenuModelTypeName}", LogType.InfoLog);
-
-            // Generate output result object.
-            var NewResult = new FulcrumNavMenuItem()
-            {
-                // Stores the content type for view and view model
-                NavUserControlType = MenuContentType,
-                NavViewModelType = MenuViewModelType,
-
-                // Configure the label and the name of the menu entry
-                Label = MenuEntryName,
-                Glyph = new Uri(OutputIconFileName, UriKind.RelativeOrAbsolute).ToString(),
-            };
-
-            // Log the result of the binding actions
-            ViewModelLogger.WriteLog($"   --> CAST NEW OBJECT AND STORED NEW CONTENTS FOR ENTRY {MenuEntryName} OK!", LogType.InfoLog);
-            return NewResult;
         }
     }
 }
