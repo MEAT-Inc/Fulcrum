@@ -12,6 +12,8 @@ using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpWrap2534;
+using SharpWrap2534.J2534Objects;
+using SharpWrap2534.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -198,21 +200,39 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Check the type of the parameter. Assign our value control accordingly.
                 UIElement ParameterValueElement = null;
                 if (ParameterType.FullName.Contains("Int") || ParameterType.FullName.Contains("String"))
+                {
+                    // Build a new TextBox object to store input values
                     ParameterValueElement = new TextBox()
                     {
                         Style = this._argumentValueTextBoxStyle,
-                        Tag = $"Type: {ParameterType.FullName}", 
+                        Tag = $"Type: {ParameterType.FullName}",
                         ToolTip = ParameterObject.IsOptional
                             ? "Optional Parameter!"
                             : "Required Parameter"
                     };
+                }
                 else if (ParameterType.IsEnum)
+                {
+                    // Build a new ComboBox with all the enum values we can pick from
                     ParameterValueElement = new ComboBox()
                     {
                         Style = this._argumentValueComboBoxStyle,
-                        ItemsSource = Enum.GetValues(ParameterType), 
+                        ItemsSource = Enum.GetValues(ParameterType),
                         SelectedIndex = 0
                     };
+                }
+                else if (ParameterType == typeof(J2534Filter))
+                {
+                    // TODO: BUILD LOGIC FOR J2534 FILTER TYPES
+                }
+                else if (ParameterType == typeof(J2534PeriodicMessage))
+                {
+                    // TODO: BUILD LOGIC FOR J2534 PERIODIC MESSAGE TYPES
+                }
+                else if (ParameterType == typeof(PassThruStructs.PassThruMsg) || ParameterType == typeof(PassThruStructs.PassThruMsg[]))
+                {
+                    // TODO: BUILD LOGIC FOR J2534 MESSAGE TYPES AND ARRAYS
+                }
                 else
                 {
                     // For all unknown casting types, just make a TextBox
