@@ -122,7 +122,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     .All(ParamObj => 
                         ParamObj.ParameterType != typeof(J2534Filter) &&
                         ParamObj.ParameterType != typeof(J2534PeriodicMessage) &&
-                        ParamObj.ParameterType == typeof(PassThruStructs.PassThruMsg[])))
+                        ParamObj.ParameterType != typeof(PassThruStructs.PassThruMsg[])))
                 .Select(MethodObject => MethodObject.Name)
                 .Where(MethodName => MethodName.StartsWith("PT"))
                 .ToArray();
