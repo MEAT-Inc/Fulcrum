@@ -27,7 +27,7 @@
     <!-- Content for our P2P View -->
     <Grid Margin="5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="75"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
