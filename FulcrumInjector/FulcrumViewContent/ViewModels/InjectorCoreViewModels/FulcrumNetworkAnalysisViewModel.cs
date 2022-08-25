@@ -15,6 +15,9 @@ using SharpWrap2534;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
 
+// Forced forms using for TreeView
+using FormsTreeView = System.Windows.Forms.TreeView;
+
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
     /// <summary>
@@ -112,9 +115,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .ToArray();
 
-            // Get the names of the methods and store them in an array
+            // Get the names of the methods and store them in an array ONLY for commands where a J2534 object is not defined
             ViewModelLogger.WriteLog($"FOUND A TOTAL OF {SharpSessionMethods.Length} UNFILTERED METHOD OBJECTS", LogType.TraceLog);
             string[] SharpSessionMethodNames = SharpSessionMethods
+                .Where(MethodObject => MethodObject.GetParameters()
+                    .All(ParamObj => 
+                        ParamObj.ParameterType != typeof(J2534Filter) &&
+                        ParamObj.ParameterType != typeof(J2534PeriodicMessage) &&
+                        ParamObj.ParameterType == typeof(PassThruStructs.PassThruMsg[])))
                 .Select(MethodObject => MethodObject.Name)
                 .Where(MethodName => MethodName.StartsWith("PT"))
                 .ToArray();
@@ -214,6 +222,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 else if (ParameterType.IsEnum)
                 {
                     // Build a new ComboBox with all the enum values we can pick from
+                    ViewModelLogger.WriteLog($"--> BUILDING COMBOBOX FOR ENUM TYPE {ParameterType.FullName} NOW...", LogType.WarnLog);
                     ParameterValueElement = new ComboBox()
                     {
                         Style = this._argumentValueComboBoxStyle,
@@ -221,32 +230,25 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                         SelectedIndex = 0
                     };
                 }
-                else if (ParameterType == typeof(J2534Filter))
-                {
-                    // TODO: BUILD LOGIC FOR J2534 FILTER TYPES
-                }
-                else if (ParameterType == typeof(J2534PeriodicMessage))
-                {
-                    // TODO: BUILD LOGIC FOR J2534 PERIODIC MESSAGE TYPES
-                }
-                else if (ParameterType == typeof(PassThruStructs.PassThruMsg) || ParameterType == typeof(PassThruStructs.PassThruMsg[]))
+                else if (ParameterType == typeof(PassThruStructs.PassThruMsg))
                 {
                     // TODO: BUILD LOGIC FOR J2534 MESSAGE TYPES AND ARRAYS
+                    ViewModelLogger.WriteLog($"--> BUILDING LISTBOX FOR J2534 PASSTHRU MESSAGES TYPE NOW...", LogType.WarnLog);
                 }
-                else
-                {
-                    // For all unknown casting types, just make a TextBox
+
+                // For all unknown casting types, just make a TextBox
+                if (ParameterValueElement == null) {
                     ViewModelLogger.WriteLog($"--> ERROR! TYPE FOR INPUT PARAMETER WAS NOT VALID! TYPE {ParameterType} WAS NOT ASSIGNABLE!", LogType.ErrorLog);
                     ParameterValueElement = new TextBox() { Style = this._argumentValueTextBoxStyle, Tag = $"Generation Error!", ToolTip = $"Error! {ParameterType} was seen to be invalid!" };
                 }
-
-                // Set the column locations for the title and value boxes here then assign the parent grid controls
+                
+                // Set our column locations and store the child values
                 Grid.SetColumn(ParameterNameTextBlock, 0); Grid.SetColumn(ParameterValueElement, 1);
                 ParameterGrid.Children.Add(ParameterNameTextBlock); ParameterGrid.Children.Add(ParameterValueElement);
-                ViewModelLogger.WriteLog($"--> STORED NEW CHILD CONTROLS FOR PARAMETER {ParameterName} OK!", LogType.InfoLog);
 
                 // Add the grid to our list of output controls and return them
                 OutputControls.Add(ParameterGrid);
+                ViewModelLogger.WriteLog($"--> STORED NEW CHILD CONTROLS FOR PARAMETER {ParameterName} OK!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"--> TOTAL OF {OutputControls.Count} GRID SETS HAVE BEEN GENERATED SO FAR", LogType.TraceLog);
             }
 
