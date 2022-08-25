@@ -106,7 +106,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="SimFile">File to load into our simulation playback helper</param>
         /// <returns>True if loaded, false if not</returns>
-        public bool LoadSimulation(string SimFile)
+        internal bool LoadSimulation(string SimFile)
         {
             // Try and load the simulation file in first
             if (!File.Exists(SimFile)) {
@@ -172,7 +172,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <param name="DllName">Name of DLL to use</param>
         /// <param name="DeviceName">Name of device to use</param>
         /// <returns></returns>
-        public bool StartSimulation(JVersion Version, string DllName, string DeviceName)
+        internal bool StartSimulation(JVersion Version, string DllName, string DeviceName)
         {
             // Setup the simulation player
             ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
@@ -210,7 +210,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// Stops the simulation reader currently running
         /// </summary>
         /// <returns>True if stopped. False if not</returns>
-        public bool StopSimulation()
+        internal bool StopSimulation()
         {
             // Stop the reader object here if it's playing
             if (!this.SimPlayer.SimulationReading || !this.IsSimulationRunning) {

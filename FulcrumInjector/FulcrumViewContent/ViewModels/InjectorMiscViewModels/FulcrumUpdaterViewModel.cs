@@ -77,6 +77,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             this.UpdateReady = true;
             this.SetupUpdaterClientEvents();
         }
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Configures updater event objects for when downloads are in the works
         /// </summary>
@@ -118,11 +121,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Invokes a new download on the git hub helper to pull in the newest release of the injector
         /// </summary>
-        public string InvokeInjectorDownload()
+        internal string InvokeInjectorDownload()
         {
             // Start by invoking a new download of the newest version
             this.IsDownloading = true;
@@ -140,7 +144,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
         /// </summary>
         /// <param name="PathToInstaller">Path to the installer to run</param>
         /// <returns>True if started, false if not.</returns>
-        public bool InstallInjectorRelease(string PathToInstaller)
+        internal bool InstallInjectorRelease(string PathToInstaller)
         {
             // Setup our string for the command to run.
             string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {PathToInstaller}";

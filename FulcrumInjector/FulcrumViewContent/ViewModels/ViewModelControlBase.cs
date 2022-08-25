@@ -31,7 +31,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Configures a new instance of our view model control methods
         /// </summary>
         /// <param name="ContentView"></param>
-        public virtual void SetupViewControl(UserControl ContentView) { BaseViewControl = ContentView; }
+        internal virtual void SetupViewControl(UserControl ContentView) { BaseViewControl = ContentView; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 

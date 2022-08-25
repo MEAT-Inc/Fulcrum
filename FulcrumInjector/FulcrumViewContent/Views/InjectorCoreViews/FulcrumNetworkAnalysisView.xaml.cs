@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     {
         // Logger object.
         private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorPeerToPeerViewLogger")) ?? new SubServiceLogger("InjectorPeerToPeerViewLogger");
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorNetworkAnalysisViewLogger")) ?? new SubServiceLogger("InjectorNetworkAnalysisViewLogger");
 
         // ViewModel object to bind onto
         public FulcrumNetworkAnalysisViewModel ViewModel { get; set; }
@@ -53,6 +53,52 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Processes events for when the index of our command object is changed.
+        /// </summary>
+        /// <param name="Sender">Combobox sending this request</param>
+        /// <param name="E">Events fired along with the combobox changed</param>
+        private void PassThruCommandComboBox_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        {
+            // Start by checking the index. If it's 0 then disable our execute buttons
+            ComboBox SendingComboBox = (ComboBox)Sender;
+
+            // Generate our control set for the selected command object
+            this.ViewLogger.WriteLog("SETTING UP COMMAND CONFIG VALUES NOW...", LogType.InfoLog);
+            this.ViewModel.CurrentJ2534CommandName = SendingComboBox.SelectedItem.ToString();
+
+            // Store the controls on our items collection inside the viewer object now
+            PassThruCommandArgsViewer.ItemsSource = this.ViewModel.GenerateCommandConfigElements();
+            this.ViewLogger.WriteLog($"STORED NEW COMMAND NAME: {this.ViewModel.CurrentJ2534CommandName}", LogType.InfoLog);
+            this.ViewLogger.WriteLog($"BUILT A TOTAL OF {PassThruCommandArgsViewer.Items.Count} CONTROL SETS FOR OUR COMMAND CONFIG!");
+            this.ViewLogger.WriteLog("STORED CONTROLS OK! CONTENT SHOULD BE DISPLAYED ON OUR VIEW NOW...", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Processes a command execution request for the network testing view
+        /// </summary>
+        /// <param name="Sender">Sending button for this command</param>
+        /// <param name="E">Event args fired along with the button click action</param>
+        private void ExecutePassThruCommand_Click(object Sender, RoutedEventArgs E)
+        {
+            // Stop the vehicle monitoring routine on the Connection View if it's currently running
+            var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
+            bool ShouldMonitor = CurrentHwInfo.IsMonitoring;
+            if (ShouldMonitor) CurrentHwInfo.StopVehicleMonitoring();
+
+            // Toggle the sending button to be disabled when the button is clicked
+            Button SendingButton = (Button)Sender;
+            SendingButton.IsEnabled = false;
+
+            // Now Execute our commands using the args built
+            // TODO: BUILD LOGIC FOR RUNNING COMMANDS!
+
+            // Reset monitoring if needed here
+            if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();
+            SendingButton.IsEnabled = true;
         }
     }
 }
