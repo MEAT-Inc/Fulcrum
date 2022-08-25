@@ -72,16 +72,21 @@
             <!-- Command input ListBox Content -->
             <Grid Grid.Column="0" Margin="5,0">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="55"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
                     <RowDefinition Height="85"/>
                 </Grid.RowDefinitions>
 
+                <!-- Information text block -->
+                <TextBlock Grid.Row="0" Style="{StaticResource SubTitleText}" FontWeight="Normal" FontSize="13" Margin="0,0"
+                           Text="Configure commands below. Any parameter names which are yellow and italic are OPTIONAL arguments for the method and will be given default values when run."/>
+
                 <!-- Command Selection CombBox and configuration list -->
-                <ComboBox Grid.Row="0" x:Name="PassThruCommandComboBox" Margin="0,5,0,5" FontSize="14"
+                <ComboBox Grid.Row="1" x:Name="PassThruCommandComboBox" Margin="0,5,0,5" FontSize="14"
                           ItemsSource="{Binding Path=SupportedJ2534Commands}" HorizontalContentAlignment="Center"
                           SelectionChanged="PassThruCommandComboBox_OnSelectionChanged"/>
-                <Border Grid.Row="1" Margin="0,5,0,0" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2">
+                <Border Grid.Row="2" Margin="0,5,0,0" BorderBrush="{StaticResource TextColorBase}" BorderThickness="2">
                     <ScrollViewer Background="Black" HorizontalContentAlignment="Stretch">
                         <ItemsControl 
                             Margin="5"
@@ -91,7 +96,7 @@
                 </Border>
 
                 <!-- Execute and Reset Buttons -->
-                <Grid Grid.Row="2" Margin="0,5,-5,0">
+                <Grid Grid.Row="3" Margin="0,5,-5,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
@@ -114,7 +119,7 @@
                 </Grid>
 
                 <!-- Content placeholders -->
-                <Grid Grid.Row="1" Margin="0,5,0,0" x:Name="NoHardwareConfiguredPlaceholder">
+                <Grid Grid.Row="2" Margin="0,5,0,0" x:Name="NoHardwareConfiguredPlaceholder">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
@@ -138,7 +143,7 @@
                         <Run FontSize="16" Text="Configure a J2534 device and DLL using the Hardware Configuration tab on the main menu."/>
                     </TextBlock>
                 </Grid>
-                <Grid Grid.Row="1" Margin="0,5,0,0" x:Name="NoCommandConfiguredPlaceholder">
+                <Grid Grid.Row="2" Margin="0,5,0,0" x:Name="NoCommandConfiguredPlaceholder">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>

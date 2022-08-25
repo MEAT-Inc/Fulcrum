@@ -42,7 +42,7 @@
             <!-- No Arguments title text style -->
             <Style x:Key="GeneratedNoArgsNeededTextStyle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Margin" Value="0,150,0,0"/>
+                <Setter Property="Margin" Value="0,100,0,0"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                 <Setter Property="TextAlignment" Value="Center"/>
