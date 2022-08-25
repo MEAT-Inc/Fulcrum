@@ -93,8 +93,27 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Button SendingButton = (Button)Sender;
             SendingButton.IsEnabled = false;
 
-            // Now Execute our commands using the args built
-            // TODO: BUILD LOGIC FOR RUNNING COMMANDS!
+            // Get the control objects on the view for our arguments and store their values here
+            List<object> CurrentArgValues = new List<object>();
+            foreach (var ControlObject in this.PassThruCommandArgsViewer.Items)
+            {
+                // Find the type of our control and get the value from it.
+                if (ControlObject.GetType() == typeof(TextBox))
+                {
+                    // Cast the control, get the value, store it, and move on.
+                    TextBox CastInputBox = (TextBox)ControlObject;
+                    CurrentArgValues.Add(CastInputBox.Text.Trim());
+                }
+                else if (ControlObject.GetType() == typeof(ComboBox))
+                {
+                    // Cast the control, get the value, store it, and move on.
+                    ComboBox CastInputBox = (ComboBox)ControlObject;
+                    CurrentArgValues.Add(CastInputBox.SelectedItem.ToString().Trim());
+                }
+                else { throw new InvalidOperationException("INVALID CONTROL TYPE IDENTIFIED! FAILED TO PULL IN ONE OR MORE ARGS!"); }
+            }
+
+            // Using this list of controls, invoke the current method using a sharp session object on the view model.
 
             // Reset monitoring if needed here
             if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();
