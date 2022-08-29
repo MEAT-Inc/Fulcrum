@@ -210,6 +210,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 if (ParameterType.FullName.Contains("Int") || ParameterType.FullName.Contains("String"))
                 {
                     // Build a new TextBox object to store input values
+                    ViewModelLogger.WriteLog($"--> BUILDING TEXTBOX FOR VALUE TYPE {ParameterType.FullName} NOW...", LogType.WarnLog);
                     ParameterValueElement = new TextBox()
                     {
                         Style = this._argumentValueTextBoxStyle,
@@ -234,9 +235,33 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 {
                     // TODO: BUILD LOGIC FOR J2534 MESSAGE TYPES AND ARRAYS
                     ViewModelLogger.WriteLog($"--> BUILDING LISTBOX FOR J2534 PASSTHRU MESSAGES TYPE NOW...", LogType.WarnLog);
+
+                    // Build a new grid containing fields for the message object to populate
+                    Grid OutputContentGrid = new Grid();
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star)});     // Message Data
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Flags
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Protocol
+
+                    // Build field objects for the content grid
+                    TextBox MessageValueTextBox = new TextBox() { Style = this._argumentValueTextBoxStyle, Tag = "Message Data" };
+                    ComboBox MessageFlagsComboBox = new ComboBox() { Style = this._argumentValueComboBoxStyle, SelectedIndex = 0, ItemsSource = Enum.GetNames(typeof(TxFlags)) };
+                    ComboBox MessageProtocolComboBox = new ComboBox() { Style = this._argumentValueComboBoxStyle, SelectedIndex = 0, ItemsSource = Enum.GetNames(typeof(ProtocolId)) };
+
+                    // Set child object rows and store the grid
+                    Grid.SetRow(MessageValueTextBox, 0);
+                    Grid.SetRow(MessageFlagsComboBox, 1);
+                    Grid.SetRow(MessageProtocolComboBox, 2);
+
+                    // Store children and return the grid object
+                    OutputContentGrid.Children.Add(MessageValueTextBox);
+                    OutputContentGrid.Children.Add(MessageFlagsComboBox);
+                    OutputContentGrid.Children.Add(MessageProtocolComboBox);
+
+                    // Store the element as our out value
+                    ParameterValueElement = OutputContentGrid;
                 }
 
-                // For all unknown casting types, just make a TextBox
+                // For all unknown casting types, just make a TextBox and mark an error was thrown
                 if (ParameterValueElement == null) {
                     ViewModelLogger.WriteLog($"--> ERROR! TYPE FOR INPUT PARAMETER WAS NOT VALID! TYPE {ParameterType} WAS NOT ASSIGNABLE!", LogType.ErrorLog);
                     ParameterValueElement = new TextBox() { Style = this._argumentValueTextBoxStyle, Tag = $"Generation Error!", ToolTip = $"Error! {ParameterType} was seen to be invalid!" };
