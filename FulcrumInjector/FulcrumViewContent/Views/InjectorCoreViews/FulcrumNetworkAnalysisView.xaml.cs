@@ -93,8 +93,55 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Button SendingButton = (Button)Sender;
             SendingButton.IsEnabled = false;
 
-            // Now Execute our commands using the args built
-            // TODO: BUILD LOGIC FOR RUNNING COMMANDS!
+            // Get the control objects on the view for our arguments and store their values here
+            List<object> CurrentArgValues = new List<object>();
+            foreach (var ControlObject in this.PassThruCommandArgsViewer.Items)
+            {
+                // Get the grid holding the name and value field object
+                Grid CastControlGrid = (Grid)ControlObject;
+                foreach (var GridChildObject in CastControlGrid.Children)
+                {
+                    // TODO: FIGURE OUT HOW TO DO REQUIRED OR NOT CHECKING
+                    // Find the type of our control and get the value from it.
+                    if (GridChildObject.GetType() == typeof(TextBox))
+                    {
+                        // Cast the control, get the value, store it, and move on.
+                        TextBox CastInputBox = (TextBox)GridChildObject;
+                        CurrentArgValues.Add(CastInputBox.Text.Trim());
+                    }
+                    else if (GridChildObject.GetType() == typeof(ComboBox))
+                    {
+                        // Cast the control, get the value, store it, and move on.
+                        ComboBox CastInputBox = (ComboBox)GridChildObject;
+                        CurrentArgValues.Add(CastInputBox.SelectedItem.ToString().Trim());
+                    }
+                    else if (GridChildObject.GetType() == typeof(Grid))
+                    {
+                        // Cast the control get all the child values and store them as an array
+                        Grid CastInputBox = (Grid)GridChildObject;
+                        foreach (var ChildGridChild in CastInputBox.Children)
+                        {
+                            // Get the value and store it   
+                            if (ChildGridChild.GetType() == typeof(TextBox))
+                            {
+                                // Cast the control, get the value, store it, and move on.
+                                TextBox ChildGridCastInputBox = (TextBox)GridChildObject;
+                                CurrentArgValues.Add(ChildGridCastInputBox.Text.Trim());
+                            }
+                            else if (ChildGridChild.GetType() == typeof(ComboBox))
+                            {
+                                // Cast the control, get the value, store it, and move on.
+                                ComboBox ChildGridCastInputBox = (ComboBox)GridChildObject;
+                                CurrentArgValues.Add(ChildGridCastInputBox.SelectedItem.ToString().Trim());
+                            }
+                        }
+                    }
+                    else { throw new InvalidOperationException("INVALID CONTROL TYPE IDENTIFIED! FAILED TO PULL IN ONE OR MORE ARGS!"); }
+                }
+            }
+
+            // Using this list of controls, invoke the current method using a sharp session object on the view model.
+            // TODO: Build logic to invoke args onto the selected method object
 
             // Reset monitoring if needed here
             if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();
