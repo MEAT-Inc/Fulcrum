@@ -22,6 +22,7 @@ using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatt
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpWrap2534;
 using Button = System.Windows.Controls.Button;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -178,7 +179,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Start by checking if we have hardware selected for simulations on the hardware view page.
             this.ViewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
-
+            
             // Now using the given hardware, run our start simulation 
             if (!this.ViewModel.IsSimulationRunning)
             {

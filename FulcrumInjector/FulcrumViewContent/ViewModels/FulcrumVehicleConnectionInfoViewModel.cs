@@ -34,7 +34,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // --------------------------------------------------------------------------------------------------------------------------
 
         // Task control for stopping refresh operations for our background voltage reading.
-        public Sharp2534Session InstanceSession;
         private CancellationTokenSource RefreshSource;
 
         // Private control values
@@ -86,7 +85,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
                     // Update private values, dispose the instance.
                     if (this.IsMonitoring) this.StopVehicleMonitoring(); 
-                    if (this.InstanceSession != null) Sharp2534Session.CloseSession(this.InstanceSession);
+                    if (FulcrumConstants.SharpSessionAlpha != null) Sharp2534Session.CloseSession(FulcrumConstants.SharpSessionAlpha);
                     ViewModelLogger.WriteLog("STOPPED SESSION INSTANCE OK AND CLEARED OUT DEVICE NAME!", LogType.InfoLog);
                     return;
                 }
@@ -102,19 +101,19 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 try
                 {
                     // Close device out and dispose of the session object instance
-                    if (this.InstanceSession != null) 
+                    if (FulcrumConstants.SharpSessionAlpha != null) 
                     {
                         // Close Session
-                        Sharp2534Session.CloseSession(this.InstanceSession);
+                        Sharp2534Session.CloseSession(FulcrumConstants.SharpSessionAlpha);
                         ViewModelLogger.WriteLog("CLOSED EXISTING SHARP SESSION OK!", LogType.WarnLog);
 
                         // Null out the session
-                        this.InstanceSession = null;
+                        FulcrumConstants.SharpSessionAlpha = null;
                         ViewModelLogger.WriteLog("SET CURRENT INSTANCE SESSION TO NULL VALUE!", LogType.WarnLog);
                     }
 
                     // Build a new session object here now.
-                    this.InstanceSession = Sharp2534Session.OpenSession(this._versionType, this._selectedDLL, this._selectedDevice);
+                    FulcrumConstants.SharpSessionAlpha = Sharp2534Session.OpenSession(this._versionType, this._selectedDLL, this._selectedDevice);
                     ViewModelLogger.WriteLog("CONFIGURED VIEW MODEL CONTENT OBJECTS FOR BACKGROUND REFRESHING OK!", LogType.InfoLog);
 
                     // Start monitoring. Throw if this fails.
@@ -204,11 +203,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 if (this.SelectedDevice == "No Device Selected") return 0.00;
 
                 // Now with our new channel ID, we open an instance and pull the channel voltage.
-                this.InstanceSession.PTOpen();
-                if (!this.InstanceSession.JDeviceInstance.IsOpen) return 0.00;
+                FulcrumConstants.SharpSessionAlpha.PTOpen();
+                if (!FulcrumConstants.SharpSessionAlpha.JDeviceInstance.IsOpen) return 0.00;
 
                 // Only read our voltage if our device was opened ok
-                this.InstanceSession.PTReadVoltage(out var DoubleVoltage, true);
+                FulcrumConstants.SharpSessionAlpha.PTReadVoltage(out var DoubleVoltage, true);
                 return DoubleVoltage;
             }
             catch
@@ -233,7 +232,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 try
                 {
                     // Build a new AutoID Session here
-                    var AutoIdInstance = InstanceSession.SpawnAutoIdHelper(ProcObject);
+                    var AutoIdInstance = FulcrumConstants.SharpSessionAlpha.SpawnAutoIdHelper(ProcObject);
                     ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {ProcObject} OK!", LogType.InfoLog);
                     ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
 
@@ -319,11 +318,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
             // Close our device here if it's open currently.
-            if (this.InstanceSession.JDeviceInstance.IsOpen) 
-                this.InstanceSession.PTClose();
+            if (FulcrumConstants.SharpSessionAlpha.JDeviceInstance.IsOpen)
+                FulcrumConstants.SharpSessionAlpha.PTClose();
 
             // Find out VIN Number values here.
-            this.InstanceSession.PTOpen();
+            FulcrumConstants.SharpSessionAlpha.PTOpen();
             bool CheckVinNumber = FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Enable Auto ID Routines", true);
             if (!CheckVinNumber) ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
 
@@ -404,7 +403,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.IsMonitoring = false;
             this.DeviceVoltage = 0.00;
             this.RefreshSource?.Cancel();
-            this.InstanceSession?.PTClose();
+            FulcrumConstants.SharpSessionAlpha?.PTClose();
 
             // Log information output
             ViewModelLogger.WriteLog("FORCING VOLTAGE BACK TO 0.00 AND RESETTING INFO STRINGS", LogType.WarnLog);

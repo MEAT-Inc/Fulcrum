@@ -160,6 +160,7 @@
                                  x:Name="textSource" 
                                  Background="Transparent" 
                                  Panel.ZIndex="2"
+                                 HorizontalContentAlignment="Center"
                                  Style="{StaticResource StaticBackgroundInputTextBox}"/>
                                 <TextBox Text="{TemplateBinding Tag}" Background="Black" Panel.ZIndex="1">
                                     <TextBox.Style>
