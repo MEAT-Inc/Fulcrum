@@ -85,16 +85,22 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <param name="E">Event args fired along with the button click action</param>
         private void ExecutePassThruCommand_Click(object Sender, RoutedEventArgs E)
         {
-            // Stop the vehicle monitoring routine on the Connection View if it's currently running
-            var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
-            bool ShouldMonitor = CurrentHwInfo.IsMonitoring;
-            if (ShouldMonitor) CurrentHwInfo.StopVehicleMonitoring();
-            this.ViewLogger.WriteLog("PREPARING TO STORE CONTROL VALUES FROM COMMAND ARGS VIEW NOW...", LogType.WarnLog);
-            this.ViewLogger.WriteLog("TOGGLED HARDWARE MONITORING VALUE IF NEEDED!", LogType.InfoLog);
-
             // Toggle the sending button to be disabled when the button is clicked
             Button SendingButton = (Button)Sender;
             SendingButton.IsEnabled = false;
+
+            // Log extracting controls here and get our child values now
+            this.ViewLogger.WriteLog("PREPARING TO STORE CONTROL VALUES FROM COMMAND ARGS VIEW NOW...", LogType.WarnLog);
+
+            // Stop the vehicle monitoring routine on the Connection View if it's currently running
+            bool ShouldMonitor = false;
+            if (SendingButton.Content.ToString().Contains("Execute")) 
+            {
+                // If the sending button contains Execute, then we need to toggle our monitoring routines.
+                ShouldMonitor = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.IsMonitoring;
+                if (ShouldMonitor) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.StopVehicleMonitoring();
+                this.ViewLogger.WriteLog("TOGGLED HARDWARE MONITORING VALUE IF NEEDED!", LogType.InfoLog);
+            }
 
             // Store default button values
             Brush DefaultBackground = SendingButton.Background;
@@ -106,24 +112,15 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Log the control type
                 this.ViewLogger.WriteLog($"--> CONTROL FOUND! TYPE OF {ControlObject.GetType().Name}");
+                if (ControlObject.GetType() != typeof(Grid)) {
+                    this.ViewLogger.WriteLog("--> NOT FINDING VALUES OF CHILD OBJECTS FOR CONTROL SINCE IT WAS NOT A GRID!", LogType.InfoLog);
+                    continue;
+                }
 
-                // Store the type of the control here
-                var MissingRequired = false;
-                Type ChildControlType = ControlObject.GetType();
-                if (ChildControlType == typeof(Grid))
-                {
-                    // Cast to a child grid and store the next set of values
-                    Grid CastChildGrid = (Grid)ControlObject;
-                    CurrentArgValues.Add(this._extractContentsForControl(CastChildGrid, out MissingRequired));
-                    this.ViewLogger.WriteLog($"   --> ADDED VALUES FOR GRID CONTROL WITHOUT ISSUES!", LogType.InfoLog);
-                }
-                else if (ChildControlType == typeof(ComboBox) || ChildControlType == typeof(TextBox))
-                {
-                    // Cast as a general UI element, extract value and store it
-                    UIElement CastChildElement = (UIElement)ControlObject;
-                    CurrentArgValues.Add(this._extractContentsForControl(CastChildElement, out MissingRequired));
-                    this.ViewLogger.WriteLog($"   --> ADDED VALUES FOR TEXTBOX OR COMBOBOX CONTROL WITHOUT ISSUES!", LogType.InfoLog);
-                }
+                // Cast to a child grid and store the next set of values
+                Grid CastChildGrid = (Grid)ControlObject;
+                CurrentArgValues.Add(this._extractContentsForControl(CastChildGrid, out bool MissingRequired));
+                this.ViewLogger.WriteLog($"   --> ADDED VALUES FOR GRID CONTROL WITHOUT ISSUES!", LogType.InfoLog);
 
                 // Check missing required
                 if (!MissingRequired) continue;
@@ -148,9 +145,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     });
                 });
 
-                // Reset monitoring if needed here and exit this routine
-                if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();
-                this.ViewLogger.WriteLog("TOGGLED VEHICLE MONITORING TO LAST KNOWN STATE WITHOUT ISSUES!", LogType.InfoLog);
+                // Exit out of this routine if we got here
+                if (ShouldMonitor) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.StopVehicleMonitoring();
+                this.ViewLogger.WriteLog("TOGGLED HARDWARE MONITORING VALUE IF NEEDED!", LogType.InfoLog);
                 return;
             }
 
@@ -158,9 +155,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("GENERATING EXECUTION ACTION FOR COMMAND NOW...", LogType.InfoLog);
             this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues);
 
-            // Reset monitoring if needed here
-            if (ShouldMonitor) CurrentHwInfo.StartVehicleMonitoring();
-            this.ViewLogger.WriteLog("TOGGLED VEHICLE MONITORING TO LAST KNOWN STATE WITHOUT ISSUES!", LogType.InfoLog);
+            // Toggle monitoring if needed
+            if (ShouldMonitor) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.StopVehicleMonitoring();
+            this.ViewLogger.WriteLog("TOGGLED HARDWARE MONITORING VALUE IF NEEDED!", LogType.InfoLog);
 
             // Reenable the sending button here
             SendingButton.IsEnabled = true;
@@ -215,7 +212,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // To Determine if it's a required value or not, check the tag of the textbox
                 string ChildCastTextBoxText = TextBoxControl.Text.Trim();
-                string NameOfArgument = TextBoxControl.Tag.ToString().Split(':')[0].Trim();
+                string NameOfArgument = TextBoxControl.ToolTip.ToString().Split(':')[0].Trim();
                 if (TextBoxControl.ToolTip.ToString().Contains("Required") && string.IsNullOrEmpty(ChildCastTextBoxText))
                 {
                     // Log missing required argument and return null/set the missing flag to true
@@ -232,7 +229,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Get the ComboBox Value and store it
                 string ChildCastComboBoxBoxText = ComboBoxControl.SelectedItem.ToString().Trim();
-                string NameOfArgument = ComboBoxControl.Tag.ToString().Split(':')[0].Trim();
+                string NameOfArgument = ComboBoxControl.ToolTip.ToString().Split(':')[0].Trim();
                 this.ViewLogger.WriteLog($"--> CHILD COMBOBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastComboBoxBoxText}");
                 return $"{NameOfArgument}: {ChildCastComboBoxBoxText}";
             }

@@ -42,7 +42,7 @@
             <!-- No Arguments title text style -->
             <Style x:Key="GeneratedNoArgsNeededTextStyle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Margin" Value="10,175,0,0"/>
+                <Setter Property="Margin" Value="10,140,0,0"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                 <Setter Property="TextAlignment" Value="Center"/>
@@ -79,8 +79,10 @@
 
             <!-- Input content TextBox style for values -->
             <Style x:Key="GeneratedArgValueTextBoxStyle"  TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
+                <Setter Property="FontSize" Value="13"/>
                 <Setter Property="Margin" Value="0,5,0,5"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
             </Style>
 
             <!-- Input content ComboBox style for values -->
@@ -88,7 +90,7 @@
                 <Setter Property="Margin" Value="0,5,0,5"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontSize" Value="13"/>
             </Style>
 
         </ResourceDictionary>

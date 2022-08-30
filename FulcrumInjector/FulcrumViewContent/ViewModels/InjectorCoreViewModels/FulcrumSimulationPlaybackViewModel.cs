@@ -180,7 +180,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Pull in a base configuration and build a new reader
             // TODO: CONFIGURE THIS TO USE INPUT VALUES FROM SETUP
             var SimConfig = SimulationConfigLoader.LoadSimulationConfig(ProtocolId.ISO15765);
-            this.SimPlayer = new SimulationPlayer(this.SimLoader, Version, DllName, DeviceName);
+            this.SimPlayer = FulcrumConstants.SharpSessionAlpha == null
+                ? new SimulationPlayer(this.SimLoader, Version, DllName, DeviceName)
+                : new SimulationPlayer(this.SimLoader, FulcrumConstants.SharpSessionAlpha);
+
+            // Reset input values if the sharp session isn't null
             ViewModelLogger.WriteLog($"NEW SIMULATION PLAYER WITH FOR VERSION {Version} USING DEVICE {DeviceName} ({DllName}) HAS BEEN SETUP!", LogType.InfoLog);
 
             // Subscribe to the player events and channel events

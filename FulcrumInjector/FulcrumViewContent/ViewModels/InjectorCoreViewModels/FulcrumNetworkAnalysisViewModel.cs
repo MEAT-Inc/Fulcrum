@@ -38,14 +38,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private bool _isHardwareSetup;
         private string[] _supportedJ2534Commands;
         private string _currentJ2534CommandName;
-        private UIElement[] _currentJ2534CommandElements;
         private PassThruExecutionAction[] _j2534CommandQueue;
 
         // Public values for our View to bind onto
         public bool IsHardwareSetup { get => _isHardwareSetup; set => PropertyUpdated(value); }
         public string[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); }
         public string CurrentJ2534CommandName { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
-        public UIElement[] CurrentJ2534CommandElements { get => _currentJ2534CommandElements; set => PropertyUpdated(value); }
         public PassThruExecutionAction[] J2534CommandQueue { get => _j2534CommandQueue; set => PropertyUpdated(value); }
 
         // Style objects for laying out view contents
@@ -179,7 +177,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 OutputControls.Add(NoArgsTextBlock);
 
                 // Store the command arg objects if they match up to the view model command name amd return output
-                this.CurrentJ2534CommandElements = CommandName == this.CurrentJ2534CommandName ? OutputControls.ToArray() : null;
                 return OutputControls.ToArray();
             }
 
@@ -233,10 +230,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog($"--> BUILDING COMBOBOX FOR ENUM TYPE {ParameterType.FullName} NOW...", LogType.WarnLog);
                     ParameterValueElement = new ComboBox()
                     {
+                        SelectedIndex = 0,
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetValues(ParameterType),
                         ToolTip = $"{ParameterName}: Type of {ParameterType.Name}",
-                        SelectedIndex = 0,
                     };
                 }
                 else if (ParameterType == typeof(PassThruStructs.PassThruMsg))
@@ -251,9 +248,26 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Protocol
 
                     // Build field objects for the content grid
-                    TextBox MessageValueTextBox = new TextBox() { Style = this._argumentValueTextBoxStyle, Tag = "Message Data" };
-                    ComboBox MessageFlagsComboBox = new ComboBox() { Style = this._argumentValueComboBoxStyle, SelectedIndex = 0, ItemsSource = Enum.GetNames(typeof(TxFlags)) };
-                    ComboBox MessageProtocolComboBox = new ComboBox() { Style = this._argumentValueComboBoxStyle, SelectedIndex = 0, ItemsSource = Enum.GetNames(typeof(ProtocolId)) };
+                    TextBox MessageValueTextBox = new TextBox()
+                    {
+                        Tag = $"Type: {typeof(string)}",
+                        Style = this._argumentValueTextBoxStyle,
+                        ToolTip = $"Message Data: Type of {typeof(string)}",
+                    };
+                    ComboBox MessageFlagsComboBox = new ComboBox()
+                    {
+                        SelectedIndex = 0,
+                        Style = this._argumentValueComboBoxStyle,
+                        ItemsSource = Enum.GetNames(typeof(TxFlags)),
+                        ToolTip = $"Tx Flags: Type of {typeof(TxFlags)}",
+                    };
+                    ComboBox MessageProtocolComboBox = new ComboBox()
+                    {
+                        SelectedIndex = 0,
+                        Style = this._argumentValueComboBoxStyle, 
+                        ItemsSource = Enum.GetNames(typeof(ProtocolId)),
+                        ToolTip = $"Protocol ID: Type of {typeof(ProtocolId)}",
+                    };
 
                     // Set child object rows and store the grid
                     Grid.SetRow(MessageValueTextBox, 0);
@@ -286,7 +300,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             }
 
             // Store the command arg objects if they match up to the view model command name
-            this.CurrentJ2534CommandElements = CommandName == this.CurrentJ2534CommandName ? OutputControls.ToArray() : null;
             ViewModelLogger.WriteLog($"TOTAL OF {OutputControls.Count} GRID SETS WERE BUILT FOR COMMAND {CommandName}", LogType.InfoLog);
             return OutputControls.ToArray();
         }

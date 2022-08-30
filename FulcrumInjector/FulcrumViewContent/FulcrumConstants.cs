@@ -39,7 +39,7 @@ namespace FulcrumInjector.FulcrumViewContent
 
         // SharpSession objects used on our instance here. Two static instances are used here.
         // Alpha is for Hardware configuration and setting up network tools. Bravo can be used for simulations if needed
-        public static Sharp2534Session SharpSessionAplha;
+        public static Sharp2534Session SharpSessionAlpha;
         public static Sharp2534Session SharpSessionBravo;
 
         // --------------------------------------------------------------------------------------------------------------------------
