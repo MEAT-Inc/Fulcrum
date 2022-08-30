@@ -64,15 +64,15 @@
         <!-- Main Content Grid -->
         <Grid Grid.Row="2" Margin="5,0" IsEnabled="{Binding IsHardwareSetup}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".70*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition/> 
+                <ColumnDefinition Width="315" MinWidth="315"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition MinWidth="200"/> 
             </Grid.ColumnDefinitions>
 
             <!-- Command input ListBox Content -->
-            <Grid Grid.Column="0" Margin="5,0">
+            <Grid Grid.Column="0" Margin="5,0,10,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="55"/>
+                    <RowDefinition Height="0"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
                     <RowDefinition Height="85"/>
@@ -80,7 +80,7 @@
 
                 <!-- Information text block -->
                 <TextBlock Grid.Row="0" Style="{StaticResource SubTitleText}" FontWeight="Normal" FontSize="13" Margin="0,0"
-                           Text="Configure commands below. Any parameter names which are yellow and italic are OPTIONAL arguments for the method and will be given default values when run."/>
+                           Text="Configure commands below. Any parameter names which are yellow and italic are OPTIONAL arguments for the method and will be given default values."/>
 
                 <!-- Command Selection CombBox and configuration list -->
                 <ComboBox Grid.Row="1" x:Name="PassThruCommandComboBox" Margin="0,5,0,5" FontSize="14"
@@ -185,9 +185,10 @@
             </Grid>
 
             <!-- Splitting Border -->
-            <Border Grid.Column="1" Margin="0,0,0,0"
-                    BorderBrush="{StaticResource TextColorBase}" 
-                    BorderThickness="0,0,2,0" VerticalAlignment="Stretch"/>
+            <GridSplitter Grid.Column="1" Margin="0,0,0,0" 
+                          Background="{StaticResource TextColorBase}" 
+                          BorderBrush="{StaticResource PrimaryColor_Darker_35}"
+                          BorderThickness="1" VerticalAlignment="Stretch"/>
 
             <!-- Content Output -->
             <Grid Grid.Column="2">

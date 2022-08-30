@@ -233,7 +233,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 try
                 {
                     // Build a new AutoID Session here
-                    var AutoIdInstance = InstanceSession.SpawnAutoIdHelper(ProcObject);
+                    var AutoIdInstance = this.InstanceSession.SpawnAutoIdHelper(ProcObject);
                     ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {ProcObject} OK!", LogType.InfoLog);
                     ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
 
@@ -319,7 +319,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("STARTING VOLTAGE REFRESH ROUTINE NOW...", LogType.InfoLog);
 
             // Close our device here if it's open currently.
-            if (this.InstanceSession.JDeviceInstance.IsOpen) 
+            if (this.InstanceSession.JDeviceInstance.IsOpen)
                 this.InstanceSession.PTClose();
 
             // Find out VIN Number values here.

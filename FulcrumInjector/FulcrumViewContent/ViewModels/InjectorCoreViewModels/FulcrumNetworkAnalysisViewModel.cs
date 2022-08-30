@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Models.SimulationModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -14,9 +16,12 @@ using SharpLogger.LoggerSupport;
 using SharpWrap2534;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
+using Application = System.Windows.Application;
+using ComboBox = System.Windows.Controls.ComboBox;
 
 // Forced forms using for TreeView
 using FormsTreeView = System.Windows.Forms.TreeView;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -34,12 +39,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private string[] _supportedJ2534Commands;
         private string _currentJ2534CommandName;
         private UIElement[] _currentJ2534CommandElements;
+        private PassThruExecutionAction[] _j2534CommandQueue;
 
         // Public values for our View to bind onto
         public bool IsHardwareSetup { get => _isHardwareSetup; set => PropertyUpdated(value); }
         public string[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); }
-        public string CurrentJ2534CommandName  { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
+        public string CurrentJ2534CommandName { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
         public UIElement[] CurrentJ2534CommandElements { get => _currentJ2534CommandElements; set => PropertyUpdated(value); }
+        public PassThruExecutionAction[] J2534CommandQueue { get => _j2534CommandQueue; set => PropertyUpdated(value); }
 
         // Style objects for laying out view contents
         private readonly ResourceDictionary _viewStyleResources;
@@ -90,7 +97,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 if (ResourceKeys.Count == 0) return false;
 
                 // Loop the keys and validate the names of each one
-                foreach (var KeyObject in ResourceKeys) 
+                foreach (var KeyObject in ResourceKeys)
                     if (!KeyObject.ToString().StartsWith("Generated")) return false;
 
                 // Return true if there are keys found and all contain Generated in the names
@@ -119,7 +126,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"FOUND A TOTAL OF {SharpSessionMethods.Length} UNFILTERED METHOD OBJECTS", LogType.TraceLog);
             string[] SharpSessionMethodNames = SharpSessionMethods
                 .Where(MethodObject => MethodObject.GetParameters()
-                    .All(ParamObj => 
+                    .All(ParamObj =>
                         ParamObj.ParameterType != typeof(J2534Filter) &&
                         ParamObj.ParameterType != typeof(J2534PeriodicMessage) &&
                         ParamObj.ParameterType != typeof(PassThruStructs.PassThruMsg[])))
@@ -193,14 +200,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                 // Now build a new grid to store output controls on along with the width values for the columns.
                 Grid ParameterGrid = new Grid();
-                ParameterGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(.65, GridUnitType.Star) });    
+                ParameterGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(.65, GridUnitType.Star) });
                 ParameterGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1.0, GridUnitType.Star) });
 
                 // Build a new TextBlock to hold our title value and style it
                 TextBlock ParameterNameTextBlock = new TextBlock()
                 {
                     Text = SplitCamelCaseName,
-                    Style = ParameterObject.IsOptional 
+                    Style = ParameterObject.IsOptional
                         ? _argumentNameTextStyleOptional
                         : this._argumentNameTextStyle
                 };
@@ -216,8 +223,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                         Style = this._argumentValueTextBoxStyle,
                         Tag = $"Type: {ParameterType.FullName}",
                         ToolTip = ParameterObject.IsOptional
-                            ? "Optional Parameter!"
-                            : "Required Parameter"
+                            ? $"{ParameterName}: Optional Parameter!"
+                            : $"{ParameterName}: Required Parameter"
                     };
                 }
                 else if (ParameterType.IsEnum)
@@ -228,7 +235,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     {
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetValues(ParameterType),
-                        SelectedIndex = 0
+                        ToolTip = $"{ParameterName}: Type of {ParameterType.Name}",
+                        SelectedIndex = 0,
                     };
                 }
                 else if (ParameterType == typeof(PassThruStructs.PassThruMsg))
@@ -238,7 +246,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Build a new grid containing fields for the message object to populate
                     Grid OutputContentGrid = new Grid();
-                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star)});     // Message Data
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });     // Message Data
                     OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Flags
                     OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Protocol
 
@@ -266,7 +274,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog($"--> ERROR! TYPE FOR INPUT PARAMETER WAS NOT VALID! TYPE {ParameterType} WAS NOT ASSIGNABLE!", LogType.ErrorLog);
                     ParameterValueElement = new TextBox() { Style = this._argumentValueTextBoxStyle, Tag = $"Generation Error!", ToolTip = $"Error! {ParameterType} was seen to be invalid!" };
                 }
-                
+
                 // Set our column locations and store the child values
                 Grid.SetColumn(ParameterNameTextBlock, 0); Grid.SetColumn(ParameterValueElement, 1);
                 ParameterGrid.Children.Add(ParameterNameTextBlock); ParameterGrid.Children.Add(ParameterValueElement);
@@ -281,6 +289,40 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.CurrentJ2534CommandElements = CommandName == this.CurrentJ2534CommandName ? OutputControls.ToArray() : null;
             ViewModelLogger.WriteLog($"TOTAL OF {OutputControls.Count} GRID SETS WERE BUILT FOR COMMAND {CommandName}", LogType.InfoLog);
             return OutputControls.ToArray();
+        }
+        /// <summary>
+        /// Builds a given command name with the specified argument objects into an action to invoke
+        /// </summary>
+        /// <param name="CurrentArgValues">Arguments for the command</param>
+        /// <param name="CommandName">Name of the command to invoke</param>
+        internal PassThruExecutionAction GenerateCommandExecutionAction(List<object> CurrentArgValues, string CommandName = null)
+        {
+            // Store the current command name if needed
+            CommandName ??= this.CurrentJ2534CommandName;
+
+            // Build a list of objects of strings to store
+            List<string> AllArgsAsStrings = new List<string>();
+            foreach (var ArgObject in CurrentArgValues)
+            {
+                // If it's a string, just add to our string output
+                if (ArgObject == null) AllArgsAsStrings.Add("NULL");
+                if (ArgObject.GetType() == typeof(string)) AllArgsAsStrings.Add(ArgObject.ToString());
+                if (ArgObject.GetType() == typeof(string[]))
+                {
+                    // Cast the list to string array and build a formatted arg string from it
+                    string[] CastArgStrings = (string[])ArgObject;
+                    string FormattedArgStrings = string.Join(", ", CastArgStrings);
+                    AllArgsAsStrings.Add(FormattedArgStrings);
+                }
+            }
+
+            // Build a formatted arg string set and print it out to the log
+            string FormattedArgsList = string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
+            ViewModelLogger.WriteLog($"BUILT NEW ARGUMENT STRING LIST FOR COMMAND {CommandName}!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"LOGGING THE LIST OF ARGUMENT OBJECTS FOR THIS COMMAND NOW...\n{FormattedArgsList}");
+
+            // Now generate a new action object to invoke our command from a given SharpSession object
+            return null;
         }
     }
 }
