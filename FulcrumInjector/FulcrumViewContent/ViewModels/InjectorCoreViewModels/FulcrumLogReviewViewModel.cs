@@ -257,8 +257,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;   
             }
         }
-
-
+        
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
@@ -338,8 +337,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 GeneratorBuilt = null; return false;
             }
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.

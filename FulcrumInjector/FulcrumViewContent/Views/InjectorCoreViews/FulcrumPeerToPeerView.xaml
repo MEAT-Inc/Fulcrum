@@ -11,7 +11,7 @@
 
     <!-- DataContext Binding -->
     <UserControl.DataContext>
-        <injectorCoreViewModels:FulcrumSimulationPlaybackViewModel/>
+        <injectorCoreViewModels:FulcrumPeerToPeerViewModel/>
     </UserControl.DataContext>
 
     <!-- Style Sheets and Resources -->

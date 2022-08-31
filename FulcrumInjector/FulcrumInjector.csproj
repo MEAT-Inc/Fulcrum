@@ -107,7 +107,7 @@
       <HintPath>..\packages\MahApps.Metro.2.4.9\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Markdig, Version=0.30.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Markdig.0.30.2\lib\net452\Markdig.dll</HintPath>
+      <HintPath>..\packages\Markdig.0.30.3\lib\net452\Markdig.dll</HintPath>
     </Reference>
     <Reference Include="Markdig.Wpf, Version=0.5.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Markdig.Wpf.0.5.0.1\lib\net452\Markdig.Wpf.dll</HintPath>
@@ -119,22 +119,22 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.5.0.1\lib\net46\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpAutoId.0.3.13.71\lib\net472\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octokit.1.0.0\lib\net46\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.3.13.67, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.3.13.67\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.3.13.72, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.3.13.71\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.7.4.122, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.7.23.139\lib\net472\SharpLogger.dll</HintPath>
+    <Reference Include="SharpLogger, Version=1.9.0.123, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.3.13.71\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.7.23.139, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.7.23.139\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.8.1.142, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.8.1.142\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=5.2.18.349, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpSimulator.0.7.23.139\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrap2534, Version=5.3.1.362, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpAutoId.0.3.13.71\lib\net472\SharpWrap2534.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
@@ -196,6 +196,7 @@
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruSimulation\SimulationGenerator.cs" />
     <Compile Include="FulcrumLogic\ExtensionClasses\SimChannelExtensions.cs" />
     <Compile Include="FulcrumViewContent\Models\EventModels\DeviceChangedEventArgs.cs" />
+    <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruExecutionAction.cs" />
     <Compile Include="FulcrumViewContent\Models\SimulationModels\SimChannelEventObject.cs" />
     <Compile Include="FulcrumViewContent\Models\SimulationModels\SimMessageEventObject.cs" />
     <Compile Include="FulcrumViewContent\Models\PassThruModels\PassThruRegexModel.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumNetworkAnalysisViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumPeerToPeerViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumSimulationPlaybackViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorMiscViewModels\FulcrumUpdaterViewModel.cs" />
@@ -230,6 +232,9 @@
       <DependentUpon>FulcrumLogReviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumVehicleConnectionInfoViewModel.cs" />
+    <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumNetworkAnalysisView.xaml.cs">
+      <DependentUpon>FulcrumNetworkAnalysisView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumPeerToPeerView.xaml.cs">
       <DependentUpon>FulcrumPeerToPeerView.xaml</DependentUpon>
     </Compile>
@@ -345,6 +350,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumNetworkAnalysisView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumPeerToPeerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -400,6 +409,10 @@
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml">
       <SubType>Designer</SubType>
@@ -535,9 +548,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FulcrumLogic\FulcrumP2P\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"
