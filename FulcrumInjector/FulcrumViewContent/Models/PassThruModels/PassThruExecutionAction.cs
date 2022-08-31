@@ -28,6 +28,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                 if (this.J2534CommandArguments == null || this.J2534CommandArguments.Length == 0)
                     return "No Command Arguments!";
 
+
                 // Build a list of objects of strings to store
                 List<string> AllArgsAsStrings = new List<string>();
                 foreach (var ArgObject in this.J2534CommandArguments)
@@ -60,6 +61,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         /// <param name="CommandArguments">The arguments of our command object</param>
         public PassThruExecutionAction(Sharp2534Session InputSession, string CommandName, object[] CommandArguments = null)
         {
+            // Store values passed in onto our instance. Parse out the argument names and types then store them.
 
         }
     }
