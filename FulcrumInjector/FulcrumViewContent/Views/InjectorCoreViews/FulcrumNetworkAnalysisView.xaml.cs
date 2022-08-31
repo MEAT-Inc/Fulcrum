@@ -241,7 +241,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
 
                 // Return the Name, value, and type as a string array
-                return $"{NameOfArgument}: {ChildCastComboBoxBoxText} - ";
+                return $"{NameOfArgument}: {ChildCastComboBoxBoxText} - {ArgTypeString}";
             }
 
             // For all other control types/unknown controls fail out

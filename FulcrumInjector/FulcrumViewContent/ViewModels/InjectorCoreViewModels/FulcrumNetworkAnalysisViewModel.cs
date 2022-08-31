@@ -317,6 +317,25 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             CommandName ??= this.CurrentJ2534CommandName;
             PassThruExecutionAction CommandAction = new PassThruExecutionAction(FulcrumConstants.SharpSessionAlpha, CommandName, CurrentArgValues);
 
+            // Parse and convert our objects in the input args array into the desired types for each argument
+            List<object> CastArgumentValues = new List<object>();
+            foreach (var ArgumentObject in CurrentArgValues)
+            {
+                // Get the string value of the argument and split it up
+                string[] ArgumentObjectArray = (string[])ArgumentObject;
+                foreach (var ArgumentStringSet in ArgumentObjectArray)
+                {
+                    // Store new values for the arg name, the arg type and the arg value
+                    string ArgNameString = ArgumentStringSet.Split(':')[0].Trim();
+                    string ArgValueString = ArgumentStringSet.Split(':')[1].Split('-')[0].Trim();
+                    string ArgTypeString = ArgumentStringSet.Split(':')[1].Split('-')[1].Trim();
+
+                    // Now find the type from the type string and cast the argument string to that type.
+                    
+                    // Add the argument cast object to our list of output argument objects here
+                }
+            }
+
             // Log built new action object and the list of arguments built for that action type
             ViewModelLogger.WriteLog($"BUILT NEW ACTION OBJECT FOR COMMAND {CommandName}!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"LOGGING THE LIST OF ARGUMENT OBJECTS FOR THIS COMMAND NOW...\n{CommandAction.CommandArgumentsString}");

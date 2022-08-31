@@ -62,7 +62,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public PassThruExecutionAction(Sharp2534Session InputSession, string CommandName, object[] CommandArguments = null)
         {
             // Store values passed in onto our instance. Parse out the argument names and types then store them.
-
+            this.SessionToInvoke = InputSession;
+            this.J2534CommandName = CommandName;
+            this.J2534CommandArguments = CommandArguments;
         }
     }
 }
