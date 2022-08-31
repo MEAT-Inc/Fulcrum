@@ -1,4 +1,4 @@
-﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+﻿﻿<#@ template debug="true" hostspecific="true" language="C#" #>
 <#@ output extension=".cs" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Text.RegularExpressions" #>
@@ -47,4 +47,3 @@ using System.Resources;
     int revision = 0;
     int build = 0;
 #>
-
