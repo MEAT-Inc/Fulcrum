@@ -39,13 +39,14 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - A laptop which has the OE Application you wish to sniff and a version of the FulcrumInjector software
   - A vehicle which is compatible with the OE application you're using.
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration. Follow this diagram as close as possilbe to ensure the best results during sniffing routines.
+
     <p align="center">
-    <br/>
     <img src="https://user-images.githubusercontent.com/62027458/188706932-8737e1e1-ebb3-4c3a-b2fe-84111709594d.PNG">
     </p>
+    
 - From this point, here's what you do to sniff the communication data between the car and the OE Application.
-  1. Open the FulcrumInjector application and using the left sidebar, find the OE Application you wish to control. Once found, click "Launch OE Application under the list of app entries. This will open up the selected OE application.
-  2. **NOTE:** If you're using a CarDAQ-Plus 3, ignore the following and go to the next step
+  - Open the FulcrumInjector application and using the left sidebar, find the OE Application you wish to control. Once found, click "Launch OE Application under the list of app entries. This will open up the selected OE application.
+  - **NOTE:** If you're using a CarDAQ-Plus 3, ignore the following and go to the next step
       - Inside the FulcrumInjector, locate the settings gear in the main view navigation bar and click it.
       - Once there, find the settings named *Allow Selection Box Popup* and ensure it is checked. 
       - This allows the selection box of the FulcrumShim to appear so you can pick which device you wish to use for this session. 
@@ -53,11 +54,11 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
           - For the CarDAQ-Plus 3, this value is normally `C:\\Program Files (x86)\\Drew Technologies, Inc\\J2534\\CarDAQ Plus 3\\cardaqplus3_0404_32.dll`.
           -  For all other DLLs or devices, you need to locate the DLL of the device on your machine and copy the path to it. This can be found easily by finding the DLL entry in the Registry Editor app and finding the value of the key named "Function Library".
       -  Once you've set these settings values, press the save button at the top of the page. The settings should save automatically, but just click it to be save. 
-  3. When the OE Application is open, you need to navigate to the device setup window/selection window of that application. Most times, this is sotred somewhere under the "Setup" or "Settings" menu of the OE application itself. Once found, under your device selection, you need to pick "FulcrumShim" as your device type and press confirm to set the device type. 
-  4. Now, if you go back into the FulcrumInjector application and navigate to the second menu entry named *Injector DLL Output*, you should see some output in the text viewer. If there's not, the two pipe state status boxes should at least have one that says *Connected*. If they don't, it does not mean something isn't working, but rather it means the OE App just hasn't accessed your PassThru device yet. 
-  5. From here, just scan the vehicle or do whatever routines you wish to sniff/shim out. During these routines, the output inside the FulcrumInjector should update in real time as the OE application performs actions on the vehicle. 
-  6. Once you're done using the OE app, you can close it from inside the OE app itself, or by going back to the FulcrumInjector and clicking "Terminate OE Application" where the launch button used to be. 
-  7. To pull the log file that was built while using the OE application, you can either navigate to the path shown in the top of the log output viewer, or by going into `C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumLogs\` and finding the newest log file named `FulcrumShim_Logging_XXXXXXX.shimLog` where the X values would be the date and time the log was built.
+  - When the OE Application is open, you need to navigate to the device setup window/selection window of that application. Most times, this is sotred somewhere under the "Setup" or "Settings" menu of the OE application itself. Once found, under your device selection, you need to pick "FulcrumShim" as your device type and press confirm to set the device type. 
+  - Now, if you go back into the FulcrumInjector application and navigate to the second menu entry named *Injector DLL Output*, you should see some output in the text viewer. If there's not, the two pipe state status boxes should at least have one that says *Connected*. If they don't, it does not mean something isn't working, but rather it means the OE App just hasn't accessed your PassThru device yet. 
+  - From here, just scan the vehicle or do whatever routines you wish to sniff/shim out. During these routines, the output inside the FulcrumInjector should update in real time as the OE application performs actions on the vehicle. 
+  - Once you're done using the OE app, you can close it from inside the OE app itself, or by going back to the FulcrumInjector and clicking "Terminate OE Application" where the launch button used to be. 
+  - To pull the log file that was built while using the OE application, you can either navigate to the path shown in the top of the log output viewer, or by going into `C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumLogs\` and finding the newest log file named `FulcrumShim_Logging_XXXXXXX.shimLog` where the X values would be the date and time the log was built.
 
 ### Sniffing External Devices
 - This setup is used when you wish to sniff/shim the data being transmitted from a third party interface connected to a vehicle that is NOT using an OE application.
