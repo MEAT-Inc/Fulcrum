@@ -43,6 +43,7 @@ class CFulcrumShim : public CWinApp
 		// Pipe configuration
 		static void StartupPipes();
 		static void ShutdownPipes();
+		static CString SetupDebugLogFile();
 		static bool PipesConnecting;
 		static fulcrum_jpipe* fulcrumPiper;
 		

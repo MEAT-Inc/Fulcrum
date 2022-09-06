@@ -68,42 +68,12 @@ BOOL CSelectionBox::OnInitDialog()
 	CDialog::OnInitDialog();
 	ShowWindow(SW_HIDE);
 
-	// Find the Progfiles folder
-	TCHAR szPath[MAX_PATH];
-	SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, szPath);
-
-	// Find the current time value
-	SYSTEMTIME LocalTime;
-	GetLocalTime(&LocalTime);
-
-	// Start logging information
+	// Start logging information and get log file name
 	CFulcrumShim::StartupPipes();
-
-	// Build the log filder dir.
-	CString logDir;
-	logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
-	if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) 
-		fulcrum_output::fulcrumDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
-	else fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
-
-	// Build the log file path using the log dir above
-	CString cstrPath;
-	cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%02d%02d%04d-%02d%02d%02d.shimLog"),
-		szPath,
-		LocalTime.wMonth,
-		LocalTime.wDay,
-		LocalTime.wYear,
-		LocalTime.wHour,
-		LocalTime.wMinute,
-		LocalTime.wSecond
-	);
-
-	// Log new file name output and open the selection box entry object.
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
-	fulcrum_output::fulcrumDebug(_T("%.3fs    Session Log File: %s\n"), GetTimeSinceInit(), cstrPath);
+	CString LogFilePath = CFulcrumShim::SetupDebugLogFile();
 
 	// Set information about the new output file
-	m_logfilename.SetWindowText(cstrPath);
+	m_logfilename.SetWindowText(LogFilePath);
 	DoPopulateRegistryListbox();
 	ShowWindow(SW_SHOW);
 	BringWindowToTop();
