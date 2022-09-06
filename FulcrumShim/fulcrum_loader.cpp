@@ -310,9 +310,28 @@ bool fulcrum_checkAndAutoload(void)
 	} while (pos < config_file_content.length() && prev < config_file_content.length());
 
 	// Now using our built values, we can setup some settings
-	if (tokens[1] == "False") {
+	if (tokens[1] == "False" || tokens[1] == "false")
+	{
+		// Get the path to our default library location
 		CString function_lib(tokens[2].c_str());
-		return fulcrum_loadLibrary(function_lib);
+
+		// Load the default library for our selected PassThru interface
+		bool fSuccess = fulcrum_loadLibrary(function_lib);
+		if (fSuccess) fLibLoaded = true;
+		else
+		{
+			// Log failed to load and show the failure
+			fulcrum_setInternalError(_T("Failed to open '%s'"), function_lib);
+			fulcrum_printretval(ERR_FAILED);
+			return false;
+		}
+
+		// Start a new log file using the location we built for our path
+		CString cstrPath = CFulcrumShim::SetupDebugLogFile();
+		fulcrum_output::writeNewLogFile(cstrPath, true);
+
+		// Return passed and move on
+		return true;
 	}
 	else
 	{
