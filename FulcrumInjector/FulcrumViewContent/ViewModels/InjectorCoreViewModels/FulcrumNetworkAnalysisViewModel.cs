@@ -231,6 +231,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ParameterValueElement = new ComboBox()
                     {
                         SelectedIndex = 0,
+                        Tag = $"Type: {ParameterType.FullName}",
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetValues(ParameterType),
                         ToolTip = $"{ParameterName}: Type of {ParameterType.Name}",
@@ -243,30 +244,32 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Build a new grid containing fields for the message object to populate
                     Grid OutputContentGrid = new Grid();
-                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });     // Message Data
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Data
                     OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Flags
                     OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Message Protocol
 
                     // Build field objects for the content grid
                     TextBox MessageValueTextBox = new TextBox()
                     {
-                        Tag = $"Type: {typeof(string)}",
                         Style = this._argumentValueTextBoxStyle,
-                        ToolTip = $"Message Data: Type of {typeof(string)}",
+                        Tag = $"Type: {typeof(string).FullName}",
+                        ToolTip = $"Message Data: Required Parameter!"
                     };
                     ComboBox MessageFlagsComboBox = new ComboBox()
                     {
                         SelectedIndex = 0,
+                        Tag = $"Type: {typeof(TxFlags).FullName}",
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetNames(typeof(TxFlags)),
-                        ToolTip = $"Tx Flags: Type of {typeof(TxFlags)}",
+                        ToolTip = $"Tx Flags: Required Paramater!",
                     };
                     ComboBox MessageProtocolComboBox = new ComboBox()
                     {
                         SelectedIndex = 0,
-                        Style = this._argumentValueComboBoxStyle, 
+                        Style = this._argumentValueComboBoxStyle,
+                        Tag = $"Type: {typeof(ProtocolId).FullName}",
                         ItemsSource = Enum.GetNames(typeof(ProtocolId)),
-                        ToolTip = $"Protocol ID: Type of {typeof(ProtocolId)}",
+                        ToolTip = $"Protocol ID: Required Parameter!",
                     };
 
                     // Set child object rows and store the grid
@@ -308,33 +311,36 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="CurrentArgValues">Arguments for the command</param>
         /// <param name="CommandName">Name of the command to invoke</param>
-        internal PassThruExecutionAction GenerateCommandExecutionAction(List<object> CurrentArgValues, string CommandName = null)
+        internal PassThruExecutionAction GenerateCommandExecutionAction(object[] CurrentArgValues, string CommandName = null)
         {
-            // Store the current command name if needed
+            // Store the current command name if needed and build a new execution object
             CommandName ??= this.CurrentJ2534CommandName;
+            PassThruExecutionAction CommandAction = new PassThruExecutionAction(FulcrumConstants.SharpSessionAlpha, CommandName, CurrentArgValues);
 
-            // Build a list of objects of strings to store
-            List<string> AllArgsAsStrings = new List<string>();
-            foreach (var ArgObject in CurrentArgValues)
+            // Parse and convert our objects in the input args array into the desired types for each argument
+            List<object> CastArgumentValues = new List<object>();
+            foreach (var ArgumentObject in CurrentArgValues)
             {
-                // If it's a string, just add to our string output
-                if (ArgObject == null) AllArgsAsStrings.Add("NULL");
-                if (ArgObject.GetType() == typeof(string)) AllArgsAsStrings.Add(ArgObject.ToString());
-                if (ArgObject.GetType() == typeof(string[]))
+                // Get the string value of the argument and split it up
+                string[] ArgumentObjectArray = (string[])ArgumentObject;
+                foreach (var ArgumentStringSet in ArgumentObjectArray)
                 {
-                    // Cast the list to string array and build a formatted arg string from it
-                    string[] CastArgStrings = (string[])ArgObject;
-                    string FormattedArgStrings = string.Join(", ", CastArgStrings);
-                    AllArgsAsStrings.Add(FormattedArgStrings);
+                    // Store new values for the arg name, the arg type and the arg value
+                    string ArgNameString = ArgumentStringSet.Split(':')[0].Trim();
+                    string ArgValueString = ArgumentStringSet.Split(':')[1].Split('-')[0].Trim();
+                    string ArgTypeString = ArgumentStringSet.Split(':')[1].Split('-')[1].Trim();
+
+                    // Now find the type from the type string and cast the argument string to that type.
+                    
+                    // Add the argument cast object to our list of output argument objects here
                 }
             }
 
-            // Build a formatted arg string set and print it out to the log
-            string FormattedArgsList = string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
-            ViewModelLogger.WriteLog($"BUILT NEW ARGUMENT STRING LIST FOR COMMAND {CommandName}!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"LOGGING THE LIST OF ARGUMENT OBJECTS FOR THIS COMMAND NOW...\n{FormattedArgsList}");
+            // Log built new action object and the list of arguments built for that action type
+            ViewModelLogger.WriteLog($"BUILT NEW ACTION OBJECT FOR COMMAND {CommandName}!", LogType.InfoLog);
+            ViewModelLogger.WriteLog($"LOGGING THE LIST OF ARGUMENT OBJECTS FOR THIS COMMAND NOW...\n{CommandAction.CommandArgumentsString}");
 
-            // Now generate a new action object to invoke our command from a given SharpSession object
+            // Configure the action to actually invoke for our execution routine
             return null;
         }
     }

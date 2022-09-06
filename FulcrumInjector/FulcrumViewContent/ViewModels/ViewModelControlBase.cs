@@ -119,8 +119,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 return MemberObj.Name.StartsWith(ComponentTypeRemoved) && MemberObj.Name.Contains("ViewModel");
             });
 
-            // If the member to update is null, throw a not found exception
-            if (MemberToUpdate == null) throw new NullReferenceException($"THE MEMBER {ViewModelTypeName.Name} COULD NOT BE FOUND!");
+            // Find if the VM is a core option or misc singleton
+            bool IsViewModelType =
+                ViewModelTypeName.Name.Contains("CoreViewModels") ||
+                ViewModelTypeName.Name.Contains("OptionViewModels") ||
+                ViewModelTypeName.Name.Contains("MiscViewModels");
+
+            // Switch for fields vs properties
             switch (MemberToUpdate.MemberType)
             {
                 // For Field based objects
@@ -129,7 +134,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     try
                     {
                         // Check for singleton content object
-                        if (!ViewModelObject.GetType().Name.Contains("InjectorCoreViewModels") && !ViewModelObject.GetType().Name.Contains("InjectorOptionViewModels"))
+                        if (!IsViewModelType)
                         {
                             // Try setting value inside this block in case VM value has no public setter.
                             MemberAsField.SetValue(null, ViewModelObject);
@@ -149,7 +154,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                     try
                     {
                         // Check for singleton content object
-                        if (!ViewModelObject.GetType().Name.Contains("InjectorCoreViewModels") && !ViewModelObject.GetType().Name.Contains("InjectorOptionViewModels"))
+                        if (!IsViewModelType)
                         {
                             // Try setting value inside this block in case VM value has no public setter.
                             MemberAsProperty.SetValue(null, ViewModelObject);

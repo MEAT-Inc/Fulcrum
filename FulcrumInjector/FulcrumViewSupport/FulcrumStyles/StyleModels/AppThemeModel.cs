@@ -98,9 +98,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
                 case ThemeType.DARK_COLORS:
                     // Make a new theme
                     var CustomDarkColors = new Theme(
-                        "JCanaLog." + PrimaryColor.Name.ToUpper() + ".Dark",
+                        "FulcrumInjector." + PrimaryColor.Name.ToUpper() + ".Dark",
                         ThemeName,
-                        "Dark (JCanaLog)",
+                        "Dark (FulcrumInjector)",
                         PrimaryColor.Name.ToUpper() + " - " + SecondaryColor.Name.ToUpper(),
                         PrimaryColor.ToMediaColor(),
                         new SolidColorBrush(SecondaryColor.ToMediaColor()),
@@ -115,9 +115,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
                 case ThemeType.LIGHT_COLORS:
                     // Make a new theme.
                     var CustomLightColors = new Theme(
-                        "JCanaLog." + PrimaryColor.Name.ToUpper() + "_" + SecondaryColor.Name.ToUpper() + ".Light",
+                        "FulcrumInjector." + PrimaryColor.Name.ToUpper() + "_" + SecondaryColor.Name.ToUpper() + ".Light",
                         ThemeName,
-                        "Light (JCanaLog)",
+                        "Light (FulcrumInjector)",
                         PrimaryColor.Name.ToUpper() + " - " + SecondaryColor.Name.ToUpper(),
                         PrimaryColor.ToMediaColor(),
                         new SolidColorBrush(SecondaryColor.ToMediaColor()),

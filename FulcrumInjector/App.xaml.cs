@@ -156,6 +156,9 @@ namespace FulcrumInjector
             LogBroker.Logger?.WriteLog($"CLEANUP ARCHIVE FILE SETUP STARTED! CHECKING FOR {ConfigObj.ArchiveOnFileCount} OR MORE LOG FILES...");
             if (Directory.GetFiles(LogBroker.BaseOutputPath).Length < (int)ConfigObj.ArchiveOnFileCount)
             {
+                // Make sure the path we're checking exists
+                if (!Directory.Exists((string)ConfigObj.LogArchivePath)) return;
+
                 // Log not cleaning up and return.
                 LogBroker.Logger?.WriteLog("NO NEED TO ARCHIVE FILES AT THIS TIME! MOVING ON", LogType.WarnLog);
                 if (Directory.GetFiles((string)ConfigObj.LogArchivePath).Length < (int)ConfigObj.ArchiveCleanupFileCount)

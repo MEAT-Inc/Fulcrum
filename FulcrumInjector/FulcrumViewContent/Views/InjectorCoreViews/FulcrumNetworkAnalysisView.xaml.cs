@@ -153,7 +153,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Using this list of controls, invoke the current method using a sharp session object on the view model.
             this.ViewLogger.WriteLog("GENERATING EXECUTION ACTION FOR COMMAND NOW...", LogType.InfoLog);
-            this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues);
+            this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
 
             // Toggle monitoring if needed
             if (ShouldMonitor) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.StopVehicleMonitoring();
@@ -221,9 +221,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     return null;
                 }
 
+                // Get the tag value and add it to our output type
+                string ArgTypeString = TextBoxControl.Tag.ToString().Split(':')[1].Trim();
+                this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
+
                 // Add the text value and log it out
                 this.ViewLogger.WriteLog($"--> CHILD TEXTBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastTextBoxText}");
-                return $"{NameOfArgument}: {ChildCastTextBoxText}";
+                return $"{NameOfArgument}: {ChildCastTextBoxText} - {ArgTypeString}";
             }
             if (ChildElement is ComboBox ComboBoxControl)
             {
@@ -231,7 +235,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 string ChildCastComboBoxBoxText = ComboBoxControl.SelectedItem.ToString().Trim();
                 string NameOfArgument = ComboBoxControl.ToolTip.ToString().Split(':')[0].Trim();
                 this.ViewLogger.WriteLog($"--> CHILD COMBOBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastComboBoxBoxText}");
-                return $"{NameOfArgument}: {ChildCastComboBoxBoxText}";
+
+                // Get the tag value and add it to our output type
+                string ArgTypeString = ComboBoxControl.Tag.ToString().Split(':')[1].Trim();
+                this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
+
+                // Return the Name, value, and type as a string array
+                return $"{NameOfArgument}: {ChildCastComboBoxBoxText} - {ArgTypeString}";
             }
 
             // For all other control types/unknown controls fail out
