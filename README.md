@@ -4,7 +4,7 @@
 
 ---
 
-### FulcrumInjector Features
+## FulcrumInjector Features
 FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pipe data out from the native calls to any other location for super deep diagnostic logging.  This application has a TON of useful features in it. Some of the most notable ones are listed below. Not all features are complete at this time but all of the layouts for them are more than 90% complete on the UI side of things.
 - Full shim logging between a PassThru interface and my application
 - Dynamic realtime processing of log output to build simulations that can be replayed at any time using this app.
@@ -17,15 +17,75 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 
 ---
 
-### Using the FulcrumInjector
+## Using the FulcrumInjector
 
 - Here's a little piece of software I made which allows me to inject data in real time into a running J2534 session for any of the OE software applications. It also provides me with usable debug logging output so I can review and modify any of my projects I build for you guys going forward.
 - This is a super super early version of this app so bear with me when it comes to features on it. Once we gather a ton of data for our simulations, we can then build the PassThru testing app we've been talking about.
 - To use this, Install the MSI packages linked in the releases tab of this repository. Then when you go to use your OE Application, pick the DLL titled "FulcrumShim". It will then pop up a new box which is where you pick your actual passthru device. The DLL simply slips between the OE Application and the PT interface you're using so I can see some more of the black magic that goes on between the apps and the VCIs. 
 
+--- 
+
+## Configuring J2534 Hardware
+- This section will go over in detail how to setup your PassThru devices for all the different features of this application
+- There's three main hardware configuration types which we can follow. Each of these possible hardware configurations are shown below with a brief overview of how to use the FulcrumInjector application for each poossible configuration. 
+  - Sniffing an OE Application
+  - Sniffing an external device
+  - Simulation Playback
+
+### Sniffing OE Applications
+- This setup is used when you wish to sniff/shim the data being transmitted from an OE application to any J2534 interface connected to the OE application of your choice. 
+- To set this up, you need the following equipment
+- A J2534 PassThru interface (I'll be explaining how to do this with a CarDAQ-Plus 3)
+- A laptop which has the OE Application you wish to sniff and a version of the FulcrumInjector software
+- A vehicle which is compatible with the OE application you're using.
+- Once you've got all the afformentioned parts in place and ready to go, here's what you do to sniff the communication data between the car and the OE Application.
+  1) Open the FulcrumInjector application and using the left sidebar, find the OE Application you wish to control. Once found, click "Launch OE Application under the list of app entries. This will open up the selected OE application.
+  2) **NOTE:** If you're using a CarDAQ-Plus 3, ignore the following and go to the next step
+      - Inside the FulcrumInjector, locate the settings gear in the main view navigation bar and click it.
+      - Once there, find the settings named *Allow Selection Box Popup* and ensure it is checked. 
+      - This allows the selection box of the FulcrumShim to appear so you can pick which device you wish to use for this session. 
+      - If you want, you can modify the value of the setting called *Default Injector DLL* to set a forced default DLL to use. 
+          - For the CarDAQ-Plus 3, this value is normally `C:\\Program Files (x86)\\Drew Technologies, Inc\\J2534\\CarDAQ Plus 3\\cardaqplus3_0404_32.dll`.
+          -  For all other DLLs or devices, you need to locate the DLL of the device on your machine and copy the path to it. This can be found easily by finding the DLL entry in the Registry Editor app and finding the value of the key named "Function Library".
+      -  Once you've set these settings values, press the save button at the top of the page. The settings should save automatically, but just click it to be save. 
+  3) When the OE Application is open, you need to navigate to the device setup window/selection window of that application. Most times, this is sotred somewhere under the "Setup" or "Settings" menu of the OE application itself. Once found, under your device selection, you need to pick "FulcrumShim" as your device type and press confirm to set the device type. 
+  4) Now, if you go back into the FulcrumInjector application and navigate to the second menu entry named *Injector DLL Output*, you should see some output in the text viewer. If there's not, the two pipe state status boxes should at least have one that says *Connected*. If they don't, it does not mean something isn't working, but rather it means the OE App just hasn't accessed your PassThru device yet. 
+  5) From here, just scan the vehicle or do whatever routines you wish to sniff/shim out. During these routines, the output inside the FulcrumInjector should update in real time as the OE application performs actions on the vehicle. 
+  6) Once you're done using the OE app, you can close it from inside the OE app itself, or by going back to the FulcrumInjector and clicking "Terminate OE Application" where the launch button used to be. 
+  7) To pull the log file that was built while using the OE application, you can either navigate to the path shown in the top of the log output viewer, or by going into `C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumLogs\` and finding the newest log file named `FulcrumShim_Logging_XXXXXXX.shimLog` where the X values would be the date and time the log was built.
+
+### Sniffing External Devices
+- This setup is used when you wish to sniff/shim the data being transmitted from a third party interface connected to a vehicle that is NOT using an OE application.
+- To set this up, you need the following equipment
+  - A J2534 PassThru interface (I'll be explaining how to do this with a CarDAQ-Plus 3)
+  - A laptop which has a version of the FulcrumInjector software
+  - A vehicle which is compatible with the OE application you're using.
+  - The third party diagnostic tool
+  - An ODB2 Y Cable
+  - The J2534 Bus Analysis Tool (I'm working on removing this as a requirement but that's quite far down the road)
+    - Link to this tool: https://www.drewtech.com/downloads/tools/J2534-1Tool-0404_Installer_v1_0_14.msi
+- Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration.
+    - **INSERT DIAGRAM OF THIS SETUP HERE**
+- After setting up your laptop, passthru device, and third party interface as explained above, follow these steps to setup a sniffing routine.
+    - **INSERT SNIFFING SETUP INSTRUCTIONS HERE**
+
+### Simulation Playback
+- This setup is used when you wish to simulate a built simulation file from inside the FulcrumInjector. These simulation files are used to play a CarDAQ-Plus 3 (or other device) as a vehicle, against another device as the diagnostic interface.
+- To set this up, you need the following equipment
+  - **TWO** J2534 PassThru interfaces (I'll be explaining how to do this with a CarDAQ-Plus 3)
+  - A laptop which has a version of the FulcrumInjector software
+  - An ODB2 Y Cable
+  - Either a 120 ohm resistor or a CAN Bus terminating block
+  - A built simulation file which will be used as our "vehicle"
+- Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration.
+    - **INSERT DIAGRAM OF THIS SETUP HERE**
+- After setting up your laptop, passthru device, and third party interface as explained above, follow these steps to setup simulation playback routine.
+    - **INSERT SIMULATION SETUP INSTRUCTIONS HERE**
+
 ---
 
-### Development Setup
+
+## Development Setup
 - If you're looking to help develop this project, you'll need to add the NuGet server for the MEAT Inc workspace into your nuget configuration. 
 - To do so, navigate to your AppData\Roaming folder (You can do this by opening windows explorer and clicking the top path bar and typing %appdata%)
 - Now find the folder named NuGet and open the file named NuGet.config
@@ -75,14 +135,14 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 
 ---
 
-### Questions, Comments, Concerns? 
+## Questions, Comments, Concerns? 
 - I don't wanna hear it...
 - But feel free to send an email to zack.walsh@meatinc.autos. He might feel like being generous sometimes...
 - Or if you're feeling like a good little nerd, make an issue on this repo's project and I'll take a peek at it.
 
 --- 
 
-### Screenshots of The FulcrumInjector
+## Screenshots of The FulcrumInjector
 
 ![Fulcrum_DllOutput](https://user-images.githubusercontent.com/62027458/176723498-299025eb-eb6d-4365-a10d-f31fd8e51e3d.PNG)
 
