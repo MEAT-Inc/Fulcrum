@@ -34,11 +34,13 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 
 ### Sniffing OE Applications
 - This setup is used when you wish to sniff/shim the data being transmitted from an OE application to any J2534 interface connected to the OE application of your choice. 
-- To set this up, you need the following equipment
-- A J2534 PassThru interface (I'll be explaining how to do this with a CarDAQ-Plus 3)
-- A laptop which has the OE Application you wish to sniff and a version of the FulcrumInjector software
-- A vehicle which is compatible with the OE application you're using.
-- Once you've got all the afformentioned parts in place and ready to go, here's what you do to sniff the communication data between the car and the OE Application.
+  - To set this up, you need the following equipment
+  - A J2534 PassThru interface (I'll be explaining how to do this with a CarDAQ-Plus 3)
+  - A laptop which has the OE Application you wish to sniff and a version of the FulcrumInjector software
+  - A vehicle which is compatible with the OE application you're using.
+- Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration. Follow this diagram as close as possilbe to ensure the best results during sniffing routines.
+  ![ShimAndSniffHardwareSetup](https://user-images.githubusercontent.com/62027458/188706932-8737e1e1-ebb3-4c3a-b2fe-84111709594d.PNG)
+- From this point, here's what you do to sniff the communication data between the car and the OE Application.
   1. Open the FulcrumInjector application and using the left sidebar, find the OE Application you wish to control. Once found, click "Launch OE Application under the list of app entries. This will open up the selected OE application.
   2. **NOTE:** If you're using a CarDAQ-Plus 3, ignore the following and go to the next step
       - Inside the FulcrumInjector, locate the settings gear in the main view navigation bar and click it.
