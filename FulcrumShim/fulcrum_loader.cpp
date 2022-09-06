@@ -310,7 +310,39 @@ bool fulcrum_checkAndAutoload(void)
 	} while (pos < config_file_content.length() && prev < config_file_content.length());
 
 	// Now using our built values, we can setup some settings
-	if (tokens[1] == "False") {
+	if (tokens[1] == "False") 
+	{
+		// If we're NOT Showing the selection box, we need to build the new log file path since it's not being done in the selection box routine.
+		CString logDir;
+		logDir.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs"), szPath);
+		if (CreateDirectory(logDir, NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+			fulcrum_output::fulcrumDebug(_T("%.3fs    Log file folder exists. Skipping creation for this directory!\n"), GetTimeSinceInit());
+		else fulcrum_output::fulcrumDebug(_T("%.3fs    Built new folder for our output logs!\n"), GetTimeSinceInit());
+
+		// Find the current time value
+		SYSTEMTIME LocalTime;
+		GetLocalTime(&LocalTime);
+
+		// Build the log file path using the log dir above
+		CString cstrPath;
+		cstrPath.Format(_T("%s\\MEAT Inc\\FulcrumShim\\FulcrumLogs\\FulcrumShim_Logging_%02d%02d%04d-%02d%02d%02d.shimLog"),
+			szPath,
+			LocalTime.wMonth,
+			LocalTime.wDay,
+			LocalTime.wYear,
+			LocalTime.wHour,
+			LocalTime.wMinute,
+			LocalTime.wSecond
+		);
+
+		// Start a new log file using the location we built for our path
+		fulcrum_output::writeNewLogFile(cstrPath, true);
+
+		// Log new file name output and open the selection box entry object.
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Configured new log file correctly!\n"), GetTimeSinceInit());
+		fulcrum_output::fulcrumDebug(_T("%.3fs    Session Log File: %s\n"), GetTimeSinceInit(), cstrPath);
+
+		// Load the default library for our selected PassThru interface
 		CString function_lib(tokens[2].c_str());
 		return fulcrum_loadLibrary(function_lib);
 	}
