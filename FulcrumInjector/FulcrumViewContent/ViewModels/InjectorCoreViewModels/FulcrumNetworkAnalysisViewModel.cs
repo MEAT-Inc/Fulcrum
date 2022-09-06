@@ -261,7 +261,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                         Tag = $"Type: {typeof(TxFlags).FullName}",
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetNames(typeof(TxFlags)),
-                        ToolTip = $"Tx Flags: Required Paramater!",
+                        ToolTip = $"Tx Flags: Required Parameter!",
                     };
                     ComboBox MessageProtocolComboBox = new ComboBox()
                     {
