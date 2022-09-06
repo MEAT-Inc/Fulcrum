@@ -39,9 +39,8 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - A laptop which has the OE Application you wish to sniff and a version of the FulcrumInjector software
   - A vehicle which is compatible with the OE application you're using.
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration. Follow this diagram as close as possilbe to ensure the best results during sniffing routines.
-    <br/>
-    <br/>
     <p align="center">
+    <br/>
     <img src="https://user-images.githubusercontent.com/62027458/188706932-8737e1e1-ebb3-4c3a-b2fe-84111709594d.PNG">
     </p>
 - From this point, here's what you do to sniff the communication data between the car and the OE Application.
