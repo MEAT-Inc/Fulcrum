@@ -71,9 +71,9 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - The J2534 Bus Analysis Tool (I'm working on removing this as a requirement but that's quite far down the road)
     - Link to this tool: https://www.drewtech.com/downloads/tools/J2534-1Tool-0404_Installer_v1_0_14.msi
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration.
-    
+
     <p align="center">
-    <img src="https://user-images.githubusercontent.com/62027458/188881471-cc714e82-4353-4de5-a13e-f00d6ea20114.PNG">
+    <img src="https://user-images.githubusercontent.com/62027458/188902967-2098747c-ef5f-4d33-99aa-7a000b4e6746.PNG">
     </p>
     
 - After setting up your laptop, passthru device, and third party interface as explained above, follow these steps to setup a sniffing routine.
