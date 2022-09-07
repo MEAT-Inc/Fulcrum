@@ -100,10 +100,10 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Content="Execute Command" Grid.Column="0" Grid.Row="0" Click="ExecutePassThruCommand_Click" 
+                    <Button Content="Execute Command" Grid.Column="0" Grid.Row="0" Click="ExecuteOrQueuePassThruCommand_Click" 
                             Margin="0,5,5,5"  Style="{StaticResource ActionButtonStyle}"
                             IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
-                    <Button Content="Queue Command" Grid.Row="0" Grid.Column="1" Click="ExecutePassThruCommand_Click"
+                    <Button Content="Queue Command" Grid.Row="0" Grid.Column="1" Click="ExecuteOrQueuePassThruCommand_Click"
                             Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"
                             IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
                     <Button Content="Show Queued Command Actions" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"

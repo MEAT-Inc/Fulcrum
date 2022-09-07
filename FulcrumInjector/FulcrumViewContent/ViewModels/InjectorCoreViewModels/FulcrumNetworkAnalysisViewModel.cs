@@ -245,7 +245,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ParameterValueElement = new ComboBox()
                     {
                         SelectedIndex = 0,
-                        Tag = $"Type: {ParameterType.FullName}",
+                        Tag = $"Type: {ParameterType.AssemblyQualifiedName}",
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetValues(ParameterType),
                         ToolTip = $"{ParameterName}: Type of {ParameterType.Name}",
@@ -281,7 +281,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     {
                         SelectedIndex = 0,
                         Style = this._argumentValueComboBoxStyle,
-                        Tag = $"Type: {typeof(ProtocolId).FullName}",
+                        Tag = $"Type: {typeof(ProtocolId).AssemblyQualifiedName}",
                         ItemsSource = Enum.GetNames(typeof(ProtocolId)),
                         ToolTip = $"Protocol ID: Required Parameter!",
                     };
@@ -333,21 +333,35 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
             // Parse and convert our objects in the input args array into the desired types for each argument
             List<object> CastArgumentValues = new List<object>();
-            foreach (var ArgumentObject in CurrentArgValues)
+            foreach (object[] ArgumentObject in CurrentArgValues)
             {
                 // Get the string value of the argument and split it up
-                string[] ArgumentObjectArray = (string[])ArgumentObject;
-                foreach (var ArgumentStringSet in ArgumentObjectArray)
+                List<object> ArgumentObjectValues = new List<object>();
+                string[] ArgStringArray = ArgumentObject.Select(ArgObj => ArgObj.ToString()).ToArray();
+                foreach (var ArgumentStringSet in ArgStringArray)
                 {
                     // Store new values for the arg name, the arg type and the arg value
-                    string ArgNameString = ArgumentStringSet.Split(':')[0].Trim();
                     string ArgValueString = ArgumentStringSet.Split(':')[1].Split('-')[0].Trim();
                     string ArgTypeString = ArgumentStringSet.Split(':')[1].Split('-')[1].Trim();
 
                     // Now find the type from the type string and cast the argument string to that type.
-                    
-                    // Add the argument cast object to our list of output argument objects here
+                    Type ArgType = Type.GetType(ArgTypeString);
+                    if (ArgTypeString.Contains("String")) ArgumentObjectValues.Add(ArgTypeString);
+                    else if (ArgTypeString.Contains("Int")) ArgumentObjectValues.Add(Int32.Parse(ArgValueString));
+                    else if (ArgTypeString.Contains("Bool")) ArgumentObjectValues.Add(Boolean.Parse(ArgValueString));
+                    else if (ArgType.IsEnum) ArgumentObjectValues.Add(Enum.Parse(ArgType, ArgValueString));
+                    else 
+                    {
+                        // If none of the above types, log this failure and append null
+                        ViewModelLogger.WriteLog($"ERROR! UNKNOWN INPUT ARGUMENT TYPE OF {ArgType.FullName} WAS PROVIDED!");
+                        ArgumentObjectValues.Add(null);
+                    }
                 }
+
+                // Add the argument cast object to our list of output argument objects here
+                CastArgumentValues.Add(ArgumentObjectValues.Count == 1
+                    ? ArgumentObjectValues[0]
+                    : ArgumentObjectValues);
             }
 
             // Log built new action object and the list of arguments built for that action type

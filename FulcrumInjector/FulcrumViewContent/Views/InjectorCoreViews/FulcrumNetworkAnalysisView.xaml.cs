@@ -83,7 +83,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="Sender">Sending button for this command</param>
         /// <param name="E">Event args fired along with the button click action</param>
-        private void ExecutePassThruCommand_Click(object Sender, RoutedEventArgs E)
+        private void ExecuteOrQueuePassThruCommand_Click(object Sender, RoutedEventArgs E)
         {
             // Toggle the sending button to be disabled when the button is clicked
             Button SendingButton = (Button)Sender;
@@ -119,7 +119,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
                 // Cast to a child grid and store the next set of values
                 Grid CastChildGrid = (Grid)ControlObject;
-                CurrentArgValues.Add(this.ExtractContentsForControl(CastChildGrid, out bool MissingRequired));
+                CurrentArgValues.Add(this._extractContentsForControl(CastChildGrid, out bool MissingRequired));
                 this.ViewLogger.WriteLog($"   --> ADDED VALUES FOR GRID CONTROL WITHOUT ISSUES!", LogType.InfoLog);
 
                 // Check missing required
@@ -129,7 +129,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // If there's no value for a required parameter, then return out of here and update the button
                 SendingButton.Background = Brushes.Red;
                 SendingButton.Content = "Set All Arguments!";
-                SendingButton.Click -= this.ExecutePassThruCommand_Click;
+                SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
                 SendingButton.IsEnabled = true;
 
                 // Wait for 2.5 seconds and reset the button
@@ -141,7 +141,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         // Reset the button here
                         SendingButton.Content = DefaultContent;
                         SendingButton.Background = DefaultBackground;
-                        SendingButton.Click += this.ExecutePassThruCommand_Click;
+                        SendingButton.Click += this.ExecuteOrQueuePassThruCommand_Click;
                     });
                 });
 
@@ -154,6 +154,33 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Using this list of controls, invoke the current method using a sharp session object on the view model.
             this.ViewLogger.WriteLog("GENERATING EXECUTION ACTION FOR COMMAND NOW...", LogType.InfoLog);
             this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
+
+            // Execute the action if needed
+            if (SendingButton.Content.ToString().Contains("Execute")) 
+            {
+                // TODO: BUILD EXECUTION LOGIC
+                this.ViewLogger.WriteLog("EXECUTING NEXT COMMAND OBJECT NOW...", LogType.InfoLog);
+            }
+
+            // Toggle Sending Button Content
+            // If there's no value for a required parameter, then return out of here and update the button
+            SendingButton.Background = Brushes.DarkGreen;
+            SendingButton.Content = "Processed OK!";
+            SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
+            SendingButton.IsEnabled = true;
+
+            // Wait for 2.5 seconds and reset the button
+            Task.Run(() =>
+            {
+                Thread.Sleep(2500);
+                Dispatcher.Invoke(() =>
+                {
+                    // Reset the button here
+                    SendingButton.Content = DefaultContent;
+                    SendingButton.Background = DefaultBackground;
+                    SendingButton.Click += this.ExecuteOrQueuePassThruCommand_Click;
+                });
+            });
 
             // Toggle monitoring if needed
             if (ShouldMonitor) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.StopVehicleMonitoring();
@@ -171,7 +198,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <param name="ChildGrid">Grid to loop the children of</param>
         /// <param name="MissingRequired">Sets if this child grid is missing one or more required paramaters</param>
         /// <returns>An array of strings showing the values of the controls in the grid</returns>
-        private object[] ExtractContentsForControl(Grid ChildGrid, out bool MissingRequired)
+        private object[] _extractContentsForControl(Grid ChildGrid, out bool MissingRequired)
         {
             // Default missing value to false
             MissingRequired = false;
@@ -182,9 +209,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Find the element type and store the values of it
                 if (ChildElement.GetType() == typeof(Grid))
-                    OutputGridValues.Add(this.ExtractContentsForControl((Grid)ChildElement, out MissingRequired));
+                    OutputGridValues.Add(this._extractContentsForControl((Grid)ChildElement, out MissingRequired));
                 else if (ChildElement.GetType() == typeof(TextBox) || ChildElement.GetType() == typeof(ComboBox))
-                    OutputGridValues.Add(this.ExtractContentsForControl((UIElement)ChildElement, out MissingRequired));
+                    OutputGridValues.Add(this._extractContentsForControl((UIElement)ChildElement, out MissingRequired));
                 
                 // Check if we're missing a required value or not.
                 if (!MissingRequired) continue;
@@ -201,7 +228,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <param name="ChildElement">Element to pull value out of</param>
         /// <param name="MissingRequired">Sets if the value of the required argument is not specified</param>
         /// <returns>The value of the argument object or null if no value found</returns>
-        private string ExtractContentsForControl(UIElement ChildElement, out bool MissingRequired)
+        private string _extractContentsForControl(UIElement ChildElement, out bool MissingRequired)
         {
             // Check if it's not a TextBox, ComboBox, or CheckBox If it isn't return null
             MissingRequired = false;
