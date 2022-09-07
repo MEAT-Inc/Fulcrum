@@ -35,18 +35,15 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                 {
                     // If it's a string, just add to our string output
                     if (ArgObject == null) AllArgsAsStrings.Add("NULL");
-                    if (ArgObject.GetType() == typeof(string)) AllArgsAsStrings.Add(ArgObject.ToString());
-                    if (ArgObject.GetType() == typeof(string[]))
-                    {
-                        // Cast the list to string array and build a formatted arg string from it
-                        string[] CastArgStrings = (string[])ArgObject;
-                        string FormattedArgStrings = string.Join(", ", CastArgStrings);
-                        AllArgsAsStrings.Add(FormattedArgStrings);
-                    }
+                    AllArgsAsStrings.Add(ArgObject.ToString());
                 }
 
                 // Build a formatted arg string set and print it out to the log
-                string FormattedArgsList = string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
+                string FormattedArgsList =
+                    $"COMMAND: {J2534CommandName}\n" +
+                    string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
+
+                // Return the built list of arguments
                 return FormattedArgsList;
             }
         }

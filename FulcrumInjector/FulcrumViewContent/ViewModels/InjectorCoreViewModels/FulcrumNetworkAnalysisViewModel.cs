@@ -253,7 +253,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
                 else if (ParameterType == typeof(PassThruStructs.PassThruMsg))
                 {
-                    // TODO: BUILD LOGIC FOR J2534 MESSAGE TYPES AND ARRAYS
+                    // Log building new message object
                     ViewModelLogger.WriteLog($"--> BUILDING LISTBOX FOR J2534 PASSTHRU MESSAGES TYPE NOW...", LogType.WarnLog);
 
                     // Build a new grid containing fields for the message object to populate
@@ -299,6 +299,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // Store the element as our out value
                     ParameterValueElement = OutputContentGrid;
                 }
+                else if (ParameterType == typeof(PassThruStructs.ISO15765ChannelDescriptor))
+                {
+                    // TODO: BUILT LOGIC FOR DESCRIPTOR OBJECTS!
+                }
 
                 // For all unknown casting types, just make a TextBox and mark an error was thrown
                 if (ParameterValueElement == null) {
@@ -329,7 +333,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         {
             // Store the current command name if needed and build a new execution object
             CommandName ??= this.CurrentJ2534CommandName;
-            PassThruExecutionAction CommandAction = new PassThruExecutionAction(FulcrumConstants.SharpSessionAlpha, CommandName, CurrentArgValues);
 
             // Parse and convert our objects in the input args array into the desired types for each argument
             List<object> CastArgumentValues = new List<object>();
@@ -357,19 +360,63 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                         ArgumentObjectValues.Add(null);
                     }
                 }
+                
+                // Add the argument cast object to our list of output argument objects here assuming it's not a complex type
+                if (ArgumentObjectValues.Count == 1) CastArgumentValues.Add(ArgumentObjectValues[0]);
+                else
+                {
+                    // Get the arg types for the current command name and find the type for it.
+                    MethodInfo CommandMethodInfo = typeof(Sharp2534Session).GetMethods()
+                        .FirstOrDefault(MethodObj => MethodObj.Name == CommandName);
 
-                // Add the argument cast object to our list of output argument objects here
-                CastArgumentValues.Add(ArgumentObjectValues.Count == 1
-                    ? ArgumentObjectValues[0]
-                    : ArgumentObjectValues);
+                    // Now find the parameter based on the index of our loop here
+                    int IndexOfArgs = CurrentArgValues.ToList().IndexOf(ArgumentObject);
+                    ParameterInfo CurrentParameterInfo = CommandMethodInfo.GetParameters()[IndexOfArgs];
+
+                    // Store the type of the parameter and cast the object based on the type of it
+                    Type CurrentParameterType = CurrentParameterInfo.ParameterType;
+                    if (CurrentParameterType == typeof(PassThruStructs.PassThruMsg))
+                    {
+                        // Build a new J2534 message object from the arguments provided
+                        ViewModelLogger.WriteLog($"GENERATING A NEW PASSTHRU MESSAGE FROM ARGUMENT OBJECTS NOW...", LogType.WarnLog);
+                        var BuiltMessageObject = J2534Device.CreatePTMsgFromString(
+                            (ProtocolId)ArgumentObjectValues[2],
+                            (uint)ArgumentObjectValues[1],
+                            ArgumentObjectValues[0].ToString()
+                        );
+
+                        // Store the generated message on our list of output
+                        CastArgumentValues.Add(BuiltMessageObject);
+                        ViewModelLogger.WriteLog("BUILT AND STORED NEW PASSTHRU MESSAGE OK! INFORMATION FOR IT IS BELOW", LogType.InfoLog);
+                        ViewModelLogger.WriteLog($"--> MESSAGE DATA BUILT: {BuiltMessageObject.DataToHexString()}");
+                        ViewModelLogger.WriteLog($"--> MESSAGE PROTOCOL: {BuiltMessageObject.ProtocolId}");
+                        ViewModelLogger.WriteLog($"--> MESSAGE FLAGS: {BuiltMessageObject.TxFlags}");
+                    }
+                    else if (CurrentParameterType == typeof(PassThruStructs.ISO15765ChannelDescriptor))
+                    {
+                        // TODO: BUILT LOGIC FOR DESCRIPTOR OBJECTS!
+                    }
+                    else
+                    {
+                        // Throw a new exception showing we have an invalid argument type here
+                        ViewModelLogger.WriteLog($"ERROR! UNKNOWN INPUT ARGUMENT WAS PROVIDED FOR CREATION FROM A LISTBOX OBJECT!", LogType.ErrorLog);
+                        CastArgumentValues.Add(null);
+                    }
+                }
             }
+
+            // Build the new command action object here and store it
+            PassThruExecutionAction CommandAction = new PassThruExecutionAction(
+                FulcrumConstants.SharpSessionAlpha, CommandName, 
+                CastArgumentValues.ToArray()
+            );
 
             // Log built new action object and the list of arguments built for that action type
             ViewModelLogger.WriteLog($"BUILT NEW ACTION OBJECT FOR COMMAND {CommandName}!", LogType.InfoLog);
             ViewModelLogger.WriteLog($"LOGGING THE LIST OF ARGUMENT OBJECTS FOR THIS COMMAND NOW...\n{CommandAction.CommandArgumentsString}");
 
             // Configure the action to actually invoke for our execution routine
-            return null;
+            return CommandAction;
         }
     }
 }
