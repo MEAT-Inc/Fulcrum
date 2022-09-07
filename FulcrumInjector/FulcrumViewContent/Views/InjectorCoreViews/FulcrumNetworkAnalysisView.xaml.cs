@@ -83,7 +83,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         /// <param name="Sender">Sending button for this command</param>
         /// <param name="E">Event args fired along with the button click action</param>
-        private void ExecutePassThruCommand_Click(object Sender, RoutedEventArgs E)
+        private void ExecuteOrQueuePassThruCommand_Click(object Sender, RoutedEventArgs E)
         {
             // Toggle the sending button to be disabled when the button is clicked
             Button SendingButton = (Button)Sender;
@@ -129,7 +129,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 // If there's no value for a required parameter, then return out of here and update the button
                 SendingButton.Background = Brushes.Red;
                 SendingButton.Content = "Set All Arguments!";
-                SendingButton.Click -= this.ExecutePassThruCommand_Click;
+                SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
                 SendingButton.IsEnabled = true;
 
                 // Wait for 2.5 seconds and reset the button
@@ -141,7 +141,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         // Reset the button here
                         SendingButton.Content = DefaultContent;
                         SendingButton.Background = DefaultBackground;
-                        SendingButton.Click += this.ExecutePassThruCommand_Click;
+                        SendingButton.Click += this.ExecuteOrQueuePassThruCommand_Click;
                     });
                 });
 
@@ -155,6 +155,33 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.ViewLogger.WriteLog("GENERATING EXECUTION ACTION FOR COMMAND NOW...", LogType.InfoLog);
             this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
 
+            // Execute the action if needed
+            if (SendingButton.Content.ToString().Contains("Execute")) 
+            {
+                // TODO: BUILD EXECUTION LOGIC
+                this.ViewLogger.WriteLog("EXECUTING NEXT COMMAND OBJECT NOW...", LogType.InfoLog);
+            }
+
+            // Toggle Sending Button Content
+            // If there's no value for a required parameter, then return out of here and update the button
+            SendingButton.Background = Brushes.DarkGreen;
+            SendingButton.Content = "Processed OK!";
+            SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
+            SendingButton.IsEnabled = true;
+
+            // Wait for 2.5 seconds and reset the button
+            Task.Run(() =>
+            {
+                Thread.Sleep(2500);
+                Dispatcher.Invoke(() =>
+                {
+                    // Reset the button here
+                    SendingButton.Content = DefaultContent;
+                    SendingButton.Background = DefaultBackground;
+                    SendingButton.Click += this.ExecuteOrQueuePassThruCommand_Click;
+                });
+            });
+
             // Toggle monitoring if needed
             if (ShouldMonitor) FulcrumConstants.FulcrumVehicleConnectionInfoViewModel.StopVehicleMonitoring();
             this.ViewLogger.WriteLog("TOGGLED HARDWARE MONITORING VALUE IF NEEDED!", LogType.InfoLog);
@@ -163,6 +190,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             SendingButton.IsEnabled = true;
         }
 
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Loops the child elements of a grid and pulls out the values of each child
@@ -202,50 +230,70 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// <returns>The value of the argument object or null if no value found</returns>
         private string _extractContentsForControl(UIElement ChildElement, out bool MissingRequired)
         {
-            // Check if it's not a textbox and not a combobox. If it isn't return null
+            // Check if it's not a TextBox, ComboBox, or CheckBox If it isn't return null
             MissingRequired = false;
-            if (ChildElement.GetType() != typeof(TextBox) && ChildElement.GetType() != typeof(ComboBox))
+            if (ChildElement.GetType() != typeof(TextBox) && 
+                ChildElement.GetType() != typeof(ComboBox) && 
+                ChildElement.GetType() != typeof(CheckBox))
                 return null;
 
-            // Get the value and store it   
-            if (ChildElement is TextBox TextBoxControl)
+
+            // Get the value and store it as a cast control to extract the value of it.
+            switch (ChildElement)
             {
-                // To Determine if it's a required value or not, check the tag of the textbox
-                string ChildCastTextBoxText = TextBoxControl.Text.Trim();
-                string NameOfArgument = TextBoxControl.ToolTip.ToString().Split(':')[0].Trim();
-                if (TextBoxControl.ToolTip.ToString().Contains("Required") && string.IsNullOrEmpty(ChildCastTextBoxText))
+                case TextBox TextBoxControl:
                 {
-                    // Log missing required argument and return null/set the missing flag to true
-                    this.ViewLogger.WriteLog("--> ERROR! REQUIRED ARGUMENT IS MISSING A VALUE!", LogType.ErrorLog);
-                    MissingRequired = true;
-                    return null;
+                    // To Determine if it's a required value or not, check the tag of the textbox
+                    string ChildCastTextBoxText = TextBoxControl.Text.Trim();
+                    string NameOfArgument = TextBoxControl.ToolTip.ToString().Split(':')[0].Trim();
+                    if (TextBoxControl.ToolTip.ToString().Contains("Required") && string.IsNullOrEmpty(ChildCastTextBoxText))
+                    {
+                        // Log missing required argument and return null/set the missing flag to true
+                        this.ViewLogger.WriteLog("--> ERROR! REQUIRED ARGUMENT IS MISSING A VALUE!", LogType.ErrorLog);
+                        MissingRequired = true;
+                        return null;
+                    }
+
+                    // Get the tag value and add it to our output type
+                    string ArgTypeString = TextBoxControl.Tag.ToString().Split(':')[1].Trim();
+                    this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
+
+                    // Add the text value and log it out
+                    this.ViewLogger.WriteLog($"--> CHILD TEXTBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastTextBoxText}");
+                    return $"{NameOfArgument}: {ChildCastTextBoxText} - {ArgTypeString}";
                 }
+                case CheckBox CheckBoxControl:
+                {
+                    // Get the CheckBox Value and store it
+                    string ChildCastCheckBoxBoxText = (bool)CheckBoxControl.IsChecked ? "True" : "False";
+                    string NameOfArgument = CheckBoxControl.ToolTip.ToString().Split(':')[0].Trim();
+                    this.ViewLogger.WriteLog($"--> CHILD CHECKBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastCheckBoxBoxText}");
 
-                // Get the tag value and add it to our output type
-                string ArgTypeString = TextBoxControl.Tag.ToString().Split(':')[1].Trim();
-                this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
+                    // Get the tag value and add it to our output type
+                    string ArgTypeString = CheckBoxControl.Tag.ToString().Split(':')[1].Trim();
+                    this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
 
-                // Add the text value and log it out
-                this.ViewLogger.WriteLog($"--> CHILD TEXTBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastTextBoxText}");
-                return $"{NameOfArgument}: {ChildCastTextBoxText} - {ArgTypeString}";
+                    // Return the Name, value, and type as a string array
+                    return $"{NameOfArgument}: {ChildCastCheckBoxBoxText} - {ArgTypeString}";
+                }
+                case ComboBox ComboBoxControl:
+                {
+                    // Get the ComboBox Value and store it
+                    string ChildCastComboBoxBoxText = ComboBoxControl.SelectedItem.ToString().Trim();
+                    string NameOfArgument = ComboBoxControl.ToolTip.ToString().Split(':')[0].Trim();
+                    this.ViewLogger.WriteLog($"--> CHILD COMBOBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastComboBoxBoxText}");
+
+                    // Get the tag value and add it to our output type
+                    string ArgTypeString = ComboBoxControl.Tag.ToString().Split(':')[1].Trim();
+                    this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
+
+                    // Return the Name, value, and type as a string array
+                    return $"{NameOfArgument}: {ChildCastComboBoxBoxText} - {ArgTypeString}";
+                }
+                default:
+                    // For all other control types/unknown controls fail out
+                    throw new InvalidOperationException("INVALID CONTROL TYPE IDENTIFIED! FAILED TO PULL IN ONE OR MORE ARGS!");
             }
-            if (ChildElement is ComboBox ComboBoxControl)
-            {
-                // Get the ComboBox Value and store it
-                string ChildCastComboBoxBoxText = ComboBoxControl.SelectedItem.ToString().Trim();
-                string NameOfArgument = ComboBoxControl.ToolTip.ToString().Split(':')[0].Trim();
-                this.ViewLogger.WriteLog($"--> CHILD COMBOBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastComboBoxBoxText}");
-
-                // Get the tag value and add it to our output type
-                string ArgTypeString = ComboBoxControl.Tag.ToString().Split(':')[1].Trim();
-                this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
-
-                // Return the Name, value, and type as a string array
-                return $"{NameOfArgument}: {ChildCastComboBoxBoxText} - {ArgTypeString}";
-            }
-
-            // For all other control types/unknown controls fail out
-            throw new InvalidOperationException("INVALID CONTROL TYPE IDENTIFIED! FAILED TO PULL IN ONE OR MORE ARGS!");
         }
     }
 }
