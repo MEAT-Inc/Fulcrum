@@ -32,7 +32,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - Sniffing an external device
   - Simulation Playback
 
-### Sniffing OE Applications
+### *Sniffing OE Applications*
 - This setup is used when you wish to sniff/shim the data being transmitted from an OE application to any J2534 interface connected to the OE application of your choice. 
   - To set this up, you need the following equipment
   - A J2534 PassThru interface (I'll be explaining how to do this with a CarDAQ-Plus 3)
@@ -41,7 +41,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration. Follow this diagram as close as possilbe to ensure the best results during sniffing routines.
 
     <p align="center">
-    <img src="https://user-images.githubusercontent.com/62027458/188706932-8737e1e1-ebb3-4c3a-b2fe-84111709594d.PNG">
+    <img src="https://user-images.githubusercontent.com/62027458/188881321-9f759fe4-057e-47ff-a036-5dea3a080e60.PNG">
     </p>
     
 - From this point, here's what you do to sniff the communication data between the car and the OE Application.
@@ -60,7 +60,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - Once you're done using the OE app, you can close it from inside the OE app itself, or by going back to the FulcrumInjector and clicking "Terminate OE Application" where the launch button used to be. 
   - To pull the log file that was built while using the OE application, you can either navigate to the path shown in the top of the log output viewer, or by going into `C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumLogs\` and finding the newest log file named `FulcrumShim_Logging_XXXXXXX.shimLog` where the X values would be the date and time the log was built.
 
-### Sniffing External Devices
+### *Sniffing External Devices*
 - This setup is used when you wish to sniff/shim the data being transmitted from a third party interface connected to a vehicle that is NOT using an OE application.
 - To set this up, you need the following equipment
   - A J2534 PassThru interface (I'll be explaining how to do this with a CarDAQ-Plus 3)
@@ -71,11 +71,15 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - The J2534 Bus Analysis Tool (I'm working on removing this as a requirement but that's quite far down the road)
     - Link to this tool: https://www.drewtech.com/downloads/tools/J2534-1Tool-0404_Installer_v1_0_14.msi
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration.
-    - **INSERT DIAGRAM OF THIS SETUP HERE**
+    
+    <p align="center">
+    <img src="https://user-images.githubusercontent.com/62027458/188881471-cc714e82-4353-4de5-a13e-f00d6ea20114.PNG">
+    </p>
+    
 - After setting up your laptop, passthru device, and third party interface as explained above, follow these steps to setup a sniffing routine.
     - **INSERT SNIFFING SETUP INSTRUCTIONS HERE**
 
-### Simulation Playback
+### *Simulation Playback*
 - This setup is used when you wish to simulate a built simulation file from inside the FulcrumInjector. These simulation files are used to play a CarDAQ-Plus 3 (or other device) as a vehicle, against another device as the diagnostic interface.
 - To set this up, you need the following equipment
   - **TWO** J2534 PassThru interfaces (I'll be explaining how to do this with a CarDAQ-Plus 3)
@@ -84,7 +88,11 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
   - Either a 120 ohm resistor or a CAN Bus terminating block
   - A built simulation file which will be used as our "vehicle"
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration.
-    - **INSERT DIAGRAM OF THIS SETUP HERE**
+    
+    <p align="center">
+    <img src="https://user-images.githubusercontent.com/62027458/188881913-31783fbe-45af-4539-9a9e-034c3b1bd5a7.PNG">
+    </p>
+
 - After setting up your laptop, passthru device, and third party interface as explained above, follow these steps to setup simulation playback routine.
     - **INSERT SIMULATION SETUP INSTRUCTIONS HERE**
 
