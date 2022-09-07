@@ -103,12 +103,10 @@
                     <Button Content="Execute Command" Grid.Column="0" Grid.Row="0" Click="ExecutePassThruCommand_Click" 
                             Margin="0,5,5,5"  Style="{StaticResource ActionButtonStyle}"
                             IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
-                    <Button Content="Queue Command" Grid.Row="0" Grid.Column="1"
+                    <Button Content="Queue Command" Grid.Row="0" Grid.Column="1" Click="ExecutePassThruCommand_Click"
                             Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"
                             IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
-                    <Button Content="Show Queue" Grid.Row="1" Grid.Column="0"
-                            Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"/>
-                    <Button Content="Execute Queue" Grid.Row="1" Grid.Column="1" 
+                    <Button Content="Show Queued Command Actions" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                             Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"
                             IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
                 </Grid>
@@ -185,8 +183,9 @@
                           BorderBrush="{StaticResource PrimaryColor_Darker_35}"
                           BorderThickness="1" VerticalAlignment="Stretch"/>
 
-            <!-- Content Output -->
-            <Grid Grid.Column="2">
+
+            <!-- Command Queue and Output Content -->
+            <Grid Grid.Column="2" Margin="0,0,10,5">
 
             </Grid>
         </Grid>

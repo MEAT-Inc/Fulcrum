@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.Models.SimulationModels;
 using SharpLogger;
@@ -16,12 +15,12 @@ using SharpLogger.LoggerSupport;
 using SharpWrap2534;
 using SharpWrap2534.J2534Objects;
 using SharpWrap2534.PassThruTypes;
+
+// Forced using calls for types
+using TextBox = System.Windows.Controls.TextBox;
 using Application = System.Windows.Application;
 using ComboBox = System.Windows.Controls.ComboBox;
 
-// Forced forms using for TreeView
-using FormsTreeView = System.Windows.Forms.TreeView;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -219,9 +218,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     {
                         Style = this._argumentValueTextBoxStyle,
                         Tag = $"Type: {ParameterType.FullName}",
+                        Text = ParameterObject.HasDefaultValue ?
+                            ParameterObject.DefaultValue.ToString() :
+                            string.Empty,
                         ToolTip = ParameterObject.IsOptional
                             ? $"{ParameterName}: Optional Parameter!"
                             : $"{ParameterName}: Required Parameter"
+                    };
+                }
+                else if (ParameterType.FullName.Contains("Bool"))
+                {
+                    // Build a checkbox object here
+                    ViewModelLogger.WriteLog($"--> BUILDING CHECKBOX FOR VALUE TYPE {ParameterType.FullName} NOW...", LogType.WarnLog);
+                    ParameterValueElement = new CheckBox()
+                    {
+                        IsChecked = true,
+                        Tag = $"Type: {ParameterType.FullName}",
+                        Style = this._argumentValueComboBoxStyle,
+                        ToolTip = $"{ParameterName}: Type of {ParameterType.Name}",
                     };
                 }
                 else if (ParameterType.IsEnum)
