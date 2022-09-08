@@ -34,10 +34,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// </summary>
         public FulcrumInstalledOeAppsView()
         {
-            // Init component. Build new VM object
+            // Initialize new UI Component
             InitializeComponent();
-            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumInstalledOeAppsViewModel());
             this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+
+            // Build a new ViewModel object
+            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumInstalledOeAppsViewModel());
         }
 
         /// <summary>

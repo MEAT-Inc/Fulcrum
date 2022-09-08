@@ -35,18 +35,15 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                 {
                     // If it's a string, just add to our string output
                     if (ArgObject == null) AllArgsAsStrings.Add("NULL");
-                    if (ArgObject.GetType() == typeof(string)) AllArgsAsStrings.Add(ArgObject.ToString());
-                    if (ArgObject.GetType() == typeof(string[]))
-                    {
-                        // Cast the list to string array and build a formatted arg string from it
-                        string[] CastArgStrings = (string[])ArgObject;
-                        string FormattedArgStrings = string.Join(", ", CastArgStrings);
-                        AllArgsAsStrings.Add(FormattedArgStrings);
-                    }
+                    AllArgsAsStrings.Add(ArgObject.ToString());
                 }
 
                 // Build a formatted arg string set and print it out to the log
-                string FormattedArgsList = string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
+                string FormattedArgsList =
+                    $"J2534 Command: {J2534CommandName}\n" +
+                    string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
+
+                // Return the built list of arguments
                 return FormattedArgsList;
             }
         }
@@ -61,7 +58,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         /// <param name="CommandArguments">The arguments of our command object</param>
         public PassThruExecutionAction(Sharp2534Session InputSession, string CommandName, object[] CommandArguments = null)
         {
-            // Store values passed in onto our instance. Parse out the argument names and types then store them.
+            // Store values passed in onto our instance.
             this.SessionToInvoke = InputSession;
             this.J2534CommandName = CommandName;
             this.J2534CommandArguments = CommandArguments;

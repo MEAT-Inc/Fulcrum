@@ -47,7 +47,6 @@ namespace FulcrumInjector
         {
             // Init main component and blur background of the main window.
             InitializeComponent();
-            this.DataContext = this;   
             App.WindowBlurHelper = new WindowBlurSetup(this, ShowBlur: true);
             InjectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE OK!", LogType.InfoLog);
             InjectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
@@ -62,7 +61,8 @@ namespace FulcrumInjector
         /// <param name="e"></param>
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Store view objects for the UI
+            // Configure DataContext and setup view controls
+            this.DataContext = this;
             FulcrumConstants.ConfigureViewControls(this);
             InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
 
