@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -210,13 +211,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                 // Check the type of the parameter. Assign our value control accordingly.
                 UIElement ParameterValueElement = null;
-                if (ParameterType.FullName.Contains("Int") || ParameterType.FullName.Contains("String"))
+                if (new[] { "Int", "Uint", "String", "Byte" }.Any(ParameterType.FullName.Contains))
                 {
                     // Build a new TextBox object to store input values
                     ViewModelLogger.WriteLog($"--> BUILDING TEXTBOX FOR VALUE TYPE {ParameterType.FullName} NOW...", LogType.WarnLog);
                     ParameterValueElement = new TextBox()
                     {
-                        Style = this._argumentValueTextBoxStyle,
+                        Style = _argumentValueTextBoxStyle,
                         Tag = $"Type: {ParameterType.FullName}",
                         Text = ParameterObject.HasDefaultValue ?
                             ParameterObject.DefaultValue.ToString() :
@@ -234,7 +235,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     {
                         IsChecked = true,
                         Tag = $"Type: {ParameterType.FullName}",
-                        Style = this._argumentValueComboBoxStyle,
+                        Style = _argumentValueComboBoxStyle,
                         ToolTip = $"{ParameterName}: Type of {ParameterType.Name}",
                     };
                 }
@@ -272,7 +273,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ComboBox MessageFlagsComboBox = new ComboBox()
                     {
                         SelectedIndex = 0,
-                        Tag = $"Type: {typeof(TxFlags).FullName}",
+                        Tag = $"Type: {typeof(TxFlags).AssemblyQualifiedName}",
                         Style = this._argumentValueComboBoxStyle,
                         ItemsSource = Enum.GetNames(typeof(TxFlags)),
                         ToolTip = $"Tx Flags: Required Parameter!",
@@ -301,7 +302,60 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 }
                 else if (ParameterType == typeof(PassThruStructs.ISO15765ChannelDescriptor))
                 {
-                    // TODO: BUILT LOGIC FOR DESCRIPTOR OBJECTS!
+                    // Log building new message object
+                    ViewModelLogger.WriteLog($"--> BUILDING LISTBOX FOR J2534 CHANNEL DESCRIPTOR OBJECT TYPE NOW...", LogType.WarnLog);
+
+                    // Build a new grid containing fields for the descriptor object to populate
+                    Grid OutputContentGrid = new Grid();
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Local Address
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Remote Address
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Local Flags
+                    OutputContentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });    // Remote Flags
+
+                    // Build field objects for the content grid
+                    TextBox LocalAddressTextBox = new TextBox()
+                    {
+                        Style = this._argumentValueTextBoxStyle,
+                        Tag = $"Type: {typeof(byte[]).FullName}",
+                        ToolTip = $"Local Address: Required Parameter!"
+                    };
+                    TextBox RemoteAddressTextBox = new TextBox()
+                    {
+                        Style = this._argumentValueTextBoxStyle,
+                        Tag = $"Type: {typeof(byte[]).FullName}",
+                        ToolTip = $"Remote Address: Required Parameter!"
+                    };
+                    ComboBox LocalTxFlagsComboBox = new ComboBox()
+                    {
+                        SelectedIndex = 0,
+                        Tag = $"Type: {typeof(PassThroughConnect).AssemblyQualifiedName}",
+                        Style = this._argumentValueComboBoxStyle,
+                        ItemsSource = Enum.GetNames(typeof(PassThroughConnect)),
+                        ToolTip = $"Local Tx Flags: Required Parameter!",
+                    };
+                    ComboBox RemoteTxFlagsComboBox = new ComboBox()
+                    {
+                        SelectedIndex = 0,
+                        Tag = $"Type: {typeof(PassThroughConnect).AssemblyQualifiedName}",
+                        Style = this._argumentValueComboBoxStyle,
+                        ItemsSource = Enum.GetNames(typeof(PassThroughConnect)),
+                        ToolTip = $"Remote Tx Flags: Required Parameter!",
+                    };
+
+                    // Set child object rows and store the grid
+                    Grid.SetRow(LocalAddressTextBox, 0);
+                    Grid.SetRow(RemoteAddressTextBox, 1);
+                    Grid.SetRow(LocalTxFlagsComboBox, 2);
+                    Grid.SetRow(RemoteTxFlagsComboBox, 3);
+
+                    // Store children and return the grid object
+                    OutputContentGrid.Children.Add(LocalAddressTextBox);
+                    OutputContentGrid.Children.Add(RemoteAddressTextBox);
+                    OutputContentGrid.Children.Add(LocalTxFlagsComboBox);
+                    OutputContentGrid.Children.Add(RemoteTxFlagsComboBox);
+
+                    // Store the element as our out value
+                    ParameterValueElement = OutputContentGrid;
                 }
 
                 // For all unknown casting types, just make a TextBox and mark an error was thrown
@@ -349,11 +403,36 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
                     // Now find the type from the type string and cast the argument string to that type.
                     Type ArgType = Type.GetType(ArgTypeString);
-                    if (ArgTypeString.Contains("String")) ArgumentObjectValues.Add(ArgTypeString);
+                    if (ArgType.IsEnum) ArgumentObjectValues.Add(Enum.Parse(ArgType, ArgValueString));
+                    else if (ArgTypeString.Contains("String")) ArgumentObjectValues.Add(ArgValueString);
                     else if (ArgTypeString.Contains("Int")) ArgumentObjectValues.Add(Int32.Parse(ArgValueString));
                     else if (ArgTypeString.Contains("Bool")) ArgumentObjectValues.Add(Boolean.Parse(ArgValueString));
-                    else if (ArgType.IsEnum) ArgumentObjectValues.Add(Enum.Parse(ArgType, ArgValueString));
-                    else 
+                    else if (ArgTypeString.Contains("Uint")) ArgumentObjectValues.Add(UInt32.Parse(ArgValueString.Replace("0x", string.Empty).Trim()));
+                    else if (ArgTypeString.Contains("Byte"))
+                    {
+                        // Remove the 0x padding from the input if needed and split the bytes into an array
+                        ArgValueString = ArgValueString.Replace("0x", string.Empty).Replace("  ", " ");
+                        string[] SplitByteStrings = ArgValueString.Split(' ')
+                            .Where(SplitPart => !string.IsNullOrWhiteSpace(SplitPart))
+                            .ToArray();
+
+                        // Convert each byte and return the output value
+                        if (SplitByteStrings.Length == 1) ArgumentObjectValues.Add(Convert.ToByte(SplitByteStrings[0], 16));
+                        else
+                        {
+                            // Build output byte array object to return our output
+                            byte[] OutputBytes = new byte[SplitByteStrings.Length];
+                            for (var ByteIndex = 0; ByteIndex < SplitByteStrings.Length; ByteIndex++)
+                            {
+                                var ByteString = SplitByteStrings[ByteIndex];
+                                OutputBytes[ByteIndex] = Convert.ToByte(ByteString, 16);
+                            }
+
+                            // Store the output byte array to be returned
+                            ArgumentObjectValues.Add(OutputBytes);
+                        }
+                    }
+                    else
                     {
                         // If none of the above types, log this failure and append null
                         ViewModelLogger.WriteLog($"ERROR! UNKNOWN INPUT ARGUMENT TYPE OF {ArgType.FullName} WAS PROVIDED!");
@@ -394,7 +473,22 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     }
                     else if (CurrentParameterType == typeof(PassThruStructs.ISO15765ChannelDescriptor))
                     {
-                        // TODO: BUILT LOGIC FOR DESCRIPTOR OBJECTS!
+                        // Build a new J2534 descriptor object from the arguments provided
+                        ViewModelLogger.WriteLog($"GENERATING A NEW ISO15765 DESCRIPTOR FROM ARGUMENT OBJECTS NOW...", LogType.WarnLog);
+                        var BuiltDescriptorObject = new PassThruStructs.ISO15765ChannelDescriptor(
+                            (byte[])ArgumentObjectValues[0],
+                            (byte[])ArgumentObjectValues[1],
+                            (uint)ArgumentObjectValues[2],
+                            (uint)ArgumentObjectValues[3]
+                        );
+
+                        // Store the generated message on our list of output
+                        CastArgumentValues.Add(BuiltDescriptorObject);
+                        ViewModelLogger.WriteLog("BUILT AND STORED NEW DESCRIPTOR OBJECT OK! INFORMATION FOR IT IS BELOW", LogType.InfoLog);
+                        ViewModelLogger.WriteLog($"--> LOCAL ADDRESS BUILT: {BuiltDescriptorObject.LocalAddress}");
+                        ViewModelLogger.WriteLog($"--> REMOTE ADDRESS BUILT: {BuiltDescriptorObject.RemoteAddress}");
+                        ViewModelLogger.WriteLog($"--> LOCAL MESSAGE FLAGS: {BuiltDescriptorObject.LocalTxFlags}");
+                        ViewModelLogger.WriteLog($"--> REMOTE MESSAGE FLAGS: {BuiltDescriptorObject.RemoteTxFlags}");
                     }
                     else
                     {

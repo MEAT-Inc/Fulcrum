@@ -28,7 +28,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     {
         // Logger object.
         private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("FulcrumSessionReportingViewLogger")) ?? new SubServiceLogger("FulcrumSessionReportingViewLogger");
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("FulcrumInstalledHardwareViewLogger")) ?? new SubServiceLogger("FulcrumInstalledHardwareViewLogger");
 
         // ViewModel object to bind onto
         public FulcrumInstalledHardwareViewModel ViewModel { get; set; }
@@ -40,7 +40,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumInstalledHardwareView()
         {
-            // Build new ViewModel object
+            // Initialize new UI component instance
             InitializeComponent();
             this.ViewModel = FulcrumConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);

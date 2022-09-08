@@ -46,7 +46,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumHamburgerCoreView()
         {
-            // Build new ViewModel object
+            // Initialize new UI Component
             InitializeComponent();
             this.ViewModel = new FulcrumHamburgerCoreViewModel();
 

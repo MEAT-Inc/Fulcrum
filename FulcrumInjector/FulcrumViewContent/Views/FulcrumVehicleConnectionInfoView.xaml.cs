@@ -39,10 +39,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// </summary>
         public FulcrumVehicleConnectionInfoView()
         {
-            // Build new ViewModel object
+            // Initialize new UI Component
             InitializeComponent();
-            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumVehicleConnectionInfoViewModel());
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Build new ViewModel object
+            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumVehicleConnectionInfoViewModel());
         }
 
         /// <summary>

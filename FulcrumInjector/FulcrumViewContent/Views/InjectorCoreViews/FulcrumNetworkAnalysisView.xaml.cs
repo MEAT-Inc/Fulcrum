@@ -39,6 +39,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumNetworkAnalysisView()
         {
+            // Initialize new UI Component
             InitializeComponent();
             this.ViewModel = FulcrumConstants.FulcrumNetworkAnalysisViewModel ?? new FulcrumNetworkAnalysisViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
@@ -209,8 +210,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Find the element type and store the values of it
                 if (ChildElement.GetType() == typeof(Grid))
-                    OutputGridValues.Add(this._extractContentsForControl((Grid)ChildElement, out MissingRequired));
-                else if (ChildElement.GetType() == typeof(TextBox) || ChildElement.GetType() == typeof(ComboBox))
+                    OutputGridValues.AddRange(this._extractContentsForControl((Grid)ChildElement, out MissingRequired).Select(ArgObj => ArgObj));
+                else if (ChildElement.GetType() == typeof(TextBox) || ChildElement.GetType() == typeof(ComboBox) || ChildElement.GetType() == typeof(CheckBox))
                     OutputGridValues.Add(this._extractContentsForControl((UIElement)ChildElement, out MissingRequired));
                 
                 // Check if we're missing a required value or not.
@@ -231,12 +232,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private string _extractContentsForControl(UIElement ChildElement, out bool MissingRequired)
         {
             // Check if it's not a TextBox, ComboBox, or CheckBox If it isn't return null
-            MissingRequired = false;
+            MissingRequired = true;
             if (ChildElement.GetType() != typeof(TextBox) && 
                 ChildElement.GetType() != typeof(ComboBox) && 
                 ChildElement.GetType() != typeof(CheckBox))
                 return null;
-
 
             // Get the value and store it as a cast control to extract the value of it.
             switch (ChildElement)
@@ -259,6 +259,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
 
                     // Add the text value and log it out
+                    MissingRequired = false;
                     this.ViewLogger.WriteLog($"--> CHILD TEXTBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastTextBoxText}");
                     return $"{NameOfArgument}: {ChildCastTextBoxText} - {ArgTypeString}";
                 }
@@ -270,6 +271,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     this.ViewLogger.WriteLog($"--> CHILD CHECKBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastCheckBoxBoxText}");
 
                     // Get the tag value and add it to our output type
+                    MissingRequired = false;
                     string ArgTypeString = CheckBoxControl.Tag.ToString().Split(':')[1].Trim();
                     this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
 
@@ -284,6 +286,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     this.ViewLogger.WriteLog($"--> CHILD COMBOBOX CONTROL VALUE PULLED: {NameOfArgument}: {ChildCastComboBoxBoxText}");
 
                     // Get the tag value and add it to our output type
+                    MissingRequired = false;
                     string ArgTypeString = ComboBoxControl.Tag.ToString().Split(':')[1].Trim();
                     this.ViewLogger.WriteLog($"--> FOUND TYPE STRING VALUE FOR CONTROL TO BE {ArgTypeString}");
 
