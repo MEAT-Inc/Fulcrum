@@ -48,36 +48,36 @@ namespace FulcrumInjector.FulcrumViewContent
         public static InjectorVersionInfo InjectorVersions => new();
 
         // View Constants for help with property bindings
-        public static InjectorMainWindow InjectorMainWindow { get; private set; }
+        public static InjectorMainWindow InjectorMainWindow { get; set; }
 
         // Title View and ViewModel
         public static FulcrumTitleView FulcrumTitleView
         {
-            get => InjectorMainWindow.FulcrumTitle;
+            get => InjectorMainWindow?.FulcrumTitle;
             set => InjectorMainWindow.FulcrumTitle = value;
         }
         public static FulcrumTitleViewModel FulcrumTitleViewModel
         {
-            get => FulcrumTitleView.ViewModel;
+            get => FulcrumTitleView?.ViewModel;
             set => FulcrumTitleView.ViewModel = value;
         }
 
         // Connected Vehicle information View and ViewModel
         public static FulcrumVehicleConnectionInfoView FulcrumVehicleConnectionInfoView
         {
-            get => InjectorMainWindow.FulcrumVehicleConnectionInfo;
+            get => InjectorMainWindow?.FulcrumVehicleConnectionInfo;
             set => InjectorMainWindow.FulcrumVehicleConnectionInfo = value;
         }
         public static FulcrumVehicleConnectionInfoViewModel FulcrumVehicleConnectionInfoViewModel
         {
-            get => FulcrumVehicleConnectionInfoView.ViewModel;
+            get => FulcrumVehicleConnectionInfoView?.ViewModel;
             set => FulcrumVehicleConnectionInfoView.ViewModel = value;
         }
 
         // Test DLL Injector View and ViewModel
         public static FulcrumDllInjectionTestView FulcrumDllInjectionTestView
         {
-            get => InjectorMainWindow.FulcrumDllInjectionTest;
+            get => InjectorMainWindow?.FulcrumDllInjectionTest;
             set => InjectorMainWindow.FulcrumDllInjectionTest = value;
         }
         public static FulcrumDllInjectionTestViewModel FulcrumDllInjectionTestViewModel
@@ -89,7 +89,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // Pipe Status View and ViewModel
         public static FulcrumPipeStatusView FulcrumPipeStatusView
         {
-            get => InjectorMainWindow.FulcrumPipeStatus;
+            get => InjectorMainWindow?.FulcrumPipeStatus;
             set => InjectorMainWindow.FulcrumPipeStatus = value;
         }
         public static FulcrumPipeStatusViewModel FulcrumPipeStatusViewModel
@@ -101,7 +101,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // OE Applications Installed View and ViewModel
         public static FulcrumInstalledOeAppsView FulcrumInstalledOeAppsView
         {
-            get => InjectorMainWindow.FulcrumInstalledOeApps;
+            get => InjectorMainWindow?.FulcrumInstalledOeApps;
             set => InjectorMainWindow.FulcrumInstalledOeApps = value;
         }
         public static FulcrumInstalledOeAppsViewModel FulcrumInstalledOeAppsViewModel
@@ -113,24 +113,24 @@ namespace FulcrumInjector.FulcrumViewContent
         // About this app View and View Model
         public static FulcrumAboutThisAppView FulcrumAboutThisAppView
         {
-            get => InjectorMainWindow.FulcrumAboutThisAppView;
+            get => InjectorMainWindow?.FulcrumAboutThisAppView;
             set => InjectorMainWindow.FulcrumAboutThisAppView = value;
         }
         public static FulcrumAboutThisAppViewModel FulcrumAboutThisAppViewModel
         {
-            get => InjectorMainWindow.FulcrumAboutThisAppView.ViewModel;
+            get => InjectorMainWindow?.FulcrumAboutThisAppView.ViewModel;
             set => InjectorMainWindow.FulcrumAboutThisAppView.ViewModel = value;
         }
 
         // Updater View and View Model
         public static FulcrumUpdaterView FulcrumUpdaterView
         {
-            get => InjectorMainWindow.FulcrumUpdaterView;
+            get => InjectorMainWindow?.FulcrumUpdaterView;
             set => InjectorMainWindow.FulcrumUpdaterView = value;
         }
         public static FulcrumUpdaterViewModel FulcrumUpdaterViewModel
         {
-            get => InjectorMainWindow.FulcrumUpdaterView.ViewModel;
+            get => InjectorMainWindow?.FulcrumUpdaterView.ViewModel;
             set => InjectorMainWindow.FulcrumUpdaterView.ViewModel = value;
         }
 
@@ -139,7 +139,7 @@ namespace FulcrumInjector.FulcrumViewContent
         // Injector Hamburger Output Views
         public static FulcrumHamburgerCoreView FulcrumHamburgerCoreView
         {
-            get => InjectorMainWindow.FulcrumHamburgerCore;
+            get => InjectorMainWindow?.FulcrumHamburgerCore;
             set => InjectorMainWindow.FulcrumHamburgerCore = value;
         }
         public static FulcrumHamburgerCoreViewModel FulcrumHamburgerCoreViewModel
