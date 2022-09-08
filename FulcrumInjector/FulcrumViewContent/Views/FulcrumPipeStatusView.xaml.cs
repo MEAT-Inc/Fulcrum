@@ -38,6 +38,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 this.ViewModel.ReaderPipeState = "Loading...";
                 this.ViewModel.WriterPipeState = "Loading...";
             });
+
+            // Log built new content OK
             this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 

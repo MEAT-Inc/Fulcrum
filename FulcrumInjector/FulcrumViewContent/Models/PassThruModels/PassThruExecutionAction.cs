@@ -40,7 +40,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 
                 // Build a formatted arg string set and print it out to the log
                 string FormattedArgsList =
-                    $"COMMAND: {J2534CommandName}\n" +
+                    $"J2534 Command: {J2534CommandName}\n" +
                     string.Join(string.Empty, AllArgsAsStrings.Select(ArgString => $"--> {ArgString}\n"));
 
                 // Return the built list of arguments
@@ -58,7 +58,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         /// <param name="CommandArguments">The arguments of our command object</param>
         public PassThruExecutionAction(Sharp2534Session InputSession, string CommandName, object[] CommandArguments = null)
         {
-            // Store values passed in onto our instance. Parse out the argument names and types then store them.
+            // Store values passed in onto our instance.
             this.SessionToInvoke = InputSession;
             this.J2534CommandName = CommandName;
             this.J2534CommandArguments = CommandArguments;

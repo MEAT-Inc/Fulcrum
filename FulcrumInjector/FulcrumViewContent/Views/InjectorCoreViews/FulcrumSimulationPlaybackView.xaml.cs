@@ -47,6 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         /// </summary>
         public FulcrumSimulationPlaybackView()
         {
+            // Initialize new UI Component
             InitializeComponent();
             this.ViewModel = FulcrumConstants.FulcrumSimulationPlaybackViewModel ?? new FulcrumSimulationPlaybackViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);

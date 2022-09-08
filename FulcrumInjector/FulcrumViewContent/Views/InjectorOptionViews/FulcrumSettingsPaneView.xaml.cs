@@ -39,8 +39,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// </summary>
         public FulcrumSettingsPaneView()
         {
-            // Build new ViewModel object
+            // Initialize new UI Component
             InitializeComponent();
+
+            // Build new ViewModel object
             this.ViewModel = FulcrumConstants.FulcrumSettingsPaneViewModel ?? new FulcrumSettingsPaneViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31911.196
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FulcrumShim", "FulcrumShim\FulcrumShim.vcxproj", "{25DE901C-9939-4B98-A2A0-58090B7375FD}"
 EndProject
@@ -16,6 +16,9 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release (Installed)|Any CPU = Release (Installed)|Any CPU
+		Release (Installed)|x64 = Release (Installed)|x64
+		Release (Installed)|x86 = Release (Installed)|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
@@ -27,6 +30,12 @@ Global
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Debug|x64.Build.0 = Debug|x64
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Debug|x86.ActiveCfg = Debug (No Events)|Win32
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Debug|x86.Build.0 = Debug (No Events)|Win32
+		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release (Installed)|Any CPU.ActiveCfg = Release (Installed)|x64
+		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release (Installed)|Any CPU.Build.0 = Release (Installed)|x64
+		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release (Installed)|x64.ActiveCfg = Release (Installed)|x64
+		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release (Installed)|x64.Build.0 = Release (Installed)|x64
+		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release (Installed)|x86.ActiveCfg = Release (Installed)|Win32
+		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release (Installed)|x86.Build.0 = Release (Installed)|Win32
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release|Any CPU.ActiveCfg = Release|Win32
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release|Any CPU.Build.0 = Release|Win32
 		{25DE901C-9939-4B98-A2A0-58090B7375FD}.Release|x64.ActiveCfg = Release|x64
@@ -38,6 +47,12 @@ Global
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Debug|x64.ActiveCfg = Debug|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Debug|x86.ActiveCfg = Debug|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Debug|x86.Build.0 = Debug|x86
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release (Installed)|Any CPU.ActiveCfg = Release (No Events)|x86
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release (Installed)|Any CPU.Build.0 = Release (No Events)|x86
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release (Installed)|x64.ActiveCfg = Release (No Events)|x86
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release (Installed)|x64.Build.0 = Release (No Events)|x86
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release (Installed)|x86.ActiveCfg = Release (No Events)|x86
+		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release (Installed)|x86.Build.0 = Release (No Events)|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release|Any CPU.ActiveCfg = Release|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release|Any CPU.Build.0 = Release|x86
 		{46915009-6E9B-410C-B2BF-0C5E92D556B5}.Release|x64.ActiveCfg = Release|x86
@@ -49,6 +64,12 @@ Global
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x64.Build.0 = Debug|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Debug|x86.Build.0 = Debug|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release (Installed)|Any CPU.ActiveCfg = Release (Installed)|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release (Installed)|Any CPU.Build.0 = Release (Installed)|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release (Installed)|x64.ActiveCfg = Release (Installed)|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release (Installed)|x64.Build.0 = Release (Installed)|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release (Installed)|x86.ActiveCfg = Release (Installed)|Any CPU
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release (Installed)|x86.Build.0 = Release (Installed)|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x64.ActiveCfg = Release|Any CPU

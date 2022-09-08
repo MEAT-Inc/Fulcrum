@@ -35,8 +35,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// </summary>
         public FulcrumDebugLoggingView()
         {
-            // Build new ViewModel object
+            // Initialize new UI Component
             InitializeComponent();
+
+            // Build new ViewModel object
             this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
