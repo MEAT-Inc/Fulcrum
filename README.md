@@ -73,7 +73,7 @@ FulcrumInjector is the ultime J2534 DLL Shim written in C++ which is able to pip
 - Once you've got all the afformentioned parts in place and ready to go, you need to setup your hardware in the following configuration.
 
     <p align="center">
-    <img src="https://user-images.githubusercontent.com/62027458/188902967-2098747c-ef5f-4d33-99aa-7a000b4e6746.PNG">
+    <img src="https://user-images.githubusercontent.com/62027458/189118065-a7a201d4-225c-42b9-af9c-aa26298f2ec1.PNG">
     </p>
     
 - After setting up your laptop, passthru device, and third party interface as explained above, follow these steps to setup a sniffing routine.
