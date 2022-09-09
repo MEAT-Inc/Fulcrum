@@ -17,7 +17,7 @@ using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using SharpWrap2534.J2534Objects;
+using SharpWrapper.J2534Objects;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 {

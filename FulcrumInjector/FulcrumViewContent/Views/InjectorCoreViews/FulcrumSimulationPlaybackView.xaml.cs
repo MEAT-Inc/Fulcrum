@@ -22,7 +22,6 @@ using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatt
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using SharpWrap2534;
 using Button = System.Windows.Controls.Button;
 using UserControl = System.Windows.Controls.UserControl;
 

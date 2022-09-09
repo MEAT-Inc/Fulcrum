@@ -14,11 +14,9 @@ using SharpAutoId.SharpAutoIdHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using SharpWrap2534;
-using SharpWrap2534.J2534Objects;
-using SharpWrap2534.PassThruImport;
-using SharpWrap2534.PassThruTypes;
-using SharpWrap2534.SupportingLogic;
+using SharpWrapper;
+using SharpWrapper.PassThruTypes;
+using SharpWrapper.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {

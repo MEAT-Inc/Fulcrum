@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using SharpLogger.LoggerSupport;
-using SharpWrap2534.J2534Objects;
-using SharpWrap2534.PassThruTypes;
-using SharpWrap2534.SupportingLogic;
+using SharpWrapper.J2534Objects;
+using SharpWrapper.PassThruTypes;
+using SharpWrapper.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {

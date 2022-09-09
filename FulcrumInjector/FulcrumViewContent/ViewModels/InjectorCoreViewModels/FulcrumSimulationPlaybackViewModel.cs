@@ -20,8 +20,8 @@ using SharpSimulator;
 using SharpSimulator.SimulationEvents;
 using SharpSimulator.SimulationObjects;
 using SharpSimulator.SupportingLogic;
-using SharpWrap2534.PassThruTypes;
-using SharpWrap2534.SupportingLogic;
+using SharpWrapper.PassThruTypes;
+using SharpWrapper.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {

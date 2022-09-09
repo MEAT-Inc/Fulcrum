@@ -10,8 +10,8 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using SharpSimulator.SimulationObjects;
-using SharpWrap2534.J2534Objects;
-using SharpWrap2534.PassThruTypes;
+using SharpWrapper.J2534Objects;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {

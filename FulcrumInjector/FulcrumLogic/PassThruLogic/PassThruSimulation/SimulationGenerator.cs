@@ -17,7 +17,6 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using SharpSimulator.SimulationObjects;
-using SharpWrap2534.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 {
