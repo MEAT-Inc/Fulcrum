@@ -13,9 +13,9 @@ using FulcrumInjector.FulcrumViewContent.Models.SimulationModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using SharpWrap2534;
-using SharpWrap2534.J2534Objects;
-using SharpWrap2534.PassThruTypes;
+using SharpWrapper;
+using SharpWrapper.J2534Objects;
+using SharpWrapper.PassThruTypes;
 
 // Forced using calls for types
 using TextBox = System.Windows.Controls.TextBox;
@@ -42,7 +42,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Public values for our View to bind onto
         public bool IsHardwareSetup { get => _isHardwareSetup; set => PropertyUpdated(value); }
-        public string[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); }
+        public string[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); } 
         public string CurrentJ2534CommandName { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
         public PassThruExecutionAction[] J2534CommandQueue { get => _j2534CommandQueue; set => PropertyUpdated(value); }
 

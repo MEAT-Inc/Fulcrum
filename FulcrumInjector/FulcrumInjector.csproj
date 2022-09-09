@@ -129,22 +129,22 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.5.3.2.365\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.8.2.147\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.3.13.72, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.3.13.72\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.3.14.78, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.3.14.78\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogger, Version=1.9.0.123, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrap2534.5.3.2.365\lib\net472\SharpLogger.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.8.2.147\lib\net472\SharpLogger.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.8.1.142, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.8.1.142\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.8.2.148, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.8.2.147\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrap2534, Version=5.3.2.365, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrap2534.5.3.2.365\lib\net472\SharpWrap2534.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=5.3.4.375, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpSimulator.0.8.2.147\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>

@@ -11,10 +11,9 @@ using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using SharpWrap2534.J2534Objects;
-using SharpWrap2534.PassThruImport;
-using SharpWrap2534.PassThruTypes;
-using SharpWrap2534.SupportingLogic;
+using SharpWrapper.J2534Objects;
+using SharpWrapper.PassThruImport;
+using SharpWrapper.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpWrap2534.J2534Objects;
-using SharpWrap2534.SupportingLogic;
+using SharpWrapper.J2534Objects;
+using SharpWrapper.SupportingLogic;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.EventModels
 {

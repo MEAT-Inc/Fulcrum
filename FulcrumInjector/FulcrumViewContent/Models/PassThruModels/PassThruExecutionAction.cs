@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpWrap2534;
+using SharpWrapper;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 {
@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public readonly string J2534CommandName;
         public readonly object[] J2534CommandArguments;
 
-        // String values used to bind onto our UI
+        // Argument Information as a list object and string object
         public string CommandArgumentsString
         {
             get

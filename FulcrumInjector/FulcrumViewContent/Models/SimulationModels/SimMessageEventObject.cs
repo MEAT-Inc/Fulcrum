@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using SharpSimulator.SimulationEvents;
-using SharpWrap2534.PassThruTypes;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
 {

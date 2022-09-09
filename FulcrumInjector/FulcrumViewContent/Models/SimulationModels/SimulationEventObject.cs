@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpSimulator.SimulationEvents;
-using SharpWrap2534;
-using SharpWrap2534.J2534Objects;
+using SharpWrapper;
+using SharpWrapper.J2534Objects;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.SimulationModels
 {
