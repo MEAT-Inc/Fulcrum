@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -38,13 +39,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         private bool _isHardwareSetup;
         private string[] _supportedJ2534Commands;
         private string _currentJ2534CommandName;
-        private PassThruExecutionAction[] _j2534CommandQueue;
+        private ObservableCollection<PassThruExecutionAction> _j2534CommandQueue;
 
         // Public values for our View to bind onto
         public bool IsHardwareSetup { get => _isHardwareSetup; set => PropertyUpdated(value); }
         public string[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); } 
         public string CurrentJ2534CommandName { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
-        public PassThruExecutionAction[] J2534CommandQueue { get => _j2534CommandQueue; set => PropertyUpdated(value); }
+        public ObservableCollection<PassThruExecutionAction> J2534CommandQueue { get => _j2534CommandQueue; set => PropertyUpdated(value); }
 
         // Style objects for laying out view contents
         private readonly ResourceDictionary _viewStyleResources;
@@ -510,6 +511,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog($"LOGGING THE LIST OF ARGUMENT OBJECTS FOR THIS COMMAND NOW...\n{CommandAction.CommandArgumentsString}");
 
             // Configure the action to actually invoke for our execution routine
+            this.J2534CommandQueue.Add(CommandAction);
             return CommandAction;
         }
     }
