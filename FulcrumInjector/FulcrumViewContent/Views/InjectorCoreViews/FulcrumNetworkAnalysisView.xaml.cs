@@ -154,21 +154,29 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Using this list of controls, invoke the current method using a sharp session object on the view model.
             this.ViewLogger.WriteLog("GENERATING EXECUTION ACTION FOR COMMAND NOW...", LogType.InfoLog);
-            this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
+            var GeneratedCommand = this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
 
             // Execute the action if needed
-            if (SendingButton.Content.ToString().Contains("Execute")) 
-            {
-                // TODO: BUILD EXECUTION LOGIC
+            if (SendingButton.Content.ToString().Contains("Execute"))
+            {                
+                // Log execution started, get the newest command entry and execute it.
                 this.ViewLogger.WriteLog("EXECUTING NEXT COMMAND OBJECT NOW...", LogType.InfoLog);
-            }
+                bool ExecutionResult = GeneratedCommand.ExecuteCommandAction();
 
-            // Toggle Sending Button Content
-            // If there's no value for a required parameter, then return out of here and update the button
-            SendingButton.Background = Brushes.DarkGreen;
-            SendingButton.Content = "Processed OK!";
-            SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
-            SendingButton.IsEnabled = true;
+                // Update sending button based on execution results
+                SendingButton.Background = ExecutionResult ? Brushes.DarkGreen : Brushes.Red;
+                SendingButton.Content = $"Execution {(ExecutionResult ? "Passed" : "Failed")}!";
+                SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
+                SendingButton.IsEnabled = true;
+            }
+            else
+            {
+                // If we're not executing, then just set the button to show command building passed
+                SendingButton.Background = Brushes.DarkGreen;
+                SendingButton.Content = "Processed OK!";
+                SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
+                SendingButton.IsEnabled = true;
+            }
 
             // Wait for 2.5 seconds and reset the button
             Task.Run(() =>

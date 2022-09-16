@@ -66,9 +66,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this._viewStyleResources = this._configureControlStyles();
             this.SupportedJ2534Commands = this._configureSupportedCommandTypes();
 
+            // Configure the collection of command objects to fire a property event when it's modified
+            this.J2534CommandQueue.CollectionChanged += (SendingCollection, EventArgs) =>
+            {
+                // Fire a new property changed event silently with a forced name value if there's a change to the collection
+                if (EventArgs.NewItems.Count == 0 && EventArgs.OldItems.Count == 0) return;
+                PropertyUpdated(SendingCollection, "J2534CommandQueue", true);
+            };
+
             // Log setup complete
-            ViewModelLogger.WriteLog("BUILT NEW FULCRUM P2P VIEW MODEL OK!");
             ViewModelLogger.WriteLog("BUILT NEW CAN NETWORK ANALYSIS VIEW MODEL LOGGER AND INSTANCE OK!", LogType.InfoLog);
+            ViewModelLogger.WriteLog("CONFIGURED COMMAND QUEUE COLLECTION TO FIRE PROPERTY EVENTS!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -502,7 +510,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
             // Build the new command action object here and store it
             PassThruExecutionAction CommandAction = new PassThruExecutionAction(
-                FulcrumConstants.SharpSessionAlpha, CommandName, 
+                FulcrumConstants.SharpSessionAlpha,
+                CommandName, 
                 CastArgumentValues.ToArray()
             );
 
