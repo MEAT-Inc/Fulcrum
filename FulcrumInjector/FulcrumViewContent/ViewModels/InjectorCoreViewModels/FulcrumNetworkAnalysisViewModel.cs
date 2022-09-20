@@ -37,14 +37,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 
         // Private Control Values
         private bool _isHardwareSetup;
-        private string[] _supportedJ2534Commands;
-        private string _currentJ2534CommandName;
+        private SharpSessionCommandType[] _supportedJ2534Commands;
+        private SharpSessionCommandType _currentJ2534CommandName;
         private ObservableCollection<PassThruExecutionAction> _j2534CommandQueue;
 
         // Public values for our View to bind onto
         public bool IsHardwareSetup { get => _isHardwareSetup; set => PropertyUpdated(value); }
-        public string[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); } 
-        public string CurrentJ2534CommandName { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
+        public SharpSessionCommandType[] SupportedJ2534Commands { get => _supportedJ2534Commands; set => PropertyUpdated(value); } 
+        public SharpSessionCommandType CurrentJ2534CommandName { get => _currentJ2534CommandName; set => PropertyUpdated(value); }
         public ObservableCollection<PassThruExecutionAction> J2534CommandQueue { get => _j2534CommandQueue; set => PropertyUpdated(value); }
 
         // Style objects for laying out view contents
@@ -67,6 +67,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.SupportedJ2534Commands = this._configureSupportedCommandTypes();
 
             // Configure the collection of command objects to fire a property event when it's modified
+            this.J2534CommandQueue = new ObservableCollection<PassThruExecutionAction>();
             this.J2534CommandQueue.CollectionChanged += (SendingCollection, EventArgs) =>
             {
                 // Fire a new property changed event silently with a forced name value if there's a change to the collection
@@ -121,7 +122,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// Sharp2534 API
         /// </summary>
         /// <returns>A string array containing all the command types we can support and issue</returns>
-        private string[] _configureSupportedCommandTypes()
+        private SharpSessionCommandType[] _configureSupportedCommandTypes()
         {
             // Begin by getting the method objects we can invoke and get their names.
             ViewModelLogger.WriteLog("GETTING REFLECTED METHOD INFORMATION FOR OUR SHARPSESSION TYPE NOW...");
@@ -141,9 +142,17 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 .Where(MethodName => MethodName.StartsWith("PT"))
                 .ToArray();
 
+            // Now cast all the method names into enum types and store them in a list to return
+            SharpSessionCommandType[] OutputCommandTypes = SharpSessionMethodNames.Select(MethodName =>
+                !Enum.TryParse(MethodName, out SharpSessionCommandType OutputCommandType) ? 
+                    SharpSessionCommandType.INVALID : 
+                    OutputCommandType)
+                .Where(CommandTypeEnum => CommandTypeEnum != SharpSessionCommandType.INVALID)
+                .ToArray();
+
             // Return the array of methods here with a "Select A Command" Option at the top
-            ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {SharpSessionMethodNames.Length} METHOD NAMES WHICH WE CAN EXECUTE ON OUR VIEW!", LogType.InfoLog);
-            return SharpSessionMethodNames;
+            ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {OutputCommandTypes.Length} METHOD NAMES WHICH WE CAN EXECUTE ON OUR VIEW!", LogType.InfoLog);
+            return OutputCommandTypes;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -153,15 +162,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="CommandName">Name of the command being pulled from our list of supported commands</param>
         /// <returns>The command configuration objects built for us to setup our command</returns>
-        internal UIElement[] GenerateCommandConfigElements(string CommandName = null)
+        internal UIElement[] GenerateCommandConfigElements(SharpSessionCommandType CommandName = SharpSessionCommandType.INVALID)
         {
             // If the command name is null, default to the one on our class
-            CommandName ??= this.CurrentJ2534CommandName;
-            if (CommandName == null) return null;
+            // Store the current command name if needed and build a new execution object
+            if (CommandName == SharpSessionCommandType.INVALID) CommandName = this.CurrentJ2534CommandName;
+            if (CommandName == SharpSessionCommandType.INVALID) return null;
 
             // Start by getting the method information for the command object
             MethodInfo CommandMethodInfo = typeof(Sharp2534Session).GetMethods()
-                .FirstOrDefault(MethodObj => MethodObj.Name == CommandName);
+                .FirstOrDefault(MethodObj => MethodObj.Name == CommandName.ToString());
 
             // Ensure the command method info is not null
             if (CommandMethodInfo == null) {
@@ -392,10 +402,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="CurrentArgValues">Arguments for the command</param>
         /// <param name="CommandName">Name of the command to invoke</param>
-        internal PassThruExecutionAction GenerateCommandExecutionAction(object[] CurrentArgValues, string CommandName = null)
+        internal PassThruExecutionAction GenerateCommandExecutionAction(object[] CurrentArgValues, SharpSessionCommandType CommandName = SharpSessionCommandType.INVALID)
         {
             // Store the current command name if needed and build a new execution object
-            CommandName ??= this.CurrentJ2534CommandName;
+            if (CommandName == SharpSessionCommandType.INVALID)
+                CommandName = this.CurrentJ2534CommandName;
 
             // Parse and convert our objects in the input args array into the desired types for each argument
             List<object> CastArgumentValues = new List<object>();
@@ -455,7 +466,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 {
                     // Get the arg types for the current command name and find the type for it.
                     MethodInfo CommandMethodInfo = typeof(Sharp2534Session).GetMethods()
-                        .FirstOrDefault(MethodObj => MethodObj.Name == CommandName);
+                        .FirstOrDefault(MethodObj => MethodObj.Name == CommandName.ToString());
 
                     // Now find the parameter based on the index of our loop here
                     int IndexOfArgs = CurrentArgValues.ToList().IndexOf(ArgumentObject);

@@ -43,6 +43,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
     public enum SharpSessionCommandType
     {
         // Command type entries go here with their hex value for identification
+        [Description("INVALID_COMMAND")] INVALID = 0x00000000,
         [Description("PassThruOpen")] PTOpen = 0x00111001,
         [Description("PassThruClose")] PTClose = 0x0011102,
         [Description("PassThruConnect")] PTConnect = 0x00112001,
@@ -174,12 +175,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         /// <param name="InputSession">Session to invoke our command onto</param>
         /// <param name="CommandName">The command name to execute</param>
         /// <param name="CommandArguments">The arguments of our command object</param>
-        public PassThruExecutionAction(Sharp2534Session InputSession, string CommandName, IEnumerable<object> CommandArguments = null)
+        public PassThruExecutionAction(Sharp2534Session InputSession, SharpSessionCommandType CommandName, IEnumerable<object> CommandArguments = null)
         {
             // Store values passed in onto our instance.
+            this.CommandName = CommandName;
             this.SessionToInvoke = InputSession;
             this.CommandArguments = (List<object>)CommandArguments;
-            this.CommandName = (SharpSessionCommandType)Enum.Parse(typeof(SharpSessionCommandType), CommandName);
 
             // Get all the methods we can support first and then find the one for our command instance
             MethodInfo[] SharpSessionMethods = typeof(Sharp2534Session)
@@ -193,7 +194,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                         ParamObj.ParameterType != typeof(J2534Filter) &&
                         ParamObj.ParameterType != typeof(J2534PeriodicMessage) &&
                         ParamObj.ParameterType != typeof(PassThruStructs.PassThruMsg[])))
-                .FirstOrDefault(MethodObj => MethodObj.Name.ToUpper() == CommandName.ToUpper());
+                .FirstOrDefault(MethodObj => MethodObj.Name.ToUpper() == CommandName.ToString().ToUpper());
             this.CommandParamsInfos = this.CommandMethodInfo?.GetParameters();
 
             // Validate the parameter count matches the argument count and that this info object is not null

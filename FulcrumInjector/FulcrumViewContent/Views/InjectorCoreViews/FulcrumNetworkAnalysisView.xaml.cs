@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -71,7 +72,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Generate our control set for the selected command object
             this.ViewLogger.WriteLog("SETTING UP COMMAND CONFIG VALUES NOW...", LogType.InfoLog);
-            this.ViewModel.CurrentJ2534CommandName = SendingComboBox.SelectedItem.ToString();
+            this.ViewModel.CurrentJ2534CommandName = (SharpSessionCommandType)Enum.Parse(
+                typeof(SharpSessionCommandType),
+                SendingComboBox.SelectedItem.ToString()
+            );
 
             // Store the controls on our items collection inside the viewer object now
             PassThruCommandArgsViewer.ItemsSource = this.ViewModel.GenerateCommandConfigElements();
