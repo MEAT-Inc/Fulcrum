@@ -96,6 +96,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
         public readonly SharpSessionCommandType CommandName;
 
         // Method information and parameter information for our method object
+        public readonly Type CommandReturnType;
         public readonly MethodInfo CommandMethodInfo;
         public readonly ParameterInfo[] CommandParamsInfos;
 
@@ -196,6 +197,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
                         ParamObj.ParameterType != typeof(PassThruStructs.PassThruMsg[])))
                 .FirstOrDefault(MethodObj => MethodObj.Name.ToUpper() == CommandName.ToString().ToUpper());
             this.CommandParamsInfos = this.CommandMethodInfo?.GetParameters();
+
+            // Store the return type for the method here
+            this.CommandReturnType = this.CommandMethodInfo?.ReturnType;
 
             // Validate the parameter count matches the argument count and that this info object is not null
             if (this.CommandMethodInfo == null)
