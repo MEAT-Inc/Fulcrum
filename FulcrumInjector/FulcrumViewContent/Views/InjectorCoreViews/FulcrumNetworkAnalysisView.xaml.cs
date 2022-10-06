@@ -202,6 +202,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Reenable the sending button here
             SendingButton.IsEnabled = true;
         }
+        /// <summary>
+        /// Toggles our flyout for the command execution queue to show the user what commands are being queued
+        /// </summary>
+        /// <param name="Sender">Sending button</param>
+        /// <param name="E">Event args passed with this click event</param>
+        private void ToggleCommandQueueFlyout_Click(object Sender, RoutedEventArgs E)
+        {
+            // Get the current flyout state and toggle it.
+            this.CommandQueueFlyout.IsOpen = !this.CommandQueueFlyout.IsOpen;
+            this.ViewLogger.WriteLog($"TOGGLED EXECUTION QUEUE FLYOUT OK! IS OPEN VALUE IS NOW {this.CommandQueueFlyout.IsOpen}");
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

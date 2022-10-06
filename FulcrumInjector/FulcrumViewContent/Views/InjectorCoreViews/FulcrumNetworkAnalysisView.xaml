@@ -109,7 +109,8 @@
                             IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
                     <Button Content="Show Queued Command Actions" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                             Margin="0,5,5,5" Style="{StaticResource ActionButtonStyle}"
-                            IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"/>
+                            IsEnabled="{Binding ElementName=PassThruCommandArgsViewer, Path=HasItems}"
+                            Click="ToggleCommandQueueFlyout_Click"/>
                 </Grid>
 
                 <!-- Content placeholders -->

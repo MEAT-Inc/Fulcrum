@@ -90,10 +90,10 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 
         // SharpSession object to invoke our routine onto
         public readonly Sharp2534Session SessionToInvoke;
-        
+
         // Command name and the arguments to invoke on our command
-        public readonly IEnumerable<object> CommandArguments;
         public readonly SharpSessionCommandType CommandName;
+        public IEnumerable<object> CommandArguments { get; private set; }
 
         // Method information and parameter information for our method object
         public readonly Type CommandReturnType;
@@ -229,7 +229,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
 
                         // If it is an optional argument object then we can just add a new object to our list of arguments on the class
                         Type ParamType = NextParamInfo.ParameterType;
-                        this.CommandArguments.Append(Activator.CreateInstance(ParamType));
+                        this.CommandArguments = this.CommandArguments.Append(Activator.CreateInstance(ParamType));
                     }
 
                     // Get the parameter object and check if the type matches/if we have a value at all.
