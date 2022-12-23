@@ -36,7 +36,7 @@
                                 <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
                                 <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
-                                <File Id="SHARPWRAP2534.DLL" Name="SharpWrap2534.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrap2534.dll" />
+                                <File Id="SHARPWRAPPER.DLL" Name="SharpWrapper.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrapper.dll" />
                                 <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
                                 <File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
                                 <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
