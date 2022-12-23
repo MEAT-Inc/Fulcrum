@@ -184,8 +184,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     this.IsLogLoaded = true;
                     this.ExpressionsBuilt = true;
                     this.ExpressionsFile = NewLogFile;
-                    this.LoadedLogFile = GenerateExpressionExtensions.ImportExpressionSet(this.ExpressionsFile);
                     this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
+                    this.LoadedLogFile = ExpressionsGenerator.ImportExpressionSet(this.ExpressionsFile);
                     ViewModelLogger.WriteLog("PULLED IN A NEW EXPRESSIONS FILE AND CONVERTED IT INTO A RAW LOG OK!");
 
                     // Toggle the viewer to show out output
@@ -234,8 +234,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");
                 }
 
-                // Set log loaded to true
-                this.IsLogLoaded = true;
+                // Set log loaded to true and log the results
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
             }
