@@ -59,25 +59,6 @@ namespace InjectorTests
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Test method for importing and storing all log file contents needed for testing later on
-        /// </summary>
-        [TestMethod]
-        public void GenerateAllCommandSets()
-        {
-            // Loop all of our built test file instances and attempt to split their contents now using a generator object
-            Parallel.ForEach(this._logFilesImported, FileKeyValuePair =>
-            {
-                // Build a new generator for the file instance and store the output values
-                string LogFileName = FileKeyValuePair.Key;
-                string LogFileContent = FileKeyValuePair.Value.LogFileContents;
-                ExpressionsGenerator GeneratorBuilt = new ExpressionsGenerator(LogFileName, LogFileContent);
-
-                // Split our log file content and store it on our output instance now
-                var BuiltSplitLines = GeneratorBuilt.GenerateCommandSets();
-                Assert.IsTrue(BuiltSplitLines != null && BuiltSplitLines.Length != 0);
-            });
-        }
-        /// <summary>
         /// Test method for building all expressions files for our input log file objects 
         /// </summary>
         [TestMethod]
@@ -92,7 +73,7 @@ namespace InjectorTests
                 ExpressionsGenerator GeneratorBuilt = new ExpressionsGenerator(LogFileName, LogFileContent);
 
                 // Build our expressions files now for each file instance
-                var BuiltExpressions = GeneratorBuilt.GenerateExpressionsSet();
+                var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions();
                 Assert.IsTrue(BuiltExpressions != null && BuiltExpressions.Length != 0);
 
                 // Store the built expressions on the new test file instance here

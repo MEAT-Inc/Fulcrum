@@ -197,7 +197,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog("BUILT GENERATOR TO CONVERT OUR BUILT J2534 LOG FILE OK!");
 
                     // Store expression objects here
-                    var BuiltExpressions = GeneratorBuilt.GenerateExpressionsSet(true);
+                    var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions(true);
                     this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
                     ViewModelLogger.WriteLog("BUILT IN NEW EXPRESSIONS FILES FROM OUR CONVERTED LOG FILE OK!");
                 }
@@ -271,7 +271,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 
                 // Start by building PTExpressions from input string object sets.
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
-                var BuiltExpressions = GeneratorBuilt.GenerateExpressionsSet(true);
+                var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions(true);
                 this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 

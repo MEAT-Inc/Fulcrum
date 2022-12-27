@@ -56,84 +56,73 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         /// <summary>
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
         /// </summary>
+        /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
         /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        public string[] GenerateCommandSets()
+        public PassThruExpression[] GenerateLogExpressions(bool UpdateParseProgress = false)
         {
             // Log building expression log command line sets now
             this._expressionsLogger.WriteLog($"SPLITTING INPUT LOG FILE {this.LogFileName} INTO COMMAND LINE SETS NOW...", LogType.InfoLog);
 
-            // Take the input log contents and split it using our time regex object
+            // Store our regex matches and regex object for the time string values located here
             var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern, RegexOptions.Compiled);
-            this.LogFileContentsSplit = TimeRegex.Split(this.LogFileContents);
+            var TimeMatches = TimeRegex.Matches(this.LogFileContents).Cast<Match>().ToArray();
 
-            // If we got no usable content throw an exception here
-            if (this.LogFileContentsSplit.Length == 0)
-                throw new InvalidOperationException("ERROR! UNABLE TO SPLIT OUR INPUT LOG FILE INTO A SET OF USABLE CONTENT!");
+            // Build an output list of lines for content, find our matches from a built expressions Regex, and generate output lines
+            var OutputExpressions = new List<PassThruExpression>();
+            var OutputCommands = Enumerable.Repeat(string.Empty, TimeMatches.Length).ToList();
+            while (OutputExpressions.Count != this.LogFileContentsSplit.Length) OutputExpressions.Add(null);
 
-            // Log done building log command line sets
-            this._expressionsLogger.WriteLog($"DONE BUILDING LOG LINE SETS FROM INPUT FILE {this.LogFileName}!", LogType.InfoLog);
-            this._expressionsLogger.WriteLog($"BUILT A TOTAL OF {this.LogFileContents.Length} LOG LINE SETS OK!", LogType.InfoLog);
-
-            // Return the built set of commands.
-            return this.LogFileContentsSplit;
-        }
-        /// <summary>
-        /// Splits the input log file content into chunks by command issues and stores their results as a set of expressions
-        /// </summary>
-        /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
-        /// <returns>A collection of all the expression objects built out from our input log file</returns>
-        public PassThruExpression[] GenerateExpressionsSet(bool UpdateParseProgress = false)
-        {
-            // Log Generating Expressions now
-            this._expressionsLogger.WriteLog($"GENERATING EXPRESSION SET FOR INPUT FILE {this.LogFileName}...", LogType.InfoLog);
-
-            // Start by splitting the input log content using our time regex object
-            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern, RegexOptions.Compiled);
-            this.LogFileContentsSplit = TimeRegex.Split(this.LogFileContents);
-            
-            // Build a temporary output list for our expressions objects here
-            var BuiltExpressions = new List<PassThruExpression>();
-            while (BuiltExpressions.Count != this.LogFileContentsSplit.Length) 
-                BuiltExpressions.Add(null);
-
-            // Now loop all the split log content objects and store their values in the temporary output list
-            Parallel.For(0, this.LogFileContentsSplit.Length, LineSetIndex =>
+            // Loop all the time matches in order and find the index of the next one. Take all content between the index values found
+            Parallel.For(0, TimeMatches.Length, MatchIndex =>
             {
-                // If no line content is found, then just move onto the next iteration
-                var InputLineSet = this.LogFileContentsSplit[LineSetIndex];
-                string[] SplitLines = InputLineSet.Split('\n').ToArray();
-                if (InputLineSet.Contains("16:BUFFER_EMPTY") || SplitLines.Length == 1) return;
+                // Store the current match and the index of it  
+                string ContentSubstring = string.Empty;
+                var CurrentMatch = TimeMatches[MatchIndex];
+                int StartingIndex = CurrentMatch.Index;
 
                 try
                 {
+                    // Find the index values of the next match now and store it to
+                    var NextMatch = MatchIndex + 1 == TimeMatches.Length
+                        ? TimeMatches[MatchIndex]
+                        : TimeMatches[MatchIndex + 1];
+
+                    // Pull a substring of our file contents here and store them now
+                    int EndingIndex = NextMatch.Index;
+                    int FileSubstringLength = EndingIndex - StartingIndex;
+                    ContentSubstring = this.LogFileContents.Substring(StartingIndex, FileSubstringLength);
+                    OutputCommands[MatchIndex] = (ContentSubstring);
+
                     // Take the split content values, get our ExpressionType, and store the built expression object here
-                    var ExpressionType = InputLineSet.GetPtTypeFromLines();
-                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(InputLineSet);
-                    lock (BuiltExpressions) BuiltExpressions[LineSetIndex] = NextClassObject;
+                    var ExpressionType = ContentSubstring.GetPtTypeFromLines();
+                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(ContentSubstring);
+                    OutputExpressions[MatchIndex] = NextClassObject;
                 }
-                catch (Exception ParseEx)
+                catch (Exception SplitLogContentEx)
                 {
-                    // Log failures out and find out why the fails happen
-                    this._expressionsLogger.WriteLog($"FAILED TO PARSE A COMMAND ENTRY! FIRST LINE OF COMMAND SET: {SplitLines[0]}", LogType.ErrorLog);
-                    this._expressionsLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ParseEx, new[] { LogType.DebugLog, LogType.DebugLog });
+                    // Log failures out and find out why the fails happen then move to our progress routine or move to next iteration
+                    this._expressionsLogger.WriteLog($"FAILED TO SPLIT A COMMAND LOG SET INTO AN EXPRESSION!", LogType.WarnLog);
+                    this._expressionsLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", SplitLogContentEx, new[] { LogType.WarnLog, LogType.TraceLog });
                 }
 
-                // Build a new progress value and then store it on the view model for our log review if needed
+                // Update progress values if needed now
                 if (!UpdateParseProgress) return;
-                lock (BuiltExpressions)
+                lock (OutputCommands)
                 {
-                    int NumberOfValues = BuiltExpressions.Count(OutputObj => OutputObj != null);
-                    double CurrentProgress = ((double)NumberOfValues / (double)BuiltExpressions.Count) * 100.00;
+                    // Get the new progress value and update our UI value with it
+                    int BuiltValues = OutputExpressions.Count(CommandObj => CommandObj != null);
+                    double CurrentProgress = ((double)BuiltValues / (double)TimeMatches.Length) * 100.00;
                     FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
                 }
             });
 
-            // Log done building log command line sets
-            this._expressionsLogger.WriteLog($"DONE BUILDING EXPRESSION OBJECTS FROM INPUT FILE {this.LogFileName}!", LogType.InfoLog);
-            this._expressionsLogger.WriteLog($"BUILT A TOTAL OF {BuiltExpressions.Count} EXPRESSIONS CORRECTLY!", LogType.InfoLog);
+            // Log done building log command line sets and expressions
+            this._expressionsLogger.WriteLog($"DONE BUILDING EXPRESSION SETS FROM INPUT FILE {this.LogFileName}!", LogType.InfoLog);
+            this._expressionsLogger.WriteLog($"BUILT A TOTAL OF {OutputCommands.Count} LOG LINE SETS OK!", LogType.InfoLog);
 
-            // Return the built expressions objects here
-            this.ExpressionsBuilt = BuiltExpressions.ToArray();
+            // Return the built set of commands.
+            this.ExpressionsBuilt = OutputExpressions.ToArray();
+            this.LogFileContentsSplit = OutputCommands.ToArray();
             return this.ExpressionsBuilt;
         }
         /// <summary>

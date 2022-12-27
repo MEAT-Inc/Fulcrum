@@ -354,7 +354,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             catch (Exception InvokeTypeEx)
             {
                 // Catch this exception for debugging use later on
-                _expExtLogger.WriteLog($"INPUT LOG LINE \"{InputLogLines[0]}\" COULD NOT BE PARSED OUT TO AN EXPRESSION TYPE!", LogType.TraceLog);
+                _expExtLogger.WriteLog($"AN INPUT LOG LINE SET COULD NOT BE PARSED OUT TO AN EXPRESSION TYPE!", LogType.TraceLog);
                 _expExtLogger.WriteLog("EXCEPTION THROWN DURING CONVERSION ROUTINE IS LOGGED BELOW", InvokeTypeEx, new[] { LogType.TraceLog, LogType.TraceLog});
                 
                 // Return null at this point since the log line objects could not be parsed for some reason
