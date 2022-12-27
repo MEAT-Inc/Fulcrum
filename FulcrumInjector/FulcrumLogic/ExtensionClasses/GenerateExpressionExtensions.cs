@@ -22,6 +22,12 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// </summary>
     public static class GenerateExpressionExtensions
     {
+        // Logger Object
+        private static SubServiceLogger _expExtLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"ExpressionsExtLogger")) ?? new SubServiceLogger("ExpressionsExtLogger");
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
         /// </summary>
@@ -316,18 +322,44 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="InputType">Enum Regex Typ</param>
         /// <returns>Type of regex for the class output</returns>
-        public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string[] InputLines)
+        public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string[] InputLogLines)
         {
-            // Pull the description string and get type of regex class.
-            string ClassType = $"{typeof(PassThruExpression).Namespace}.{InputType.ToDescriptionString()}";
-            if (Type.GetType(ClassType) == null) 
-                try { return new PassThruExpression(string.Join(string.Empty, InputLines), InputType); }
-                catch { return null; }
+            // Join the log lines on newline characters and get the type value here
+            string JoinedLogLines = string.Join(string.Empty, InputLogLines.Select(LogLine => LogLine.Trim() + "\n"));
+            return GetRegexClassFromCommand(InputType, JoinedLogLines);
+        }
+        /// <summary>
+        /// Converts an input Regex command type enum into a type output
+        /// </summary>
+        /// <param name="InputType">Enum Regex Typ</param>
+        /// <returns>Type of regex for the class output</returns>
+        public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string InputLogLines)
+        {
+            try
+            {
+                // Pull the description string and get type of regex class.
+                string InputTypeName = InputType.ToDescriptionString();
+                string ClassNamespace = typeof(PassThruExpression).Namespace;
+                string ClassType = $"{ClassNamespace}.{InputTypeName}";
+                
+                // Build a new PassThru Expression object here based on the type found for our expression
+                Type RegexClassType = Type.GetType(ClassType);
+                PassThruExpression BuiltExpression = RegexClassType == null
+                    ? new PassThruExpression(InputLogLines, InputType)
+                    : (PassThruExpression)Activator.CreateInstance(RegexClassType, InputLogLines);
 
-            // Find our output type value here.
-            Type OutputType = Type.GetType(ClassType);
-            var RegexConstructor = OutputType.GetConstructor(new[] { typeof(string) });
-            return (PassThruExpression)RegexConstructor.Invoke(new[] { string.Join(string.Empty, InputLines) });
+                // Return the new Expression object here and move on
+                return BuiltExpression;
+            }
+            catch (Exception InvokeTypeEx)
+            {
+                // Catch this exception for debugging use later on
+                _expExtLogger.WriteLog($"INPUT LOG LINE \"{InputLogLines[0]}\" COULD NOT BE PARSED OUT TO AN EXPRESSION TYPE!", LogType.TraceLog);
+                _expExtLogger.WriteLog("EXCEPTION THROWN DURING CONVERSION ROUTINE IS LOGGED BELOW", InvokeTypeEx, new[] { LogType.TraceLog, LogType.TraceLog});
+                
+                // Return null at this point since the log line objects could not be parsed for some reason
+                return null;
+            }
         }
     }
 }

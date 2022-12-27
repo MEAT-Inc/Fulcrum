@@ -44,17 +44,17 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         /// </summary>
         /// <param name="InputLines">Lines to find the PTCommand Type for.</param>
         /// <returns>The type of PTCommand regex to search with.</returns>
-        public static PassThruCommandType GetTypeFromLines(this string[] InputLines)
+        public static PassThruCommandType GetPtTypeFromLines(this string[] InputLines)
         {
             // Return the result from our joined line output.
-            return GetTypeFromLines(string.Join("\n", InputLines.Select(Input => Input.TrimEnd())));
+            return GetPtTypeFromLines(string.Join("\n", InputLines.Select(Input => Input.TrimEnd())));
         }
         /// <summary>
         /// Finds a PTCommand type from the given input line set
         /// </summary>
         /// <param name="InputLines">Lines to find the PTCommand Type for.</param>
         /// <returns>The type of PTCommand regex to search with.</returns>
-        public static PassThruCommandType GetTypeFromLines(this string InputLines)
+        public static PassThruCommandType GetPtTypeFromLines(this string InputLines)
         {
             // Find the type of command by converting all enums to string array and searching for the type.
             var EnumTypesArray = Enum.GetValues(typeof(PassThruCommandType))
