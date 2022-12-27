@@ -69,8 +69,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 
             // Build an output list of lines for content, find our matches from a built expressions Regex, and generate output lines
             var OutputExpressions = new List<PassThruExpression>();
+            while (OutputExpressions.Count != TimeMatches.Length) OutputExpressions.Add(null);
             var OutputCommands = Enumerable.Repeat(string.Empty, TimeMatches.Length).ToList();
-            while (OutputExpressions.Count != this.LogFileContentsSplit.Length) OutputExpressions.Add(null);
 
             // Loop all the time matches in order and find the index of the next one. Take all content between the index values found
             Parallel.For(0, TimeMatches.Length, MatchIndex =>
@@ -91,7 +91,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                     int EndingIndex = NextMatch.Index;
                     int FileSubstringLength = EndingIndex - StartingIndex;
                     ContentSubstring = this.LogFileContents.Substring(StartingIndex, FileSubstringLength);
-                    OutputCommands[MatchIndex] = (ContentSubstring);
+                    OutputCommands[MatchIndex] = ContentSubstring;
 
                     // Take the split content values, get our ExpressionType, and store the built expression object here
                     var ExpressionType = ContentSubstring.GetPtTypeFromLines();
