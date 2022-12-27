@@ -19,8 +19,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
     public class PassThruExpression
     {
         // Logger Object
-        protected internal SubServiceLogger ExpressionLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
+        protected internal readonly SubServiceLogger ExpressionLogger;
 
         // String Values for Command content
         public readonly string CommandLines;
@@ -180,6 +179,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             this.CommandLines = CommandInput;
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\r');
+
+            // Build a logger object for our expression here
+            this.ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
 
             // Find command issue request values. (Pull using Base Class)
             var FieldsToSet = this.GetExpressionProperties(true);

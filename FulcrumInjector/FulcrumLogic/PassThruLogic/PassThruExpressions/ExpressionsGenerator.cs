@@ -72,6 +72,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             while (OutputExpressions.Count != TimeMatches.Length) OutputExpressions.Add(null);
             var OutputCommands = Enumerable.Repeat(string.Empty, TimeMatches.Length).ToList();
 
+            // Store an int value to track our loop count based on the number of iterations built now
+            int LoopsCompleted = 0;
+
             // Loop all the time matches in order and find the index of the next one. Take all content between the index values found
             Parallel.For(0, TimeMatches.Length, MatchIndex =>
             {
@@ -84,7 +87,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 string MatchContents = CurrentMatch.Value;
 
                 try
-                { 
+                {
                     // Find the index values of the next match now and store it to
                     var NextMatch = MatchIndex + 1 == TimeMatches.Length
                         ? TimeMatches[MatchIndex]
@@ -110,13 +113,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 
                 // Update progress values if needed now
                 if (!UpdateParseProgress) return;
-                lock (OutputCommands)
-                {
-                    // Get the new progress value and update our UI value with it
-                    int BuiltValues = OutputExpressions.Count(CommandObj => CommandObj != null);
-                    double CurrentProgress = ((double)BuiltValues / (double)TimeMatches.Length) * 100.00;
-                    FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
-                }
+            
+                // Get the new progress value and update our UI value with it
+                int OldProgress = FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress;
+                int CurrentProgress = (int)((double)LoopsCompleted++ / (double)TimeMatches.Length * 100.00);
+                if (OldProgress != CurrentProgress) FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = CurrentProgress;
             });
 
             // Log done building log command line sets and expressions
