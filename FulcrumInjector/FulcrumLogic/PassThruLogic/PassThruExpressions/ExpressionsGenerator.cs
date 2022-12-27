@@ -61,7 +61,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
         public PassThruExpression[] GenerateLogExpressions(bool UpdateParseProgress = false)
         {
             // Log building expression log command line sets now
-            this._expressionsLogger.WriteLog($"SPLITTING INPUT LOG FILE {this.LogFileName} INTO COMMAND LINE SETS NOW...", LogType.InfoLog);
+            this._expressionsLogger.WriteLog($"CONVERTING INPUT LOG FILE {this.LogFileName} INTO AN EXPRESSION SET NOW...", LogType.InfoLog);
 
             // Store our regex matches and regex object for the time string values located here
             var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern, RegexOptions.Compiled);
@@ -75,13 +75,16 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             // Loop all the time matches in order and find the index of the next one. Take all content between the index values found
             Parallel.For(0, TimeMatches.Length, MatchIndex =>
             {
-                // Store the current match and the index of it  
-                string ContentSubstring = string.Empty;
+                // Pull our our current match object here and store it
                 var CurrentMatch = TimeMatches[MatchIndex];
+
+                // Store the index and the string value of this match object here
+                string FileSubString = string.Empty;
                 int StartingIndex = CurrentMatch.Index;
+                string MatchContents = CurrentMatch.Value;
 
                 try
-                {
+                { 
                     // Find the index values of the next match now and store it to
                     var NextMatch = MatchIndex + 1 == TimeMatches.Length
                         ? TimeMatches[MatchIndex]
@@ -90,19 +93,19 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                     // Pull a substring of our file contents here and store them now
                     int EndingIndex = NextMatch.Index;
                     int FileSubstringLength = EndingIndex - StartingIndex;
-                    ContentSubstring = this.LogFileContents.Substring(StartingIndex, FileSubstringLength);
-                    OutputCommands[MatchIndex] = ContentSubstring;
+                    FileSubString = this.LogFileContents.Substring(StartingIndex, FileSubstringLength);
+                    OutputCommands[MatchIndex] = FileSubString;
 
                     // Take the split content values, get our ExpressionType, and store the built expression object here
-                    var ExpressionType = ContentSubstring.GetPtTypeFromLines();
-                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(ContentSubstring);
+                    var ExpressionType = FileSubString.GetPtTypeFromLines();
+                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(FileSubString);
                     OutputExpressions[MatchIndex] = NextClassObject;
                 }
-                catch (Exception SplitLogContentEx)
+                catch (Exception GenerateExpressionEx)
                 {
                     // Log failures out and find out why the fails happen then move to our progress routine or move to next iteration
-                    this._expressionsLogger.WriteLog($"FAILED TO SPLIT A COMMAND LOG SET INTO AN EXPRESSION!", LogType.WarnLog);
-                    this._expressionsLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", SplitLogContentEx, new[] { LogType.WarnLog, LogType.TraceLog });
+                    this._expressionsLogger.WriteLog($"FAILED TO GENERATE AN EXPRESSION FROM INPUT COMMAND {MatchContents} (Index: {MatchIndex})!", LogType.WarnLog);
+                    this._expressionsLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", GenerateExpressionEx, new[] { LogType.WarnLog, LogType.TraceLog });
                 }
 
                 // Update progress values if needed now
@@ -118,7 +121,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 
             // Log done building log command line sets and expressions
             this._expressionsLogger.WriteLog($"DONE BUILDING EXPRESSION SETS FROM INPUT FILE {this.LogFileName}!", LogType.InfoLog);
-            this._expressionsLogger.WriteLog($"BUILT A TOTAL OF {OutputCommands.Count} LOG LINE SETS OK!", LogType.InfoLog);
+            this._expressionsLogger.WriteLog($"BUILT A TOTAL OF {OutputExpressions.Count} LOG LINE SETS OK!", LogType.InfoLog);
 
             // Return the built set of commands.
             this.ExpressionsBuilt = OutputExpressions.ToArray();
