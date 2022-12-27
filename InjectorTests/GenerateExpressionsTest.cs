@@ -73,7 +73,7 @@ namespace InjectorTests
                 ExpressionsGenerator GeneratorBuilt = new ExpressionsGenerator(LogFileName, LogFileContent);
 
                 // Split our log file content and store it on our output instance now
-                var BuiltSplitLines = GeneratorBuilt.GenerateCommandSets(false);
+                var BuiltSplitLines = GeneratorBuilt.GenerateCommandSets();
                 Assert.IsTrue(BuiltSplitLines != null && BuiltSplitLines.Length != 0);
             });
         }
