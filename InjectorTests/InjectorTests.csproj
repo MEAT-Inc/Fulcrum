@@ -54,7 +54,7 @@
       <Version>2.2.7</Version>
     </PackageReference>
     <PackageReference Include="SharpSimulator">
-      <Version>0.8.2.147</Version>
+      <Version>0.8.2.151</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
