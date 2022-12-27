@@ -108,11 +108,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.ExpressionsBuilt = false;
             ViewModelLogger.WriteLog("TOGGLED ENABLED STATUS OF TOGGLE BUTTON OK!", LogType.InfoLog);
 
-            // This is turned off for now. No need to dupe import all of these objects
-            //      Import Regex objects. 
-            //      ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
-            //      var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
-            //      ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
+            // BUG: This is turned off for now. No need to dupe import all of these objects
+            // Import Regex objects. 
+            // ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
+            // var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
+            // ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
 
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL LOG REVIEW OUTPUT VALUES OK!", LogType.InfoLog);
@@ -197,7 +197,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog("BUILT GENERATOR TO CONVERT OUR BUILT J2534 LOG FILE OK!");
 
                     // Store expression objects here
-                    var BuiltExpressions = GeneratorBuilt.SplitAndGenerateExpressions(true);
+                    var BuiltExpressions = GeneratorBuilt.GenerateExpressionsSet(true);
                     this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
                     ViewModelLogger.WriteLog("BUILT IN NEW EXPRESSIONS FILES FROM OUR CONVERTED LOG FILE OK!");
                 }
@@ -271,7 +271,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 
                 // Start by building PTExpressions from input string object sets.
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
-                var BuiltExpressions = GeneratorBuilt.SplitAndGenerateExpressions(true);
+                var BuiltExpressions = GeneratorBuilt.GenerateExpressionsSet(true);
                 this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 
