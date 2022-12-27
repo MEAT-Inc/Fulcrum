@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
 
 // Reference for the PassThruExpression objects and expression generator
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
+using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
 
 namespace InjectorTests
 {

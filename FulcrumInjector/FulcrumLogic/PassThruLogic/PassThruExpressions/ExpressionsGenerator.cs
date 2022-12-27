@@ -107,7 +107,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 try
                 {
                     // Take the split content values, get our ExpressionType, and store the built expression object here
-                    var ExpressionType = SplitLines.GetPtTypeFromLines();
+                    var ExpressionType = InputLineSet.GetPtTypeFromLines();
                     var NextClassObject = ExpressionType.GetRegexClassFromCommand(InputLineSet);
                     lock (BuiltExpressions) BuiltExpressions[LineSetIndex] = NextClassObject;
                 }
