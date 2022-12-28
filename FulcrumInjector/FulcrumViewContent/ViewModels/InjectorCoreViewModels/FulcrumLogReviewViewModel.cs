@@ -279,6 +279,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._expressionsFile}!", LogType.InfoLog);
                 this.ProcessingProgress = 100; this.ExpressionsBuilt = true;
+
+                // Toggle the viewer to show out output
+                if (!this.ToggleViewerContents(ViewerStateType.ShowingExpressions))
+                    throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                // Return true at this point since it seems like we built everything correctly
                 return true;
             }
             catch (Exception Ex)
@@ -317,10 +323,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog("SAVING SIMULATION FILE OUTPUT NOW...", LogType.InfoLog);
                 this.SimulationFile = GeneratorBuilt.SaveSimulationFile(this.LoadedLogFile);
                 ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {this.SimulationFile} OK!", LogType.InfoLog);
+                this.ProcessingProgress = 100; this.SimulationBuilt = true;
 
-                // Return passed and move out of here.
-                this.ProcessingProgress = 100;
-                this.SimulationBuilt = true;
+                // Toggle the viewer to show out output
+                if (!this.ToggleViewerContents(ViewerStateType.ShowingExpressions))
+                    throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                // Return true at this point since it seems like we built everything correctly
                 return true;
             } 
             catch (Exception BuildSimEx) 
