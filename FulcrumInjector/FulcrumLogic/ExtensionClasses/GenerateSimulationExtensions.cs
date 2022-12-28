@@ -93,7 +93,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Find the ProtocolID and Current Channel ID. Then build a sim channel
             if (PTConnectCommands.Length == 0) return null;
             var ConnectCommand = PTConnectCommands.FirstOrDefault();
-            var ChannelFlags = (PassThroughConnect)uint.Parse(ConnectCommand.ConnectFlags);
+            var ChannelFlags = (PassThroughConnect)Convert.ToUInt32(ConnectCommand.ConnectFlags, 16);
             var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
             var BaudRateInUse = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(BaudRate))
                 .FirstOrDefault(BaudObj => BaudObj.Contains(ProtocolInUse.ToString()) && BaudObj.Contains(ConnectCommand.BaudRate)));
