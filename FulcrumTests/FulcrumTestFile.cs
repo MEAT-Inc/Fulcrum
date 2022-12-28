@@ -14,7 +14,7 @@ namespace InjectorTests
     /// <summary>
     /// Structure used to help track testing results and states
     /// </summary>
-    internal class InjectorTestFile
+    internal class FulcrumTestFile
     {
         // Input file path and name for our log file object 
         public readonly string LogFile;             // Full path to our log file
@@ -38,7 +38,7 @@ namespace InjectorTests
         /// </summary>
         /// <param name="InputLogFile">Full path to our input log file instance</param>
         /// <exception cref="FileNotFoundException">Thrown when the input file object is not found</exception>
-        public InjectorTestFile(string InputLogFile)
+        public FulcrumTestFile(string InputLogFile)
         {
             // Check if the file exists and store it on our instance here
             if (!File.Exists(InputLogFile))

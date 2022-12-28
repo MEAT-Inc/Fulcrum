@@ -111,7 +111,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     .ToArray());
 
                 // Log added new content
-                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
+                // this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
             }
             if (this.GetType() == typeof(PassThruStartMessageFilterExpression))
             {
@@ -124,7 +124,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     .ToArray());
 
                 // Log added new content
-                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
+                // this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
             }
             if (this.GetType() == typeof(PassThruIoctlExpression))
             {
@@ -137,7 +137,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     .ToArray());
 
                 // Log added new content
-                this.ExpressionLogger.WriteLog("PULLED IN NEW IOCTL VALUES FOR COMMAND CONTENTS CORRECTLY!", LogType.InfoLog);
+                // this.ExpressionLogger.WriteLog("PULLED IN NEW IOCTL VALUES FOR COMMAND CONTENTS CORRECTLY!", LogType.InfoLog);
             }
 
             // Remove double newlines. Command lines are split with \r so this doesn't apply.
@@ -169,6 +169,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
 
         // --------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// A Default constructor for the PassThruExpression object type.
+        /// This is used to spawn in a default/null value for our expression object instances
+        /// </summary>
+        public PassThruExpression()
+        {
+            // Store the none type for our expression and exit out
+            this.TypeOfExpression = PassThruCommandType.NONE;
+        }
         /// <summary>
         /// Builds a new set of PassThruCommand Regex Operations
         /// </summary>
@@ -214,8 +223,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
 
             // Now apply values using base method and exit out of this routine
             bool StorePassed = this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
-            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!");
-            this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
+            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!"); 
+            // this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------
@@ -262,8 +271,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                 catch (Exception SetEx)
                 {
                     // Throw an exception output for this error type.
-                    // this.ExpressionLogger.WriteLog($"EXCEPTION THROWN DURING EXPRESSION VALUE STORE FOR COMMAND TYPE {this.GetType().Name}!", LogType.ErrorLog);
-                    // this.ExpressionLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetEx);
+                    this.ExpressionLogger.WriteLog($"EXCEPTION THROWN DURING EXPRESSION VALUE STORE FOR COMMAND TYPE {this.GetType().Name}!", LogType.ErrorLog);
+                    this.ExpressionLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetEx);
                     return false;
                 }
             }
