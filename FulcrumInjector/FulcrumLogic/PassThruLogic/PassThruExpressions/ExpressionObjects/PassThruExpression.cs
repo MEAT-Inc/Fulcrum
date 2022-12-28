@@ -91,7 +91,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
 
             // Store string to replace and build new list of strings
             var NewLines = new List<string>() { SplitString }; NewLines.Add("\r");
-            NewLines.AddRange(this.SplitCommandLines.Select(LineObj => "   " + LineObj));
+            NewLines.AddRange(this.SplitCommandLines.Select(LineObj => "   " + LineObj.Trim()));
             NewLines.Add("\n");
 
             // Add our breakdown contents here.
