@@ -21,8 +21,7 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
             {
                 // If the main output value is null, return anyway.
                 if (LogBroker.MainLogFileName == null) { return null; }
-                var CurrentLogger = LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                    .FirstOrDefault(LogObj => LogObj.LoggerName.StartsWith("JsonConfigLogger"));
+                var CurrentLogger = LoggerQueue.SpawnLogger("JsonConfigLogger", LoggerActions.SubServiceLogger);
 
                 // Check logger
                 if (CurrentLogger != null) return (SubServiceLogger)CurrentLogger;
@@ -41,15 +40,16 @@ namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
         /// <summary>
         /// Loads a new config file, sets the access bool to true if the file exists
         /// </summary>
-        /// <param name="NewConfigFileName"></param>
-        public static void SetNewAppConfigFile(string NewConfigFileName)
+        /// <param name="NewConfigFileName">Name of our configuration file to use</param>
+        /// <param name="ForcedDirectory">The forced path to look in for our configuration file</param>
+        public static void SetNewAppConfigFile(string NewConfigFileName, string ForcedDirectory = null)
         {
             // Pull location of the configuration application. If debugging is on, then try and set it using the working dir. 
-            string FulcrumInjectorExe;
+            string FulcrumInjectorExe = ForcedDirectory ?? string.Empty;
             ConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
 #if DEBUG
             ConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
-            FulcrumInjectorExe = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            FulcrumInjectorExe = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #else
             string FulcrumInjectorDir;
             var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");

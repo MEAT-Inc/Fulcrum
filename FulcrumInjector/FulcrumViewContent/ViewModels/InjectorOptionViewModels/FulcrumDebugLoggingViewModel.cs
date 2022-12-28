@@ -14,8 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     public class FulcrumDebugLoggingViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("DebugLoggingViewModelLogger")) ?? new SubServiceLogger("DebugLoggingViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("DebugLoggingViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _usingRegex;
@@ -63,7 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 
             // Build filtering list and return them
             var PulledNames = new List<string>() { "--- Select A Logger ---" };
-            PulledNames.AddRange(LogBroker.LoggerQueue.GetLoggers().Select(LoggerObj => LoggerObj.LoggerName).ToList());
+            PulledNames.AddRange(LoggerQueue.GetLoggers().Select(LoggerObj => LoggerObj.LoggerName).ToList());
 
             // Return them here
             ViewModelLogger.WriteLog($"PULLED A TOTAL OF {PulledNames.Count} LOGGER NAMES OK!", LogType.InfoLog);

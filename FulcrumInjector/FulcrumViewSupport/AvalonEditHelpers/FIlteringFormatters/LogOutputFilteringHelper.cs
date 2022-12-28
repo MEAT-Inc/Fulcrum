@@ -13,8 +13,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatte
     public class LogOutputFilteringHelper
     {
         // Logger object.
-        private static SubServiceLogger FilterLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("AvalonEditFilteringLogger")) ?? new SubServiceLogger("AvalonEditFilteringLogger");
+        private static SubServiceLogger FilterLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AvalonEditFilteringLogger", LoggerActions.SubServiceLogger);
 
         // Editor object to use and Session GUID
         public readonly Guid SessionGuid;

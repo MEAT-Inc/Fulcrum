@@ -279,8 +279,7 @@ namespace FulcrumInjector
         private void ConfigureUserSettings()
         {
             // Build a logger for this method
-            var SettingsLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("UserSettingConfigLogger")) ?? new SubServiceLogger("UserSettingConfigLogger");
+            var SettingsLogger = (SubServiceLogger)LoggerQueue.SpawnLogger("UserSettingConfigLogger", LoggerActions.SubServiceLogger);
 
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = FulcrumSettingsShare.GenerateSettingsModels();

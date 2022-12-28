@@ -31,8 +31,7 @@ namespace FulcrumInjector.FulcrumViewContent
     public static class FulcrumConstants
     {
         // Logger object.
-        private static SubServiceLogger ConstantsLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("WatchdogConstantsLogger")) ?? new SubServiceLogger("WatchdogConstantsLogger");
+        private static SubServiceLogger ConstantsLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("WatchdogConstantsLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

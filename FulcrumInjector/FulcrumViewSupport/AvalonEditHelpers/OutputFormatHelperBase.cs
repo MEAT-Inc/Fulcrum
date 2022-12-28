@@ -23,8 +23,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     public abstract class OutputFormatHelperBase : TargetWithLayout
     {
         // Logger Object 
-        protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("FormatOutputLogger")) ?? new SubServiceLogger("FormatOutputLogger");
+        protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FormatOutputLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------------------------
 

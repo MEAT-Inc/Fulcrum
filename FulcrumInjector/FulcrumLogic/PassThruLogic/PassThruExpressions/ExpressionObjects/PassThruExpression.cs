@@ -91,7 +91,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
 
             // Store string to replace and build new list of strings
             var NewLines = new List<string>() { SplitString }; NewLines.Add("\r");
-            NewLines.AddRange(this.SplitCommandLines.Select(LineObj => "   " + LineObj));
+            NewLines.AddRange(this.SplitCommandLines.Select(LineObj => "   " + LineObj.Trim()));
             NewLines.Add("\n");
 
             // Add our breakdown contents here.
@@ -111,7 +111,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     .ToArray());
 
                 // Log added new content
-                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
+                // this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES CONTENTS CORRECTLY!", LogType.InfoLog);
             }
             if (this.GetType() == typeof(PassThruStartMessageFilterExpression))
             {
@@ -124,7 +124,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     .ToArray());
 
                 // Log added new content
-                this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
+                // this.ExpressionLogger.WriteLog("PULLED IN NEW MESSAGES FOR FILTER CONTENTS CORRECTLY!", LogType.InfoLog);
             }
             if (this.GetType() == typeof(PassThruIoctlExpression))
             {
@@ -137,7 +137,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     .ToArray());
 
                 // Log added new content
-                this.ExpressionLogger.WriteLog("PULLED IN NEW IOCTL VALUES FOR COMMAND CONTENTS CORRECTLY!", LogType.InfoLog);
+                // this.ExpressionLogger.WriteLog("PULLED IN NEW IOCTL VALUES FOR COMMAND CONTENTS CORRECTLY!", LogType.InfoLog);
             }
 
             // Remove double newlines. Command lines are split with \r so this doesn't apply.
@@ -170,6 +170,15 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
         // --------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// A Default constructor for the PassThruExpression object type.
+        /// This is used to spawn in a default/null value for our expression object instances
+        /// </summary>
+        public PassThruExpression()
+        {
+            // Store the none type for our expression and exit out
+            this.TypeOfExpression = PassThruCommandType.NONE;
+        }
+        /// <summary>
         /// Builds a new set of PassThruCommand Regex Operations
         /// </summary>
         /// <param name="CommandInput">Input command string</param>
@@ -180,21 +189,16 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\r');
 
-            // Lock the logger queue to find our new logger object
-            lock (LogBroker.LoggerQueue)
-            {
-                // Build a logger object for our expression here
-                this.ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                    .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
-            }
+            // Build a logger object for our expression here
+            this.ExpressionLogger = (SubServiceLogger)LoggerQueue.SpawnLogger($"{this.GetType().Name}Logger", LoggerActions.SubServiceLogger);
 
             // Find command issue request values. (Pull using Base Class)
+            this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
             var FieldsToSet = this.GetExpressionProperties(true);
-            bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
             if (!this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings))
             {
                 // Try and find the end of the command in a different way
-                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+                // this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
                 StatusCodeStrings = new[]
                 {
                     $"{TimeStrings[2]} 0:STATUS_NOERROR",
@@ -203,10 +207,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                 };
             }
 
-            // Check our output values
-            if (!ExecutionTimeResult) 
-                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
-
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string>();
             StringsToApply.AddRange(from NextIndex in this.TimeRegex.ExpressionValueGroups where NextIndex <= TimeStrings.Length select TimeStrings[NextIndex]);
@@ -214,8 +214,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
 
             // Now apply values using base method and exit out of this routine
             bool StorePassed = this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray());
-            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!");
-            this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
+            if (!StorePassed) throw new InvalidOperationException("FAILED TO SET BASE CLASS VALUES FOR EXPRESSION OBJECT!"); 
+            // this.ExpressionLogger.WriteLog($"BUILT NEW EXPRESSION OBJECT WITH TYPE OF {this.GetType().Name}", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------
@@ -262,8 +262,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                 catch (Exception SetEx)
                 {
                     // Throw an exception output for this error type.
-                    // this.ExpressionLogger.WriteLog($"EXCEPTION THROWN DURING EXPRESSION VALUE STORE FOR COMMAND TYPE {this.GetType().Name}!", LogType.ErrorLog);
-                    // this.ExpressionLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetEx);
+                    this.ExpressionLogger.WriteLog($"EXCEPTION THROWN DURING EXPRESSION VALUE STORE FOR COMMAND TYPE {this.GetType().Name}!", LogType.ErrorLog);
+                    this.ExpressionLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetEx);
                     return false;
                 }
             }

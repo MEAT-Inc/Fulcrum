@@ -19,8 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumDllInjectionTestViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorTestViewModelLogger")) ?? new SubServiceLogger("InjectorTestViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorTestViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _injectionLoadPassed;      // Pass or fail for our injection load process

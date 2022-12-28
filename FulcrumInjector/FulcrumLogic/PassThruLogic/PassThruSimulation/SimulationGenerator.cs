@@ -26,8 +26,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
     public class SimulationGenerator
     {
         // Logger object.
-        private SubServiceLogger SimLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimGeneratorLogger")) ?? new SubServiceLogger("SimGeneratorLogger");
+        private SubServiceLogger SimLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimGeneratorLogger", LoggerActions.SubServiceLogger);
 
         // Input objects for this class instance to build simulations
         public string SimulationName;
@@ -134,8 +133,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
             // Get a logger object for saving expression sets.
             string LoggerName = $"{Path.GetFileNameWithoutExtension(BaseFileName)}_SimulationsLogger";
-            var ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith(LoggerName)) ?? new SubServiceLogger(LoggerName);
+            var ExpressionLogger = (SubServiceLogger)LoggerQueue.SpawnLogger(LoggerName, LoggerActions.SubServiceLogger);
 
             // Find output path and then build final path value.             
             Directory.CreateDirectory(OutputFolder);

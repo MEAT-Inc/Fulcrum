@@ -42,19 +42,20 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GenerateExpressionsTest.cs" />
+    <Compile Include="FulcrumTests\FulcrumExpressionsTests.cs" />
+    <Compile Include="FulcrumTests\FulcrumTestsInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="InjectorTestFile.cs" />
+    <Compile Include="FulcrumTestFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestAdapter">
-      <Version>2.2.7</Version>
+      <Version>3.0.2</Version>
     </PackageReference>
     <PackageReference Include="MSTest.TestFramework">
-      <Version>2.2.7</Version>
+      <Version>3.0.2</Version>
     </PackageReference>
     <PackageReference Include="SharpSimulator">
-      <Version>0.8.2.151</Version>
+      <Version>0.8.3.155</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -63,48 +64,60 @@
       <Name>FulcrumInjector</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="InjectorLogs\CarDAQPlus3_12202022_2016_CHEVY_SILVERADO_3GCUKREC9GG389021.txt">
+    <None Include="AppSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12202022_2016_CHEVY_SILVERADO_3GCUKREC9GG389021.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12202022_2020_GMC_SIERRA_3GTU9BEDXLG175726.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12202022_2020_GMC_SIERRA_3GTU9BEDXLG175726.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12202022_2021_CHEVY_SILVERADO_3GCPYFEDXMG432098.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12202022_2021_CHEVY_SILVERADO_3GCPYFEDXMG432098.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12212022_2021_HYUNDAI_ELANTRA_5NPLN4AG4MH035182.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2021_HYUNDAI_ELANTRA_5NPLN4AG4MH035182.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12212022_2021_TOYOTA_RAV4EV_4T3D6RFV0MU043147.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2021_TOYOTA_RAV4EV_4T3D6RFV0MU043147.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12212022_2022_HYUNDAI_TUSCON_5NMJB3AE3NH154607.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2022_HYUNDAI_TUSCON_5NMJB3AE3NH154607.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12212022_2022_TOYOTA_CAMRY_4T1C11AK0NU012595.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2022_TOYOTA_CAMRY_4T1C11AK0NU012595.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12222022_2015_CHEVY_CAMARO_2G1FD1E35F9249280.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2015_CHEVY_CAMARO_2G1FD1E35F9249280.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12222022_2015_CHEVY_CORVETTE_1G1YK2D74F5109288.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2015_CHEVY_CORVETTE_1G1YK2D74F5109288.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12222022_2017_CHEVY_CAMARO_1G1FB1RS6H0114331.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2017_CHEVY_CAMARO_1G1FB1RS6H0114331.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12222022_2018_CHEVY_CRUZE_1G1BE5SM8J7247047.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2018_CHEVY_CRUZE_1G1BE5SM8J7247047.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12222022_2018_CHEVY_MALIBU_1G1ZB5ST0JF108065.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2018_CHEVY_MALIBU_1G1ZB5ST0JF108065.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="InjectorLogs\CarDAQPlus3_12222022_2021_CHEVY_EQUINOX_3GNAXFEV3MS135227.txt">
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2021_CHEVY_EQUINOX_3GNAXFEV3MS135227.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
+
+copy /Y "$(ProjectDir)FulcrumLogs\*" $(TargetDir)FulcrumLogs"
+copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)\$FulcrumInjectorSettings.json"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

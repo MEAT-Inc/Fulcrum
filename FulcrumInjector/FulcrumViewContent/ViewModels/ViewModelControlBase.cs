@@ -17,8 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class ViewModelControlBase : INotifyPropertyChanged
     {
         // Logger object.
-        private static SubServiceLogger ViewModelPropLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("ViewModelPropLogger")) ?? new SubServiceLogger("ViewModelPropLogger");
+        private static SubServiceLogger ViewModelPropLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("ViewModelPropLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

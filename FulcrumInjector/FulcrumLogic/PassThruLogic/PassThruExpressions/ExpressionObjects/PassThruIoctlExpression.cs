@@ -46,9 +46,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             // Now build the Ioctl Parameters from the input content if any exist.
             this.FindIoctlParameters(out this.ParameterValues);
             this.ParameterCount = this.ParameterValues.Length == 0 ? "No Parameters" : $"{this.ParameterValues.Length} Parameters";
-            if (this.ParameterCount == "No Parameters") 
-                this.ExpressionLogger.WriteLog($"WARNING! NO IOCTL PARAMETERS FOUND FOR TYPE {this.GetType().Name}!", LogType.WarnLog);
-
+            
             // Now apply values using base method and exit out of this routine
             StringsToApply.Add(this.ParameterCount);
             if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))

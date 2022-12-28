@@ -16,8 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
     public class HamburgerNavService
     {
         // Logger for navigation service instance
-        private SubServiceLogger NavLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("HamburgerNavServiceLogger")) ?? new SubServiceLogger("HamburgerNavServiceLogger");
+        private SubServiceLogger NavLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("HamburgerNavServiceLogger", LoggerActions.SubServiceLogger);
 
         // Navigation events and event handler
         public event NavigatedEventHandler Navigated;

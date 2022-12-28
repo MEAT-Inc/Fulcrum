@@ -18,8 +18,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
     public class AppThemeConfiguration
     {
         // Logger Object
-        private static SubServiceLogger ThemeLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("AppThemeLogger")) ?? new SubServiceLogger("AppThemeLogger");
+        private static SubServiceLogger ThemeLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AppThemeLogger", LoggerActions.SubServiceLogger);
 
         // Themes that exist regardless of the current operations
         public AppTheme[] PresetThemes { get; private set; }

@@ -23,9 +23,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     public static class GenerateExpressionExtensions
     {
         // Logger Object
-        private static SubServiceLogger _expExtLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"ExpressionsExtLogger")) ?? new SubServiceLogger("ExpressionsExtLogger");
-
+        private static SubServiceLogger _expExtLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"ExpressionsExtLogger", LoggerActions.SubServiceLogger);
+        
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // If no messages are found during the split process, then we need to return out.
             if (SplitMessageLines.Length == 0) {
-                ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!", LogType.TraceLog);
+                // ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!", LogType.TraceLog);
                 MessageProperties = new List<string[]>();
                 return "No Messages Found!";
             }
@@ -74,7 +73,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 var RegexResultTuples = new List<Tuple<string, string>>();
                 bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
                 if (!MatchedContent) {
-                    ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.TraceLog);
+                    // ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.TraceLog);
                     continue;
                 }
 
@@ -131,11 +130,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Add this string to our list of messages.
                 OutputMessages.Add(RegexValuesOutputString);
                 MessageProperties.Add(RegexResultTuples.Select(TupleObj => TupleObj.Item2).ToArray());
-                ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.TraceLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.TraceLog);
             }
 
             // Return built table string object.
-            ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
+            // ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
             return string.Join("\n", OutputMessages);
         }
         /// <summary>
@@ -181,8 +180,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             }
 
             // Check if no values were pulled. If this is the case then dump out.
-            if (SplitMessageLines.Length == 0) {
-                ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!", LogType.TraceLog);
+            if (SplitMessageLines.Length == 0)
+            {
+                // ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!", LogType.TraceLog);
                 FilterProperties = new List<string[]>();
                 return "No Filter Content Found!";
             }
@@ -203,7 +203,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 {
                     // Check if this is a null flow control instance
                     if (MsgLineSet.Trim() != "FlowControl is NULL") {
-                        ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.TraceLog);
+                        // ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.TraceLog);
                         continue;
                     }
 
@@ -214,7 +214,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                         OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[TupleIndex], "NULL"));
 
                     // Log Expression found and continue.
-                    ExpressionObject.ExpressionLogger.WriteLog("FOUND NULL FLOW CONTROL! PARSING AND MOVING ON...", LogType.TraceLog);
+                    // ExpressionObject.ExpressionLogger.WriteLog("FOUND NULL FLOW CONTROL! PARSING AND MOVING ON...", LogType.TraceLog);
                 }
 
                 // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
@@ -253,7 +253,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Add this string to our list of messages.
                 OutputMessages.Add(RegexValuesOutputString + "\n");
                 FilterProperties.Add(OutputMessageTuple.Select(TupleObj => TupleObj.Item2).ToArray());
-                ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.TraceLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.TraceLog);
             }
 
             // Return built table string object.
@@ -278,7 +278,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var IoctlRegex = PassThruRegexModelShare.IoctlParameterValue;
             bool IoctlResults = IoctlRegex.Evaluate(ExpressionObject.CommandLines, out var IoctlResultStrings);
             if (!IoctlResults) {
-                ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.TraceLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.TraceLog);
                 ParameterProperties = Array.Empty<Tuple<string, string, string>>();
                 return "No Parameters";
             }
@@ -311,7 +311,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             );
 
             // Throw new exception since not yet built.
-            ExpressionObject.ExpressionLogger.WriteLog($"BUILT OUT A TOTAL OF {ParameterProperties.Length} NEW PT IOCTL COMMAND OBJECTS!", LogType.TraceLog);
+            // ExpressionObject.ExpressionLogger.WriteLog($"BUILT OUT A TOTAL OF {ParameterProperties.Length} NEW PT IOCTL COMMAND OBJECTS!", LogType.TraceLog);
             return IoctlTableOutput;
         }
 

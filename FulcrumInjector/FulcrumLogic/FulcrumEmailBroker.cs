@@ -19,8 +19,7 @@ namespace FulcrumInjector.FulcrumLogic
     public class FulcrumEmailBroker
     {
         // Logger object
-        private SubServiceLogger EmailLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("ReportSendingBrokerLogger")) ?? new SubServiceLogger("ReportSendingBrokerLogger");
+        private SubServiceLogger EmailLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("ReportSendingBrokerLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

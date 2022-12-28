@@ -16,8 +16,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumTitleViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("TitleViewModelLogger")) ?? new SubServiceLogger("TitleViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private string _titleTextString;          // Private value for title view title text
