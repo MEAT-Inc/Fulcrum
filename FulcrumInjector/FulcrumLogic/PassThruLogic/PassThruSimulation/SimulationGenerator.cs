@@ -25,20 +25,32 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
     /// </summary>
     public class SimulationGenerator
     {
-        // Logger object.
-        private SubServiceLogger SimLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimGeneratorLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
 
-        // Input objects for this class instance to build simulations
+        #region Fields
+
+        // Logger instance and input objects for this class instance to build simulations
+        private readonly SubServiceLogger _simulationLogger;
         public string SimulationName;
         public string SimulationFile;
         public PassThruExpression[] InputExpressions;
+
+        #endregion // Fields
+
+        #region Properties
 
         // Grouping Objects built out.
         public SimulationChannel[] BuiltSimulationChannels { get; private set; }
         public Tuple<uint, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
 
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
         // ------------------------------------------------------------------------------------------------------------------------------------------
-        
+
         /// <summary>
         /// Builds a new simulation object generator from the given input expressions
         /// </summary>
@@ -52,7 +64,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             this.SimulationName = InputFileName;
             this.InputExpressions = Expressions;
             this.SimulationFile = Path.Combine(InputFilePath, InputFileName);
-            this.SimLogger.WriteLog($"READY TO BUILD NEW SIMULATION NAMED {SimulationName} WITH {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
+            string FileNameCleaned = Path.GetFileNameWithoutExtension(this.SimulationName);
+            this._simulationLogger = (SubServiceLogger)LoggerQueue.SpawnLogger($"SimGeneratorLogger_{FileNameCleaned}", LoggerActions.SubServiceLogger);
+            this._simulationLogger.WriteLog($"READY TO BUILD NEW SIMULATION NAMED {this.SimulationName} WITH {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,13 +81,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             List<Tuple<uint, PassThruExpression[]>> BuiltExpressions = new List<Tuple<uint, PassThruExpression[]>>();
 
             // Store the ID Values here
-            this.SimLogger.WriteLog("GROUPING COMMANDS BY CHANNEL ID VALUES NOW...", LogType.WarnLog);
+            this._simulationLogger.WriteLog("GROUPING COMMANDS BY CHANNEL ID VALUES NOW...", LogType.WarnLog);
             var GroupedAsLists = this.InputExpressions.GroupByChannelIds();
-            Parallel.ForEach(GroupedAsLists, (GroupList) => {
-
+            Parallel.ForEach(GroupedAsLists, (GroupList) => 
+            {
                 // Build Expression
                 BuiltExpressions.Add(new Tuple<uint, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
-                this.SimLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
+                this._simulationLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
 
                 // Store progress value
                 double CurrentProgress = BuiltExpressions.Count / (double)GroupedAsLists.Length * 100.00;
@@ -81,7 +95,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             });
 
             // Log done grouping, return the built ID values here.
-            this.SimLogger.WriteLog("BUILT GROUPED SIMULATION COMMANDS OK!", LogType.InfoLog);
+            this._simulationLogger.WriteLog("BUILT GROUPED SIMULATION COMMANDS OK!", LogType.InfoLog);
             this.GroupedChannelExpressions = BuiltExpressions.ToArray();
             return this.GroupedChannelExpressions;
         }
@@ -93,7 +107,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         {
             // Start by building return list object. Then build our data
             List<Tuple<uint, SimulationChannel>> BuiltChannelsList = new List<Tuple<uint, SimulationChannel>>();
-            this.SimLogger.WriteLog("BUILDING CHANNEL OBJECTS FROM CHANNEL ID VALUES NOW...", LogType.WarnLog);
+            this._simulationLogger.WriteLog("BUILDING CHANNEL OBJECTS FROM CHANNEL ID VALUES NOW...", LogType.WarnLog);
 
             // Make sure the channel objects exist here first. 
             this.GroupedChannelExpressions ??= Array.Empty<Tuple<uint, PassThruExpression[]>>();
@@ -110,11 +124,11 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 // Append it into our list of output here
                 if (BuiltChannel == null) continue;
                 BuiltChannelsList.Add(new Tuple<uint, SimulationChannel>(ChannelId, BuiltChannel.Item2));
-                this.SimLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
+                this._simulationLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
             }
 
             // Log information and exit out of this routine
-            this.SimLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
+            this._simulationLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
             BuiltChannelsList = BuiltChannelsList.Where(TupleOBj => TupleOBj != null).ToList();
             this.BuiltSimulationChannels = BuiltChannelsList.Select(ChannelSet => ChannelSet.Item2).ToArray();
             return BuiltChannelsList.ToArray();
@@ -155,23 +169,19 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
                 File.WriteAllText(FinalOutputPath,OutputJsonValues);
 
-                // TODO: Figure out why I had this code in here...
-                // Check to see if we aren't in the default location
-                // if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
-                // {
-                //     // Find the base path, get the file name, and copy it into here.
-                //     string LocalDirectory = Path.GetDirectoryName(BaseFileName);
-                //     string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptSim";
-                //     File.Copy(FinalOutputPath, CopyLocation, true);
-                // 
-                //     // Remove the Expressions Logger. Log done and return
-                //     ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
-                //     this.SimulationFile = CopyLocation;
-                //     return CopyLocation;
-                // }
+                // Check to see if we aren't in the default location. If not, store the file in both the input spot and the injector directory
+                if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
+                {
+                    // Find the base path, get the file name, and copy it into here.
+                    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
+                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptSim";
+                    File.Copy(FinalOutputPath, CopyLocation, true);
+
+                    // Remove the Expressions Logger. Log done and return
+                    ExpressionLogger.WriteLog("COPIED OUTPUT SIMULATION FILE INTO THE BASE SIMULATION FILE LOCATION!");
+                }
 
                 // Remove the Expressions Logger. Log done and return
-                ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
                 this.SimulationFile = FinalOutputPath;
                 return FinalOutputPath;
             }
