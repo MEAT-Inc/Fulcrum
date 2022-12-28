@@ -20,8 +20,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
     public class SimEventDataTemplateSelector : DataTemplateSelector
     {
         // Logger object.
-        private static SubServiceLogger TemplateLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimEventDataTemplateLogger")) ?? new SubServiceLogger("SimEventDataTemplateLogger");
+        private static SubServiceLogger TemplateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimEventDataTemplateLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

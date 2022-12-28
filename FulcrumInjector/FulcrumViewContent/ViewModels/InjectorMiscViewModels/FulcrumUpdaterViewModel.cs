@@ -23,8 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
     public class FulcrumUpdaterViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("UpdaterViewModelLogger")) ?? new SubServiceLogger("UpdaterViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("UpdaterViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _updateReady;                // Sets if there's an update ready or not.

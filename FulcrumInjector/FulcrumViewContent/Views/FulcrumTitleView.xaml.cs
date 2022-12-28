@@ -16,8 +16,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     public partial class FulcrumTitleView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("TitleViewLogger")) ?? new SubServiceLogger("TitleViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumTitleViewModel ViewModel { get; set; }

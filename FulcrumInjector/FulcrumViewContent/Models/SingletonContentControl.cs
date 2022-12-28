@@ -14,8 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
     public class SingletonContentControl<TViewType, TViewModelType> where TViewModelType : ViewModelControlBase
     {
         // Singleton watchdog Logger. Build this once the pipe is built.
-        private static SubServiceLogger SingletonLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SingletonContentLogger")) ?? new SubServiceLogger("SingletonContentLogger");
+        private static SubServiceLogger SingletonLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SingletonContentLogger", LoggerActions.SubServiceLogger);
 
         // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -163,9 +162,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
 
             // Build new logger instance for singleton object
             string TypeName = SingletonUserControlContent.GetType().Name;
-            this.InstanceLogger = (SubServiceLogger)(LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"Singleton_{TypeName}_InstanceLogger")) ?? 
-                                                     new SubServiceLogger($"Singleton_{TypeName}_InstanceLogger"));
+            this.InstanceLogger = (SubServiceLogger)LoggerQueue.SpawnLogger($"Singleton_{TypeName}_InstanceLogger", LoggerActions.SubServiceLogger);
             this.InstanceLogger.WriteLog($"INSTANCE HAS BEEN CREATED AND TIMESTAMPED! TIME BUILT: {this.TimeCreated:s}", LogType.TraceLog);
 
             // Log building new singleton instance object

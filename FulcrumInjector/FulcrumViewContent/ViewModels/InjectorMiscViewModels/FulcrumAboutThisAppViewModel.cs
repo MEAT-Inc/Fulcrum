@@ -15,8 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
     public class FulcrumAboutThisAppViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("AboutThisAppViewModelLogger")) ?? new SubServiceLogger("AboutThisAppViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewModelLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

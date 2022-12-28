@@ -21,8 +21,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     public static class SimChannelExtensions
     {
         // Logger object for this extension class
-        private static SubServiceLogger _simExtensionLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimExtensionLogger")) ?? new SubServiceLogger("SimExtensionLogger");
+        private static SubServiceLogger _simExtensionLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimExtensionLogger", LoggerActions.SubServiceLogger);
 
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object

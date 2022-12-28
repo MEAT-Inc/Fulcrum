@@ -27,8 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumInstalledHardwareView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("FulcrumInstalledHardwareViewLogger")) ?? new SubServiceLogger("FulcrumInstalledHardwareViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FulcrumInstalledHardwareViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumInstalledHardwareViewModel ViewModel { get; set; }

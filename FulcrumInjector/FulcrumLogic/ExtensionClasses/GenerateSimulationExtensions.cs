@@ -22,8 +22,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     public static class GenerateSimulationExtensions
     {
         // Logger object.
-        private static SubServiceLogger SimExtensionLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimExtensionLogger")) ?? new SubServiceLogger("SimExtensionLogger");
+        private static SubServiceLogger SimExtensionLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimExtensionLogger", LoggerActions.SubServiceLogger);
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -66,7 +65,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             SimExtensionLogger.WriteLog($"BUILT A TOTAL OF {PairedExpressions.Count} EXPRESSION CHANNEL SETS OK!", LogType.WarnLog);
             return PairedExpressions.ToArray();
         }
-
         /// <summary>
         /// Builds a Channel object from a set of input expressions
         /// </summary>

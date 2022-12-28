@@ -47,8 +47,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogReviewViewModelLogger")) ?? new SubServiceLogger("InjectorLogReviewViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private string _loadedLogFile = "";
@@ -108,11 +107,11 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.ExpressionsBuilt = false;
             ViewModelLogger.WriteLog("TOGGLED ENABLED STATUS OF TOGGLE BUTTON OK!", LogType.InfoLog);
 
-            // This is turned off for now. No need to dupe import all of these objects
-            //      Import Regex objects. 
-            //      ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
-            //      var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
-            //      ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
+            // BUG: This is turned off for now. No need to dupe import all of these objects
+            // Import Regex objects. 
+            // ViewModelLogger.WriteLog("CONFIGURING REGEX ENTRIES NOW...");
+            // var BuiltObjects = PassThruExpressionShare.GeneratePassThruRegexModels();
+            // ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltObjects.Count} REGEX OBJECTS OK!", LogType.InfoLog);
 
             // Build log content helper and return
             ViewModelLogger.WriteLog("SETUP NEW DLL LOG REVIEW OUTPUT VALUES OK!", LogType.InfoLog);
@@ -184,8 +183,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     this.IsLogLoaded = true;
                     this.ExpressionsBuilt = true;
                     this.ExpressionsFile = NewLogFile;
-                    this.LoadedLogFile = GenerateExpressionExtensions.ImportExpressionSet(this.ExpressionsFile);
                     this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
+                    this.LoadedLogFile = ExpressionsGenerator.ImportExpressionSet(this.ExpressionsFile);
                     ViewModelLogger.WriteLog("PULLED IN A NEW EXPRESSIONS FILE AND CONVERTED IT INTO A RAW LOG OK!");
 
                     // Toggle the viewer to show out output
@@ -197,8 +196,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog("BUILT GENERATOR TO CONVERT OUR BUILT J2534 LOG FILE OK!");
 
                     // Store expression objects here
-                    GeneratorBuilt.SplitLogToCommands(false);
-                    var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
+                    var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions(true);
                     this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
                     ViewModelLogger.WriteLog("BUILT IN NEW EXPRESSIONS FILES FROM OUR CONVERTED LOG FILE OK!");
                 }
@@ -234,8 +232,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");
                 }
 
-                // Set log loaded to true
-                this.IsLogLoaded = true;
+                // Set log loaded to true and log the results
                 ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
                 return true;
             }
@@ -270,12 +267,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Build command split log contents first. 
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog); 
                 GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
-                var SplitLogContent = GeneratorBuilt.SplitLogToCommands(true);
-                ViewModelLogger.WriteLog($"SPLIT CONTENTS INTO A TOTAL OF {SplitLogContent.Length} CONTENT SET OBJECTS", LogType.WarnLog);
-
+                
                 // Start by building PTExpressions from input string object sets.
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
-                var BuiltExpressions = GeneratorBuilt.GenerateExpressionSet(true);
+                var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions(true);
                 this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 
@@ -284,6 +279,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._expressionsFile}!", LogType.InfoLog);
                 this.ProcessingProgress = 100; this.ExpressionsBuilt = true;
+
+                // Toggle the viewer to show out output
+                if (!this.ToggleViewerContents(ViewerStateType.ShowingExpressions))
+                    throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                // Return true at this point since it seems like we built everything correctly
                 return true;
             }
             catch (Exception Ex)
@@ -321,11 +322,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Save simulation object here.
                 ViewModelLogger.WriteLog("SAVING SIMULATION FILE OUTPUT NOW...", LogType.InfoLog);
                 this.SimulationFile = GeneratorBuilt.SaveSimulationFile(this.LoadedLogFile);
-                ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {this.SimulationFile} OK!", LogType.InfoLog);
+                if (this._simulationFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW SIMULATION CONTENT!");
+                ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {this.SimulationFile} FROM INPUT EXPRESSIONS!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT A TOTAL OF {GeneratorBuilt.BuiltSimulationChannels.Length} SIM CHANNELS!", LogType.InfoLog);
+                this.ProcessingProgress = 100; this.SimulationBuilt = true;
 
-                // Return passed and move out of here.
-                this.ProcessingProgress = 100;
-                this.SimulationBuilt = true;
+                // Toggle the viewer to show out output
+                if (!this.ToggleViewerContents(ViewerStateType.ShowingSimulation))
+                    throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
+
+                // Return true at this point since it seems like we built everything correctly
                 return true;
             } 
             catch (Exception BuildSimEx) 

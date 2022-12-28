@@ -22,8 +22,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     public class FulcrumSessionReportingViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SessionReportViewModelLogger")) ?? new SubServiceLogger("SessionReportViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SessionReportViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private Control Values
         private bool _canModifyMessage = true;

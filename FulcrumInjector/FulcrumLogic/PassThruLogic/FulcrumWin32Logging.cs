@@ -29,8 +29,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic
     public static class FulcrumWin32Logging
     {
         // Logger object.
-        private static SubServiceLogger ExportLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorLogExportLogger")) ?? new SubServiceLogger("InjectorLogExportLogger");
+        private static SubServiceLogger ExportLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogExportLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

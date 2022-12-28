@@ -52,21 +52,17 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
 
             // If we failed to pull our read count just send out ? and ?. If it's a complete read count, then we know we're passed so just do 0/0
             if (!PtReadMsgsResult) this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
-            if (!MessagesReadResult) MessagesReadStrings = CommandInput.Contains("PTReadMsgs() complete") ?
-                new[] { "Read ?/?", "?", "?" } : 
-                new[] { "Read ? of ? messages", "?", "?" };
+            if (!MessagesReadResult) MessagesReadStrings = CommandInput.Contains("PTReadMsgs() complete") || CommandInput.Contains("Zero messages received")
+                ? new[] { "Read 0/0", "0", "0" }
+                : new[] { "Read ? of ? messages", "?", "?" };
 
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string> { PassThruReadMsgsStrings[0] };
             StringsToApply.AddRange(from NextIndex in this.PtReadMessagesRegex.ExpressionValueGroups where NextIndex <= PassThruReadMsgsStrings.Length select PassThruReadMsgsStrings[NextIndex]);
             StringsToApply.AddRange(from NextIndex in this.MessagesReadRegex.ExpressionValueGroups where NextIndex <= MessagesReadStrings.Length select MessagesReadStrings[NextIndex]);
-         
-            // Find our message content values here.
-            string MessageTable = this.FindMessageContents(out this.MessageProperties);
-            if (MessageTable is "" or "No Messages Found!")
-                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR EXPRESSION TYPE {this.GetType().Name}!", LogType.WarnLog);
 
             // Now apply values using base method and exit out of this routine
+            this.FindMessageContents(out this.MessageProperties);
             if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
                 throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }

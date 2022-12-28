@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{02CF1451-D3B2-4234-BB8B-15B0C48B394D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InjectorTests</RootNamespace>
+    <AssemblyName>InjectorTests</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FulcrumTests\FulcrumExpressionsTests.cs" />
+    <Compile Include="FulcrumTests\FulcrumTestsInitializer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FulcrumTestFile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestAdapter">
+      <Version>3.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="MSTest.TestFramework">
+      <Version>3.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="SharpSimulator">
+      <Version>0.8.3.155</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FulcrumInjector\FulcrumInjector.csproj">
+      <Project>{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}</Project>
+      <Name>FulcrumInjector</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AppSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12202022_2016_CHEVY_SILVERADO_3GCUKREC9GG389021.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12202022_2020_GMC_SIERRA_3GTU9BEDXLG175726.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12202022_2021_CHEVY_SILVERADO_3GCPYFEDXMG432098.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2021_HYUNDAI_ELANTRA_5NPLN4AG4MH035182.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2021_TOYOTA_RAV4EV_4T3D6RFV0MU043147.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2022_HYUNDAI_TUSCON_5NMJB3AE3NH154607.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12212022_2022_TOYOTA_CAMRY_4T1C11AK0NU012595.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2015_CHEVY_CAMARO_2G1FD1E35F9249280.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2015_CHEVY_CORVETTE_1G1YK2D74F5109288.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2017_CHEVY_CAMARO_1G1FB1RS6H0114331.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2018_CHEVY_CRUZE_1G1BE5SM8J7247047.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2018_CHEVY_MALIBU_1G1ZB5ST0JF108065.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FulcrumLogs\CarDAQPlus3_12222022_2021_CHEVY_EQUINOX_3GNAXFEV3MS135227.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
+
+copy /Y "$(ProjectDir)FulcrumLogs\*" $(TargetDir)FulcrumLogs"
+copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)\$FulcrumInjectorSettings.json"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

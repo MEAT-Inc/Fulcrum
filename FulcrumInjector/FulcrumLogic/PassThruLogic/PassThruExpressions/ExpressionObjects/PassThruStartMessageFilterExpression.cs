@@ -48,12 +48,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             StringsToApply.AddRange(from NextIndex in this.PtStartMsgFilterRegex.ExpressionValueGroups where NextIndex <= PassThruFilterStrings.Length select PassThruFilterStrings[NextIndex]);
             StringsToApply.AddRange(from NextIndex in this.FilterIdReturnedRegex.ExpressionValueGroups where NextIndex <= FilterIdResultStrings.Length select FilterIdResultStrings[NextIndex]);
 
-            // Now apply our message filter contents
-            string MessageTable = this.FindMessageContents(out this.MessageFilterContents);
-            if (MessageTable is "" or "No Filter Content Found!")
-                this.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOR FILTER FOUND FOR EXPRESSION TYPE {this.GetType().Name}!", LogType.WarnLog);
-
-            // Now apply values using base method and exit out of this routine
+            // Find filter content values and apply values using base method then exit out of this routine
+            this.FindFilterContents(out this.MessageFilterContents);
             if (!this.SetExpressionProperties(FieldsToSet, StringsToApply.ToArray()))
                 throw new InvalidOperationException($"FAILED TO SET CLASS VALUES FOR EXPRESSION OBJECT OF TYPE {this.GetType().Name}!");
         }
