@@ -187,7 +187,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
 
             // Log information about the simulation generation routine and exit out
             this._simulationLogger.WriteLog($"BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
-            this._simulationLogger.WriteLog($"A TOTAL OF {this.SimulationChannels.Count} CHANNELS HAVE BEEN BUILT!", LogType.InfoLog);
+            this._simulationLogger.WriteLog($"A TOTAL OF {SimChannelsBuilt.Count} CHANNELS HAVE BEEN BUILT!", LogType.InfoLog);
             this.SimulationChannels = SimChannelsBuilt;
             return this.SimulationChannels;
         }

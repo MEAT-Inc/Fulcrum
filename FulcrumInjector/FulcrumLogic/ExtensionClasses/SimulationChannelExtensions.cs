@@ -20,9 +20,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// </summary>
     public static class SimulationChannelExtensions
     {
-        // Logger object for this extension class
-        private static SubServiceLogger _simExtensionLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimExtensionLogger", LoggerActions.SubServiceLogger);
-
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object
         /// </summary>
@@ -31,7 +28,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static J2534Filter[] StoreMessageFilters(this SimulationChannel InputChannel, PassThruStartMessageFilterExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            _simExtensionLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
             Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJ2534Object.ConvertFilterExpression(FilterExpression, true)));
             
@@ -46,7 +42,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static PassThruStructs.PassThruMsg[] StoreMessagesWritten(this SimulationChannel InputChannel, PassThruWriteMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
             Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.AddRange(ExpressionToJ2534Object.ConvertWriteExpression(MessageExpression)));
 
@@ -68,7 +63,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static PassThruStructs.PassThruMsg[] StoreMessagesRead(this SimulationChannel InputChannel, PassThruReadMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
             Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.AddRange(ExpressionToJ2534Object.ConvertReadExpression(MessageExpression)));
 
