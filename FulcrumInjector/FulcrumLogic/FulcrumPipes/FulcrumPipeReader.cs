@@ -160,6 +160,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumPipes
                     catch (Exception ConnectEx)
                     {
                         // Connecting to false
+                        IsConnecting = false;
                         if (ConnectEx is not TimeoutException)
                         {
                             // Throw exception and return out assuming window content has been built now
