@@ -168,8 +168,8 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumPipes
                             throw new Exception("FAILED TO CONFIGURE PIPE READER DUE TO NULL MAIN WINDOW INSTANCE! IS THE APP RUNNING?", ConnectEx);
                         }
 
-                        // Set state to disconnected. Log failure
-                        this.PipeState = FulcrumPipeState.Disconnected;
+                        // Set the state to disconnected if it's not currently disconnected and log out this state value if needed
+                        if (this.PipeState != FulcrumPipeState.Disconnected) this.PipeState = FulcrumPipeState.Disconnected;
                         if (!IsLogged)
                         {
                             // Set the logged state value to true so we stop logging this message [FULC-134]
