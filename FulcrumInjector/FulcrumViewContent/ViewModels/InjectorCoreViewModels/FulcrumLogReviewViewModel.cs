@@ -264,17 +264,18 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         {
             try
             {
-                // Build command split log contents first. 
+                // Log we're building a expression file set and build a new expressions generator here 
+                this.ProcessingProgress = 0;
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog); 
                 GeneratorBuilt = new ExpressionsGenerator(this.LoadedLogFile, this.LogFileContents);
                 
                 // Start by building PTExpressions from input string object sets.
                 ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
                 var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions(true);
-                this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 this._lastBuiltExpressions = new ObservableCollection<PassThruExpression>(BuiltExpressions);
 
                 // Convert the expression set into a list of file strings now and return list built.
+                this._expressionsFile = GeneratorBuilt.SaveExpressionsFile(this.LoadedLogFile);
                 if (this._expressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
                 ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {this._expressionsFile}!", LogType.InfoLog);
@@ -290,6 +291,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             catch (Exception Ex)
             {
                 // Log failures, return nothing
+                this.ProcessingProgress = 100;
                 ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
                 GeneratorBuilt = null; this.ExpressionsBuilt = false;
@@ -303,28 +305,24 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// <returns>True if built ok. False if not</returns>
         internal bool BuildLogSimulation(out SimulationGenerator GeneratorBuilt)
         {
-            // Log information about this instance.
-            this.ProcessingProgress = 0;
-            ViewModelLogger.WriteLog("BUILDING SIMULATION REQUEST PROCESSED! STARTING JOB NOW...", LogType.InfoLog);
             try
             {
-                // Try to build our generator here
-                this.ProcessingProgress = 25;
+                // Log we're building a simulation file set and build a new expressions generator here 
+                this.ProcessingProgress = 0;
+                ViewModelLogger.WriteLog("BUILDING SIMULATION FROM LOADED LOG FILE NOW...", LogType.InfoLog);
                 GeneratorBuilt = new SimulationGenerator(this.LoadedLogFile, this._lastBuiltExpressions.ToArray());
-                ViewModelLogger.WriteLog("BUILT GENERATOR OK!", LogType.InfoLog);
 
                 // Now Build our simulation content objects for this generator
-                var BuiltIdValues = GeneratorBuilt.GenerateGroupedIds(); this.ProcessingProgress = 50;
-                var GeneratedChannels = GeneratorBuilt.GenerateSimulationChannels(); this.ProcessingProgress = 75;
-                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! {BuiltIdValues.Length} ID PAIRS", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! {GeneratedChannels.Length} ID PAIRS", LogType.InfoLog);
+                var BuiltIdValues = GeneratorBuilt.GenerateGroupedIds(true);
+                var GeneratedChannels = GeneratorBuilt.GenerateSimulationChannels(true); 
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL TUPLE PAIRINGS OK! {BuiltIdValues.Count} ID PAIRS", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT OUT CHANNEL OBJECT SIMULATIONS OK! {GeneratedChannels.Count} ID PAIRS", LogType.InfoLog);
 
-                // Save simulation object here.
-                ViewModelLogger.WriteLog("SAVING SIMULATION FILE OUTPUT NOW...", LogType.InfoLog);
+                // Save the built simulation channels as a JSON file here.
                 this.SimulationFile = GeneratorBuilt.SaveSimulationFile(this.LoadedLogFile);
                 if (this._simulationFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW SIMULATION CONTENT!");
                 ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {this.SimulationFile} FROM INPUT EXPRESSIONS!", LogType.InfoLog);
-                ViewModelLogger.WriteLog($"BUILT A TOTAL OF {GeneratorBuilt.BuiltSimulationChannels.Length} SIM CHANNELS!", LogType.InfoLog);
+                ViewModelLogger.WriteLog($"BUILT A TOTAL OF {GeneratorBuilt.SimulationChannels.Count} SIM CHANNELS!", LogType.InfoLog);
                 this.ProcessingProgress = 100; this.SimulationBuilt = true;
 
                 // Toggle the viewer to show out output
@@ -340,7 +338,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 this.ProcessingProgress = 100;
                 ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
-                GeneratorBuilt = null; return false;
+                GeneratorBuilt = null; this.SimulationBuilt = false;
+                return false;
             }
         }
 

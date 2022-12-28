@@ -189,7 +189,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumLogic\ExtensionClasses\GenerateSimulationExtensions.cs" />
     <Compile Include="FulcrumLogic\FulcrumUpdater\InjectorUpdater.cs" />
     <Compile Include="FulcrumLogic\FulcrumUpdater\InjectorVersionInfo.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionsGenerator.cs" />
@@ -214,7 +213,7 @@
     <Compile Include="FulcrumLogic\ExtensionClasses\TextTableGenerator.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\FulcrumWin32Logging.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\ExpressionObjects\PassThruOpenExpression.cs" />
-    <Compile Include="FulcrumLogic\ExtensionClasses\GenerateExpressionExtensions.cs" />
+    <Compile Include="FulcrumLogic\ExtensionClasses\PassThruExpressionExtensions.cs" />
     <Compile Include="FulcrumLogic\PassThruLogic\PassThruExpressions\PtExpressionProperty.cs" />
     <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />

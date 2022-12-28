@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -41,8 +42,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         #region Properties
 
         // Grouping Objects built out.
-        public SimulationChannel[] BuiltSimulationChannels { get; private set; }
-        public Tuple<uint, PassThruExpression[]>[] GroupedChannelExpressions { get; private set; }
+        public Dictionary<uint, SimulationChannel> SimulationChannels { get; private set; }
+        public Dictionary<uint, PassThruExpression[]> SimulationExpressions { get; private set; }
 
         #endregion // Properties
 
@@ -70,73 +71,118 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
- 
+
         /// <summary>
-        /// Generates our grouped ID values for out input expression objects
+        /// Converts an input set of expression objects into a grouped set of expressions paired off by a Channel ID Value
         /// </summary>
-        /// <returns>Build ID groupings</returns>
-        public Tuple<uint, PassThruExpression[]>[] GenerateGroupedIds()
+        /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
+        /// <returns>A collection of built expression objects paired off by channel ID values</returns>
+        public Dictionary<uint, PassThruExpression[]> GenerateGroupedIds(bool UpdateParseProgress = false)
         {
-            // List for return output objects
-            List<Tuple<uint, PassThruExpression[]>> BuiltExpressions = new List<Tuple<uint, PassThruExpression[]>>();
-
-            // Store the ID Values here
+            // Build a dictionary for return output objects and log we're starting to update our values
+            var BuiltExpressions = new Dictionary<uint, PassThruExpression[]>();
             this._simulationLogger.WriteLog("GROUPING COMMANDS BY CHANNEL ID VALUES NOW...", LogType.WarnLog);
-            var GroupedAsLists = this.InputExpressions.GroupByChannelIds();
-            Parallel.ForEach(GroupedAsLists, (GroupList) => 
-            {
-                // Build Expression
-                BuiltExpressions.Add(new Tuple<uint, PassThruExpression[]>(GroupList.Item1, GroupList.Item2.ToArray()));
-                this._simulationLogger.WriteLog($"--> BUILT NEW LIST GROUPING FOR CHANNEL ID {GroupList.Item1}", LogType.TraceLog);
 
-                // Store progress value
-                double CurrentProgress = BuiltExpressions.Count / (double)GroupedAsLists.Length * 100.00;
-                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
+            // Group off all the commands by channel ID and then convert them to paired objects
+            int LoopsCompleted = 0; int ExpressionsCount = this.InputExpressions.Length;
+            Parallel.ForEach(this.InputExpressions, ExpressionObject =>
+            {
+                // Invoke a progress update here if needed
+                if (UpdateParseProgress)
+                {
+                    // Get the new progress value and update our UI value with it
+                    int OldProgress = FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress;
+                    int CurrentProgress = (int)((double)LoopsCompleted++ / (double)ExpressionsCount * 100.00);
+                    if (OldProgress != CurrentProgress) FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = CurrentProgress;
+                }
+
+                // If we've got a none type expression, move on to the next loop
+                if (ExpressionObject.TypeOfExpression == PassThruCommandType.NONE) return;
+                
+                // Find our channel ID property and store it here as a uint value to pair off with
+                FieldInfo DesiredProperty = ExpressionObject
+                    .GetExpressionProperties()
+                    .FirstOrDefault(FieldObj => FieldObj.Name
+                        .Replace(" ", string.Empty).ToUpper()
+                        .Contains("ChannelID".ToUpper()));
+
+                // If the field info is not null, then store the value located
+                if (DesiredProperty ==  null) return;
+                uint ChannelIdValue = uint.Parse(DesiredProperty.GetValue(ExpressionObject).ToString());
+
+                // Lock our output collection here to avoid thread issues
+                lock (BuiltExpressions)
+                {
+                    // Now insert this expression object based on what keys are in the output collection of expressions
+                    if (!BuiltExpressions.ContainsKey(ChannelIdValue))
+                    {
+                        // Build a new tuple object to store on the output collection
+                        PassThruExpression[] ExpressionsArray = { ExpressionObject };
+                        BuiltExpressions.Add(ChannelIdValue, ExpressionsArray);
+                    }
+                    else
+                    {
+                        // Pull the current tuple object set, update the list value for it, and store it
+                        PassThruExpression[] ExpressionsFound = BuiltExpressions[ChannelIdValue];
+                        ExpressionsFound = ExpressionsFound.Append(ExpressionObject).ToArray();
+                        BuiltExpressions[ChannelIdValue] = ExpressionsFound;
+                    }
+                }
             });
 
-            // Log done grouping, return the built ID values here.
+            // Log done grouping, return the built ID values here as a dictionary with the Expressions and ID values
             this._simulationLogger.WriteLog("BUILT GROUPED SIMULATION COMMANDS OK!", LogType.InfoLog);
-            this.GroupedChannelExpressions = BuiltExpressions.ToArray();
-            return this.GroupedChannelExpressions;
+            this.SimulationExpressions = BuiltExpressions;
+            return this.SimulationExpressions;
         }
         /// <summary>
-        /// Builds our simulation channel objects for our input expressions on this object
+        /// Builds our simulation channel objects for our input expressions which were paired off and generated in the routine above
         /// </summary>
-        /// <returns>The set of built expression objects</returns>
-        public Tuple<uint, SimulationChannel>[] GenerateSimulationChannels()
+        /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
+        /// <returns>The set of built simulation channels and channel ID values paired off</returns>
+        public Dictionary<uint, SimulationChannel> GenerateSimulationChannels(bool UpdateParseProgress = false)
         {
-            // Start by building return list object. Then build our data
-            List<Tuple<uint, SimulationChannel>> BuiltChannelsList = new List<Tuple<uint, SimulationChannel>>();
+            // Build a dictionary for return output objects and log we're starting to update our values
+            var SimChannelsBuilt = new Dictionary<uint, SimulationChannel>();
             this._simulationLogger.WriteLog("BUILDING CHANNEL OBJECTS FROM CHANNEL ID VALUES NOW...", LogType.WarnLog);
 
-            // Make sure the channel objects exist here first. 
-            this.GroupedChannelExpressions ??= Array.Empty<Tuple<uint, PassThruExpression[]>>();
-            foreach (var ChannelObjectExpressions in this.GroupedChannelExpressions)
+            // Loop all the expression sets built in parallel and generate a simulation channel for them
+            int LoopsCompleted = 0; int ExpressionsCount = this.SimulationExpressions.Count;
+            Parallel.ForEach(this.SimulationExpressions, ExpressionSet =>
             {
-                // Pull the Channel ID, build our output contents
-                uint ChannelId = ChannelObjectExpressions.Item1;
-                var BuiltChannel = ChannelObjectExpressions.Item2.BuildChannelsFromExpressions(ChannelId);
+                // Pull the Channel ID and the expression objects here and build a channel from it
+                uint SimChannelId = ExpressionSet.Key;
+                PassThruExpression[] ChannelExpressions = ExpressionSet.Value;
+                SimulationChannel BuiltChannel = ChannelExpressions.BuildChannelsFromExpressions(SimChannelId);
 
-                // Store progress value
-                double CurrentProgress = (double)(BuiltChannelsList.Count / (double)this.GroupedChannelExpressions.Length) * 100.00;
-                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
+                // If the built channel object exists and is usable, then store it on our output collection now
+                lock (SimChannelsBuilt)
+                {
+                    // Now insert this expression object based on what keys are in the output collection of expressions
+                    if (!SimChannelsBuilt.ContainsKey(SimChannelId)) SimChannelsBuilt.Add(SimChannelId, BuiltChannel);
+                    else throw new InvalidDataException($"ERROR! CAN NOT APPEND A SIM CHANNEL WITH ID {SimChannelId} SINCE IT EXISTS ALREADY!");
+                }
 
-                // Append it into our list of output here
-                if (BuiltChannel == null) continue;
-                BuiltChannelsList.Add(new Tuple<uint, SimulationChannel>(ChannelId, BuiltChannel.Item2));
-                this._simulationLogger.WriteLog($"--> BUILT EXPRESSION SET FOR CHANNEL {ChannelId}", LogType.TraceLog);
-            }
+                // Invoke a progress update here if needed
+                if (!UpdateParseProgress) return;
 
-            // Log information and exit out of this routine
-            this._simulationLogger.WriteLog("BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
-            BuiltChannelsList = BuiltChannelsList.Where(TupleOBj => TupleOBj != null).ToList();
-            this.BuiltSimulationChannels = BuiltChannelsList.Select(ChannelSet => ChannelSet.Item2).ToArray();
-            return BuiltChannelsList.ToArray();
+                // Get the new progress value and update our UI value with it
+                int OldProgress = FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress;
+                int CurrentProgress = (int)((double)LoopsCompleted++ / (double)ExpressionsCount * 100.00);
+                if (OldProgress != CurrentProgress) FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = CurrentProgress;
+            });
+
+            // Log information about the simulation generation routine and exit out
+            this._simulationLogger.WriteLog($"BUILT CHANNEL SIMULATION OBJECTS OK!", LogType.InfoLog);
+            this._simulationLogger.WriteLog($"A TOTAL OF {this.SimulationChannels.Count} CHANNELS HAVE BEEN BUILT!", LogType.InfoLog);
+            this.SimulationChannels = SimChannelsBuilt;
+            return this.SimulationChannels;
         }
+        
         /// <summary>
         /// Takes an input set of PTExpressions and writes them to a file object desired.
         /// </summary>
-        /// <param name="InputExpressions">Expression input objects</param>
+        /// <param name="BaseFileName">Base file name to update and use as the output file name</param>
         /// <returns>Path of our built expression file</returns>
         public string SaveSimulationFile(string BaseFileName = "")
         {
@@ -155,14 +201,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             ExpressionLogger.WriteLog($"BASE OUTPUT LOCATION FOR SIMULATIONS IS SEEN TO BE {Path.GetDirectoryName(FinalOutputPath)}", LogType.InfoLog);
 
             // Log information about the expression set and output location
-            ExpressionLogger.WriteLog($"SAVING A TOTAL OF {this.BuiltSimulationChannels.Length} SIMULATION OBJECTS NOW...", LogType.InfoLog);
+            ExpressionLogger.WriteLog($"SAVING A TOTAL OF {this.SimulationChannels.Count} SIMULATION OBJECTS NOW...", LogType.InfoLog);
             ExpressionLogger.WriteLog($"EXPRESSION SET IS BEING SAVED TO OUTPUT FILE: {FinalOutputPath}", LogType.InfoLog);
 
             try
             {
                 // Now Build output string content from each expression object.
                 ExpressionLogger.WriteLog("CONVERTING TO STRINGS NOW...", LogType.WarnLog);
-                string OutputJsonValues = JsonConvert.SerializeObject(this.BuiltSimulationChannels, Formatting.Indented);
+                string OutputJsonValues = JsonConvert.SerializeObject(this.SimulationChannels, Formatting.Indented);
 
                 // Log information and write output.
                 ExpressionLogger.WriteLog($"CONVERTED INPUT OBJECTS INTO A JSON OUTPUT STRING OK!", LogType.WarnLog);

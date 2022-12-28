@@ -14,13 +14,15 @@ using NLog.Targets;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpSimulator.SimulationObjects;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class GenerateExpressionExtensions
+    public static class PassThruExpressionExtensions
     {
         // Logger Object
         private static SubServiceLogger _expExtLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"ExpressionsExtLogger", LoggerActions.SubServiceLogger);
@@ -313,6 +315,63 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Throw new exception since not yet built.
             // ExpressionObject.ExpressionLogger.WriteLog($"BUILT OUT A TOTAL OF {ParameterProperties.Length} NEW PT IOCTL COMMAND OBJECTS!", LogType.TraceLog);
             return IoctlTableOutput;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Builds a Channel object from a set of input expressions
+        /// </summary>
+        /// <param name="GroupedExpression">Expression set to convert</param>
+        /// <param name="ChannelId">ID of the channel object to create</param>
+        /// <returns>Builds a channel session object to simulate (converted to JSON)</returns>
+        public static SimulationChannel BuildChannelsFromExpressions(this PassThruExpression[] GroupedExpression, uint ChannelId)
+        {
+            // Find all the PTFilter commands first and invert them.
+            var PTConnectCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTConnect)
+                .Cast<PassThruConnectExpression>()
+                .ToArray();
+            var PTFilterCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTStartMsgFilter)
+                .Cast<PassThruStartMessageFilterExpression>()
+                .ToArray();
+            var PTReadCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTReadMsgs)
+                .Cast<PassThruReadMessagesExpression>()
+                .ToArray();
+            var PTWriteCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTWriteMsgs)
+                .Cast<PassThruWriteMessagesExpression>()
+                .ToArray();
+
+            // Find the ProtocolID and Current Channel ID. Then build a sim channel
+            if (PTConnectCommands.Length == 0) return null;
+            var ConnectCommand = PTConnectCommands.FirstOrDefault();
+            var ChannelFlags = (PassThroughConnect)Convert.ToUInt32(ConnectCommand.ConnectFlags, 16);
+            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
+            var BaudRateInUse = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(BaudRate)).FirstOrDefault(BaudObj => BaudObj.Contains(ConnectCommand.BaudRate)));
+
+            // Build simulation channel here and return it out
+            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, BaudRateInUse);
+            NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesRead(PTReadCommands);
+            NextChannel.StoreMessagesWritten(PTWriteCommands);
+            NextChannel.StorePassThruPairs(GroupedExpression);
+
+            // Log information about the built out command objects.
+            _expExtLogger.WriteLog(
+                $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS (CHANNEL ID {ChannelId}):" +
+                $"\n--> {PTConnectCommands.Length} PT CONNECTS" +
+                $"\n--> {PTFilterCommands.Length} FILTERS" +
+                $"\n--> {PTReadCommands.Length} READ COMMANDS" +
+                $"\n--> {PTWriteCommands.Length} WRITE COMMANDS" +
+                $"\n--> {NextChannel.MessagePairs.Length} MESSAGE PAIRS TOTAL",
+                LogType.InfoLog
+            );
+
+            // Return a new tuple of our object for the command output
+            return NextChannel;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
