@@ -417,6 +417,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 CastView.Dispatcher.Invoke(() => {
                     CastView.ReplayLogInputContent.Text = NewViewerContents;
                     CastView.FilteringLogFileTextBox.Text = NewViewerFileName;
+                    CastView.ViewerContentComboBox.SelectedIndex = (int)StateToSet - 1;
                 });
 
                 // Toggle the showing parsed value.

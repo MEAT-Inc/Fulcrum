@@ -350,7 +350,10 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var ConnectCommand = PTConnectCommands.FirstOrDefault();
             var ChannelFlags = (PassThroughConnect)Convert.ToUInt32(ConnectCommand.ConnectFlags, 16);
             var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
-            var BaudRateInUse = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(BaudRate)).FirstOrDefault(BaudObj => BaudObj.Contains(ConnectCommand.BaudRate)));
+            var BaudRateInUse = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(BaudRate))
+                .FirstOrDefault(BaudObj => 
+                    BaudObj.Contains(ConnectCommand.BaudRate) &&
+                    BaudObj.Contains(ProtocolInUse.ToString().Split('_')[0].ToUpper())));
 
             // Build simulation channel here and return it out
             var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, BaudRateInUse);
