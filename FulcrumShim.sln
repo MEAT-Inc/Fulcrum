@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FulcrumInjector", "FulcrumI
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulcrumApps", "FulcrumApps", "{58E5FCD5-281D-4CA0-AE50-D916429B71FE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulcrumTests", "FulcrumTests", "{2A1AA874-B321-4B8A-B3D0-641557D0F4A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InjectorTests", "InjectorTests\InjectorTests.csproj", "{02CF1451-D3B2-4234-BB8B-15B0C48B394D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +80,24 @@ Global
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x64.Build.0 = Release|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x86.ActiveCfg = Release|Any CPU
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}.Release|x86.Build.0 = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Debug|x64.Build.0 = Debug|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Debug|x86.Build.0 = Debug|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release (Installed)|Any CPU.ActiveCfg = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release (Installed)|Any CPU.Build.0 = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release (Installed)|x64.ActiveCfg = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release (Installed)|x64.Build.0 = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release (Installed)|x86.ActiveCfg = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release (Installed)|x86.Build.0 = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release|x64.ActiveCfg = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release|x64.Build.0 = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release|x86.ActiveCfg = Release|Any CPU
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +105,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{25DE901C-9939-4B98-A2A0-58090B7375FD} = {58E5FCD5-281D-4CA0-AE50-D916429B71FE}
 		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7} = {58E5FCD5-281D-4CA0-AE50-D916429B71FE}
+		{02CF1451-D3B2-4234-BB8B-15B0C48B394D} = {2A1AA874-B321-4B8A-B3D0-641557D0F4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1546852D-0441-4435-AAAD-B4BAF4D43FD6}

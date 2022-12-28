@@ -66,7 +66,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             SimExtensionLogger.WriteLog($"BUILT A TOTAL OF {PairedExpressions.Count} EXPRESSION CHANNEL SETS OK!", LogType.WarnLog);
             return PairedExpressions.ToArray();
         }
-
         /// <summary>
         /// Builds a Channel object from a set of input expressions
         /// </summary>

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
@@ -11,6 +14,7 @@ using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 {
@@ -20,7 +24,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
     public class ExpressionsGenerator
     {
         // Logger object and private helpers
-        private readonly SubServiceLogger ExpLogger;
+        private readonly SubServiceLogger _expressionsLogger;
 
         // Input objects for this class instance to build simulations
         public readonly string LogFileName;
@@ -43,100 +47,117 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             // Store our File nam e and contents here
             this.LogFileName = LogFileName;
             this.LogFileContents = LogFileContents;
-            this.ExpLogger = new SubServiceLogger($"ExpressionsLogger_{Path.GetFileNameWithoutExtension(this.LogFileName)}");
-            this.ExpLogger.WriteLog("BUILT NEW SETUP FOR AN EXPRESSIONS GENERATOR OK! READY TO BUILD OUR EXPRESSIONS FILE!", LogType.InfoLog);
+            this._expressionsLogger = new SubServiceLogger($"ExpressionsLogger_{Path.GetFileNameWithoutExtension(this.LogFileName)}");
+            this._expressionsLogger.WriteLog("BUILT NEW SETUP FOR AN EXPRESSIONS GENERATOR OK! READY TO BUILD OUR EXPRESSIONS FILE!", LogType.InfoLog);
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Splits an input content string into a set fo PT Command objects which are split into objects.
+        ///
+        /// PreReqs:
+        ///     1) Load in the log file at the path specified in the CTOR of this class
+        ///     2) Store the log contents in a class variable
+        ///
+        /// Execution:
+        ///     1) Log bullshit about this process
+        ///     2) Load the regex for time string parsing and compile it (for spood)
+        ///     3) Process all matches in the log file content and split into an array of substrings
+        ///     4) 
         /// </summary>
-        /// <param name="UpdateParseProgress">Action for progress updating</param>
+        /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
         /// <returns>Returns a set of file objects which contain the PT commands from a file.</returns>
-        public string[] SplitLogToCommands(bool UpdateParseProgress = false)
+        public PassThruExpression[] GenerateLogExpressions(bool UpdateParseProgress = false)
         {
-            // Build regex objects to help split input content into sets.
-            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
-            var StatusRegex = new Regex(PassThruRegexModelShare.PassThruStatus.ExpressionPattern);
+            // Log building expression log command line sets now
+            if (UpdateParseProgress) FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 0;
+            this._expressionsLogger.WriteLog($"CONVERTING INPUT LOG FILE {this.LogFileName} INTO AN EXPRESSION SET NOW...", LogType.InfoLog);
 
-            // Make an empty array of strings and then begin splitting.
-            List<string> OutputLines = new List<string>();
-            for (int CharIndex = 0; CharIndex < LogFileContents.Length;)
+            // Store our regex matches and regex object for the time string values located here
+            var TimeRegex = new Regex(PassThruRegexModelShare.PassThruTime.ExpressionPattern, RegexOptions.Compiled);
+            var TimeMatches = TimeRegex.Matches(this.LogFileContents).Cast<Match>().ToArray();
+
+            // Build an output list of lines for content, find our matches from a built expressions Regex, and generate output lines
+            var OutputExpressions = new List<PassThruExpression>();
+            while (OutputExpressions.Count != TimeMatches.Length) OutputExpressions.Add(null);
+            var OutputCommands = Enumerable.Repeat(string.Empty, TimeMatches.Length).ToList();
+
+            // Store an int value to track our loop count based on the number of iterations built now
+            int LoopsCompleted = 0;
+
+            // Loop all the time matches in order and find the index of the next one. Take all content between the index values found
+            ParallelOptions ParseOptions = new ParallelOptions() { MaxDegreeOfParallelism = 3 };
+            Parallel.For(0, TimeMatches.Length, ParseOptions, MatchIndex =>
             {
-                // Find the first index of a time entry and the close command index.
-                int TimeStartIndex = TimeRegex.Match(LogFileContents, CharIndex).Index;
-                var ErrorCloseMatch = StatusRegex.Match(LogFileContents, TimeStartIndex);
-                int ErrorCloseStart = ErrorCloseMatch.Index; int ErrorCloseLength = ErrorCloseMatch.Length;
-                if (!ErrorCloseMatch.Success)
-                {
-                    // If we can't find the status close message, try and find it using the next command startup.
-                    var NextTime = TimeRegex.Match(LogFileContents, TimeStartIndex + 1).Index;
-                    ErrorCloseStart = NextTime; ErrorCloseLength = 0;
-                }
+                // Pull our our current match object here and store it
+                Match CurrentMatch = TimeMatches[MatchIndex];
 
-                // Now find the end of our length for the match object
-                int ErrorCloseIndex = ErrorCloseStart + ErrorCloseLength;
-
-                // Take the difference in End/Start as our string length value.
-                if (ErrorCloseIndex - TimeStartIndex < 0) ErrorCloseIndex = LogFileContents.Length;
-                string NextCommand = LogFileContents.Substring(TimeStartIndex, ErrorCloseIndex - TimeStartIndex);
-
-                // If it was found in the list already, then we break out of this loop to stop adding dupes.
-                CharIndex = ErrorCloseIndex;
-                OutputLines.Add(NextCommand);
-
-                // Progress Updating Action if the bool is set to do so.
-                if (!UpdateParseProgress) continue;
-                double CurrentProgress = ((double)CharIndex / (double)LogFileContents.Length) * 100.00;
-                FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
-            }
-
-            // Return the built set of commands.
-            this.LogFileContentsSplit = OutputLines.ToArray();
-            return this.LogFileContentsSplit;
-        }
-        /// <summary>
-        /// Generates our expression sets based on the given value input
-        /// </summary>
-        /// <returns></returns>
-        public PassThruExpression[] GenerateExpressionSet(bool UpdateParseProgress = false)
-        {
-            // Setup parsing routine here.
-            var ExpressionSet = LogFileContentsSplit.Select(LineSet =>
-            {
-                // Split our output content here and then build a type for the expressions
-                if (LineSet.Length == 0) return null;
-                string[] SplitLines = LineSet.Split('\n');
-                var ExpressionType = SplitLines.GetTypeFromLines();
+                // Store the index and the string value of this match object here
+                string FileSubString = string.Empty;
+                int StartingIndex = CurrentMatch.Index;
+                string MatchContents = CurrentMatch.Value;
 
                 try
                 {
-                    // Build expression class object and tick our progress
-                    var NextClassObject = ExpressionType.GetRegexClassFromCommand(SplitLines);
-                    if (!UpdateParseProgress) return NextClassObject;
+                    // Find the index values of the next match now and store it to
+                    Match NextMatch = MatchIndex + 1 == TimeMatches.Length
+                        ? TimeMatches[MatchIndex]
+                        : TimeMatches[MatchIndex + 1];
+                        
+                    // Pull a substring of our file contents here and store them now
+                    int EndingIndex = NextMatch.Index;
+                    int FileSubstringLength = EndingIndex - StartingIndex;
+                    FileSubString = this.LogFileContents.Substring(StartingIndex, FileSubstringLength);
+                    OutputCommands[MatchIndex] = FileSubString;
 
-                    // Update progress, return built object
-                    int IndexOfLine = LogFileContents.LastIndexOf(LineSet);
-                    double CurrentProgress = (IndexOfLine / (double)LogFileContents.Length) * 100.00;
-                    FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = (int)CurrentProgress;
-                    return NextClassObject;
+                    // If we've got the zero messages error line, then just return on
+                    bool IsEmpty = string.IsNullOrWhiteSpace(FileSubString);
+                    bool HasBuffEmpty = FileSubString.Contains("16:BUFFER_EMPTY");
+                    bool HasComplete = FileSubString.Contains("PTReadMsgs() complete");
+                    if (IsEmpty! && !HasBuffEmpty && !HasComplete)
+                    {
+                        // Take the split content values, get our ExpressionType, and store the built expression object here
+                        PassThruCommandType ExpressionType = FileSubString.GetPtTypeFromLines();
+                        PassThruExpression NextClassObject = ExpressionType.GetRegexClassFromCommand(FileSubString);
+                        OutputExpressions[MatchIndex] = NextClassObject;
+                    }
                 }
-                catch (Exception ParseEx)
+                catch (Exception GenerateExpressionEx)
                 {
-                    // Log failures out and find out why the fails happen
-                    ExpLogger.WriteLog($"FAILED TO PARSE A COMMAND ENTRY! FIRST LINE OF COMMANDS {SplitLines[0]}", LogType.WarnLog);
-                    ExpLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", ParseEx, new[] { LogType.WarnLog, LogType.TraceLog });
-                    return null;
+                    // Log failures out and find out why the fails happen then move to our progress routine or move to next iteration
+                    this._expressionsLogger.WriteLog($"FAILED TO GENERATE AN EXPRESSION FROM INPUT COMMAND {MatchContents} (Index: {MatchIndex})!", LogType.WarnLog);
+                    this._expressionsLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", GenerateExpressionEx, new[] { LogType.WarnLog, LogType.TraceLog });
                 }
-            }).Where(ExpObj => ExpObj != null).ToArray();
 
-            // Store and return the expressions
-            this.ExpressionsBuilt = ExpressionSet;
+                // Update progress values if needed now
+                if (!UpdateParseProgress) return;
+            
+                // Get the new progress value and update our UI value with it
+                int OldProgress = FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress;
+                int CurrentProgress = (int)((double)LoopsCompleted++ / (double)TimeMatches.Length * 100.00);
+                if (OldProgress != CurrentProgress) FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = CurrentProgress;
+            });
+
+            // Log done building log command line sets and expressions
+            this._expressionsLogger.WriteLog($"DONE BUILDING EXPRESSION SETS FROM INPUT FILE {this.LogFileName}!", LogType.InfoLog);
+            this._expressionsLogger.WriteLog($"BUILT A TOTAL OF {OutputExpressions.Count} LOG LINE SETS OK!", LogType.InfoLog);
+
+            // Prune all null values off the array of expressions
+            if (UpdateParseProgress) FulcrumConstants.FulcrumLogReviewViewModel.ProcessingProgress = 100;
+            OutputExpressions = OutputExpressions
+                .Where(ExpressionObj => ExpressionObj != null)
+                .ToList();
+
+            // Return the built set of commands.
+            this.ExpressionsBuilt = OutputExpressions.ToArray();
+            this.LogFileContentsSplit = OutputCommands.ToArray();
             return this.ExpressionsBuilt;
         }
         /// <summary>
         /// Takes an input set of PTExpressions and writes them to a file object desired.
         /// </summary>
-        /// <param name="InputExpressions">Expression input objects</param>
+        /// <param name="BaseFileName">Input file name to save our output expressions file content as</param>
         /// <returns>Path of our built expression file</returns>
         public string SaveExpressionsFile(string BaseFileName = "")
         {
@@ -171,23 +192,22 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 ExpressionLogger.WriteLog("WRITING OUTPUT CONTENTS NOW...", LogType.WarnLog);
                 File.WriteAllText(FinalOutputPath, string.Join("\n", OutputExpressionStrings));
 
-                // TODO: Figure out why I had this code in here...
-                // Check to see if we aren't in the default location
-                //if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
-                //{
-                //    // Find the base path, get the file name, and copy it into here.
-                //    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
-                //    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
-                //    File.Copy(FinalOutputPath, CopyLocation, true);
-                //
-                //    // Remove the Expressions Logger. Log done and return
-                //    ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
-                //    this.ExpressionsFile = CopyLocation;
-                //    return CopyLocation;
-                //}
-
                 // Remove the Expressions Logger. Log done and return
                 ExpressionLogger.WriteLog("DONE LOGGING OUTPUT CONTENT! RETURNING OUTPUT VALUES NOW");
+
+                // Check to see if we aren't in the default location
+                if (BaseFileName.Contains(Path.DirectorySeparatorChar) && !BaseFileName.Contains("FulcrumLogs"))
+                {
+                    // Find the base path, get the file name, and copy it into here.
+                    string LocalDirectory = Path.GetDirectoryName(BaseFileName);
+                    string CopyLocation = Path.Combine(LocalDirectory, Path.GetFileNameWithoutExtension(FinalOutputPath)) + ".ptExp";
+                    File.Copy(FinalOutputPath, CopyLocation, true);
+
+                    // Remove the Expressions Logger. Log done and return
+                    ExpressionLogger.WriteLog("COPIED OUTPUT EXPRESSIONS FILE INTO THE BASE EXPRESSION FILE LOCATION!");
+                }
+
+                // Store the path to our final expressions file and exit out
                 this.ExpressionsFile = FinalOutputPath;
                 return FinalOutputPath;
             }
@@ -200,6 +220,52 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
                 // Return nothing.
                 return string.Empty;
             }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Imports an expression file and converts it into a list of expression objects
+        /// </summary>
+        /// <returns>A temporary file name which contains the contents of our log file.</returns>
+        public static string ImportExpressionSet(string InputFilePath)
+        {
+            // Read the contents of the file and store them. Split them out based on the expression splitting line entries
+            string InputExpressionContent = File.ReadAllText(InputFilePath);
+            string[] ExpressionStringsSplit = Regex.Split(InputExpressionContent, @"=+\n\n=+");
+
+            // Now find JUST the log file content values and store them.
+            string[] LogLinesPulled = ExpressionStringsSplit.Select(ExpressionEntrySet =>
+            {
+                // Regex match our content values desired
+                string RegexLogLinesFound = Regex.Replace(ExpressionEntrySet, @"=+|\+=+\+\s+(?>\|[^\r\n]+\s+)+\+=+\+\s+", string.Empty);
+                string[] SplitRegexLogLines = RegexLogLinesFound
+                    .Split('\n')
+                    .Where(LogLine =>
+                        LogLine.Length > 3 &&
+                        !LogLine.Contains("No Parameters") &&
+                        !LogLine.Contains("No Messages Found!") &&
+                        !string.IsNullOrWhiteSpace(LogLine))
+                    .Select(LogLine => LogLine.Substring(3))
+                    .ToArray();
+
+                // Now trim the padding edges off and return
+                string OutputRegexStrings = string.Join("\n", SplitRegexLogLines);
+                return OutputRegexStrings;
+            }).ToArray();
+
+            // Convert pulled strings into one whole object. Convert the log content into an expression here
+            string CombinedOutputLogLines = string.Join("\n", LogLinesPulled);
+            string OutputLogFileDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultConversionsPath");
+            string ConvertedLogFilePath = Path.Combine(OutputLogFileDirectory, "ExpressionImport_" + Path.GetFileName(Path.ChangeExtension(InputFilePath, ".txt")));
+
+            // Remove old files and write out the new contents
+            if (File.Exists(ConvertedLogFilePath)) File.Delete(ConvertedLogFilePath);
+            if (!Directory.Exists(OutputLogFileDirectory)) Directory.CreateDirectory(OutputLogFileDirectory);
+            File.WriteAllText(ConvertedLogFilePath, CombinedOutputLogLines);
+
+            // Return the built file path
+            return ConvertedLogFilePath;
         }
     }
 }
