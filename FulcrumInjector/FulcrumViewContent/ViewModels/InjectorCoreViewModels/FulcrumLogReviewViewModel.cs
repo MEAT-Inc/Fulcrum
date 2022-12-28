@@ -183,8 +183,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     this.IsLogLoaded = true;
                     this.ExpressionsBuilt = true;
                     this.ExpressionsFile = NewLogFile;
-                    this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
                     this.LoadedLogFile = ExpressionsGenerator.ImportExpressionSet(this.ExpressionsFile);
+                    this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
                     ViewModelLogger.WriteLog("PULLED IN A NEW EXPRESSIONS FILE AND CONVERTED IT INTO A RAW LOG OK!");
 
                     // Toggle the viewer to show out output
