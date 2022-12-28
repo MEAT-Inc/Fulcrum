@@ -18,7 +18,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// <summary>
     /// Class object which contains messages and filters for a simulation channel object
     /// </summary>
-    public static class SimChannelExtensions
+    public static class SimulationChannelExtensions
     {
         // Logger object for this extension class
         private static SubServiceLogger _simExtensionLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimExtensionLogger", LoggerActions.SubServiceLogger);
@@ -89,7 +89,22 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// <param name="GroupedExpression">Expressions to search thru</param>
         public static SimulationMessagePair[] StorePassThruPairs(this SimulationChannel InputChannel, PassThruExpression[] GroupedExpression)
         {
-            // Pull out our pairs
+            // Order the input expression objects by time fired off and then pull out our pairing values
+            GroupedExpression = GroupedExpression.OrderBy(ExpObj =>
+            {
+                // Store the seconds and milliseconds values here
+                string[] TimeSplit = ExpObj.ExecutionTime.Split('.');
+
+                // Parse the seconds and milliseconds value and return a timespan for them
+                int SecondsValue = int.Parse(TimeSplit[0]);
+                int MillisValue = int.Parse(TimeSplit[1].Replace("s", string.Empty));
+
+                // Build an output timespan value here and return it for sorting routines
+                TimeSpan TimeElapsed = new TimeSpan(0, 0, 0, SecondsValue, MillisValue);
+                return TimeElapsed;
+            }).ToArray();
+
+            // Build a temporary output list object and loop all of our expressions here
             var MessagesPaired = new List<Tuple<PassThruWriteMessagesExpression, PassThruReadMessagesExpression[]>>();
             foreach (var ExpressionObject in GroupedExpression)
             {

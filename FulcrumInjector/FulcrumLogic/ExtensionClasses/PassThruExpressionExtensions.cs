@@ -350,13 +350,16 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var ConnectCommand = PTConnectCommands.FirstOrDefault();
             var ChannelFlags = (PassThroughConnect)Convert.ToUInt32(ConnectCommand.ConnectFlags, 16);
             var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
-            var BaudRateInUse = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(BaudRate))
-                .FirstOrDefault(BaudObj => 
-                    BaudObj.Contains(ConnectCommand.BaudRate) &&
-                    BaudObj.Contains(ProtocolInUse.ToString().Split('_')[0].ToUpper())));
+            var ChannelBaud = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(ProtocolId))
+                .Select(BaudValue => BaudValue
+                    .Split('_')
+                    .OrderByDescending(StringPart => StringPart.Length)
+                    .FirstOrDefault())
+                .FirstOrDefault(ProtocolName => ProtocolInUse.ToString().Contains(ProtocolName)) + "_" + ConnectCommand.BaudRate);
 
             // Build simulation channel here and return it out
-            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, BaudRateInUse);
+            if (PTReadCommands.Length == 0 || PTWriteCommands.Length == 0) return null;
+            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, ChannelBaud);
             NextChannel.StoreMessageFilters(PTFilterCommands);
             NextChannel.StoreMessagesRead(PTReadCommands);
             NextChannel.StoreMessagesWritten(PTWriteCommands);
@@ -365,11 +368,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             // Log information about the built out command objects.
             _expExtLogger.WriteLog(
                 $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS (CHANNEL ID {ChannelId}):" +
-                $"\n--> {PTConnectCommands.Length} PT CONNECTS" +
-                $"\n--> {PTFilterCommands.Length} FILTERS" +
-                $"\n--> {PTReadCommands.Length} READ COMMANDS" +
-                $"\n--> {PTWriteCommands.Length} WRITE COMMANDS" +
-                $"\n--> {NextChannel.MessagePairs.Length} MESSAGE PAIRS TOTAL",
+                $" {PTConnectCommands.Length} PT CONNECTS" +
+                $" | {PTFilterCommands.Length} FILTERS" +
+                $" | {PTReadCommands.Length} READ COMMANDS" +
+                $" | {PTWriteCommands.Length} WRITE COMMANDS" +
+                $" | {NextChannel.MessagePairs.Length} MESSAGE PAIRS TOTAL",
                 LogType.InfoLog
             );
 

@@ -336,7 +336,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Log failures out and return nothing
                 this.ProcessingProgress = 100;
-                ViewModelLogger.WriteLog("FAILED TO BUILD NEW GENERATION ROUTINE HELPER!", LogType.ErrorLog);
+                ViewModelLogger.WriteLog("FAILED TO BUILD NEW SIMULATION FILE USING INPUT EXPRESSIONS!", LogType.ErrorLog);
                 ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
                 GeneratorBuilt = null; this.SimulationBuilt = false;
                 return false;

@@ -150,17 +150,30 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             int LoopsCompleted = 0; int ExpressionsCount = this.SimulationExpressions.Count;
             Parallel.ForEach(this.SimulationExpressions, ExpressionSet =>
             {
-                // Pull the Channel ID and the expression objects here and build a channel from it
-                uint SimChannelId = ExpressionSet.Key;
-                PassThruExpression[] ChannelExpressions = ExpressionSet.Value;
-                SimulationChannel BuiltChannel = ChannelExpressions.BuildChannelsFromExpressions(SimChannelId);
-
-                // If the built channel object exists and is usable, then store it on our output collection now
-                lock (SimChannelsBuilt)
+                try
                 {
-                    // Now insert this expression object based on what keys are in the output collection of expressions
-                    if (!SimChannelsBuilt.ContainsKey(SimChannelId)) SimChannelsBuilt.Add(SimChannelId, BuiltChannel);
-                    else throw new InvalidDataException($"ERROR! CAN NOT APPEND A SIM CHANNEL WITH ID {SimChannelId} SINCE IT EXISTS ALREADY!");
+                    // Pull the Channel ID and the expression objects here and build a channel from it
+                    uint SimChannelId = ExpressionSet.Key;
+                    PassThruExpression[] ChannelExpressions = ExpressionSet.Value;
+                    SimulationChannel BuiltChannel = ChannelExpressions.BuildChannelsFromExpressions(SimChannelId);
+
+                    // If our channel object is not null, then store it on our output collection now
+                    if (BuiltChannel != null)
+                    {
+                        // Lock the output collection to avoid thread issues and store the new channel
+                        lock (SimChannelsBuilt)
+                        {
+                            // Now insert this expression object based on what keys are in the output collection of expressions
+                            if (!SimChannelsBuilt.ContainsKey(SimChannelId)) SimChannelsBuilt.Add(SimChannelId, BuiltChannel);
+                            else throw new InvalidDataException($"ERROR! CAN NOT APPEND A SIM CHANNEL WITH ID {SimChannelId} SINCE IT EXISTS ALREADY!");
+                        }
+                    }
+                }
+                catch (Exception BuildChannelCommandEx)
+                {
+                    // Log failures out and find out why the fails happen then move to our progress routine or move to next iteration
+                    this._simulationLogger.WriteLog($"FAILED TO GENERATE A SIMULATION CHANNEL FROM A SET OF EXPRESSIONS!", LogType.WarnLog);
+                    this._simulationLogger.WriteLog("EXCEPTION THROWN IS LOGGED BELOW", BuildChannelCommandEx, new[] { LogType.WarnLog, LogType.TraceLog });
                 }
 
                 // Invoke a progress update here if needed
