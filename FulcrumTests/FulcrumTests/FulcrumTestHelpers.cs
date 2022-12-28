@@ -16,15 +16,14 @@ namespace InjectorTests.FulcrumTests
     /// Contains the init/setup routine used to build a new injector test suite
     /// </summary>
     [TestClass]
-    public class FulcrumTestsInitializer
+    public class FulcrumTestHelpers
     {
         /// <summary>
         /// Overload/Init routine for the injector tests.
         /// This will run before the first call of the injector test classes
         /// </summary>
         /// <param name="Context">Test Context</param>
-        [AssemblyInitialize]
-        public static void AssemblyInit(TestContext Context)
+        public static void FulcrumTestInit()
         {
             // Store a new configuration file for the injector setup routines 
             string ConfigFileName = "FulcrumInjectorSettings.json";

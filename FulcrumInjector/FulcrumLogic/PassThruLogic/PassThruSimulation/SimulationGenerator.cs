@@ -65,18 +65,18 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
             this.SimulationName = InputFileName;
             this.InputExpressions = Expressions;
             this.SimulationFile = Path.Combine(InputFilePath, InputFileName);
-            string FileNameCleaned = Path.GetFileNameWithoutExtension(this.SimulationName);
-            this._simulationLogger = (SubServiceLogger)LoggerQueue.SpawnLogger($"SimGeneratorLogger_{FileNameCleaned}", LoggerActions.SubServiceLogger);
+            string LoggerName = $"SimGeneratorLogger_{Path.GetFileNameWithoutExtension(this.SimulationName)}";
+            this._simulationLogger = (SubServiceLogger)LoggerQueue.SpawnLogger(LoggerName, LoggerActions.SubServiceLogger); 
             this._simulationLogger.WriteLog($"READY TO BUILD NEW SIMULATION NAMED {this.SimulationName} WITH {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Converts an input set of expression objects into a grouped set of expressions paired off by a Channel ID Value
-        /// </summary>
-        /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
-        /// <returns>A collection of built expression objects paired off by channel ID values</returns>
+            /// Converts an input set of expression objects into a grouped set of expressions paired off by a Channel ID Value
+            /// </summary>
+            /// <param name="UpdateParseProgress">When true, progress on the injector log review window will be updated</param>
+            /// <returns>A collection of built expression objects paired off by channel ID values</returns>
         public Dictionary<uint, PassThruExpression[]> GenerateGroupedIds(bool UpdateParseProgress = false)
         {
             // Build a dictionary for return output objects and log we're starting to update our values
