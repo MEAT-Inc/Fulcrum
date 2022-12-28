@@ -198,8 +198,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 
             // Get a logger object for saving expression sets.
             string LoggerName = $"{Path.GetFileNameWithoutExtension(BaseFileName)}_ExpressionsLogger";
-            var ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith(LoggerName)) ?? new SubServiceLogger(LoggerName);
+            var ExpressionLogger = (SubServiceLogger)LoggerQueue.SpawnLogger(LoggerName, LoggerActions.SubServiceLogger);
 
             // Find output path and then build final path value.             
             if (!Directory.Exists(Path.GetDirectoryName(FinalOutputPath))) { Directory.CreateDirectory(Path.GetDirectoryName(FinalOutputPath)); }

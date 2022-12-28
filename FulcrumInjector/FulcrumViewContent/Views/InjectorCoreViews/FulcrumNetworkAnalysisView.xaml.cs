@@ -27,8 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumNetworkAnalysisView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorNetworkAnalysisViewLogger")) ?? new SubServiceLogger("InjectorNetworkAnalysisViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorNetworkAnalysisViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumNetworkAnalysisViewModel ViewModel { get; set; }

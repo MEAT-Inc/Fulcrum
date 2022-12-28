@@ -23,9 +23,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     public static class GenerateExpressionExtensions
     {
         // Logger Object
-        private static SubServiceLogger _expExtLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"ExpressionsExtLogger")) ?? new SubServiceLogger("ExpressionsExtLogger");
-
+        private static SubServiceLogger _expExtLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"ExpressionsExtLogger", LoggerActions.SubServiceLogger);
+        
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>

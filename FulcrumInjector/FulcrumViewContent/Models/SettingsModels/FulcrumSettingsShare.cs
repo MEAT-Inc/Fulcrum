@@ -14,8 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     public static class FulcrumSettingsShare
     {
         // Logger Object
-        private static SubServiceLogger SettingStoreLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsModelStoreLogger")) ?? new SubServiceLogger("SettingsModelStoreLogger");
+        private static SubServiceLogger SettingStoreLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsModelStoreLogger", LoggerActions.SubServiceLogger);
 
         // ---------------------------------------------------------------------------------------------------------------------
 

@@ -189,13 +189,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\r');
 
-            // Lock the logger queue to find our new logger object
-            lock (LogBroker.LoggerQueue)
-            {
-                // Build a logger object for our expression here
-                this.ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                    .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
-            }
+            // Build a logger object for our expression here
+            this.ExpressionLogger = (SubServiceLogger)LoggerQueue.SpawnLogger($"{this.GetType().Name}Logger", LoggerActions.SubServiceLogger);
 
             // Find command issue request values. (Pull using Base Class)
             var FieldsToSet = this.GetExpressionProperties(true);

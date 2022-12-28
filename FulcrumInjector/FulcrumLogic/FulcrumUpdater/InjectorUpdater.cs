@@ -25,8 +25,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
     public class InjectorUpdater
     {
         // Logger object.
-        private SubServiceLogger _injectorUpdateLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorUpdateLogger")) ?? new SubServiceLogger("InjectorUpdateLogger");
+        private SubServiceLogger _injectorUpdateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorUpdateLogger", LoggerActions.SubServiceLogger);
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

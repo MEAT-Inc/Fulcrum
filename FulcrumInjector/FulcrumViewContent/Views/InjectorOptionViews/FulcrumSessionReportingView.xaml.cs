@@ -29,8 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
     public partial class FulcrumSessionReportingView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("FulcrumSessionReportingViewLogger")) ?? new SubServiceLogger("FulcrumSessionReportingViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FulcrumSessionReportingViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumSessionReportingViewModel ViewModel { get; set; }

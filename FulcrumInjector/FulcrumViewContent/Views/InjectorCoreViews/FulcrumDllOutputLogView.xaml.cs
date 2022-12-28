@@ -26,8 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumDllOutputLogView : UserControl
     {  
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorDllOutputViewLogger")) ?? new SubServiceLogger("InjectorDllOutputViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorDllOutputViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumDllOutputLogViewModel ViewModel { get; set; }

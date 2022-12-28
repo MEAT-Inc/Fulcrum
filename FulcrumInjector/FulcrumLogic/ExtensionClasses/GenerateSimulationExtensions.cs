@@ -22,8 +22,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     public static class GenerateSimulationExtensions
     {
         // Logger object.
-        private static SubServiceLogger SimExtensionLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimExtensionLogger")) ?? new SubServiceLogger("SimExtensionLogger");
+        private static SubServiceLogger SimExtensionLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimExtensionLogger", LoggerActions.SubServiceLogger);
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
         

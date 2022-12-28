@@ -35,8 +35,7 @@ namespace FulcrumInjector
     public partial class InjectorMainWindow : MetroWindow
     {   
         // Logger object.
-        private static SubServiceLogger InjectorMainLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorMainLogger")) ?? new SubServiceLogger("InjectorMainLogger");
+        private static SubServiceLogger InjectorMainLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorMainLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

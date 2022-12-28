@@ -19,8 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.PassThruModels
     {
         // Logger Object 
 
-        private static SubServiceLogger RegexStoreLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("PassThruRegexModelShareLogger")) ?? new SubServiceLogger("PassThruRegexModelShareLogger");
+        private static SubServiceLogger RegexStoreLogger = (SubServiceLogger)LoggerQueue.SpawnLogger("PassThruRegexModelShareLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

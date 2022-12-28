@@ -29,8 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     public class SettingsEntryModel
     {
         // Logger object.
-        private static SubServiceLogger ModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsEntryModelLogger")) ?? new SubServiceLogger("SettingsEntryModelLogger");
+        private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsEntryModelLogger", LoggerActions.SubServiceLogger);
 
         // Basic Setting configurations
         public string SettingName { get; set; }
