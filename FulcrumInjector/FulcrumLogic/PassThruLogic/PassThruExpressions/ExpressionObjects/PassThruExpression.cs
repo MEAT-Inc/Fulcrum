@@ -193,12 +193,12 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             this.ExpressionLogger = (SubServiceLogger)LoggerQueue.SpawnLogger($"{this.GetType().Name}Logger", LoggerActions.SubServiceLogger);
 
             // Find command issue request values. (Pull using Base Class)
+            this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
             var FieldsToSet = this.GetExpressionProperties(true);
-            bool ExecutionTimeResult = this.TimeRegex.Evaluate(CommandInput, out var TimeStrings);
             if (!this.StatusCodeRegex.Evaluate(CommandInput, out var StatusCodeStrings))
             {
                 // Try and find the end of the command in a different way
-                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
+                // this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
                 StatusCodeStrings = new[]
                 {
                     $"{TimeStrings[2]} 0:STATUS_NOERROR",
@@ -206,10 +206,6 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                     "0:STATUS_NOERROR"
                 };
             }
-
-            // Check our output values
-            if (!ExecutionTimeResult) 
-                this.ExpressionLogger.WriteLog($"FAILED TO REGEX OPERATE ON ONE OR MORE TYPES FOR EXPRESSION TYPE {this.GetType().Name}!");
 
             // Find our values to store here and add them to our list of values.
             List<string> StringsToApply = new List<string>();
