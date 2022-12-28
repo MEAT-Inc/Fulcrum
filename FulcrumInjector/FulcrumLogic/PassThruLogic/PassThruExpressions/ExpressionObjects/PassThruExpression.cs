@@ -160,7 +160,7 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                 var ResultAttribute = (PtExpressionProperty)FieldObj.GetCustomAttributes(typeof(PtExpressionProperty)).FirstOrDefault();
 
                 // Now compare value to the passed/failed setup.
-                return ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
+                return ResultAttribute != null && ResultAttribute.ResultState(CurrentValue) == ResultAttribute.ResultValue;
             });
 
             // Now see if all the values in the Results array passed.
@@ -180,9 +180,13 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
             this.TypeOfExpression = ExpressionType;
             this.SplitCommandLines = CommandInput.Split('\r');
 
-            // Build a logger object for our expression here
-            this.ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-                .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
+            // Lock the logger queue to find our new logger object
+            lock (LogBroker.LoggerQueue)
+            {
+                // Build a logger object for our expression here
+                this.ExpressionLogger = (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
+                    .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
+            }
 
             // Find command issue request values. (Pull using Base Class)
             var FieldsToSet = this.GetExpressionProperties(true);
@@ -258,14 +262,14 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.Express
                 catch (Exception SetEx)
                 {
                     // Throw an exception output for this error type.
-                    this.ExpressionLogger.WriteLog($"EXCEPTION THROWN DURING EXPRESSION VALUE STORE FOR COMMAND TYPE {this.GetType().Name}!", LogType.ErrorLog);
-                    this.ExpressionLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetEx);
+                    // this.ExpressionLogger.WriteLog($"EXCEPTION THROWN DURING EXPRESSION VALUE STORE FOR COMMAND TYPE {this.GetType().Name}!", LogType.ErrorLog);
+                    // this.ExpressionLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetEx);
                     return false;
                 }
             }
 
             // Log passed, return output.
-            this.ExpressionLogger.WriteLog($"UPDATED EXPRESSION VALUES FOR A TYPE OF {this.GetType().Name} OK!");
+            // this.ExpressionLogger.WriteLog($"UPDATED EXPRESSION VALUES FOR A TYPE OF {this.GetType().Name} OK!");
             return true;
         }
     }

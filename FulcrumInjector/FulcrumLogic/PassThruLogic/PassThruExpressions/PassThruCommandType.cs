@@ -64,8 +64,9 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
 
             // Find the return type here based on the first instance of a PTCommand type object on the array.
             var EnumStringSelected = EnumTypesArray.FirstOrDefault(InputLines.Contains);
-            return (PassThruCommandType)(string.IsNullOrWhiteSpace(EnumStringSelected) ?
-                PassThruCommandType.NONE : Enum.Parse(typeof(PassThruCommandType), EnumStringSelected));
+            return (PassThruCommandType)(string.IsNullOrWhiteSpace(EnumStringSelected) 
+                ? PassThruCommandType.NONE 
+                : Enum.Parse(typeof(PassThruCommandType), EnumStringSelected));
         }
     }
 }

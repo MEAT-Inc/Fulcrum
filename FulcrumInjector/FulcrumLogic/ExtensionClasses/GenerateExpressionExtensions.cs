@@ -325,7 +325,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string[] InputLogLines)
         {
             // Join the log lines on newline characters and get the type value here
-            string JoinedLogLines = string.Join(string.Empty, InputLogLines.Select(LogLine => LogLine.Trim() + "\n"));
+            string JoinedLogLines = string.Join(string.Empty, InputLogLines.Select(LogLine => LogLine.Trim()));
             return GetRegexClassFromCommand(InputType, JoinedLogLines);
         }
         /// <summary>
