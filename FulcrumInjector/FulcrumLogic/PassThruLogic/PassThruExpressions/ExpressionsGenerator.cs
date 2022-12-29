@@ -62,7 +62,8 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions
             // Store our File nam e and contents here
             this.LogFileName = LogFileName;
             this.LogFileContents = LogFileContents ?? File.ReadAllText(LogFileName);
-            this._expressionsLogger = new SubServiceLogger($"ExpressionsLogger_{Path.GetFileNameWithoutExtension(this.LogFileName)}");
+            string LoggerName = $"ExpGeneratorLogger_{Path.GetFileNameWithoutExtension(this.LogFileName)}";
+            this._expressionsLogger = (SubServiceLogger)LoggerQueue.SpawnLogger(LoggerName, LoggerActions.SubServiceLogger);
             this._expressionsLogger.WriteLog("BUILT NEW SETUP FOR AN EXPRESSIONS GENERATOR OK! READY TO BUILD OUR EXPRESSIONS FILE!", LogType.InfoLog);
         }
 

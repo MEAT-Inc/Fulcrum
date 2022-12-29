@@ -1,30 +1,44 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 
-namespace InjectorTests.FulcrumTests
+namespace InjectorTests
 {
     /// <summary>
     /// Injector testing init class.
-    /// Contains the init/setup routine used to build a new injector test suite
+    /// Contains the init/setup routines used to build a new injector test suite
     /// </summary>
-    [TestClass]
-    public class FulcrumTestsInitializer
+    public static class FulcrumTestHelpers
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Location of our log files to use during testing
+        private static readonly string _logFileFolder = Path.Combine(Directory.GetCurrentDirectory(), @"FulcrumLogs");
+
+        #endregion // Fields
+
+        #region Properties
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Overload/Init routine for the injector tests.
         /// This will run before the first call of the injector test classes
         /// </summary>
         /// <param name="Context">Test Context</param>
-        [AssemblyInitialize]
-        public static void AssemblyInit(TestContext Context)
+        public static void FulcrumLoggingInit()
         {
             // Store a new configuration file for the injector setup routines 
             string ConfigFileName = "FulcrumInjectorSettings.json";
@@ -40,6 +54,28 @@ namespace InjectorTests.FulcrumTests
             // Configure a logging session instance here and setup our broker instance
             LogBroker.ConfigureLoggingSession(AppName, LoggingPath, MinLoggingLevel, MaxLoggingLevel);
             BaseLogger.SetFlushTrigger(MaxLoggingLevel); LogBroker.BrokerInstance.FillBrokerPool();
+        }
+        /// <summary>
+        /// Configures a new collection of file objects to use in this test suite.
+        /// </summary>
+        /// <returns>A dictionary of file names and test file objects to be used during testing</returns>
+        public static Dictionary<string, FulcrumInjectorFile> FulcrumInputFileConfig()
+        {
+            // Build a new dictionary to store our injector files first
+            var FulcrumInputFiles = new Dictionary<string, FulcrumInjectorFile>();
+
+            // Loop all the files found in our injector logs folder and import them for testing
+            string[] InjectorFiles = Directory.GetFiles(_logFileFolder).Where(FileName => FileName.EndsWith(".txt")).ToArray();
+            foreach (var InjectorFilePath in InjectorFiles)
+            {
+                // Build a new structure for our injector log file and store it on our class instance
+                FulcrumInjectorFile NextInjectorFile = new FulcrumInjectorFile(InjectorFilePath);
+                if (FulcrumInputFiles.ContainsKey(InjectorFilePath)) FulcrumInputFiles[InjectorFilePath] = NextInjectorFile;
+                else FulcrumInputFiles.Add(InjectorFilePath, NextInjectorFile);
+            }
+
+            // Return the built list of log file objects now
+            return FulcrumInputFiles;
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
