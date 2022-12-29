@@ -14,8 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     public partial class FulcrumPipeStatusView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("PipeStatusViewLogger")) ?? new SubServiceLogger("PipeStatusViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumPipeStatusViewModel ViewModel { get; set; }

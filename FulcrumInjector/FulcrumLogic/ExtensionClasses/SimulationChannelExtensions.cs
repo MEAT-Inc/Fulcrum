@@ -18,12 +18,8 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
     /// <summary>
     /// Class object which contains messages and filters for a simulation channel object
     /// </summary>
-    public static class SimChannelExtensions
+    public static class SimulationChannelExtensions
     {
-        // Logger object for this extension class
-        private static SubServiceLogger _simExtensionLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SimExtensionLogger")) ?? new SubServiceLogger("SimExtensionLogger");
-
         /// <summary>
         /// Stores a set of Expressions into messages on the given channel object
         /// </summary>
@@ -32,7 +28,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static J2534Filter[] StoreMessageFilters(this SimulationChannel InputChannel, PassThruStartMessageFilterExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            _simExtensionLogger.WriteLog("BUILDING NEW CHANNEL FILTER ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<J2534Filter> BuiltFilters = new List<J2534Filter>();
             Parallel.ForEach(ExpressionsToStore, (FilterExpression) => BuiltFilters.Add(ExpressionToJ2534Object.ConvertFilterExpression(FilterExpression, true)));
             
@@ -47,7 +42,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static PassThruStructs.PassThruMsg[] StoreMessagesWritten(this SimulationChannel InputChannel, PassThruWriteMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES WRITTEN (TO BE READ) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
             Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.AddRange(ExpressionToJ2534Object.ConvertWriteExpression(MessageExpression)));
 
@@ -69,7 +63,6 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         public static PassThruStructs.PassThruMsg[] StoreMessagesRead(this SimulationChannel InputChannel, PassThruReadMessagesExpression[] ExpressionsToStore)
         {
             // Loop each of these filter objects in parallel and update contents.
-            _simExtensionLogger.WriteLog("BUILDING NEW MESSAGES READ (TO BE WRITTEN) ARRAY FROM EXPRESSION SET NOW...", LogType.InfoLog);
             List<PassThruStructs.PassThruMsg> BuiltMessages = new List<PassThruStructs.PassThruMsg>();
             Parallel.ForEach(ExpressionsToStore, (MessageExpression) => BuiltMessages.AddRange(ExpressionToJ2534Object.ConvertReadExpression(MessageExpression)));
 
@@ -90,7 +83,22 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// <param name="GroupedExpression">Expressions to search thru</param>
         public static SimulationMessagePair[] StorePassThruPairs(this SimulationChannel InputChannel, PassThruExpression[] GroupedExpression)
         {
-            // Pull out our pairs
+            // Order the input expression objects by time fired off and then pull out our pairing values
+            GroupedExpression = GroupedExpression.OrderBy(ExpObj =>
+            {
+                // Store the seconds and milliseconds values here
+                string[] TimeSplit = ExpObj.ExecutionTime.Split('.');
+
+                // Parse the seconds and milliseconds value and return a timespan for them
+                int SecondsValue = int.Parse(TimeSplit[0]);
+                int MillisValue = int.Parse(TimeSplit[1].Replace("s", string.Empty));
+
+                // Build an output timespan value here and return it for sorting routines
+                TimeSpan TimeElapsed = new TimeSpan(0, 0, 0, SecondsValue, MillisValue);
+                return TimeElapsed;
+            }).ToArray();
+
+            // Build a temporary output list object and loop all of our expressions here
             var MessagesPaired = new List<Tuple<PassThruWriteMessagesExpression, PassThruReadMessagesExpression[]>>();
             foreach (var ExpressionObject in GroupedExpression)
             {

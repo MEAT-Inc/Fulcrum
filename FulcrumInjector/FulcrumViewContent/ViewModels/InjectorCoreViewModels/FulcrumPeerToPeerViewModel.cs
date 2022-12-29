@@ -16,8 +16,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     public class FulcrumPeerToPeerViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorPeerToPeerViewModelLogger")) ?? new SubServiceLogger("InjectorPeerToPeerViewModelLogger");
+        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorPeerToPeerViewModelLogger", LoggerActions.SubServiceLogger);
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

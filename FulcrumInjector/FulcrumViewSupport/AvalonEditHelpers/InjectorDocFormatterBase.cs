@@ -20,9 +20,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     public class InjectorDocFormatterBase : DocumentColorizingTransformer
     {
         // Logger object and color brushes for formatting output.
-        protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith($"{this.GetType().Name}Logger")) ?? new SubServiceLogger($"{this.GetType().Name}Logger");
         protected internal Tuple<MediaBrush, MediaBrush>[] _coloringBrushes;
+        protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"{this.GetType().Name}Logger", LoggerActions.SubServiceLogger); 
 
         // --------------------------------------------------------------------------------------------------
 

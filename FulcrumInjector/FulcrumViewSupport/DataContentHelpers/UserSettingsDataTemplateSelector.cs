@@ -15,8 +15,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
     public class UserSettingsDataTemplateSelector : DataTemplateSelector
     {
         // Logger object.
-        private static SubServiceLogger TemplateLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsDataTemplateLogger")) ?? new SubServiceLogger("SettingsDataTemplateLogger");
+        private static SubServiceLogger TemplateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsDataTemplateLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

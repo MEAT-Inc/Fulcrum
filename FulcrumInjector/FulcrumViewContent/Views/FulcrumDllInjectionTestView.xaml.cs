@@ -17,8 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     public partial class FulcrumDllInjectionTestView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorTestViewLogger")) ?? new SubServiceLogger("InjectorTestViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorTestViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumDllInjectionTestViewModel ViewModel { get; set; }

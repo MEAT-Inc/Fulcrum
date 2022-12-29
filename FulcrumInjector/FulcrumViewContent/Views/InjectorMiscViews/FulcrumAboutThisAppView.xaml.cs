@@ -26,8 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
     public partial class FulcrumAboutThisAppView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("AboutThisAppViewLogger")) ?? new SubServiceLogger("AboutThisAppViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumAboutThisAppViewModel ViewModel { get; set; }

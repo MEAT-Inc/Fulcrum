@@ -26,8 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
     public partial class FulcrumSettingsPaneView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("SettingsViewLogger")) ?? new SubServiceLogger("SettingsViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumSettingsPaneViewModel ViewModel { get; set; }

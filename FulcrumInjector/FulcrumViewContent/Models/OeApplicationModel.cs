@@ -15,8 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
     public class OeApplicationModel
     {
         // Logger object.
-        private static SubServiceLogger ModelLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("OeApplicationModelLogger")) ?? new SubServiceLogger("OeApplicationModelLogger");
+        private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("OeApplicationModelLogger", LoggerActions.SubServiceLogger);
 
         // Properties about an OE Application
         public string OEAppName { get; private set; }

@@ -21,8 +21,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     public partial class FulcrumInstalledOeAppsView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InstalledOeAppsViewLogger")) ?? new SubServiceLogger("InstalledOeAppsViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InstalledOeAppsViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumInstalledOeAppsViewModel ViewModel { get; set; }

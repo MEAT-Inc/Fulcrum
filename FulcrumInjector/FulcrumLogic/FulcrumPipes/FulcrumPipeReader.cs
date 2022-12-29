@@ -153,6 +153,7 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumPipes
             return Task.Run(() =>
             {
                 // Build pipe reading stream object
+                bool IsLogged = false;
                 while (!this.FulcrumPipe.IsConnected)
                 {
                     try { this.FulcrumPipe.Connect(DefaultConnectionTimeout); }
@@ -168,12 +169,19 @@ namespace FulcrumInjector.FulcrumLogic.FulcrumPipes
                             throw new Exception("FAILED TO CONFIGURE PIPE READER DUE TO NULL MAIN WINDOW INSTANCE! IS THE APP RUNNING?", ConnectEx);
                         }
 
-                        // Set state to disconnected. Log failure
-                        this.PipeState = FulcrumPipeState.Disconnected;
-                        this.PipeLogger.WriteLog("FAILED TO CONNECT TO HOST PIPE SERVER AFTER GIVEN TIMEOUT VALUE!", LogType.WarnLog);
+                        // Set the state to disconnected if it's not currently disconnected and log out this state value if needed
+                        if (this.PipeState != FulcrumPipeState.Disconnected) this.PipeState = FulcrumPipeState.Disconnected;
+                        if (!IsLogged)
+                        {
+                            // Set the logged state value to true so we stop logging this message [FULC-134]
+                            IsLogged = true;
+                            this.PipeLogger.WriteLog("FAILED TO CONNECT TO HOST PIPE SERVER AFTER GIVEN TIMEOUT VALUE!", LogType.WarnLog);
+                        }
+
+                        // Continue on to the next iteration
                         continue;
                     }
-
+                   
                     // If we're connected, log that information and break out
                     IsConnecting = false;
                     this.PipeState = FulcrumPipeState.Connected;

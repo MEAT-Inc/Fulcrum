@@ -14,57 +14,20 @@ using NLog.Targets;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpSimulator.SimulationObjects;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 {
     /// <summary>
     /// Extensions for parsing out commands into new types of output for PT Regex Classes
     /// </summary>
-    public static class GenerateExpressionExtensions
+    public static class PassThruExpressionExtensions
     {
-        /// <summary>
-        /// Imports an expression file and converts it into a list of expression objects
-        /// </summary>
-        /// <returns>A temporary file name which contains the contents of our log file.</returns>
-        public static string ImportExpressionSet(string InputFilePath)
-        {
-            // Read the contents of the file and store them. Split them out based on the expression splitting line entries
-            string InputExpressionContent = File.ReadAllText(InputFilePath);
-            string[] ExpressionStringsSplit = Regex.Split(InputExpressionContent, @"=+\n\n=+");
-
-            // Now find JUST the log file content values and store them.
-            string[] LogLinesPulled = ExpressionStringsSplit.Select(ExpressionEntrySet =>
-            {
-                // Regex match our content values desired
-                string RegexLogLinesFound = Regex.Replace(ExpressionEntrySet, @"=+|\+=+\+\s+(?>\|[^\r\n]+\s+)+\+=+\+\s+", string.Empty);
-                string[] SplitRegexLogLines = RegexLogLinesFound
-                    .Split('\n')
-                    .Where(LogLine =>
-                        LogLine.Length > 3 && 
-                        !LogLine.Contains("No Parameters") && 
-                        !LogLine.Contains("No Messages Found!") &&
-                        !string.IsNullOrWhiteSpace(LogLine))
-                    .Select(LogLine => LogLine.Substring(3))
-                    .ToArray();
-
-                // Now trim the padding edges off and return
-                string OutputRegexStrings = string.Join("\n", SplitRegexLogLines);
-                return OutputRegexStrings;
-            }).ToArray();
-
-            // Convert pulled strings into one whole object. Convert the log content into an expression here
-            string CombinedOutputLogLines = string.Join("\n", LogLinesPulled);
-            string OutputLogFileDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultConversionsPath");
-            string ConvertedLogFilePath = Path.Combine(OutputLogFileDirectory, "ExpressionImport_" + Path.GetFileName(Path.ChangeExtension(InputFilePath, ".txt")));
-
-            // Remove old files and write out the new contents
-            if (File.Exists(ConvertedLogFilePath)) File.Delete(ConvertedLogFilePath);
-            if (!Directory.Exists(OutputLogFileDirectory)) Directory.CreateDirectory(OutputLogFileDirectory);
-            File.WriteAllText(ConvertedLogFilePath, CombinedOutputLogLines);
-            
-            // Return the built file path
-            return ConvertedLogFilePath;
-        }
+        // Logger Object
+        private static SubServiceLogger _expExtLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"ExpressionsExtLogger", LoggerActions.SubServiceLogger);
+        
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Pulls out all of our message content values and stores them into a list with details.
@@ -98,7 +61,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
 
             // If no messages are found during the split process, then we need to return out.
             if (SplitMessageLines.Length == 0) {
-                ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!");
+                // ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!", LogType.TraceLog);
                 MessageProperties = new List<string[]>();
                 return "No Messages Found!";
             }
@@ -112,7 +75,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 var RegexResultTuples = new List<Tuple<string, string>>();
                 bool MatchedContent = MessageContentRegex.Evaluate(MsgLineSet, out var MatchedMessageStrings);
                 if (!MatchedContent) {
-                    ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
+                    // ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.TraceLog);
                     continue;
                 }
 
@@ -169,11 +132,11 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Add this string to our list of messages.
                 OutputMessages.Add(RegexValuesOutputString);
                 MessageProperties.Add(RegexResultTuples.Select(TupleObj => TupleObj.Item2).ToArray());
-                ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.InfoLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR COMMAND OK!", LogType.TraceLog);
             }
 
             // Return built table string object.
-            ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
+            // ExpressionObject.ExpressionLogger.WriteLog("BUILT OUTPUT EXPRESSIONS FOR MESSAGE CONTENTS OK!", LogType.InfoLog);
             return string.Join("\n", OutputMessages);
         }
         /// <summary>
@@ -219,8 +182,9 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             }
 
             // Check if no values were pulled. If this is the case then dump out.
-            if (SplitMessageLines.Length == 0) {
-                ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!");
+            if (SplitMessageLines.Length == 0)
+            {
+                // ExpressionObject.ExpressionLogger.WriteLog($"WARNING! NO MESSAGES FOUND FOR MESSAGE COMMAND! TYPE OF MESSAGE COMMAND WAS {ExpressionObject.GetType().Name}!", LogType.TraceLog);
                 FilterProperties = new List<string[]>();
                 return "No Filter Content Found!";
             }
@@ -241,7 +205,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 {
                     // Check if this is a null flow control instance
                     if (MsgLineSet.Trim() != "FlowControl is NULL") {
-                        ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.WarnLog);
+                        // ExpressionObject.ExpressionLogger.WriteLog("NO MATCH FOUND FOR MESSAGES! MOVING ON", LogType.TraceLog);
                         continue;
                     }
 
@@ -252,7 +216,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                         OutputMessageTuple.Add(new Tuple<string, string>(ResultStringTable[TupleIndex], "NULL"));
 
                     // Log Expression found and continue.
-                    ExpressionObject.ExpressionLogger.WriteLog("FOUND NULL FLOW CONTROL! PARSING AND MOVING ON...", LogType.InfoLog);
+                    // ExpressionObject.ExpressionLogger.WriteLog("FOUND NULL FLOW CONTROL! PARSING AND MOVING ON...", LogType.TraceLog);
                 }
 
                 // Make sure the value for Flags is not zero. If it is, then we need to insert a "No Value" object
@@ -291,7 +255,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
                 // Add this string to our list of messages.
                 OutputMessages.Add(RegexValuesOutputString + "\n");
                 FilterProperties.Add(OutputMessageTuple.Select(TupleObj => TupleObj.Item2).ToArray());
-                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.InfoLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("ADDED NEW MESSAGE OBJECT FOR FILTER COMMAND OK!", LogType.TraceLog);
             }
 
             // Return built table string object.
@@ -316,7 +280,7 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             var IoctlRegex = PassThruRegexModelShare.IoctlParameterValue;
             bool IoctlResults = IoctlRegex.Evaluate(ExpressionObject.CommandLines, out var IoctlResultStrings);
             if (!IoctlResults) {
-                ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.WarnLog);
+                // ExpressionObject.ExpressionLogger.WriteLog("NO IOCTL COMMAND OBJECTS FOUND! RETURNING NO VALUES OUTPUT NOW...", LogType.TraceLog);
                 ParameterProperties = Array.Empty<Tuple<string, string, string>>();
                 return "No Parameters";
             }
@@ -349,8 +313,71 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
             );
 
             // Throw new exception since not yet built.
-            ExpressionObject.ExpressionLogger.WriteLog($"BUILT OUT A TOTAL OF {ParameterProperties.Length} NEW PT IOCTL COMMAND OBJECTS!", LogType.InfoLog);
+            // ExpressionObject.ExpressionLogger.WriteLog($"BUILT OUT A TOTAL OF {ParameterProperties.Length} NEW PT IOCTL COMMAND OBJECTS!", LogType.TraceLog);
             return IoctlTableOutput;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Builds a Channel object from a set of input expressions
+        /// </summary>
+        /// <param name="GroupedExpression">Expression set to convert</param>
+        /// <param name="ChannelId">ID of the channel object to create</param>
+        /// <returns>Builds a channel session object to simulate (converted to JSON)</returns>
+        public static SimulationChannel BuildChannelsFromExpressions(this PassThruExpression[] GroupedExpression, uint ChannelId)
+        {
+            // Find all the PTFilter commands first and invert them.
+            var PTConnectCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTConnect)
+                .Cast<PassThruConnectExpression>()
+                .ToArray();
+            var PTFilterCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTStartMsgFilter)
+                .Cast<PassThruStartMessageFilterExpression>()
+                .ToArray();
+            var PTReadCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTReadMsgs)
+                .Cast<PassThruReadMessagesExpression>()
+                .ToArray();
+            var PTWriteCommands = GroupedExpression
+                .Where(ExpObj => ExpObj.TypeOfExpression == PassThruCommandType.PTWriteMsgs)
+                .Cast<PassThruWriteMessagesExpression>()
+                .ToArray();
+
+            // Find the ProtocolID and Current Channel ID. Then build a sim channel
+            if (PTConnectCommands.Length == 0) return null;
+            var ConnectCommand = PTConnectCommands.FirstOrDefault();
+            var ChannelFlags = (PassThroughConnect)Convert.ToUInt32(ConnectCommand.ConnectFlags, 16);
+            var ProtocolInUse = (ProtocolId)Enum.Parse(typeof(ProtocolId), ConnectCommand.ProtocolId.Split(':')[1]);
+            var ChannelBaud = (BaudRate)Enum.Parse(typeof(BaudRate), Enum.GetNames(typeof(ProtocolId))
+                .Select(BaudValue => BaudValue
+                    .Split('_')
+                    .OrderByDescending(StringPart => StringPart.Length)
+                    .FirstOrDefault())
+                .FirstOrDefault(ProtocolName => ProtocolInUse.ToString().Contains(ProtocolName)) + "_" + ConnectCommand.BaudRate);
+
+            // Build simulation channel here and return it out
+            if (PTReadCommands.Length == 0 || PTWriteCommands.Length == 0) return null;
+            var NextChannel = new SimulationChannel(ChannelId, ProtocolInUse, ChannelFlags, ChannelBaud);
+            NextChannel.StoreMessageFilters(PTFilterCommands);
+            NextChannel.StoreMessagesRead(PTReadCommands);
+            NextChannel.StoreMessagesWritten(PTWriteCommands);
+            NextChannel.StorePassThruPairs(GroupedExpression);
+
+            // Log information about the built out command objects.
+            _expExtLogger.WriteLog(
+                $"PULLED OUT THE FOLLOWING INFO FROM OUR COMMANDS (CHANNEL ID {ChannelId}):" +
+                $" {PTConnectCommands.Length} PT CONNECTS" +
+                $" | {PTFilterCommands.Length} FILTERS" +
+                $" | {PTReadCommands.Length} READ COMMANDS" +
+                $" | {PTWriteCommands.Length} WRITE COMMANDS" +
+                $" | {NextChannel.MessagePairs.Length} MESSAGE PAIRS TOTAL",
+                LogType.InfoLog
+            );
+
+            // Return a new tuple of our object for the command output
+            return NextChannel;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -360,18 +387,44 @@ namespace FulcrumInjector.FulcrumLogic.ExtensionClasses
         /// </summary>
         /// <param name="InputType">Enum Regex Typ</param>
         /// <returns>Type of regex for the class output</returns>
-        public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string[] InputLines)
+        public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string[] InputLogLines)
         {
-            // Pull the description string and get type of regex class.
-            string ClassType = $"{typeof(PassThruExpression).Namespace}.{InputType.ToDescriptionString()}";
-            if (Type.GetType(ClassType) == null) 
-                try { return new PassThruExpression(string.Join(string.Empty, InputLines), InputType); }
-                catch { return null; }
+            // Join the log lines on newline characters and get the type value here
+            string JoinedLogLines = string.Join(string.Empty, InputLogLines.Select(LogLine => LogLine.Trim()));
+            return GetRegexClassFromCommand(InputType, JoinedLogLines);
+        }
+        /// <summary>
+        /// Converts an input Regex command type enum into a type output
+        /// </summary>
+        /// <param name="InputType">Enum Regex Typ</param>
+        /// <returns>Type of regex for the class output</returns>
+        public static PassThruExpression GetRegexClassFromCommand(this PassThruCommandType InputType, string InputLogLines)
+        {
+            try
+            {
+                // Pull the description string and get type of regex class.
+                string InputTypeName = InputType.ToDescriptionString();
+                string ClassNamespace = typeof(PassThruExpression).Namespace;
+                string ClassType = $"{ClassNamespace}.{InputTypeName}";
+                
+                // Build a new PassThru Expression object here based on the type found for our expression
+                Type RegexClassType = Type.GetType(ClassType);
+                PassThruExpression BuiltExpression = RegexClassType == null
+                    ? new PassThruExpression(InputLogLines, InputType)
+                    : (PassThruExpression)Activator.CreateInstance(RegexClassType, InputLogLines);
 
-            // Find our output type value here.
-            Type OutputType = Type.GetType(ClassType);
-            var RegexConstructor = OutputType.GetConstructor(new[] { typeof(string) });
-            return (PassThruExpression)RegexConstructor.Invoke(new[] { string.Join(string.Empty, InputLines) });
+                // Return the new Expression object here and move on
+                return BuiltExpression;
+            }
+            catch (Exception InvokeTypeEx)
+            {
+                // Catch this exception for debugging use later on
+                _expExtLogger.WriteLog($"AN INPUT LOG LINE SET COULD NOT BE PARSED OUT TO AN EXPRESSION TYPE!", LogType.TraceLog);
+                _expExtLogger.WriteLog("EXCEPTION THROWN DURING CONVERSION ROUTINE IS LOGGED BELOW", InvokeTypeEx, new[] { LogType.TraceLog, LogType.TraceLog});
+                
+                // Return null at this point since the log line objects could not be parsed for some reason
+                return null;
+            }
         }
     }
 }

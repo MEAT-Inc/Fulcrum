@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -26,8 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumNetworkAnalysisView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LogBroker.LoggerQueue.GetLoggers(LoggerActions.SubServiceLogger)
-            .FirstOrDefault(LoggerObj => LoggerObj.LoggerName.StartsWith("InjectorNetworkAnalysisViewLogger")) ?? new SubServiceLogger("InjectorNetworkAnalysisViewLogger");
+        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorNetworkAnalysisViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumNetworkAnalysisViewModel ViewModel { get; set; }
@@ -71,7 +71,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Generate our control set for the selected command object
             this.ViewLogger.WriteLog("SETTING UP COMMAND CONFIG VALUES NOW...", LogType.InfoLog);
-            this.ViewModel.CurrentJ2534CommandName = SendingComboBox.SelectedItem.ToString();
+            this.ViewModel.CurrentJ2534CommandName = (SharpSessionCommandType)Enum.Parse(
+                typeof(SharpSessionCommandType),
+                SendingComboBox.SelectedItem.ToString()
+            );
 
             // Store the controls on our items collection inside the viewer object now
             PassThruCommandArgsViewer.ItemsSource = this.ViewModel.GenerateCommandConfigElements();
@@ -154,21 +157,29 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Using this list of controls, invoke the current method using a sharp session object on the view model.
             this.ViewLogger.WriteLog("GENERATING EXECUTION ACTION FOR COMMAND NOW...", LogType.InfoLog);
-            this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
+            var GeneratedCommand = this.ViewModel.GenerateCommandExecutionAction(CurrentArgValues.ToArray());
 
             // Execute the action if needed
-            if (SendingButton.Content.ToString().Contains("Execute")) 
-            {
-                // TODO: BUILD EXECUTION LOGIC
+            if (SendingButton.Content.ToString().Contains("Execute"))
+            {                
+                // Log execution started, get the newest command entry and execute it.
                 this.ViewLogger.WriteLog("EXECUTING NEXT COMMAND OBJECT NOW...", LogType.InfoLog);
-            }
+                bool ExecutionResult = GeneratedCommand.ExecuteCommandAction();
 
-            // Toggle Sending Button Content
-            // If there's no value for a required parameter, then return out of here and update the button
-            SendingButton.Background = Brushes.DarkGreen;
-            SendingButton.Content = "Processed OK!";
-            SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
-            SendingButton.IsEnabled = true;
+                // Update sending button based on execution results
+                SendingButton.Background = ExecutionResult ? Brushes.DarkGreen : Brushes.Red;
+                SendingButton.Content = $"Execution {(ExecutionResult ? "Passed" : "Failed")}!";
+                SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
+                SendingButton.IsEnabled = true;
+            }
+            else
+            {
+                // If we're not executing, then just set the button to show command building passed
+                SendingButton.Background = Brushes.DarkGreen;
+                SendingButton.Content = "Processed OK!";
+                SendingButton.Click -= this.ExecuteOrQueuePassThruCommand_Click;
+                SendingButton.IsEnabled = true;
+            }
 
             // Wait for 2.5 seconds and reset the button
             Task.Run(() =>
@@ -189,6 +200,17 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Reenable the sending button here
             SendingButton.IsEnabled = true;
+        }
+        /// <summary>
+        /// Toggles our flyout for the command execution queue to show the user what commands are being queued
+        /// </summary>
+        /// <param name="Sender">Sending button</param>
+        /// <param name="E">Event args passed with this click event</param>
+        private void ToggleCommandQueueFlyout_Click(object Sender, RoutedEventArgs E)
+        {
+            // Get the current flyout state and toggle it.
+            this.CommandQueueFlyout.IsOpen = !this.CommandQueueFlyout.IsOpen;
+            this.ViewLogger.WriteLog($"TOGGLED EXECUTION QUEUE FLYOUT OK! IS OPEN VALUE IS NOW {this.CommandQueueFlyout.IsOpen}");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
