@@ -43,7 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FulcrumTests\FulcrumExpressionsTests.cs" />
-    <Compile Include="FulcrumTests\FulcrumTestsInitializer.cs" />
+    <Compile Include="FulcrumTests\FulcrumSimulationsTests.cs" />
+    <Compile Include="FulcrumTestHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FulcrumTestFile.cs" />
   </ItemGroup>
@@ -55,7 +56,7 @@
       <Version>3.0.2</Version>
     </PackageReference>
     <PackageReference Include="SharpSimulator">
-      <Version>0.8.3.155</Version>
+      <Version>0.8.4.157</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
