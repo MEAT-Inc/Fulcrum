@@ -18,11 +18,6 @@ namespace InjectorTests.FulcrumTests
         #endregion // Custom Events
 
         #region Fields
-
-        // Collection of objects used to track our input files and their results
-        private Dictionary<string, FulcrumInjectorFile> _injectorLogFiles;
-        private readonly string _logFileFolder = Path.Combine(Directory.GetCurrentDirectory(), @"FulcrumLogs");
-
         #endregion // Fields
 
         #region Properties
@@ -40,20 +35,7 @@ namespace InjectorTests.FulcrumTests
         public void SetupExpressionsTests()
         {
             // Invoke a new logging setup here first
-            FulcrumTestHelpers.FulcrumTestInit();
-
-            // Build a new dictionary to store our injector files first
-            this._injectorLogFiles = new Dictionary<string, FulcrumInjectorFile>();
-
-            // Loop all the files found in our injector logs folder and import them for testing
-            string[] InjectorFiles = Directory.GetFiles(this._logFileFolder).Where(FileName => FileName.EndsWith(".txt")).ToArray();
-            foreach (var InjectorFilePath in InjectorFiles)
-            {
-                // Build a new structure for our injector log file and store it on our class instance
-                FulcrumInjectorFile NextInjectorFile = new FulcrumInjectorFile(InjectorFilePath);
-                if (this._injectorLogFiles.ContainsKey(InjectorFilePath)) this._injectorLogFiles[InjectorFilePath] = NextInjectorFile;
-                else this._injectorLogFiles.Add(InjectorFilePath, NextInjectorFile);
-            }
+            FulcrumTestHelpers.FulcrumLoggingInit();
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -65,12 +47,15 @@ namespace InjectorTests.FulcrumTests
         [TestMethod("Generate All Expressions")]
         public void GenerateAllExpressionsFiles()
         {
+            // Pull in all our file objects to loop through first
+            var FulcrumTestFiles = FulcrumTestHelpers.FulcrumInputFileConfig();
+
             // Loop all of our built test file instances and attempt to split their contents now using a generator object
-            string[] LogFileNames = this._injectorLogFiles.Keys.ToArray();
+            string[] LogFileNames = FulcrumTestFiles.Keys.ToArray();
             Parallel.ForEach(LogFileNames, LogFileName =>
             {
                 // Build a new generator for the file instance and store the output values
-                var TestFileObject = this._injectorLogFiles[LogFileName];
+                var TestFileObject = FulcrumTestFiles[LogFileName];
                 string LogFileContent = TestFileObject.LogFileContents;
                 ExpressionsGenerator GeneratorBuilt = new ExpressionsGenerator(LogFileName, LogFileContent);
 
@@ -83,12 +68,12 @@ namespace InjectorTests.FulcrumTests
                 Assert.IsTrue(BuiltExpressions != null && BuiltExpressions.Length != 0);
 
                 // Lock the collection of log file objects and update it
-                lock (this._injectorLogFiles)
-                    this._injectorLogFiles[LogFileName].StoreExpressionsResults(ExpressionsFileName, BuiltExpressions);
+                lock (FulcrumTestFiles)
+                    FulcrumTestFiles[LogFileName].StoreExpressionsResults(ExpressionsFileName, BuiltExpressions);
             });
 
             // Once done, print all of the file object text tables
-            var FileObjects = this._injectorLogFiles.Values.ToArray();
+            var FileObjects = FulcrumTestFiles.Values.ToArray();
             string FilesAsStrings = FulcrumTestHelpers.FulcrumFilesAsTextTable(FileObjects);
             LogBroker.Logger.WriteLog("\n\nGeneration Test Complete! Printing out Expression Results Now.." + FilesAsStrings);
         }

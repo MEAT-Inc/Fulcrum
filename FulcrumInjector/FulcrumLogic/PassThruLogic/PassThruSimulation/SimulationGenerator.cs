@@ -56,15 +56,10 @@ namespace FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation
         /// Builds a new simulation object generator from the given input expressions
         /// </summary>
         public SimulationGenerator(string SimName, PassThruExpression[] Expressions)
-        {
-            // Build our new file name here.
-            string InputFilePath = Path.GetDirectoryName(SimName);
-            string InputFileName = Path.ChangeExtension(Path.GetFileName(SimName), ".ptSim");
-
+        { 
             // Store name of simulation and the input expressions here.
-            this.SimulationName = InputFileName;
             this.InputExpressions = Expressions;
-            this.SimulationFile = Path.Combine(InputFilePath, InputFileName);
+            this.SimulationName = Path.ChangeExtension(Path.GetFileName(SimName), ".ptSim");
             string LoggerName = $"SimGeneratorLogger_{Path.GetFileNameWithoutExtension(this.SimulationName)}";
             this._simulationLogger = (SubServiceLogger)LoggerQueue.SpawnLogger(LoggerName, LoggerActions.SubServiceLogger); 
             this._simulationLogger.WriteLog($"READY TO BUILD NEW SIMULATION NAMED {this.SimulationName} WITH {Expressions.Length} INPUT EXPRESSIONS...", LogType.WarnLog);

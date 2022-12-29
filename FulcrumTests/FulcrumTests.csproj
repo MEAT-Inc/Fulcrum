@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="FulcrumTests\FulcrumExpressionsTests.cs" />
     <Compile Include="FulcrumTests\FulcrumSimulationsTests.cs" />
-    <Compile Include="FulcrumTests\FulcrumTestHelpers.cs" />
+    <Compile Include="FulcrumTestHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FulcrumTestFile.cs" />
   </ItemGroup>
