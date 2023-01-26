@@ -78,14 +78,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     bool IsDeviceReady = this.SelectedDLL != null && !string.IsNullOrEmpty(value);
                     FulcrumConstants.FulcrumSimulationPlaybackViewModel.IsHardwareSetup = IsDeviceReady;
                 }
-
-                // Update the network analysis view model values here 
-                if (FulcrumConstants.FulcrumNetworkAnalysisViewModel != null)
-                {
-                    // Store values if the VM is not null
-                    bool IsDeviceReady = this.SelectedDLL != null && !string.IsNullOrEmpty(value);
-                    FulcrumConstants.FulcrumNetworkAnalysisViewModel.IsHardwareSetup = IsDeviceReady;
-                }
             }
         }
 
