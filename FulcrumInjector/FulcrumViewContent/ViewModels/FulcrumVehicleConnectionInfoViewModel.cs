@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewContent.Models.EventModels;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using Newtonsoft.Json;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpAutoId.SharpAutoIdHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpWrapper;
 using SharpWrapper.PassThruTypes;
-using SharpWrapper.SupportingLogic;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {

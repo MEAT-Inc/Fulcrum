@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using ICSharpCode.AvalonEdit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -83,7 +83,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         /// Saves a new setting object value onto the view model and settings share instance
         /// </summary>
         /// <param name="SenderContext"></param>
-        internal void SaveSettingValue(SettingsEntryModel SenderContext)
+        internal void SaveSettingValue(FulcrumSettingsEntryModel SenderContext)
         {
             // Store the setting value back onto our view model content and save it's JSON Value.
             ViewModelLogger.WriteLog($"SETTING VALUE BEING WRITTEN OUT: {JsonConvert.SerializeObject(SenderContext, Formatting.None)}", LogType.TraceLog);

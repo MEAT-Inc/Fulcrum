@@ -18,9 +18,10 @@ using System.Reflection;
 using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Svg;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels

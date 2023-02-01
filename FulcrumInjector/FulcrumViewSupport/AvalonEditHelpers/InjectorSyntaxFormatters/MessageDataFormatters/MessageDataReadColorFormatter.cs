@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using ICSharpCode.AvalonEdit.Document;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
-using ICSharpCode.AvalonEdit.Document;
+using SharpExpressions;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.MessageDataFormatters
 {
@@ -27,7 +27,9 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         {
             // Convert input regex into a multiline ready expression
             List<Regex> BuiltLineExpressions = new List<Regex>();
-            string MessageDataRegexString = PassThruRegexModelShare.MessageFilterInfo.ExpressionPattern;
+            string MessageDataRegexString = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionType.MessageReadInfo]
+                .ExpressionPattern;
             MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
             for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
                 BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));

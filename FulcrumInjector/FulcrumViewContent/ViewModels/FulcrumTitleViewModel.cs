@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;

@@ -1,32 +1,18 @@
-﻿using System;
-using System;
-using System.Collections.Generic;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+using SharpLogger;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
-using NLog;
-using NLog.Config;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using SharpSupport;
 using Button = System.Windows.Controls.Button;
 using ComboBox = System.Windows.Controls.ComboBox;
 using TextBox = System.Windows.Controls.TextBox;
@@ -195,7 +181,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             Task.Run(() =>
             {
                 // Store result from processing
-                bool ParseResult = this.ViewModel.BuildLogExpressions(out _);
+                bool ParseResult = this.ViewModel.BuildLogExpressions();
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
@@ -220,13 +206,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Store result from processing if it's not yet done on the view model
                 if (this.ViewModel.ExpressionsBuilt == false) 
-                    if (!this.ViewModel.BuildLogExpressions(out _)) {
+                    if (!this.ViewModel.BuildLogExpressions()) {
                         this.ProcessingActionFinished(false, SendingButton, Defaults);
                         return;
                     }
 
                 // Now build our simulation object here
-                bool SimResult = this.ViewModel.BuildLogSimulation(out var SimGenerator); 
+                bool SimResult = this.ViewModel.BuildLogSimulation(); 
                 this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher

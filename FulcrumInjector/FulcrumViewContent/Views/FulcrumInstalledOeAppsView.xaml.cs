@@ -79,7 +79,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
 
             // Check the view model of our object instance. If Can boot then boot. If can kill then kill
             bool RanCommand = false; bool WasBooted = this.ViewModel.CanBootApp;
-            Process BootedProcess = null; OeApplicationModel KilledApplication = null; 
+            Process BootedProcess = null; FulcrumOeAppModel KilledApplication = null; 
             if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication(out KilledApplication);
             else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out BootedProcess);
             else throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
