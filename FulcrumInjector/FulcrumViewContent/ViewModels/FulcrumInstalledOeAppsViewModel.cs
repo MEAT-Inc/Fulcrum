@@ -24,15 +24,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private bool _canBootApp;
         private bool _canKillApp;
         private Process _runningAppProcess;
-        private OeApplicationModel _targetAppModel;
-        private OeApplicationModel _runningAppModel;
-        private ObservableCollection<OeApplicationModel> _installedOeApps;
+        private FulcrumOeAppModel _targetAppModel;
+        private FulcrumOeAppModel _runningAppModel;
+        private ObservableCollection<FulcrumOeAppModel> _installedOeApps;
 
         // Public values for our view to bind onto 
         public bool CanBootApp { get => _canBootApp; private set => PropertyUpdated(value); }
         public bool CanKillApp { get => _canKillApp; private set => PropertyUpdated(value); }
-        public OeApplicationModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
-        public ObservableCollection<OeApplicationModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
+        public FulcrumOeAppModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
+        public ObservableCollection<FulcrumOeAppModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -65,14 +65,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Pulls in a list of OE application names and paths as a set of objects.
         /// Converts them into a list and returns them.
         /// </summary>
-        internal ObservableCollection<OeApplicationModel> ImportOeApplications()
+        internal ObservableCollection<FulcrumOeAppModel> ImportOeApplications()
         {
             // Log info. Pull app objects in from the settings file, and begin to import them.
             ViewModelLogger.WriteLog("PULLING IN LIST OF PREDEFINED OE APPLICATIONS AND STORING THEM ONTO OUR VIEW OBJECT NOW...", LogType.WarnLog);
             var PulledAppsObject = ValueLoaders.GetConfigValue<object[]>("FulcrumOeAppNames");
 
             // Store output in this list.
-            List<OeApplicationModel> OutputApps = new List<OeApplicationModel>();
+            List<FulcrumOeAppModel> OutputApps = new List<FulcrumOeAppModel>();
             foreach (var AppObject in PulledAppsObject)
             {
                 // Cast the application object into a new model for our app instances.
@@ -81,7 +81,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 {
                     // Convert this into a string of Json. Then built it into a json cast OE app model
                     string JsonOfObject = JsonConvert.SerializeObject(AppObject);
-                    OeApplicationModel NextAppModel = JsonConvert.DeserializeObject<OeApplicationModel>(JsonOfObject);
+                    FulcrumOeAppModel NextAppModel = JsonConvert.DeserializeObject<FulcrumOeAppModel>(JsonOfObject);
 
                     // Add to list of outputs
                     OutputApps.Add(NextAppModel);
@@ -99,7 +99,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             // Log output information here.
             ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {PulledAppsObject.Length} OBJECTS AND CREATED {OutputApps.Count} CAST APP OBJECTS!", LogType.WarnLog);
             ViewModelLogger.WriteLog("RETURNING BUILT APP OBJECT INSTANCES NOW...");
-            return new ObservableCollection<OeApplicationModel>(OutputApps);
+            return new ObservableCollection<FulcrumOeAppModel>(OutputApps);
         }
 
 
@@ -108,7 +108,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// </summary>
         /// <param name="AppToStore">App to boot </param>
         /// <returns>True if booted. false if failed.</returns>
-        internal bool SetTargetOeApplication(OeApplicationModel AppToStore)
+        internal bool SetTargetOeApplication(FulcrumOeAppModel AppToStore)
         {
             // Store the app here and return status.
             ViewModelLogger.WriteLog($"STORING NEW OE APPLICATION NAMED {AppToStore.OEAppName} NOW...", LogType.WarnLog);
@@ -130,7 +130,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <param name="AppName"></param>
         /// <param name="NewCommandValue"></param>
         /// <returns></returns>
-        internal OeApplicationModel ModifyOeAppCommand(string AppName, string NewCommandValue) {
+        internal FulcrumOeAppModel ModifyOeAppCommand(string AppName, string NewCommandValue) {
             // Throw since this is not yet built in.
             throw new NotImplementedException("Modifying OE Apps is not yet supported");
         }
@@ -182,7 +182,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Boots a new OE Application based on the current value given for it.
         /// </summary>
         /// <returns>True if killed. false if failed.</returns>
-        internal bool KillOeApplication(out OeApplicationModel LastRunModel)
+        internal bool KillOeApplication(out FulcrumOeAppModel LastRunModel)
         {
             // Check if app to kill is not null.
             if (this.RunningAppModel == null || !this.CanKillApp) {

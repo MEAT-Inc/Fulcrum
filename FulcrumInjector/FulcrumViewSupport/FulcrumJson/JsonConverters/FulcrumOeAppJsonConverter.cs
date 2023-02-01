@@ -10,14 +10,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
     /// <summary>
     /// JSON Converter for converting input OE Scan App Path objects
     /// </summary>
-    public class OeApplicationJsonConverter : JsonConverter
+    public class FulcrumOeAppJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if the object can be converted or not.
         /// </summary>
         /// <param name="ObjectType"></param>
         /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(OeApplicationModel); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumOeAppModel); }
 
         /// <summary>
         /// Writes JSON output
@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            OeApplicationModel CastApp = (OeApplicationModel)ValueObject;
+            FulcrumOeAppModel CastApp = (FulcrumOeAppModel)ValueObject;
 
             // Build a dynamic output object
             var OutputObject = JObject.FromObject(new
@@ -74,7 +74,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
                 !AppCommand.Contains("$OEAppPath$") ? AppCommand : AppCommand.Replace("$OEAppPath$", FinalAppPath);
 
             // Generate new output app model object.
-            OeApplicationModel OutputApp = new OeApplicationModel(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
+            FulcrumOeAppModel OutputApp = new FulcrumOeAppModel(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
             return OutputApp;
         }
     }

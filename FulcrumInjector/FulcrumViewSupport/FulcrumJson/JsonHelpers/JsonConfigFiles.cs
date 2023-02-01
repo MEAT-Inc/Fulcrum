@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using SharpLogger;

@@ -76,7 +76,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Get our type values and context here. Then modify the new value of our setting as needed.
             Control SendingControl = (Control)Sender;
-            SettingsEntryModel SenderContext = SendingControl.DataContext as SettingsEntryModel;
+            FulcrumSettingsEntryModel SenderContext = SendingControl.DataContext as FulcrumSettingsEntryModel;
             if (SendingControl is ComboBox SendingComboBox)
             {
                 // Log information, find the selected object value

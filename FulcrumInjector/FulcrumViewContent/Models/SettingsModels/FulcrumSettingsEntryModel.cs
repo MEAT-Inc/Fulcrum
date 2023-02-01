@@ -25,8 +25,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     /// <summary>
     /// Model object for our settings entries
     /// </summary>
-    [JsonConverter(typeof(SettingsEntryModelJsonConverter))]
-    public class SettingsEntryModel
+    [JsonConverter(typeof(FulcrumSettingsCollectionJsonConverter))]
+    public class FulcrumSettingsEntryModel
     {
         // Logger object.
         private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsEntryModelLogger", LoggerActions.SubServiceLogger);
@@ -49,7 +49,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         /// <param name="Value">Setting value</param>
         /// <param name="ControlType">Type of UI Control</param>
         /// <param name="Description">Description of setting</param>
-        public SettingsEntryModel(string Name, object Value, ControlTypes ControlType, string Description = "No Description")
+        public FulcrumSettingsEntryModel(string Name, object Value, ControlTypes ControlType, string Description = "No Description")
         {
             // Store values for object onto class now.
             this.SettingName = Name;

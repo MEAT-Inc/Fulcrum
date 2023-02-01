@@ -201,7 +201,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumUpdater\InjectorUpdater.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater\InjectorVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumEmailBroker.cs" />
-    <Compile Include="FulcrumViewContent\Models\FulcrumNavMenuItem.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
@@ -215,7 +215,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\Models\SingletonContentControl.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\SingletonContentControl.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumInstalledHardwareView.xaml.cs">
       <DependentUpon>FulcrumInstalledHardwareView.xaml</DependentUpon>
     </Compile>
@@ -249,8 +249,8 @@
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\LogLevelColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\LoggerNameColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\TimeColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJson\JsonConverters\OeApplicationJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJson\JsonConverters\SettingsEntryModelJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJson\JsonConverters\FulcrumOeAppJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJson\JsonConverters\FulcrumSettingsCollectionJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\InjectorOutputSyntaxHelper.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParamFormatters\TypeAndTimeColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\InverseBoolConverter.cs" />
@@ -276,9 +276,9 @@
     <Compile Include="FulcrumViewSupport\FulcrumJson\JsonHelpers\JsonConfigFiles.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\DebugLoggingRedirectTarget.cs" />
-    <Compile Include="FulcrumViewContent\Models\OeApplicationModel.cs" />
-    <Compile Include="FulcrumViewContent\Models\SettingsModels\SettingsEntryModel.cs" />
-    <Compile Include="FulcrumViewContent\Models\SettingsModels\SettingsEntryModelCollection.cs" />
+    <Compile Include="FulcrumViewContent\Models\FulcrumOeAppModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsEntryModel.cs" />
+    <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsCollection.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\PropertyWatchdog.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumDebugLoggingViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorCoreViewModels\FulcrumDllOutputLogViewModel.cs" />

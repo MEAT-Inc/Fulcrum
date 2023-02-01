@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using MahApps.Metro.Controls;
 
-namespace FulcrumInjector.FulcrumViewContent.Models
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Dependency property object for navigation menu types

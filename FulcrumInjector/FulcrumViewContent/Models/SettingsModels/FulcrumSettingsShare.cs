@@ -37,37 +37,37 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         public static SettingsEntryCollectionModel InjectorGeneralSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("Hardware Configuration Settings")
-            ) ?? new SettingsEntryCollectionModel("Hardware Configuration Settings", Array.Empty<SettingsEntryModel>());
+            ) ?? new SettingsEntryCollectionModel("Hardware Configuration Settings", Array.Empty<FulcrumSettingsEntryModel>());
 
         // Settings for Debug log viewing (Or an empty settings model if null)
         public static SettingsEntryCollectionModel DebugLogViewerSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Settings")
-            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Settings", Array.Empty<SettingsEntryModel>());
+            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Settings", Array.Empty<FulcrumSettingsEntryModel>());
 
         // Settings for pipe configuration (Or an empty settings model if null)
         public static SettingsEntryCollectionModel InjectorPipeConfigSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
-            ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<SettingsEntryModel>());
+            ) ?? new SettingsEntryCollectionModel("Injector Pipe Settings", Array.Empty<FulcrumSettingsEntryModel>());
 
         // Settings for Regex Objects during parsing.
         public static SettingsEntryCollectionModel InjectorRegexSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Regex Settings")
-            ) ?? new SettingsEntryCollectionModel("PassThru Regex Settings", Array.Empty<SettingsEntryModel>());
+            ) ?? new SettingsEntryCollectionModel("PassThru Regex Settings", Array.Empty<FulcrumSettingsEntryModel>());
 
         // Settings for color output during formatting for PT Output
         public static SettingsEntryCollectionModel InjectorDllSyntaxSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Syntax Settings")
-            ) ?? new SettingsEntryCollectionModel("PassThru Syntax Settings", Array.Empty<SettingsEntryModel>());
+            ) ?? new SettingsEntryCollectionModel("PassThru Syntax Settings", Array.Empty<FulcrumSettingsEntryModel>());
 
         // Settings for color output during formatting for PT Output
         public static SettingsEntryCollectionModel InjectorDebugSyntaxSettings =>
             SettingsEntrySets?.FirstOrDefault(SettingObj =>
                 SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Syntax Settings")
-            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Syntax Settings", Array.Empty<SettingsEntryModel>());
+            ) ?? new SettingsEntryCollectionModel("Debug Log Viewer Syntax Settings", Array.Empty<FulcrumSettingsEntryModel>());
 
         // ---------------------------------------------------------------------------------------------------------------------
 

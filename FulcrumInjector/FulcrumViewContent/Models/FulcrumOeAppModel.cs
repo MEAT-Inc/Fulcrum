@@ -11,8 +11,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models
     /// <summary>
     /// Model object of our OE Applications installed on the system.
     /// </summary>
-    [JsonConverter(typeof(OeApplicationJsonConverter))]
-    public class OeApplicationModel
+    [JsonConverter(typeof(FulcrumOeAppJsonConverter))]
+    public class FulcrumOeAppModel
     {
         // Logger object.
         private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("OeApplicationModelLogger", LoggerActions.SubServiceLogger);
@@ -38,7 +38,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         /// <summary>
         /// Builds a new OE application object from a given set of values.
         /// </summary>
-        public OeApplicationModel(string Name, string Path, string Version = "N/A", string BatLaunchCommand = null, string[] PathSet = null)
+        public FulcrumOeAppModel(string Name, string Path, string Version = "N/A", string BatLaunchCommand = null, string[] PathSet = null)
         {
             // Store values. Append into our list of models.
             this.OEAppName = Name;

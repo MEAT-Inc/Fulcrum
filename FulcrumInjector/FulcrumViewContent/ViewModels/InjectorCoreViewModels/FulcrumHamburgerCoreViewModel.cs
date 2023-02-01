@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Svg;
 

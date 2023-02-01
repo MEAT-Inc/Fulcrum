@@ -10,14 +10,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
     /// JSON Converter for settings object entries
     /// </summary>
     /// <typeparam name="TSettingType"></typeparam>
-    public class SettingsEntryModelJsonConverter : JsonConverter
+    public class FulcrumSettingsCollectionJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if we can convert this object or not.
         /// </summary>
         /// <param name="ObjectType"></param>
         /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(SettingsEntryModel); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumSettingsEntryModel); }
 
         /// <summary>
         /// Writes JSON output
@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            SettingsEntryModel CastSettingEntry = ValueObject as SettingsEntryModel;
+            FulcrumSettingsEntryModel CastSettingEntry = ValueObject as FulcrumSettingsEntryModel;
 
             // Build a dynamic output object
             string TypeOfControlString = CastSettingEntry.TypeOfControl.ToString();
@@ -83,7 +83,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
             }
 
             // Return built output object
-            return new SettingsEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
+            return new FulcrumSettingsEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
         }
     }
 }

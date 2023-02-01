@@ -50,7 +50,6 @@
                                 <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.DLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
                                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
                                 <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
-                                <File Id="FULCRUMINJECTOR.XML" Name="FulcrumInjector.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.xml" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                                 <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />

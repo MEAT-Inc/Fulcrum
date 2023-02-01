@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     {
         // Title of section and the settings themselves
         public string SettingSectionTitle { get; set; }
-        public SettingsEntryModel[] SettingsEntries { get; set; }
+        public FulcrumSettingsEntryModel[] SettingsEntries { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         /// </summary>
         /// <param name="SectionName"></param>
         /// <param name="SettingsEntries"></param>
-        public SettingsEntryCollectionModel(string SectionName, SettingsEntryModel[] SettingsEntries)
+        public SettingsEntryCollectionModel(string SectionName, FulcrumSettingsEntryModel[] SettingsEntries)
         {
             // Store values
             this.SettingSectionTitle = SectionName;
@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         /// </summary>
         /// <param name="SettingsToAdd"></param>
         /// <returns></returns>
-        public SettingsEntryModel[] UpdateSetting(params SettingsEntryModel[] SettingsToAdd)
+        public FulcrumSettingsEntryModel[] UpdateSetting(params FulcrumSettingsEntryModel[] SettingsToAdd)
         {
             // Add one by one and replacing dupes.
             var TempList = SettingsEntries.ToList();

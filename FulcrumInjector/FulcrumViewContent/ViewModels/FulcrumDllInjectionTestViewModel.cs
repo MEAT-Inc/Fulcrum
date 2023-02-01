@@ -3,6 +3,7 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSupport;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
