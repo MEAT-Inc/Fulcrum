@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic;
-using FulcrumInjector.FulcrumLogic.FulcrumPipes.PipeEvents;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewSupport;
-using SharpLogger;
+﻿using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpPipes;
+using System;
+using System.Linq;
+using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {
@@ -158,7 +152,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         /// </summary>
         /// <param name="PipeInstance">Pipe object calling these events</param>
         /// <param name="EventArgs">The events themselves.</param>
-        internal void OnPipeReaderContentProcessed(object PipeInstance, FulcrumPipeDataReadEventArgs EventArgs)
+        internal void OnPipeReaderContentProcessed(object PipeInstance, PassThruPipe.PipeDataEventArgs EventArgs)
         {
             // See if there's a new log file to contain and update here.
             if (!EventArgs.PipeDataString.Contains("Session Log File:")) return;

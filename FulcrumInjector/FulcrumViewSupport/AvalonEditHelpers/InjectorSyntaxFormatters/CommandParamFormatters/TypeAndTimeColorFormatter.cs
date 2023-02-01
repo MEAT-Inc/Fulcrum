@@ -1,6 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
-using ICSharpCode.AvalonEdit.Document;
+﻿using ICSharpCode.AvalonEdit.Document;
+using SharpExpressions;
+using System.Text.RegularExpressions;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.CommandParamFormatters
 {
@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Find the command type for our input object here. If none, drop out
-            Regex TimeMatchRegex = new(PassThruRegexModelShare.PassThruTime.ExpressionPattern);
+            Regex TimeMatchRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionType.CommandTime].ExpressionRegex;
             Match MatchesFound = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
 
             // Now run our coloring definitions and return out.

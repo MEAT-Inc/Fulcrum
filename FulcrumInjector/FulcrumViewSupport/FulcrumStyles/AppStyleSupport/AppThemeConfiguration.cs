@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ControlzEx.Theming;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
@@ -91,10 +91,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
                 }
             }
 
-            // Log information and the themes built.
-            ThemeLogger.WriteLog("BUILT NEW PRESETS OK! STORING THEM INTO OUR CONFIG OBJECT NOW...");
-            ThemeLogger.WriteLog($"THEMES BUILT ARE BEING SHOWN BELOW:\n{string.Join("\n", this.PresetThemes.Select(ThemeObj => ThemeObj.ToString()))}");
-
             // Add these themes into the whole setup now.
             this.PresetThemes = ThemeDefines
                 .SelectMany(ThemeObj =>
@@ -108,6 +104,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
                     return new[] { DarkTheme, LightTheme };
                 })
                 .ToArray();
+
+            // Log information and the themes built.
+            // ThemeLogger.WriteLog("BUILT NEW PRESETS OK! STORING THEM INTO OUR CONFIG OBJECT NOW...");
+            // ThemeLogger.WriteLog($"THEMES BUILT ARE BEING SHOWN BELOW:\n{string.Join("\n", this.PresetThemes.Select(ThemeObj => ThemeObj.ToString()))}");
 
             // Log done and ready.
             ValueSetters.SetValue("FulcrumInjectorAppThemes.GeneratedAppPresets", this.PresetThemes);
