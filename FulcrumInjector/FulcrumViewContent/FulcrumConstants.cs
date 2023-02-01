@@ -17,7 +17,6 @@ using FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
-using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;

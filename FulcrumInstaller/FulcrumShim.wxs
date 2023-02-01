@@ -27,18 +27,22 @@
                     <Directory Id="DriverComponent" Name="FulcrumShim">
                         <!-- Injector App Files -->
                         <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
-                            <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
-                                <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
+							<!-- Supporting DLLs and Logic -->
+	                        <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
+	                            <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
                                 <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
                                 <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.dll" />
+                                <File Id="MARKDIG.DLL" Name="Markdig.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.dll" />
+                                <File Id="MARKDIG.WPF.DLL" Name="Markdig.Wpf.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.Wpf.dll" />
                                 <File Id="MICROSOFT.XAML.BEHAVIORS.DLL" Name="Microsoft.Xaml.Behaviors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.dll" />
                                 <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
                                 <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
-                                <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
-                                <File Id="SHARPWRAPPER.DLL" Name="SharpWrapper.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrapper.dll" />
-                                <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
+                                <File Id="OCTOKIT.DLL" Name="Octokit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.dll" />
                                 <File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
+                                <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
+                                <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
+                                <File Id="SHARPWRAPPER.DLL" Name="SharpWrapper.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrapper.dll" />
                                 <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
                                 <File Id="SYSTEM.BUFFERS.DLL" Name="System.Buffers.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.dll" />
                                 <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
@@ -46,31 +50,30 @@
                                 <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.DLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
                                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
                                 <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
+                                <File Id="FULCRUMINJECTOR.XML" Name="FulcrumInjector.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.xml" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
+                                <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />
                                 <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
-								<File Id="MARKDIG.DLL" Name="Markdig.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.dll" />
-                                <File Id="MARKDIG.WPF.DLL" Name="Markdig.Wpf.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.Wpf.dll" />
-								<File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
-                                <File Id="OCTOKIT.DLL" Name="Octokit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.dll" />
+                                <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
+                                <File Id="OCTOKIT.XML" Name="Octokit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.xml" />
                                 <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
                                 <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
                                 <File Id="SYSTEM.MEMORY.XML" Name="System.Memory.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.xml" />
                                 <File Id="SYSTEM.NUMERICS.VECTORS.XML" Name="System.Numerics.Vectors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.xml" />
                                 <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.XML" Name="System.Runtime.CompilerServices.Unsafe.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.xml" />
-                                <!-- Injector EXE and Shortcuts -->
-                                <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
-                                    <!-- Start Menu Shortcut -->
-                                    <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
-                                        <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-                                    </Shortcut>
-                                    <!-- Desktop Shortcut -->
-                                    <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
-                                        <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-                                    </Shortcut>
-                                </File>
-
-                            </Component>
+	                            <!-- Injector EXE and Shortcuts -->
+	                            <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
+		                            <!-- Start Menu Shortcut -->
+		                            <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+			                            <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+		                            </Shortcut>
+		                            <!-- Desktop Shortcut -->
+		                            <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+			                            <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+		                            </Shortcut>
+	                            </File>                            
+	                        </Component>
                             <Directory Id="FULCRUMXAML" Name="FulcrumXAML">
                                 <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
                                     <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml" />
@@ -82,9 +85,9 @@
                                     <File Id="FULCRUMHAMBURGERCOREVIEWSTYLES.XAML" Name="FulcrumHamburgerCoreViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml" />
                                     <File Id="FULCRUMINSTALLEDHARDWAREVIEWSTYLES.XAML" Name="FulcrumInstalledHardwareViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml" />
                                     <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
-									<File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
-									<File Id="FULCRUMPEERTOPEERVIEWSTYLES.XAML" Name="FulcrumPeerToPeerViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml" />
-									<File Id="FULCRUMNETWORKANAYSISSTYLES.XAML" Name="FulcrumNetworkAnalysisStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml" />
+                                    <File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
+                                    <File Id="FULCRUMPEERTOPEERVIEWSTYLES.XAML" Name="FulcrumPeerToPeerViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml" />
+                                    <File Id="FULCRUMNETWORKANAYSISSTYLES.XAML" Name="FulcrumNetworkAnalysisStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml" />
                                     <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
                                     <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
                                     <File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />
