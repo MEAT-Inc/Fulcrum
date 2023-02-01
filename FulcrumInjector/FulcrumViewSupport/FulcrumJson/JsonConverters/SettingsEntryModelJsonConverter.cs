@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpExpressions;
 
-namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
 {
     /// <summary>
     /// JSON Converter for settings object entries

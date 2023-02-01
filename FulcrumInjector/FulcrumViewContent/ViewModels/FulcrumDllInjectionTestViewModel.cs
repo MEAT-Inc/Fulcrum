@@ -1,10 +1,10 @@
-﻿using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using SharpLogger;
+﻿using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSupport;
 using System;
 using System.Runtime.InteropServices;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {

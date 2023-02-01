@@ -5,7 +5,7 @@ using FulcrumInjector.FulcrumViewContent.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
 {
     /// <summary>
     /// JSON Converter for converting input OE Scan App Path objects

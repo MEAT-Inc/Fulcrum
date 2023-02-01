@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 {
     /// <summary>
     /// Class used for setting values on the JSON Configuration values.

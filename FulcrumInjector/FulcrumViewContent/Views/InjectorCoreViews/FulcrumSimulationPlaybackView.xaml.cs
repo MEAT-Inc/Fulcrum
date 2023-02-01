@@ -1,5 +1,4 @@
-﻿using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -10,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Button = System.Windows.Controls.Button;
 using UserControl = System.Windows.Controls.UserControl;
 

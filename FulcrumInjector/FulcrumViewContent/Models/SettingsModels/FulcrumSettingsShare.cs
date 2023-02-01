@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;

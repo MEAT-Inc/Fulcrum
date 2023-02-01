@@ -11,7 +11,7 @@ using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpSupport;
 
-namespace FulcrumInjector.FulcrumLogic
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Class used for sending emails out to our client applications and users

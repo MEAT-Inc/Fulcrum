@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
 using Newtonsoft.Json;
 using SharpLogger;
 using SharpLogger.LoggerObjects;

@@ -1,11 +1,11 @@
-﻿using FulcrumInjector.FulcrumLogic;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using SharpLogger;
+﻿using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpPipes;
 using System;
 using System.Linq;
+using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {

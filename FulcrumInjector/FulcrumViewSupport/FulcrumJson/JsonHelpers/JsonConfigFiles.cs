@@ -1,13 +1,12 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 {
     /// <summary>
     /// Class which contains info about the possible json files to import.

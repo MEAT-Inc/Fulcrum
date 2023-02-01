@@ -3,9 +3,8 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogger.LoggerSupport;
-using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
-namespace FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 {
     /// <summary>
     /// Contains methods for loading config values.

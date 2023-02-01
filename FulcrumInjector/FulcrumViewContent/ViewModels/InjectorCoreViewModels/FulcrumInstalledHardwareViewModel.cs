@@ -1,5 +1,4 @@
-﻿using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
@@ -9,6 +8,7 @@ using SharpWrapper.PassThruTypes;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {

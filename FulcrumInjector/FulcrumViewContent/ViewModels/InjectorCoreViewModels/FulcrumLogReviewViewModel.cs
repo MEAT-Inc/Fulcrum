@@ -1,5 +1,4 @@
-﻿using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
+﻿using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using SharpExpressions;
@@ -12,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels

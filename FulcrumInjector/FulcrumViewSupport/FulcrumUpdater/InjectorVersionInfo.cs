@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
-namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
 {
     /// <summary>
     /// Class object containing information about the current version of this application

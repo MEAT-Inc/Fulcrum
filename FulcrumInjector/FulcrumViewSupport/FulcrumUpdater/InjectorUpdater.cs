@@ -1,23 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using ControlzEx.Standard;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using Newtonsoft.Json;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Octokit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 
-
-namespace FulcrumInjector.FulcrumLogic.FulcrumUpdater
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
 {
     /// <summary>
     /// Class which houses the logic for pulling in a new Fulcrum Injector MSI File.
