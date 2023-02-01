@@ -22,8 +22,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         private PropertyWatchdog _testInjectionButtonWatchdog;
 
         // Private pipe objects to be allocated
-        private PassThruPipe _readerPipe;
-        private PassThruPipe _writerPipe;
+        private readonly PassThruPipe _readerPipe;
+        private readonly PassThruPipe _writerPipe;
 
         // Public values for our view to bind onto 
         public string ReaderPipeState { get => _readerPipeState; set => PropertyUpdated(value); }
@@ -41,8 +41,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Configure new pipe instances for our class
-            this._readerPipe = PassThruPipe.AllocatePipe(PassThruPipeTypes.ReaderPipe, out _);
-            this._writerPipe = PassThruPipe.AllocatePipe(PassThruPipeTypes.WriterPipe, out _);
+            this._readerPipe = PassThruPipeReader.AllocatePipe();
+            this._writerPipe = PassThruPipeWriter.AllocatePipe();
 
             // Build new pipe model object and watchdogs.
             this._readerPipeStateWatchdog = new PropertyWatchdog(250);
@@ -106,6 +106,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         break;
                 }
             });
+
+            // Start the allocate routines now if needed
+            this._readerPipe.StartPipeConnectionAsync();
+            this._writerPipe.StartPipeConnectionAsync();
 
             // Log built and output information.
             ViewModelLogger.WriteLog("CONFIGURED AND STARTED NEW WATCHDOGS FOR THE READER AND WRITER PIPE STATE VALUES!", LogType.InfoLog);

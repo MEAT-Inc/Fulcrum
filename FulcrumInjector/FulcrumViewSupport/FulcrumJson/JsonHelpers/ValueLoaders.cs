@@ -2,6 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog;
 using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
@@ -35,7 +36,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 
             // If not null, convert and return.
             var ConvertedValue = ValueObject.ToObject<TValueType>();
-            JsonConfigFiles.ConfigLogger?.WriteLog($"PROPERTY: {JsonPath} | VALUE: {JsonConvert.SerializeObject(ConvertedValue, Formatting.None)}", LogType.TraceLog);
+            string JsonValue = JsonConvert.SerializeObject(ConvertedValue, Formatting.None);
+            JsonConfigFiles.ConfigLogger?.WriteLog(
+                JsonValue.Length < 250
+                    ? $"PROPERTY: {JsonPath} | VALUE: {JsonValue}"
+                    : $"PROPERTY: {JsonPath} | VALUE: VALUE AS STRING IS TOO LONG TO DISPLAY IN THIS LOG FILE!",
+                LogType.TraceLog);
+
+            // Return the built converted value here
             return ConvertedValue;
         }
 

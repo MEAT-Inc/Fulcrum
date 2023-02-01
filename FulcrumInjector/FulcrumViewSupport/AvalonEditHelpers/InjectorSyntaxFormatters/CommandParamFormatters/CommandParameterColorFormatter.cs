@@ -24,7 +24,9 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Find the command type for our input object here. If none, drop out
-            Regex CommandParamsRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionType.CommandParams].ExpressionRegex;
+            Regex CommandParamsRegex = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionType.CommandParameterInfo]
+                .ExpressionRegex;
             Match FoundMatch = CommandParamsRegex.Match(CurrentContext.Document.GetText(InputLine));
             if (!FoundMatch.Success) return;
 

@@ -77,7 +77,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
                 PassThruExpressionRegex FoundRegex = PassThruExpressionRegex.LoadedExpressions[RegexType];
 
                 // Now using the found regex model object, we can store a new value for the setting entry
-                string RegexPattern = FoundRegex.ExpressionPattern;
+                string RegexPattern = FoundRegex.ExpressionRegex.ToString();
                 string RegexGroups = $"*GROUPS_({string.Join(",", FoundRegex.ExpressionValueGroups)})*";
                 SettingValue = $"{RegexPattern.Trim()} {RegexGroups.Trim()}";
             }

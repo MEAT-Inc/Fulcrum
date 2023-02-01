@@ -85,9 +85,9 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
             }
 
             // Log information about the built setting
-            ModelLogger.WriteLog($"BUILT NEW SETTING OBJECT NAMED {this.SettingName} OK!");
-            ModelLogger.WriteLog($"SETTING CONTROL TYPE IS {(this.SettingControlType == null ? "FAILED_BINDING" : this.SettingControlType.Name)}");
-            ModelLogger.WriteLog($"SETTING DESCRIPTION: {this.SettingDescription}", LogType.TraceLog);
+            // ModelLogger.WriteLog($"BUILT NEW SETTING OBJECT NAMED {this.SettingName} OK!");
+            // ModelLogger.WriteLog($"SETTING CONTROL TYPE IS {(this.SettingControlType == null ? "FAILED_BINDING" : this.SettingControlType.Name)}");
+            // ModelLogger.WriteLog($"SETTING DESCRIPTION: {this.SettingDescription}", LogType.TraceLog);
         }
     }
 }
