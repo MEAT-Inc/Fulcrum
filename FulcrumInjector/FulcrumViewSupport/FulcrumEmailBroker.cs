@@ -6,10 +6,10 @@ using System.Net;
 using System.Net.Mail;
 using System.Security;
 using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumLogic.ExtensionClasses;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpSupport;
 
 namespace FulcrumInjector.FulcrumLogic
 {

@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Threading;
-using FulcrumInjector.FulcrumLogic.FulcrumPipes.PipeEvents;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+﻿using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
-using ICSharpCode.AvalonEdit;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpPipes;
+using System;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -70,7 +64,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="PipeInstance">Pipe object calling these events</param>
         /// <param name="EventArgs">The events themselves.</param>
-        internal void OnPipeReaderContentProcessed(object PipeInstance, FulcrumPipeDataReadEventArgs EventArgs)
+        internal void OnPipeReaderContentProcessed(object PipeInstance, PassThruPipe.PipeDataEventArgs EventArgs)
         {
             // Attach output content into our session log box.
             FulcrumDllOutputLogView ViewCast = this.BaseViewControl as FulcrumDllOutputLogView;

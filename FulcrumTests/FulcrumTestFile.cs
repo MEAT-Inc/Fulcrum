@@ -1,14 +1,9 @@
-﻿using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions.ExpressionObjects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
-using SharpSimulator.SimulationObjects;
+using SharpExpressions;
+using SharpSimulator;
+using SharpSupport;
 
 namespace InjectorTests
 {
@@ -18,27 +13,27 @@ namespace InjectorTests
     public class FulcrumInjectorFile
     {
         // Input file path and name for our log file object 
-        public readonly string LogFile;                                       // Full path to our log file
-        public readonly string LogFileName;                                   // Name of the log file without the path
-        public readonly int LogFileSize;                                      // Size of the log file in bytes
-        public readonly int LogFileLength;                                    // Number of lines in the log file 
-        public readonly string LogFileContents;                               // Contents of the log file read in
-                                                                              
-        // Output content and information for file Expressions                
-        public string ExpressionsFile { get; private set; }                   // Built output expressions file
-        public string ExpressionsFileName { get; private set; }               // Name of the built output expressions file
-        public string ExpressionsFileContents { get; private set; }           // Content of the built expressions file
-        public int ExpressionsFileSize { get; private set; }                  // Size of the built expressions file
-        public int ExpressionsFileLength { get; private set; }                // Length of the built expressions file
-        public PassThruExpression[] ExpressionsBuilt { get; private set; }    // Built expressions objects for our log file
-                                                                              
-        // Output content and information for file Simulations                
-        public string SimulationFile { get; private set; }                    // Built output simulations file
-        public string SimulationFileName { get; private set; }                // Name of the built output simulations file
-        public string SimulationFileContents { get; private set; }            // Content of the built simulations file
-        public int SimulationFileSize { get; private set; }                   // Size of the built simulations file
-        public int SimulationFileLength { get; private set; }                 // Length of the built simulations file
-        public SimulationChannel[] SimulationChannels { get; private set; }   // Built simulations channels for our log file
+        public readonly string LogFile;                                               // Full path to our log file
+        public readonly string LogFileName;                                           // Name of the log file without the path
+        public readonly int LogFileSize;                                              // Size of the log file in bytes
+        public readonly int LogFileLength;                                            // Number of lines in the log file 
+        public readonly string LogFileContents;                                       // Contents of the log file read in
+                                                                                      
+        // Output content and information for file Expressions                        
+        public string ExpressionsFile { get; private set; }                           // Built output expressions file
+        public string ExpressionsFileName { get; private set; }                       // Name of the built output expressions file
+        public string ExpressionsFileContents { get; private set; }                   // Content of the built expressions file
+        public int ExpressionsFileSize { get; private set; }                          // Size of the built expressions file
+        public int ExpressionsFileLength { get; private set; }                        // Length of the built expressions file
+        public PassThruExpression[] ExpressionsBuilt { get; private set; }            // Built expressions objects for our log file
+                                                                                      
+        // Output content and information for file Simulations                        
+        public string SimulationFile { get; private set; }                            // Built output simulations file
+        public string SimulationFileName { get; private set; }                        // Name of the built output simulations file
+        public string SimulationFileContents { get; private set; }                    // Content of the built simulations file
+        public int SimulationFileSize { get; private set; }                           // Size of the built simulations file
+        public int SimulationFileLength { get; private set; }                         // Length of the built simulations file
+        public PassThruSimulationChannel[] SimulationChannels { get; private set; }   // Built simulations channels for our log file
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -135,7 +130,7 @@ namespace InjectorTests
         /// </summary>
         /// <param name="SimulationFilePath">Path to the simulation file</param>
         /// <param name="BuiltChannels">The built simulation values</param>
-        public void StoreSimulationResults(string SimulationFilePath, SimulationChannel[] BuiltChannels)
+        public void StoreSimulationResults(string SimulationFilePath, PassThruSimulationChannel[] BuiltChannels)
         {
             // Store the new simulation values on this instance and exit out
             this.SimulationChannels = BuiltChannels;

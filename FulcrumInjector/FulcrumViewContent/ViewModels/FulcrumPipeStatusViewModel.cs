@@ -1,13 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using FulcrumInjector.FulcrumLogic.FulcrumPipes;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
+﻿using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpPipes;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {
@@ -22,9 +17,13 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         // Private Control Values
         private string _readerPipeState;
         private string _writerPipeState;
-        private PropertyWatchdog _testInjectionButtonWatchdog;
         private PropertyWatchdog _readerPipeStateWatchdog;
         private PropertyWatchdog _writerPipeStateWatchdog;
+        private PropertyWatchdog _testInjectionButtonWatchdog;
+
+        // Private pipe objects to be allocated
+        private PassThruPipe _readerPipe;
+        private PassThruPipe _writerPipe;
 
         // Public values for our view to bind onto 
         public string ReaderPipeState { get => _readerPipeState; set => PropertyUpdated(value); }
@@ -40,6 +39,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
+
+            // Configure new pipe instances for our class
+            this._readerPipe = PassThruPipe.AllocatePipe(PassThruPipeTypes.ReaderPipe, out _);
+            this._writerPipe = PassThruPipe.AllocatePipe(PassThruPipeTypes.WriterPipe, out _);
 
             // Build new pipe model object and watchdogs.
             this._readerPipeStateWatchdog = new PropertyWatchdog(250);
@@ -60,8 +63,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         {
             // Reader State and Writer State watchdogs for the current pipe state values.
             // BUG: Trying to understand why these two watchdogs are hanging up the UI. Seems logging operations hang forever? Maybe turn down frequency
-            this._readerPipeStateWatchdog.StartUpdateTimer((_, _) => { this.ReaderPipeState = FulcrumPipeReader.PipeInstance.PipeState.ToString(); });
-            this._writerPipeStateWatchdog.StartUpdateTimer((_, _) => { this.WriterPipeState = FulcrumPipeWriter.PipeInstance.PipeState.ToString(); });
+            this._readerPipeStateWatchdog.StartUpdateTimer((_, _) => { this.ReaderPipeState = this._readerPipe.PipeState.ToString(); });
+            this._writerPipeStateWatchdog.StartUpdateTimer((_, _) => { this.WriterPipeState = this._writerPipe.PipeState.ToString(); });
 
             // Injector button state watchdog
             this._testInjectionButtonWatchdog.StartUpdateTimer((_,_) =>
@@ -88,7 +91,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                 }
 
                 // Set content based on injector state values
-                switch (FulcrumPipeReader.IsConnecting)
+                switch (PassThruPipeReader.IsConnecting)
                 {
                     // If injector is connecting
                     case true:

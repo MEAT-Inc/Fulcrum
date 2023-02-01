@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Documents;
-using FulcrumInjector.FulcrumLogic.ExtensionClasses;
-using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
+﻿using FulcrumInjector.FulcrumLogic.FulcrumUpdater;
+using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using Markdig.Wpf;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
 {

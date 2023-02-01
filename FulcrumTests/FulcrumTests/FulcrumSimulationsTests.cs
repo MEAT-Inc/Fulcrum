@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpLogger;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruSimulation;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpLogger;
+using SharpExpressions;
+using SharpSimulator;
 
 namespace InjectorTests.FulcrumTests
 {
@@ -60,29 +59,27 @@ namespace InjectorTests.FulcrumTests
                 string LogFileContent = TestFileObject.LogFileContents;
 
                 // Build our expressions files now for each file instance
-                ExpressionsGenerator ExpGenerator = new ExpressionsGenerator(TestFileObject.LogFile, LogFileContent);
+                var ExpGenerator = PassThruExpressionsGenerator.LoadPassThruLogFile(TestFileObject.LogFile);
                 var BuiltExpressions = ExpGenerator.GenerateLogExpressions();
                 var ExpressionsFileName = ExpGenerator.SaveExpressionsFile(TestFileObject.LogFile);
 
                 // Now build a simulation generator and invoke the build routine
-                SimulationGenerator SimGenerator = new SimulationGenerator(TestFileObject.LogFile, BuiltExpressions);
-                var GroupedExpressionSets = SimGenerator.GenerateGroupedIds();
-                var BuiltSimulationChannels = SimGenerator.GenerateSimulationChannels();
+                var SimGenerator = new PassThruSimulationGenerator(TestFileObject.LogFileName, BuiltExpressions);
+                var BuiltSimulationChannels = SimGenerator.GenerateLogSimulation();
                 var SimulationFileName = SimGenerator.SaveSimulationFile(TestFileObject.LogFile);
 
                 // Check some conditions for the simulation file routine
                 Assert.IsTrue(File.Exists(ExpressionsFileName));
                 Assert.IsTrue(File.Exists(SimulationFileName));
                 Assert.IsTrue(BuiltExpressions != null && BuiltExpressions.Length != 0);
-                Assert.IsTrue(GroupedExpressionSets != null && GroupedExpressionSets.Count != 0);
-                Assert.IsTrue(BuiltSimulationChannels != null && BuiltSimulationChannels.Count != 0);
+                Assert.IsTrue(BuiltSimulationChannels != null && BuiltSimulationChannels.Length != 0);
 
                 // Lock the collection of log file objects and update it
                 lock (FulcrumTestFiles)
                 {
                     // Store the expression generation results and the simulation generation results
                     FulcrumTestFiles[LogFileName].StoreExpressionsResults(ExpressionsFileName, BuiltExpressions);
-                    FulcrumTestFiles[LogFileName].StoreSimulationResults(SimulationFileName, BuiltSimulationChannels.Values.ToArray());
+                    FulcrumTestFiles[LogFileName].StoreSimulationResults(SimulationFileName, BuiltSimulationChannels);
                 }
             });
 

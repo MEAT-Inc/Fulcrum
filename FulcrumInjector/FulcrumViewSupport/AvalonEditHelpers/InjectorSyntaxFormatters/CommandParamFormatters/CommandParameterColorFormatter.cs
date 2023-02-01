@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using ICSharpCode.AvalonEdit.Document;
+using System.Linq;
 using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumViewContent.Models.PassThruModels;
-using ICSharpCode.AvalonEdit.Document;
+using SharpExpressions;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters.CommandParamFormatters
 {
@@ -24,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFor
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Find the command type for our input object here. If none, drop out
-            Regex CommandParamsRegex = new(PassThruRegexModelShare.PassThruParameters.ExpressionPattern);
+            Regex CommandParamsRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionType.CommandParams].ExpressionRegex;
             Match FoundMatch = CommandParamsRegex.Match(CurrentContext.Document.GetText(InputLine));
             if (!FoundMatch.Success) return;
 

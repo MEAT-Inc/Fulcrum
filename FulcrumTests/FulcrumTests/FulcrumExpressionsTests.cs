@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpExpressions;
+using SharpLogger;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.PassThruLogic.PassThruExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpLogger;
 
 namespace InjectorTests.FulcrumTests
 {
@@ -56,8 +55,7 @@ namespace InjectorTests.FulcrumTests
             {
                 // Build a new generator for the file instance and store the output values
                 var TestFileObject = FulcrumTestFiles[LogFileName];
-                string LogFileContent = TestFileObject.LogFileContents;
-                ExpressionsGenerator GeneratorBuilt = new ExpressionsGenerator(LogFileName, LogFileContent);
+                var GeneratorBuilt = PassThruExpressionsGenerator.LoadPassThruLogFile(LogFileName);
 
                 // Build our expressions files now for each file instance and save them out
                 var BuiltExpressions = GeneratorBuilt.GenerateLogExpressions();
