@@ -263,6 +263,9 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
