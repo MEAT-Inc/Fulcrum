@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.Models.EventModels;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
 using SharpWrapper.J2534Objects;
 using SharpWrapper.PassThruImport;
-using SharpWrapper.SupportingLogic;
+using SharpWrapper.PassThruTypes;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
@@ -77,14 +72,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     // Store values if the VM is not null
                     bool IsDeviceReady = this.SelectedDLL != null && !string.IsNullOrEmpty(value);
                     FulcrumConstants.FulcrumSimulationPlaybackViewModel.IsHardwareSetup = IsDeviceReady;
-                }
-
-                // Update the network analysis view model values here 
-                if (FulcrumConstants.FulcrumNetworkAnalysisViewModel != null)
-                {
-                    // Store values if the VM is not null
-                    bool IsDeviceReady = this.SelectedDLL != null && !string.IsNullOrEmpty(value);
-                    FulcrumConstants.FulcrumNetworkAnalysisViewModel.IsHardwareSetup = IsDeviceReady;
                 }
             }
         }

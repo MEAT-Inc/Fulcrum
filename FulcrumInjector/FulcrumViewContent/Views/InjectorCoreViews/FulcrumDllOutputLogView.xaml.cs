@@ -1,13 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using FulcrumInjector.FulcrumLogic.FulcrumPipes;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
@@ -17,6 +8,13 @@ using NLog.Config;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpPipes;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 {
@@ -44,7 +42,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
             // Build event for our pipe objects to process new pipe content into our output box
-            FulcrumPipeReader.PipeInstance.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
+            PassThruPipeReader ReaderPipe = PassThruPipeReader.AllocatePipe();
+            ReaderPipe.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
             this.ViewLogger.WriteLog("STORED NEW EVENT BROKER FOR PIPE READING DATA PROCESSED OK!", LogType.InfoLog);
 
             // Configure the new Logging Output Target.

@@ -266,9 +266,6 @@
                                 <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="false">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
@@ -313,6 +310,9 @@
                                 <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding Path=IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
@@ -320,11 +320,11 @@
                                         <Condition Binding="{Binding Path=IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
                                     </MultiDataTrigger.Conditions>
                                     <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
+                                </MultiDataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding Path=IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
                                         <Condition Binding="{Binding Path=IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                        <Condition Binding="{Binding Path=IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
                                         <Condition Binding="{Binding Path=IsSimulationRunning, UpdateSourceTrigger=PropertyChanged}" Value="false"/>
                                     </MultiDataTrigger.Conditions>
                                     <Setter Property="Visibility" Value="Visible"/>

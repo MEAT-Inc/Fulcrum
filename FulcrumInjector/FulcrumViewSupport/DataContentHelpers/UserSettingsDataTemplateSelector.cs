@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
         public override DataTemplate SelectTemplate(object InputItem, DependencyObject ObjectContainer)
         {
             // Check if we can use this selector object or not.
-            if (ObjectContainer is FrameworkElement InputElement && InputItem is SettingsEntryModel SettingModelObject)
+            if (ObjectContainer is FrameworkElement InputElement && InputItem is FulcrumSettingsEntryModel SettingModelObject)
             {
                 // Now find the type of control to use
                 switch (SettingModelObject.TypeOfControl)

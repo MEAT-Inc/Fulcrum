@@ -1,4 +1,9 @@
-﻿using System;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
+using SharpLogger;
+using SharpLogger.LoggerObjects;
+using SharpLogger.LoggerSupport;
+using SharpPipes;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,16 +12,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumLogic.FulcrumPipes;
-using FulcrumInjector.FulcrumLogic.JsonLogic.JsonHelpers;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
-using ICSharpCode.AvalonEdit;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using Application = System.Windows.Application;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Button = System.Windows.Controls.Button;
 using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
@@ -48,8 +45,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             this.ViewModel = FulcrumConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel();
             ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
 
-            // Build event broker for session logging output
-            FulcrumPipeReader.PipeInstance.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
+            // Build event for our pipe objects to process new pipe content into our output box
+            PassThruPipeReader ReaderPipe = PassThruPipeReader.AllocatePipe();
+            ReaderPipe.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
             this.ViewLogger.WriteLog("STORED NEW EVENT HELPER FOR PROCESSING LOG CONTENTS ON PIPE DATA OUTPUT!", LogType.InfoLog);
         }
 
