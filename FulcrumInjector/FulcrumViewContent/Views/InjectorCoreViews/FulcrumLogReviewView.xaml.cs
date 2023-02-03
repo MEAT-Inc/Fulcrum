@@ -143,7 +143,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         }
 
                         // Allow all buttons on and set them up to show index 0
-                        else {
+                        else 
+                        {
                             this.ViewerContentComboBox.SelectedIndex = 0;
                             this.BuildExpressionsButton.IsEnabled = true;
                             this.BuildSimulationButton.IsEnabled = true;

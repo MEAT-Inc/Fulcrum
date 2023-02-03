@@ -49,12 +49,12 @@ namespace FulcrumInjector
             // Force the working directory. Build JSON settings objects
             JsonConfigFiles.SetNewAppConfigFile("FulcrumInjectorSettings.json");
 
-            // Run single instance configuration first
+            // Run single instance configuration first and setup logging
+            this.ConfigureLogging();
             this.ConfigureSingleInstance();
             this.ConfigureAppExitRoutine();
 
-            // Logging config and app theme config.
-            this.ConfigureLogging();
+            // Logging cleanup and app theme config.
             this.ConfigureLogCleanup();
             LogBroker.Logger?.WriteLog("LOGGING CONFIGURATION ROUTINE HAS BEEN COMPLETED OK!", LogType.InfoLog);
 

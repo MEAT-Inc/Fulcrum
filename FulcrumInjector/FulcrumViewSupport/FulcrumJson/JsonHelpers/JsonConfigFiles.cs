@@ -21,14 +21,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
             {
                 // If the main output value is null, return anyway.
                 if (LogBroker.MainLogFileName == null) { return null; }
-                var CurrentLogger = LoggerQueue.SpawnLogger("JsonConfigLogger", LoggerActions.SubServiceLogger);
-
-                // Check logger
-                if (CurrentLogger != null) return (SubServiceLogger)CurrentLogger;
-
-                // Add new logger if all the found ones are null
-                var NewLogger = new SubServiceLogger("JsonConfigLogger", LogBroker.MainLogFileName);
-                return NewLogger;
+                return (SubServiceLogger)LoggerQueue.SpawnLogger("JsonConfigLogger", LoggerActions.SubServiceLogger);
             }
         }
 
