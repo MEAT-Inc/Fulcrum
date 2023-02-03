@@ -175,8 +175,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     this.IsLogLoaded = true;
                     this.ExpressionsBuilt = true;
                     this.ExpressionsFile = NewLogFile;
-                    this.LoadedLogFile = NewLogFile;
-                    this.LogFileContents = File.ReadAllText(this.LoadedLogFile);
                     ViewModelLogger.WriteLog("PULLED IN A NEW EXPRESSIONS FILE AND CONVERTED IT INTO A RAW LOG OK!");
 
                     // Toggle the viewer to show out output
@@ -190,8 +188,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                     this.IsLogLoaded = true;
                     this.SimulationBuilt = true;
                     this.SimulationFile = NewLogFile;
-                    this.LoadedLogFile = NewLogFile;
-
+                    
                     // Toggle the viewer to show out output
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingSimulation))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
@@ -208,6 +205,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 
                     // Return passed and copy into our temp location
+                    // TODO: Figure out what the fuck this is all about?
                     string LogFileName = Path.GetFileName(NewLogFile);
                     string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultImportFilePath");
                     Directory.CreateDirectory(DefaultImportLocation);

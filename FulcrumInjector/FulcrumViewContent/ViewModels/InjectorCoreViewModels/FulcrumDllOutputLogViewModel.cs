@@ -1,9 +1,6 @@
 ﻿using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using SharpPipes;
 using System;
 
@@ -12,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     public class FulcrumDllOutputLogViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorDllOutputViewModelLogger", LoggerActions.SubServiceLogger);
+        // private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorDllOutputViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _hasOutput;
@@ -34,16 +31,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         public FulcrumDllOutputLogViewModel()
         {
             // Log information and store values 
-            ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            // ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+            // ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Build default value for session log files.
-            ViewModelLogger.WriteLog("BUILDING EMPTY ARRAY FOR SESSION LOG FILES NOW...", LogType.WarnLog);
+            // ViewModelLogger.WriteLog("BUILDING EMPTY ARRAY FOR SESSION LOG FILES NOW...", LogType.WarnLog);
             this.SessionLogs = Array.Empty<string>();
 
             // Build log content helper and return
-            ViewModelLogger.WriteLog("SETUP NEW DLL INJECTION OUTPUT LOG VALUES OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+            // ViewModelLogger.WriteLog("SETUP NEW DLL INJECTION OUTPUT LOG VALUES OK!", LogType.InfoLog);
+            // ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
 
@@ -68,7 +65,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         {
             // Attach output content into our session log box.
             FulcrumDllOutputLogView ViewCast = this.BaseViewControl as FulcrumDllOutputLogView;
-            if (ViewCast == null) ViewModelLogger.WriteLog("WARNING: CAST VIEW ENTRY WAS NULL!", LogType.TraceLog); 
+            // if (ViewCast == null) // ViewModelLogger.WriteLog("WARNING: CAST VIEW ENTRY WAS NULL!", LogType.TraceLog); 
             else ViewCast?.Dispatcher.Invoke(() => { ViewCast.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
         }
     }
