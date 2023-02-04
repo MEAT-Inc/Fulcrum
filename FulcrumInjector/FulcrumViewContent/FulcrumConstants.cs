@@ -205,11 +205,11 @@ namespace FulcrumInjector.FulcrumViewContent
         {
             // Store value and log results
             InjectorMainWindow = WindowBase;
-            ConstantsLogger.WriteLog("STORED NEW MAIN WINDOW VIEW FOR CONSTANTS OBJECT OK!", LogType.InfoLog);
-            ConstantsLogger.WriteLog($"MAIN WINDOW WAS PASSED AS TYPE {WindowBase.GetType().Name}");
+           // ConstantsLogger.WriteLog("STORED NEW MAIN WINDOW VIEW FOR CONSTANTS OBJECT OK!", LogType.InfoLog);
+            //ConstantsLogger.WriteLog($"MAIN WINDOW WAS PASSED AS TYPE {WindowBase.GetType().Name}");
 
             // Set the flyouts for our debugging configuration and settings pane
-            ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
+            //ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
             bool SetConstants = FulcrumTitleView.SetFlyoutBindings(
                 InjectorMainWindow.InformationFlyout, 
                 InjectorMainWindow.AppUpdatesFlyout,
@@ -218,7 +218,7 @@ namespace FulcrumInjector.FulcrumViewContent
             );
 
             // Check result
-            if (SetConstants) ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
+            //if (SetConstants) ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
             else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
         }
         /// <summary>
@@ -231,7 +231,7 @@ namespace FulcrumInjector.FulcrumViewContent
         public static bool SetConstantVariable(Type ViewOrViewModelType, string PropertyName, object PropertyValue)
         {
             // Start by finding the control with the type given
-            ConstantsLogger.WriteLog($"ATTEMPTING TO SET VAR {PropertyName} ON OBJECT TYPED {ViewOrViewModelType.Name}....");
+          //  ConstantsLogger.WriteLog($"ATTEMPTING TO SET VAR {PropertyName} ON OBJECT TYPED {ViewOrViewModelType.Name}....");
             var DesiredPropertyObject = ViewOrViewModelType.GetMembers(BindingFlags.Public | BindingFlags.Static)
                 .Where(MemberObj => MemberObj.MemberType == MemberTypes.Property)
                 .Select(MemberObj =>
@@ -247,12 +247,12 @@ namespace FulcrumInjector.FulcrumViewContent
 
             // Make sure it's not null
             if (DesiredPropertyObject == null) {
-                ConstantsLogger.WriteLog("FAILED TO FIND A USABLE PROPERTY OBJECT VALUE ON THE CONSTANTS OBJECT!", LogType.ErrorLog);
+               // ConstantsLogger.WriteLog("FAILED TO FIND A USABLE PROPERTY OBJECT VALUE ON THE CONSTANTS OBJECT!", LogType.ErrorLog);
                 return false;
             }
 
             // Now apply our new value
-            ConstantsLogger.WriteLog("LOCATED NEW PROPERTY OBJECT TO MODIFY OK!", LogType.InfoLog);
+           // ConstantsLogger.WriteLog("LOCATED NEW PROPERTY OBJECT TO MODIFY OK!", LogType.InfoLog);
             try
             {
                 // Pull the member info and store the best one for us
@@ -260,7 +260,7 @@ namespace FulcrumInjector.FulcrumViewContent
                     .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                     .FirstOrDefault(MemberObj => MemberObj.Name == PropertyName);
                 if (DesiredMember == null) throw new InvalidOperationException("FAILED TO LOCATE MEMBER ON REFLECTED INSTANCE");
-                ConstantsLogger.WriteLog("PULLED NEW MEMBER INSTANCE OBJECT OK! SETTING IT NOW...", LogType.InfoLog);
+              //  ConstantsLogger.WriteLog("PULLED NEW MEMBER INSTANCE OBJECT OK! SETTING IT NOW...", LogType.InfoLog);
 
                 // Now set the value on our new member info
                 switch (DesiredMember.MemberType)
@@ -282,14 +282,14 @@ namespace FulcrumInjector.FulcrumViewContent
                 }
 
                 // Set new value correctly! Log and return passed
-                ConstantsLogger.WriteLog("SET NEW VALUE OBJECT TO OUR DESIRED PROPERTY OK!", LogType.InfoLog);
+              //  ConstantsLogger.WriteLog("SET NEW VALUE OBJECT TO OUR DESIRED PROPERTY OK!", LogType.InfoLog);
                 return true;
             }
             catch (Exception Ex)
             {
                 // Catch failure, log it, and return failed
-                ConstantsLogger.WriteLog($"FAILED TO SET NEW PROPERTY VALUE NAMED {PropertyName}!", LogType.TraceLog);
-                ConstantsLogger.WriteLog("EXCEPTION THROWN DURING PULL!", Ex);
+             //   ConstantsLogger.WriteLog($"FAILED TO SET NEW PROPERTY VALUE NAMED {PropertyName}!", LogType.TraceLog);
+               // ConstantsLogger.WriteLog("EXCEPTION THROWN DURING PULL!", Ex);
                 return false;
             }
         }
@@ -302,12 +302,12 @@ namespace FulcrumInjector.FulcrumViewContent
         public static void ProcessAppExit(object AppObject, ExitEventArgs ExitArgs)
         {
             // First Log information
-            LogBroker.Logger?.WriteLog("PROCESSED APP ENVIRONMENT OBJECT SHUTDOWN COMMAND OK!", LogType.WarnLog);
-            LogBroker.Logger?.WriteLog("CLOSING THIS INSTANCE CLEANLY AND THEN FORCE RUNNING A TERMINATION COMMAND!", LogType.InfoLog);
+          //  LogBroker.Logger?.WriteLog("PROCESSED APP ENVIRONMENT OBJECT SHUTDOWN COMMAND OK!", LogType.WarnLog);
+            //LogBroker.Logger?.WriteLog("CLOSING THIS INSTANCE CLEANLY AND THEN FORCE RUNNING A TERMINATION COMMAND!", LogType.InfoLog);
 
             // Flush async targets
-            LogBroker.Logger?.WriteLog("FLUSHING ASYNC OUTPUT TARGETS NOW...", LogType.WarnLog);
-            LogBroker.BrokerInstance.FlushAllAsyncTargets();
+           // LogBroker.Logger?.WriteLog("FLUSHING ASYNC OUTPUT TARGETS NOW...", LogType.WarnLog);
+            //LogBroker.BrokerInstance.FlushAllAsyncTargets();
 
             // Now build a process object. Simple bat file that runs a Taskkill instance on this app after waiting 3 seconds.
             string TempBat = Path.ChangeExtension(Path.GetTempFileName(), "bat");
@@ -319,13 +319,13 @@ namespace FulcrumInjector.FulcrumViewContent
             });
 
             // Write temp bat file to output and then run it.
-            LogBroker.Logger?.WriteLog($"BAT FILE LOCATION WAS GENERATED AND SET TO {TempBat}", LogType.InfoLog);
-            LogBroker.Logger?.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents}", LogType.TraceLog);
+           // LogBroker.Logger?.WriteLog($"BAT FILE LOCATION WAS GENERATED AND SET TO {TempBat}", LogType.InfoLog);
+           // LogBroker.Logger?.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents}", LogType.TraceLog);
             File.WriteAllText(TempBat, BatContents);
 
             // Now run the output command.
-            LogBroker.Logger?.WriteLog("RUNNING TERMINATION COMMAND INSTANCE NOW...", LogType.WarnLog);
-            LogBroker.Logger?.WriteLog("THIS SHOULD BE THE LAST TIME THIS LOG FILE IS USED!", LogType.InfoLog);
+          //  LogBroker.Logger?.WriteLog("RUNNING TERMINATION COMMAND INSTANCE NOW...", LogType.WarnLog);
+          //  LogBroker.Logger?.WriteLog("THIS SHOULD BE THE LAST TIME THIS LOG FILE IS USED!", LogType.InfoLog);
             ProcessStartInfo TerminateInfo = new ProcessStartInfo()
             {
                 FileName = "cmd.exe",
@@ -335,7 +335,7 @@ namespace FulcrumInjector.FulcrumViewContent
             };
 
             // Execute here and exit out app.
-            LogBroker.Logger?.WriteLog($"EXECUTING NOW! TIME OF APP EXIT: {DateTime.Now:R}", LogType.WarnLog);
+           // LogBroker.Logger?.WriteLog($"EXECUTING NOW! TIME OF APP EXIT: {DateTime.Now:R}", LogType.WarnLog);
             Process.Start(TerminateInfo);
         }
     }

@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             this.OEAppCommand = BatLaunchCommand ?? $"cmd.exe /C \"{OEAppPath}\"";
 
             // Log built new app instance.
-            ModelLogger.WriteLog($"BUILT NEW OE APP: {this}", LogType.TraceLog);
+           // ModelLogger.WriteLog($"BUILT NEW OE APP: {this}", LogType.TraceLog);
         }
     }
 }

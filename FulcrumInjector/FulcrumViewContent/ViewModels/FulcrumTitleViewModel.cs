@@ -37,8 +37,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         public FulcrumTitleViewModel()
         {
             // Log information and store values 
-            ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
+         //   ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+         //   ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Store title and version string values now.
             this.ShimDLLVersionString = $"Shim Version: {FulcrumConstants.InjectorVersions.ShimVersionString}";
@@ -46,12 +46,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
 
             // Log output information
-            ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"INJECTOR:  {InjectorVersionString}");
-            ViewModelLogger.WriteLog($"SHIM:      {ShimDLLVersionString}");
+         //   ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!", LogType.InfoLog);
+         //   ViewModelLogger.WriteLog($"INJECTOR:  {InjectorVersionString}");
+         //   ViewModelLogger.WriteLog($"SHIM:      {ShimDLLVersionString}");
 
             // Log completed setup.
-            ViewModelLogger.WriteLog("SETUP NEW TITLE AND VERSION STRING VALUES OK!", LogType.InfoLog);
+          //  ViewModelLogger.WriteLog("SETUP NEW TITLE AND VERSION STRING VALUES OK!", LogType.InfoLog);
         }
     }
 }

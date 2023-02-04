@@ -79,12 +79,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         {
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = ValueLoaders.GetConfigValue<SettingsEntryCollectionModel[]>("FulcrumUserSettings");
-            SettingStoreLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
-            SettingStoreLogger.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
-            foreach (var SettingSet in SettingsLoaded) SettingStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet}");
+          //  SettingStoreLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
+           // SettingStoreLogger.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
+          //  foreach (var SettingSet in SettingsLoaded) SettingStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet}");
 
             // Log passed and return output
-            SettingStoreLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
+          //  SettingStoreLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
             _settingsEntrySets = new ObservableCollection<SettingsEntryCollectionModel>(SettingsLoaded);
             return _settingsEntrySets;
         }

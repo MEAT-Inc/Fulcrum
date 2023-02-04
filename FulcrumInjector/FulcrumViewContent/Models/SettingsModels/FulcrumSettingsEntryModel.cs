@@ -80,7 +80,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 // Not Valid
                 case ControlTypes.NOT_DEFINED:
                     this.SettingControlType = null;
-                    ModelLogger.WriteLog($"FAILED TO BUILD NEW CONTROL INSTANCE FOR SETTING {SettingName}!", LogType.ErrorLog);
+                   // ModelLogger.WriteLog($"FAILED TO BUILD NEW CONTROL INSTANCE FOR SETTING {SettingName}!", LogType.ErrorLog);
                     break;
             }
 
