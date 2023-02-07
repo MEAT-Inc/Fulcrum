@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpSupport;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,10 +7,6 @@ using System.Net;
 using System.Net.Mail;
 using System.Security;
 using System.Text.RegularExpressions;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using SharpSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport
 {
@@ -19,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     public class FulcrumEmailBroker
     {
         // Logger object
-        private SubServiceLogger EmailLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("ReportSendingBrokerLogger", LoggerActions.SubServiceLogger);
+     //   private SubServiceLogger EmailLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("ReportSendingBrokerLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +36,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 // Make sure the list of emails is not null. 
                 if (this._emailRecipientAddresses == null && this.DefaultRecipientAddress != null)
                 {
-                    this.EmailLogger.WriteLog("WARING! NO EMAILS ENTERED YET! RETURNING ONLY OUR DEFAULT MAIL RECIPIENT!", LogType.WarnLog);
+                  //  this.EmailLogger.WriteLog("WARING! NO EMAILS ENTERED YET! RETURNING ONLY OUR DEFAULT MAIL RECIPIENT!", LogType.WarnLog);
                     return new MailAddress[] { DefaultRecipientAddress };
                 }
 
@@ -81,7 +78,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Now build default settings values and log information
             this.EmailSenderName = SenderName;
             this.EmailSenderAddress = new MailAddress(SenderEmail);
-            if (DefaultRecipient == null) this.EmailLogger.WriteLog("NOT INCLUDING A DEFAULT RECIPIENT ON THESE EMAILS!", LogType.WarnLog);
+        //    if (DefaultRecipient == null) this.EmailLogger.WriteLog("NOT INCLUDING A DEFAULT RECIPIENT ON THESE EMAILS!", LogType.WarnLog);
             else { this.DefaultRecipientAddress = new MailAddress(DefaultRecipient); }
 
             // Configure password entry and the SMTP Client here
@@ -89,8 +86,8 @@ namespace FulcrumInjector.FulcrumViewSupport
             Array.ForEach(SenderPassword.ToArray(), this.EmailSenderPassword.AppendChar);
 
             // Log information about passed output here.
-            this.EmailLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this.EmailSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
-            this.EmailLogger.WriteLog($"PULLED IN A NEW PASSWORD VALUE OF {SenderPassword} TO USE FOR SENDING OPERATIONS", LogType.InfoLog);
+          //  this.EmailLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this.EmailSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
+         //   this.EmailLogger.WriteLog($"PULLED IN A NEW PASSWORD VALUE OF {SenderPassword} TO USE FOR SENDING OPERATIONS", LogType.InfoLog);
             if (this.DefaultRecipientAddress != null) this.EmailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
         }
 
@@ -111,8 +108,8 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Log information about the newly
             this._smtpSetupConfigured = true;
-            this.EmailLogger.WriteLog("CONFIGURED NEW SMTP CLIENT LOGIN AND CONFIG VALUES!");
-            this.EmailLogger.WriteLog($"HOST: {this.EmailSenderName} | PORT: {this.SmtpServerPort} | TIMEOUT: {this.SmtpServerTimeout}", LogType.TraceLog);
+          //  this.EmailLogger.WriteLog("CONFIGURED NEW SMTP CLIENT LOGIN AND CONFIG VALUES!");
+          //  this.EmailLogger.WriteLog($"HOST: {this.EmailSenderName} | PORT: {this.SmtpServerPort} | TIMEOUT: {this.SmtpServerTimeout}", LogType.TraceLog);
         }
         /// <summary>
         /// Authorizes the sender email passed into the CTOR and ensures we can use it.
@@ -123,14 +120,14 @@ namespace FulcrumInjector.FulcrumViewSupport
         {
             // Check if config values are built.
             if (!this._smtpSetupConfigured) {
-                this.EmailLogger.WriteLog("SMTP CONFIGURATION VALUES ARE NOT YET BUILT! RETURNING NULL!", LogType.ErrorLog); 
+             //   this.EmailLogger.WriteLog("SMTP CONFIGURATION VALUES ARE NOT YET BUILT! RETURNING NULL!", LogType.ErrorLog); 
                 return false;
             }
 
             try
             {
                 // First build a new SMTP Client.
-                this.EmailLogger.WriteLog("ATTEMPTING TO CONNECT TO OUR SMTP SERVER NOW...", LogType.WarnLog);
+             //   this.EmailLogger.WriteLog("ATTEMPTING TO CONNECT TO OUR SMTP SERVER NOW...", LogType.WarnLog);
                 this.SendingClient = new SmtpClient
                 {
                     // Setup name and port values and timeout value.
@@ -147,14 +144,14 @@ namespace FulcrumInjector.FulcrumViewSupport
                 };
 
                 // Return passed and the built client.
-                this.EmailLogger.WriteLog("BUILT NEW SMTP CLIENT OBJECT OK! RETURNING IT NOW", LogType.InfoLog);
+            //    this.EmailLogger.WriteLog("BUILT NEW SMTP CLIENT OBJECT OK! RETURNING IT NOW", LogType.InfoLog);
                 return true;
             }
             catch (Exception SetupEx)
             {
                 // Log the failure output
-                this.EmailLogger.WriteLog("FAILED TO CONFIGURE OUR NEW SMTP CLIENT! THIS IS A SERIOUS ISSUE!", LogType.ErrorLog);
-                this.EmailLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetupEx); 
+             //   this.EmailLogger.WriteLog("FAILED TO CONFIGURE OUR NEW SMTP CLIENT! THIS IS A SERIOUS ISSUE!", LogType.ErrorLog);
+              //  this.EmailLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetupEx); 
                 return false;
             }
         }
@@ -175,19 +172,19 @@ namespace FulcrumInjector.FulcrumViewSupport
                 var TempAddress = new MailAddress(NextRecipient);
                 if (EmailRecipientAddresses.Any(EmailObj => Equals(EmailObj, TempAddress)))
                 {
-                    this.EmailLogger.WriteLog("ADDRESS WAS ALREADY IN OUR LIST OF RECIPIENTS! RETURNING FALSE", LogType.WarnLog);
+                //    this.EmailLogger.WriteLog("ADDRESS WAS ALREADY IN OUR LIST OF RECIPIENTS! RETURNING FALSE", LogType.WarnLog);
                     return false;
                 }
 
                 // Add address here since it does not currently exist.
                 this.EmailRecipientAddresses = this.EmailRecipientAddresses.Append(TempAddress).ToArray();
-                this.EmailLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
+               // this.EmailLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
                 return true;
             }
             catch
             {
                 // If it failed, then return false.
-                this.EmailLogger.WriteLog("EMAIL PROVIDED WAS NOT A VALID EMAIL! RETURNING FALSE", LogType.WarnLog);
+              //  this.EmailLogger.WriteLog("EMAIL PROVIDED WAS NOT A VALID EMAIL! RETURNING FALSE", LogType.WarnLog);
                 return false;
             }
         }
@@ -200,7 +197,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             if (RecipientAddress == null)
             {
                 // Log Removing all.
-                this.EmailLogger.WriteLog("REMOVING ALL RECIPIENTS FROM LIST OF ENTRIES NOW...", LogType.WarnLog);
+            //    this.EmailLogger.WriteLog("REMOVING ALL RECIPIENTS FROM LIST OF ENTRIES NOW...", LogType.WarnLog);
                 this.EmailRecipientAddresses = Array.Empty<MailAddress>();
                 return true;
             }
@@ -208,20 +205,20 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Remove only the given name.
             if (this.EmailRecipientAddresses.All(EmailObj => !string.Equals(EmailObj.ToString(), RecipientAddress, StringComparison.CurrentCultureIgnoreCase)))
             {
-                this.EmailLogger.WriteLog($"NO EMAIL ADDRESS WITH THE VALUE {RecipientAddress} WAS FOUND!", LogType.WarnLog);
+             //   this.EmailLogger.WriteLog($"NO EMAIL ADDRESS WITH THE VALUE {RecipientAddress} WAS FOUND!", LogType.WarnLog);
                 return false;
             }
 
             // Remove value here and return.
             var StringAddresses = this.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString().ToUpper());
             if (!StringAddresses.ToList().Remove(RecipientAddress.ToUpper())) {
-                this.EmailLogger.WriteLog($"FAILED TO REMOVE REQUESED ADDRESS OF {RecipientAddress}!", LogType.WarnLog);
+             //   this.EmailLogger.WriteLog($"FAILED TO REMOVE REQUESED ADDRESS OF {RecipientAddress}!", LogType.WarnLog);
                 return false;
             }
 
             // Now reset email list contents here.
             this.EmailRecipientAddresses = StringAddresses.Select(StringAddr => new MailAddress(StringAddr)).ToArray();
-            this.EmailLogger.WriteLog($"REMOVED ADDRESS NAME {RecipientAddress} CORRECTLY! STORING NEW ADDRESS SET NOW...", LogType.InfoLog);
+           // this.EmailLogger.WriteLog($"REMOVED ADDRESS NAME {RecipientAddress} CORRECTLY! STORING NEW ADDRESS SET NOW...", LogType.InfoLog);
             return true;
         }
 
@@ -236,9 +233,9 @@ namespace FulcrumInjector.FulcrumViewSupport
         {
             // Check if the list exists at all and if the new path is in it.
             this.MessageAttachmentFiles ??= Array.Empty<FileInfo>();
-            this.EmailLogger.WriteLog($"ATTACHING FILE {PathToAttachment}", LogType.InfoLog);
+        //    this.EmailLogger.WriteLog($"ATTACHING FILE {PathToAttachment}", LogType.InfoLog);
             if (!File.Exists(PathToAttachment)) {
-                this.EmailLogger.WriteLog("FILE OBJECT DOES NOT EXIST! CAN NOT ADD IT INTO OUR ATTACHMENT LIST!", LogType.ErrorLog);
+            //    this.EmailLogger.WriteLog("FILE OBJECT DOES NOT EXIST! CAN NOT ADD IT INTO OUR ATTACHMENT LIST!", LogType.ErrorLog);
                 return false;
             }
 
@@ -247,7 +244,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 return false;
 
             // Log total file count now and add into our list.
-            this.EmailLogger.WriteLog("APPENDING NEW FILE OBJECT INTO OUR LIST OF ATTACHMENTS NOW...", LogType.InfoLog);
+         //   this.EmailLogger.WriteLog("APPENDING NEW FILE OBJECT INTO OUR LIST OF ATTACHMENTS NOW...", LogType.InfoLog);
             this.MessageAttachmentFiles = this.MessageAttachmentFiles.Append(new FileInfo(PathToAttachment)).ToArray();
             return true;
         }
@@ -264,15 +261,15 @@ namespace FulcrumInjector.FulcrumViewSupport
             if (NameToRemove == null)
             {
                 // Removes all entries if no value is given.
-                this.EmailLogger.WriteLog("NO NAME FILTER WAS PROVIDED! REMOVING ALL ENTRIES FROM OUR MAIL LIST NOW...");
+            //    this.EmailLogger.WriteLog("NO NAME FILTER WAS PROVIDED! REMOVING ALL ENTRIES FROM OUR MAIL LIST NOW...");
                 this.MessageAttachmentFiles = Array.Empty<FileInfo>();
                 return true;
             }
 
             // Check if the list exists and log file removing
             this.MessageAttachmentFiles ??= Array.Empty<FileInfo>();
-            this.EmailLogger.WriteLog($"REMOVING FILE NAME {NameToRemove}", LogType.InfoLog);
-            if (UseFilter) this.EmailLogger.WriteLog("WARNING: REGEX FILTERING WAS TURNED ON! USING IT NOW", LogType.WarnLog);
+         //   this.EmailLogger.WriteLog($"REMOVING FILE NAME {NameToRemove}", LogType.InfoLog);
+          //  if (UseFilter) this.EmailLogger.WriteLog("WARNING: REGEX FILTERING WAS TURNED ON! USING IT NOW", LogType.WarnLog);
 
             // Find matches or the file object.
             var FilesToRemove = this.MessageAttachmentFiles.Where(FileObj =>
@@ -284,12 +281,12 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Check if there's files to pull.
             if (!FilesToRemove.Any()) {
-                this.EmailLogger.WriteLog("NO FILES FOUND TO REMOVE! RETURNING FAILED NOW...", LogType.ErrorLog);
+           //     this.EmailLogger.WriteLog("NO FILES FOUND TO REMOVE! RETURNING FAILED NOW...", LogType.ErrorLog);
                 return false;
             }
 
             // Log how many files to remove and pull them all out.
-            this.EmailLogger.WriteLog($"FILES TO PULL OUT OF THE LIST: {FilesToRemove.Count()}", LogType.InfoLog);
+         //   this.EmailLogger.WriteLog($"FILES TO PULL OUT OF THE LIST: {FilesToRemove.Count()}", LogType.InfoLog);
             this.MessageAttachmentFiles = this.MessageAttachmentFiles.Where(FileObj => !FilesToRemove.Contains(FileObj)).ToArray();
             return true;
         }
@@ -306,8 +303,8 @@ namespace FulcrumInjector.FulcrumViewSupport
         public bool SendReportMessage(string MessageSubject, string MessageBodyContent, bool IncludeAttachments = true)
         {
             // Log information about the startup of this new message object.
-            this.EmailLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {this.EmailRecipientAddresses.Length} RECIPIENTS TITLED {MessageSubject}", LogType.WarnLog);
-            this.EmailLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
+         //   this.EmailLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {this.EmailRecipientAddresses.Length} RECIPIENTS TITLED {MessageSubject}", LogType.WarnLog);
+         //   this.EmailLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
 
             // Update the content of our message with a final output for log file entries and names.
             var OutputFilesTupleSet = this.MessageAttachmentFiles.Select(FileObj =>
@@ -318,7 +315,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 string TimeLastModified = FileObj.LastWriteTime.ToString("f");
                 return new Tuple<string, string, string>(FileName, FileSizeFormatted, TimeLastModified);
             }).ToArray();
-            this.EmailLogger.WriteLog("BUILT NEW TUPLE ARRAY FOR ALL FILE OBJECTS IN USE CORRECTLY!", LogType.InfoLog);
+         //   this.EmailLogger.WriteLog("BUILT NEW TUPLE ARRAY FOR ALL FILE OBJECTS IN USE CORRECTLY!", LogType.InfoLog);
 
             // Build our output table object as a text block using the converter class.
             string OutputFileTable = 
@@ -331,15 +328,15 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Log the output table object here and build out the mailmessage.
             MessageBodyContent += $"\n\n{string.Concat(Enumerable.Repeat("=", 75))}\n\n{OutputFileTable}";
-            this.EmailLogger.WriteLog("BUILT NEW OUTPUT TABLE CORRECTLY! ENTIRE MESSAGE OBJECT AND OUTPUT TABLE IS LOGGED BELOW!", LogType.InfoLog);
-            this.EmailLogger.WriteLog($"\n{OutputFileTable}", LogType.TraceLog);
+         //   this.EmailLogger.WriteLog("BUILT NEW OUTPUT TABLE CORRECTLY! ENTIRE MESSAGE OBJECT AND OUTPUT TABLE IS LOGGED BELOW!", LogType.InfoLog);
+         //   this.EmailLogger.WriteLog($"\n{OutputFileTable}", LogType.TraceLog);
 
             // Build mail object and send it out.
             bool OverallStatus = true;
             foreach (var RecipientAddress in this.EmailRecipientAddresses)
             {
                 // Build message, send it out, and move to the next one.
-                this.EmailLogger.WriteLog($"SENDING REPORT TO {RecipientAddress.Address}", LogType.TraceLog);
+            //    this.EmailLogger.WriteLog($"SENDING REPORT TO {RecipientAddress.Address}", LogType.TraceLog);
                 MailMessage OutputMessage = new MailMessage(
                     this.EmailSenderAddress.Address,    // Sender
                     RecipientAddress.Address,            // Recipient
@@ -348,31 +345,31 @@ namespace FulcrumInjector.FulcrumViewSupport
                 );
 
                 // File in the attachment objects now.
-                this.EmailLogger.WriteLog("ATTACHING FILES TO MESSAGE OBJECT NOW...", LogType.WarnLog);
+             //   this.EmailLogger.WriteLog("ATTACHING FILES TO MESSAGE OBJECT NOW...", LogType.WarnLog);
                 foreach (var FileInstance in this.MessageAttachmentFiles) 
                     OutputMessage.Attachments.Add(new Attachment(FileInstance.FullName));
-                this.EmailLogger.WriteLog("ATTACHMENT PROCESS PASSED WITHOUT ISSUES!", LogType.InfoLog);
-                this.EmailLogger.WriteLog($"MESSAGE OBJECT NOW CONTAINS A TOTAL OF {OutputMessage.Attachments.Count} ATTACHMENTS", LogType.TraceLog);
+             //   this.EmailLogger.WriteLog("ATTACHMENT PROCESS PASSED WITHOUT ISSUES!", LogType.InfoLog);
+             //   this.EmailLogger.WriteLog($"MESSAGE OBJECT NOW CONTAINS A TOTAL OF {OutputMessage.Attachments.Count} ATTACHMENTS", LogType.TraceLog);
 
                 try
                 {
                     // Ensure our SMTP server instance has been configured correctly.
                     if (!this._smtpSetupConfigured) {
-                        this.EmailLogger.WriteLog("WARNING SMTP SERVER WAS NOT CONFIGURED! TRYING TO START IT UP NOW...", LogType.WarnLog);
+                      //  this.EmailLogger.WriteLog("WARNING SMTP SERVER WAS NOT CONFIGURED! TRYING TO START IT UP NOW...", LogType.WarnLog);
                         if (!this.AuthenticateSmtpClient()) throw new InvalidOperationException("FAILED TO CONFIGURE SMTP SERVER! ARE YOU SURE YOU PASSED IN CONFIG VALUES?");
                     }
 
                     // Now fire it off using our SMTP Server instance.
-                    this.EmailLogger.WriteLog($"SENDING OUTPUT MESSAGE TO RECIPIENT {RecipientAddress.Address} NOW...", LogType.WarnLog);
+                 //   this.EmailLogger.WriteLog($"SENDING OUTPUT MESSAGE TO RECIPIENT {RecipientAddress.Address} NOW...", LogType.WarnLog);
                     this.SendingClient.Send(OutputMessage);
-                    this.EmailLogger.WriteLog($"SENDING ROUTINE PASSED FOR MESSAGE OUTPUT TO CLIENT {RecipientAddress.Address}!", LogType.InfoLog);
+                 //   this.EmailLogger.WriteLog($"SENDING ROUTINE PASSED FOR MESSAGE OUTPUT TO CLIENT {RecipientAddress.Address}!", LogType.InfoLog);
                 }
                 catch (Exception MailEx)
                 {
                     // Log failures, set the overall output value to false.
                     OverallStatus = false;
-                    this.EmailLogger.WriteLog($"FAILED TO INVOKE SENDING ROUTINE FOR MESSAGE TO BE SENT TO RECIPIENT {RecipientAddress.Address}!", LogType.ErrorLog);
-                    this.EmailLogger.WriteLog("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
+                 //   this.EmailLogger.WriteLog($"FAILED TO INVOKE SENDING ROUTINE FOR MESSAGE TO BE SENT TO RECIPIENT {RecipientAddress.Address}!", LogType.ErrorLog);
+                 //   this.EmailLogger.WriteLog("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
                 }
             }
 

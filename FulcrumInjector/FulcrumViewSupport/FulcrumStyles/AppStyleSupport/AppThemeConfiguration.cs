@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using ControlzEx.Theming;
+﻿using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
 {
@@ -18,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
     public class AppThemeConfiguration
     {
         // Logger Object
-        private static SubServiceLogger ThemeLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AppThemeLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger ThemeLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AppThemeLogger", LoggerActions.SubServiceLogger);
 
         // Themes that exist regardless of the current operations
         public AppTheme[] PresetThemes { get; private set; }
@@ -33,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
                 // Set new theme value here.
                 _currentAppTheme = value;
                 AppColorSetter.SetAppColorScheme(value);
-                ThemeLogger.WriteLog("SETTING NEW THEME VALUE BASED ON CURRENT SET VALUE NOW!", LogType.InfoLog);
+             //   ThemeLogger.WriteLog("SETTING NEW THEME VALUE BASED ON CURRENT SET VALUE NOW!", LogType.InfoLog);
 
                 // Add into the list of themes if needed
                 if (PresetThemes.All(ThemeObj => ThemeObj.ThemeName != value.ThemeName))
@@ -41,7 +38,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
 
                 // Write it out here
                 ValueSetters.SetValue("FulcrumInjectorAppThemes.AppliedAppTheme", value);
-                ThemeLogger.WriteLog("APPLIED NEW THEME OUTPUT FOR THIS APPLICATION OK!", LogType.InfoLog);
+              //  ThemeLogger.WriteLog("APPLIED NEW THEME OUTPUT FOR THIS APPLICATION OK!", LogType.InfoLog);
             }
         }
 
@@ -53,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
         public AppThemeConfiguration()
         {
             // Store theme values.
-            ThemeLogger.WriteLog("SETTING UP NEW THEME CONTENT SETS FOR APPLICATION NOW...", LogType.InfoLog);
+          //  ThemeLogger.WriteLog("SETTING UP NEW THEME CONTENT SETS FOR APPLICATION NOW...", LogType.InfoLog);
 
             // List of colors to setup as themes
             this.PresetThemes ??= Array.Empty<AppTheme>();
@@ -64,7 +61,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
             var PulledUserThemes = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumInjectorAppThemes.UserEnteredThemes");
             if (PulledUserThemes.Length != 0)
             {
-                ThemeLogger.WriteLog($"LOCATED A TOTAL OF {PulledUserThemes.Length} USER DEFINED THEMES. IMPORTING THEM NOW...", LogType.InfoLog);
+             //   ThemeLogger.WriteLog($"LOCATED A TOTAL OF {PulledUserThemes.Length} USER DEFINED THEMES. IMPORTING THEM NOW...", LogType.InfoLog);
                 foreach (var NewThemeObject in PulledUserThemes)
                 {
                     // Store new values and build themes
@@ -76,18 +73,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
                     if (NewThemeObject.ThemeName == null || ThemeBaseColor == null || ThemeSecondaryColor == null)
                     {
                         // Log failed to build theme and continue.
-                        ThemeLogger.WriteLog("FAILED TO BUILD NEW THEME! ONE OR MORE ENTRIES WAS FOUND TO BE NULL!", LogType.ErrorLog);
-                        ThemeLogger.WriteLog($"VALUES LOCATED:", LogType.ErrorLog);
-                        ThemeLogger.WriteLog($"Theme Name:      {NewThemeObject.ThemeName ?? "NULL"}", LogType.ErrorLog);
-                        ThemeLogger.WriteLog($"Base Color:      {ThemeBaseColor ?? "NULL"}", LogType.ErrorLog);
-                        ThemeLogger.WriteLog($"Secondary Color: {ThemeSecondaryColor ?? "NULL"}", LogType.ErrorLog);
+                    //    ThemeLogger.WriteLog("FAILED TO BUILD NEW THEME! ONE OR MORE ENTRIES WAS FOUND TO BE NULL!", LogType.ErrorLog);
+                     //   ThemeLogger.WriteLog($"VALUES LOCATED:", LogType.ErrorLog);
+                     //   ThemeLogger.WriteLog($"Theme Name:      {NewThemeObject.ThemeName ?? "NULL"}", LogType.ErrorLog);
+                     //   ThemeLogger.WriteLog($"Base Color:      {ThemeBaseColor ?? "NULL"}", LogType.ErrorLog);
+                    //    ThemeLogger.WriteLog($"Secondary Color: {ThemeSecondaryColor ?? "NULL"}", LogType.ErrorLog);
                         continue;
                     }
 
                     // Add theme object
                     ThemeType TypeOfTheme = NewThemeObject.IsDarkTheme == true ? ThemeType.DARK_COLORS : ThemeType.LIGHT_COLORS;
                     ThemeDefines.Add(new(ThemeName, ThemeBaseColor, ThemeSecondaryColor, TypeOfTheme));
-                    ThemeLogger.WriteLog($"BUILT NEW THEME NAMED {ThemeName} FOR APP {AppName} CORRECTLY!", LogType.InfoLog);
+                 //   ThemeLogger.WriteLog($"BUILT NEW THEME NAMED {ThemeName} FOR APP {AppName} CORRECTLY!", LogType.InfoLog);
                 }
             }
 
@@ -98,7 +95,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
                     // Build themes here and store a dark/light configuration for each one of them
                     var DarkTheme = GenerateNewTheme(ThemeObj.Item1, ThemeObj.Item2, ThemeObj.Item3, ThemeType.DARK_COLORS);
                     var LightTheme = GenerateNewTheme(ThemeObj.Item1, ThemeObj.Item2, ThemeObj.Item3, ThemeType.LIGHT_COLORS);
-                    ThemeLogger.WriteLog($"STORED NEW THEME TITLED {ThemeObj.Item1} TO THE THEME MANGER OK!");
+                 //   ThemeLogger.WriteLog($"STORED NEW THEME TITLED {ThemeObj.Item1} TO THE THEME MANGER OK!");
 
                     // Return our theme objects
                     return new[] { DarkTheme, LightTheme };
@@ -111,8 +108,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
 
             // Log done and ready.
             ValueSetters.SetValue("FulcrumInjectorAppThemes.GeneratedAppPresets", this.PresetThemes);
-            ThemeLogger.WriteLog("STORED PRESET VALUES ON THE MAIN INSTANCE THEME OBJECT OK!", LogType.InfoLog);
-            ThemeLogger.WriteLog("READY TO RUN CUSTOM THEME CONFIGURATIONS FROM HERE ON.", LogType.InfoLog);
+          //  ThemeLogger.WriteLog("STORED PRESET VALUES ON THE MAIN INSTANCE THEME OBJECT OK!", LogType.InfoLog);
+          //  ThemeLogger.WriteLog("READY TO RUN CUSTOM THEME CONFIGURATIONS FROM HERE ON.", LogType.InfoLog);
         }
 
 

@@ -1,29 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FulcrumInjector.FulcrumViewContent;
+using FulcrumInjector.FulcrumViewSupport;
+using MahApps.Metro.Controls;
+using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using FulcrumInjector.FulcrumViewContent;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
-using MahApps.Metro.Controls;
-using NLog;
-using NLog.Config;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using Path = System.IO.Path;
 
 namespace FulcrumInjector
@@ -46,8 +27,8 @@ namespace FulcrumInjector
             // Init main component and blur background of the main window.
             InitializeComponent();
             App.WindowBlurHelper = new WindowBlurSetup(this, ShowBlur: true);
-            InjectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE OK!", LogType.InfoLog);
-            InjectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
+        //    InjectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE OK!", LogType.InfoLog);
+         //   InjectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +43,7 @@ namespace FulcrumInjector
             // Configure DataContext and setup view controls
             this.DataContext = this;
             FulcrumConstants.ConfigureViewControls(this);
-            InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
+          //  InjectorMainLogger.WriteLog("STORED UI CONTROLS FOR FLYOUT HELPERS OK!", LogType.InfoLog);
 
             // Set title to DEBUG if the app is inside our debug directory
             if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
@@ -74,11 +55,11 @@ namespace FulcrumInjector
             if (this.Title.Contains("(")) this.Title += ")";
 #endif
             // Log information output
-            InjectorMainLogger.WriteLog("CONFIGURED NEW TITLE VALUE BASED ON OPERATIONAL CONDITIONS OK!", LogType.InfoLog);
-            InjectorMainLogger.WriteLog($"NEW TITLE VALUE CONFIGURED: {this.Title}", LogType.InfoLog);
+         //   InjectorMainLogger.WriteLog("CONFIGURED NEW TITLE VALUE BASED ON OPERATIONAL CONDITIONS OK!", LogType.InfoLog);
+         //   InjectorMainLogger.WriteLog($"NEW TITLE VALUE CONFIGURED: {this.Title}", LogType.InfoLog);
 
             // Log Version information output
-            InjectorMainLogger.WriteLog("INJECTOR VERSION INFORMATION BUILT OK!", LogType.InfoLog);
+         //   InjectorMainLogger.WriteLog("INJECTOR VERSION INFORMATION BUILT OK!", LogType.InfoLog);
         }
         /// <summary>
         /// Routine method for closing actions when the main window instance is closed out.
@@ -88,8 +69,8 @@ namespace FulcrumInjector
         private void InjectorMainWindow_OnClosed(object Sender, EventArgs E)
         {
             // Log information about closing out now.
-            InjectorMainLogger.WriteLog("PROCESSED MAIN WINDOW CLOSEOUT ROUTINE CALL! CALLING TERMINATE ROUTINE!", LogType.ErrorLog);
-            InjectorMainLogger.WriteLog("THIS EXIT COMMAND STARTED FROM WITHIN OUR MAIN WINDOW INSTANCE! THIS WAS LIKELY A CLOSE BUTTON CALL", LogType.InfoLog);
+         //   InjectorMainLogger.WriteLog("PROCESSED MAIN WINDOW CLOSEOUT ROUTINE CALL! CALLING TERMINATE ROUTINE!", LogType.ErrorLog);
+          //  InjectorMainLogger.WriteLog("THIS EXIT COMMAND STARTED FROM WITHIN OUR MAIN WINDOW INSTANCE! THIS WAS LIKELY A CLOSE BUTTON CALL", LogType.InfoLog);
 
             // Now call the routine in the constants file.
             FulcrumConstants.ProcessAppExit(null, null);

@@ -1,10 +1,7 @@
-﻿using System;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
@@ -14,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     public static class FulcrumSettingsShare
     {
         // Logger Object
-        private static SubServiceLogger SettingStoreLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsModelStoreLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger SettingStoreLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsModelStoreLogger", LoggerActions.SubServiceLogger);
 
         // ---------------------------------------------------------------------------------------------------------------------
 

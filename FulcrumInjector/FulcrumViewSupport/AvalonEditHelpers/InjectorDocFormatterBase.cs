@@ -1,13 +1,8 @@
-﻿using System;
-using System.Drawing;
+﻿using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Rendering;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using ICSharpCode.AvalonEdit.Document;
-using ICSharpCode.AvalonEdit.Rendering;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-
 // Color Brushes
 using MediaBrush = System.Windows.Media.Brush;
 using MediaBrushes = System.Windows.Media.Brushes;
@@ -21,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     {
         // Logger object and color brushes for formatting output.
         protected internal Tuple<MediaBrush, MediaBrush>[] _coloringBrushes;
-        protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"{this.GetType().Name}Logger", LoggerActions.SubServiceLogger); 
+      //  protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LoggerQueue.SpawnLogger($"{this.GetType().Name}Logger", LoggerActions.SubServiceLogger); 
 
         // --------------------------------------------------------------------------------------------------
 
@@ -114,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // The base definition will just print the output using our base command
-            this.FormatLogger.WriteLog("BASE FORMATTER TYPE HIT! THIS SHOULDN'T BE POSSIBLE!", LogType.TraceLog);
+          //  this.FormatLogger.WriteLog("BASE FORMATTER TYPE HIT! THIS SHOULDN'T BE POSSIBLE!", LogType.TraceLog);
             throw new InvalidOperationException("CAN NOT ACCESS THE OVERRIDE FOR WRITING OBJECTS ON THE BASE FORMAT HELPER COMMAND CLASS!");
         }
     }

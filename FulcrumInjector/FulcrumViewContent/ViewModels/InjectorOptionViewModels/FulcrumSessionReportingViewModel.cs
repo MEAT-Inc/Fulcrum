@@ -1,11 +1,8 @@
-﻿using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using SharpPipes;
 using System;
 using System.Linq;
-using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {
@@ -16,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     public class FulcrumSessionReportingViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SessionReportViewModelLogger", LoggerActions.SubServiceLogger);
+     //   private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SessionReportViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private Control Values
         private bool _canModifyMessage = true;

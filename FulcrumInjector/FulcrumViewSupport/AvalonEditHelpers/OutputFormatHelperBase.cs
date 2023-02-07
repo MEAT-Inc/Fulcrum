@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Rendering;
-using NLog.Targets;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Media;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
 {
@@ -23,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
     public abstract class OutputFormatHelperBase : TargetWithLayout
     {
         // Logger Object 
-        protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FormatOutputLogger", LoggerActions.SubServiceLogger);
+      //  protected internal SubServiceLogger FormatLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FormatOutputLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -42,11 +34,11 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         public Tuple<string, Tuple<string, string>[]>[] BuildColorFormatValues(FulcrumSettingsEntryModel[] SettingsInputValues)
         {
             // Load value from the config file.
-            FormatLogger?.WriteLog("[INJECTOR SYNTAX] ::: IMPORTING CONFIGURATION VALUES FROM SETTINGS STORE NOW...", LogType.WarnLog);
+          //  FormatLogger?.WriteLog("[INJECTOR SYNTAX] ::: IMPORTING CONFIGURATION VALUES FROM SETTINGS STORE NOW...", LogType.WarnLog);
             List<Tuple<string, Tuple<string, string>[]>> OutputValues = new List<Tuple<string, Tuple<string, string>[]>>();
 
             // Loop our settings values here and build entries.
-            FormatLogger?.WriteLog($"[INJECTOR SYNTAX] ::: COMBINED TOTAL OF {SettingsInputValues.Length} SETTING VALUES TO PARSE", LogType.TraceLog);
+          //  FormatLogger?.WriteLog($"[INJECTOR SYNTAX] ::: COMBINED TOTAL OF {SettingsInputValues.Length} SETTING VALUES TO PARSE", LogType.TraceLog);
             foreach (var SettingEntry in SettingsInputValues)
             {
                 // Get current setting value string.
@@ -59,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
 
                 // If Failed, log it and move on.
                 if (MatchSetBuilt.Count == 0) {
-                    FormatLogger?.WriteLog($"[INJECTOR SYNTAX] ::: FAILED TO PULL COLOR VALUES FOR STRING ENTRY {SettingColorValues}!", LogType.ErrorLog);
+                //    FormatLogger?.WriteLog($"[INJECTOR SYNTAX] ::: FAILED TO PULL COLOR VALUES FOR STRING ENTRY {SettingColorValues}!", LogType.ErrorLog);
                     continue;
                 }
 
@@ -84,7 +76,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
             }
 
             // Return built list of tuple output here.
-            FormatLogger?.WriteLog("[INJECTOR SYNTAX] ::: CONFIGURED NEW COLOR VALUE SETS OK! RETURNING BUILT OUTPUT CONTENTS NOW", LogType.InfoLog);
+         //   FormatLogger?.WriteLog("[INJECTOR SYNTAX] ::: CONFIGURED NEW COLOR VALUE SETS OK! RETURNING BUILT OUTPUT CONTENTS NOW", LogType.InfoLog);
             this.ColorConfigurationValues = OutputValues.ToArray();
             return OutputValues.ToArray();
         }
@@ -97,7 +89,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
         {
             // Make sure type is a doc formatter. If not return null. Then try to pull value.
             if (TypeOfFormatter.BaseType != typeof(InjectorDocFormatterBase)) {
-                this.FormatLogger.WriteLog("CAN NOT FORMAT OUTPUT FOR INJECTOR LOGS THAT ARE NOT OF DOC COLORIZING TYPE!");
+            //    this.FormatLogger.WriteLog("CAN NOT FORMAT OUTPUT FOR INJECTOR LOGS THAT ARE NOT OF DOC COLORIZING TYPE!");
                 return null;
             }
 
@@ -123,8 +115,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers
             });
             
             // Log the type pulled and values.
-            FormatLogger.WriteLog($"PULLED TYPE COLOR VALUE SET {MatchedType.Item1} OK!", LogType.InfoLog);
-            FormatLogger.WriteLog($"TOTAL OF {MatchedType.Item2.Length} COLOR SETS FOR THIS TYPE!", LogType.InfoLog);
+         //   FormatLogger.WriteLog($"PULLED TYPE COLOR VALUE SET {MatchedType.Item1} OK!", LogType.InfoLog);
+         //   FormatLogger.WriteLog($"TOTAL OF {MatchedType.Item2.Length} COLOR SETS FOR THIS TYPE!", LogType.InfoLog);
 
             // Return the values pulled in.
             return MatchedType.Item2;

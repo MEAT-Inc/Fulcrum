@@ -1,7 +1,4 @@
 ﻿using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using SharpPipes;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
@@ -12,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumPipeStatusViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewModelLogger", LoggerActions.SubServiceLogger);
+    //    private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private Control Values
         private string _readerPipeState;

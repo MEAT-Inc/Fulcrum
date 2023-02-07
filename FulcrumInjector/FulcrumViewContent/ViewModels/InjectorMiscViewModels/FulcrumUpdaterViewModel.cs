@@ -1,12 +1,9 @@
-﻿using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
-using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
 {
@@ -16,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
     public class FulcrumUpdaterViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("UpdaterViewModelLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("UpdaterViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _updateReady;                // Sets if there's an update ready or not.

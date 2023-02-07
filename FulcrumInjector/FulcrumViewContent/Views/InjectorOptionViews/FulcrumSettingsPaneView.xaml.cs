@@ -1,22 +1,13 @@
-﻿using System;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Routing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
-using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 {
@@ -43,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Build new ViewModel object
             this.ViewModel = FulcrumConstants.FulcrumSettingsPaneViewModel ?? new FulcrumSettingsPaneViewModel();
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+        //    ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -59,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 
             // Configure Settings instances here.
             Dispatcher.Invoke(() => { this.ViewModel.PopulateAppSettingJsonViewer(JsonSettingsViewEditor); });
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -72,7 +63,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         private void SettingValueChanged_OnTrigger(object Sender, RoutedEventArgs E)
         {
             // Log processing content value here.
-            this.ViewLogger.WriteLog("PROCESSING SETTING CONTENT VALUE CHANGED EVENT!", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog("PROCESSING SETTING CONTENT VALUE CHANGED EVENT!", LogType.InfoLog);
 
             // Get our type values and context here. Then modify the new value of our setting as needed.
             Control SendingControl = (Control)Sender;
@@ -80,18 +71,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (SendingControl is ComboBox SendingComboBox)
             {
                 // Log information, find the selected object value
-                this.ViewLogger.WriteLog("SETTING UP NEW ARRAY VALUES FOR COMBOBOX!", LogType.InfoLog);
+              //  this.ViewLogger.WriteLog("SETTING UP NEW ARRAY VALUES FOR COMBOBOX!", LogType.InfoLog);
                 string SelectedValue = SendingComboBox.SelectedItem.ToString();
 
                 // Get Array of values
                 List<string> SettingValueOptions = ((string[])SenderContext.SettingValue).ToList();
                 SettingValueOptions.Remove(SelectedValue); SettingValueOptions.Insert(0, SelectedValue);
-                this.ViewLogger.WriteLog("UPDATED SETTINGS VALUE OK FOR COMBOBOX ITEM!", LogType.InfoLog);
+              //  this.ViewLogger.WriteLog("UPDATED SETTINGS VALUE OK FOR COMBOBOX ITEM!", LogType.InfoLog);
             }
             
             // Apply our setting value here.
             if (SenderContext != null) this.ViewModel.SaveSettingValue(SenderContext); 
-            else this.ViewLogger.WriteLog("FAILED TO BUILD CONTEXT FOR OUR SETTING OBJECT!", LogType.ErrorLog);
+          //  else this.ViewLogger.WriteLog("FAILED TO BUILD CONTEXT FOR OUR SETTING OBJECT!", LogType.ErrorLog);
         }
         /// <summary>
         /// Force saves all settings values from our view model onto the settings share for this application
@@ -102,14 +93,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Log information, save all settings objects to our JSON file now.
             Button SendButton = (Button)Sender;
-            this.ViewLogger.WriteLog("SAVING SETTINGS VALUES MANUALLY NOW...", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog("SAVING SETTINGS VALUES MANUALLY NOW...", LogType.InfoLog);
 
             // Store new values from our ViewModel onto the share and into JSON 
             Task.Run(() =>
             {
                 FulcrumSettingsShare.SettingsEntrySets = FulcrumSettingsShare.GenerateSettingsModels();
                 ValueSetters.SetValue("FulcrumUserSettings", FulcrumSettingsShare.SettingsEntrySets);
-                this.ViewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
+            //    this.ViewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
 
                 // Change Color and Set to Saved! on the content here.
                 string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;
@@ -120,7 +111,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                     Thread.Sleep(3000);
                     Dispatcher.Invoke(() => SendButton.Content = OriginalContent);
                     Dispatcher.Invoke(() => SendButton.Background = OriginalBackground);
-                    this.ViewLogger.WriteLog("RESET CONTENT AND COLOR OF SENDING SAVE BUTTON OK!", LogType.TraceLog);
+                //    this.ViewLogger.WriteLog("RESET CONTENT AND COLOR OF SENDING SAVE BUTTON OK!", LogType.TraceLog);
                 });
             });
         }
@@ -137,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (this.JsonViewerFlyout.IsOpen) { this.CloseJsonViewerFlyoutButton_OnClick(sender, e); return; }
 
             // Toggle view visibility
-            ViewLogger.WriteLog("OPENING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
+         //   ViewLogger.WriteLog("OPENING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
             this.ViewModel.PopulateAppSettingJsonViewer(JsonSettingsViewEditor);
             this.JsonViewerFlyout.IsOpen = true;
         }
@@ -149,7 +140,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         private void ReloadJsonContentFlyoutButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Repopulate the values here.
-            ViewLogger.WriteLog("REFRESHING JSON CONTENTS NOW...", LogType.TraceLog);
+        //    ViewLogger.WriteLog("REFRESHING JSON CONTENTS NOW...", LogType.TraceLog);
             this.ViewModel.PopulateAppSettingJsonViewer(this.JsonSettingsViewEditor);
         }
         /// <summary>
@@ -160,7 +151,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         private void SaveJsonContentFlyoutButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Repopulate the values here.
-            ViewLogger.WriteLog("SAVING NEW JSON CONTENTS NOW...", LogType.TraceLog);
+          //  ViewLogger.WriteLog("SAVING NEW JSON CONTENTS NOW...", LogType.TraceLog);
             this.ViewModel.SaveAppSettingJsonAsConfig(this.JsonSettingsViewEditor);
         }
         /// <summary>
@@ -174,7 +165,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (!this.JsonViewerFlyout.IsOpen) { this.OpenJsonViewerFlyoutButton_OnClick(sender, e); return; }
 
             // Toggle view visibility
-            ViewLogger.WriteLog("CLOSING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
+          //  ViewLogger.WriteLog("CLOSING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
             this.JsonViewerFlyout.IsOpen = false;
         }
     }

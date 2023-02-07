@@ -1,11 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
+using System;
 using System.Windows.Forms;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
-using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
@@ -29,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
     public class FulcrumSettingsEntryModel
     {
         // Logger object.
-        private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsEntryModelLogger", LoggerActions.SubServiceLogger);
+     //   private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsEntryModelLogger", LoggerActions.SubServiceLogger);
 
         // Basic Setting configurations
         public string SettingName { get; set; }

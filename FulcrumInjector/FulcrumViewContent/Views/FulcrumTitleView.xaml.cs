@@ -1,12 +1,7 @@
-﻿using System.Linq;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels;
+using MahApps.Metro.Controls;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using MahApps.Metro.Controls;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -16,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     public partial class FulcrumTitleView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewLogger", LoggerActions.SubServiceLogger);
+     //   private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumTitleViewModel ViewModel { get; set; }
@@ -31,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Initialize new UI Component
             InitializeComponent();
             this.ViewModel = new FulcrumTitleViewModel();
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -46,7 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             DataContext = ViewModel;
 
             // Log booted title view
-            this.ViewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -69,13 +64,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             this.AppUpdatesFlyout = AppUpdatesFlyout;
             CloseAboutButton.Click += AboutThisApplicationButton_OnClick;
             CloseAppUpdatesButton.Click += ToggleApplicationUpdateReadyView_OnClick;
-            ViewLogger.WriteLog("STORED NEW APP INFORMATION FLYOUT VALUE OK!", LogType.InfoLog);
-            ViewLogger.WriteLog("STORED NEW APP UPDATES FLYOUT VALUE OK!", LogType.InfoLog);
-            ViewLogger.WriteLog("STORED NEW APP INFORMATION CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
-            ViewLogger.WriteLog("STORED NEW APP UPDATES CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
+         //   ViewLogger.WriteLog("STORED NEW APP INFORMATION FLYOUT VALUE OK!", LogType.InfoLog);
+         //   ViewLogger.WriteLog("STORED NEW APP UPDATES FLYOUT VALUE OK!", LogType.InfoLog);
+          //  ViewLogger.WriteLog("STORED NEW APP INFORMATION CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
+          //  ViewLogger.WriteLog("STORED NEW APP UPDATES CLOSING BUTTON COMMAND VALUE OK!", LogType.InfoLog);
 
             // Log and return 
-            ViewLogger.WriteLog("INFORMATION/UPDATES FLYOUT AND CONTROL BUTTONS HAVE BEEN SETUP AND BOUND OK!");
+          //  ViewLogger.WriteLog("INFORMATION/UPDATES FLYOUT AND CONTROL BUTTONS HAVE BEEN SETUP AND BOUND OK!");
             return true;
         }
 
@@ -89,13 +84,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         private void AboutThisApplicationButton_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
-            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR ABOUT THIS APPLICATION ICON CORRECTLY!", LogType.WarnLog);
-            if (this.InformationFlyout == null) { ViewLogger.WriteLog("ERROR! INFORMATION FLYOUT IS NULL!", LogType.ErrorLog); }
+          //  ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR ABOUT THIS APPLICATION ICON CORRECTLY!", LogType.WarnLog);
+         //   if (this.InformationFlyout == null) { ViewLogger.WriteLog("ERROR! INFORMATION FLYOUT IS NULL!", LogType.ErrorLog); }
             else
             {
                 // Toggle the information pane
                 this.InformationFlyout.IsOpen = !this.InformationFlyout.IsOpen;
-                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR ABOUT THIS APP FLYOUT OK!", LogType.InfoLog);
+             //   ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR ABOUT THIS APP FLYOUT OK!", LogType.InfoLog);
             }
         }
         /// <summary>
@@ -106,13 +101,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         private void ToggleApplicationUpdateReadyView_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
-            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
-            if (this.AppUpdatesFlyout == null) { ViewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
+          //  ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
+          //  if (this.AppUpdatesFlyout == null) { ViewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
             else
             {
                 // Toggle the information pane
                 this.AppUpdatesFlyout.IsOpen = !this.AppUpdatesFlyout.IsOpen;
-                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
+             //   ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
             }
         }
     }

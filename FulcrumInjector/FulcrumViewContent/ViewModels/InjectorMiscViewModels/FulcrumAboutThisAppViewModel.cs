@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-
-namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
+﻿namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
 {
     /// <summary>
     /// View model content for the About view on the injector application
@@ -15,7 +6,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
     public class FulcrumAboutThisAppViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewModelLogger", LoggerActions.SubServiceLogger);
+     //   private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewModelLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

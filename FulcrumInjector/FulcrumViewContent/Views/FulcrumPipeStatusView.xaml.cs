@@ -1,10 +1,6 @@
-﻿using System.Linq;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -14,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     public partial class FulcrumPipeStatusView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewLogger", LoggerActions.SubServiceLogger);
+     //   private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumPipeStatusViewModel ViewModel { get; set; }
@@ -39,7 +35,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             });
 
             // Log built new content OK
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -57,7 +53,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             Dispatcher.InvokeAsync(() =>
             {
                 this.ViewModel.SetupPipeStateWatchdogs();
-                this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
             });
         }
 

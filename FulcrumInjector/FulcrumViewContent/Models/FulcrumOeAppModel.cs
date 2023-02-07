@@ -1,10 +1,5 @@
-﻿using System.IO;
-using System.Linq;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
-using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
+using System.IO;
 
 namespace FulcrumInjector.FulcrumViewContent.Models
 {

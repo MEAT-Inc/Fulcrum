@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Rendering;
-using NLog;
-using NLog.Config;
-using NLog.Layouts;
-using NLog.Targets;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using System.Linq;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
 {
@@ -35,21 +23,21 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         {
             // Store UserControl and Exit box
             this.OutputEditor = EditorObject;
-            FormatLogger.WriteLog("STORED NEW CONTENT VALUES FOR USER CONTROL AND EDITOR INPUT OK!", LogType.InfoLog);
+         //   FormatLogger.WriteLog("STORED NEW CONTENT VALUES FOR USER CONTROL AND EDITOR INPUT OK!", LogType.InfoLog);
 
             // Setup our Layout
             this.Layout = new SimpleLayout(
                 "[${date:format=hh\\:mm\\:ss}][${level:uppercase=true}][${mdc:custom-name}][${mdc:item=calling-class-short}] ::: ${message}"
             );
-            FormatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
+          //  FormatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
 
             // Startup highlighting for this output.
             base.BuildColorFormatValues(FulcrumSettingsShare.InjectorDebugSyntaxSettings.SettingsEntries);
-            FormatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
+         //   FormatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
 
             // Start output formatting here.
             this.StartColorHighlighting();
-            FormatLogger.WriteLog("FORMAT OUTPUT HAS BEEN BUILT AND KICKED OFF OK!", LogType.InfoLog);
+         //   FormatLogger.WriteLog("FORMAT OUTPUT HAS BEEN BUILT AND KICKED OFF OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
             this.StopColorHighlighting();
 
             // Invoke this on a background thread to avoid access issues.
-            FormatLogger.WriteLog("STARTING NEW FORMAT HELPERS NOW...", LogType.WarnLog);
+         //   FormatLogger.WriteLog("STARTING NEW FORMAT HELPERS NOW...", LogType.WarnLog);
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
                 // Now build all our new color format helpers.
@@ -79,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         public override void StopColorHighlighting()
         {
             // Log information, find transformers to remove, and remove them
-            FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
+         //   FormatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
                 // Get the transformers to pull away from this editor

@@ -1,12 +1,8 @@
-﻿using System;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels;
+using System;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
 {
@@ -16,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
     public class HamburgerNavService
     {
         // Logger for navigation service instance
-        private SubServiceLogger NavLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("HamburgerNavServiceLogger", LoggerActions.SubServiceLogger);
+      //  private SubServiceLogger NavLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("HamburgerNavServiceLogger", LoggerActions.SubServiceLogger);
 
         // Navigation events and event handler
         public event NavigatedEventHandler Navigated;
@@ -50,7 +46,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
         /// <summary>
         /// Build new navigation service instance object
         /// </summary>
-        public HamburgerNavService() { this.NavLogger.WriteLog("[NAVIGATION_CTOR] ::: BUILT NEW INSTANCE OF A NAVIGATION SERVICE OK!", LogType.InfoLog); }
+      //  public HamburgerNavService() { this.NavLogger.WriteLog("[NAVIGATION_CTOR] ::: BUILT NEW INSTANCE OF A NAVIGATION SERVICE OK!", LogType.InfoLog); }
 
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
         {
             // If not type of view model control base, then dump out.
             if (UserControlType.BaseType != typeof(UserControl)) {
-                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: CAN NOT USE A NON USERCONTROL BASE TYPE FOR SINGLETON LOOKUPS!", LogType.ErrorLog);
+             //   this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: CAN NOT USE A NON USERCONTROL BASE TYPE FOR SINGLETON LOOKUPS!", LogType.ErrorLog);
                 return false;
             }
 
@@ -73,19 +69,19 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
 
             // Check if our user control object output is defined or not.
             if (NavigationOutputContent == null) {
-                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: FAILED TO LOCATE CONTENT FOR TYPE OBJECT: {UserControlType.Name}!", LogType.WarnLog);
-                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILDING NEW VIEW CONTENT AND STORING NEW VALUES ON INJECTOR CONSTANTS FOR IT NOW...", LogType.WarnLog);
+              //  this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: FAILED TO LOCATE CONTENT FOR TYPE OBJECT: {UserControlType.Name}!", LogType.WarnLog);
+              //  this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILDING NEW VIEW CONTENT AND STORING NEW VALUES ON INJECTOR CONSTANTS FOR IT NOW...", LogType.WarnLog);
 
                 // Build instance of the type passed in and have it store into the injector constants
                 var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(UserControlType, ViewModelType);
-                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILT NEW OUTPUT CONTENT FOR THE CONTROL TYPE {UserControlType.Name} OK!", LogType.InfoLog);
-                this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: NAVIGATING TO NEW TYPE: {UserControlType.Name}", LogType.TraceLog);
+              //  this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILT NEW OUTPUT CONTENT FOR THE CONTROL TYPE {UserControlType.Name} OK!", LogType.InfoLog);
+              //  this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: NAVIGATING TO NEW TYPE: {UserControlType.Name}", LogType.TraceLog);
                 return this.NavigationFrame.NavigationService?.Content?.GetType() != UserControlType &&
                        this.NavigationFrame.Navigate(BuiltSingleton.SingletonUserControl);
             }
 
             // Return true if navigation passed correctly
-            this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: NAVIGATING TO NEW TYPE: {UserControlType.Name}", LogType.TraceLog);
+          //  this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: NAVIGATING TO NEW TYPE: {UserControlType.Name}", LogType.TraceLog);
             return this.NavigationFrame.NavigationService?.Content?.GetType() != UserControlType &&
                    this.NavigationFrame.Navigate(NavigationOutputContent);
         }
@@ -99,14 +95,14 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
         {
             // Check for frame state value
             if (this._navigationFrame == null) {
-                this.NavLogger.WriteLog($"[NAVIGATE_REGISTER] ::: FAILED TO REGISTER NEW FRAME SINCE IT WAS NULL!", LogType.TraceLog);
+            //    this.NavLogger.WriteLog($"[NAVIGATE_REGISTER] ::: FAILED TO REGISTER NEW FRAME SINCE IT WAS NULL!", LogType.TraceLog);
                 return;
             }
 
             // Add new event handlers
             this._navigationFrame.Navigated += this.NavigationFrameNavigated;
             this._navigationFrame.NavigationFailed += this.NavigationFrameNavigationFailed;
-            this.NavLogger.WriteLog($"[NAVIGATE_REGISTER] ::: REGISTERED NEW FRAME INSTANCE OBJECT", LogType.TraceLog);
+          //  this.NavLogger.WriteLog($"[NAVIGATE_REGISTER] ::: REGISTERED NEW FRAME INSTANCE OBJECT", LogType.TraceLog);
         }
         /// <summary>
         /// Removes a frame instance from our frame object store
@@ -115,14 +111,14 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
         {
             // Check for frame state value
             if (this._navigationFrame == null) {
-                this.NavLogger.WriteLog($"[NAVIGATE_UNREGISTER] ::: FAILED TO UNREGISTER NEW FRAME SINCE IT WAS NULL!", LogType.TraceLog);
+            //    this.NavLogger.WriteLog($"[NAVIGATE_UNREGISTER] ::: FAILED TO UNREGISTER NEW FRAME SINCE IT WAS NULL!", LogType.TraceLog);
                 return;
             }
 
             // Remove event handlers
             this._navigationFrame.Navigated -= this.NavigationFrameNavigated;
             this._navigationFrame.NavigationFailed -= this.NavigationFrameNavigationFailed;
-            this.NavLogger.WriteLog($"[NAVIGATE_UNREGISTER] ::: UNREGISTERED NEW FRAME INSTANCE OBJECT", LogType.TraceLog);
+          //  this.NavLogger.WriteLog($"[NAVIGATE_UNREGISTER] ::: UNREGISTERED NEW FRAME INSTANCE OBJECT", LogType.TraceLog);
         }
 
 

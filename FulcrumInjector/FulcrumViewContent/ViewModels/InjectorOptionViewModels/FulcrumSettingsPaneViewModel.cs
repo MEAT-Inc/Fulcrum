@@ -1,16 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using ICSharpCode.AvalonEdit;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {
@@ -20,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     public class FulcrumSettingsPaneViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsViewModelLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Settings entries to bind onto
         private ObservableCollection<SettingsEntryCollectionModel> _settingsEntrySets;

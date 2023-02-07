@@ -1,17 +1,14 @@
 ﻿using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using SharpExpressions;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
@@ -35,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewModelLogger", LoggerActions.SubServiceLogger);
+    //    private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private generator objects 
         private PassThruSimulationGenerator _simulationGenerator;

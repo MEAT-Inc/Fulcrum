@@ -1,11 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {
@@ -15,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumTitleViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewModelLogger", LoggerActions.SubServiceLogger);
+     //   private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private string _titleTextString;          // Private value for title view title text

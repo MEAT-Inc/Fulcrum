@@ -1,11 +1,6 @@
-﻿using System.Linq;
+﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
 {
@@ -15,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
     public class UserSettingsDataTemplateSelector : DataTemplateSelector
     {
         // Logger object.
-        private static SubServiceLogger TemplateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsDataTemplateLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger TemplateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsDataTemplateLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -41,14 +36,14 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
 
                     // If failed
                     case ControlTypes.NOT_DEFINED:
-                        TemplateLogger.WriteLog($"FAILED TO FIND NEW CONTROL TYPE FOR VALUE {SettingModelObject.TypeOfControl}!", LogType.ErrorLog);
+                     //   TemplateLogger.WriteLog($"FAILED TO FIND NEW CONTROL TYPE FOR VALUE {SettingModelObject.TypeOfControl}!", LogType.ErrorLog);
                         return null;
                 }
             }
 
             // Failed to find control template output
-            TemplateLogger.WriteLog("ERROR! INVALID CONTROL TYPE WAS PROCESSED! NOT RETURNING A DATATEMPLATE FOR IT", LogType.ErrorLog);
-            TemplateLogger.WriteLog($"CONTROL PASSED CONTENT: {JsonConvert.SerializeObject(InputItem, Formatting.None)}", LogType.TraceLog);
+         //   TemplateLogger.WriteLog("ERROR! INVALID CONTROL TYPE WAS PROCESSED! NOT RETURNING A DATATEMPLATE FOR IT", LogType.ErrorLog);
+          //  TemplateLogger.WriteLog($"CONTROL PASSED CONTENT: {JsonConvert.SerializeObject(InputItem, Formatting.None)}", LogType.TraceLog);
             return null;
         }
     }

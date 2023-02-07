@@ -1,22 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
 {
@@ -26,7 +10,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
     public partial class FulcrumAboutThisAppView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewLogger", LoggerActions.SubServiceLogger);
+      /// <summary>
+      // private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewLogger", LoggerActions.SubServiceLogger);
+      /// </summary>
 
         // ViewModel object to bind onto
         public FulcrumAboutThisAppViewModel ViewModel { get; set; }
@@ -40,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         {
             InitializeComponent();
             this.ViewModel = new FulcrumAboutThisAppViewModel();
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+        //    this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -55,7 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             DataContext = ViewModel;
 
             // Log booted title view
-            this.ViewLogger.WriteLog("SETUP ABOUT THIS APP VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("SETUP ABOUT THIS APP VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

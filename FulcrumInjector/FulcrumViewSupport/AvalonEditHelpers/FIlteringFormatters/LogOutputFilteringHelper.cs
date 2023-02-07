@@ -1,9 +1,6 @@
-﻿using System;
+﻿using ICSharpCode.AvalonEdit;
+using System;
 using System.Linq;
-using ICSharpCode.AvalonEdit;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
 {
@@ -28,7 +25,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatte
             // Store class values and log information
             this.SessionEditor = EditorInput;
             this.SessionGuid = Guid.NewGuid();
-            FilterLogger.WriteLog($"BUILT NEW AVALON EDIT HELPER WITH SESSION ID {SessionGuid} OK!", LogType.InfoLog);
+         //   FilterLogger.WriteLog($"BUILT NEW AVALON EDIT HELPER WITH SESSION ID {SessionGuid} OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -68,8 +65,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatte
             catch (Exception Ex)
             {
                 // Log this failure and return outupt.
-                FilterLogger.WriteLog("ERROR! FAILED TO STORE NEW COLORING METHODS ONTO OUR DOCUMENT VIEW!", LogType.ErrorLog);
-                FilterLogger.WriteLog("EXCEPTION THROWN DURING COLORING LINE ROUTINE!", Ex);
+              //  FilterLogger.WriteLog("ERROR! FAILED TO STORE NEW COLORING METHODS ONTO OUR DOCUMENT VIEW!", LogType.ErrorLog);
+             //   FilterLogger.WriteLog("EXCEPTION THROWN DURING COLORING LINE ROUTINE!", Ex);
 
                 // Set output to failed
                 return null;
@@ -116,8 +113,8 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatte
             catch (Exception Ex)
             {
                 // Log this failure and return outupt.
-                FilterLogger.WriteLog("ERROR! FAILED TO STORE NEW FILTERING METHODS ONTO OUR DOCUMENT VIEW!", LogType.ErrorLog);
-                FilterLogger.WriteLog("EXCEPTION THROWN DURING FILTERING ROUTINE!", Ex);
+             //   FilterLogger.WriteLog("ERROR! FAILED TO STORE NEW FILTERING METHODS ONTO OUR DOCUMENT VIEW!", LogType.ErrorLog);
+             //   FilterLogger.WriteLog("EXCEPTION THROWN DURING FILTERING ROUTINE!", Ex);
                 return null;
             }
         }

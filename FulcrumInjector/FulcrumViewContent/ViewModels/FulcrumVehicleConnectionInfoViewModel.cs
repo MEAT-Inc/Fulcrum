@@ -1,8 +1,5 @@
 ﻿using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
 using SharpAutoId.SharpAutoIdHelpers;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using SharpWrapper;
 using SharpWrapper.PassThruTypes;
 using System;
@@ -17,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumVehicleConnectionInfoViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("VehicleConnectionViewModelLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("VehicleConnectionViewModelLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 

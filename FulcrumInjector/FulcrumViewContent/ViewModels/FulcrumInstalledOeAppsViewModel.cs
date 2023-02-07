@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumInstalledOeAppsViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InstalledOeAppsViewModelLogger", LoggerActions.SubServiceLogger);
+     //   private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InstalledOeAppsViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private Control Values
         private bool _canBootApp;

@@ -1,10 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using System.Collections.Generic;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
 {
@@ -14,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     public class FulcrumDebugLoggingViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("DebugLoggingViewModelLogger", LoggerActions.SubServiceLogger);
+    //    private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("DebugLoggingViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _usingRegex;

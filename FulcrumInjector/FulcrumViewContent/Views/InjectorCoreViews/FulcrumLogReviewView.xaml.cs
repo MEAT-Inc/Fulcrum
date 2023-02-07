@@ -1,9 +1,8 @@
 ﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using SharpSupport;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,8 +10,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
-using SharpSupport;
 using Button = System.Windows.Controls.Button;
 using ComboBox = System.Windows.Controls.ComboBox;
 using TextBox = System.Windows.Controls.TextBox;
@@ -26,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumLogReviewView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewLogger", LoggerActions.SubServiceLogger);
+      //  private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumLogReviewViewModel ViewModel { get; set; }
@@ -41,7 +38,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Initialize new UI Component
             InitializeComponent();
             this.ViewModel = FulcrumConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel();
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+          //  ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -58,7 +55,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup coloring helper.
             this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.ReplayLogInputContent);
             this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.ReplayLogInputContent);
-            this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
+         //   this.ViewLogger.WriteLog("SETUP A NEW LOG FILE READING OBJECT TO PROCESS INPUT LOG FILES FOR REVIEW OK!", LogType.WarnLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +73,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             var DefaultColor = SenderButton.Background;
 
             // Log information about opening appending box and begin selection
-            this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
             using OpenFileDialog SelectAttachmentDialog = new OpenFileDialog()
             {
                 Multiselect = true,
@@ -91,10 +88,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             };
 
             // Now open the dialog and allow the user to pick some new files.
-            this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
+          //  this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
             if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 // Log failed, set no file, reset sending button and return.
-                this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
+              //  this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
             }
 
@@ -113,8 +110,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
                 // Store new file object value. Validate it on the ViewModel object first.
                 bool LoadResult = this.ViewModel.LoadLogContents(FileToLoad);
-                if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
-                else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
+             //   if (LoadResult) this.ViewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
+              //  else this.ViewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
                 // Enable grid, remove click command.
                 Task.Run(() =>
@@ -160,7 +157,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         SenderButton.Click += LoadInjectorLogFile_OnClick;
 
                         // Log information
-                        this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                      //  this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                     });
                 });
             });
@@ -174,19 +171,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Setup default values and parse out content values
             var Defaults = this.ProcessingActionStarted(SendingButton);
-            this.ViewLogger.WriteLog("STARTING PROCESSING FOR PARSE CONTENT VALUES NOW...");
+          //  this.ViewLogger.WriteLog("STARTING PROCESSING FOR PARSE CONTENT VALUES NOW...");
 
             // Run this as a task to keep our UI Alive
-            this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
             Task.Run(() =>
             {
                 // Store result from processing
                 bool ParseResult = this.ViewModel.BuildLogExpressions();
-                this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+              //  this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
                 Dispatcher.Invoke(() => this.ProcessingActionFinished(ParseResult, SendingButton, Defaults));
-                this.ViewLogger.WriteLog("INPUT CONTENT PARSING IS NOW COMPLETE!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog("INPUT CONTENT PARSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }
         /// <summary>
@@ -198,10 +195,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Start by pulling in the expression values from our view model object and then pass them into our parser
             var Defaults = this.ProcessingActionStarted(SendingButton);
-            this.ViewLogger.WriteLog("BUILDING SIMULATION FILE NOW...");
+        //    this.ViewLogger.WriteLog("BUILDING SIMULATION FILE NOW...");
 
             // TODO: RUN THE CURRENT CONTENTS INTO THE SIMULATION HELPER PROCESSES AND BUILD OUTPUT!
-            this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
+        //    this.ViewLogger.WriteLog("PROCESSING CONTENTS IN THE BACKGROUND NOW.", LogType.InfoLog);
             Task.Run(() =>
             {
                 // Store result from processing if it's not yet done on the view model
@@ -213,11 +210,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
                 // Now build our simulation object here
                 bool SimResult = this.ViewModel.BuildLogSimulation(); 
-                this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
                 Dispatcher.Invoke(() => this.ProcessingActionFinished(SimResult, SendingButton, Defaults));
-                this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }
 
@@ -229,7 +226,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private object[] ProcessingActionStarted(object SendingButton)
         {
             // Start by turning off the grid for all sending buttons.
-            this.ViewLogger.WriteLog("PROCESSED CLICK FOR PROCESSING COMMAND! DISABLING BUTTONS AND PREPARING TO PROCESS FILE NOW", LogType.WarnLog);
+         //   this.ViewLogger.WriteLog("PROCESSED CLICK FOR PROCESSING COMMAND! DISABLING BUTTONS AND PREPARING TO PROCESS FILE NOW", LogType.WarnLog);
 
             // Pull the button object
             Button SenderButton = (Button)SendingButton;
@@ -290,7 +287,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                     });
 
                     // Log information about being done
-                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                  //  this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                 });
             });
         }
@@ -342,7 +339,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting: ON" : "Syntax Highlighting: OFF";
 
             // Log toggle result.
-            this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
+        //    this.ViewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
         }
         /// <summary>
         /// Changes the processing output actions of the comobox so it can show new values in the viewer
@@ -354,7 +351,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Start by finding what value is selected in our combobox.
             ComboBox CastBox = (ComboBox)Sender;
             int SelectedBoxIndex = CastBox.SelectedIndex;
-            this.ViewLogger?.WriteLog("TOGGLING VIEW CONTENTS FOR PROCESSING OUTPUT VIEWER NOW...", LogType.InfoLog);
+          //  this.ViewLogger?.WriteLog("TOGGLING VIEW CONTENTS FOR PROCESSING OUTPUT VIEWER NOW...", LogType.InfoLog);
 
             // Now apply the new content based on what's in the box.
             FulcrumLogReviewViewModel.ViewerStateType DesiredState = FulcrumLogReviewViewModel.ViewerStateType.NoContent;
@@ -364,7 +361,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Now toggle the state value
             string DefaultValue = FilteringLogFileTextBox.Text;
-            if (this.ViewModel.ToggleViewerContents(DesiredState)) this.ViewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
+          //  if (this.ViewModel.ToggleViewerContents(DesiredState)) this.ViewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
             else
             {
                 // Set to failed 

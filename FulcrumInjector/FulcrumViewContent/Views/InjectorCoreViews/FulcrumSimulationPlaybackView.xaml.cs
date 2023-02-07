@@ -1,7 +1,5 @@
 ﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Button = System.Windows.Controls.Button;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -21,7 +18,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumSimulationPlaybackView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewLogger", LoggerActions.SubServiceLogger);
+     //   private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
@@ -36,7 +33,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Initialize new UI Component
             InitializeComponent();
             this.ViewModel = FulcrumConstants.FulcrumSimulationPlaybackViewModel ?? new FulcrumSimulationPlaybackViewModel();
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+         //   ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -53,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Check for hardware selection from the monitoring view
             var HardwareConfigView = FulcrumConstants.FulcrumInstalledHardwareViewModel;
             this.ViewModel.IsHardwareSetup = !(HardwareConfigView.SelectedDLL == null || string.IsNullOrEmpty(HardwareConfigView.SelectedDevice));
-            this.ViewLogger.WriteLog($"CURRENT HARDWARE STATE FOR SIMULATIONS: {this.ViewModel.IsHardwareSetup}");
+         //   this.ViewLogger.WriteLog($"CURRENT HARDWARE STATE FOR SIMULATIONS: {this.ViewModel.IsHardwareSetup}");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,7 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             var DefaultColor = SenderButton.Background;
 
             // Log information about opening appending box and begin selection
-            this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
             using OpenFileDialog SelectAttachmentDialog = new OpenFileDialog()
             {
                 Multiselect = false,
@@ -86,10 +83,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             };
 
             // Now open the dialog and allow the user to pick some new files.
-            this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
+         //   this.ViewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
             if (SelectAttachmentDialog.ShowDialog() != DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 // Log failed, set no file, reset sending button and return.
-                this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
+             //   this.ViewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
             }
 
@@ -106,8 +103,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
                 // Store new file object value. Validate it on the ViewModel object first.
                 bool LoadResult = this.ViewModel.LoadSimulation(FileToLoad);
-                if (LoadResult) this.ViewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
-                else this.ViewLogger.WriteLog("FAILED TO LOAD NEW SIMULATION FILE! THIS IS FATAL", LogType.ErrorLog);
+              //  if (LoadResult) this.ViewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
+             //   else this.ViewLogger.WriteLog("FAILED TO LOAD NEW SIMULATION FILE! THIS IS FATAL", LogType.ErrorLog);
 
                 // Enable grid, remove click command.
                 Task.Run(() =>
@@ -131,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                         SenderButton.Click += this.LoadSimulationButton_OnClick;
 
                         // Log information
-                        this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                     //   this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                     });
                 });
             });
@@ -145,14 +142,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         {
             // Toggle the view for our simulation editor flyout
             this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
-            this.ViewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
-            this.ViewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
+           // this.ViewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
+           // this.ViewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
 
             // Toggle the content of the sending button
             Button SendButton = (Button)Sender;
             SendButton.Content = this.SimulationEditorFlyout.IsOpen ?
                 "Close Editor" : "Setup Simulation";
-            this.ViewLogger.WriteLog("TOGGLED EDITOR TOGGLE SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
+           // this.ViewLogger.WriteLog("TOGGLED EDITOR TOGGLE SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
         }
 
 
@@ -164,7 +161,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void StartSimulationButton_OnClick(object Sender, RoutedEventArgs E)
         {
             // Start by checking if we have hardware selected for simulations on the hardware view page.
-            this.ViewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
             
             // Now using the given hardware, run our start simulation 
@@ -181,7 +178,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 });
 
                 // Exit out of this method here
-                this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog("STARTED NEW SIMULATION INSTANCE OK!", LogType.InfoLog);
                 return;
             }
 
@@ -193,7 +190,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 CurrentHwInfo.StartVehicleMonitoring();
 
                 // Log done and exit out of this routine
-                this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
+              //  this.ViewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
             });
         }
     }

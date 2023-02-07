@@ -1,9 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 {
@@ -27,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 
             // Build content and log information.
             string NewContent = JsonConvert.SerializeObject(ValueObject, Formatting.Indented);
-            JsonConfigFiles.ConfigLogger?.WriteLog($"STORING NEW VALUE INTO JSON CONFIG KEY {PropertyKey} NOW...");
+          //  JsonConfigFiles.ConfigLogger?.WriteLog($"STORING NEW VALUE INTO JSON CONFIG KEY {PropertyKey} NOW...");
 
             // Select the config item first\
             string TypeOfConfig;
@@ -41,8 +38,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
             catch (Exception SetEx)
             {
                 // Log failure and return false.
-                JsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO GET CURRENT CONFIG OBJECT TYPE FOR OUR JSON CONFIG!", LogType.ErrorLog);
-                JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL CONFIG ROUTINE: ", SetEx);
+              //  JsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO GET CURRENT CONFIG OBJECT TYPE FOR OUR JSON CONFIG!", LogType.ErrorLog);
+              //  JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL CONFIG ROUTINE: ", SetEx);
                 return false;
             }
 
@@ -52,14 +49,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
                 // For a key value item object
                 string[] SplitContentPath = PropertyKey.Split('.').Skip(1).ToArray();
                 JObject ConfigObjectLocated = ValueLoaders.GetJObjectConfig(TypeOfConfig);
-                JsonConfigFiles.ConfigLogger?.WriteLog("PULLED CONTENT FOR CONFIG FILE TO MODIFY OK!", LogType.TraceLog);
+             //   JsonConfigFiles.ConfigLogger?.WriteLog("PULLED CONTENT FOR CONFIG FILE TO MODIFY OK!", LogType.TraceLog);
 
                 // Check missing value here now.
                 if (ConfigObjectLocated[SplitContentPath.FirstOrDefault() ?? PropertyKey] == null && !AppendMissing)
                 {
                     // Log missing and return false.
-                    JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! MISSING CONFIG FILE VALUE FOR OBJECT KEY NAME: {PropertyKey}!", LogType.ErrorLog);
-                    JsonConfigFiles.ConfigLogger?.WriteLog($"NEW JSON VALUE WILL NOT BE SET!", LogType.ErrorLog);
+                  //  JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! MISSING CONFIG FILE VALUE FOR OBJECT KEY NAME: {PropertyKey}!", LogType.ErrorLog);
+                 //   JsonConfigFiles.ConfigLogger?.WriteLog($"NEW JSON VALUE WILL NOT BE SET!", LogType.ErrorLog);
                     return false;
                 }
 
@@ -73,14 +70,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 
                 // Write out our JSON values here
                 File.WriteAllText(OutputPath, JsonConfigFiles.ApplicationConfig.ToString(Formatting.Indented));
-                JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
+             //   JsonConfigFiles.ConfigLogger?.WriteLog($"STORED JSON CONFIG VALUE FOR PROPERTY {PropertyKey} OK!", LogType.InfoLog);
                 return true;
             }
             catch (Exception SetEx)
             {
                 // Log failure and return false.
-                JsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO STORE NEW VALUE FOR OUR JSON CONFIG!", LogType.ErrorLog);
-                JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING SET ROUTINE: ", SetEx);
+             //   JsonConfigFiles.ConfigLogger?.WriteLog("FAILED TO STORE NEW VALUE FOR OUR JSON CONFIG!", LogType.ErrorLog);
+             //   JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING SET ROUTINE: ", SetEx);
                 return false;
             }
         }

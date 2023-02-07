@@ -1,28 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using MahApps.Metro.Controls;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using Svg;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 {
@@ -32,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumHamburgerCoreView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorHamburgerViewLogger", LoggerActions.SubServiceLogger);
+      //  private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorHamburgerViewLogger", LoggerActions.SubServiceLogger);
 
         // Class helper values. VM And Nav animator
         public FulcrumHamburgerCoreViewModel ViewModel { get; set; }     // ViewModel object to bind onto
@@ -53,7 +36,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             this.NavService = new HamburgerNavService();
             this.InjectorHamburgerMenu.Content = NavService.NavigationFrame;
             this.NavService.Navigated += this.NavigationServiceEx_OnNavigated;
-            this.ViewLogger.WriteLog("CONFIGURED NEW NAV SERVICE FOR OUR HAMBURGER CORE OBJECT OK!", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog("CONFIGURED NEW NAV SERVICE FOR OUR HAMBURGER CORE OBJECT OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -70,11 +53,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup Menu icon objects here.
             this.InjectorHamburgerMenu.ItemsSource = this.ViewModel.SetupHamburgerMenuItems();
             this.InjectorHamburgerMenu.OptionsItemsSource =  this.ViewModel.SetupHamburgerOptionItems();
-            this.ViewLogger.WriteLog("SETUP AND STORED NEW MENU ENTRIES ON THE VIEW OK!", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog("SETUP AND STORED NEW MENU ENTRIES ON THE VIEW OK!", LogType.InfoLog);
 
             // Log built view contents ok
             InjectorHamburgerMenu.SelectedIndex = 0;
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM HAMBURGER CORE OK!", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM HAMBURGER CORE OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +74,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 
             // Navigate here and 
             this.NavService.Navigate(BuiltItemObject.NavUserControlType, BuiltItemObject.NavViewModelType);
-            this.ViewLogger.WriteLog($"NAVIGATED FROM SELECTED MENU ITEM TO A NEW CONTROL VIEW CORRECTLY!", LogType.TraceLog);
+         //   this.ViewLogger.WriteLog($"NAVIGATED FROM SELECTED MENU ITEM TO A NEW CONTROL VIEW CORRECTLY!", LogType.TraceLog);
         }
 
         /// <summary>
@@ -106,14 +89,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 .Items
                 .OfType<FulcrumNavMenuItem>()
                 .FirstOrDefault(MenuObj => MenuObj.NavUserControlType == e.Content?.GetType());
-            this.ViewLogger.WriteLog($"BOUND SELECTED MENU ITEM TO {this.InjectorHamburgerMenu.SelectedIndex}", LogType.TraceLog);
+         //   this.ViewLogger.WriteLog($"BOUND SELECTED MENU ITEM TO {this.InjectorHamburgerMenu.SelectedIndex}", LogType.TraceLog);
  
             // Set options items
             this.InjectorHamburgerMenu.SelectedOptionsItem = this.InjectorHamburgerMenu
                 .OptionsItems
                 .OfType<FulcrumNavMenuItem>()
                 .FirstOrDefault(MenuObj => MenuObj.NavUserControlType == e.Content?.GetType());
-            this.ViewLogger.WriteLog($"BOUND SELECTED OPTIONS ITEM TO {this.InjectorHamburgerMenu.SelectedOptionsIndex}", LogType.TraceLog);
+          //  this.ViewLogger.WriteLog($"BOUND SELECTED OPTIONS ITEM TO {this.InjectorHamburgerMenu.SelectedOptionsIndex}", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

@@ -1,11 +1,7 @@
-﻿using System;
-using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using SharpSimulator;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using SharpSimulator;
 
 namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
 {
@@ -15,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
     public class SimEventDataTemplateSelector : DataTemplateSelector
     {
         // Logger object.
-        private static SubServiceLogger TemplateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimEventDataTemplateLogger", LoggerActions.SubServiceLogger);
+      //  private static SubServiceLogger TemplateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SimEventDataTemplateLogger", LoggerActions.SubServiceLogger);
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -38,13 +34,13 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
                     return InputElement.FindResource("MessageContentTemplate") as DataTemplate;
 
                 // If failed, log the failure and exit out
-                TemplateLogger.WriteLog($"FAILED TO FIND NEW CONTROL TYPE FOR OBJECT TYPE {SimEventObject.GetType().Name}!", LogType.ErrorLog);
+              //  TemplateLogger.WriteLog($"FAILED TO FIND NEW CONTROL TYPE FOR OBJECT TYPE {SimEventObject.GetType().Name}!", LogType.ErrorLog);
                 return null;
             }
 
             // Failed to find control template output
-            TemplateLogger.WriteLog("ERROR! INVALID CONTROL TYPE WAS PROCESSED! NOT RETURNING A DATATEMPLATE FOR IT", LogType.ErrorLog);
-            TemplateLogger.WriteLog($"CONTROL PASSED CONTENT: {JsonConvert.SerializeObject(InputItem, Formatting.None)}", LogType.TraceLog);
+         //   TemplateLogger.WriteLog("ERROR! INVALID CONTROL TYPE WAS PROCESSED! NOT RETURNING A DATATEMPLATE FOR IT", LogType.ErrorLog);
+         //   TemplateLogger.WriteLog($"CONTROL PASSED CONTENT: {JsonConvert.SerializeObject(InputItem, Formatting.None)}", LogType.TraceLog);
             return null;
         }
     }

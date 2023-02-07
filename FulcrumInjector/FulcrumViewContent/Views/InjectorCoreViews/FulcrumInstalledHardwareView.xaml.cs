@@ -1,23 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
+using SharpWrapper.J2534Objects;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using SharpWrapper.J2534Objects;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
 {
@@ -27,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
     public partial class FulcrumInstalledHardwareView : UserControl
     {
         // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FulcrumInstalledHardwareViewLogger", LoggerActions.SubServiceLogger);
+      //  private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FulcrumInstalledHardwareViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
         public FulcrumInstalledHardwareViewModel ViewModel { get; set; }
@@ -42,7 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Initialize new UI component instance
             InitializeComponent();
             this.ViewModel = FulcrumConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel();
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+          //  ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
 
         /// <summary>
@@ -55,7 +40,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             // Setup a new ViewModel
             this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR HARDWARE INFORMATION OUTPUT OK!", LogType.InfoLog);
+          //  this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR HARDWARE INFORMATION OUTPUT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -68,7 +53,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void InstalledDLLsListBox_OnSelectionChanged(object SendingDllObject, SelectionChangedEventArgs DllChangedEventArgs)
         {
             // Log info, find the currently selected DLL object, cast it, and run the VM Method.
-            this.ViewLogger.WriteLog("PULLING IN NEW DEVICES FOR DLL ENTRY NOW...", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog("PULLING IN NEW DEVICES FOR DLL ENTRY NOW...", LogType.InfoLog);
 
             // Convert sender and cast our DLL object
             J2534Dll SelectedDLL = (J2534Dll)(DllChangedEventArgs.AddedItems.Count == 0 ?
@@ -76,12 +61,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
                 DllChangedEventArgs.AddedItems[0]);
 
             // Clear out the Devices if Needed
-            this.ViewLogger.WriteLog($"DLL OBJECT BEING MODIFIED: {SelectedDLL.Name}", LogType.WarnLog);
+         //   this.ViewLogger.WriteLog($"DLL OBJECT BEING MODIFIED: {SelectedDLL.Name}", LogType.WarnLog);
             if (DllChangedEventArgs.RemovedItems.Contains(SelectedDLL))
             {
                 // Remove the devices listed
                 InstalledDevicesListBox.ItemsSource = null;
-                this.ViewLogger.WriteLog("CLEARED OUT OLD DLL VALUES OK!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog("CLEARED OUT OLD DLL VALUES OK!", LogType.InfoLog);
             }
 
             // Log and populate devices
@@ -89,7 +74,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
             {
                 // Populate the DLL entry and let devices flow in
                 this.ViewModel.SelectedDLL = SelectedDLL;
-                this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
+             //   this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY SET FOR DLL ENTRY WITH LONG NAME {SelectedDLL.LongName} OK!", LogType.InfoLog);
             });
         }
         /// <summary>
@@ -100,21 +85,21 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews
         private void InstalledDevicesListBox_OnSelectionChanged(object SendingDeviceObject, SelectionChangedEventArgs DeviceChangedEventArgs)
         {
             // Log info, find the currently selected DLL object, cast it, and run the VM Method.
-            this.ViewLogger.WriteLog("PROCESSED A DEVICE SELECTION CHANGED EVENT!", LogType.InfoLog);
+         //   this.ViewLogger.WriteLog("PROCESSED A DEVICE SELECTION CHANGED EVENT!", LogType.InfoLog);
 
             // Convert sender and cast our DLL object
             ListBox SendingBox = (ListBox)SendingDeviceObject;
             string SelectedDevice = SendingBox.SelectedItem?.ToString();
 
             // BUG: THIS LOG ENTRY HANGS THE WHOLE APP?
-            this.ViewLogger.WriteLog(
+          //  this.ViewLogger.WriteLog(
                 string.IsNullOrWhiteSpace(SelectedDevice) ? "NO DLL ENTRY SELECTED! CLEARING" : $"DEVICE ENTRY PULLED: {SelectedDevice}",
-                LogType.TraceLog
+            //    LogType.TraceLog
             );
 
             // Log and populate devices
             this.ViewModel.SelectedDevice = SelectedDevice;
-            if (SelectedDevice != null) this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
+          //  if (SelectedDevice != null) this.ViewLogger.WriteLog($"POPULATED OUR DEVICE ENTRY NAMED {SelectedDevice} ON OUR VIEW MODEL OK!", LogType.InfoLog);
         }
     }
 }

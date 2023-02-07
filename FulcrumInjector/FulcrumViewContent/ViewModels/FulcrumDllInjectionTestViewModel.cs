@@ -1,11 +1,7 @@
-﻿using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using SharpSupport;
+﻿using SharpSupport;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
 {
@@ -15,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     public class FulcrumDllInjectionTestViewModel : ViewModelControlBase
     {
         // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorTestViewModelLogger", LoggerActions.SubServiceLogger);
+     //   private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorTestViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Private control values
         private bool _injectionLoadPassed;      // Pass or fail for our injection load process
