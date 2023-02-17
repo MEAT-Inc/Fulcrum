@@ -100,6 +100,7 @@ FulcrumInjector is the ultimate J2534 DLL Shim written in C++ which is able to p
 
 
 ## Development Setup
+- NOTE: As of 2/17/2023 - I've closed down the readonly access for anyone to use. If you want to use these packages, please contact zack.walsh@meatinc.autos for an API key, and someone will walk you through getting into this package repository. This decision was made after realizing that while the key was readonly and on a dedicated bot account, it's not the best idea to leave API keys exposed. And since making these projects public, it was only logical to remove the keys from here.
 - If you're looking to help develop this project, you'll need to add the NuGet server for the MEAT Inc workspace into your nuget configuration. 
 - To do so, navigate to your AppData\Roaming folder (You can do this by opening windows explorer and clicking the top path bar and typing %appdata%)
 - Now find the folder named NuGet and open the file named NuGet.config
@@ -108,8 +109,6 @@ FulcrumInjector is the ultimate J2534 DLL Shim written in C++ which is able to p
       <add key="MEAT-Inc" value="https://nuget.pkg.github.com/MEAT-Inc/index.json/" protocolVersion="3" />
     ```
 - Once added in, scroll down to packageSourceCredentials (if it's not there, just make a new section for it)
-- From here on out, when you see {INSERT_API_KEY_HERE} that means you need to insert the Base64 decoded version of the following string:
- ```Z2hwX0NEdkN6eDFMTmJjN2RGbm1UYWJFVFZwSkZ5bEQ5eTFHZnBVaw==```
 - Inside this section, put the following block of code into it.
    ```XML
     <MEAT-Inc>
