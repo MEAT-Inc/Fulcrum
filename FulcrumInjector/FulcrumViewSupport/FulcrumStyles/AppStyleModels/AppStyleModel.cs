@@ -5,45 +5,48 @@ using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using Newtonsoft.Json;
 using Color = System.Drawing.Color;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
 {
-    /// <summary>
-    /// Type of theme used.
-    /// </summary>
-    public enum ThemeType
-    {
-        DARK_COLORS = 0,
-        LIGHT_COLORS = 1,
-    }
-
     /// <summary>
     /// Color Theme for this application
     /// </summary>
-    public class AppTheme
+    internal class AppStyleModel
     {
-        // Base Theme Values    
-        public string ThemeName;                // Name of the theme
-        public ThemeType TypeOfTheme;           // Is Dark Or light or both
-        public AppThemeColorSet ThemeColors;    // Custom app theme color set
+        #region Custom Events
+        #endregion //Custom Events
 
-        [JsonIgnore]
-        public Theme MahThemeObject;            // Mahapps Theme object built from this theme.
+        #region Fields
+
+        // Base Theme Values used to help configure color values
+        public string ThemeName;                        // Name of the theme
+        public StyleType TypeOfStyle;                   // Is Dark Or light or both
+        public AppStyleColorSet StyleColors;            // Custom app theme color set
+        [JsonIgnore] public Theme MahThemeObject;       // Mahapps Theme object built from this theme.
+
+        #endregion //Fields
+
+        #region Properties
 
         // Color objects.
         [JsonConverter(typeof(CustomColorValueJsonConverter))]
         public Color PrimaryColor
         {
-            get => ThemeColors.GetDrawingColor(ColorTypes.PRIMARY_COLOR_BASE);
-            set => ThemeColors.SetDrawingColor(ColorTypes.PRIMARY_COLOR_BASE, value);
+            get => StyleColors.GetDrawingColor(ColorTypes.PRIMARY_COLOR_BASE);
+            set => StyleColors.SetDrawingColor(ColorTypes.PRIMARY_COLOR_BASE, value);
         }
         [JsonConverter(typeof(CustomColorValueJsonConverter))]
         public Color SecondaryColor
         {
-            get => ThemeColors.GetDrawingColor(ColorTypes.SECONDARY_COLOR_BASE);
-            set => ThemeColors.SetDrawingColor(ColorTypes.SECONDARY_COLOR_BASE, value);
+            get => StyleColors.GetDrawingColor(ColorTypes.SECONDARY_COLOR_BASE);
+            set => StyleColors.SetDrawingColor(ColorTypes.SECONDARY_COLOR_BASE, value);
         }
 
-        // ---------------------------------------------------------------------------------------------
+        #endregion //Properties
+
+        #region Structs and Classes
+        #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Returns a string ID of this theme object split by -
@@ -55,13 +58,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
             return $"{ThemeName} - {CustomColorConverter.HexConverter(PrimaryColor)} - {CustomColorConverter.HexConverter(SecondaryColor)}";
         }
 
-        // ---------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Json Constructor for this object
         /// </summary>
         [JsonConstructor]
-        public AppTheme()
+        public AppStyleModel()
         {
             // Still build the mahapp theme object
             // BuildMahTheme();
@@ -69,22 +72,23 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
         /// <summary>
         /// Setup basic theme colors
         /// </summary>
-        public AppTheme(string ThemeName, string Primary, string Secondary, ThemeType TypeOfTheme)
+        public AppStyleModel(string ThemeName, string Primary, string Secondary, StyleType typeOfStyle)
         {
             // Set color string values
-            this.TypeOfTheme = TypeOfTheme;
-            this.ThemeName = ThemeName + (TypeOfTheme == ThemeType.DARK_COLORS ? " (Dark)" : " (Light)");
+            this.TypeOfStyle = typeOfStyle;
+            this.ThemeName = ThemeName + (typeOfStyle == StyleType.DARK_COLORS ? " (Dark)" : " (Light)");
 
             // Build the new Theme object
-            ThemeColors = new AppThemeColorSet(
+            StyleColors = new AppStyleColorSet(
                 Primary, Secondary,
-                TypeOfTheme == ThemeType.DARK_COLORS
+                typeOfStyle == StyleType.DARK_COLORS
             );
 
             // Generate the mah theme and the color setup
             MahThemeObject = BuildMahTheme();
         }
 
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a MahApps Theme object to associate with this app theme
@@ -92,10 +96,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
         public Theme BuildMahTheme()
         {
             // Build the new theme here
-            switch (TypeOfTheme)
+            switch (TypeOfStyle)
             {
                 // For Dark colors
-                case ThemeType.DARK_COLORS:
+                case StyleType.DARK_COLORS:
                     // Make a new theme
                     var CustomDarkColors = new Theme(
                         "FulcrumInjector." + PrimaryColor.Name.ToUpper() + ".Dark",
@@ -112,7 +116,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.StyleModels
                     return CustomDarkColors;
 
                 // For light colors
-                case ThemeType.LIGHT_COLORS:
+                case StyleType.LIGHT_COLORS:
                     // Make a new theme.
                     var CustomLightColors = new Theme(
                         "FulcrumInjector." + PrimaryColor.Name.ToUpper() + "_" + SecondaryColor.Name.ToUpper() + ".Light",

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 {
@@ -12,6 +12,24 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
     /// </summary>
     public static class ValueLoaders
     {
+        #region Custom Events
+        #endregion //Custom Events
+
+        #region Fields
+
+        // Helper logging object for logging changes in this class
+        private static readonly SharpLogger _valueLoadersLogger = new SharpLogger(LoggerActions.FileLogger);
+
+        #endregion //Fields
+
+        #region Properties
+        #endregion //Properties
+
+        #region Structs and Classes
+        #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Pulls a JSON Object value from the given query path and converts it to an object.
         /// </summary>
@@ -25,19 +43,19 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
                 throw new InvalidOperationException("CAN NOT PULL CONFIG VALUES SINCE THE CONFIG FILE IS NOT YET BUILT!");
 
             // Get the token first.
-            JsonConfigFiles.ConfigLogger?.WriteLog($"TRYING TO PULL VALUE AT: {JsonPath}", LogType.TraceLog);
+            _valueLoadersLogger?.WriteLog($"TRYING TO PULL VALUE AT: {JsonPath}", LogType.TraceLog);
             var ValueObject = JsonConfigFiles.ApplicationConfig.SelectToken(JsonPath);
             if (ValueObject == null)
             {
                 // If our output object is null, then just return a generic output of the type passed
-                JsonConfigFiles.ConfigLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
+                _valueLoadersLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
                 return (TValueType)new object();
             }
 
             // If not null, convert and return.
             var ConvertedValue = ValueObject.ToObject<TValueType>();
             string JsonValue = JsonConvert.SerializeObject(ConvertedValue, Formatting.None);
-            JsonConfigFiles.ConfigLogger?.WriteLog(
+            _valueLoadersLogger?.WriteLog(
                 JsonValue.Length < 250
                     ? $"PROPERTY: {JsonPath} | VALUE: {JsonValue}"
                     : $"PROPERTY: {JsonPath} | VALUE: VALUE AS STRING IS TOO LONG TO DISPLAY IN THIS LOG FILE!",
@@ -46,12 +64,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
             // Return the built converted value here
             return ConvertedValue;
         }
-
         /// <summary>
-        /// Tries to get a jobject from our master config file type
+        /// Tries to get a JObject from our master config file type
         /// </summary>
         /// <param name="JObjectKey">Base Type of a json key</param>
-        /// <returns></returns>
+        /// <returns>A JObject built from our requested Key value</returns>
         public static JObject GetJObjectConfig(string JObjectKey)
         {
             // See if our config file is missing.
@@ -59,12 +76,12 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
                 throw new InvalidOperationException("CAN NOT PULL CONFIG VALUES SINCE THE CONFIG FILE IS NOT YET BUILT!");
 
             // Check for full config.
-            JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {JObjectKey}", LogType.TraceLog);
+            _valueLoadersLogger?.WriteLog($"PULLING CONFIG VALUE FOR TYPE {JObjectKey}", LogType.TraceLog);
             try
             {
                 // Try and get the current object. If failed, return null
                 var PulledJObject = JsonConfigFiles.ApplicationConfig[JObjectKey];
-                JsonConfigFiles.ConfigLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {JObjectKey} OK!", LogType.TraceLog);
+                _valueLoadersLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {JObjectKey} OK!", LogType.TraceLog);
 
                 // Cast and return if needed
                 if (PulledJObject.Type != JTokenType.Array) return JObject.FromObject(PulledJObject);
@@ -78,8 +95,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
             catch (Exception PullEx)
             {
                 // Catch failure, log it, and return null
-                JsonConfigFiles.ConfigLogger?.WriteLog($"FAILED TO PULL CONFIG FOR SECTION {JObjectKey}!", LogType.TraceLog);
-                JsonConfigFiles.ConfigLogger?.WriteLog("EXCEPTION THROWN DURING PULL!", PullEx, new[] { LogType.TraceLog });
+                _valueLoadersLogger?.WriteLog($"FAILED TO PULL CONFIG FOR SECTION {JObjectKey}!", LogType.TraceLog);
+                _valueLoadersLogger?.WriteException("EXCEPTION THROWN DURING PULL!", PullEx, LogType.TraceLog);
                 return null;
             }
         }
@@ -92,12 +109,12 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
         {
             // Check for full config.
             string ConfigKeyString = JObjectKey.ToString();
-            JsonConfigFiles.ConfigLogger?.WriteLog($"PULLING CONFIG VALUE FILE PATH FOR TYPE {ConfigKeyString}", LogType.TraceLog);
+            _valueLoadersLogger?.WriteLog($"PULLING CONFIG VALUE FILE PATH FOR TYPE {ConfigKeyString}", LogType.TraceLog);
             string OutputPath = Path.Combine(Directory.GetCurrentDirectory(), "JsonConfiguration", JObjectKey.ToString() + ".json");
-            JsonConfigFiles.ConfigLogger?.WriteLog($"GENERATED JSON CONFIG PATH: {OutputPath}", LogType.TraceLog);
+            _valueLoadersLogger?.WriteLog($"GENERATED JSON CONFIG PATH: {OutputPath}", LogType.TraceLog);
 
             // Check if real.
-            if (!File.Exists(OutputPath)) JsonConfigFiles.ConfigLogger?.WriteLog("DESIRED JSON CONFIG FILE DOES NOT EXIST!", LogType.WarnLog);
+            if (!File.Exists(OutputPath)) _valueLoadersLogger?.WriteLog("DESIRED JSON CONFIG FILE DOES NOT EXIST!", LogType.WarnLog);
             return File.Exists(OutputPath) ? OutputPath : "";
         }
     }

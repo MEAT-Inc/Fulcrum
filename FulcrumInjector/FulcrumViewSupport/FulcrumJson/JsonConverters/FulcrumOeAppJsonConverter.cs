@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
     /// <summary>
     /// JSON Converter for converting input OE Scan App Path objects
     /// </summary>
-    public class FulcrumOeAppJsonConverter : JsonConverter
+    internal class FulcrumOeAppJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if the object can be converted or not.

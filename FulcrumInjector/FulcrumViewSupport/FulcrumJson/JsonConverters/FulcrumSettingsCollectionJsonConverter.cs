@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters
     /// JSON Converter for settings object entries
     /// </summary>
     /// <typeparam name="TSettingType"></typeparam>
-    public class FulcrumSettingsCollectionJsonConverter : JsonConverter
+    internal class FulcrumSettingsCollectionJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if we can convert this object or not.

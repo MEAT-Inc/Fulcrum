@@ -1,8 +1,11 @@
 ﻿using System.Windows.Media;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
 {
-    public static class CustomColorShader
+    /// <summary>
+    /// Supporting class used to help find shades of colors based on input color values
+    /// </summary>
+    internal static class CustomColorShader
     {
         /// <summary>
         /// Color shader.
@@ -14,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
         public static string GenerateShadeString(Color InputColor, Color Comparison, float ChangeBy)
         {
             var NewColor = GetShade(InputColor, Comparison, ChangeBy);
-            return GenerateColorString(NewColor);
+            return _generateColorString(NewColor);
         }
         /// <summary>
         /// Color shader.
@@ -54,20 +57,35 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleSupport
             float er = CompareColor.R, eg = CompareColor.G, eb = CompareColor.B;
 
             // Modify the colors CompareColor get the difference
-            byte r = (byte)sr.GetShadeFloats(er, amount),
-                g = (byte)sg.GetShadeFloats(eg, amount),
-                b = (byte)sb.GetShadeFloats(eb, amount);
+            byte r = (byte)sr._getShadeFloats(er, amount),
+                g = (byte)sg._getShadeFloats(eg, amount),
+                b = (byte)sb._getShadeFloats(eb, amount);
 
             // Return the new InputColor
             return Color.FromRgb(r, g, b);
         }
-        private static float GetShadeFloats(this float start, float end, float amount)
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Finds float values for shades of colors based on a given change value
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        private static float _getShadeFloats(this float start, float end, float amount)
         {
             float difference = end - start;
             float adjusted = difference * amount;
             return start + adjusted;
         }
-        private static string GenerateColorString(Color BaseColor)
+        /// <summary>
+        /// Converts a color into a hex string (0xFFFFFFFF)
+        /// </summary>
+        /// <param name="BaseColor">The color to convert to a string</param>
+        /// <returns>The string built for the color</returns>
+        private static string _generateColorString(Color BaseColor)
         {
             string AlphaHex = BaseColor.A.ToString("X2");
             string RedHex = BaseColor.R.ToString("X2");
