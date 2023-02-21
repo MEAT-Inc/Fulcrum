@@ -7,9 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Octokit;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
 {
