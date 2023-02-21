@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Applies a blur to a window.
     /// </summary>
-    public class WindowBlurSetup
+    internal class WindowBlurSetup
     {
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);

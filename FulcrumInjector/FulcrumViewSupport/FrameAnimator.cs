@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Animates frame objects
     /// </summary>
-    public class FrameAnimator
+    internal class FrameAnimator
     {
         /// <summary>
         /// Navigation helper which pulls our Storyboard and metadata contents on request
