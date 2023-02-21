@@ -126,10 +126,10 @@
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.10.0.140\lib\net472\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.10.0.140\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
@@ -142,6 +142,9 @@
     </Reference>
     <Reference Include="SharpLogger, Version=1.10.0.140, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpLogger.1.10.0.140\lib\net472\SharpLogger.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpLogging, Version=2.5.4.273, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
     <Reference Include="SharpPipes, Version=0.1.3.18, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpPipes.0.1.3.18\lib\net472\SharpPipes.dll</HintPath>
@@ -198,6 +201,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater\InjectorUpdater.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater\InjectorVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumEmailBroker.cs" />
@@ -257,20 +261,18 @@
     <Compile Include="FulcrumViewSupport\DataContentHelpers\SimEventDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\UserSettingsDataTemplateSelector.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\MarkdownXamlSchemaContext.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\AppColorSetter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToObjectConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\HamburgerNavService.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\ColorMatchingHelper.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\CustomColorShader.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumStyles\CustomColorShader.cs" />
     <Compile Include="FulcrumViewSupport\WindowBlurSetup.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleSupport\AppThemeConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomColorConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomColorValueJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomFilePathJsonConverters.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\StyleModels\AppThemeColorSet.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\StyleModels\AppThemeModel.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleColorSet.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleModel.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJson\JsonHelpers\ValueLoaders.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJson\JsonHelpers\ValueSetters.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJson\JsonHelpers\JsonConfigFiles.cs" />

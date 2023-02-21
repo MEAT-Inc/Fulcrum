@@ -78,7 +78,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             this.BlurOpacity = OpacityValue;
 
             // Check color and store.
-            if (ColorToSet == default) ColorToSet = App.ThemeConfiguration.CurrentAppTheme.PrimaryColor; 
+            if (ColorToSet == default) ColorToSet = App.ThemeConfiguration.CurrentAppStyleModel.PrimaryColor; 
             this.ColorToSet = ColorToSet;
 
             // Store window helper

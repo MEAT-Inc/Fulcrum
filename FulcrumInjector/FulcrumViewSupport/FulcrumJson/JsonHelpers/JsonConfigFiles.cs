@@ -1,11 +1,10 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 {
@@ -14,72 +13,21 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
     /// </summary>
     public static class JsonConfigFiles
     {
-        // Logger object for these methods.
-        internal static SubServiceLogger ConfigLogger
-        {
-            get
-            {
-                // If the main output value is null, return anyway.
-                if (LogBroker.MainLogFileName == null) { return null; }
-                return (SubServiceLogger)LoggerQueue.SpawnLogger("JsonConfigLogger", LoggerActions.SubServiceLogger);
-            }
-        }
+        #region Custom Events
+        #endregion //Custom Events
 
-        // ---------------------------------- Input Located JSON Files ----------------------------------------
+        #region Fields
 
-        // List of all the files found in the directory of this application
-        public static string AppConfigFile;
-
-        /// <summary>
-        /// Loads a new config file, sets the access bool to true if the file exists
-        /// </summary>
-        /// <param name="NewConfigFileName">Name of our configuration file to use</param>
-        /// <param name="ForcedDirectory">The forced path to look in for our configuration file</param>
-        public static void SetNewAppConfigFile(string NewConfigFileName, string ForcedDirectory = null)
-        {
-            // Pull location of the configuration application. If debugging is on, then try and set it using the working dir. 
-            string FulcrumInjectorExe = ForcedDirectory ?? string.Empty;
-            ConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
-#if DEBUG
-            ConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
-            FulcrumInjectorExe = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-#else
-            string FulcrumInjectorDir;
-            var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
-            if (FulcrumKey != null) { FulcrumInjectorExe = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()); } 
-            else 
-            {
-                ConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
-                FulcrumInjectorExe = @"C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumInjector";
-            }
-#endif
-            // List all the files in the directory we've located now and then find our settings file by name
-            Directory.SetCurrentDirectory(FulcrumInjectorExe);
-            ConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorExe}", LogType.InfoLog);
-            string[] LocatedFilesInDirectory = Directory.GetFiles(FulcrumInjectorExe, "*.json", SearchOption.AllDirectories);
-            ConfigLogger?.WriteLog($"LOCATED A TOTAL OF {LocatedFilesInDirectory.Length} FILES IN OUR APP FOLDER WITH A JSON EXTENSION");
-            string MatchedConfigFile = LocatedFilesInDirectory
-                .OrderBy(FileObj => FileObj.Length)
-                .FirstOrDefault(FileObj => FileObj.Contains(NewConfigFileName));
-
-            // Check if the file is null or not found first
-            if (MatchedConfigFile == null) throw new FileNotFoundException($"FAILED TO FIND OUR JSON CONFIG FILE!\nFILE: {NewConfigFileName}");
-            ConfigLogger?.WriteLog($"LOCATED CONFIG FILE NAME IS: {MatchedConfigFile}", LogType.InfoLog);
-
-            // Log info. Set file state
-            AppConfigFile = Path.GetFullPath(MatchedConfigFile);
-            ConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
-            ConfigLogger?.WriteLog($"EXPECTED TO LOAD JSON CONFIG FILE AT: {AppConfigFile}");
-
-            // Check existing
-            if (File.Exists(AppConfigFile)) ConfigLogger?.WriteLog("CONFIG FILE LOADED OK!", LogType.InfoLog);
-            else throw new FileNotFoundException($"FAILED TO FIND OUR JSON CONFIG FILE!\nFILE: {AppConfigFile}");
-        }
-
-        // ------------------------------------ Combined Output JSON ------------------------------------------
-
-        // Desired combined output JSON File
+        // Private fields used to hold our configuration object and logger instances
         private static JObject _applicationConfig;
+        private static readonly SharpLogger _jsonConfigLogger = new SharpLogger(LoggerActions.FileLogger);
+
+        #endregion //Fields
+
+        #region Properties
+
+        // Currently loaded app configuration file and the JSON object built from that file
+        public static string AppConfigFile { get; private set; }
         public static JObject ApplicationConfig
         {
             get
@@ -89,13 +37,66 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 
                 // Build new here for the desired input file object.
                 if (!FirstConfig) return _applicationConfig;
-                ConfigLogger?.WriteLog($"BUILDING NEW JCONFIG OBJECT NOW...", LogType.TraceLog);
+                _jsonConfigLogger?.WriteLog($"BUILDING NEW JCONFIG OBJECT NOW...", LogType.TraceLog);
                 _applicationConfig = JObject.Parse(File.ReadAllText(AppConfigFile));
-                ConfigLogger?.WriteLog($"GENERATED JSON CONFIG FILE OBJECT OK AND WROTE CONTENT TO {AppConfigFile} OK! RETURNED CONTENTS NOW...", LogType.TraceLog);
+                _jsonConfigLogger?.WriteLog($"GENERATED JSON CONFIG FILE OBJECT OK AND WROTE CONTENT TO {AppConfigFile} OK! RETURNED CONTENTS NOW...", LogType.TraceLog);
 
                 // Return the object.
                 return _applicationConfig;
             }
+        }
+
+        #endregion //Properties
+
+        #region Structs and Classes
+        #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Loads a new config file, sets the access bool to true if the file exists
+        /// </summary>
+        /// <param name="NewConfigFileName">Name of our configuration file to use</param>
+        /// <param name="ForcedDirectory">The forced path to look in for our configuration file</param>
+        public static void SetInjectorConfigFile(string NewConfigFileName, string ForcedDirectory = null)
+        {
+            // Pull location of the configuration application. If debugging is on, then try and set it using the working dir. 
+            string FulcrumInjectorExe = ForcedDirectory ?? string.Empty;
+            _jsonConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
+#if DEBUG
+            _jsonConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
+            FulcrumInjectorExe = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#else
+            string FulcrumInjectorDir;
+            var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
+            if (FulcrumKey != null) { FulcrumInjectorExe = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()); } 
+            else 
+            {
+                _jsonConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
+                FulcrumInjectorExe = @"C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumInjector";
+            }
+#endif
+            // List all the files in the directory we've located now and then find our settings file by name
+            Directory.SetCurrentDirectory(FulcrumInjectorExe);
+            _jsonConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorExe}", LogType.InfoLog);
+            string[] LocatedFilesInDirectory = Directory.GetFiles(FulcrumInjectorExe, "*.json", SearchOption.AllDirectories);
+            _jsonConfigLogger?.WriteLog($"LOCATED A TOTAL OF {LocatedFilesInDirectory.Length} FILES IN OUR APP FOLDER WITH A JSON EXTENSION");
+            string MatchedConfigFile = LocatedFilesInDirectory
+                .OrderBy(FileObj => FileObj.Length)
+                .FirstOrDefault(FileObj => FileObj.Contains(NewConfigFileName));
+
+            // Check if the file is null or not found first
+            if (MatchedConfigFile == null) throw new FileNotFoundException($"FAILED TO FIND OUR JSON CONFIG FILE!\nFILE: {NewConfigFileName}");
+            _jsonConfigLogger?.WriteLog($"LOCATED CONFIG FILE NAME IS: {MatchedConfigFile}", LogType.InfoLog);
+
+            // Log info. Set file state
+            AppConfigFile = Path.GetFullPath(MatchedConfigFile);
+            _jsonConfigLogger?.WriteLog("STORING NEW JSON FILE NOW!", LogType.InfoLog);
+            _jsonConfigLogger?.WriteLog($"EXPECTED TO LOAD JSON CONFIG FILE AT: {AppConfigFile}");
+
+            // Check existing
+            if (File.Exists(AppConfigFile)) _jsonConfigLogger?.WriteLog("CONFIG FILE LOADED OK!", LogType.InfoLog);
+            else throw new FileNotFoundException($"FAILED TO FIND OUR JSON CONFIG FILE!\nFILE: {AppConfigFile}");
         }
     }
 }
