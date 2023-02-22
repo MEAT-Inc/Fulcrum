@@ -24,6 +24,7 @@ using Markdig.Wpf;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpLogging;
 using Markdown = Markdig.Wpf.Markdown;
 using XamlReader = System.Windows.Markup.XamlReader;
 
@@ -73,10 +74,10 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
 
             // Log ready to show updates and build our XAML content output
             this.ViewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
-            FulcrumConstants.InjectorMainWindow.AppUpdatesFlyout.IsOpen = true;
+            FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = true;
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Updates the release notes viewer with the latest release notes
@@ -122,6 +123,27 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             // Now request a new install routine from the view model.
             this.ViewLogger.WriteLog("BOOTING NEW INSTALLER FOR THE FULCRUM INJECTOR NOW...", LogType.InfoLog);
             this.ViewModel.InstallInjectorRelease(OutputAssetFile);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Button click event for the updates view
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void ToggleApplicationUpdateReadyView_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Log processed and show if we have to.
+            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
+            if (FulcrumConstants.FulcrumMainWindow?.AppUpdatesFlyout == null) { ViewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
+            else
+            {
+                // Toggle the information pane
+                bool IsOpen = FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen;
+                FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = !IsOpen;
+                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
+            }
         }
     }
 }

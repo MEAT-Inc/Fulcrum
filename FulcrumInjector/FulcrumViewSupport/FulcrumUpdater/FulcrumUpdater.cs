@@ -14,35 +14,44 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
     /// <summary>
     /// Class which houses the logic for pulling in a new Fulcrum Injector MSI File.
     /// </summary>
-    internal class InjectorUpdater
+    internal class FulcrumUpdater
     {
-        // Logger object.
-        private SubServiceLogger _injectorUpdateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorUpdateLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
 
-        // ------------------------------------------------------------------------------------------------------------------------------------------
+        // Event for download progress
+        public EventHandler<DownloadDataCompletedEventArgs> OnUpdaterComplete;
+        public EventHandler<DownloadProgressChangedEventArgs> OnUpdaterProgress;
 
-        // Git Client object
-        private readonly GitHubClient UpdaterClient;
-        private readonly Stopwatch DownloadTimer;
+        #endregion //Custom Events
 
-        // Updater configuration values
-        private readonly string UpdaterUserName;
-        private readonly string UpdaterSecretKey;
-        private readonly string UpdaterRepoName;
-        private readonly string UpdaterOrgName;
+        #region Fields
 
-        // Private version configuration helpers
+        // Logger object for this update helper instance 
+        private readonly SharpLogger _injectorUpdateLogger;
+
+        // Private backing fields for the Git helper, timer, and updater configuration
+        private readonly Stopwatch _downloadTimer;
+        private readonly GitHubClient _gitUpdaterClient;
+        private readonly UpdateConfiguration _updaterConfiguration;
+
+        // Private backing fields to hold version information helpers
         private string _latestInjectorVersion;
         private string[] _injectorVersionsFound;
 
-        // Version information found
-        public Release LatestInjectorRelease { get; private set; }
-        public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
+        #endregion //Fields
+
+        #region Properties
+
+        // Public facing fields holding information about our latest version information
         public string LatestInjectorVersion
         {
             get => _latestInjectorVersion ?? this.RefreshInjectorVersions().FirstOrDefault();
             private set => _latestInjectorVersion = value;
         }
+        public Release LatestInjectorRelease { get; private set; }
+        public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
+
+        // Public facing properties holding all versions found on the server
         public string[] InjectorVersionsFound
         {
             get
@@ -59,58 +68,49 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
         }
 
         // Time download elapsed and approximate time remaining
-        public string DownloadTimeElapsed => this.DownloadTimer == null ? "00:00" : this.DownloadTimer.Elapsed.ToString().Split('.')[0];
         public string DownloadTimeRemaining { get; private set; }
+        public string DownloadTimeElapsed => this._downloadTimer == null ? "00:00" : this._downloadTimer.Elapsed.ToString().Split('.')[0];
 
-        // Event for download progress
-        public Action<DownloadProgressChangedEventArgs> UpdateDownloadProgressAction;
-        public Action<DownloadDataCompletedEventArgs> DownloadCompleteProgressAction;
+        #endregion //Properties
+
+        #region Structs and Classes
+
+        /// <summary>
+        /// Private class instance used to hold our injector configuration values for updates
+        /// </summary>
+        public class UpdateConfiguration
+        {
+            public bool ForceUpdateReady { get; set; }
+            public string UpdaterOrgName { get; set; }
+            public string UpdaterRepoName { get; set; }
+            public string UpdaterUserName { get; set; }
+            public string UpdaterSecretKey { get; set; }
+        }
+
+
+        #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new injector update helper object which pulls our GitHub release information
         /// </summary>
-        public InjectorUpdater()
+        public FulcrumUpdater()
         {
-            // Store values for updater configuration variables here
-            this.UpdaterUserName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterUserName");
-            this.UpdaterRepoName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterRepoName");
-            this.UpdaterOrgName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterOrgName");
-
-            // Pull in our API key here and decode it.
-            byte[] KeyBytes = Convert.FromBase64String(ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorUpdates.UpdaterSecretKey"));
-            this.UpdaterSecretKey = Encoding.UTF8.GetString(KeyBytes);
-
-            // Log pulled in all values ok and continue on
+            // Construct a new logger instance and build a new configuration for the updater
+            this._injectorUpdateLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this._updaterConfiguration = ValueLoaders.GetConfigValue<UpdateConfiguration>("FulcrumInjectorConstants.InjectorUpdates");
+            this._updaterConfiguration.UpdaterSecretKey = Encoding.UTF8.GetString(Convert.FromBase64String(this._updaterConfiguration.UpdaterSecretKey));
             this._injectorUpdateLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
 
             // Configure updater here
-            this.DownloadTimer = new Stopwatch();
-            Credentials LoginCredentials = new Credentials(this.UpdaterSecretKey);
-            this.UpdaterClient = new GitHubClient(new ProductHeaderValue(this.UpdaterUserName)) { Credentials = LoginCredentials };
+            this._downloadTimer = new Stopwatch();
+            Credentials LoginCredentials = new Credentials(this._updaterConfiguration.UpdaterSecretKey);
+            this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._updaterConfiguration.UpdaterUserName)) { Credentials = LoginCredentials };
             this._injectorUpdateLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATING NOW USING MEAT INC BOT TOKEN ACCESS...", LogType.InfoLog);
         }
 
-        /// <summary>
-        /// Pulls in all release objects from the injector repo
-        /// </summary>
-        /// <returns>A readonly list of objects used to index releases</returns>
-        private Release[] _acquireInjectorReleaseObjects()
-        {
-            // Pull in the releases and return them out
-            this._injectorUpdateLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            var ReleasesFound = this.UpdaterClient.Repository.Release.GetAll(this.UpdaterOrgName, this.UpdaterRepoName).Result.ToArray();
-            this._injectorUpdateLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
-
-            // Store our latest release object on this class
-            if (ReleasesFound?.Length != 0) 
-                this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
-
-            // Return the releases
-            return ReleasesFound;
-        }
-
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Updates the injector version information on the class instance.
@@ -142,9 +142,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
         public bool CheckAgainstVersion(string InputVersion)
         {
             // Validate that the versions exist to compare
-            if (this.InjectorVersionsFound == null || this.LatestInjectorVersion == null) {
-                this.RefreshInjectorVersions();
+            if (this.InjectorVersionsFound == null || this.LatestInjectorVersion == null)
+            {
+                // IF no versions are found, then refresh them all now
                 this._injectorUpdateLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
+                this.RefreshInjectorVersions();
             }
 
             // Now compare the versions
@@ -182,30 +184,46 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
             AssetDownloadHelper.DownloadProgressChanged += (Sender, Args) =>
             {
                 // Invoke the event for progress changed if it's not null
-                if (this.UpdateDownloadProgressAction == null) return;
-                this.UpdateDownloadProgressAction.Invoke(Args);
+                if (this.OnUpdaterProgress == null) return;
+                this.OnUpdaterProgress?.Invoke(Sender ?? this, Args);
 
                 // Find our approximate time left
-                var ApproximateMillisLeft = this.DownloadTimer.ElapsedMilliseconds * Args.TotalBytesToReceive / Args.BytesReceived;
+                var ApproximateMillisLeft = this._downloadTimer.ElapsedMilliseconds * Args.TotalBytesToReceive / Args.BytesReceived;
                 TimeSpan ApproximateToSpan = TimeSpan.FromMilliseconds(ApproximateMillisLeft);
                 this.DownloadTimeRemaining = ApproximateToSpan.ToString("mm:ss");
             };
             AssetDownloadHelper.DownloadDataCompleted += (Sender, Args) =>
             {
                 // Invoke the event for progress done if it's not null
-                if (this.DownloadCompleteProgressAction == null) return;
-                this.DownloadCompleteProgressAction.Invoke(Args);
+                if (this.OnUpdaterComplete == null) return;
+                this.OnUpdaterComplete.Invoke(Sender ?? this, Args);
             };
 
             // Log done building setup and download the version output here
-            this.DownloadTimer.Start(); 
+            this._downloadTimer.Start();
             this._injectorUpdateLogger.WriteLog("BUILT NEW WEB CLIENT FOR DOWNLOADING ASSETS OK! STARTING DOWNLOAD NOW...", LogType.InfoLog);
-            AssetDownloadHelper.DownloadFile(InjectorAssetUrl, InjectorAssetPath); this.DownloadTimer.Stop();
+            AssetDownloadHelper.DownloadFile(InjectorAssetUrl, InjectorAssetPath); this._downloadTimer.Stop();
             this._injectorUpdateLogger.WriteLog($"TOTAL DOWNLOAD TIME TAKEN: {this.DownloadTimeElapsed}");
 
             // Return the path of our new asset
             this._injectorUpdateLogger.WriteLog("DOWNLOADED UPDATES OK! RETURNING OUTPUT PATH FOR ASSETS NOW...");
             return InjectorAssetPath;
+        }
+
+        /// <summary>
+        /// Pulls in all release objects from the injector repo
+        /// </summary>
+        /// <returns>A readonly list of objects used to index releases</returns>
+        private Release[] _acquireInjectorReleaseObjects()
+        {
+            // Pull in the releases and return them out
+            this._injectorUpdateLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
+            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._updaterConfiguration.UpdaterOrgName, this._updaterConfiguration.UpdaterRepoName).Result.ToArray();
+            this._injectorUpdateLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+
+            // Store our latest release object on this class
+            if (ReleasesFound?.Length != 0) this.LatestInjectorRelease = ReleasesFound.FirstOrDefault(); 
+            return ReleasesFound;
         }
     }
 }

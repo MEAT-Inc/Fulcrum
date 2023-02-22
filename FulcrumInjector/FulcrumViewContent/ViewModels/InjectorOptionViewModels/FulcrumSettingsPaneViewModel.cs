@@ -23,8 +23,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsViewModelLogger", LoggerActions.SubServiceLogger);
 
         // Settings entries to bind onto
-        private ObservableCollection<SettingsEntryCollectionModel> _settingsEntrySets;
-        public ObservableCollection<SettingsEntryCollectionModel> SettingsEntrySets
+        private ObservableCollection<FulcrumSettingsCollectionModel> _settingsEntrySets;
+        public ObservableCollection<FulcrumSettingsCollectionModel> SettingsEntrySets
         {
             get => _settingsEntrySets ??= FulcrumSettingsShare.GenerateSettingsModels();
             set => PropertyUpdated(value);

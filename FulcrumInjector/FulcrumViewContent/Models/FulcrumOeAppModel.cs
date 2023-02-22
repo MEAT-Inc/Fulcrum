@@ -1,10 +1,6 @@
 ﻿using System.IO;
-using System.Linq;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
 using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Models
 {
@@ -14,8 +10,13 @@ namespace FulcrumInjector.FulcrumViewContent.Models
     [JsonConverter(typeof(FulcrumOeAppJsonConverter))]
     public class FulcrumOeAppModel
     {
-        // Logger object.
-        private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("OeApplicationModelLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion //Custom Events
+
+        #region Fields
+        #endregion //Fields
+
+        #region Properties
 
         // Properties about an OE Application
         public string OEAppName { get; private set; }
@@ -25,7 +26,12 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         public string[] OEAppPathList { get; private set; }
         public bool IsAppUsable => File.Exists(OEAppPath);
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion //Properties
+
+        #region Structs and Classes
+        #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Returns hyphenated string object for this app instance
@@ -33,7 +39,7 @@ namespace FulcrumInjector.FulcrumViewContent.Models
         /// <returns></returns>
         public override string ToString() { return $"{OEAppName} - {OEAppPath} - {OEAppVersion} - {OEAppCommand}"; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new OE application object from a given set of values.
@@ -46,9 +52,6 @@ namespace FulcrumInjector.FulcrumViewContent.Models
             this.OEAppVersion = Version;
             this.OEAppPathList = PathSet ?? new[] { this.OEAppPath };
             this.OEAppCommand = BatLaunchCommand ?? $"cmd.exe /C \"{OEAppPath}\"";
-
-            // Log built new app instance.
-            ModelLogger.WriteLog($"BUILT NEW OE APP: {this}", LogType.TraceLog);
         }
     }
 }

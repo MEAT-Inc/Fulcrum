@@ -32,6 +32,9 @@ namespace FulcrumInjector
 
         #region Fields
 
+        // Logger for our application instance object
+        private SharpLogger _appLogger;
+
         // Color and Setting Configuration Objects from the config helpers
         internal static WindowBlurSetup WindowBlurHelper;
         internal static AppThemeConfiguration ThemeConfiguration;
@@ -89,11 +92,16 @@ namespace FulcrumInjector
             SharpLogBroker.InitializeLogging(BrokerConfig);
             SharpLogArchiver.InitializeArchiving(ArchiverConfig);
 
-            // Log information and current application version.
-            string CurrentAppVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            SharpLogBroker.MasterLogger?.WriteLog($"LOGGING FOR {BrokerConfig.LogBrokerName} HAS BEEN STARTED OK!", LogType.WarnLog);
-            SharpLogBroker.MasterLogger?.WriteLog($"{BrokerConfig.LogBrokerName} APPLICATION IS NOW LIVE! VERSION: {CurrentAppVersion}", LogType.WarnLog);
-            SharpLogBroker.MasterLogger?.WriteLog("LOGGING CONFIGURATION ROUTINE HAS BEEN COMPLETED OK!", LogType.InfoLog);
+            // Build a new logger for this app instance and log our some basic information
+            this._appLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            string CurrentShimVersion = FulcrumConstants.FulcrumVersions.ShimVersionString;
+            string CurrentAppVersion = FulcrumConstants.FulcrumVersions.InjectorVersionString;
+
+            // Log out this application has been booted correctly
+            this._appLogger.WriteLog($"LOGGING FOR {BrokerConfig.LogBrokerName} HAS BEEN STARTED OK!", LogType.WarnLog);
+            this._appLogger.WriteLog($"{BrokerConfig.LogBrokerName} APPLICATION IS NOW LIVE!", LogType.WarnLog);
+            this._appLogger.WriteLog($"--> INJECTOR VERSION: {CurrentAppVersion}", LogType.WarnLog);
+            this._appLogger.WriteLog($"--> SHIM DLL VERSION: {CurrentShimVersion}", LogType.WarnLog);
         }
         /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.
@@ -136,7 +144,44 @@ namespace FulcrumInjector
         private void _configureAppExitRoutine()
         {
             // Build event helper, Log done and return out.
-            Application.Current.Exit += FulcrumConstants.ProcessAppExit;
+            Current.Exit += (SendingAppplication, ExitEventArgs) =>
+            {
+                // First spawn an exit helper logger and log information 
+                SharpLogger ExitLogger = new SharpLogger(LoggerActions.UniversalLogger, "ExitEventLogger");
+                ExitLogger.WriteLog("PROCESSED APP ENVIRONMENT OBJECT SHUTDOWN COMMAND OK!", LogType.WarnLog);
+                ExitLogger.WriteLog("CLOSING THIS INSTANCE CLEANLY AND THEN FORCE RUNNING A TERMINATION COMMAND!", LogType.InfoLog);
+
+                // Now build a process object. Simple bat file that runs a Taskkill instance on this app after waiting 3 seconds.
+                string TempBat = Path.ChangeExtension(Path.GetTempFileName(), "bat");
+                string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+                string BatContents = string.Join("\n", new string[]
+                {
+                    "timeout /t 5 /nobreak > NUL",
+                    $"taskkill /F /IM {CurrentInstanceName}*"
+                });
+
+                // Write temp bat file to output and then run it.
+                ExitLogger.WriteLog($"BAT FILE LOCATION WAS GENERATED AND SET TO {TempBat}", LogType.InfoLog);
+                ExitLogger.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents}", LogType.TraceLog);
+                File.WriteAllText(TempBat, BatContents);
+
+                // Now run the output command.
+                ExitLogger.WriteLog("RUNNING TERMINATION COMMAND INSTANCE NOW...", LogType.WarnLog);
+                ExitLogger.WriteLog("THIS SHOULD BE THE LAST TIME THIS LOG FILE IS USED!", LogType.InfoLog);
+                ProcessStartInfo TerminateInfo = new ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    CreateNoWindow = true,
+                    Arguments = $"/C \"{TempBat}\"",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                };
+
+                // Execute here and exit out app.
+                ExitLogger.WriteLog($"EXECUTING NOW! TIME OF APP EXIT: {DateTime.Now:R}", LogType.WarnLog);
+                Process.Start(TerminateInfo);
+            };
+
+            // Log that we've hooked in a new exit routine to our window instance
             SharpLogBroker.MasterLogger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
             SharpLogBroker.MasterLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
@@ -199,8 +244,8 @@ namespace FulcrumInjector
         private void _configureUserSettings()
         {
             // Pull our settings objects out from the settings file.
-            var SettingsLoaded = FulcrumSettingsShare.GenerateSettingsModels();
-            SharpLogBroker.MasterLogger?.WriteLog($"PULLED IN {SettingsLoaded.Count} SETTINGS SEGMENTS OK!", LogType.InfoLog);
+            FulcrumConstants._injectorSettings.GenerateSettingsModels();
+            SharpLogBroker.MasterLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
             SharpLogBroker.MasterLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
         }
     }

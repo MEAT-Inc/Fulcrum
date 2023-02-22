@@ -41,8 +41,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Store title and version string values now.
-            this.ShimDLLVersionString = $"Shim Version: {FulcrumConstants.InjectorVersions.ShimVersionString}";
-            this.InjectorVersionString = $"Version: {FulcrumConstants.InjectorVersions.InjectorVersionString}";
+            this.ShimDLLVersionString = $"Shim Version: {FulcrumConstants.FulcrumVersions.ShimVersionString}";
+            this.InjectorVersionString = $"Version: {FulcrumConstants.FulcrumVersions.InjectorVersionString}";
             this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
 
             // Log output information

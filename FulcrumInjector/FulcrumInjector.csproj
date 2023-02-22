@@ -202,8 +202,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumUpdater\InjectorUpdater.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumUpdater\InjectorVersionInfo.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumUpdater\FulcrumUpdater.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumUpdater\FulcrumVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumEmailBroker.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewContent\Models\SettingsModels\FulcrumSettingsShare.cs" />
@@ -412,7 +412,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InjectorMainWindow.xaml">
+    <Page Include="FulcrumMainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -420,8 +420,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="InjectorMainWindow.xaml.cs">
-      <DependentUpon>InjectorMainWindow.xaml</DependentUpon>
+    <Compile Include="FulcrumMainWindow.xaml.cs">
+      <DependentUpon>FulcrumMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml">

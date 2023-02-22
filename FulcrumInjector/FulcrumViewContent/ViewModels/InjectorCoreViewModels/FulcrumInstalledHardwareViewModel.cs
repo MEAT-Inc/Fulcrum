@@ -96,7 +96,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             this.InstalledDLLs = new ObservableCollection<J2534Dll>(new PassThruImportDLLs().LocatedJ2534DLLs);
 
             // See if using default PT Device is on or off.
-            if (FulcrumSettingsShare.InjectorGeneralSettings.GetSettingValue("Auto Consume CarDAQ-Plus 3", false))
+            if (FulcrumSettingsShare.InjectorGeneralFulcrumSettings.GetSettingValue("Auto Consume CarDAQ-Plus 3", false))
             {
                 // Pull in our PT Device now.
                 if (this.InstalledDLLs.Any(DLLObj => DLLObj.Name.Contains("CarDAQ-Plus 3"))) {

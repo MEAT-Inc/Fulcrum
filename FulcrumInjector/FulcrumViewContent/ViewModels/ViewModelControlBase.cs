@@ -108,7 +108,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
             // Gets all the members and sets one to update
             var AppStoreMembers = AppViewStoreType.GetMembers();
-            if (FulcrumConstants.InjectorMainWindow == null) { return; }
+            if (FulcrumConstants.FulcrumMainWindow == null) { return; }
 
             // If the main window isn't null keep going.
             var MemberToUpdate = AppStoreMembers.FirstOrDefault((MemberObj) =>

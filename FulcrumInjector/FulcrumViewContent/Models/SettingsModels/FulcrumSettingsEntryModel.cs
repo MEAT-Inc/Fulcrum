@@ -1,35 +1,23 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonConverters;
 using Newtonsoft.Json;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
 {
     /// <summary>
-    /// Types of possible controls we can use here.
-    /// </summary>
-    public enum ControlTypes
-    {
-        NOT_DEFINED,        // Bad enum type parse
-        CHECKBOX_CONTROL,   // Checkbox
-        TEXTBOX_CONTROL,    // Textbox
-        COMBOBOX_CONTROL,   // Combobox
-    }
-
-    // --------------------------------------------------------------------------------------------------------------------------
-
-    /// <summary>
     /// Model object for our settings entries
     /// </summary>
     [JsonConverter(typeof(FulcrumSettingsCollectionJsonConverter))]
-    public class FulcrumSettingsEntryModel
+    internal class FulcrumSettingsEntryModel
     {
-        // Logger object.
-        private static SubServiceLogger ModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsEntryModelLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion //Custom Events
+
+        #region Fields
+        #endregion //Fields
+
+        #region Properties
 
         // Basic Setting configurations
         public string SettingName { get; set; }
@@ -40,7 +28,24 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
         public ControlTypes TypeOfControl { get; set; }
         public Type SettingControlType { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion //Properties
+
+        #region Structs and Classes
+
+        /// <summary>
+        /// Types of possible controls we can use here.
+        /// </summary>
+        public enum ControlTypes
+        {
+            NOT_DEFINED,        // Bad enum type parse
+            CHECKBOX_CONTROL,   // Checkbox
+            TEXTBOX_CONTROL,    // Textbox
+            COMBOBOX_CONTROL,   // Combobox
+        }
+
+        #endregion //Structs and Classes
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new settings entry object.
@@ -55,6 +60,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
             this.SettingName = Name;
             this.SettingValue = Value;
             this.SettingDescription = Description;
+
+            // Configure a new settings logger
 
             // Set our control type
             this.TypeOfControl = ControlType;
@@ -80,14 +87,8 @@ namespace FulcrumInjector.FulcrumViewContent.Models.SettingsModels
                 // Not Valid
                 case ControlTypes.NOT_DEFINED:
                     this.SettingControlType = null;
-                    ModelLogger.WriteLog($"FAILED TO BUILD NEW CONTROL INSTANCE FOR SETTING {SettingName}!", LogType.ErrorLog);
-                    break;
+                    throw new ArgumentException($"Error! Control type was not defined! Unable to store setting entry {Name}!");
             }
-
-            // Log information about the built setting
-            // ModelLogger.WriteLog($"BUILT NEW SETTING OBJECT NAMED {this.SettingName} OK!");
-            // ModelLogger.WriteLog($"SETTING CONTROL TYPE IS {(this.SettingControlType == null ? "FAILED_BINDING" : this.SettingControlType.Name)}");
-            // ModelLogger.WriteLog($"SETTING DESCRIPTION: {this.SettingDescription}", LogType.TraceLog);
         }
     }
 }

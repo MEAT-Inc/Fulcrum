@@ -17,6 +17,7 @@ using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
 using SharpLogger;
 using SharpLogger.LoggerObjects;
 using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
 {
@@ -31,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         // ViewModel object to bind onto
         public FulcrumAboutThisAppViewModel ViewModel { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds new logic for a view showing title information and the text for the version
@@ -58,6 +59,25 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
             this.ViewLogger.WriteLog("SETUP ABOUT THIS APP VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Button click event for the settings gear. This will trigger our session settings view.
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void AboutThisApplicationButton_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Log processed and show if we have to.
+            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR ABOUT THIS APPLICATION ICON CORRECTLY!", LogType.WarnLog);
+            if (FulcrumConstants.FulcrumMainWindow?.InformationFlyout == null) { ViewLogger.WriteLog("ERROR! INFORMATION FLYOUT IS NULL!", LogType.ErrorLog); }
+            else
+            {
+                // Toggle the information pane
+                bool IsOpen = FulcrumConstants.FulcrumMainWindow.InformationFlyout.IsOpen;
+                FulcrumConstants.FulcrumMainWindow.InformationFlyout.IsOpen = !IsOpen;
+                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR ABOUT THIS APP FLYOUT OK!", LogType.InfoLog);
+            }
+        }
     }
 }

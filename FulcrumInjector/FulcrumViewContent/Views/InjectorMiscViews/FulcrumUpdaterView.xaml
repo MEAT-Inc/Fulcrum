@@ -133,9 +133,10 @@
                     IsEnabled="{Binding Path=UpdateReady}"/>
             <Button Grid.Column="1" 
                     FontSize="18"
-                    x:Name="CloseUpdatesFlyoutButton"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"
+                    x:Name="CloseUpdatesFlyoutButton"
+                    Click="ToggleApplicationUpdateReadyView_OnClick"
                     Style="{StaticResource ActionButtonStyle}"
                     Content="Close Updater" Width="250" Height="35" />
         </Grid>

@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
             FormatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
 
             // Startup highlighting for this output.
-            base.BuildColorFormatValues(FulcrumSettingsShare.InjectorDebugSyntaxSettings.SettingsEntries);
+            base.BuildColorFormatValues(FulcrumSettingsShare.InjectorDebugSyntaxFulcrumSettings.SettingsEntries);
             FormatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
 
             // Start output formatting here.

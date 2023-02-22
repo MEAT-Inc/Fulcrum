@@ -20,7 +20,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers
 
         // Private fields used to hold our configuration object and logger instances
         private static JObject _applicationConfig;
-        private static readonly SharpLogger _jsonConfigLogger = new SharpLogger(LoggerActions.FileLogger);
+        private static readonly SharpLogger _jsonConfigLogger = new(LoggerActions.FileLogger);
 
         #endregion //Fields
 
