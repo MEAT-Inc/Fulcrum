@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Class used for sending emails out to our client applications and users
     /// </summary>
-    public class FulcrumEmailBroker
+    internal class FulcrumEmailBroker
     {
         // Logger object
         private SubServiceLogger EmailLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("ReportSendingBrokerLogger", LoggerActions.SubServiceLogger);

@@ -7,16 +7,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Octokit;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
 {
     /// <summary>
     /// Class which houses the logic for pulling in a new Fulcrum Injector MSI File.
     /// </summary>
-    public class InjectorUpdater
+    internal class InjectorUpdater
     {
         // Logger object.
         private SubServiceLogger _injectorUpdateLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorUpdateLogger", LoggerActions.SubServiceLogger);

@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
     /// <summary>
     /// Class object containing information about the current version of this application
     /// </summary>
-    public class InjectorVersionInfo : IComparable
+    internal class InjectorVersionInfo : IComparable
     {
         // Versions of the currently installed shim and injector objects
         public readonly Version ShimVersion;

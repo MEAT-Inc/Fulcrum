@@ -7,7 +7,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Dependency property object for navigation menu types
     /// </summary>
-    public class FulcrumNavMenuItem : HamburgerMenuGlyphItem
+    internal class FulcrumNavMenuItem : HamburgerMenuGlyphItem
     {
         // Sets if we can navigate on this object or not.
         public bool IsNavigation => this.NavUserControlType != null && this.NavViewModelType != null;

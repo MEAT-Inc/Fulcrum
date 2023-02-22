@@ -33,8 +33,8 @@ namespace FulcrumInjector
         #region Fields
 
         // Color and Setting Configuration Objects from the config helpers
-        public static WindowBlurSetup WindowBlurHelper;
-        public static AppThemeConfiguration ThemeConfiguration;
+        internal static WindowBlurSetup WindowBlurHelper;
+        internal static AppThemeConfiguration ThemeConfiguration;
 
         #endregion //Fields
 
