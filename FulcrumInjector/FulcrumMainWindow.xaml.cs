@@ -19,8 +19,9 @@ namespace FulcrumInjector
 
         #region Fields
 
-        // Private backing fields for window logic
+        // Private backing fields for the main window logger and the blur configuration helper
         private readonly SharpLogger _injectorMainLogger;
+        private readonly FulcrumWindowBlur _fulcrumWindowBlurHelper;
 
         #endregion //Fields
 
@@ -41,10 +42,13 @@ namespace FulcrumInjector
             InitializeComponent();
 
             // Setup a blur effect for our window background and configure the logger for this window
-            App.WindowBlurHelper = new WindowBlurSetup(this, ShowBlur: true);
             this._injectorMainLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this._injectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE OK!", LogType.InfoLog);
-            this._injectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME CANS", LogType.WarnLog);
+            this._fulcrumWindowBlurHelper = new FulcrumWindowBlur(this);
+
+            // Log out that we're ready to FINALLY pop this window instance open
+            this._injectorMainLogger.WriteLog("STORED INJECTOR INSTANCE ON OUR CONSTANTS CLASS OK!", LogType.InfoLog);
+            this._injectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE CORRECTLY!", LogType.InfoLog);
+            this._injectorMainLogger.WriteLog("WELCOME TO THE FULCRUM INJECTOR. LETS SNIFF SOME GODDAMN CAN BUS", LogType.WarnLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

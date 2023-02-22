@@ -32,12 +32,9 @@ namespace FulcrumInjector
 
         #region Fields
 
-        // Logger for our application instance object
+        // Logger for our application instance object and the current theme configuration applied to it
         private SharpLogger _appLogger;
-
-        // Color and Setting Configuration Objects from the config helpers
-        internal static WindowBlurSetup WindowBlurHelper;
-        internal static AppThemeConfiguration ThemeConfiguration;
+        internal AppThemeConfiguration ThemeConfiguration;
 
         #endregion //Fields
 
@@ -74,7 +71,7 @@ namespace FulcrumInjector
             this._configureSingletonViews();
 
             // Log out that all of our startup routines are complete
-            SharpLogBroker.MasterLogger?.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
+            this._appLogger.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -110,12 +107,12 @@ namespace FulcrumInjector
         {
             // Find all the fulcrum process objects now.
             var CurrentInjector = Process.GetCurrentProcess();
-            SharpLogBroker.MasterLogger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
-            SharpLogBroker.MasterLogger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
+            this._appLogger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
+            this._appLogger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
 
             // Find the process values here.
             string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
-            SharpLogBroker.MasterLogger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
+            this._appLogger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
             var InjectorsTotal = Process.GetProcesses()
                 .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
                 .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName)
@@ -123,20 +120,20 @@ namespace FulcrumInjector
                 .ToList();
 
             // Now kill any existing instances
-            SharpLogBroker.MasterLogger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
+            this._appLogger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
             if (InjectorsTotal.Count > 0)
             {
                 // Log removing files and delete the log output
-                SharpLogBroker.MasterLogger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
+                this._appLogger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
                 try { File.Delete(SharpLogBroker.LogFilePath); }
-                catch { SharpLogBroker.MasterLogger?.WriteLog("CAN NOT DELETE NON EXISTENT FILES!", LogType.ErrorLog); }
+                catch { this._appLogger?.WriteLog("CAN NOT DELETE NON EXISTENT FILES!", LogType.ErrorLog); }
 
                 // Exit the application
                 Environment.Exit(100);
             }
 
             // Return passed output.
-            SharpLogBroker.MasterLogger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
+            this._appLogger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
         }
         /// <summary>
         /// Builds an event control object for methods to run when the app closes out.
@@ -182,8 +179,8 @@ namespace FulcrumInjector
             };
 
             // Log that we've hooked in a new exit routine to our window instance
-            SharpLogBroker.MasterLogger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
-            SharpLogBroker.MasterLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
+            this._appLogger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
+            this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
         /// <summary>
         /// Pulls in the resource dictionaries from the given resource path and stores them in the app
@@ -191,7 +188,7 @@ namespace FulcrumInjector
         private void _configureSingletonViews()
         {
             // Log information. Pull files in and store them all. This tuple create call pulls types for views then types for view models
-            SharpLogBroker.MasterLogger?.WriteLog("GENERATING STATIC VIEW CONTENTS FOR HAMBURGER CORE CONTENTS NOW...", LogType.WarnLog);
+            this._appLogger?.WriteLog("GENERATING STATIC VIEW CONTENTS FOR HAMBURGER CORE CONTENTS NOW...", LogType.WarnLog);
             var LoopResultCast = Assembly.GetExecutingAssembly().GetTypes().Where(TypePulled =>
                     TypePulled.Namespace != null && !TypePulled.Name.Contains("HamburgerCore") && 
                     (TypePulled.Namespace.Contains("InjectorCoreView") || TypePulled.Namespace.Contains("InjectorOptionView")))
@@ -200,29 +197,29 @@ namespace FulcrumInjector
             // Now build singleton instances for the types required.
             var ViewTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("View")).ToArray();
             var ViewModelTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("ViewModel")).ToArray();
-            if (ViewTypes.Length != ViewModelTypes.Length) SharpLogBroker.MasterLogger?.WriteLog("WARNING! TYPE OUTPUT LISTS ARE NOT EQUAL SIZES!", LogType.ErrorLog);
+            if (ViewTypes.Length != ViewModelTypes.Length) this._appLogger?.WriteLog("WARNING! TYPE OUTPUT LISTS ARE NOT EQUAL SIZES!", LogType.ErrorLog);
 
             // Loop operation here
             int MaxLoopIndex = Math.Min(ViewTypes.Length, ViewModelTypes.Length);
-            SharpLogBroker.MasterLogger?.WriteLog($"BUILDING TYPE INSTANCES NOW...", LogType.InfoLog);
-            SharpLogBroker.MasterLogger?.WriteLog($"A TOTAL OF {MaxLoopIndex} BASE ASSEMBLY TYPES ARE BEING SPLIT AND PROCESSED...", LogType.InfoLog);
+            this._appLogger?.WriteLog($"BUILDING TYPE INSTANCES NOW...", LogType.InfoLog);
+            this._appLogger?.WriteLog($"A TOTAL OF {MaxLoopIndex} BASE ASSEMBLY TYPES ARE BEING SPLIT AND PROCESSED...", LogType.InfoLog);
             for (int IndexValue = 0; IndexValue < MaxLoopIndex; IndexValue += 1)
             {
                 // Pull type values here
                 Type ViewType = ViewTypes[IndexValue]; Type ViewModelType = ViewModelTypes[IndexValue];
-                SharpLogBroker.MasterLogger?.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
-                SharpLogBroker.MasterLogger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
-                SharpLogBroker.MasterLogger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
+                this._appLogger?.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
+                this._appLogger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
+                this._appLogger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
 
                 // Generate our singleton object here.
                 var BuiltSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.CreateSingletonInstance(ViewType, ViewModelType);
-                SharpLogBroker.MasterLogger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-                SharpLogBroker.MasterLogger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
+                this._appLogger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
+                this._appLogger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
             }
 
             // Log completed building and exit routine
-            SharpLogBroker.MasterLogger?.WriteLog("BUILT OUTPUT TYPE CONTENTS OK! THESE VALUES ARE NOW STORED ON OUR MAIN WINDOW INSTANCE!", LogType.WarnLog);
-            SharpLogBroker.MasterLogger?.WriteLog("THE TYPE OUTPUT BUILT IS BEING PROJECTED ONTO THE FULCRUM INJECTOR CONSTANTS STORE OBJECT!", LogType.WarnLog);
+            this._appLogger?.WriteLog("BUILT OUTPUT TYPE CONTENTS OK! THESE VALUES ARE NOW STORED ON OUR MAIN WINDOW INSTANCE!", LogType.WarnLog);
+            this._appLogger?.WriteLog("THE TYPE OUTPUT BUILT IS BEING PROJECTED ONTO THE FULCRUM INJECTOR CONSTANTS STORE OBJECT!", LogType.WarnLog);
         }
         /// <summary>
         /// Configure new theme setup for instance objects.
@@ -230,13 +227,13 @@ namespace FulcrumInjector
         private void _configureCurrentTheme()
         {
             // Log infos and set values.
-            SharpLogBroker.MasterLogger?.WriteLog("SETTING UP MAIN APPLICATION THEME VALUES NOW...", LogType.InfoLog);
+            this._appLogger?.WriteLog("SETTING UP MAIN APPLICATION THEME VALUES NOW...", LogType.InfoLog);
 
             // Set theme configurations
             ThemeManager.Current.SyncTheme();
             ThemeConfiguration = new AppThemeConfiguration();
             ThemeConfiguration.CurrentAppStyleModel = ThemeConfiguration.PresetThemes[0];
-            SharpLogBroker.MasterLogger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
+            this._appLogger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
         }
         /// <summary>
         /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
@@ -244,9 +241,9 @@ namespace FulcrumInjector
         private void _configureUserSettings()
         {
             // Pull our settings objects out from the settings file.
-            FulcrumConstants._injectorSettings.GenerateSettingsModels();
-            SharpLogBroker.MasterLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
-            SharpLogBroker.MasterLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
+            FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
+            this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
+            this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
         }
     }
 }

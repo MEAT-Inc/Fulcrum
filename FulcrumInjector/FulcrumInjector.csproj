@@ -201,6 +201,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater\FulcrumUpdater.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater\FulcrumVersionInfo.cs" />
@@ -263,10 +264,9 @@
     <Compile Include="FulcrumViewSupport\DataContentHelpers\MarkdownXamlSchemaContext.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToObjectConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\BoolToVisibilityConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\HamburgerNavService.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\CustomColorShader.cs" />
-    <Compile Include="FulcrumViewSupport\WindowBlurSetup.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWindowBlur.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomColorConverter.cs" />
     <Compile Include="FulcrumViewSupport\DataContentHelpers\CustomColorValueJsonConverter.cs" />
@@ -377,14 +377,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

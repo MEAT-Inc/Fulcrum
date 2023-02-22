@@ -7,9 +7,18 @@ namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Animates frame objects
+    /// TODO: Figure out why this is here? I feel like it's got something to do with animating the hamburger menu items
     /// </summary>
     internal class FrameAnimator
     {
+        #region Custom Events
+        #endregion //Custom Events
+
+        #region Fields
+        #endregion //Fields
+
+        #region Properties
+
         /// <summary>
         /// Navigation helper which pulls our Storyboard and metadata contents on request
         /// </summary>
@@ -20,21 +29,39 @@ namespace FulcrumInjector.FulcrumViewSupport
                 typeof(FrameAnimator),
                 new FrameworkPropertyMetadata(null, OnFrameNavigationStoryboardChanged));
 
-        private static void OnFrameNavigationStoryboardChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        #endregion //Properties
+
+        #region Structs and Classes
+        #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>Helper for setting <see cref="FrameNavigationStoryboardProperty"/> on <paramref name="control"/>.</summary>
+        /// <param name="control"><see cref="DependencyObject"/> to set <see cref="FrameNavigationStoryboardProperty"/> on.</param>
+        /// <param name="storyboard">FrameNavigationStoryboard property value.</param>
+        public static void SetFrameNavigationStoryboard(DependencyObject control, Storyboard storyboard)
         {
-            if (d is Frame frame && e.OldValue != e.NewValue)
-            {
-                frame.Navigating -= Frame_Navigating;
-                if (e.NewValue is Storyboard)
-                {
-                    frame.Navigating += Frame_Navigating;
-                }
-            }
+            control.SetValue(FrameNavigationStoryboardProperty, storyboard);
+        }
+        /// <summary>Helper for getting <see cref="FrameNavigationStoryboardProperty"/> from <paramref name="control"/>.</summary>
+        /// <param name="control"><see cref="DependencyObject"/> to read <see cref="FrameNavigationStoryboardProperty"/> from.</param>
+        /// <returns>FrameNavigationStoryboard property value.</returns>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        public static Storyboard GetFrameNavigationStoryboard(DependencyObject control)
+        {
+            return (Storyboard)control.GetValue(FrameNavigationStoryboardProperty);
         }
 
-        private static void Frame_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Event to fire when a frame is navigating
+        /// </summary>
+        /// <param name="SendingControl">The control which has fired a navigation request</param>
+        /// <param name="EventArgs">Cancellation event args to stop this event if wanted</param>
+        private static void Frame_Navigating(object SendingControl, System.Windows.Navigation.NavigatingCancelEventArgs EventArgs)
         {
-            if (sender is Frame frame)
+            if (SendingControl is Frame frame)
             {
                 var sb = GetFrameNavigationStoryboard(frame);
                 if (sb != null)
@@ -44,22 +71,21 @@ namespace FulcrumInjector.FulcrumViewSupport
                 }
             }
         }
-
-        /// <summary>Helper for setting <see cref="FrameNavigationStoryboardProperty"/> on <paramref name="control"/>.</summary>
-        /// <param name="control"><see cref="DependencyObject"/> to set <see cref="FrameNavigationStoryboardProperty"/> on.</param>
-        /// <param name="storyboard">FrameNavigationStoryboard property value.</param>
-        public static void SetFrameNavigationStoryboard(DependencyObject control, Storyboard storyboard)
+        /// <summary>
+        /// Event handler to fire when the navigation state changes for a storyboard
+        /// </summary>
+        /// <param name="DepObj">The property firing this event</param>
+        /// <param name="DepObjArgs">EventArgs fired along with this event</param>
+        private static void OnFrameNavigationStoryboardChanged(DependencyObject DepObj, DependencyPropertyChangedEventArgs DepObjArgs)
         {
-            control.SetValue(FrameNavigationStoryboardProperty, storyboard);
-        }
-
-        /// <summary>Helper for getting <see cref="FrameNavigationStoryboardProperty"/> from <paramref name="control"/>.</summary>
-        /// <param name="control"><see cref="DependencyObject"/> to read <see cref="FrameNavigationStoryboardProperty"/> from.</param>
-        /// <returns>FrameNavigationStoryboard property value.</returns>
-        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
-        public static Storyboard GetFrameNavigationStoryboard(DependencyObject control)
-        {
-            return (Storyboard)control.GetValue(FrameNavigationStoryboardProperty);
+            if (DepObj is Frame frame && DepObjArgs.OldValue != DepObjArgs.NewValue)
+            {
+                frame.Navigating -= Frame_Navigating;
+                if (DepObjArgs.NewValue is Storyboard)
+                {
+                    frame.Navigating += Frame_Navigating;
+                }
+            }
         }
     }
 }

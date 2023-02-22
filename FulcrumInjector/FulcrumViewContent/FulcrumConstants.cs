@@ -25,9 +25,6 @@ namespace FulcrumInjector.FulcrumViewContent
 
         #region Fields
 
-        // Private logging instance used to log state changes in the constants class
-        private static readonly SharpLogger ConstantsLogger = new(LoggerActions.UniversalLogger);
-
         // Static fields for our injector application information
         private static FulcrumSettingsShare _fulcrumSettings;                   // Collection of all setting objects for this instance
         public static readonly FulcrumVersionInfo FulcrumVersions = new();      // Current version information for this application
@@ -83,9 +80,6 @@ namespace FulcrumInjector.FulcrumViewContent
                 _fulcrumSettingsPaneSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
                 _fulcrumSessionReportingSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
                 _fulcrumDebugLoggingSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
-
-                // Log done with this configuration once complete
-                ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW AND CONFIGURED NEW CONSTANTS VALUES FOR SINGLETONS CORRECTLY!", LogType.InfoLog);
             }
         }
 
