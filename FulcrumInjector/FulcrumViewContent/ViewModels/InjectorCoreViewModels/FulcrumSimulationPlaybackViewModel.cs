@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     /// <summary>
     /// View model for playback during the injector simulation processing
     /// </summary>
-    public class FulcrumSimulationPlaybackViewModel : ViewModelControlBase
+    public class FulcrumSimulationPlaybackViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorSimPlaybackViewModelLogger", LoggerActions.SubServiceLogger);

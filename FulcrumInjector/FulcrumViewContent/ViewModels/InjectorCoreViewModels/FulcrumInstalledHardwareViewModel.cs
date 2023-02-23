@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     /// <summary>
     /// Class used to bind our installed/active hardware objects to the view content for showing current PassThru devices.
     /// </summary>
-    public class FulcrumInstalledHardwareViewModel : ViewModelControlBase
+    public class FulcrumInstalledHardwareViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InstalledHardwareViewModelLogger", LoggerActions.SubServiceLogger);

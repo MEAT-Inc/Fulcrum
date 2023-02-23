@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
     /// <summary>
     /// View model content for the About view on the injector application
     /// </summary>
-    public class FulcrumAboutThisAppViewModel : ViewModelControlBase
+    public class FulcrumAboutThisAppViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("AboutThisAppViewModelLogger", LoggerActions.SubServiceLogger);

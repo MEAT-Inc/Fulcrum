@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// Base class for Model objects on the UI
     /// </summary>
-    internal class ViewModelControlBase : INotifyPropertyChanged
+    internal class FulcrumViewModelBase : INotifyPropertyChanged
     {
         #region Custom Events
 
@@ -50,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Constructs a new instance of a ViewModelControl base object
         /// </summary>
         /// <param name="ViewContent">The view which this VMC Base object will be consuming</param>
-        public ViewModelControlBase(UserControl ViewContent)
+        public FulcrumViewModelBase(UserControl ViewContent)
         {
             // Store the base view content on this instance and exit out
             this.BaseViewControl = ViewContent;
@@ -77,7 +77,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// Updates the globals with the new values configured into this object 
         /// </summary>
         /// <param name="ViewModelObject">Object to update</param>
-        private void _updateSingletonProperty(ViewModelControlBase ViewModelObject)
+        private void _updateSingletonProperty(FulcrumViewModelBase ViewModelObject)
         {
             // Get the types on the globals first.
             var AppViewStoreType = typeof(FulcrumConstants);
@@ -119,8 +119,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         }
 
                         // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
-                        var PulledSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                        FulcrumSingletonContent<UserControl, ViewModelControlBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
+                        var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
+                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
                         return;
                     }
                     catch { return; }
@@ -139,8 +139,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
                         }
 
                         // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
-                        var PulledSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                        FulcrumSingletonContent<UserControl, ViewModelControlBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
+                        var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
+                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
                         return;
                     }
                     catch { return; }

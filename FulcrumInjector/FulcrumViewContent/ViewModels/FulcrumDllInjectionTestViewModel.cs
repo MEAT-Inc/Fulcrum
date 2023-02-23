@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// View Model for Injection Test View
     /// </summary>
-    internal class FulcrumDllInjectionTestViewModel : ViewModelControlBase
+    internal class FulcrumDllInjectionTestViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion //Custom Events

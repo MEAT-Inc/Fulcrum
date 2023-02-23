@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// Singleton instance builder for user controls.
     /// This forces us to only pass in ViewModelControl base instance objects.
     /// </summary>
-    internal class FulcrumSingletonContent<TViewType, TViewModelType> where TViewModelType : ViewModelControlBase
+    internal class FulcrumSingletonContent<TViewType, TViewModelType> where TViewModelType : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion //Custom Events
