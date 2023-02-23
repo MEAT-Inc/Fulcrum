@@ -1,10 +1,7 @@
-﻿using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 using SharpLogging;
@@ -14,36 +11,54 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
     /// <summary>
     /// View model content for the Updater view on the injector application
     /// </summary>
-    public class FulcrumUpdaterViewModel : FulcrumViewModelBase
+    internal class FulcrumUpdaterViewModel : FulcrumViewModelBase
     {
-        // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("UpdaterViewModelLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
 
-        // Private control values
+        #region Fields
+
+        // GitHub Updater Client
+        public readonly FulcrumUpdater GitHubUpdateHelper;
+
+        // Private backing fields for our public properties
         private bool _updateReady;                // Sets if there's an update ready or not.
         private bool _isDownloading;              // Sets if the updater is currently pulling in a file or not.
         private double _downloadProgress;         // Progress for when downloads are in the works
         private string _downloadTimeElapsed;      // Time downloading spent so far
         private string _downloadTimeRemaining;    // Approximate time left on the download
 
-        // Public values for our view to bind onto 
-        public readonly FulcrumUpdater GitHubUpdateHelper;
+        #endregion // Fields
+
+        #region Properties
+
+        // Public properties for the view to bind onto  
         public bool UpdateReady { get => _updateReady; set => PropertyUpdated(value); }
         public bool IsDownloading { get => _isDownloading; set => PropertyUpdated(value); }
         public double DownloadProgress { get => _downloadProgress; set => PropertyUpdated(value); }
         public string DownloadTimeElapsed { get => _downloadTimeElapsed; set => PropertyUpdated(value); }
         public string DownloadTimeRemaining { get => _downloadTimeRemaining; set => PropertyUpdated(value); }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        public FulcrumUpdaterViewModel()
+        /// <param name="UpdaterViewUserControl">User control which holds the view content for the updater</param>
+        public FulcrumUpdaterViewModel(UserControl UpdaterViewUserControl) : base(UpdaterViewUserControl)
         {
+            // Spawn a new logger for this view model instance 
+            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
+
             // Log information and store values
-            ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Setup basic view bound values
             this.DownloadProgress = 0;
@@ -53,16 +68,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             // Build new update helper
             this.GitHubUpdateHelper = new FulcrumUpdater();
             GitHubUpdateHelper.RefreshInjectorVersions();
-            ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 
             // Check for force update toggle
             bool ForceUpdate = ValueLoaders.GetConfigValue<bool>("FulcrumInjectorConstants.InjectorUpdates.ForceUpdateReady");
-            if (ForceUpdate) ViewModelLogger.WriteLog("WARNING! FORCING UPDATES IS ON! ENSURING SHOW UPDATE BUTTON IS VISIBLE!", LogType.WarnLog);
+            if (ForceUpdate) this.ViewModelLogger.WriteLog("WARNING! FORCING UPDATES IS ON! ENSURING SHOW UPDATE BUTTON IS VISIBLE!", LogType.WarnLog);
 
             // Check for our updates now.
             if (!GitHubUpdateHelper.CheckAgainstVersion(FulcrumConstants.FulcrumVersions.InjectorVersionString) && !ForceUpdate) {
-                ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
-                ViewModelLogger.WriteLog("NOT CONFIGURING UPDATE EVENT ROUTINES FOR OUR UPDATER OBJECT!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("NOT CONFIGURING UPDATE EVENT ROUTINES FOR OUR UPDATER OBJECT!", LogType.WarnLog);
                 return;
             }
 
@@ -71,21 +86,21 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             this._initializeUpdaterClientEvents();
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Invokes a new download on the git hub helper to pull in the newest release of the injector
         /// </summary>
-        internal string InvokeInjectorDownload()
+        public string InvokeInjectorDownload()
         {
             // Start by invoking a new download of the newest version
             this.IsDownloading = true;
             string LatestTag = this.GitHubUpdateHelper.LatestInjectorVersion;
-            ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
             string OutputAssetPath = this.GitHubUpdateHelper.DownloadInjectorRelease(LatestTag, out string AssetUrl);
 
             // Log done downloading and return the path
-            ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {OutputAssetPath} OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {OutputAssetPath} OK!", LogType.InfoLog);
             this.IsDownloading = false;
             return OutputAssetPath;
         }
@@ -94,12 +109,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
         /// </summary>
         /// <param name="PathToInstaller">Path to the installer to run</param>
         /// <returns>True if started, false if not.</returns>
-        internal bool InstallInjectorRelease(string PathToInstaller)
+        public bool InstallInjectorRelease(string PathToInstaller)
         {
             // Setup our string for the command to run.
             string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {PathToInstaller}";
             if (!File.Exists(PathToInstaller)) {
-                ViewModelLogger.WriteLog($"PATH {PathToInstaller} DOES NOT EXIST ON THE SYSTEM! UNABLE TO INSTALL A NEW VERSION!", LogType.ErrorLog);
+                this.ViewModelLogger.WriteLog($"PATH {PathToInstaller} DOES NOT EXIST ON THE SYSTEM! UNABLE TO INSTALL A NEW VERSION!", LogType.ErrorLog);
                 return false; 
             }
 
@@ -115,16 +130,14 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             };
 
             // Log starting updates and return true
-            ViewModelLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
-            ViewModelLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
 
             // Boot the update and return true
             InstallNewReleaseProcess.Start();
             InstallNewReleaseProcess.CloseMainWindow();
             return true;
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Configures updater event objects for when downloads are in the works
@@ -136,10 +149,9 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             this.GitHubUpdateHelper.OnUpdaterComplete += _updateDownloadCompleteProgressEvent;
 
             // Log done and exit routine
-            ViewModelLogger.WriteLog("BUILT EVENTS FOR PROGRESS MONITORING CORRECTLY!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("BUILT EVENTS FOR PROGRESS MONITORING CORRECTLY!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
         }
-
         /// <summary>
         /// Event handler routine for when download progress is updated
         /// </summary>
@@ -156,7 +168,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             // Log the current byte count output
             string CurrentSize = UpdateArgs.BytesReceived.ToString();
             string TotalSize = UpdateArgs.TotalBytesToReceive.ToString();
-            ViewModelLogger.WriteLog($"CURRENT DOWNLOAD PROGRESS: {CurrentSize} OF {TotalSize}");
+            this.ViewModelLogger.WriteLog($"CURRENT DOWNLOAD PROGRESS: {CurrentSize} OF {TotalSize}");
         }
         /// <summary>
         /// Event handler routine for when download progress is completed
@@ -172,9 +184,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels
             this.DownloadTimeRemaining = "Download Done!";
 
             // Log done downloading and update values for the view model
-            ViewModelLogger.WriteLog("DOWNLOADING COMPLETED WITHOUT ISSUES!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"TOTAL DOWNLOAD TIME ELAPSED: {GitHubUpdateHelper.DownloadTimeElapsed}");
+            this.ViewModelLogger.WriteLog("DOWNLOADING COMPLETED WITHOUT ISSUES!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"TOTAL DOWNLOAD TIME ELAPSED: {GitHubUpdateHelper.DownloadTimeElapsed}");
         }
-
     }
 }

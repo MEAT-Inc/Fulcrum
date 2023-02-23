@@ -2,25 +2,73 @@
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using SharpExpressions;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using SharpSimulator;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
-
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
     /// <summary>
     /// Viewmodel object for viewing output log instances from old log files.
     /// </summary>
-    public class FulcrumLogReviewViewModel : FulcrumViewModelBase
+    internal class FulcrumLogReviewViewModel : FulcrumViewModelBase
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Private generator objects 
+        private PassThruSimulationGenerator _simulationGenerator;
+        private PassThruExpressionsGenerator _expressionsGenerator;
+
+        // Helpers for syntax formatting and filtering
+        public LogOutputFilteringHelper LogFilteringHelper;
+        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
+
+        // Private backing fields for our public properties
+        private string _loadedLogFile = "";
+        private string _simulationFile = "";
+        private string _expressionsFile = "";
+        private string _logFileContents = "";
+        private string _simulationFileContents = "";
+        private string _expressionsFileContents = "";
+        private bool _isLogLoaded = false;
+        private bool _simulationBuilt = false;
+        private bool _expressionsBuilt = false;
+        private ViewerStateType _currentState;
+
+        // Progress Of Viewer actions
+        private int _processingProgress = 0;
+        private ObservableCollection<PassThruExpression> _lastBuiltExpressions;
+        private ObservableCollection<PassThruSimulationChannel> _lastBuiltSimulation;
+
+        #endregion // Fields
+
+        #region Properties
+
+        // Public properties for the view to bind onto  
+        public bool IsLogLoaded { get => _isLogLoaded; set => PropertyUpdated(value); }
+        public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
+        public string SimulationFile { get => _simulationFile; set => PropertyUpdated(value); }
+        public string ExpressionsFile { get => _expressionsFile; set => PropertyUpdated(value); }
+        public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
+        public string SimulationFileContents { get => _simulationFileContents; set => PropertyUpdated(value); }
+        public string ExpressionsFileContents { get => _expressionsFileContents; set => PropertyUpdated(value); }
+        public bool ExpressionsBuilt { get => _expressionsBuilt; set => PropertyUpdated(value); }
+        public bool SimulationBuilt { get => _simulationBuilt; set => PropertyUpdated(value); }
+        public int ProcessingProgress { get => _processingProgress; set => PropertyUpdated(value); }
+
+        #endregion // Properties
+
+        #region Structs and Classes
+
         /// <summary>
         /// Enum used to set our viewer current state value
         /// </summary>
@@ -32,64 +80,20 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             [Description("Simulation File")] ShowingSimulation
         }
 
+        #endregion // Structs and Classes
+
+
         // ------------------------------------------------------------------------------------------------------------------------------------------
-
-        // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorLogReviewViewModelLogger", LoggerActions.SubServiceLogger);
-
-        // Private generator objects 
-        private PassThruSimulationGenerator _simulationGenerator;
-        private PassThruExpressionsGenerator _expressionsGenerator;
-
-        // Private control values
-        private string _loadedLogFile = "";
-        private string _simulationFile = "";
-        private string _expressionsFile = "";
-
-        // Values for content strings to pull in
-        private string _logFileContents = "";
-        private string _simulationFileContents = "";
-        private string _expressionsFileContents = "";
-
-        // Private string for last built expressions file.
-        private bool _isLogLoaded = false;
-        private bool _simulationBuilt = false;
-        private bool _expressionsBuilt = false;
-        private ViewerStateType _currentState;
-
-        // Progress Of Viewer actions
-        private int _processingProgress = 0;
-        private ObservableCollection<PassThruExpression> _lastBuiltExpressions;
-        private ObservableCollection<PassThruSimulationChannel> _lastBuiltSimulation;
-
-        public bool IsLogLoaded { get => _isLogLoaded; set => PropertyUpdated(value); }
-        public string LoadedLogFile { get => _loadedLogFile; set => PropertyUpdated(value); }
-        public string SimulationFile { get => _simulationFile; set => PropertyUpdated(value); }
-        public string ExpressionsFile { get => _expressionsFile; set => PropertyUpdated(value); }
-
-        // File Content Values
-        public string LogFileContents { get => _logFileContents; set => PropertyUpdated(value); }
-        public string SimulationFileContents { get => _simulationFileContents; set => PropertyUpdated(value); }
-        public string ExpressionsFileContents { get => _expressionsFileContents; set => PropertyUpdated(value); }
-
-        // View boolean toggles
-        public bool ExpressionsBuilt { get => _expressionsBuilt; set => PropertyUpdated(value); }
-        public bool SimulationBuilt { get => _simulationBuilt; set => PropertyUpdated(value); }
-
-        // Progress for parse
-        public int ProcessingProgress { get => _processingProgress; set => PropertyUpdated(value); }
-
-        // Helper for syntax formatting and filtering
-        public LogOutputFilteringHelper LogFilteringHelper;
-        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
+        
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        public FulcrumLogReviewViewModel()
+        /// <param name="LogReviewUserControl">UserControl which holds our content for the Log Review view</param>
+        public FulcrumLogReviewViewModel(UserControl LogReviewUserControl) : base(LogReviewUserControl) 
         {
+            // Spawn a new logger for this view model instance 
+            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
+
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP INJECTOR LOG REVIEW VIEW BOUND VALUES NOW...", LogType.WarnLog);
@@ -117,7 +121,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="LogFilePaths"></param>
         /// <returns>Path to a combined output log file.</returns>
-        internal string CombineLogFiles(string[] LogFilePaths)
+        public string CombineLogFiles(string[] LogFilePaths)
         {
             // Find the name of the first file and use it as our base.
             string OutputPath = Path.Combine(
@@ -149,7 +153,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// Loads the contents of an input log file object from a given path and stores them into the view.
         /// </summary>
         /// <param name="NewLogFile"></param>
-        internal bool LoadLogContents(string NewLogFile)
+        public bool LoadLogContents(string NewLogFile)
         {
             // Log information, load contents, store values.
             ViewModelLogger.WriteLog("LOADING NEW LOG FILE CONTENTS NOW...", LogType.InfoLog);
@@ -223,7 +227,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Log failed to load and set our contents to just "Failed to Load!" with the exception stack trace.
                 ViewModelLogger.WriteLog("FAILED TO LOAD NEW LOG FILE! VIEW IS SHOWING STACK TRACE NOW!", LogType.InfoLog);
-                ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW.", Ex);
+                ViewModelLogger.WriteException("EXCEPTION THROWN IS BEING LOGGED BELOW.", Ex);
 
                 // Store new values.
                 this.IsLogLoaded = false; this.LoadedLogFile = null;
@@ -237,13 +241,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 return false;   
             }
         }
-        
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
         /// <param name="OutputExpressions"></param>
         /// <returns></returns>
-        internal bool BuildLogExpressions()
+        public bool BuildLogExpressions()
         {
             try
             {
@@ -282,7 +285,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Log failures, return nothing
                 this.ProcessingProgress = 100;
                 ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
-                ViewModelLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", Ex);
+                ViewModelLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", Ex);
                 this.ExpressionsBuilt = false;
                 return false;
             }
@@ -292,7 +295,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="GeneratorBuilt">Built generation helper</param>
         /// <returns>True if built ok. False if not</returns>
-        internal bool BuildLogSimulation()
+        public bool BuildLogSimulation()
         {
             try
             { 
@@ -330,17 +333,16 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
                 // Log failures out and return nothing
                 this.ProcessingProgress = 100;
                 ViewModelLogger.WriteLog("FAILED TO BUILD NEW SIMULATION FILE USING INPUT EXPRESSIONS!", LogType.ErrorLog);
-                ViewModelLogger.WriteLog("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
+                ViewModelLogger.WriteException("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
                 this.SimulationBuilt = false;
                 return false;
             }
         }
-
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.
         /// </summary>
         /// <param name="TextToFind"></param>
-        internal void SearchForText(string TextToFind)
+        public void SearchForText(string TextToFind)
         {
             // Make sure transformer is built
             if (LogFilteringHelper == null) return;
@@ -351,7 +353,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
         /// </summary>
         /// <param name="StateToSet">State to apply</param>
         /// <returns></returns>
-        internal bool ToggleViewerContents(ViewerStateType StateToSet)
+        public bool ToggleViewerContents(ViewerStateType StateToSet)
         {
             try
             {
@@ -421,7 +423,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             {
                 // Log failures. Return false.
                 ViewModelLogger.WriteLog("FAILED TO LOAD IN NEW CONTENTS FOR OUR FILE ENTRIES!");
-                ViewModelLogger.WriteLog("EXCEPTIONS ARE BEING LOGGED BELOW", LoadEx);
+                ViewModelLogger.WriteException("EXCEPTIONS ARE BEING LOGGED BELOW", LoadEx);
                 return false;
             }
         }

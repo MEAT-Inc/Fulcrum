@@ -1,62 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using MahApps.Metro.Controls;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
-using System.IO;
 using System.Reflection;
-using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
 using Svg;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
     /// <summary>
     /// ViewModel for the main hamburger core object
     /// </summary>
-    public class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
+    internal class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
     {
-        // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorHamburgerViewModelLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
 
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        // Private control values
-        private ObservableCollection<FulcrumNavMenuItem> _injectorMenuEntries;
-        private ObservableCollection<FulcrumNavMenuItem> _injectorMenuOptions;
-
-        // Public values for our view to bind to
-        public ObservableCollection<FulcrumNavMenuItem> InjectorMenuEntries { get => _injectorMenuEntries; set => PropertyUpdated(value); }
-        public ObservableCollection<FulcrumNavMenuItem> InjectorMenuOptions { get => _injectorMenuOptions; set => PropertyUpdated(value); }
-
-        // --------------------------------------------------------------------------------------------------------------------------
+        #region Fields
 
         // Path for Icons and Styles
         public readonly string FulcrumIconPath;
         public readonly dynamic[] FulcrumMenuEntries;
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // Private backing fields for our public properties
+        private ObservableCollection<FulcrumNavMenuItem> _injectorMenuEntries;
+        private ObservableCollection<FulcrumNavMenuItem> _injectorMenuOptions;
+
+        #endregion // Fields
+
+        #region Properties
+
+        // Public properties for the view to bind onto  
+        public ObservableCollection<FulcrumNavMenuItem> InjectorMenuEntries { get => _injectorMenuEntries; set => PropertyUpdated(value); }
+        public ObservableCollection<FulcrumNavMenuItem> InjectorMenuOptions { get => _injectorMenuOptions; set => PropertyUpdated(value); }
+
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        public FulcrumHamburgerCoreViewModel()
+        /// <param name="HamburgerUserControl">UserControl which holds the content for our hamburger core</param>
+        public FulcrumHamburgerCoreViewModel(UserControl HamburgerUserControl) : base(HamburgerUserControl)
         {
+            // Spawn a new logger for this view model instance 
+            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
+
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP HAMBURGER VIEW BOUND VALUES NOW...", LogType.WarnLog);
@@ -79,15 +78,101 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             ViewModelLogger.WriteLog("SETUP NEW HAMBURGER OUTPUT LOG VALUES OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Applies new hamburger menu items here
+        /// </summary>
+        public FulcrumNavMenuItem[] SetupHamburgerMenuItems()
+        {
+            // Pull icon objects, store menu entries into a list
+            FulcrumNavMenuItem[] OutputMenuItems = Array.Empty<FulcrumNavMenuItem>();
+            ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OBJECTS NOW...", LogType.InfoLog);
+            foreach (var IconObjectEntry in this.FulcrumMenuEntries)
+            {
+                // Pull values out of icon objects and check if option or not
+                string MenuEntryName = IconObjectEntry.MenuEntry;
+
+                // Check if the menu object is enabled or not
+                bool MenuOptionEnabled = IconObjectEntry.IsEntryEnabled;
+                if (!MenuOptionEnabled) {
+                    ViewModelLogger.WriteLog($"--> WARNING! MENU ENTRY {MenuOptionEnabled} IS NOT ENABLED! SKIPPING ADDITION FOR IT!", LogType.WarnLog);
+                    continue;
+                }
+
+                // If it's an option entry skip it as well
+                if (IconObjectEntry.EntryType == "OptionEntry") {
+                    ViewModelLogger.WriteLog($"   --> ENTRY OBJECT IS SEEN TO BE AN OPTION ENTRY! NOT INCLUDING THIS IN OUR MENU VALUES", LogType.InfoLog);
+                    ViewModelLogger.WriteLog($"   --> SKIPPED ENTRY {MenuEntryName}", LogType.InfoLog);
+                    continue;
+                }
+
+                // If not an option entry, pull our other values and run the builder
+                string MenuViewType = IconObjectEntry.MenuViewType;
+                string MenuModelType = IconObjectEntry.MenuModelType;
+                string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;
+
+                // Build new menu entry and add to our collection
+                OutputMenuItems = OutputMenuItems.Append(this._buildHamburgerNavItem(MenuEntryName, MenuViewType,  MenuModelType, MenuIconSvgPaths)).ToArray();
+                ViewModelLogger.WriteLog($"   --> STORED NEW MENU ENTRY NAMED {MenuEntryName} OK!", LogType.InfoLog);
+            }
+
+            // Return built output object values
+            this.InjectorMenuEntries = new ObservableCollection<FulcrumNavMenuItem>(OutputMenuItems);
+            return OutputMenuItems;
+        }
+        /// <summary>
+        /// Builds the option item entries for our injector hamburger menu
+        /// </summary>
+        /// <returns>List of objects built for our hamburger views</returns>
+        public FulcrumNavMenuItem[] SetupHamburgerOptionItems()
+        {
+            // Pull icon objects, store menu entries into a list
+            FulcrumNavMenuItem[] OutputOptionEntries = Array.Empty<FulcrumNavMenuItem>();
+            ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OPTION OBJECTS NOW...", LogType.InfoLog);
+            foreach (var IconObjectEntry in this.FulcrumMenuEntries)
+            {
+                // Pull values out of icon objects and check if option or not
+                string MenuEntryName = IconObjectEntry.MenuEntry;
+
+                // Check if the menu object is enabled or not
+                bool MenuOptionEnabled = IconObjectEntry.IsEntryEnabled;
+                if (!MenuOptionEnabled) {
+                    ViewModelLogger.WriteLog($"--> WARNING! MENU ENTRY {MenuOptionEnabled} IS NOT ENABLED! SKIPPING ADDITION FOR IT!", LogType.WarnLog);
+                    continue;
+                }
+
+                // If it's a menu entry skip it as well]
+                if (IconObjectEntry.EntryType == "MenuEntry") {
+                    ViewModelLogger.WriteLog($"   --> ENTRY OBJECT IS SEEN TO BE AN MENU ENTRY! NOT INCLUDING THIS IN OUR OPTION VALUES", LogType.InfoLog);
+                    ViewModelLogger.WriteLog($"   --> SKIPPED ENTRY {MenuEntryName}", LogType.InfoLog);
+                    continue;
+                }
+
+                // If not a menu entry, pull our other values and run the builder
+                string MenuViewType = IconObjectEntry.MenuViewType;
+                string MenuModelType = IconObjectEntry.MenuModelType;
+                string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;
+
+                // Build new menu entry and add to our collection
+                OutputOptionEntries = OutputOptionEntries.Append(this._buildHamburgerNavItem(MenuEntryName, MenuViewType, MenuModelType, MenuIconSvgPaths)).ToArray();
+                ViewModelLogger.WriteLog($"   --> STORED NEW OPTION ENTRY NAMED {MenuEntryName} OK!", LogType.InfoLog);
+            }
+
+            // Return built output object values
+            this.InjectorMenuOptions = new ObservableCollection<FulcrumNavMenuItem>(OutputOptionEntries);
+            return OutputOptionEntries;
+        }
 
         /// <summary>
         /// Builds a hamburger entry object from a given set of values for a menu entry.
         /// </summary>
-        /// <param name="IconPath">Path to icons folder</param>
-        /// <param name="IconObjectEntry">Icon object to use for set</param>
-        /// <returns></returns>
-        private FulcrumNavMenuItem BuildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
+        /// <param name="MenuEntryName">Menu item name</param>
+        /// <param name="MenuViewTypeName">View type for the menu item</param>
+        /// <param name="MenuModelTypeName">Model type for the menu item</param>
+        /// <param name="MenuIconSvgPaths">The SVG Path value for the menu item icon</param>
+        /// <returns>A built navigation item for the menu object</returns>
+        private FulcrumNavMenuItem _buildHamburgerNavItem(string MenuEntryName, string MenuViewTypeName, string MenuModelTypeName, string MenuIconSvgPaths)
         {
             // Replace Icon path with current text color value
             var CurrentMerged = Application.Current.Resources.MergedDictionaries;
@@ -138,92 +223,6 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
             // Log the result of the binding actions
             ViewModelLogger.WriteLog($"   --> CAST NEW OBJECT AND STORED NEW CONTENTS FOR ENTRY {MenuEntryName} OK!", LogType.InfoLog);
             return NewResult;
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Applies new hamburger menu items here
-        /// </summary>
-        internal FulcrumNavMenuItem[] SetupHamburgerMenuItems()
-        {
-            // Pull icon objects, store menu entries into a list
-            FulcrumNavMenuItem[] OutputMenuItems = Array.Empty<FulcrumNavMenuItem>();
-            ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OBJECTS NOW...", LogType.InfoLog);
-            foreach (var IconObjectEntry in this.FulcrumMenuEntries)
-            {
-                // Pull values out of icon objects and check if option or not
-                string MenuEntryName = IconObjectEntry.MenuEntry;
-
-                // Check if the menu object is enabled or not
-                bool MenuOptionEnabled = IconObjectEntry.IsEntryEnabled;
-                if (!MenuOptionEnabled) {
-                    ViewModelLogger.WriteLog($"--> WARNING! MENU ENTRY {MenuOptionEnabled} IS NOT ENABLED! SKIPPING ADDITION FOR IT!", LogType.WarnLog);
-                    continue;
-                }
-
-                // If it's an option entry skip it as well
-                if (IconObjectEntry.EntryType == "OptionEntry") {
-                    ViewModelLogger.WriteLog($"   --> ENTRY OBJECT IS SEEN TO BE AN OPTION ENTRY! NOT INCLUDING THIS IN OUR MENU VALUES", LogType.InfoLog);
-                    ViewModelLogger.WriteLog($"   --> SKIPPED ENTRY {MenuEntryName}", LogType.InfoLog);
-                    continue;
-                }
-
-                // If not an option entry, pull our other values and run the builder
-                string MenuViewType = IconObjectEntry.MenuViewType;
-                string MenuModelType = IconObjectEntry.MenuModelType;
-                string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;
-
-                // Build new menu entry and add to our collection
-                OutputMenuItems = OutputMenuItems.Append(this.BuildHamburgerNavItem(MenuEntryName, MenuViewType,  MenuModelType, MenuIconSvgPaths)).ToArray();
-                ViewModelLogger.WriteLog($"   --> STORED NEW MENU ENTRY NAMED {MenuEntryName} OK!", LogType.InfoLog);
-            }
-
-            // Return built output object values
-            this.InjectorMenuEntries = new ObservableCollection<FulcrumNavMenuItem>(OutputMenuItems);
-            return OutputMenuItems;
-        }
-        /// <summary>
-        /// Builds the option item entries for our injector hamburger menu
-        /// </summary>
-        /// <returns>List of objects built for our hamburger views</returns>
-        internal FulcrumNavMenuItem[] SetupHamburgerOptionItems()
-        {
-            // Pull icon objects, store menu entries into a list
-            FulcrumNavMenuItem[] OutputOptionEntries = Array.Empty<FulcrumNavMenuItem>();
-            ViewModelLogger.WriteLog("--> BUILDING BOUND VIEW MODEL ENTRIES FOR MENU OPTION OBJECTS NOW...", LogType.InfoLog);
-            foreach (var IconObjectEntry in this.FulcrumMenuEntries)
-            {
-                // Pull values out of icon objects and check if option or not
-                string MenuEntryName = IconObjectEntry.MenuEntry;
-
-                // Check if the menu object is enabled or not
-                bool MenuOptionEnabled = IconObjectEntry.IsEntryEnabled;
-                if (!MenuOptionEnabled) {
-                    ViewModelLogger.WriteLog($"--> WARNING! MENU ENTRY {MenuOptionEnabled} IS NOT ENABLED! SKIPPING ADDITION FOR IT!", LogType.WarnLog);
-                    continue;
-                }
-
-                // If it's a menu entry skip it as well]
-                if (IconObjectEntry.EntryType == "MenuEntry") {
-                    ViewModelLogger.WriteLog($"   --> ENTRY OBJECT IS SEEN TO BE AN MENU ENTRY! NOT INCLUDING THIS IN OUR OPTION VALUES", LogType.InfoLog);
-                    ViewModelLogger.WriteLog($"   --> SKIPPED ENTRY {MenuEntryName}", LogType.InfoLog);
-                    continue;
-                }
-
-                // If not a menu entry, pull our other values and run the builder
-                string MenuViewType = IconObjectEntry.MenuViewType;
-                string MenuModelType = IconObjectEntry.MenuModelType;
-                string MenuIconSvgPaths = IconObjectEntry.MenuIconSvgPath;
-
-                // Build new menu entry and add to our collection
-                OutputOptionEntries = OutputOptionEntries.Append(this.BuildHamburgerNavItem(MenuEntryName, MenuViewType, MenuModelType, MenuIconSvgPaths)).ToArray();
-                ViewModelLogger.WriteLog($"   --> STORED NEW OPTION ENTRY NAMED {MenuEntryName} OK!", LogType.InfoLog);
-            }
-
-            // Return built output object values
-            this.InjectorMenuOptions = new ObservableCollection<FulcrumNavMenuItem>(OutputOptionEntries);
-            return OutputOptionEntries;
         }
     }
 }

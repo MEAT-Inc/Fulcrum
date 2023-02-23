@@ -48,15 +48,15 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        /// <param name="PipeStateUserControl">The user control holding the pipe status view used to setup this VM</param>
+        /// <param name="PipeStateUserControl">UserControl which holds the content for the pipe status view</param>
         public FulcrumPipeStatusViewModel(UserControl PipeStateUserControl) : base(PipeStateUserControl)
         {
             // Spawn a new logger for this view model instance 
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Log information and store values 
-            ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
             // Configure new pipe instances for our class
             this._readerPipe = PassThruPipeReader.AllocatePipe();
@@ -66,10 +66,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this._readerPipeStateWatchdog = new PropertyWatchdog(250);
             this._writerPipeStateWatchdog = new PropertyWatchdog(250);
             this._testInjectionButtonWatchdog = new PropertyWatchdog(250);
-            ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
 
             // Log completed setup.
-            ViewModelLogger.WriteLog("SETUP NEW PIPE STATUS MONITOR VALUES OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("SETUP NEW PIPE STATUS MONITOR VALUES OK!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,10 +130,10 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             this._writerPipe.StartPipeConnectionAsync();
 
             // Log built and output information.
-            ViewModelLogger.WriteLog("CONFIGURED AND STARTED NEW WATCHDOGS FOR THE READER AND WRITER PIPE STATE VALUES!", LogType.InfoLog);
-            ViewModelLogger.WriteLog($"READER IS UPDATING AT A RATE OF {this._readerPipeStateWatchdog.UpdateInterval.Milliseconds}");
-            ViewModelLogger.WriteLog($"WRITER IS UPDATING AT A RATE OF {this._writerPipeStateWatchdog.UpdateInterval.Milliseconds}");
-            ViewModelLogger.WriteLog($"TESTER IS UPDATING AT A RATE OF {this._testInjectionButtonWatchdog.UpdateInterval.Milliseconds}");
+            this.ViewModelLogger.WriteLog("CONFIGURED AND STARTED NEW WATCHDOGS FOR THE READER AND WRITER PIPE STATE VALUES!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"READER IS UPDATING AT A RATE OF {this._readerPipeStateWatchdog.UpdateInterval.Milliseconds}");
+            this.ViewModelLogger.WriteLog($"WRITER IS UPDATING AT A RATE OF {this._writerPipeStateWatchdog.UpdateInterval.Milliseconds}");
+            this.ViewModelLogger.WriteLog($"TESTER IS UPDATING AT A RATE OF {this._testInjectionButtonWatchdog.UpdateInterval.Milliseconds}");
         }
     }
 }

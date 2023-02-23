@@ -80,7 +80,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <param name="ViewType">The type of the view to spawn</param>
         /// <param name="ViewModelType">The type of the view model to spawn</param>
         /// <returns>True if built ok. False if not.</returns>
-        internal static FulcrumSingletonContent<TViewType, TViewModelType> CreateSingletonInstance(Type ViewType, Type ViewModelType)
+        public static FulcrumSingletonContent<TViewType, TViewModelType> CreateSingletonInstance(Type ViewType, Type ViewModelType)
         {
             // Build new instance of this singleton helper and return it
             _singletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewType.Name}...", LogType.WarnLog);
@@ -116,7 +116,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <param name="ViewObject">The view we need to register on our singleton</param>
         /// <param name="ViewModelObject">The view model we need to register on our singleton</param>
         /// <returns>True if the singleton is registered correctly. False if not.</returns>
-        internal static FulcrumSingletonContent<TViewType, TViewModelType> RegisterAsSingleton(TViewType ViewObject, TViewModelType ViewModelObject)
+        public static FulcrumSingletonContent<TViewType, TViewModelType> RegisterAsSingleton(TViewType ViewObject, TViewModelType ViewModelObject)
         {
             // Build new instance of this singleton helper and return it
             _singletonLogger.WriteLog($"TRYING TO REGISTER NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewObject.GetType().Name}...", LogType.WarnLog);

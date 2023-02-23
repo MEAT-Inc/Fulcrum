@@ -140,9 +140,6 @@
     <Reference Include="SharpExpressions, Version=0.3.1.40, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpExpressions.0.3.1.40\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogger, Version=1.10.0.140, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.1.10.0.140\lib\net472\SharpLogger.dll</HintPath>
-    </Reference>
     <Reference Include="SharpLogging, Version=2.5.4.273, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\SharpLogging.dll</HintPath>
     </Reference>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -49,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        /// <param name="InstalledAppsView">The user control holding the installed apps view used to setup this VM</param>
+        /// <param name="InstalledAppsView">UserControl which holds the content for our Installed apps view</param>
         public FulcrumInstalledOeAppsViewModel(UserControl InstalledAppsView) : base(InstalledAppsView)
         {           
             // Spawn a new logger for this view model instance 
