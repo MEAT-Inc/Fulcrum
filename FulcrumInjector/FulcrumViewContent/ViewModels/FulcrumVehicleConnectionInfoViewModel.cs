@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// View model object for our connected vehicle information helper
     /// </summary>
-    public class FulcrumVehicleConnectionInfoViewModel : ViewModelControlBase
+    public class FulcrumVehicleConnectionInfoViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("VehicleConnectionViewModelLogger", LoggerActions.SubServiceLogger);

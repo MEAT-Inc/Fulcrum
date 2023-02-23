@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     /// <summary>
     /// ViewModel for settings pane binding values
     /// </summary>
-    public class FulcrumSettingsPaneViewModel : ViewModelControlBase
+    public class FulcrumSettingsPaneViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SettingsViewModelLogger", LoggerActions.SubServiceLogger);

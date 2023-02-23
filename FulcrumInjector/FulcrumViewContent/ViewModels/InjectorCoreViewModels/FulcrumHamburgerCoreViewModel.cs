@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     /// <summary>
     /// ViewModel for the main hamburger core object
     /// </summary>
-    public class FulcrumHamburgerCoreViewModel : ViewModelControlBase
+    public class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorHamburgerViewModelLogger", LoggerActions.SubServiceLogger);

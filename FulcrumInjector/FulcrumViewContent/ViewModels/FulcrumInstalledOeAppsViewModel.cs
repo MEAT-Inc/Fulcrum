@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// Viewmodel for installed OE Applications
     /// </summary>
-    internal class FulcrumInstalledOeAppsViewModel : ViewModelControlBase
+    internal class FulcrumInstalledOeAppsViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion //Custom Events

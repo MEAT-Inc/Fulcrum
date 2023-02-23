@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// ViewModel logic for our title view component
     /// </summary>
-    public class FulcrumTitleViewModel : ViewModelControlBase
+    public class FulcrumTitleViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("TitleViewModelLogger", LoggerActions.SubServiceLogger);

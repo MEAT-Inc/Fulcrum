@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     /// <summary>
     /// View model used to help render and register logging redirects
     /// </summary>
-    public class FulcrumDebugLoggingViewModel : ViewModelControlBase
+    public class FulcrumDebugLoggingViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("DebugLoggingViewModelLogger", LoggerActions.SubServiceLogger);

@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// View Model for pipe status values
     /// </summary>
-    internal class FulcrumPipeStatusViewModel : ViewModelControlBase
+    internal class FulcrumPipeStatusViewModel : FulcrumViewModelBase
     {
         #region Custom Events
 

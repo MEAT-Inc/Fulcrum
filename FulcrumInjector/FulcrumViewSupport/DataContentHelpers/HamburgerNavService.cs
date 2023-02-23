@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
             }
 
             // Find the object we need to use for our content.
-            var NavigationOutputContent = FulcrumSingletonContent<UserControl, ViewModelControlBase>.FulcrumSingletons
+            var NavigationOutputContent = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.FulcrumSingletons
                 ?.FirstOrDefault(SingletonObj => SingletonObj?.SingletonUserControl.GetType() == UserControlType)
                 ?.SingletonUserControl;
 
@@ -77,7 +77,7 @@ namespace FulcrumInjector.FulcrumViewSupport.DataContentHelpers
                 this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILDING NEW VIEW CONTENT AND STORING NEW VALUES ON INJECTOR CONSTANTS FOR IT NOW...", LogType.WarnLog);
 
                 // Build instance of the type passed in and have it store into the injector constants
-                var BuiltSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.CreateSingletonInstance(UserControlType, ViewModelType);
+                var BuiltSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(UserControlType, ViewModelType);
                 this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILT NEW OUTPUT CONTENT FOR THE CONTROL TYPE {UserControlType.Name} OK!", LogType.InfoLog);
                 this.NavLogger.WriteLog($"[NAVIGATE_TYPE] ::: NAVIGATING TO NEW TYPE: {UserControlType.Name}", LogType.TraceLog);
                 return this.NavigationFrame.NavigationService?.Content?.GetType() != UserControlType &&

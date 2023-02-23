@@ -212,7 +212,7 @@ namespace FulcrumInjector
                 this._appLogger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
 
                 // Generate our singleton object here.
-                var BuiltSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.CreateSingletonInstance(ViewType, ViewModelType);
+                var BuiltSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(ViewType, ViewModelType);
                 this._appLogger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
                 this._appLogger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
             }

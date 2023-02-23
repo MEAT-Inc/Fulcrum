@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// View Model for Injection Test View
     /// </summary>
-    internal class FulcrumDllInjectionTestViewModel : ViewModelControlBase
+    internal class FulcrumDllInjectionTestViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion //Custom Events
@@ -51,8 +51,8 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
 
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
-        /// <param name="DllInjectionView">The user control holding the DLL injector view used to setup this VM</param>
         /// </summary>
+        /// <param name="DllInjectionView">The user control holding the DLL injector view used to setup this VM</param>
         public FulcrumDllInjectionTestViewModel(UserControl DllInjectionView) : base(DllInjectionView)
         {
             // Spawn a new logger for this view model instance 

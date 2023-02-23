@@ -9,7 +9,7 @@ using System;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
 {
-    public class FulcrumDllOutputLogViewModel : ViewModelControlBase
+    public class FulcrumDllOutputLogViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorDllOutputViewModelLogger", LoggerActions.SubServiceLogger);

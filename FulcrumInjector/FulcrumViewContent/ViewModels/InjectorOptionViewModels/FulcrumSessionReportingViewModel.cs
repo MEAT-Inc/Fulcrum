@@ -13,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
     /// Session reporting ViewModel used for sending cleaned up session information out to my email
     /// Email is defined in the app settings.
     /// </summary>
-    public class FulcrumSessionReportingViewModel : ViewModelControlBase
+    public class FulcrumSessionReportingViewModel : FulcrumViewModelBase
     {
         // Logger object.
         private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("SessionReportViewModelLogger", LoggerActions.SubServiceLogger);

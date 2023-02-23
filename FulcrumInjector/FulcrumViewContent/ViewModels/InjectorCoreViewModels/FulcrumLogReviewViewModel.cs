@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels
     /// <summary>
     /// Viewmodel object for viewing output log instances from old log files.
     /// </summary>
-    public class FulcrumLogReviewViewModel : ViewModelControlBase
+    public class FulcrumLogReviewViewModel : FulcrumViewModelBase
     {
         /// <summary>
         /// Enum used to set our viewer current state value

@@ -288,7 +288,7 @@
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumPipeStatusViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\InjectorOptionViewModels\FulcrumSettingsPaneViewModel.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumTitleViewModel.cs" />
-    <Compile Include="FulcrumViewContent\ViewModels\ViewModelControlBase.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumViewModelBase.cs" />
     <Compile Include="FulcrumViewContent\ViewModels\FulcrumDllInjectionTestViewModel.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorOptionViews\FulcrumDebugLoggingView.xaml.cs">
       <DependentUpon>FulcrumDebugLoggingView.xaml</DependentUpon>
