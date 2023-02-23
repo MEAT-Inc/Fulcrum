@@ -1,7 +1,6 @@
-﻿using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+﻿using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
+using SharpLogging;
 using SharpPipes;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels
@@ -9,33 +8,52 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
     /// <summary>
     /// View Model for pipe status values
     /// </summary>
-    public class FulcrumPipeStatusViewModel : ViewModelControlBase
+    internal class FulcrumPipeStatusViewModel : ViewModelControlBase
     {
-        // Logger object.
-        private static SubServiceLogger ViewModelLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewModelLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
 
-        // Private Control Values
+        // Private property watchdogs to update our UI based on other events 
+        // TODO: FUCKING REMOVE THIS? WHY NOT USE PROP CHANGED EVENTS?
+        private readonly PropertyWatchdog _readerPipeStateWatchdog;
+        private readonly PropertyWatchdog _writerPipeStateWatchdog;
+        private readonly PropertyWatchdog _testInjectionButtonWatchdog;
+        
+        #endregion //Custom Events
+
+        #region Fields
+
+        // Private backing fields for our public properties
         private string _readerPipeState;
         private string _writerPipeState;
-        private PropertyWatchdog _readerPipeStateWatchdog;
-        private PropertyWatchdog _writerPipeStateWatchdog;
-        private PropertyWatchdog _testInjectionButtonWatchdog;
 
         // Private pipe objects to be allocated
         private readonly PassThruPipe _readerPipe;
         private readonly PassThruPipe _writerPipe;
 
-        // Public values for our view to bind onto 
+        #endregion //Fields
+
+        #region Properties
+
+        // Public properties for the view to bind onto  
         public string ReaderPipeState { get => _readerPipeState; set => PropertyUpdated(value); }
         public string WriterPipeState { get => _writerPipeState; set => PropertyUpdated(value); }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion //Properties
+
+        #region Structs and Classes
+        #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
-        public FulcrumPipeStatusViewModel()
+        /// <param name="PipeStateUserControl">The user control holding the pipe status view used to setup this VM</param>
+        public FulcrumPipeStatusViewModel(UserControl PipeStateUserControl) : base(PipeStateUserControl)
         {
+            // Spawn a new logger for this view model instance 
+            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
+
             // Log information and store values 
             ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
@@ -54,12 +72,12 @@ namespace FulcrumInjector.FulcrumViewContent.ViewModels
             ViewModelLogger.WriteLog("SETUP NEW PIPE STATUS MONITOR VALUES OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Build new watchdogs for our pipe state monitoring output
         /// </summary>
-        internal void SetupPipeStateWatchdogs()
+        public void SetupPipeStateWatchdogs()
         {
             // Reader State and Writer State watchdogs for the current pipe state values.
             // BUG: Trying to understand why these two watchdogs are hanging up the UI. Seems logging operations hang forever? Maybe turn down frequency

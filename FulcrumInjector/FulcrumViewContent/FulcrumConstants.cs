@@ -37,13 +37,13 @@ namespace FulcrumInjector.FulcrumViewContent
         private static FulcrumMainWindow _fulcrumMainWindow;                    // Main window of the injector application
 
         // Private static Singleton Injector DLL Core Output View Contents. These get set to control view contents on the Main window
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumInstalledHardwareSingleton;
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumDllOutputSingleton;
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumLogReviewSingleton;
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumSimulationSingleton;
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumSettingsPaneSingleton;
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumSessionReportingSingleton;
-        private static SingletonContentControl<UserControl, ViewModelControlBase> _fulcrumDebugLoggingSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumInstalledHardwareFulcrumSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumDllOutputFulcrumSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumLogReviewFulcrumSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumSimulationFulcrumSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumSettingsPaneFulcrumSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumSessionReportingFulcrumSingleton;
+        private static FulcrumSingletonContent<UserControl, ViewModelControlBase> _fulcrumDebugLoggingFulcrumSingleton;
 
         #endregion //Fields
 
@@ -73,13 +73,13 @@ namespace FulcrumInjector.FulcrumViewContent
                 _fulcrumMainWindow = value;
 
                 // Find and store all of our singleton instances now
-                _fulcrumInstalledHardwareSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumInstalledHardwareView));
-                _fulcrumDllOutputSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
-                _fulcrumLogReviewSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
-                _fulcrumSimulationSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
-                _fulcrumSettingsPaneSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
-                _fulcrumSessionReportingSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
-                _fulcrumDebugLoggingSingleton = SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
+                _fulcrumInstalledHardwareFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumInstalledHardwareView));
+                _fulcrumDllOutputFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
+                _fulcrumLogReviewFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
+                _fulcrumSimulationFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
+                _fulcrumSettingsPaneFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
+                _fulcrumSessionReportingFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
+                _fulcrumDebugLoggingFulcrumSingleton = FulcrumSingletonContent<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
             }
         }
 
@@ -168,20 +168,20 @@ namespace FulcrumInjector.FulcrumViewContent
         }
 
         // Public facing singletons used to pull information about our views and view models in the hamburger content
-        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => (FulcrumInstalledHardwareView)_fulcrumInstalledHardwareSingleton?.SingletonUserControl;
-        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => (FulcrumInstalledHardwareViewModel)_fulcrumInstalledHardwareSingleton?.SingletonViewModel;
-        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => (FulcrumDllOutputLogView)_fulcrumDllOutputSingleton?.SingletonUserControl;
-        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => (FulcrumDllOutputLogViewModel)_fulcrumDllOutputSingleton?.SingletonViewModel;
-        public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)_fulcrumLogReviewSingleton?.SingletonUserControl;
-        public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => (FulcrumLogReviewViewModel)_fulcrumLogReviewSingleton?.SingletonViewModel;
-        public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)_fulcrumSimulationSingleton?.SingletonUserControl;
-        public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)_fulcrumSimulationSingleton?.SingletonViewModel;
-        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)_fulcrumSettingsPaneSingleton?.SingletonUserControl;
-        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => (FulcrumSettingsPaneViewModel)_fulcrumSettingsPaneSingleton?.SingletonViewModel;
-        public static FulcrumSessionReportingView FulcrumSessionReportingView => (FulcrumSessionReportingView)_fulcrumSessionReportingSingleton?.SingletonUserControl;
-        public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => (FulcrumSessionReportingViewModel)_fulcrumSessionReportingSingleton?.SingletonViewModel;
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)_fulcrumDebugLoggingSingleton?.SingletonUserControl;
-        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)_fulcrumDebugLoggingSingleton?.SingletonViewModel;
+        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => (FulcrumInstalledHardwareView)_fulcrumInstalledHardwareFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => (FulcrumInstalledHardwareViewModel)_fulcrumInstalledHardwareFulcrumSingleton?.SingletonViewModel;
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => (FulcrumDllOutputLogView)_fulcrumDllOutputFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => (FulcrumDllOutputLogViewModel)_fulcrumDllOutputFulcrumSingleton?.SingletonViewModel;
+        public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)_fulcrumLogReviewFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => (FulcrumLogReviewViewModel)_fulcrumLogReviewFulcrumSingleton?.SingletonViewModel;
+        public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)_fulcrumSimulationFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)_fulcrumSimulationFulcrumSingleton?.SingletonViewModel;
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)_fulcrumSettingsPaneFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => (FulcrumSettingsPaneViewModel)_fulcrumSettingsPaneFulcrumSingleton?.SingletonViewModel;
+        public static FulcrumSessionReportingView FulcrumSessionReportingView => (FulcrumSessionReportingView)_fulcrumSessionReportingFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => (FulcrumSessionReportingViewModel)_fulcrumSessionReportingFulcrumSingleton?.SingletonViewModel;
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)_fulcrumDebugLoggingFulcrumSingleton?.SingletonUserControl;
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)_fulcrumDebugLoggingFulcrumSingleton?.SingletonViewModel;
 
         #endregion //Properties
 

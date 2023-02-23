@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -20,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorTestViewLogger", LoggerActions.SubServiceLogger);
 
         // ViewModel object to bind onto
-        public FulcrumDllInjectionTestViewModel ViewModel { get; set; }
+        internal FulcrumDllInjectionTestViewModel ViewModel { get; set; }
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +27,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             InitializeComponent();
 
             // Build new view model object
-            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumDllInjectionTestViewModel());
+            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumDllInjectionTestViewModel(this));
             this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 

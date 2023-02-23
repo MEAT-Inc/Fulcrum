@@ -220,7 +220,7 @@
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumHamburgerCoreView.xaml.cs">
       <DependentUpon>FulcrumHamburgerCoreView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\ViewModels\SingletonContentControl.cs" />
+    <Compile Include="FulcrumViewContent\ViewModels\FulcrumSingletonContent.cs" />
     <Compile Include="FulcrumViewContent\Views\InjectorCoreViews\FulcrumInstalledHardwareView.xaml.cs">
       <DependentUpon>FulcrumInstalledHardwareView.xaml</DependentUpon>
     </Compile>
