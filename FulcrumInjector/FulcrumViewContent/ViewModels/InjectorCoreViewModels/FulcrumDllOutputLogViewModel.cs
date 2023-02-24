@@ -1,5 +1,5 @@
 ﻿using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FilteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
 using SharpPipes;
 using System;

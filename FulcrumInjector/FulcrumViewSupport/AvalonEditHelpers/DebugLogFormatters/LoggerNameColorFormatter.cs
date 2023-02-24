@@ -1,9 +1,4 @@
-﻿using System;
-using System.Windows.Media;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.InjectorSyntaxFormatters;
-using ICSharpCode.AvalonEdit.Document;
-using ICSharpCode.AvalonEdit.Rendering;
-using SharpLogger.LoggerSupport;
+﻿using ICSharpCode.AvalonEdit.Document;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
 {
@@ -17,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         /// </summary>
         public LoggerNameColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
 
-        // --------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Color logger names here

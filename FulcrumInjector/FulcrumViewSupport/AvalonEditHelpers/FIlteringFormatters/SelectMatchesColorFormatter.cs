@@ -4,7 +4,7 @@ using System.Windows.Media;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FilteringFormatters
 {
     /// <summary>
     /// Selects the text matching the given input pattern.

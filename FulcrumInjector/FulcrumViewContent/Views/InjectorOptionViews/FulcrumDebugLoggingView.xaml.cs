@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FilteringFormatters;
 using NLog;
 using NLog.Config;
 using SharpLogging;

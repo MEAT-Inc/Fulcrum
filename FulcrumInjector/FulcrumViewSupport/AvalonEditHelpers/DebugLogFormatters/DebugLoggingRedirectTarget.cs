@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
+﻿using System.Linq;
+using FulcrumInjector.FulcrumViewContent;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Rendering;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
 using NLog.Targets;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters
 {
@@ -26,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
         [RequiredParameter]
         public new TextEditor OutputEditor { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new instance of our redirecting target object.
@@ -44,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
             FormatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
 
             // Startup highlighting for this output.
-            base.BuildColorFormatValues(FulcrumSettingsShare.InjectorDebugSyntaxFulcrumSettings.SettingsEntries);
+            base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDebugSyntaxFulcrumSettings.ToArray());
             FormatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
 
             // Start output formatting here.
@@ -52,7 +45,7 @@ namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatter
             FormatLogger.WriteLog("FORMAT OUTPUT HAS BEEN BUILT AND KICKED OFF OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Begins writing output for highlighting syntax

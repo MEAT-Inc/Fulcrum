@@ -240,14 +240,14 @@
     </Compile>
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\CommandParamFormatters\CommandParameterColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorDocFormatterBase.cs" />
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\LogOutputFilteringHelper.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FilteringFormatters\LogOutputFilteringHelper.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\CallStackColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataFormatters\MessageFilterDataColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataFormatters\MessageDataReadColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\InjectorSyntaxFormatters\MessageDataFormatters\MessageDataSentColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\OutputFormatHelperBase.cs" />
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\FilteringColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FIlteringFormatters\SelectMatchesColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FilteringFormatters\FilteringColorFormatter.cs" />
+    <Compile Include="FulcrumViewSupport\AvalonEditHelpers\FilteringFormatters\SelectMatchesColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\LogLevelColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\LoggerNameColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\AvalonEditHelpers\DebugLogFormatters\TimeColorFormatter.cs" />

@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Linq;
 using ICSharpCode.AvalonEdit;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters
+namespace FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FilteringFormatters
 {
     /// <summary>
     /// Contains a set of methods which are able to help us modify avEdit objects by filtering

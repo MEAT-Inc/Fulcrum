@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
+using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FilteringFormatters;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels
