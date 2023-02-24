@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using Newtonsoft.Json;
 using Color = System.Drawing.Color;
 
@@ -208,9 +208,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
                 default: throw new ArgumentOutOfRangeException(nameof(TypeOfColor), TypeOfColor, null);
             }
         }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
+        
         /// <summary>
         /// Generates a new color set for a theme.
         /// </summary>
