@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using ControlzEx.Theming;
@@ -91,6 +92,22 @@ namespace FulcrumInjector
             this._appLogger.WriteLog($"{BrokerConfig.LogBrokerName} APPLICATION IS NOW LIVE!", LogType.WarnLog);
             this._appLogger.WriteLog($"--> INJECTOR VERSION: {CurrentAppVersion}", LogType.WarnLog);
             this._appLogger.WriteLog($"--> SHIM DLL VERSION: {CurrentShimVersion}", LogType.WarnLog);
+
+            // Finally invoke an archive routine if needed
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                this._appLogger.WriteLog("LOGGING ARCHIVE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                this._appLogger.WriteLog("PROGRESS FOR THESE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Boot the archive routine first
+                SharpLogArchiver.ArchiveLogFiles();
+                this._appLogger.WriteLog("ARCHIVE ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+
+                // Then invoke the archive cleanup routines
+                SharpLogArchiver.CleanupArchiveHistory();
+                this._appLogger.WriteLog("ARCHIVE CLEANUP ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.

@@ -126,10 +126,10 @@
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\SharpLogger.2.5.5.279\lib\net472\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpLogger.2.5.5.279\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
@@ -140,8 +140,8 @@
     <Reference Include="SharpExpressions, Version=0.3.1.40, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpExpressions.0.3.1.40\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.5.4.273, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.5.4.273\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.5.5.279, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.5.5.279\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
     <Reference Include="SharpPipes, Version=0.1.3.18, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpPipes.0.1.3.18\lib\net472\SharpPipes.dll</HintPath>
