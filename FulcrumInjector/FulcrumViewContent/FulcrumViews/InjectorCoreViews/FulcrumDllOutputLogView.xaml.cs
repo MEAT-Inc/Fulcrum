@@ -61,19 +61,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             var CurrentConfig = LogManager.Configuration;
             if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "LiveInjectorOutputTarget"))
             {
-                this._viewLogger.WriteLog("WARNING: TARGET WAS ALREADY CONFIGURED AND FOUND! NOT BUILDING AGAIN", LogType.WarnLog);
-                return;
+                // Log information, build new target output and return.
+                this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
+                ConfigurationItemFactory.Default.Targets.RegisterDefinition("LiveInjectorOutputTarget", typeof(InjectorOutputSyntaxHelper));
+                CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
+                this._viewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR PIPE OUTPUT AND FOR INJECTOR DLL OUTPUT OK!", LogType.InfoLog);
             }
-
-            // Log information, build new target output and return.
-            this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition("LiveInjectorOutputTarget", typeof(InjectorOutputSyntaxHelper));
-            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
-            this._viewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR PIPE OUTPUT AND FOR INJECTOR DLL OUTPUT OK!", LogType.InfoLog);
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Setup our data context and log information out
+            this.DataContext = this.ViewModel;
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE INJECTOR DLL OUTPUT VIEW OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
@@ -82,12 +83,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumDLLOutputLogView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new data context for our ViewModel
-            this.DataContext = this.ViewModel;
-
             // Configure filtering and coloring instances here.
-            this.ViewModel.LogFilteringHelper ??= new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
-            this.ViewModel.InjectorSyntaxHelper ??= new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit);
+            this.ViewModel.LogFilteringHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
+            this.ViewModel.InjectorSyntaxHelper = new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit);
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR FULCRUM DLL OUTPUT OK!", LogType.InfoLog);
         }
 

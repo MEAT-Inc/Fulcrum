@@ -44,18 +44,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
-        }
-        /// <summary>
-        /// On loaded, we want to setup our new viewmodel object and populate values
-        /// </summary>
-        /// <param name="sender">Sending object</param>
-        /// <param name="e">Events attached to it.</param>
-        private void FulcrumVehicleConnectionInfoView_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            // Setup a new ViewModel
+
+            // Setup a new data context for our view model instance
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

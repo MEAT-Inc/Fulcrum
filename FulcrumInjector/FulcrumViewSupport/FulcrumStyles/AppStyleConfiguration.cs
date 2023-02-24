@@ -23,8 +23,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
         #region Fields
 
         // Backing fields used to help setup theme configurations and logging
-        private readonly SharpLogger _themeLogger;        // Logging object used to help keep track of them updates
-        private AppStyleModel _currentAppStyleModel;      // Currently applied theme object for the injector instance
+        private readonly SharpLogger _themeLogger;       // Logging object used to help keep track of them updates
+        private AppStyleModel _currentAppStyleModel;     // Currently applied theme object for the injector instance
 
         #endregion //Fields
 
@@ -56,7 +56,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
         public AppThemeConfiguration()
         {
             // Store theme values.
-            this._themeLogger = new SharpLogger(LoggerActions.FileLogger);
+            this._themeLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this._themeLogger.WriteLog("SETTING UP NEW THEME CONTENT SETS FOR APPLICATION NOW...", LogType.InfoLog);
 
             // List of colors to setup as themes

@@ -48,23 +48,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         /// <param name="SettingsViewUserControl">UserControl which holds the content for our settings view</param>
         public FulcrumSettingsPaneViewModel(UserControl SettingsViewUserControl) : base(SettingsViewUserControl)
         {
-            // Spawn a new logger for this view model instance 
+            // Spawn a new logger for this view model instance and log some information
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-
-            // Log information and store values 
-            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
-
-            // Pull settings values in on startup
-            if (FulcrumConstants.FulcrumSettings.Count == 0)
-            {
-                FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
-                this.ViewModelLogger.WriteLog("GENERATED NEW SETTINGS FOR VIEW MODEL CORRECTLY! SETTINGS IMPORTED TO OUR VIEW CONTENT FROM SHARE!", LogType.InfoLog);
-            }
-
-            // Log completed setup and store this instance onto our injector constants
             this.ViewModelLogger.WriteLog("SETUP NEW SETTINGS CONFIGURATION VALUES OK!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog($"STORED NEW VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
+
+            // BUG: Disabled this for now. Was going to possibly double load everything
+            // Pull settings values in on startup
+            // if (FulcrumConstants.FulcrumSettings.Count == 0)
+            // {
+            //     // If no settings were found, generate them now
+            //     FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
+            //     this.ViewModelLogger.WriteLog("GENERATED NEW SETTINGS FOR VIEW MODEL CORRECTLY! SETTINGS IMPORTED TO OUR VIEW CONTENT FROM SHARE!", LogType.InfoLog);
+            // }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

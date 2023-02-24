@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         #region Fields
 
         // Logger instance for our settings share
-        private readonly SharpLogger _settingsStoreLogger = new(LoggerActions.UniversalLogger);
+        private SharpLogger _settingsStoreLogger;
 
         #endregion //Fields
 
@@ -57,22 +57,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Spawns a new instance of a setting share object. Will also check to see if this is built on the constants or not
-        /// </summary>
-        public FulcrumSettingsShare()
-        {
-            // Load in all of our settings values when this object is built
-            this.GenerateSettingsModels();
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
         /// Builds a list of settings model objects to use from our input json objects
         /// </summary>
         /// <returns>Settings entries built output</returns>
         public IEnumerable<FulcrumSettingsCollectionModel> GenerateSettingsModels()
         {
+            // Configure our new logger instance
+            this._settingsStoreLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
+
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = ValueLoaders.GetConfigValue<FulcrumSettingsCollectionModel[]>("FulcrumUserSettings");
             this._settingsStoreLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);

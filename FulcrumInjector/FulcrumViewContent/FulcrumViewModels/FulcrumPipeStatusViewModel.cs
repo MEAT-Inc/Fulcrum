@@ -52,11 +52,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         public FulcrumPipeStatusViewModel(UserControl PipeStateUserControl) : base(PipeStateUserControl)
         {
             // Spawn a new logger for this view model instance 
-            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-
-            // Log information and store values 
-            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger); 
             this.ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Configure new pipe instances for our class
             this._readerPipe = PassThruPipeReader.AllocatePipe();
@@ -66,10 +64,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this._readerPipeStateWatchdog = new PropertyWatchdog(250);
             this._writerPipeStateWatchdog = new PropertyWatchdog(250);
             this._testInjectionButtonWatchdog = new PropertyWatchdog(250);
-            this.ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!", LogType.InfoLog);
-
-            // Log completed setup.
-            this.ViewModelLogger.WriteLog("SETUP NEW PIPE STATUS MONITOR VALUES OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!");
+            this.ViewModelLogger.WriteLog("SETUP NEW PIPE STATUS MONITOR VALUES OK!");
+            this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

@@ -55,10 +55,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         {
             // Spawn a new logger for this view model instance 
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-
-            // Log information and store values
-            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Setup basic view bound values
             this.DownloadProgress = 0;
@@ -78,12 +76,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             if (!GitHubUpdateHelper.CheckAgainstVersion(FulcrumConstants.FulcrumVersions.InjectorVersionString) && !ForceUpdate) {
                 this.ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
                 this.ViewModelLogger.WriteLog("NOT CONFIGURING UPDATE EVENT ROUTINES FOR OUR UPDATER OBJECT!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
+                
+                // Exit out of this routine once no update is found
                 return;
             }
 
             // Now setup view content for update ready.
             this.UpdateReady = true;
             this._initializeUpdaterClientEvents();
+
+            // Log completed building view model instance and exit out
+            this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

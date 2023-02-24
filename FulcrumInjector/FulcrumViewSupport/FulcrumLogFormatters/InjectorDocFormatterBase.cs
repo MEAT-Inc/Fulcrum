@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 using SharpLogging;
+
 // Color Brushes
 using MediaBrush = System.Windows.Media.Brush;
 using MediaBrushes = System.Windows.Media.Brushes;
@@ -21,8 +22,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters
         #region Fields
 
         // Logger object and color brushes for formatting output.
+        protected static SharpLogger _formatLogger;
         protected Tuple<MediaBrush, MediaBrush>[] _coloringBrushes;
-        protected static readonly SharpLogger _formatLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
         #endregion //Fields
 
@@ -39,6 +40,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters
         /// </summary>
         protected InjectorDocFormatterBase(OutputFormatHelperBase FormatBase)
         {
+            // Configure our logger instance if needed
+            _formatLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
+
             // Pull in our color values. Store format helper.
             if (this.GetType() == typeof(InjectorDocFormatterBase)) return;
             this._coloringBrushes = FormatBase.PullColorForCommand(this.GetType());

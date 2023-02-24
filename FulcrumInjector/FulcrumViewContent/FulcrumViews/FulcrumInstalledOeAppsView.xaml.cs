@@ -50,18 +50,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
-        }
-        /// <summary>
-        /// On loaded, we want to setup our new viewmodel object and populate values
-        /// </summary>
-        /// <param name="sender">Sending object</param>
-        /// <param name="e">Events attached to it.</param>
-        private void FulcrumInstalledOeAppsView_OnLoaded(object sender, RoutedEventArgs e)
-        {
+
             // Setup our data context and log information out
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------

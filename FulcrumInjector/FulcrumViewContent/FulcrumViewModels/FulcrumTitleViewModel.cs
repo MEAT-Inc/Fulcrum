@@ -45,8 +45,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         {
             // Spawn a new logger for this view model instance 
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-
-            // Log information and store values 
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog("SETTING UP TITLE VIEW BOUND VALUES NOW...", LogType.WarnLog);
 
@@ -56,12 +54,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
 
             // Log output information
-            this.ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!");
             this.ViewModelLogger.WriteLog($"INJECTOR:  {InjectorVersionString}");
             this.ViewModelLogger.WriteLog($"SHIM:      {ShimDLLVersionString}");
-
-            // Log completed setup.
-            this.ViewModelLogger.WriteLog("SETUP NEW TITLE AND VERSION STRING VALUES OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
     }
 }

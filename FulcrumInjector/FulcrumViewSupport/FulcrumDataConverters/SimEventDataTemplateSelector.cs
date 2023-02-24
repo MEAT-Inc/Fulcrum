@@ -18,7 +18,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         #region Fields
 
         // Logger object to log failures from our template instance
-        private static readonly SharpLogger _templateLogger = new(LoggerActions.UniversalLogger);
+        private static SharpLogger _templateLogger;
 
         #endregion //Fields
 
@@ -39,6 +39,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// <returns></returns>
         public override DataTemplate SelectTemplate(object InputItem, DependencyObject ObjectContainer)
         {
+            // Configure the logger instance if needed
+            _templateLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
+
             // Check if we can use this selector object or not.
             if (ObjectContainer is FrameworkElement InputElement && InputItem is EventArgs SimEventObject)
             {

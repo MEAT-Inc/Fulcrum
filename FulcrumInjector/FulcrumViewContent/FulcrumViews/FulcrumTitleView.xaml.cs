@@ -43,18 +43,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
-        }
-        /// <summary>
-        /// On loaded, we want to setup our new viewmodel object and populate values
-        /// </summary>
-        /// <param name="sender">Sending object</param>
-        /// <param name="e">Events attached to it.</param>
-        private void FulcrumTitleView_OnLoaded(object sender, RoutedEventArgs e)
-        {
+
+            // Store new event handlers for the buttons on this window
+            this.btnCheckForUpdates.Click += FulcrumConstants.FulcrumUpdaterView.ToggleApplicationUpdateInformation_OnClick;
+            this.btnAboutTheInjetor.Click += FulcrumConstants.FulcrumAboutThisAppView.ToggleAboutThisApplicationFlyout_OnClick;
+            this._viewLogger.WriteLog("STORED NEW BUTTON EVENTS FOR THE TITLE VIEW BUTTON CONTENT OK!");
+
             // Setup a new ViewModel and store our context
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
     }
 }

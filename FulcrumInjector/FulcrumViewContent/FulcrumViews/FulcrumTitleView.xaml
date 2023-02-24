@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
-             d:DesignHeight="150" d:DesignWidth="800"
-             Loaded="FulcrumTitleView_OnLoaded">
+             d:DesignHeight="150" d:DesignWidth="800">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
@@ -52,9 +51,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- Update Button -->
-            <Button HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Check for Updates"
+            <Button HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Check for Updates" x:Name="btnCheckForUpdates"
                     Style="{DynamicResource ActionButtonStyleTransparent}" Margin="0,0,0,0" Grid.Column="0"
-                    Click="ToggleApplicationUpdateReadyView_OnClick"
                     FontWeight="DemiBold" Width="25" Background="{StaticResource PrimaryColor_Darker_65}" Foreground="{StaticResource TextColorBase}">
                 <Path Fill="{DynamicResource TextColorBase}" Margin="0,1,1.5,0">
                     <Path.Data>
@@ -69,7 +67,7 @@
             <!-- About Button -->
             <Button HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="About The Injector"
                     Style="{DynamicResource ActionButtonStyleTransparent}"
-                    Width="25" Margin="0,0,0,0" Grid.Column="1" Click="AboutThisApplicationButton_OnClick">
+                    Width="25" Margin="0,0,0,0" Grid.Column="1" x:Name="btnAboutTheInjetor">
                 <Path Fill="{DynamicResource TextColorBase}" Margin="0,1,0,0">
                     <Path.Data>
                         <PathGeometry Figures="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>

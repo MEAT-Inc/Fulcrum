@@ -16,8 +16,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
 
         #region Fields
 
-        // Private field used to hold our configuration object
+        // Private fields used to hold our configuration and logging objects
         private static JObject _applicationConfig;
+        private static SharpLogger _backingLogger;
 
         #endregion //Fields
 
@@ -25,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
         
         // Logger instance for our JSON configuration helpers
         private static SharpLogger _jsonConfigLogger => SharpLogBroker.LogBrokerInitialized
-            ? new SharpLogger(LoggerActions.UniversalLogger)
+            ? _backingLogger ??= new SharpLogger(LoggerActions.UniversalLogger)
             : null;
 
         // Currently loaded app configuration file and the JSON object built from that file

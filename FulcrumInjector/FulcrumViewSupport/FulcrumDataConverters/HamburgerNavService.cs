@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
 
         // Logger object and backing fields for our frame setup
         private Frame _navigationFrame;
-        private readonly SharpLogger _navServiceLogger = new(LoggerActions.UniversalLogger);
+        private readonly SharpLogger _navServiceLogger;
 
         #endregion //Fields
 
@@ -78,6 +78,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         public HamburgerNavService()
         {
             // Log out this service has been constructed and exit out
+            this._navServiceLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this._navServiceLogger.WriteLog("[NAVIGATION_CTOR] ::: BUILT NEW INSTANCE OF A NAVIGATION SERVICE OK!", LogType.InfoLog);
         }
 

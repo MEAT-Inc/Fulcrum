@@ -165,7 +165,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // Log the failure output
                 this._emailLogger.WriteLog("FAILED TO CONFIGURE OUR NEW SMTP CLIENT! THIS IS A SERIOUS ISSUE!", LogType.ErrorLog);
-                this._emailLogger.WriteLog("EXCEPTION IS BEING LOGGED BELOW", SetupEx); 
+                this._emailLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", SetupEx); 
                 return false;
             }
         }
@@ -376,7 +376,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     // Log failures, set the overall output value to false.
                     OverallStatus = false;
                     this._emailLogger.WriteLog($"FAILED TO INVOKE SENDING ROUTINE FOR MESSAGE TO BE SENT TO RECIPIENT {RecipientAddress.Address}!", LogType.ErrorLog);
-                    this._emailLogger.WriteLog("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
+                    this._emailLogger.WriteException("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
                 }
             }
 

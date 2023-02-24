@@ -128,7 +128,7 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"
                     x:Name="CloseUpdatesFlyoutButton"
-                    Click="ToggleApplicationUpdateReadyView_OnClick"
+                    Click="ToggleApplicationUpdateInformation_OnClick"
                     Style="{StaticResource ActionButtonStyle}"
                     Content="Close Updater" Width="250" Height="35" />
         </Grid>

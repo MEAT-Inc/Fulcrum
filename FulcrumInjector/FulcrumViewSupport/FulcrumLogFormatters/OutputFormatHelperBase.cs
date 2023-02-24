@@ -22,7 +22,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters
         #region Fields
 
         // Logger object used to log exceptions thrown during formatting
-        protected static readonly SharpLogger _formatLogger = new(LoggerActions.UniversalLogger);
+        protected static SharpLogger _formatLogger;
 
         #endregion //Fields
 
@@ -38,6 +38,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters
 
         #region Structs and Classes
         #endregion //Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        protected OutputFormatHelperBase()
+        {
+            // Spawn our logger instance if needed and move on
+            _formatLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

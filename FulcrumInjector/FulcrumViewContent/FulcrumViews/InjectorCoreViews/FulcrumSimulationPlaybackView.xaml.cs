@@ -48,7 +48,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Setup our data context and log information out
+            this.DataContext = this.ViewModel;
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE SIMULATION PLAYBACK VIEW OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
@@ -57,9 +61,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumSimulationPlaybackView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new data context for our view model
-            this.DataContext = this.ViewModel;
-
             // Check for hardware selection from the monitoring view
             var HardwareConfigView = FulcrumConstants.FulcrumInstalledHardwareViewModel;
             this.ViewModel.IsHardwareSetup = !(HardwareConfigView.SelectedDLL == null || string.IsNullOrEmpty(HardwareConfigView.SelectedDevice));

@@ -36,9 +36,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         public override string ToString()
         {
             // Build output string and return it formatted
-            string[] SettingNameSet = SettingsEntries == null ? 
+            string[] SettingNameSet = !this.Any() ? 
                 new[] { "No Settings Imported" } :
-                SettingsEntries?.Select(SettingObj => SettingObj.SettingName).ToArray();
+                this.Select(SettingObj => SettingObj.SettingName).ToArray();
 
             // Build output value from the name set generated
             var OutputString = $"{this.SettingSectionTitle} --> [{string.Join(",", SettingNameSet)}]";

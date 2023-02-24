@@ -50,7 +50,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+
+            // Setup our data context and log information out
+            this.DataContext = this.ViewModel;
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
@@ -59,12 +63,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumSettingsPaneView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new data context for our view model
-            this.DataContext = this.ViewModel;
-
-            // Configure Settings instances here.
-            Dispatcher.Invoke(() => { this.ViewModel.PopulateAppSettingJsonViewer(JsonSettingsViewEditor); });
-            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            // Populate our settings values here
+            this.ViewModel.PopulateAppSettingJsonViewer(this.JsonSettingsViewEditor);
+            this._viewLogger.WriteLog("BUILT AND LOADED IN SESSION SETTINGS FOR THIS VIEW CORRECTLY!");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

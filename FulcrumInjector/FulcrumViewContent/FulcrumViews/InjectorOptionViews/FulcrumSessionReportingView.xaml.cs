@@ -50,6 +50,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = FulcrumConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel(this);
 
+            // Append new session log files.
+            this.ViewModel.AppendSessionLogFiles();
+            this._viewLogger.WriteLog("STORED SESSION LOG FILES INTO EMAIL ATTACHMENTS OK!", LogType.InfoLog);
+
             // Build event for our pipe objects to process new pipe content into our output box
             PassThruPipeReader ReaderPipe = PassThruPipeReader.AllocatePipe();
             ReaderPipe.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
@@ -57,7 +61,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
             // Initialize new UI Component
             InitializeComponent();
-            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+            
+            // Setup our data context and log information out
+            this.DataContext = this.ViewModel;
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE SESSION REPORTING VIEW OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
@@ -66,19 +74,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumSessionReportingView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new data context using our view model
-            this.DataContext = this.ViewModel;
-
-            // Append new session log files.
-            this.ViewModel.AppendSessionLogFiles();
-            this._viewLogger.WriteLog("STORED SESSION LOG FILES INTO EMAIL ATTACHMENTS OK!", LogType.InfoLog);
-
             // Force show help menu and build email temp text
-            if (this.EmailBodyTextContent.Text.Length == 0) {
+            if (this.EmailBodyTextContent.Text.Length == 0)
+            {
                 this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
                 this._viewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
             }
-    
+
             // Log done building new ViewModel.
             if (this.ViewModel.ShowEmailInfoText) this.ToggleEmailPaneInfoButton_OnClick(null, null);
             this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
