@@ -10,11 +10,6 @@
              d:DesignHeight="450" d:DesignWidth="800" 
              Loaded="FulcrumInjectorDebugLoggingView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorOptionViewModels:FulcrumDebugLoggingViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

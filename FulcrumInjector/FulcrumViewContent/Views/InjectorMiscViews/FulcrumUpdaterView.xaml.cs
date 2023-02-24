@@ -1,29 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xaml;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
 using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
 using Markdig;
-using Markdig.Syntax;
-using Markdig.Wpf;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
 using SharpLogging;
 using Markdown = Markdig.Wpf.Markdown;
 using XamlReader = System.Windows.Markup.XamlReader;
@@ -35,25 +20,41 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
     /// </summary>
     public partial class FulcrumUpdaterView : UserControl
     {
-        // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("UpdaterAppViewLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Logger instance for this view content
+        private readonly SharpLogger _viewLogger;
+
+        #endregion // Fields
+
+        #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumUpdaterViewModel ViewModel { get; set; }
+        internal FulcrumUpdaterViewModel ViewModel { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds new logic for a view showing title information and the text for the version
         /// </summary>
         public FulcrumUpdaterView()
         {
+            // Spawn a new logger and setup our view model
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = new FulcrumUpdaterViewModel(this);
+
+            // Initialize new UI Component
             InitializeComponent();
-            this.ViewModel = new FulcrumUpdaterViewModel();
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
-
-
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -61,19 +62,18 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumUpdaterView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new ViewModel
-            ViewModel.SetupViewControl(this);
-            DataContext = ViewModel;
+            // Setup a new data context for our view model
+            this.DataContext = this.ViewModel;
 
             // See if we need to open the updater view
             this.UpdateReleaseNotesContents();
             if (!this.ViewModel.UpdateReady) {
-                this.ViewLogger.WriteLog("SETUP UPDATER VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
+                this._viewLogger.WriteLog("SETUP UPDATER VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
                 return;
             }
 
             // Log ready to show updates and build our XAML content output
-            this.ViewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
+            this._viewLogger.WriteLog("SHOWING UPDATE WINDOW SINCE AN UPDATE IS READY!", LogType.InfoLog);
             FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = true;
         }
 
@@ -99,9 +99,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
                     this.ReleaseNotesViewer.Document = OutputDocument;
 
             // Log done building release notes
-            this.ViewLogger.WriteLog("RELEASE NOTES FOR UPDATER WERE BUILT AND ARE BEING SHOWN NOW!", LogType.InfoLog);
+            this._viewLogger.WriteLog("RELEASE NOTES FOR UPDATER WERE BUILT AND ARE BEING SHOWN NOW!", LogType.InfoLog);
         }
-
         /// <summary>
         /// Method to pop open hyperlinks from the converted markdown document
         /// </summary>
@@ -116,17 +115,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         private void StartUpdateFlyoutButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Invoke a download for our updater
-            this.ViewLogger.WriteLog("PULLING NEWEST INJECTOR RELEASE USING OUR VIEW MODEL HELPERS NOW...", LogType.WarnLog);
+            this._viewLogger.WriteLog("PULLING NEWEST INJECTOR RELEASE USING OUR VIEW MODEL HELPERS NOW...", LogType.WarnLog);
             string OutputAssetFile = this.ViewModel.InvokeInjectorDownload();
-            this.ViewLogger.WriteLog($"ASSET PATH PULLED IN: {OutputAssetFile}");
+            this._viewLogger.WriteLog($"ASSET PATH PULLED IN: {OutputAssetFile}");
 
             // Now request a new install routine from the view model.
-            this.ViewLogger.WriteLog("BOOTING NEW INSTALLER FOR THE FULCRUM INJECTOR NOW...", LogType.InfoLog);
+            this._viewLogger.WriteLog("BOOTING NEW INSTALLER FOR THE FULCRUM INJECTOR NOW...", LogType.InfoLog);
             this.ViewModel.InstallInjectorRelease(OutputAssetFile);
         }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Button click event for the updates view
         /// </summary>
@@ -135,14 +131,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews
         private void ToggleApplicationUpdateReadyView_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
-            ViewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
-            if (FulcrumConstants.FulcrumMainWindow?.AppUpdatesFlyout == null) { ViewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
+            _viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
+            if (FulcrumConstants.FulcrumMainWindow?.AppUpdatesFlyout == null) { _viewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
             else
             {
                 // Toggle the information pane
                 bool IsOpen = FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen;
                 FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = !IsOpen;
-                ViewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
+                _viewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
             }
         }
     }

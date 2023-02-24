@@ -9,11 +9,6 @@
              d:DesignHeight="150" d:DesignWidth="800"
              Loaded="FulcrumTitleView_OnLoaded">
 
-    <!-- DataContext for the Title View -->
-    <UserControl.DataContext>
-        <viewModels:FulcrumTitleViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

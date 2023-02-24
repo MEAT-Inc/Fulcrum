@@ -1,22 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -24,12 +10,26 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     /// Interaction logic for FulcrumConnectedVehicleInfoView.xaml
     /// </summary>
     public partial class FulcrumVehicleConnectionInfoView : UserControl
-    {        
-        // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("FulcrumSessionReportingViewLogger", LoggerActions.SubServiceLogger);
+    {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Logger instance for this view content
+        private readonly SharpLogger _viewLogger;
+
+        #endregion // Fields
+
+        #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumVehicleConnectionInfoViewModel ViewModel { get; set; }
+        internal FulcrumVehicleConnectionInfoViewModel ViewModel { get; set; }
+        
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
 
         // --------------------------------------------------------------------------------------------------------------------------
 
@@ -38,14 +38,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// </summary>
         public FulcrumVehicleConnectionInfoView()
         {
+            // Spawn a new logger and setup our view model
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = new FulcrumVehicleConnectionInfoViewModel(this);
+
             // Initialize new UI Component
             InitializeComponent();
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
-
-            // Build new ViewModel object
-            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumVehicleConnectionInfoViewModel());
+            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
         }
-
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -54,12 +54,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         private void FulcrumVehicleConnectionInfoView_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Setup a new ViewModel
-            this.ViewModel.SetupViewControl(this);
             this.DataContext = this.ViewModel;
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Button control click for when we toggle auto ID on or off manually.
@@ -70,16 +69,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         private void TriggerAutoIdRoutine_OnClick(object Sender, RoutedEventArgs E)
         {
             // Trigger our updating routine.
-            this.ViewLogger.WriteLog("ATTEMPTING MANUAL TRIGGER FOR AUTO ID NOW...", LogType.InfoLog);
+            this._viewLogger.WriteLog("ATTEMPTING MANUAL TRIGGER FOR AUTO ID NOW...", LogType.InfoLog);
             Task.Run(() =>
             {
                 this.ViewModel.AutoIdRunning = true;
-                if (!this.ViewModel.ReadVoltageAndVin()) this.ViewLogger.WriteLog("FAILED TO PULL VIN OR VOLTAGE VALUE!", LogType.ErrorLog);
-                else this.ViewLogger.WriteLog("PULLED AND POPULATED NEW VOLTAGE AND VIN VALUES OK!", LogType.InfoLog);
+                if (!this.ViewModel.ReadVoltageAndVin()) this._viewLogger.WriteLog("FAILED TO PULL VIN OR VOLTAGE VALUE!", LogType.ErrorLog);
+                else this._viewLogger.WriteLog("PULLED AND POPULATED NEW VOLTAGE AND VIN VALUES OK!", LogType.InfoLog);
                 this.ViewModel.AutoIdRunning = false;
 
                 // Log routine done and exit out.
-                this.ViewLogger.WriteLog("ROUTINE COMPLETED! CHECK UI CONTENT AND LOG ENTRIES ABOVE TO SEE HOW THE OUTPUT LOOKS", LogType.InfoLog);
+                this._viewLogger.WriteLog("ROUTINE COMPLETED! CHECK UI CONTENT AND LOG ENTRIES ABOVE TO SEE HOW THE OUTPUT LOOKS", LogType.InfoLog);
             });
         }
     }

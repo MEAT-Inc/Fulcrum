@@ -8,11 +8,6 @@
              Width="400" Height="110"
              Loaded="FulcrumInjectorTestView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <viewModels:FulcrumDllInjectionTestViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

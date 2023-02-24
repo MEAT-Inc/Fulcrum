@@ -9,12 +9,6 @@
              Loaded="FulcrumAboutThisAppView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
 
-
-    <!-- DataContext for the Updater View -->
-    <UserControl.DataContext>
-        <injectorMiscViewModels:FulcrumAboutThisAppViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

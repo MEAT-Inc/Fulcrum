@@ -9,11 +9,6 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="FulcrumVehicleConnectionInfoView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorViewModels:FulcrumVehicleConnectionInfoViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

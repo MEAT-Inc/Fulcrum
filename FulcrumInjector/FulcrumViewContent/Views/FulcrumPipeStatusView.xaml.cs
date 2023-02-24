@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -13,35 +10,46 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     /// </summary>
     public partial class FulcrumPipeStatusView : UserControl
     {
-        // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("PipeStatusViewLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Logger instance for this view content
+        private readonly SharpLogger _viewLogger;
+
+        #endregion // Fields
+
+        #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumPipeStatusViewModel ViewModel { get; set; }
+        internal FulcrumPipeStatusViewModel ViewModel { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new pipe status view object
         /// </summary>
         public FulcrumPipeStatusView()
         {
+            // Spawn a new logger and setup our view model
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = new FulcrumPipeStatusViewModel(this)
+            {
+                // Store default values for our pipe states
+                ReaderPipeState = "Loading...",
+                WriterPipeState = "Loading..."
+            };
+
             // Init component. Build new VM object
             InitializeComponent();
-            Dispatcher.InvokeAsync(() =>
-            {
-                // Build new view model object
-                this.ViewModel = new FulcrumPipeStatusViewModel();
-
-                // Store default values for our pipe states
-                this.ViewModel.ReaderPipeState = "Loading...";
-                this.ViewModel.WriterPipeState = "Loading...";
-            });
-
-            // Log built new content OK
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
-
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -49,19 +57,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <param name="e">Events attached to it.</param>
         private void FulcrumPipeStatusView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new ViewModel
-            this.ViewModel.SetupViewControl(this);
+            // Setup a new ViewModel and setup our pipe watchdogs
             this.DataContext = this.ViewModel;
-
-            // Configure pipe instances here.
             Dispatcher.InvokeAsync(() =>
             {
                 this.ViewModel.SetupPipeStateWatchdogs();
-                this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
+                this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
             });
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
     }
 }

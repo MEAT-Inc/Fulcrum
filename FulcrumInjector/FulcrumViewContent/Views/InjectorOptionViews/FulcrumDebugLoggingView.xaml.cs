@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
-using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.DebugLogFormatters;
 using FulcrumInjector.FulcrumViewSupport.AvalonEditHelpers.FIlteringFormatters;
 using NLog;
 using NLog.Config;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
 {
@@ -21,36 +16,50 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
     /// </summary>
     public partial class FulcrumDebugLoggingView : UserControl
     {
-        // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("DebugLoggingViewLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Logger instance for this view content
+        private readonly SharpLogger _viewLogger;
+
+        #endregion // Fields
+
+        #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumDebugLoggingViewModel ViewModel { get; set; }
+        internal FulcrumDebugLoggingViewModel ViewModel { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new pipe status view object
         /// </summary>
         public FulcrumDebugLoggingView()
         {
-            // Initialize new UI Component
-            InitializeComponent();
-
-            // Build new ViewModel object
-            this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel();
-            ViewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+            // Spawn a new logger and setup our view model
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel(this);
 
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
             try { CurrentConfig.RemoveTarget("DebugLoggingRedirectTarget"); }
-            catch { ViewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog); }
+            catch { this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog); }
             ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugLoggingRedirectTarget", typeof(DebugLoggingRedirectTarget));
             CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
             LogManager.ReconfigExistingLoggers();
-            this.ViewLogger.WriteLog("BUILT INSTANCE FOR OUR DLL OUTPUT DEBUG LOGGING VIEW OK!", LogType.InfoLog);
-        }
+            this._viewLogger.WriteLog("BUILT INSTANCE FOR OUR DLL OUTPUT DEBUG LOGGING VIEW OK!", LogType.InfoLog);
 
+            // Initialize new UI Component
+            InitializeComponent();
+            this._viewLogger.WriteLog($"STORED NEW VIEW OBJECT AND VIEW MODEL OBJECT FOR TYPE {this.GetType().Name} TO INJECTOR CONSTANTS OK!", LogType.InfoLog);
+        }
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -58,20 +67,19 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumInjectorDebugLoggingView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new ViewModel
-            this.ViewModel.SetupViewControl(this);
+            // Setup a new data context for our view model
             this.DataContext = this.ViewModel;
 
             // Log Added new target output ok
-            this.ViewLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
-            this.ViewLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
+            this._viewLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
+            this._viewLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
 
             // Configure pipe instances here.
             this.ViewModel.LogContentHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Searches for the provided text values
@@ -93,8 +101,6 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
                 Dispatcher.Invoke(() => FilteringTextBox.IsEnabled = true);
             });
         }
-
-
         /// <summary>
         /// Pulls in new loggers and shows them here.
         /// </summary>
@@ -104,7 +110,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
         {
             // Trigger refresh logger list
             this.ViewModel.BuildLoggerNamesList();
-            ViewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
+            this._viewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
         }
         /// <summary>
         /// Takes the selected logger object and filters log lines to only contain those from the given logger
@@ -120,13 +126,13 @@ namespace FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews
             if (CastSendingBox.SelectedIndex <= 0)
             {
                 ViewModel?.FilterByLoggerName(null);
-                ViewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
+                this._viewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
                 return;
             }
 
             // Now setup new filtering rule.
             string SelectedLoggerName = CastSendingBox.SelectedItem?.ToString();
-            ViewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
+            this._viewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
             ViewModel.FilterByLoggerName(SelectedLoggerName);
         }
     }

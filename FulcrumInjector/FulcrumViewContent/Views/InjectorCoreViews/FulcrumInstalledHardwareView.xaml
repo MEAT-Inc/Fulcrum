@@ -9,11 +9,6 @@
              Loaded="FulcrumInstalledHardwareView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorOptionViewModels:FulcrumInstalledHardwareViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

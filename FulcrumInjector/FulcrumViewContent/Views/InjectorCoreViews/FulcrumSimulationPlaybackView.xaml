@@ -12,11 +12,6 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="FulcrumSimulationPlaybackView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorCoreViewModels:FulcrumSimulationPlaybackViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets and Resources -->
     <UserControl.Resources>
         <ResourceDictionary>
@@ -193,7 +188,7 @@
                         Style="{StaticResource ActionButtonStyle}"
                         IsEnabled="{Binding Path=IsSimLoaded}"/>
                 <Button Grid.Column="3"
-                        Click="StartSimulationButton_OnClick" Margin="5,0,0,0">
+                        Click="ToggleSimulationButton_OnClick" Margin="5,0,0,0">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
                             <Style.Triggers>

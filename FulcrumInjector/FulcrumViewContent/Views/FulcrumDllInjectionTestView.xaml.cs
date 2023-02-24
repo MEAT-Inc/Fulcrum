@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -10,27 +11,40 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     /// </summary>
     public partial class FulcrumDllInjectionTestView : UserControl
     {
-        // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InjectorTestViewLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Logger instance for this view content
+        private readonly SharpLogger _viewLogger;
+
+        #endregion // Fields
+
+        #region Properties
 
         // ViewModel object to bind onto
         internal FulcrumDllInjectionTestViewModel ViewModel { get; set; }
+        #endregion // Properties
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds new logic for a view which tests our DLL Injection routines
         /// </summary>
         public FulcrumDllInjectionTestView()
         {
+            // Spawn a new logger and setup our view model
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = new FulcrumDllInjectionTestViewModel(this);
+
             // Initialize new UI Component
             InitializeComponent();
-
-            // Build new view model object
-            Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumDllInjectionTestViewModel(this));
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
-
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -38,12 +52,11 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <param name="e">Events attached to it.</param>
         private void FulcrumInjectorTestView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new ViewModel
-            ViewModel.SetupViewControl(this);
-            DataContext = this.ViewModel;
+            // Setup a new data context for this view
+            this.DataContext = this.ViewModel;
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Tests the injection for the DLL on this application
@@ -57,7 +70,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 // Clear out text box, run the test, and log the output
                 TestInjectionButton.IsEnabled = false;
                 this.ViewModel.InjectorTestResult = "Working...";
-                ViewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
+                this._viewLogger.WriteLog("ATTEMPTING INJECTOR LOGIC INJECTION ON THE VIEWMODEL NOW...", LogType.WarnLog);
 
                 // Set View to show the Injector Output View for the hamburger main menu
                 // var MenuItem = InjectorConstants.FulcrumHamburgerCoreViewModel.FulcrumMenuEntries
@@ -68,8 +81,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 // Run the injection test here on a Dispatched thread 
                 string ResultOutput = string.Empty;
                 this.ViewModel.InjectionLoadPassed = this.ViewModel.TestInjectorDllLoading(out ResultOutput);
-                if (!this.ViewModel.InjectionLoadPassed) { ViewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog); }
-                else ViewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
+                if (!this.ViewModel.InjectionLoadPassed) { this._viewLogger.WriteLog($"FAILED TO INJECT DLL INTO THE SYSTEM! SEE LOG FILES FOR MORE INFORMATION!", LogType.ErrorLog); }
+                else this._viewLogger.WriteLog($"INJECTION PASSED OK! READY TO USE WITH OE APPLICATIONS!", LogType.InfoLog);
 
                 // Set Value on the View now.
                 TestInjectionButton.IsEnabled = false;
@@ -81,16 +94,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                 // Log the failure here.
                 TestInjectionButton.IsEnabled = true;
                 TestInjectionButton.Content = "Test Injection";
-                ViewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
-                ViewLogger.WriteLog("FAILED TO LOAD OUR DLL!", LogType.ErrorLog);
-                ViewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
-                ViewLogger.WriteLog("THIS IS A FATAL ISSUE!", LogType.ErrorLog);
-                ViewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
+                this._viewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
+                this._viewLogger.WriteLog("FAILED TO LOAD OUR DLL!", LogType.ErrorLog);
+                this._viewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
+                this._viewLogger.WriteLog("THIS IS A FATAL ISSUE!", LogType.ErrorLog);
+                this._viewLogger.WriteLog("----------------------------------------------", LogType.FatalLog);
 
                 // Store output
                 this.ViewModel.InjectorTestResult = "Load Failure!";
-                ViewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
-                ViewLogger.WriteLog("EXCEPTION CONTENTS ARE BEING LOGGED TO FILE NOW", Ex);
+                this._viewLogger.WriteLog($"EXCEPTION THROWN: {Ex.Message}", LogType.ErrorLog);
+                this._viewLogger.WriteLog("EXCEPTION CONTENTS ARE BEING LOGGED TO FILE NOW", Ex);
             }
         }
     }

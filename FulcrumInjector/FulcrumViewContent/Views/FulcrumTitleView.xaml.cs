@@ -1,9 +1,6 @@
-﻿using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
-using MahApps.Metro.Controls;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
@@ -26,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         #region Properties
 
         // Public facing fields for view content configuration
-        public FulcrumTitleViewModel ViewModel { get; set; }
+        internal FulcrumTitleViewModel ViewModel { get; set; }
 
         #endregion //Properties
 
@@ -40,10 +37,12 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// </summary>
         public FulcrumTitleView()
         {
+            // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumTitleViewModel(this);
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+
             // Initialize new UI Component
             InitializeComponent();
-            this.ViewModel = new FulcrumTitleViewModel();
-            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
         /// <summary>
@@ -53,11 +52,8 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <param name="e">Events attached to it.</param>
         private void FulcrumTitleView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new ViewModel
-            ViewModel.SetupViewControl(this);
-            DataContext = ViewModel;
-
-            // Log booted title view
+            // Setup a new ViewModel and store our context
+            this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
         }
     }

@@ -16,11 +16,6 @@
         <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </FrameworkElement.CommandBindings>
 
-    <!-- DataContext for the Updater View -->
-    <UserControl.DataContext>
-        <viewModels:FulcrumUpdaterViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

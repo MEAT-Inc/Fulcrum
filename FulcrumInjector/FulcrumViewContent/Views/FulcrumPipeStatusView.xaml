@@ -8,11 +8,6 @@
              Width="400" Height="165"
              Loaded="FulcrumPipeStatusView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <viewModels:FulcrumPipeStatusViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

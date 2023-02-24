@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,9 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.Models;
 using FulcrumInjector.FulcrumViewContent.ViewModels;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.Views
 {
@@ -20,27 +17,41 @@ namespace FulcrumInjector.FulcrumViewContent.Views
     /// </summary>
     public partial class FulcrumInstalledOeAppsView : UserControl
     {
-        // Logger object.
-        private SubServiceLogger ViewLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("InstalledOeAppsViewLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Logger instance for this view content
+        private readonly SharpLogger _viewLogger;
+
+        #endregion // Fields
+
+        #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
+        internal FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Builds a new OE App status view object
         /// </summary>
         public FulcrumInstalledOeAppsView()
         {
+            // Spawn a new logger and setup our view model
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = new FulcrumInstalledOeAppsViewModel(this);
+
             // Initialize new UI Component
             InitializeComponent();
-            this.ViewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
-
-            // Build a new ViewModel object
-            this.Dispatcher.InvokeAsync(() => this.ViewModel = new FulcrumInstalledOeAppsViewModel());
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
-
         /// <summary>
         /// On loaded, we want to setup our new viewmodel object and populate values
         /// </summary>
@@ -48,10 +59,9 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         /// <param name="e">Events attached to it.</param>
         private void FulcrumInstalledOeAppsView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Setup a new ViewModel
-            this.ViewModel.SetupViewControl(this);
+            // Setup our data context and log information out
             this.DataContext = this.ViewModel;
-            this.ViewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -66,16 +76,16 @@ namespace FulcrumInjector.FulcrumViewContent.Views
             // Build selected object output here.
             int SelectedIndexValue = this.InstalledAppsListView.SelectedIndex;
             var SelectedObject = this.ViewModel.InstalledOeApps[SelectedIndexValue];
-            this.ViewLogger.WriteLog($"PULLED IN NEW SELECTED INDEX VALUE OF AN OE APP AS {SelectedIndexValue}", LogType.InfoLog);
+            this._viewLogger.WriteLog($"PULLED IN NEW SELECTED INDEX VALUE OF AN OE APP AS {SelectedIndexValue}", LogType.InfoLog);
             if (SelectedIndexValue == -1 || SelectedIndexValue > this.ViewModel.InstalledOeApps.Count) {
-                this.ViewLogger.WriteLog("ERROR! INDEX WAS OUT OF RANGE FOR POSSIBLE OE APP OBJECTS!", LogType.ErrorLog);
+                this._viewLogger.WriteLog("ERROR! INDEX WAS OUT OF RANGE FOR POSSIBLE OE APP OBJECTS!", LogType.ErrorLog);
                 return;
             }
 
             // Now using this index value, find our current model object.
             this.ViewModel.SetTargetOeApplication(SelectedObject);
-            this.ViewLogger.WriteLog($"APP OBJECT SELECTED FOR TARGETING IS: {SelectedObject}", LogType.InfoLog);
-            this.ViewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
+            this._viewLogger.WriteLog($"APP OBJECT SELECTED FOR TARGETING IS: {SelectedObject}", LogType.InfoLog);
+            this._viewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
 
             // Check the view model of our object instance. If Can boot then boot. If can kill then kill
             bool RanCommand = false; bool WasBooted = this.ViewModel.CanBootApp;
@@ -128,16 +138,14 @@ namespace FulcrumInjector.FulcrumViewContent.Views
                             $"Terminate OE Application";
 
                     // Log information
-                    this.ViewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                    this._viewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
                 });
             });
 
             // Log Passed output and return here
-            this.ViewLogger.WriteLog("BUILT NEW COMMAND INSTANCE FOR OE APP OBJECT OK!", LogType.InfoLog);
-            this.ViewLogger.WriteLog("TOGGLED CONTENT VALUES, AND TRIGGERED APP METHOD CORRECTLY!", LogType.InfoLog);
+            this._viewLogger.WriteLog("BUILT NEW COMMAND INSTANCE FOR OE APP OBJECT OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog("TOGGLED CONTENT VALUES, AND TRIGGERED APP METHOD CORRECTLY!", LogType.InfoLog);
         }
-
-
         /// <summary>
         /// Event for a double click on an OE Application object.
         /// THIS IS NOT YET DONE!
@@ -148,7 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent.Views
         {
             // Check for a double click event action. If not, return out. If it is, show a new flyout object to allow user to modify the app object.
             bool DoubleClick = GridClickedArgs.LeftButton == MouseButtonState.Pressed && GridClickedArgs.ClickCount == 2;
-            if (DoubleClick) this.ViewLogger.WriteLog("PROCESSED REQUEST TO CHANGE OE APP CONTENT! THIS IS NOT YET BUILT!");
+            if (DoubleClick) this._viewLogger.WriteLog("PROCESSED REQUEST TO CHANGE OE APP CONTENT! THIS IS NOT YET BUILT!");
         }
     }
 }

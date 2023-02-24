@@ -8,11 +8,6 @@
              Width="400" Height="525"
              Loaded="FulcrumInstalledOeAppsView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <viewModels:FulcrumInstalledOeAppsViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

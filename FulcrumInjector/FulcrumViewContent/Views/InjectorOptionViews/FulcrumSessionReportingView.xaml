@@ -10,11 +10,6 @@
              Loaded="FulcrumSessionReportingView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorOptionViewModels:FulcrumSessionReportingViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>

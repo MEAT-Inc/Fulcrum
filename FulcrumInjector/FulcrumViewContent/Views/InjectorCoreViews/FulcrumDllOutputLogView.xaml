@@ -10,11 +10,6 @@
              d:DesignWidth="650"
              Loaded="FulcrumDLLOutputLogView_OnLoaded">
 
-    <!-- DataContext Binding -->
-    <UserControl.DataContext>
-        <injectorCoreViewModels:FulcrumDllOutputLogViewModel/>
-    </UserControl.DataContext>
-
     <!-- Style Sheets -->
     <UserControl.Resources>
         <ResourceDictionary>
