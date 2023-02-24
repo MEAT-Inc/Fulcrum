@@ -60,39 +60,39 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
             this._themeLogger.WriteLog("SETTING UP NEW THEME CONTENT SETS FOR APPLICATION NOW...", LogType.InfoLog);
 
             // List of colors to setup as themes
-            this.PresetThemes ??= Array.Empty<AppStyleModel>();
-            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
-            var ThemeDefines = new List<(string, string, string, StyleType)>() { };
+            this.PresetThemes = Array.Empty<AppStyleModel>();
+            string AppName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.AppInstanceName");
+            var ThemeDefines = new List<(string, string, string, ThemeTypes)>() { };
 
             // Try and add forced user themes here.
-            var PulledUserThemes = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumInjectorAppThemes.UserEnteredThemes");
-            if (PulledUserThemes.Length != 0)
+            var PulledUserThemes = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumAppThemes.UserEnteredThemes");
+            if (PulledUserThemes.Length == 0) throw new MissingFieldException("Error! Failed to find one or more themes to import to this application!");
+            this._themeLogger.WriteLog($"LOCATED A TOTAL OF {PulledUserThemes.Length} USER DEFINED THEMES. IMPORTING THEM NOW...", LogType.InfoLog);
+            
+            // Loop all the themes pulled in now and apply them to our theme store
+            foreach (var NewThemeObject in PulledUserThemes)
             {
-                this._themeLogger.WriteLog($"LOCATED A TOTAL OF {PulledUserThemes.Length} USER DEFINED THEMES. IMPORTING THEM NOW...", LogType.InfoLog);
-                foreach (var NewThemeObject in PulledUserThemes)
+                // Store new values and build themes
+                string ThemeBaseColor = NewThemeObject.PrimaryColor;
+                string ThemeSecondaryColor = NewThemeObject.SecondaryColor;
+                string ThemeName = $"{AppName} - {NewThemeObject.ThemeName}";
+
+                // Make sure this is a valid theme object
+                if (NewThemeObject.ThemeName == null || ThemeBaseColor == null || ThemeSecondaryColor == null)
                 {
-                    // Store new values and build themes
-                    string ThemeBaseColor = NewThemeObject.BaseColor;
-                    string ThemeSecondaryColor = NewThemeObject.SecondaryColor;
-                    string ThemeName = $"{AppName} - {NewThemeObject.ThemeName}";
-
-                    // Make sure this is a valid theme object
-                    if (NewThemeObject.ThemeName == null || ThemeBaseColor == null || ThemeSecondaryColor == null)
-                    {
-                        // Log failed to build theme and continue.
-                        this._themeLogger.WriteLog("FAILED TO BUILD NEW THEME! ONE OR MORE ENTRIES WAS FOUND TO BE NULL!", LogType.ErrorLog);
-                        this._themeLogger.WriteLog($"VALUES LOCATED:", LogType.ErrorLog);
-                        this._themeLogger.WriteLog($"Theme Name:      {NewThemeObject.ThemeName ?? "NULL"}", LogType.ErrorLog);
-                        this._themeLogger.WriteLog($"Base Color:      {ThemeBaseColor ?? "NULL"}", LogType.ErrorLog);
-                        this._themeLogger.WriteLog($"Secondary Color: {ThemeSecondaryColor ?? "NULL"}", LogType.ErrorLog);
-                        continue;
-                    }
-
-                    // Add theme object
-                    StyleType typeOfStyle = NewThemeObject.IsDarkTheme == true ? StyleType.DARK_COLORS : StyleType.LIGHT_COLORS;
-                    ThemeDefines.Add(new(ThemeName, ThemeBaseColor, ThemeSecondaryColor, typeOfStyle));
-                    this._themeLogger.WriteLog($"BUILT NEW THEME NAMED {ThemeName} FOR APP {AppName} CORRECTLY!", LogType.InfoLog);
+                    // Log failed to build theme and continue.
+                    this._themeLogger.WriteLog("FAILED TO BUILD NEW THEME! ONE OR MORE ENTRIES WAS FOUND TO BE NULL!", LogType.ErrorLog);
+                    this._themeLogger.WriteLog($"VALUES LOCATED:", LogType.ErrorLog);
+                    this._themeLogger.WriteLog($"Theme Name:      {NewThemeObject.ThemeName ?? "NULL"}", LogType.ErrorLog);
+                    this._themeLogger.WriteLog($"Base Color:      {ThemeBaseColor ?? "NULL"}", LogType.ErrorLog);
+                    this._themeLogger.WriteLog($"Secondary Color: {ThemeSecondaryColor ?? "NULL"}", LogType.ErrorLog);
+                    continue;
                 }
+
+                // Add theme object
+                ThemeTypes typeOfTheme = NewThemeObject.IsDarkTheme == true ? ThemeTypes.DARK_COLORS : ThemeTypes.LIGHT_COLORS;
+                ThemeDefines.Add(new(ThemeName, ThemeBaseColor, ThemeSecondaryColor, typeOfTheme));
+                this._themeLogger.WriteLog($"BUILT NEW THEME NAMED {ThemeName} FOR APP {AppName} CORRECTLY!", LogType.InfoLog);
             }
 
             // Add these themes into the whole setup now.
@@ -100,8 +100,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
                 .SelectMany(ThemeObj =>
                 {
                     // Build themes here and store a dark/light configuration for each one of them
-                    var DarkTheme = GenerateAppTheme(ThemeObj.Item1, ThemeObj.Item2, ThemeObj.Item3, StyleType.DARK_COLORS);
-                    var LightTheme = GenerateAppTheme(ThemeObj.Item1, ThemeObj.Item2, ThemeObj.Item3, StyleType.LIGHT_COLORS);
+                    var DarkTheme = GenerateAppTheme(ThemeObj.Item1, ThemeObj.Item2, ThemeObj.Item3, ThemeTypes.DARK_COLORS);
+                    var LightTheme = GenerateAppTheme(ThemeObj.Item1, ThemeObj.Item2, ThemeObj.Item3, ThemeTypes.LIGHT_COLORS);
                     this._themeLogger.WriteLog($"STORED NEW THEME TITLED {ThemeObj.Item1} TO THE THEME MANGER OK!");
 
                     // Return our theme objects
@@ -110,7 +110,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
                 .ToArray();
 
             // Log done and ready.
-            ValueSetters.SetValue("FulcrumInjectorAppThemes.GeneratedAppPresets", this.PresetThemes);
+            ValueSetters.SetValue("FulcrumAppThemes.GeneratedAppPresets", this.PresetThemes);
             this._themeLogger.WriteLog("STORED PRESET VALUES ON THE MAIN INSTANCE THEME OBJECT OK!", LogType.InfoLog);
             this._themeLogger.WriteLog("READY TO RUN CUSTOM THEME CONFIGURATIONS FROM HERE ON.", LogType.InfoLog);
         }
@@ -121,14 +121,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
         /// <param name="ThemeName">Name of theme</param>
         /// <param name="BaseColor">Main color</param>
         /// <param name="ShowcaseColor">Background Color</param>
-        public AppStyleModel GenerateAppTheme(string ThemeName, string BaseColor, string ShowcaseColor, StyleType typeOfStyle)
+        public AppStyleModel GenerateAppTheme(string ThemeName, string BaseColor, string ShowcaseColor, ThemeTypes typeOfTheme)
         {
             // Get Color Uints
             int BaseUint = int.Parse(BaseColor.Replace("0x", string.Empty), NumberStyles.HexNumber);
             int ShowcaseUint = int.Parse(ShowcaseColor.Replace("0x", string.Empty), NumberStyles.HexNumber);
 
             // Convert the Uints into colors.
-            return GenerateAppTheme(ThemeName, System.Drawing.Color.FromArgb(BaseUint), System.Drawing.Color.FromArgb(ShowcaseUint), typeOfStyle);
+            return GenerateAppTheme(ThemeName, System.Drawing.Color.FromArgb(BaseUint), System.Drawing.Color.FromArgb(ShowcaseUint), typeOfTheme);
         }
         /// <summary>
         /// Adds a new theme object to this settings model
@@ -136,16 +136,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
         /// <param name="ThemeName">Name of theme</param>
         /// <param name="BaseColor">Main color</param>
         /// <param name="ShowcaseColor">Background Color</param>
-        public AppStyleModel GenerateAppTheme(string ThemeName, System.Drawing.Color BaseColor, System.Drawing.Color ShowcaseColor, StyleType typeOfStyle)
+        public AppStyleModel GenerateAppTheme(string ThemeName, System.Drawing.Color BaseColor, System.Drawing.Color ShowcaseColor, ThemeTypes typeOfTheme)
         {
             // Build the new theme here
-            switch (typeOfStyle)
+            switch (typeOfTheme)
             {
                 // Generate the custom schemes here.
-                case StyleType.DARK_COLORS:
-                    string DarkBaseHexString = CustomColorConverter.HexConverter(BaseColor);
-                    string DarkShowcaseHexString = CustomColorConverter.HexConverter(ShowcaseColor);
-                    var DarkNewTheme = new AppStyleModel(ThemeName, DarkBaseHexString, DarkShowcaseHexString, typeOfStyle);
+                case ThemeTypes.DARK_COLORS:
+                    string DarkBaseHexString = CustomColorConverter.ToHexString(BaseColor);
+                    string DarkShowcaseHexString = CustomColorConverter.ToHexString(ShowcaseColor);
+                    var DarkNewTheme = new AppStyleModel(ThemeName, DarkBaseHexString, DarkShowcaseHexString, typeOfTheme);
 
                     // Return the new theme object if in the list.
                     if (this.PresetThemes.ToList().TrueForAll(ThemeObj => ThemeObj.ThemeName == DarkNewTheme.ThemeName))
@@ -156,10 +156,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
                     return DarkNewTheme;
 
                 // Light color theme
-                case StyleType.LIGHT_COLORS:
-                    string LightBaseHexString = CustomColorConverter.HexConverter(BaseColor);
-                    string LightShowcaseHexString = CustomColorConverter.HexConverter(ShowcaseColor);
-                    var LightNewTheme = new AppStyleModel(ThemeName, LightBaseHexString, LightShowcaseHexString, typeOfStyle);
+                case ThemeTypes.LIGHT_COLORS:
+                    string LightBaseHexString = CustomColorConverter.ToHexString(BaseColor);
+                    string LightShowcaseHexString = CustomColorConverter.ToHexString(ShowcaseColor);
+                    var LightNewTheme = new AppStyleModel(ThemeName, LightBaseHexString, LightShowcaseHexString, typeOfTheme);
 
                     // Return the new theme object if in the list.
                     if (this.PresetThemes.ToList().TrueForAll(ThemeObj => ThemeObj.ThemeName == LightNewTheme.ThemeName))
@@ -193,11 +193,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
             // Set Primary and Secondary Colors
             ColorResources["PrimaryColor"] = new SolidColorBrush(CustomColorShader.GenerateShadeColor(PrimaryColor, Colors.Black, 0));
             ColorResources["SecondaryColor"] = new SolidColorBrush(CustomColorShader.GenerateShadeColor(SecondaryColor, Colors.Black, 0));
-            ColorResources["TextColorBase"] = styleModelToSet.TypeOfStyle switch
+            ColorResources["TextColorBase"] = styleModelToSet.ThemeType switch
             {
                 // Set the text base color
-                StyleType.DARK_COLORS => new SolidColorBrush(Colors.White),
-                StyleType.LIGHT_COLORS => new SolidColorBrush(Colors.Black),
+                ThemeTypes.DARK_COLORS => new SolidColorBrush(Colors.White),
+                ThemeTypes.LIGHT_COLORS => new SolidColorBrush(Colors.Black),
                 _ => ColorResources["TextColorBase"]
             };
 
@@ -225,9 +225,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
 
             // Set the resource back here.
             Application.Current.Resources["AppColorTheme"] = ColorResources;
-            ValueSetters.SetValue("FulcrumInjectorAppThemes.AppliedAppTheme", styleModelToSet);
+            ValueSetters.SetValue("FulcrumAppThemes.AppliedAppTheme", styleModelToSet);
             ThemeManager.Current.ChangeTheme(Application.Current, RuntimeThemeGenerator.Current.GenerateRuntimeTheme(
-                    (styleModelToSet.TypeOfStyle == StyleType.DARK_COLORS ? "Dark" : "Light"),
+                    (styleModelToSet.ThemeType == ThemeTypes.DARK_COLORS ? "Dark" : "Light"),
                     styleModelToSet.PrimaryColor.ToMediaColor()
             ));
 

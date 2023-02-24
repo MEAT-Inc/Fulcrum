@@ -121,7 +121,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Find the name of the first file and use it as our base.
             string OutputPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultImportFilePath")
+                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultImportFilePath")
             );
 
             // Build file name here.
@@ -208,7 +208,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
                     // Return passed and copy into our temp location
                     string LogFileName = Path.GetFileName(NewLogFile);
-                    string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultImportFilePath");
+                    string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultImportFilePath");
                     Directory.CreateDirectory(DefaultImportLocation);
                     File.Copy(NewLogFile, Path.Combine(DefaultImportLocation, LogFileName), true);
                     this.ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");

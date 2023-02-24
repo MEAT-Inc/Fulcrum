@@ -70,7 +70,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters
         /// Pulls in all settings newly from the JSON Config file and stores them on this instance object.
         /// </summary>
         /// <returns></returns>
-        public Tuple<string, Tuple<string, string>[]>[] BuildColorFormatValues(FulcrumSettingsEntryModel[] SettingsInputValues)
+        public Tuple<string, Tuple<string, string>[]>[] BuildColorFormatValues(FulcrumSettingEntryModel[] SettingsInputValues)
         {
             // Load value from the config file.
             _formatLogger?.WriteLog("[INJECTOR SYNTAX] ::: IMPORTING CONFIGURATION VALUES FROM SETTINGS STORE NOW...", LogType.WarnLog);

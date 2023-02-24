@@ -7,8 +7,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
     /// <summary>
     /// Model object of our OE Applications installed on the system.
     /// </summary>
-    [JsonConverter(typeof(OeAppJsonConverter))]
-    public class FulcrumOeAppModel
+    [JsonConverter(typeof(OeApplicationJsonConverter))]
+    public class FulcrumOeApplicationModel
     {
         #region Custom Events
         #endregion //Custom Events
@@ -44,7 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
         /// <summary>
         /// Builds a new OE application object from a given set of values.
         /// </summary>
-        public FulcrumOeAppModel(string Name, string Path, string Version = "N/A", string BatLaunchCommand = null, string[] PathSet = null)
+        public FulcrumOeApplicationModel(string Name, string Path, string Version = "N/A", string BatLaunchCommand = null, string[] PathSet = null)
         {
             // Store values. Append into our list of models.
             this.OEAppName = Name;

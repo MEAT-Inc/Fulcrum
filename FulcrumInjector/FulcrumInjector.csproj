@@ -251,8 +251,8 @@
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\DebugLogFormatters\LogLevelColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\DebugLogFormatters\LoggerNameColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\DebugLogFormatters\TimeColorFormatter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\OeAppJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\SettingsCollectionJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\OeApplicationJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\SettingEntryJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\InjectorSyntaxFormatters\InjectorOutputSyntaxHelper.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\InjectorSyntaxFormatters\CommandParamFormatters\TypeAndTimeColorFormatter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolConverter.cs" />
@@ -275,8 +275,8 @@
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConfigFile.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\DebugLogFormatters\DebugLoggingRedirectTarget.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumOeAppModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingsEntryModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumOeApplicationModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingEntryModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingsCollection.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\PropertyWatchdog.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorOptionViewModels\FulcrumDebugLoggingViewModel.cs" />

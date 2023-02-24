@@ -24,9 +24,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         private bool _canBootApp;
         private bool _canKillApp;
         private Process _runningAppProcess;
-        private FulcrumOeAppModel _targetAppModel;
-        private FulcrumOeAppModel _runningAppModel;
-        private ObservableCollection<FulcrumOeAppModel> _installedOeApps;
+        private FulcrumOeApplicationModel _targetAppModel;
+        private FulcrumOeApplicationModel _runningAppModel;
+        private ObservableCollection<FulcrumOeApplicationModel> _installedOeApps;
 
         #endregion //Fields
 
@@ -35,8 +35,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         // Public properties for the view to bind onto  
         public bool CanBootApp { get => _canBootApp; private set => PropertyUpdated(value); }
         public bool CanKillApp { get => _canKillApp; private set => PropertyUpdated(value); }
-        public FulcrumOeAppModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
-        public ObservableCollection<FulcrumOeAppModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
+        public FulcrumOeApplicationModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
+        public ObservableCollection<FulcrumOeApplicationModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
 
         #endregion //Properties
 
@@ -74,41 +74,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// Pulls in a list of OE application names and paths as a set of objects.
         /// Converts them into a list and returns them.
         /// </summary>
-        public ObservableCollection<FulcrumOeAppModel> ImportOeApplications()
+        public ObservableCollection<FulcrumOeApplicationModel> ImportOeApplications()
         {
             // Log info. Pull app objects in from the settings file, and begin to import them.
             this.ViewModelLogger.WriteLog("PULLING IN LIST OF PREDEFINED OE APPLICATIONS AND STORING THEM ONTO OUR VIEW OBJECT NOW...", LogType.WarnLog);
-            var PulledAppsObject = ValueLoaders.GetConfigValue<object[]>("FulcrumOeAppNames");
-
-            // Store output in this list.
-            List<FulcrumOeAppModel> OutputApps = new List<FulcrumOeAppModel>();
-            foreach (var AppObject in PulledAppsObject)
-            {
-                // Cast the application object into a new model for our app instances.
-                this.ViewModelLogger.WriteLog($"TRYING TO CAST OBJECT {PulledAppsObject.ToList().IndexOf(AppObject)} OF {PulledAppsObject.Length} NOW...", LogType.TraceLog);
-                try
-                {
-                    // Convert this into a string of Json. Then built it into a json cast OE app model
-                    string JsonOfObject = JsonConvert.SerializeObject(AppObject);
-                    FulcrumOeAppModel NextAppModel = JsonConvert.DeserializeObject<FulcrumOeAppModel>(JsonOfObject);
-
-                    // Add to list of outputs
-                    OutputApps.Add(NextAppModel);
-                }
-                catch { this.ViewModelLogger.WriteLog("FAILED TO CAST CURRENT OBJECT INTO A NEW OE APP MODEL! MOVING ON", LogType.WarnLog); }
-            }
+            var LoadedOeApplications = ValueLoaders.GetConfigValue<FulcrumOeApplicationModel[]>("FulcrumOeApplications");
 
             // Put our usable apps first and soft those A-Z. Append the not usable ones and sort them A-Z
-            OutputApps = OutputApps.OrderBy(AppObj => AppObj.IsAppUsable).Reverse().ToList();
-            OutputApps = new[] {
-                OutputApps.Where(AppObj => AppObj.IsAppUsable).OrderBy(AppObj => AppObj.OEAppName).ToList(),
-                OutputApps.Where(AppObj => !AppObj.IsAppUsable).OrderBy(AppObj => AppObj.OEAppName).ToList()    
-            }.SelectMany(AppSet => AppSet).ToList();
+            LoadedOeApplications = LoadedOeApplications.OrderBy(AppObj => AppObj.IsAppUsable).Reverse().ToArray();
+            LoadedOeApplications = new[] {
+                LoadedOeApplications.Where(AppObj => AppObj.IsAppUsable).OrderBy(AppObj => AppObj.OEAppName).ToList(),
+                LoadedOeApplications.Where(AppObj => !AppObj.IsAppUsable).OrderBy(AppObj => AppObj.OEAppName).ToList()    
+            }.SelectMany(AppSet => AppSet).ToArray();
 
             // Log output information here.
-            this.ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {PulledAppsObject.Length} OBJECTS AND CREATED {OutputApps.Count} CAST APP OBJECTS!", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {LoadedOeApplications.Length} OBJECTS AND CREATED {LoadedOeApplications.Length} CAST APP OBJECTS!", LogType.WarnLog);
             this.ViewModelLogger.WriteLog("RETURNING BUILT APP OBJECT INSTANCES NOW...");
-            return new ObservableCollection<FulcrumOeAppModel>(OutputApps);
+            return new ObservableCollection<FulcrumOeApplicationModel>(LoadedOeApplications);
         }
 
         /// <summary>
@@ -116,7 +98,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// </summary>
         /// <param name="AppToStore">App to boot </param>
         /// <returns>True if booted. false if failed.</returns>
-        public bool SetTargetOeApplication(FulcrumOeAppModel AppToStore)
+        public bool SetTargetOeApplication(FulcrumOeApplicationModel AppToStore)
         {
             // Store the app here and return status.
             this.ViewModelLogger.WriteLog($"STORING NEW OE APPLICATION NAMED {AppToStore.OEAppName} NOW...", LogType.WarnLog);
@@ -180,7 +162,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// </summary>
         /// <param name="LastRunOeApp">The last built and run OE application model object</param>
         /// <returns>True if killed. false if failed.</returns>
-        public bool KillOeApplication(out FulcrumOeAppModel LastRunOeApp)
+        public bool KillOeApplication(out FulcrumOeApplicationModel LastRunOeApp)
         {
             // Check if app to kill is not null.
             if (this.RunningAppModel == null || !this.CanKillApp) {

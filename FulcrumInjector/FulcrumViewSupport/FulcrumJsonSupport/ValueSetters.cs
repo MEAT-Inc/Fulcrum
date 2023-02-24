@@ -10,19 +10,25 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
     /// <summary>
     /// Class used for setting values on the JSON Configuration values.
     /// </summary>
-    public static class ValueSetters
+    internal static class ValueSetters
     {
         #region Custom Events
         #endregion //Custom Events
 
         #region Fields
 
-        // Helper logging object for logging changes in this class
-        private static readonly SharpLogger _valueSettersLogger = new SharpLogger(LoggerActions.FileLogger);
+        // Backing logger object used to help prevent issues when calling the class logger
+        private static SharpLogger _backingLogger;
 
         #endregion //Fields
 
         #region Properties
+
+        // Logging object used to write information out from this class
+        private static SharpLogger _valueSettersLogger => SharpLogBroker.LogBrokerInitialized
+            ? _backingLogger ??= new SharpLogger(LoggerActions.UniversalLogger)
+            : null;
+
         #endregion //Properties
 
         #region Structs and Classes

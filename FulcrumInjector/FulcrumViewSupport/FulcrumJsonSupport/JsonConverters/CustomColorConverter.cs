@@ -95,7 +95,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// </summary>
         /// <param name="InputColor">Color to convert</param>
         /// <returns>string converted color value</returns>
-        public static string HexConverter(DrawingColor InputColor)
+        public static string ToHexString(this DrawingColor InputColor)
         {
             return (InputColor.R.ToString("X2") + InputColor.G.ToString("X2") + InputColor.B.ToString("X2")).ToUpper();
         }
@@ -104,7 +104,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// </summary>
         /// <param name="InputColor">Color to convert</param>
         /// <returns>string converted color value</returns>
-        public static string RGBConverter(DrawingColor InputColor)
+        public static string ToRgbString(this DrawingColor InputColor)
         {
             return (InputColor.R.ToString() + "," + InputColor.G.ToString() + "," + InputColor.B.ToString()).ToUpper();
         }

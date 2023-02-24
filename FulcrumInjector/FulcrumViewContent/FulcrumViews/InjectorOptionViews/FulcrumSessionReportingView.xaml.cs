@@ -77,7 +77,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Force show help menu and build email temp text
             if (this.EmailBodyTextContent.Text.Length == 0)
             {
-                this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
+                this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
                 this._viewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
             }
 
@@ -217,7 +217,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
                 CheckPathExists = true,
                 RestoreDirectory = true,
                 AutoUpgradeEnabled = true,
-                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorLogging.DefaultLoggingPath")
+                InitialDirectory = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultLoggingPath")
             };
 
             // Now open the dialog and allow the user to pick some new files.

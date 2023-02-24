@@ -141,7 +141,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Check for not supported DLL Values.
             ObservableCollection<string> DevicesFound = new ObservableCollection<string>();
-            var IgnoredDLLs = ValueLoaders.GetConfigValue<string[]>("FulcrumInjectorConstants.InjectorHardwareRefresh.IgnoredDLLNames");
+            var IgnoredDLLs = ValueLoaders.GetConfigValue<string[]>("FulcrumConstants.InjectorHardwareRefresh.IgnoredDLLNames");
             IsIgnoredDLL = IgnoredDLLs.Contains(DllEntry.Name);
             if (IgnoredDLLs.Contains(DllEntry.Name)) {
                 this.ViewModelLogger.WriteLog("NOT UPDATING DEVICES FOR A DLL WHICH IS KNOWN TO NOT BE USABLE WITH THE FULCRUM!", LogType.WarnLog);

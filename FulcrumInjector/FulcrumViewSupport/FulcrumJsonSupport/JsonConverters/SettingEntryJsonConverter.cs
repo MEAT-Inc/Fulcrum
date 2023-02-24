@@ -9,14 +9,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
     /// <summary>
     /// JSON Converter for settings object entries
     /// </summary>
-    internal class SettingsCollectionJsonConverter : JsonConverter
+    internal class SettingEntryJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if we can convert this object or not.
         /// </summary>
         /// <param name="ObjectType"></param>
         /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumSettingsEntryModel); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumSettingEntryModel); }
         /// <summary>
         /// Writes JSON output
         /// </summary>
@@ -27,15 +27,15 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            FulcrumSettingsEntryModel CastSettingEntry = ValueObject as FulcrumSettingsEntryModel;
+            FulcrumSettingEntryModel castSettingEntry = ValueObject as FulcrumSettingEntryModel;
 
             // Build a dynamic output object
-            string TypeOfControlString = CastSettingEntry.TypeOfControl.ToString();
+            string TypeOfControlString = castSettingEntry.TypeOfControl.ToString();
             var OutputObject = JObject.FromObject(new
             {
-                CastSettingEntry.SettingName,                // Setting Name
-                CastSettingEntry.SettingValue,               // Setting Value
-                CastSettingEntry.SettingDescription,         // Description of the setting
+                castSettingEntry.SettingName,                // Setting Name
+                castSettingEntry.SettingValue,               // Setting Value
+                castSettingEntry.SettingDescription,         // Description of the setting
                 SettingControlType = TypeOfControlString,    // Setting UI Control Type
             });
 
@@ -60,7 +60,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             string SettingName = InputObject["SettingName"]?.Value<string>();
             object SettingValue = InputObject["SettingValue"]?.Value<object>();
             string SettingDescription = InputObject["SettingDescription"]?.Value<string>();
-            Enum.TryParse(InputObject["SettingControlType"]?.Value<object>()?.ToString(), out FulcrumSettingsEntryModel.ControlTypes SettingControlType);
+            Enum.TryParse(InputObject["SettingControlType"]?.Value<object>()?.ToString(), out FulcrumSettingEntryModel.ControlTypes SettingControlType);
 
             // Double check that this is NOT a PassThruRegex value. If it is, then we apply a new Regex based on loaded values
             if (SettingName.Contains("Regex") && string.IsNullOrEmpty(SettingValue?.ToString()))
@@ -81,7 +81,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             }
 
             // Return built output object
-            return new FulcrumSettingsEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
+            return new FulcrumSettingEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
         }
     }
 }

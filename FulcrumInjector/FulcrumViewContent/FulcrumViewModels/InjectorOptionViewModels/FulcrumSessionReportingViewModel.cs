@@ -148,7 +148,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             {
                 // Pull in new settings values for sender and default receivers.
                 this.ViewModelLogger.WriteLog("PULLING IN NEW VALUES FOR BROKER OBJECT AND CONSTRUCTING IT", LogType.InfoLog);
-                var EmailConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.InjectorEmailConfiguration.SenderConfiguration");
+                var EmailConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumConstants.InjectorEmailConfiguration.SenderConfiguration");
                 string SendName = EmailConfigObject.ReportSenderName;
                 string SendEmail = EmailConfigObject.ReportSenderEmail;
                 string SendPassword = EmailConfigObject.ReportSenderPassword;
@@ -159,7 +159,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
 
                 // Now try and authorize the client for a google address.
                 this.ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
-                var SmtpConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumInjectorConstants.InjectorEmailConfiguration.SmtpServerSettings");
+                var SmtpConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumConstants.InjectorEmailConfiguration.SmtpServerSettings");
                 var SmtpServerPort = (int)SmtpConfigObject.ServerPort;
                 var SmtpServerName = (string)SmtpConfigObject.ServerName;
                 var SmtpServerTimeout = (int)SmtpConfigObject.ServerTimeout;

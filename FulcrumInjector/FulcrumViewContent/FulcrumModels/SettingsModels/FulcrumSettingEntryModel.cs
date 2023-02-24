@@ -8,8 +8,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
     /// <summary>
     /// Model object for our settings entries
     /// </summary>
-    [JsonConverter(typeof(SettingsCollectionJsonConverter))]
-    internal class FulcrumSettingsEntryModel
+    [JsonConverter(typeof(SettingEntryJsonConverter))]
+    internal class FulcrumSettingEntryModel
     {
         #region Custom Events
         #endregion //Custom Events
@@ -54,7 +54,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// <param name="Value">Setting value</param>
         /// <param name="ControlType">Type of UI Control</param>
         /// <param name="Description">Description of setting</param>
-        public FulcrumSettingsEntryModel(string Name, object Value, ControlTypes ControlType, string Description = "No Description")
+        public FulcrumSettingEntryModel(string Name, object Value, ControlTypes ControlType, string Description = "No Description")
         {
             // Store values for object onto class now.
             this.SettingName = Name;

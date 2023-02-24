@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             // Store title and version string values now.
             this.ShimDLLVersionString = $"Shim Version: {FulcrumConstants.FulcrumVersions.ShimVersionString}";
             this.InjectorVersionString = $"Version: {FulcrumConstants.FulcrumVersions.InjectorVersionString}";
-            this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+            this.TitleTextString = ValueLoaders.GetConfigValue<string>("FulcrumConstants.AppInstanceName");
 
             // Log output information
             this.ViewModelLogger.WriteLog("PULLED NEW TITLE AND VERSION VALUES OK!");

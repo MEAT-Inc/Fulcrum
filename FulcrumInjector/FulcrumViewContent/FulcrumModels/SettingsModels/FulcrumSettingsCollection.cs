@@ -2,22 +2,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 {
     /// <summary>
     /// Wrapper holding a list of settings sets
     /// </summary>
-    internal class FulcrumSettingsCollectionModel : IEnumerable<FulcrumSettingsEntryModel>
+    internal class FulcrumSettingsCollection : IEnumerable<FulcrumSettingEntryModel>
     {
         #region Custom Events
         #endregion //Custom Events
 
         #region Fields
 
-        // Private backing fields for our collections of settings
-        public readonly string SettingSectionTitle;
-        private readonly List<FulcrumSettingsEntryModel> _settingsEntries;
+        // Private backing fields for our collections of settings and the title of the setting set
+        public string SettingSectionTitle;
+        private readonly List<FulcrumSettingEntryModel> _settingsEntries;
 
         #endregion //Fields
 
@@ -58,10 +59,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// Returns our enumerator using the cast collection of settings on this class instance
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<FulcrumSettingsEntryModel> GetEnumerator()
+        public IEnumerator<FulcrumSettingEntryModel> GetEnumerator()
         {
             // Return our settings objects ordered by their names as a collection
-            return (IEnumerator<FulcrumSettingsEntryModel>)this._settingsEntries.GetEnumerator();
+            return (IEnumerator<FulcrumSettingEntryModel>)this._settingsEntries.GetEnumerator();
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,7 +72,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// </summary>
         /// <param name="SectionName"></param>
         /// <param name="SettingsEntries"></param>
-        public FulcrumSettingsCollectionModel(string SectionName, IEnumerable<FulcrumSettingsEntryModel> SettingsEntries)
+        public FulcrumSettingsCollection(string SectionName, IEnumerable<FulcrumSettingEntryModel> SettingsEntries)
         {
             // Store values for the setting collection name and setting objects 
             this.SettingSectionTitle = SectionName;
@@ -104,7 +105,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// </summary>
         /// <param name="SettingsToAdd"></param>
         /// <returns></returns>
-        public IEnumerable<FulcrumSettingsEntryModel> UpdateSetting(params FulcrumSettingsEntryModel[] SettingsToAdd)
+        public IEnumerable<FulcrumSettingEntryModel> UpdateSetting(params FulcrumSettingEntryModel[] SettingsToAdd)
         {
             // Add one by one and replacing dupes.
             foreach (var SettingEntry in SettingsToAdd)

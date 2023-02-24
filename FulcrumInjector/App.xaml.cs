@@ -74,8 +74,8 @@ namespace FulcrumInjector
         private void _configureInjectorLogging()
         {
             // Load in and apply the log archive and log broker configurations for this instance
-            var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("InjectorLogging.LogBrokerConfiguration");
-            var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("InjectorLogging.LogArchiveConfiguration");
+            var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
+            var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");
 
             // Make logger and build global logger object.
             SharpLogBroker.InitializeLogging(BrokerConfig);
@@ -103,12 +103,11 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
 
             // Find the process values here.
-            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.AppInstanceName");
             this._appLogger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
             var InjectorsTotal = Process.GetProcesses()
                 .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
-                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName)
-                                  || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
+                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName) || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
                 .ToList();
 
             // Now kill any existing instances
@@ -142,7 +141,7 @@ namespace FulcrumInjector
 
                 // Now build a process object. Simple bat file that runs a Taskkill instance on this app after waiting 3 seconds.
                 string TempBat = Path.ChangeExtension(Path.GetTempFileName(), "bat");
-                string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
+                string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.AppInstanceName");
                 string BatContents = string.Join("\n", new string[]
                 {
                     "timeout /t 5 /nobreak > NUL",
@@ -223,8 +222,8 @@ namespace FulcrumInjector
 
             // Set theme configurations
             ThemeManager.Current.SyncTheme();
-            ThemeConfiguration = new AppThemeConfiguration();
-            ThemeConfiguration.CurrentAppStyleModel = ThemeConfiguration.PresetThemes[0];
+            this.ThemeConfiguration = new AppThemeConfiguration();
+            this.ThemeConfiguration.CurrentAppStyleModel = ThemeConfiguration.PresetThemes[0];
             this._appLogger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
         }
         /// <summary>

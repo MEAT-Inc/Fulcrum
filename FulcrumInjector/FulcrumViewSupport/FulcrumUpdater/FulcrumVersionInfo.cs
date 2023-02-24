@@ -79,7 +79,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
 #if DEBUG
                 Path.GetFullPath("..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll");
 #else
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorDllInformation.FulcrumDLL");  
+                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDllInformation.FulcrumDLL");  
 #endif
 
             // Make sure the injector DLL Exists

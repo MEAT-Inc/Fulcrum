@@ -42,18 +42,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
             _templateLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
 
             // Check if we can use this selector object or not.
-            if (ObjectContainer is FrameworkElement InputElement && InputItem is FulcrumSettingsEntryModel SettingModelObject)
+            if (ObjectContainer is FrameworkElement InputElement && InputItem is FulcrumSettingEntryModel SettingModelObject)
             {
                 // Now find the type of control to use
                 switch (SettingModelObject.TypeOfControl)
                 {
                     // Found control type
-                    case FulcrumSettingsEntryModel.ControlTypes.CHECKBOX_CONTROL: return InputElement.FindResource("CheckboxSettingEntryDataTemplate") as DataTemplate;
-                    case FulcrumSettingsEntryModel.ControlTypes.TEXTBOX_CONTROL: return InputElement.FindResource("TextBoxSettingEntryDataTemplate") as DataTemplate;
-                    case FulcrumSettingsEntryModel.ControlTypes.COMBOBOX_CONTROL: return InputElement.FindResource("ComboBoxSettingEntryDataTemplate") as DataTemplate;
+                    case FulcrumSettingEntryModel.ControlTypes.CHECKBOX_CONTROL: return InputElement.FindResource("CheckboxSettingEntryDataTemplate") as DataTemplate;
+                    case FulcrumSettingEntryModel.ControlTypes.TEXTBOX_CONTROL: return InputElement.FindResource("TextBoxSettingEntryDataTemplate") as DataTemplate;
+                    case FulcrumSettingEntryModel.ControlTypes.COMBOBOX_CONTROL: return InputElement.FindResource("ComboBoxSettingEntryDataTemplate") as DataTemplate;
 
                     // If failed
-                    case FulcrumSettingsEntryModel.ControlTypes.NOT_DEFINED:
+                    case FulcrumSettingEntryModel.ControlTypes.NOT_DEFINED:
                         _templateLogger.WriteLog($"FAILED TO FIND NEW CONTROL TYPE FOR VALUE {SettingModelObject.TypeOfControl}!", LogType.ErrorLog);
                         return null;
                 }

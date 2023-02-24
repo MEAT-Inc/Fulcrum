@@ -22,7 +22,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 
             // Generate the color string value
             Color CastColor = (Color)ObjectValue;
-            string ColorHexString = CustomColorConverter.HexConverter(CastColor);
+            string ColorHexString = CustomColorConverter.ToHexString(CastColor);
 
             // Write the value
             JWriter.WriteValue(ColorHexString);

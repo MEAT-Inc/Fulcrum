@@ -66,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 #if DEBUG
                Path.GetFullPath("..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll");
 #else
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorDllInformation.FulcrumDLL");  
+                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDllInformation.FulcrumDLL");  
 #endif
 
             // Log information about the DLL Path values

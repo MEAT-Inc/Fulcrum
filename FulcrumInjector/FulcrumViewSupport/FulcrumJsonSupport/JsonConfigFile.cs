@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
     /// <summary>
     /// Class which contains info about the possible json files to import.
     /// </summary>
-    public static class JsonConfigFile
+    internal static class JsonConfigFile
     {
         #region Custom Events
         #endregion //Custom Events

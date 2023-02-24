@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
 
@@ -9,19 +8,25 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
     /// <summary>
     /// Contains methods for loading config values.
     /// </summary>
-    public static class ValueLoaders
+    internal static class ValueLoaders
     {
         #region Custom Events
         #endregion //Custom Events
 
         #region Fields
 
-        // Helper logging object for logging changes in this class
-        private static readonly SharpLogger _valueLoadersLogger = new SharpLogger(LoggerActions.FileLogger);
+        // Backing logger object used to avoid configuration issues
+        private static SharpLogger _backingLogger;
 
         #endregion //Fields
 
         #region Properties
+
+        // Logging object used to write information out from this class
+        private static SharpLogger _valueLoadersLogger => SharpLogBroker.LogBrokerInitialized
+            ? _backingLogger ??= new SharpLogger(LoggerActions.UniversalLogger)
+            : null;
+
         #endregion //Properties
 
         #region Structs and Classes
@@ -51,14 +56,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
                 return (TValueType)new object();
             }
 
-            // If not null, convert and return.
-            var ConvertedValue = ValueObject.ToObject<TValueType>();
-            string JsonValue = JsonConvert.SerializeObject(ConvertedValue, Formatting.None);
-            _valueLoadersLogger?.WriteLog(
-                JsonValue.Length < 250
-                    ? $"PROPERTY: {JsonPath} | VALUE: {JsonValue}"
-                    : $"PROPERTY: {JsonPath} | VALUE: VALUE AS STRING IS TOO LONG TO DISPLAY IN THIS LOG FILE!",
-                LogType.TraceLog);
+            // If not null, convert and return the object into the desired generic type
+            TValueType ConvertedValue = ValueObject.ToObject<TValueType>();
+            _valueLoadersLogger?.WriteLog($"PROPERTY: {JsonPath} WAS READ AND STORED AS TYPE {typeof(TValueType).Name} CORRECTLY!", LogType.TraceLog);
 
             // Return the built converted value here
             return ConvertedValue;

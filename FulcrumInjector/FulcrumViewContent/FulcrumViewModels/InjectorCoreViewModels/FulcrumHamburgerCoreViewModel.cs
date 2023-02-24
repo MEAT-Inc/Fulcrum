@@ -63,7 +63,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.FulcrumMenuEntries = ValueLoaders.GetConfigValue<dynamic[]>("FulcrumMenuEntries");
             this.FulcrumIconPath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.InjectorResources.FulcrumIconsPath"));
+                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumIconsPath"));
             this.ViewModelLogger.WriteLog("IMPORTED VALUES FROM JSON FILE OK!", LogType.InfoLog);
 
             // Ensure output icon path exists
