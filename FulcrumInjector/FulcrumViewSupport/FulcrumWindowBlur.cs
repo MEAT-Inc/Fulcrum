@@ -9,46 +9,15 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Applies a blur to a window
     /// </summary>
-    internal class FulcrumWindowBlur
+    internal static class FulcrumWindowBlur
     {
         #region Custom Events
         #endregion //Custom Events
 
         #region Fields
-
-        // Private fields which hold our window object and the window interop helper
-        private bool _isShowingBlur = false;
-        private readonly Window _windowInstance;
-        private readonly WindowInteropHelper _windowInterop;
-
-        // Fields holding our window color values and opacity values
-        public Color _blurColor;
-        private uint _blurOpacity;
-
         #endregion //Fields
 
         #region Properties
-
-        // Public facing properties holding the blur opacity value and the blur color to apply
-        public Color BlurColor
-        {
-            get => this._blurColor;
-            set
-            {
-                this._blurColor = value;
-                if (this._isShowingBlur) this.ShowBlurEffect();
-            }
-        }
-        public double BlurOpacity
-        {
-            get => _blurOpacity;
-            set
-            {
-                this._blurOpacity = (uint)value;
-                if (this._isShowingBlur) this.ShowBlurEffect(); 
-            }
-        }
-
         #endregion //Properties
 
         #region Structs and Classes
@@ -92,76 +61,71 @@ namespace FulcrumInjector.FulcrumViewSupport
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Builds a new object ot modify and stores it on this object.
-        /// </summary>
-        /// <param name="WindowToModify">The window instance to blur when applied</param>
-        public FulcrumWindowBlur(Window WindowToModify, double OpacityValue = 75.00, Color ColorToBlur = default, bool ShowBlur = true)
-        {
-            // Store values for the window to blur and our desired opacity value
-            this._windowInstance = WindowToModify;
-            this._blurOpacity = (uint)OpacityValue;
-
-            // Check the provided color and store it once validated 
-            if (ColorToBlur == default) ColorToBlur = ((App)Application.Current).ThemeConfiguration.CurrentAppStyleModel.PrimaryColor; 
-            this._blurColor = ColorToBlur;
-
-            // Spawn and store a new window interop helper to invoke the blur operations
-            this._windowInterop = new WindowInteropHelper(_windowInstance);
-            if (ShowBlur) { this.ShowBlurEffect(); }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
         /// Turns blur effect on for the desired window.
         /// </summary>
-        public void ShowBlurEffect()
+        /// <param name="WindowToModify">The window to blur the background on</param>
+        /// <param name="OpacityValue">The opacity to set our blur value to</param>
+        /// <param name="ColorToBlur">The color to use for the blurring style</param>
+        public static void ShowBlurEffect(Window WindowToModify, double OpacityValue = 75.00, Color ColorToBlur = default)
         {
-            // Build object to blur with
-            var BlurAccent = new AccentPolicy();
-            var ColorUint = (uint)(((_blurColor.A << 24) | (_blurColor.R << 16) | (_blurColor.G << 8) | _blurColor.B) & 0xffffffffL);
-            BlurAccent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
-            BlurAccent.GradientColor = (int)((_blurOpacity << 24) | (ColorUint & 0xFFFFFF));
-            var AccentStructSize = Marshal.SizeOf(BlurAccent);
+            // Make sure the window is valid, the opacity is set, and check our default color for blurring
+            if (WindowToModify == null || OpacityValue == 0.00) return; 
+            if (ColorToBlur == default) ColorToBlur = ((App)Application.Current).ThemeConfiguration.CurrentAppStyleModel.PrimaryColor;
+            var ColorUint = (uint)(((ColorToBlur.A << 24) | (ColorToBlur.R << 16) | (ColorToBlur.G << 8) | ColorToBlur.B) & 0xffffffffL);
 
-            // Setup pointer for blur.
+            // Build object to blur with
+            var BlurAccent = new AccentPolicy
+            {
+                AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND,
+                GradientColor = (int)(((uint)OpacityValue << 24) | (ColorUint & 0xFFFFFF))
+            };
+
+            // Setup pointer for blur and Marshal out the structure needed
+            var AccentStructSize = Marshal.SizeOf(BlurAccent);
             var AccentPointer = Marshal.AllocHGlobal(AccentStructSize);
             Marshal.StructureToPtr(BlurAccent, AccentPointer, false);
 
             // Configure new marshall for pointer struct.
-            var CompDataObject = new WindowCompositionAttributeData();
-            CompDataObject.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-            CompDataObject.SizeOfData = AccentStructSize;
-            CompDataObject.Data = AccentPointer;
+            var CompDataObject = new WindowCompositionAttributeData
+            {
+                Data = AccentPointer,
+                SizeOfData = AccentStructSize,
+                Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY,
+            };
 
-            // Set state here.
-            this._isShowingBlur = true;
-            SetWindowCompositionAttribute(_windowInterop.Handle, ref CompDataObject);
+            // Setup a new interop helper and store the new blur state here.
+            var InteropHelper = new WindowInteropHelper(WindowToModify);
+            SetWindowCompositionAttribute(InteropHelper.Handle, ref CompDataObject);
             Marshal.FreeHGlobal(AccentPointer);
         }
         /// <summary>
-        /// Hides the blur effect
+        /// Hides the blur effect on the given window instance
         /// </summary>
-        public void HideBlurEffect()
+        /// <param name="WindowToModify">The window to remove our blur effect from</param>
+        public static void HideBlurEffect(Window WindowToModify)
         {
-            // Build object to blur with
-            var BlurAccent = new AccentPolicy();
-            BlurAccent.AccentState = AccentState.ACCENT_DISABLED;
-            var AccentStructSize = Marshal.SizeOf(BlurAccent);
+            // Make sure the given window instance is not null
+            if (WindowToModify == null) return;
 
-            // Setup pointer for blur.
+            // Build object to blur with
+            var BlurAccent = new AccentPolicy { AccentState = AccentState.ACCENT_DISABLED };
+
+            // Setup pointer for blur and marshal out the needed structures
+            var AccentStructSize = Marshal.SizeOf(BlurAccent);
             var AccentPointer = Marshal.AllocHGlobal(AccentStructSize);
             Marshal.StructureToPtr(BlurAccent, AccentPointer, false);
 
-            // Configure new marshall for pointer strcut.
-            var CompDataObject = new WindowCompositionAttributeData();
-            CompDataObject.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-            CompDataObject.SizeOfData = AccentStructSize;
-            CompDataObject.Data = AccentPointer;
+            // Configure new marshall for pointer structures.
+            var CompDataObject = new WindowCompositionAttributeData
+            {
+                Data = AccentPointer,
+                SizeOfData = AccentStructSize,
+                Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY,
+            };
 
-            // Set state here.
-            this._isShowingBlur = false;  
-            SetWindowCompositionAttribute(_windowInterop.Handle, ref CompDataObject);
+            // Setup a new interop helper and store the new blur state here.
+            var InteropHelper = new WindowInteropHelper(WindowToModify);
+            SetWindowCompositionAttribute(InteropHelper.Handle, ref CompDataObject);
             Marshal.FreeHGlobal(AccentPointer);
         }
     }

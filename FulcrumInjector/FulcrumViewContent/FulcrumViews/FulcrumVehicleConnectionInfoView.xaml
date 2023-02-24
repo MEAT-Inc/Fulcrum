@@ -1,0 +1,139 @@
+﻿<UserControl x:Class="FulcrumInjector.FulcrumViewContent.FulcrumViews.FulcrumVehicleConnectionInfoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="FulcrumVehicleConnectionInfoView_OnLoaded">
+
+    <!-- Style Sheets -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumVehicleConnectionInfoStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Content For Vehicle Connection -->
+    <Grid Background="{StaticResource PrimaryColor_Darker_65}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width=".75*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.ColumnSpan="2" BorderBrush="{StaticResource SecondaryColor_Lighter_35}" BorderThickness="3" CornerRadius="2"/>
+        
+        <!-- Device and Voltage Information -->
+        <Grid Grid.Column="0" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0" Margin="1">
+                <TextBlock
+                    FontSize="14" FontWeight="DemiBold"
+                    Text="J2534 Device:" Padding="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=SelectedDevice, Mode=OneWay}" 
+                           FontSize="14" x:Name="SelectedDeviceTextBlock"
+                           FontWeight="Normal" Foreground="Yellow"
+                           HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Grid.Row="1" Margin="1">
+                <TextBlock
+                    FontSize="14" FontWeight="DemiBold"
+                    Text="OBD Voltage:" Padding="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=DeviceVoltage, StringFormat={}{0:F2}v, Mode=OneWay}" 
+                           FontSize="14"
+                           FontWeight="Normal" Foreground="Yellow"
+                           HorizontalAlignment="Left" VerticalAlignment="Center">
+                </TextBlock>
+            </DockPanel>
+        </Grid>
+
+        <!-- Splitting Border -->
+        <Border Grid.Column="0" BorderThickness="0,0,3,0" BorderBrush="{StaticResource SecondaryColor_Lighter_35}"/>
+
+        <!-- VIN Number and Information Box -->
+        <Grid Grid.Column="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0" Margin="1">
+                <TextBlock
+                    FontSize="14" FontWeight="DemiBold"
+                    Text="VIN:  " Padding="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=VehicleVin}" 
+                           FontSize="14"
+                           FontWeight="Normal" Foreground="Yellow"
+                           HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Grid.Row="1" Margin="1">
+                <TextBlock
+                    FontSize="14" FontWeight="DemiBold"
+                    Text="YMM:" Padding="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=VehicleInfo}" 
+                           FontSize="14"
+                           FontWeight="Normal" Foreground="Yellow"
+                           HorizontalAlignment="Left" VerticalAlignment="Center">
+                </TextBlock>
+            </DockPanel>
+
+            <!-- Button for icon to start/stop auto id manually -->
+            <Button Grid.Row="0" HorizontalAlignment="Right" 
+                    VerticalAlignment="Center" Grid.RowSpan="2" ToolTip="Auto ID Connected Vehicle"
+                    Width="25" Margin="0,0,15,0" Grid.Column="0" Click="TriggerAutoIdRoutine_OnClick" 
+                    IsEnabled="{Binding CanManualId}" Background="Transparent">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AutoIdRunning, Mode=OneTime}" Value="True">
+                                <Setter Property="Background" Value="DarkGreen"/>
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding AutoIdRunning, Mode=OneTime}" Value="False">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Path>
+                    <Path.Style>
+                        <Style TargetType="Path">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AutoIdRunning}" Value="True">
+                                    <Setter Property="Fill" Value="Yellow"/>
+                                    <Setter Property="Margin" Value="0,0,2,0"/>
+                                    <Setter Property="Data">
+                                        <Setter.Value>
+                                            <PathGeometry Figures="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2h-7zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48V8.35zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding AutoIdRunning}" Value="False">
+                                    <Setter Property="Fill" Value="{DynamicResource TextColorBase}"/>
+                                    <Setter Property="Margin" Value="0,0,0,0"/>
+                                    <Setter Property="Data">
+                                        <Setter.Value>
+                                            <PathGeometry Figures="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                        </Setter.Value>
+                                    </Setter>                                
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Path.Style>
+                </Path>
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                </Button.LayoutTransform>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

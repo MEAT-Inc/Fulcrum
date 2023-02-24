@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using Octokit;
 using SharpLogging;
 

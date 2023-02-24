@@ -1,14 +1,14 @@
 ﻿using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
-using FulcrumInjector.FulcrumViewContent.Views;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 using SharpLogging;
 using SharpWrapper;
@@ -56,7 +56,7 @@ namespace FulcrumInjector.FulcrumViewContent
             {
                 // If the settings share exists, then just return it. Otherwise only build one if possible
                 if (_fulcrumSettings != null) return _fulcrumSettings;
-                if (string.IsNullOrWhiteSpace(JsonConfigFiles.AppConfigFile)) return null;
+                if (string.IsNullOrWhiteSpace(JsonConfigFile.AppConfigFile)) return null;
 
                 // Return a new instance of the setting share if needed
                 return _fulcrumSettings ??= new FulcrumSettingsShare();

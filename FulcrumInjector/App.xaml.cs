@@ -10,11 +10,9 @@ using System.Windows;
 using System.Windows.Controls;
 using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewContent;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.Models.SettingsModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using NLog;
 using NLog.Fluent;
@@ -56,7 +54,7 @@ namespace FulcrumInjector
             base.OnStartup(e);
 
             // Force the working directory. Build JSON settings objects
-            JsonConfigFiles.SetInjectorConfigFile("FulcrumInjectorSettings.json");
+            JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
 
             // Setup our logging instance information
             this._configureInjectorLogging();
