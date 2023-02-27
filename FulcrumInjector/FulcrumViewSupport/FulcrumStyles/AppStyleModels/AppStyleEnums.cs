@@ -5,7 +5,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
     /// <summary>
     /// Type of theme used.
     /// </summary>
-    internal enum StyleType
+    internal enum ThemeTypes
     {
         DARK_COLORS = 0,
         LIGHT_COLORS = 1,

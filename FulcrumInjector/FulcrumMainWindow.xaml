@@ -1,0 +1,159 @@
+﻿<mah:MetroWindow x:Class="FulcrumInjector.FulcrumMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FulcrumInjector"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:fulcrumViews="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews"
+        xmlns:injectorCoreViews="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews"
+        xmlns:injectorMiscViews="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews"
+        mc:Ignorable="d"
+        Title="Fulcrum Injector" 
+        Height="800" Width="1200" 
+        AllowsTransparency="True"
+        ResizeMode="CanResize"
+        MinWidth="1000" MinHeight="800"
+        Loaded="InjectorMainWindow_OnLoaded"
+        Closed="InjectorMainWindow_OnClosed">
+    
+    <!-- Dark Semi Transparent Background -->
+    <Window.Background>
+        <SolidColorBrush Color="#020202" Opacity=".85"/>
+    </Window.Background>
+
+    <Window.Resources>
+        <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+    </Window.Resources>
+
+    <Grid Margin="0">
+        <!-- Row Layout for content -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".125*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!-- Top border and the title information for this app -->
+        <Border Grid.Row="0" Grid.RowSpan="2" BorderBrush="{StaticResource TextColorBase}" Style="{StaticResource TransparentBackgroundBorder}"/>
+        <Grid Grid.Row="0">
+            <fulcrumViews:FulcrumTitleView x:Name="FulcrumTitle"/>
+            <Border BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+        </Grid>
+
+        <!-- All Other App Content Goes Down Here -->
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="275"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Side Pane View -->
+            <Viewbox Stretch="Fill" Grid.Column="0" Margin="0,10,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".6*"/>
+                        <RowDefinition Height=".6*"/>
+                        <RowDefinition Height="625"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Splitting Borders -->
+                    <Border Grid.Row="0" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+                    <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,0,0,2" Margin="5,0"/>
+
+                    <!-- DLL Loading Test Pane -->
+                    <fulcrumViews:FulcrumDllInjectionTestView
+                        Grid.Row="0" 
+                        Height="105"
+                        x:Name="FulcrumDllInjectionTest"/>
+
+                    <!-- Pipe State And Information Pane -->
+                    <fulcrumViews:FulcrumPipeStatusView 
+                        Grid.Row="1" 
+                        Height="150"
+                        x:Name="FulcrumPipeStatus"/>
+
+                    <!-- OE Apps Installed -->
+                    <fulcrumViews:FulcrumInstalledOeAppsView
+                        Grid.Row="2"
+                        Height="625"
+                        VerticalContentAlignment="Stretch"
+                        x:Name="FulcrumInstalledOeApps"/>
+                </Grid>
+            </Viewbox>
+
+            <!-- Splitting Border -->
+            <Border Grid.Column="1" Margin="3,0,0,0" Opacity=".75" BorderThickness="0,0,3,0" BorderBrush="{StaticResource TextColorBase}"/>
+
+            <!-- Main Content View Box -->
+            <Grid Grid.Column="2" Margin="5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height=".125*"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <fulcrumViews:FulcrumVehicleConnectionInfoView 
+                    Grid.Row="0" 
+                    Margin="5,5"
+                    x:Name="FulcrumVehicleConnectionInfo"/>
+                <injectorCoreViews:FulcrumHamburgerCoreView 
+                    Margin="0,5,0,0"
+                    x:Name="FulcrumHamburgerCore"  
+                    Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Grid>
+        </Grid>
+
+        <!-- Flyouts for About and Updates -->
+        <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- About this app flyout-->
+            <mah:Flyout 
+                Margin="70,85,0,0"
+                Position="Top"
+                x:Name="InformationFlyout"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="600"
+                Height="520"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+
+                <!-- Content for About this app-->
+                <injectorMiscViews:FulcrumAboutThisAppView x:Name="FulcrumAboutThisAppView"/>
+            </mah:Flyout>
+
+            <!-- Updates Flyout-->
+            <mah:Flyout 
+                Margin="70,85,0,0"
+                Position="Top"
+                x:Name="AppUpdatesFlyout"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="600"
+                Height="520"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+
+
+                <!-- Content for About this app-->
+                <injectorMiscViews:FulcrumUpdaterView x:Name="FulcrumUpdaterView"/>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </Grid>
+</mah:MetroWindow>

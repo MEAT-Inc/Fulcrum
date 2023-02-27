@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Media;
 using ControlzEx.Theming;
-using FulcrumInjector.FulcrumViewSupport.DataContentHelpers;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using Newtonsoft.Json;
 using Color = System.Drawing.Color;
 
@@ -17,16 +17,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
 
         #region Fields
 
-        // Base Theme Values used to help configure color values
-        public string ThemeName;                        // Name of the theme
-        public StyleType TypeOfStyle;                   // Is Dark Or light or both
-        public AppStyleColorSet StyleColors;            // Custom app theme color set
-        [JsonIgnore] public Theme MahThemeObject;       // Mahapps Theme object built from this theme.
+        // Public fields for our theme instance and color configuration set
+        [JsonIgnore] public ThemeTypes ThemeType;             // The type of theme being built. Light or dark                           
+        [JsonIgnore] public Theme MahThemeObject;             // Mahapps Theme object built from this theme.
+        [JsonIgnore] public AppStyleColorSet StyleColors;     // Custom app theme color set
 
         #endregion //Fields
 
         #region Properties
 
+        // Public name and type properties for our theme instance
+        public string ThemeName { get; set; }
+        
         // Color objects.
         [JsonConverter(typeof(CustomColorValueJsonConverter))]
         public Color PrimaryColor
@@ -55,7 +57,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
         public override string ToString()
         {
             // Build theme string. Example: 'Test Theme - 0x65646 - 0x56838' would be a base return type
-            return $"{ThemeName} - {CustomColorConverter.HexConverter(PrimaryColor)} - {CustomColorConverter.HexConverter(SecondaryColor)}";
+            return $"{this.ThemeName} - {this.PrimaryColor.ToHexString()} - {this.SecondaryColor.ToHexString()}";
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,27 +66,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
         /// Json Constructor for this object
         /// </summary>
         [JsonConstructor]
-        public AppStyleModel()
-        {
-            // Still build the mahapp theme object
-            // BuildMahTheme();
-        }
+        public AppStyleModel() { }
         /// <summary>
         /// Setup basic theme colors
         /// </summary>
-        public AppStyleModel(string ThemeName, string Primary, string Secondary, StyleType typeOfStyle)
+        public AppStyleModel(string ThemeName, string Primary, string Secondary, ThemeTypes ThemeType)
         {
             // Set color string values
-            this.TypeOfStyle = typeOfStyle;
-            this.ThemeName = ThemeName + (typeOfStyle == StyleType.DARK_COLORS ? " (Dark)" : " (Light)");
+            this.ThemeType = ThemeType;
+            this.ThemeName = ThemeName + (ThemeType == ThemeTypes.DARK_COLORS ? " (Dark)" : " (Light)");
 
-            // Build the new Theme object
-            StyleColors = new AppStyleColorSet(
-                Primary, Secondary,
-                typeOfStyle == StyleType.DARK_COLORS
-            );
-
-            // Generate the mah theme and the color setup
+            // Build the new Theme object and an app color set for this theme configuration model
+            StyleColors = new AppStyleColorSet(Primary, Secondary, ThemeType == ThemeTypes.DARK_COLORS);
             MahThemeObject = BuildMahTheme();
         }
 
@@ -96,10 +89,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
         public Theme BuildMahTheme()
         {
             // Build the new theme here
-            switch (TypeOfStyle)
+            switch (this.ThemeType)
             {
                 // For Dark colors
-                case StyleType.DARK_COLORS:
+                case ThemeTypes.DARK_COLORS:
                     // Make a new theme
                     var CustomDarkColors = new Theme(
                         "FulcrumInjector." + PrimaryColor.Name.ToUpper() + ".Dark",
@@ -116,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
                     return CustomDarkColors;
 
                 // For light colors
-                case StyleType.LIGHT_COLORS:
+                case ThemeTypes.LIGHT_COLORS:
                     // Make a new theme.
                     var CustomLightColors = new Theme(
                         "FulcrumInjector." + PrimaryColor.Name.ToUpper() + "_" + SecondaryColor.Name.ToUpper() + ".Light",
@@ -131,10 +124,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels
 
                     // Break out and set
                     return CustomLightColors;
-            }
 
-            // Fail out if we got here.
-            throw new InvalidOperationException("FAILED TO GENERATE MAH COLOR OBJECT!");
+                // Default case will always throw an exception here
+                default: throw new InvalidOperationException("FAILED TO GENERATE MAH COLOR OBJECT!");
+            }
         }
     }
 }
