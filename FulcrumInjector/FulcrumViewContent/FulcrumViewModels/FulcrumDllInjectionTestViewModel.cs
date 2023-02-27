@@ -2,8 +2,8 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogging;
-using SharpSupport;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 {
@@ -101,14 +101,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             // Begin by loading the DLL Object
             this.InjectorTestResult = "Testing...";
             this.ViewModelLogger.WriteLog($"PULLING IN FULCRUM DLL NOW", LogType.InfoLog);
-            IntPtr LoadResult = Win32Invokers.LoadLibrary(this.InjectorDllPath);
+            IntPtr LoadResult = FulcrumWin32Invokers.LoadLibrary(this.InjectorDllPath);
             this.ViewModelLogger.WriteLog($"RESULT FROM LOADING DLL: {LoadResult}", LogType.InfoLog);
 
             // Make sure the pointer is not 0s. 
             if (LoadResult == IntPtr.Zero)
             {
                 // Log failure, set output value and return false
-                var ErrorCode = Win32Invokers.GetLastError();
+                var ErrorCode = FulcrumWin32Invokers.GetLastError();
                 this.ViewModelLogger.WriteLog("FAILED TO LOAD OUR NEW DLL INSTANCE FOR OUR APPLICATION!", LogType.ErrorLog);
                 this.ViewModelLogger.WriteLog($"ERROR CODE PROCESSED FROM LOADING REQUEST WAS: {ErrorCode}", LogType.ErrorLog);
 
@@ -135,10 +135,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             }
 
             // Run our unload calls here
-            if (!Win32Invokers.FreeLibrary(LoadResult))
+            if (!FulcrumWin32Invokers.FreeLibrary(LoadResult))
             {
                 // Get Error code and build message
-                var ErrorCode = Win32Invokers.GetLastError();
+                var ErrorCode =FulcrumWin32Invokers.GetLastError();
                 this.InjectorTestResult = $"Unload Error! ({ErrorCode})";
                 ResultString = this.InjectorTestResult;
 
@@ -169,13 +169,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             {
                 // Import our PTOpen command
                 this.ViewModelLogger.WriteLog("IMPORTING PT OPEN METHOD AND NOW...", LogType.WarnLog);
-                IntPtr PassThruOpenCommand = Win32Invokers.GetProcAddress(InjectorDllPtr, "PassThruOpen");
+                IntPtr PassThruOpenCommand = FulcrumWin32Invokers.GetProcAddress(InjectorDllPtr, "PassThruOpen");
                 PTOpen = (DelegatePassThruOpen)Marshal.GetDelegateForFunctionPointer(PassThruOpenCommand, typeof(DelegatePassThruOpen));
                 this.ViewModelLogger.WriteLog("IMPORTED PTOPEN METHOD OK!", LogType.InfoLog);
 
                 // Import our PTClose command
                 this.ViewModelLogger.WriteLog("IMPORTING PT CLOSE METHOD NOW...", LogType.WarnLog);
-                IntPtr PassThruCloseCommand = Win32Invokers.GetProcAddress(InjectorDllPtr, "PassThruClose");
+                IntPtr PassThruCloseCommand = FulcrumWin32Invokers.GetProcAddress(InjectorDllPtr, "PassThruClose");
                 PTClose = (DelegatePassThruClose)Marshal.GetDelegateForFunctionPointer(PassThruCloseCommand, typeof(DelegatePassThruClose));
                 this.ViewModelLogger.WriteLog("IMPORTED PTCLOSE METHOD OK!", LogType.InfoLog);
 
