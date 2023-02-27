@@ -51,12 +51,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
 
             // Setup a new ViewModel and setup our pipe watchdogs
             this.DataContext = this.ViewModel;
-            Dispatcher.InvokeAsync(() =>
-            {
-                this.ViewModel.SetupPipeStateWatchdogs();
-                this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
-                this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
-            });
+            this.ViewModel.SetupPipeStateWatchdogs();
+            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
+            this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
     }
 }
