@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Find the command type for our input object here. If none, drop out
-            Regex TimeMatchRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionType.CommandTime].ExpressionRegex;
+            Regex TimeMatchRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionTypes.CommandTime].ExpressionRegex;
             Match MatchesFound = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
 
             // Now run our coloring definitions and return out.

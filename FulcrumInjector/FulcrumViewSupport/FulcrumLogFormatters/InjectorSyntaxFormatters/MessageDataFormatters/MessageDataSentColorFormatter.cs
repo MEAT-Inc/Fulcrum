@@ -28,7 +28,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
             // Convert input regex into a multiline ready expression
             List<Regex> BuiltLineExpressions = new List<Regex>();
             string MessageDataRegexString = PassThruExpressionRegex
-                .LoadedExpressions[PassThruExpressionType.MessageSentInfo]
+                .LoadedExpressions[PassThruExpressionTypes.MessageSentInfo]
                 .ExpressionPattern; MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
             for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
                 BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));

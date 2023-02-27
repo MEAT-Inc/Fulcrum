@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using SharpAutoId.SharpAutoIdHelpers;
+using SharpAutoId;
 using SharpLogging;
 using SharpWrapper;
 using SharpWrapper.PassThruTypes;
@@ -365,18 +365,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         {
             // Get a list of all supported protocols and then pull in all the types of auto ID routines we can use
             this.AutoIdRunning = true;
-            foreach (var ProcObject in SharpAutoIdConfig.SupportedProtocols)
+            foreach (var ProcObject in AutoIdConfiguration.SupportedProtocols)
             {
                 try
                 {
                     // Build a new AutoID Session here
-                    var AutoIdInstance = FulcrumConstants.SharpSessionAlpha.SpawnAutoIdHelper(ProcObject);
+                    var AutoIdInstance = AutoIdHelper.BuildAutoIdHelper(FulcrumConstants.SharpSessionAlpha, ProcObject);
                     this.ViewModelLogger.WriteLog($"BUILT NEW INSTANCE OF SESSION FOR TYPE {ProcObject} OK!", LogType.InfoLog);
                     this.ViewModelLogger.WriteLog("PULLING VIN AND OPENING CHANNEL FOR TYPE INSTANCE NOW...", LogType.InfoLog);
 
                     // Open channel, read VIN, and close out
-                    AutoIdInstance.ConnectChannel(out _);
-                    if (!AutoIdInstance.RetrieveVinNumber(out VinString))
+                    AutoIdInstance.ConnectAutoIdChannel(out _);
+                    if (!AutoIdInstance.RetrieveVehicleVIN(out VinString))
                     {
                         this.ViewModelLogger.WriteLog($"NO VIN NUMBER PULLED FOR PROTOCOL VALUE {ProcObject}!", LogType.WarnLog);
                         continue;

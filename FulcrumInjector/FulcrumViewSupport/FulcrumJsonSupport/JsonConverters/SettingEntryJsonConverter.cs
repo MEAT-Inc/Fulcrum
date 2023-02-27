@@ -71,7 +71,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                     .Replace(" ", string.Empty);
 
                 // Parse the regex type into an enumeration value and pull it from our store here
-                var RegexType = (PassThruExpressionType)Enum.Parse(typeof(PassThruExpressionType), RegexTypeName);
+                var RegexType = (PassThruExpressionTypes)Enum.Parse(typeof(PassThruExpressionTypes), RegexTypeName);
                 PassThruExpressionRegex FoundRegex = PassThruExpressionRegex.LoadedExpressions[RegexType];
 
                 // Now using the found regex model object, we can store a new value for the setting entry
