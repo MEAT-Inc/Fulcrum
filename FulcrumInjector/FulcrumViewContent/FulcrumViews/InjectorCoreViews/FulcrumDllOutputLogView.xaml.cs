@@ -57,6 +57,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             ReaderPipe.PipeDataProcessed += this.ViewModel.OnPipeReaderContentProcessed;
             this._viewLogger.WriteLog("STORED NEW EVENT BROKER FOR PIPE READING DATA PROCESSED OK!", LogType.InfoLog);
 
+            // Initialize new UI Component
+            InitializeComponent();
+            
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
             if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "LiveInjectorOutputTarget"))
@@ -67,9 +70,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
                 this._viewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR PIPE OUTPUT AND FOR INJECTOR DLL OUTPUT OK!", LogType.InfoLog);
             }
-
-            // Initialize new UI Component
-            InitializeComponent();
 
             // Setup our data context and log information out
             this.DataContext = this.ViewModel;

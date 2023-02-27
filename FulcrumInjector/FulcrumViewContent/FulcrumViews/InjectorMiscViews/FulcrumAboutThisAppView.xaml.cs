@@ -44,6 +44,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             // Initialize new UI component instance
             InitializeComponent();
 
+            // Hook in a new event for the button click on the check for updates title button
+            FulcrumConstants.FulcrumTitleView.btnAboutTheInjetor.Click += this.ToggleAboutThisApplicationFlyout_OnClick;
+            this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE ABOUT THIS APP BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
+
             // Setup our data context and log information out
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP ABOUT THIS APP VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
