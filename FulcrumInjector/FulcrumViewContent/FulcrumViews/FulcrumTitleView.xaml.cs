@@ -43,12 +43,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
 
             // Initialize new UI Component
             InitializeComponent();
-
-            // Store new event handlers for the buttons on this window
-            this.btnCheckForUpdates.Click += FulcrumConstants.FulcrumUpdaterView.ToggleApplicationUpdateInformation_OnClick;
-            this.btnAboutTheInjetor.Click += FulcrumConstants.FulcrumAboutThisAppView.ToggleAboutThisApplicationFlyout_OnClick;
-            this._viewLogger.WriteLog("STORED NEW BUTTON EVENTS FOR THE TITLE VIEW BUTTON CONTENT OK!");
-
+            
             // Setup a new ViewModel and store our context
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
