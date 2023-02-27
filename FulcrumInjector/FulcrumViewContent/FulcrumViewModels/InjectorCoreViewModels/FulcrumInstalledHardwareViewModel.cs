@@ -105,7 +105,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Pull in our DLL Entries and our device entries now.
             this.ViewModelLogger.WriteLog("UPDATING AND IMPORTING CURRENT DLL LIST FOR THIS SYSTEM NOW...", LogType.WarnLog);
-            this.InstalledDLLs = new ObservableCollection<J2534Dll>(new PassThruImportDLLs().LocatedJ2534DLLs ?? Array.Empty<J2534Dll>());
+            this.InstalledDLLs = new ObservableCollection<J2534Dll>(PassThruImportDLLs.FindAllInstalledDLLs());
 
             // See if using default PT Device is on or off.
             bool AutoConsume = FulcrumConstants.FulcrumSettings.InjectorGeneralFulcrumSettings.GetSettingValue("Auto Consume CarDAQ-Plus 3", false);
