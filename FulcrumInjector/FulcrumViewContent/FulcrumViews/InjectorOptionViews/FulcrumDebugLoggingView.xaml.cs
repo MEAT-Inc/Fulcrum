@@ -47,6 +47,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel(this);
 
+            // Initialize new UI Component
+            InitializeComponent();
+
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
             try { CurrentConfig.RemoveTarget("DebugLoggingRedirectTarget"); }
@@ -60,10 +63,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
             this._viewLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
-
-            // Initialize new UI Component
-            InitializeComponent();
-
+            
+            // Store our View model as the current context and log out some information
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE DEBUG LOGGING REVIEW VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
