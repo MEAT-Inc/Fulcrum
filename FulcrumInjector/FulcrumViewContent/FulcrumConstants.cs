@@ -1,25 +1,16 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.Models;
-using FulcrumInjector.FulcrumViewContent.ViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorMiscViewModels;
-using FulcrumInjector.FulcrumViewContent.ViewModels.InjectorOptionViewModels;
-using FulcrumInjector.FulcrumViewContent.Views;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorMiscViews;
-using FulcrumInjector.FulcrumViewContent.Views.InjectorOptionViews;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJson.JsonHelpers;
+﻿using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
-using SharpLogger;
-using SharpLogger.LoggerObjects;
-using SharpLogger.LoggerSupport;
+using SharpLogging;
 using SharpWrapper;
 
 namespace FulcrumInjector.FulcrumViewContent
@@ -27,117 +18,76 @@ namespace FulcrumInjector.FulcrumViewContent
     /// <summary>
     /// Static class which holds all the View constants for our application.
     /// </summary>
-    public static class FulcrumConstants
+    internal static class FulcrumConstants
     {
-        // Logger object.
-        private static SubServiceLogger ConstantsLogger => (SubServiceLogger)LoggerQueue.SpawnLogger("WatchdogConstantsLogger", LoggerActions.SubServiceLogger);
+        #region Custom Events
+        #endregion //Custom Events
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        #region Fields
 
-        // SharpSession objects used on our instance here. Two static instances are used here.
-        // Alpha is for Hardware configuration and setting up network tools. Bravo can be used for simulations if needed
-        public static Sharp2534Session SharpSessionAlpha;
-        public static Sharp2534Session SharpSessionBravo;
+        // Static fields for our injector application information
+        private static FulcrumSettingsShare _fulcrumSettings;                   // Collection of all setting objects for this instance
+        public static readonly FulcrumVersionInfo FulcrumVersions = new();      // Current version information for this application
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // Public static fields for our injector sharp sessions
+        public static Sharp2534Session SharpSessionAlpha;                       // Sharp Session used for configuring hardware
+        public static Sharp2534Session SharpSessionBravo;                       // Sharp Session for setting up simulations
 
-        // Main Version object for this application
-        public static InjectorVersionInfo InjectorVersions => new();
+        // Private static backing field for the injector main window
+        private static FulcrumMainWindow _fulcrumMainWindow;                    // Main window of the injector application
 
-        // View Constants for help with property bindings
-        public static InjectorMainWindow InjectorMainWindow { get; set; }
+        // Private static Singleton Injector DLL Core Output View Contents. These get set to control view contents on the Main window
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumInstalledHardwareSingleton;
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumDllOutputSingleton;
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumLogReviewSingleton;
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumSimulationSingleton;
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumSettingsPaneSingleton;
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumSessionReportingSingleton;
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumDebugLoggingSingleton;
 
-        // Title View and ViewModel
-        public static FulcrumTitleView FulcrumTitleView
+        #endregion //Fields
+
+        #region Properties
+
+        // Public static setting share object for this instance of our injector app
+        public static FulcrumSettingsShare FulcrumSettings
         {
-            get => InjectorMainWindow?.FulcrumTitle;
-            set => InjectorMainWindow.FulcrumTitle = value;
-        }
-        public static FulcrumTitleViewModel FulcrumTitleViewModel
-        {
-            get => FulcrumTitleView?.ViewModel;
-            set => FulcrumTitleView.ViewModel = value;
-        }
+            get
+            {
+                // If the settings share exists, then just return it. Otherwise only build one if possible
+                if (_fulcrumSettings != null) return _fulcrumSettings;
+                if (string.IsNullOrWhiteSpace(JsonConfigFile.AppConfigFile)) return null;
 
-        // Connected Vehicle information View and ViewModel
-        public static FulcrumVehicleConnectionInfoView FulcrumVehicleConnectionInfoView
-        {
-            get => InjectorMainWindow?.FulcrumVehicleConnectionInfo;
-            set => InjectorMainWindow.FulcrumVehicleConnectionInfo = value;
-        }
-        public static FulcrumVehicleConnectionInfoViewModel FulcrumVehicleConnectionInfoViewModel
-        {
-            get => FulcrumVehicleConnectionInfoView?.ViewModel;
-            set => FulcrumVehicleConnectionInfoView.ViewModel = value;
-        }
-
-        // Test DLL Injector View and ViewModel
-        public static FulcrumDllInjectionTestView FulcrumDllInjectionTestView
-        {
-            get => InjectorMainWindow?.FulcrumDllInjectionTest;
-            set => InjectorMainWindow.FulcrumDllInjectionTest = value;
-        }
-        public static FulcrumDllInjectionTestViewModel FulcrumDllInjectionTestViewModel
-        {
-            get => FulcrumDllInjectionTestView.ViewModel;
-            set => FulcrumDllInjectionTestView.ViewModel = value;
+                // Return a new instance of the setting share if needed
+                return _fulcrumSettings ??= new FulcrumSettingsShare();
+            }
         }
 
-        // Pipe Status View and ViewModel
-        public static FulcrumPipeStatusView FulcrumPipeStatusView
+        // Public static property holding the current injector window instance
+        public static FulcrumMainWindow FulcrumMainWindow
         {
-            get => InjectorMainWindow?.FulcrumPipeStatus;
-            set => InjectorMainWindow.FulcrumPipeStatus = value;
-        }
-        public static FulcrumPipeStatusViewModel FulcrumPipeStatusViewModel
-        {
-            get => FulcrumPipeStatusView.ViewModel;
-            set => FulcrumPipeStatusView.ViewModel = value;
+            get => _fulcrumMainWindow;
+            set
+            {
+                // Store the new main window value on our backing field
+                _fulcrumMainWindow = value;
+
+                // Find and store all of our singleton instances now
+                _fulcrumInstalledHardwareSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumInstalledHardwareView));
+                _fulcrumDllOutputSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
+                _fulcrumLogReviewSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
+                _fulcrumSimulationSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
+                _fulcrumSettingsPaneSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
+                _fulcrumSessionReportingSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
+                _fulcrumDebugLoggingSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
+            }
         }
 
-        // OE Applications Installed View and ViewModel
-        public static FulcrumInstalledOeAppsView FulcrumInstalledOeAppsView
-        {
-            get => InjectorMainWindow?.FulcrumInstalledOeApps;
-            set => InjectorMainWindow.FulcrumInstalledOeApps = value;
-        }
-        public static FulcrumInstalledOeAppsViewModel FulcrumInstalledOeAppsViewModel
-        {
-            get => FulcrumInstalledOeAppsView.ViewModel;
-            set => FulcrumInstalledOeAppsView.ViewModel = value;
-        }
-
-        // About this app View and View Model
-        public static FulcrumAboutThisAppView FulcrumAboutThisAppView
-        {
-            get => InjectorMainWindow?.FulcrumAboutThisAppView;
-            set => InjectorMainWindow.FulcrumAboutThisAppView = value;
-        }
-        public static FulcrumAboutThisAppViewModel FulcrumAboutThisAppViewModel
-        {
-            get => InjectorMainWindow?.FulcrumAboutThisAppView.ViewModel;
-            set => InjectorMainWindow.FulcrumAboutThisAppView.ViewModel = value;
-        }
-
-        // Updater View and View Model
-        public static FulcrumUpdaterView FulcrumUpdaterView
-        {
-            get => InjectorMainWindow?.FulcrumUpdaterView;
-            set => InjectorMainWindow.FulcrumUpdaterView = value;
-        }
-        public static FulcrumUpdaterViewModel FulcrumUpdaterViewModel
-        {
-            get => InjectorMainWindow?.FulcrumUpdaterView.ViewModel;
-            set => InjectorMainWindow.FulcrumUpdaterView.ViewModel = value;
-        }
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        // Injector Hamburger Output Views
+        // Public static properties for our injector hamburger view content
         public static FulcrumHamburgerCoreView FulcrumHamburgerCoreView
         {
-            get => InjectorMainWindow?.FulcrumHamburgerCore;
-            set => InjectorMainWindow.FulcrumHamburgerCore = value;
+            get => FulcrumMainWindow?.FulcrumHamburgerCore;
+            set => FulcrumMainWindow.FulcrumHamburgerCore = value;
         }
         public static FulcrumHamburgerCoreViewModel FulcrumHamburgerCoreViewModel
         {
@@ -145,198 +95,97 @@ namespace FulcrumInjector.FulcrumViewContent
             set => FulcrumHamburgerCoreView.ViewModel = value;
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        // Singleton Injector DLL Core Output View Contents. These get set to control view contents on the Main window
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumInstalledHardwareSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumInstalledHardwareView));
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumDllOutputSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDllOutputLogView));
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumLogReviewSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumLogReviewView));
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSimulationSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSimulationPlaybackView));
-
-        // Singleton Injector DLL Option Output View Contents. These get set to control view contents on the Main window
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSettingsPaneSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSettingsPaneView));
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumSessionReportingSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumSessionReportingView));
-        public static SingletonContentControl<UserControl, ViewModelControlBase> FulcrumDebugLoggingSingleton =>
-            SingletonContentControl<UserControl, ViewModelControlBase>.LocateSingletonViewInstance(typeof(FulcrumDebugLoggingView));
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        // Installed Hardware view  user control and view model object
-        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => (FulcrumInstalledHardwareView)FulcrumInstalledHardwareSingleton?.SingletonUserControl;
-        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => (FulcrumInstalledHardwareViewModel)FulcrumInstalledHardwareSingleton?.SingletonViewModel;
-
-        // DLL Output Logging user control and view model object
-        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => (FulcrumDllOutputLogView)FulcrumDllOutputSingleton?.SingletonUserControl;
-        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => (FulcrumDllOutputLogViewModel)FulcrumDllOutputSingleton?.SingletonViewModel;
-
-        // Log Reviewing user control and view model object
-        public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)FulcrumLogReviewSingleton?.SingletonUserControl;
-        public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => (FulcrumLogReviewViewModel)FulcrumLogReviewSingleton?.SingletonViewModel;
-
-        // Simulation Playback user control and view model object
-        public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)FulcrumSimulationSingleton?.SingletonUserControl;
-        public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)FulcrumSimulationSingleton?.SingletonViewModel;
-
-        // User settings and configuration user control and view model object
-        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)FulcrumSettingsPaneSingleton?.SingletonUserControl;
-        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => (FulcrumSettingsPaneViewModel)FulcrumSettingsPaneSingleton?.SingletonViewModel;
-
-        // Session output reporting user control and view model object
-        public static FulcrumSessionReportingView FulcrumSessionReportingView => (FulcrumSessionReportingView)FulcrumSessionReportingSingleton?.SingletonUserControl;
-        public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => (FulcrumSessionReportingViewModel)FulcrumSessionReportingSingleton?.SingletonViewModel;
-
-        // Debug logging output user control and view model object
-        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)FulcrumDebugLoggingSingleton?.SingletonUserControl;
-        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)FulcrumDebugLoggingSingleton?.SingletonViewModel;
-
-        // --------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Builds a static set of control objects for view use
-        /// </summary>
-        /// <param name="WindowBase">Main window being controlled</param>
-        public static void ConfigureViewControls(InjectorMainWindow WindowBase)
+        // Public static properties used to help configure our new instances of windows and views for the injector app
+        public static FulcrumTitleView FulcrumTitleView
         {
-            // Store value and log results
-            InjectorMainWindow = WindowBase;
-            ConstantsLogger.WriteLog("STORED NEW MAIN WINDOW VIEW FOR CONSTANTS OBJECT OK!", LogType.InfoLog);
-            ConstantsLogger.WriteLog($"MAIN WINDOW WAS PASSED AS TYPE {WindowBase.GetType().Name}");
-
-            // Set the flyouts for our debugging configuration and settings pane
-            ConstantsLogger.WriteLog("STORING VIEWS FOR SETTINGS AND DEBUG FLYOUTS NOW...");
-            bool SetConstants = FulcrumTitleView.SetFlyoutBindings(
-                InjectorMainWindow.InformationFlyout, 
-                InjectorMainWindow.AppUpdatesFlyout,
-                FulcrumAboutThisAppView.CloseInfoFlyoutButton,
-                FulcrumUpdaterView.CloseUpdatesFlyoutButton
-            );
-
-            // Check result
-            if (SetConstants) ConstantsLogger.WriteLog("STORED VALUES FROM MAIN WINDOW OK!", LogType.InfoLog);
-            else throw new InvalidOperationException("FAILED TO CONFIGURE NEW SETTINGS AND DEBUG FLYOUT VIEWS!");
+            get => FulcrumMainWindow?.FulcrumTitle;
+            set => FulcrumMainWindow.FulcrumTitle = value;
+        }                                                
+        public static FulcrumTitleViewModel FulcrumTitleViewModel
+        {
+            get => FulcrumTitleView?.ViewModel;
+            set => FulcrumTitleView.ViewModel = value;
+        }                                      
+        public static FulcrumVehicleConnectionInfoView FulcrumVehicleConnectionInfoView
+        {
+            get => FulcrumMainWindow?.FulcrumVehicleConnectionInfo;
+            set => FulcrumMainWindow.FulcrumVehicleConnectionInfo = value;
+        }                
+        public static FulcrumVehicleConnectionInfoViewModel FulcrumVehicleConnectionInfoViewModel
+        {
+            get => FulcrumVehicleConnectionInfoView?.ViewModel;
+            set => FulcrumVehicleConnectionInfoView.ViewModel = value;
+        }      
+        public static FulcrumDllInjectionTestView FulcrumDllInjectionTestView
+        {
+            get => FulcrumMainWindow?.FulcrumDllInjectionTest;
+            set => FulcrumMainWindow.FulcrumDllInjectionTest = value;
+        }                          
+        public static FulcrumDllInjectionTestViewModel FulcrumDllInjectionTestViewModel
+        {
+            get => FulcrumDllInjectionTestView.ViewModel;
+            set => FulcrumDllInjectionTestView.ViewModel = value;
+        }                
+        public static FulcrumPipeStatusView FulcrumPipeStatusView
+        {
+            get => FulcrumMainWindow?.FulcrumPipeStatus;
+            set => FulcrumMainWindow.FulcrumPipeStatus = value;
         }
-        /// <summary>
-        /// Sets a value on one of the global UI Control values here
-        /// </summary>
-        /// <param name="ViewOrViewModelType"></param>
-        /// <param name="PropertyName"></param>
-        /// <param name="PropertyValue"></param>
-        /// <returns></returns>
-        public static bool SetConstantVariable(Type ViewOrViewModelType, string PropertyName, object PropertyValue)
+        public static FulcrumPipeStatusViewModel FulcrumPipeStatusViewModel
         {
-            // Start by finding the control with the type given
-            ConstantsLogger.WriteLog($"ATTEMPTING TO SET VAR {PropertyName} ON OBJECT TYPED {ViewOrViewModelType.Name}....");
-            var DesiredPropertyObject = ViewOrViewModelType.GetMembers(BindingFlags.Public | BindingFlags.Static)
-                .Where(MemberObj => MemberObj.MemberType == MemberTypes.Property)
-                .Select(MemberObj =>
-                {
-                    // Pull value object and cast into property info
-                    PropertyInfo CastInfo = MemberObj as PropertyInfo;
-                    object ValuePulled = CastInfo.GetValue(null);
-
-                    // Return built tuple
-                    return new Tuple<PropertyInfo, string, object>(CastInfo, CastInfo.PropertyType.Name, ValuePulled);
-                }).ToList()
-                .FirstOrDefault(ValueSet => ValueSet.Item2 == ViewOrViewModelType.Name);
-
-            // Make sure it's not null
-            if (DesiredPropertyObject == null) {
-                ConstantsLogger.WriteLog("FAILED TO FIND A USABLE PROPERTY OBJECT VALUE ON THE CONSTANTS OBJECT!", LogType.ErrorLog);
-                return false;
-            }
-
-            // Now apply our new value
-            ConstantsLogger.WriteLog("LOCATED NEW PROPERTY OBJECT TO MODIFY OK!", LogType.InfoLog);
-            try
-            {
-                // Pull the member info and store the best one for us
-                var DesiredMember = DesiredPropertyObject.Item3.GetType()
-                    .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    .FirstOrDefault(MemberObj => MemberObj.Name == PropertyName);
-                if (DesiredMember == null) throw new InvalidOperationException("FAILED TO LOCATE MEMBER ON REFLECTED INSTANCE");
-                ConstantsLogger.WriteLog("PULLED NEW MEMBER INSTANCE OBJECT OK! SETTING IT NOW...", LogType.InfoLog);
-
-                // Now set the value on our new member info
-                switch (DesiredMember.MemberType)
-                {
-                    // Sets the value on the class into the current invoking object
-                    case MemberTypes.Field:
-                        FieldInfo InvokerField = (FieldInfo)DesiredMember;
-                        InvokerField.SetValue(DesiredPropertyObject.Item3, PropertyValue);
-                        break;
-
-                    // PropertyInfo
-                    case MemberTypes.Property:
-                        PropertyInfo InvokerProperty = (PropertyInfo)DesiredMember;
-                        InvokerProperty.SetValue(DesiredPropertyObject.Item3, PropertyValue);
-                        break;
-
-                    // Not found
-                    default: throw new NotImplementedException($"THE INVOKED MEMBER {PropertyName} COULD NOT BE FOUND!");
-                }
-
-                // Set new value correctly! Log and return passed
-                ConstantsLogger.WriteLog("SET NEW VALUE OBJECT TO OUR DESIRED PROPERTY OK!", LogType.InfoLog);
-                return true;
-            }
-            catch (Exception Ex)
-            {
-                // Catch failure, log it, and return failed
-                ConstantsLogger.WriteLog($"FAILED TO SET NEW PROPERTY VALUE NAMED {PropertyName}!", LogType.TraceLog);
-                ConstantsLogger.WriteLog("EXCEPTION THROWN DURING PULL!", Ex);
-                return false;
-            }
+            get => FulcrumPipeStatusView.ViewModel;
+            set => FulcrumPipeStatusView.ViewModel = value;
+        }
+        public static FulcrumInstalledOeAppsView FulcrumInstalledOeAppsView
+        {
+            get => FulcrumMainWindow?.FulcrumInstalledOeApps;
+            set => FulcrumMainWindow.FulcrumInstalledOeApps = value;
+        }
+        public static FulcrumInstalledOeAppsViewModel FulcrumInstalledOeAppsViewModel
+        {
+            get => FulcrumInstalledOeAppsView.ViewModel;
+            set => FulcrumInstalledOeAppsView.ViewModel = value;
+        }
+        public static FulcrumAboutThisAppView FulcrumAboutThisAppView
+        {
+            get => FulcrumMainWindow?.FulcrumAboutThisAppView;
+            set => FulcrumMainWindow.FulcrumAboutThisAppView = value;
+        }
+        public static FulcrumAboutThisAppViewModel FulcrumAboutThisAppViewModel
+        {
+            get => FulcrumMainWindow?.FulcrumAboutThisAppView.ViewModel;
+            set => FulcrumMainWindow.FulcrumAboutThisAppView.ViewModel = value;
+        }
+        public static FulcrumUpdaterView FulcrumUpdaterView
+        {
+            get => FulcrumMainWindow?.FulcrumUpdaterView;
+            set => FulcrumMainWindow.FulcrumUpdaterView = value;
+        }
+        public static FulcrumUpdaterViewModel FulcrumUpdaterViewModel
+        {
+            get => FulcrumMainWindow?.FulcrumUpdaterView.ViewModel;
+            set => FulcrumMainWindow.FulcrumUpdaterView.ViewModel = value;
         }
 
-        // --------------------------------------------------------------------------------------------------------------------------
+        // Public facing singletons used to pull information about our views and view models in the hamburger content
+        public static FulcrumInstalledHardwareView FulcrumInstalledHardwareView => (FulcrumInstalledHardwareView)_fulcrumInstalledHardwareSingleton?.SingletonUserControl;
+        public static FulcrumInstalledHardwareViewModel FulcrumInstalledHardwareViewModel => (FulcrumInstalledHardwareViewModel)_fulcrumInstalledHardwareSingleton?.SingletonViewModel;
+        public static FulcrumDllOutputLogView FulcrumDllOutputLogView => (FulcrumDllOutputLogView)_fulcrumDllOutputSingleton?.SingletonUserControl;
+        public static FulcrumDllOutputLogViewModel FulcrumDllOutputLogViewModel => (FulcrumDllOutputLogViewModel)_fulcrumDllOutputSingleton?.SingletonViewModel;
+        public static FulcrumLogReviewView FulcrumLogReviewView => (FulcrumLogReviewView)_fulcrumLogReviewSingleton?.SingletonUserControl;
+        public static FulcrumLogReviewViewModel FulcrumLogReviewViewModel => (FulcrumLogReviewViewModel)_fulcrumLogReviewSingleton?.SingletonViewModel;
+        public static FulcrumSimulationPlaybackView FulcrumSimulationPlaybackView => (FulcrumSimulationPlaybackView)_fulcrumSimulationSingleton?.SingletonUserControl;
+        public static FulcrumSimulationPlaybackViewModel FulcrumSimulationPlaybackViewModel => (FulcrumSimulationPlaybackViewModel)_fulcrumSimulationSingleton?.SingletonViewModel;
+        public static FulcrumSettingsPaneView FulcrumSettingsPaneView => (FulcrumSettingsPaneView)_fulcrumSettingsPaneSingleton?.SingletonUserControl;
+        public static FulcrumSettingsPaneViewModel FulcrumSettingsPaneViewModel => (FulcrumSettingsPaneViewModel)_fulcrumSettingsPaneSingleton?.SingletonViewModel;
+        public static FulcrumSessionReportingView FulcrumSessionReportingView => (FulcrumSessionReportingView)_fulcrumSessionReportingSingleton?.SingletonUserControl;
+        public static FulcrumSessionReportingViewModel FulcrumSessionReportingViewModel => (FulcrumSessionReportingViewModel)_fulcrumSessionReportingSingleton?.SingletonViewModel;
+        public static FulcrumDebugLoggingView FulcrumDebugLoggingView => (FulcrumDebugLoggingView)_fulcrumDebugLoggingSingleton?.SingletonUserControl;
+        public static FulcrumDebugLoggingViewModel FulcrumDebugLoggingViewModel => (FulcrumDebugLoggingViewModel)_fulcrumDebugLoggingSingleton?.SingletonViewModel;
 
-        /// <summary>
-        /// Method to invoke as an event when the end app routines are hit.
-        /// </summary>
-        public static void ProcessAppExit(object AppObject, ExitEventArgs ExitArgs)
-        {
-            // First Log information
-            LogBroker.Logger?.WriteLog("PROCESSED APP ENVIRONMENT OBJECT SHUTDOWN COMMAND OK!", LogType.WarnLog);
-            LogBroker.Logger?.WriteLog("CLOSING THIS INSTANCE CLEANLY AND THEN FORCE RUNNING A TERMINATION COMMAND!", LogType.InfoLog);
+        #endregion //Properties
 
-            // Flush async targets
-            LogBroker.Logger?.WriteLog("FLUSHING ASYNC OUTPUT TARGETS NOW...", LogType.WarnLog);
-            LogBroker.BrokerInstance.FlushAllAsyncTargets();
-
-            // Now build a process object. Simple bat file that runs a Taskkill instance on this app after waiting 3 seconds.
-            string TempBat = Path.ChangeExtension(Path.GetTempFileName(), "bat");
-            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumInjectorConstants.AppInstanceName");
-            string BatContents = string.Join("\n", new string[]
-            {
-                "timeout /t 5 /nobreak > NUL",
-                $"taskkill /F /IM {CurrentInstanceName}*"
-            });
-
-            // Write temp bat file to output and then run it.
-            LogBroker.Logger?.WriteLog($"BAT FILE LOCATION WAS GENERATED AND SET TO {TempBat}", LogType.InfoLog);
-            LogBroker.Logger?.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents}", LogType.TraceLog);
-            File.WriteAllText(TempBat, BatContents);
-
-            // Now run the output command.
-            LogBroker.Logger?.WriteLog("RUNNING TERMINATION COMMAND INSTANCE NOW...", LogType.WarnLog);
-            LogBroker.Logger?.WriteLog("THIS SHOULD BE THE LAST TIME THIS LOG FILE IS USED!", LogType.InfoLog);
-            ProcessStartInfo TerminateInfo = new ProcessStartInfo()
-            {
-                FileName = "cmd.exe",
-                CreateNoWindow = true,
-                Arguments = $"/C \"{TempBat}\"",
-                WindowStyle = ProcessWindowStyle.Hidden,
-            };
-
-            // Execute here and exit out app.
-            LogBroker.Logger?.WriteLog($"EXECUTING NOW! TIME OF APP EXIT: {DateTime.Now:R}", LogType.WarnLog);
-            Process.Start(TerminateInfo);
-        }
+        #region Structs and Classes
+        #endregion //Structs and Classes
     }
 }
