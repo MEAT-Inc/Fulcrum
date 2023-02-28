@@ -17,12 +17,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         #region Fields
 
         // Private backing fields for our collections of settings and the title of the setting set
-        public string SettingSectionTitle;
+        private string _settingSectionTitle;
         private readonly List<FulcrumSettingEntryModel> _settingsEntries;
 
         #endregion //Fields
 
         #region Properties
+
+        // Public facing title property for this collection of settings
+        public string SettingSectionTitle
+        {
+            get => this._settingSectionTitle;
+            private set => this._settingSectionTitle = value;
+        }
+
         #endregion //Properties
 
         #region Structs and Classes

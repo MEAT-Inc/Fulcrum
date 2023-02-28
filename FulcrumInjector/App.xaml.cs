@@ -149,7 +149,7 @@ namespace FulcrumInjector
         private void _configureAppExitRoutine()
         {
             // Build event helper, Log done and return out.
-            Current.Exit += (SendingAppplication, ExitEventArgs) =>
+            Current.Exit += (_, _) =>
             {
                 // First spawn an exit helper logger and log information 
                 SharpLogger ExitLogger = new SharpLogger(LoggerActions.UniversalLogger, "ExitEventLogger");
@@ -167,7 +167,7 @@ namespace FulcrumInjector
 
                 // Write temp bat file to output and then run it.
                 ExitLogger.WriteLog($"BAT FILE LOCATION WAS GENERATED AND SET TO {TempBat}", LogType.InfoLog);
-                ExitLogger.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents}", LogType.TraceLog);
+                ExitLogger.WriteLog($"BUILDING OUTPUT BAT FILE WITH CONTENTS OF {BatContents.Replace("\n", " ")}", LogType.TraceLog);
                 File.WriteAllText(TempBat, BatContents);
 
                 // Now run the output command.
@@ -215,14 +215,14 @@ namespace FulcrumInjector
             {
                 // Pull type values here
                 Type ViewType = ViewTypes[IndexValue]; Type ViewModelType = ViewModelTypes[IndexValue];
-                this._appLogger?.WriteLog("   --> PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
-                this._appLogger?.WriteLog($"   --> VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
-                this._appLogger?.WriteLog($"   --> VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
+                this._appLogger?.WriteLog("PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
+                this._appLogger?.WriteLog($"VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
+                this._appLogger?.WriteLog($"VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
 
                 // Generate our singleton object here.
                 var BuiltSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(ViewType, ViewModelType);
-                this._appLogger?.WriteLog("   --> NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-                this._appLogger?.WriteLog($"   --> SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
+                this._appLogger?.WriteLog("NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
+                this._appLogger?.WriteLog($"SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
             }
 
             // Log completed building and exit routine

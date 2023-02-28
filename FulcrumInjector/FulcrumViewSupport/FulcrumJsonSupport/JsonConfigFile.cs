@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
 
@@ -70,7 +71,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
             _jsonConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
             FulcrumInjectorExe = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #else
-            string FulcrumInjectorDir;
             var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
             if (FulcrumKey != null) { FulcrumInjectorExe = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()); } 
             else 

@@ -50,18 +50,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         {
             // Spawn a new logger for this view model instance and log some information
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModelLogger.WriteLog("SETUP NEW SETTINGS CONFIGURATION VALUES OK!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
 
-            // BUG: Disabled this for now. Was going to possibly double load everything
-            // Pull settings values in on startup
-            // if (FulcrumConstants.FulcrumSettings.Count == 0)
-            // {
-            //     // If no settings were found, generate them now
-            //     FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
-            //     this.ViewModelLogger.WriteLog("GENERATED NEW SETTINGS FOR VIEW MODEL CORRECTLY! SETTINGS IMPORTED TO OUR VIEW CONTENT FROM SHARE!", LogType.InfoLog);
-            // }
+            // Store the settings sets for our instance on the view model
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ToList());
+            this.ViewModelLogger.WriteLog("IMPORTED AND STORED NEW SETTINGS CONFIGURATION VALUES OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,9 +81,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             this.ViewModelLogger.WriteLog("SAVING JSON ON THE EDITOR INTO OUR APP CONFIG FILE NOW..."); 
             File.WriteAllText(JsonConfigFile.AppConfigFile, EditorDocument.Text);
             this.ViewModelLogger.WriteLog("WROTE NEW JSON CONTENT OK! PULLING IN CONTENTS TO REFRESH NOW...", LogType.InfoLog);
-
-            // Refresh content view now.
+            
+            // Reload the settings into our view model now 
             this.PopulateAppSettingJsonViewer(EditorDocument);
+            FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ToList());
         }
         /// <summary>
         /// Saves a new setting object value onto the view model and settings share instance
@@ -118,6 +114,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             // Store our value in the JSON configuration files now.
             ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
             this.ViewModelLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
+
+            // Reload the settings into our view model now 
+            FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
 
             // If we've got a special setting value, then store it here.
             if (LocatedSettingSet.SettingSectionTitle != "FulcrumShim DLL Settings") return;

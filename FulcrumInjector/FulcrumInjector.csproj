@@ -70,38 +70,12 @@
   <PropertyGroup>
     <ApplicationIcon>FulcrumResources\ShimIconProject.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28No Events%29|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug %28No Events%29\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28No Events%29|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release %28No Events%29\</OutputPath>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>FulcrumInjector.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28Installed%29|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Release %28Installed%29\</OutputPath>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
@@ -126,31 +100,31 @@
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.5.7.282\lib\net472\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.10.5.191\lib\net472\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrapper.6.1.5.421\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\packages\SharpSimulator.0.10.5.191\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.4.3.113, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.4.3.113\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.4.3.115, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.4.3.115\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
-    <Reference Include="SharpExpressions, Version=0.4.5.51, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.10.5.189\lib\net472\SharpExpressions.dll</HintPath>
+    <Reference Include="SharpExpressions, Version=0.4.5.53, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.10.5.191\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.5.7.282, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrapper.6.1.5.421\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.5.8.284, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.10.5.191\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
-    <Reference Include="SharpPipes, Version=0.2.3.25, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpPipes.0.2.3.25\lib\net472\SharpPipes.dll</HintPath>
+    <Reference Include="SharpPipes, Version=0.2.3.26, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpPipes.0.2.3.26\lib\net472\SharpPipes.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.10.5.189, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.10.5.189\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.10.5.191, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.10.5.191\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrapper, Version=6.1.5.421, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrapper.6.1.5.421\lib\net472\SharpWrapper.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=6.1.5.422, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpSimulator.0.10.5.191\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
