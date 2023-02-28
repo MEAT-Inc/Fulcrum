@@ -98,9 +98,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
             // Find if the VM is a core option or misc singleton
             bool IsViewModelType =
-                ViewModelTypeName.Name.Contains("CoreViewModels") ||
-                ViewModelTypeName.Name.Contains("OptionViewModels") ||
-                ViewModelTypeName.Name.Contains("MiscViewModels");
+                ViewModelTypeName.FullName.Contains("CoreViewModels") ||
+                ViewModelTypeName.FullName.Contains("OptionViewModels") ||
+                ViewModelTypeName.FullName.Contains("MiscViewModels");
 
             // Switch for fields vs properties
             switch (MemberToUpdate.MemberType)

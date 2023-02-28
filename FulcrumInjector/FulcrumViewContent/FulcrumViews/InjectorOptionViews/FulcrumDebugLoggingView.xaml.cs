@@ -73,6 +73,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE DEBUG LOGGING REVIEW VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
+        /// <summary>
+        /// On loaded, we want to setup our new viewmodel object and populate values
+        /// </summary>
+        /// <param name="sender">Sending object</param>
+        /// <param name="e">Events attached to it.</param>
+        private void FulcrumDebugLoggingView_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // Refresh logger list each time this view is opened
+            this.ViewModel.LoggerNamesFound = this.ViewModel.BuildLoggerNamesList();
+            this._viewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -97,17 +108,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             });
         }
         /// <summary>
-        /// Pulls in new loggers and shows them here.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LoggerNameComboBox_OnDropDownOpened(object sender, EventArgs e)
-        {
-            // Trigger refresh logger list
-            this.ViewModel.LoggerNamesFound = this.ViewModel.BuildLoggerNamesList();
-            this._viewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
-        }
-        /// <summary>
         /// Takes the selected logger object and filters log lines to only contain those from the given logger
         /// </summary>
         /// <param name="sender"></param>
@@ -120,7 +120,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Check for zero or no selection
             if (CastSendingBox.SelectedIndex <= 0)
             {
-                ViewModel?.FilterByLoggerName(null);
+                this.ViewModel?.FilterByLoggerName(null);
                 this._viewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
                 return;
             }
@@ -128,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Now setup new filtering rule.
             string SelectedLoggerName = CastSendingBox.SelectedItem?.ToString();
             this._viewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
-            ViewModel.FilterByLoggerName(SelectedLoggerName);
+            this.ViewModel.FilterByLoggerName(SelectedLoggerName);
         }
     }
 }
