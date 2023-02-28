@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using SharpLogging;
@@ -49,9 +50,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             // Init component. Build new VM object
             InitializeComponent();
 
-            // Setup a new ViewModel and setup our pipe watchdogs
+            // Setup a new ViewModel and setup our pipe watchdogs in a background task
             this.DataContext = this.ViewModel;
-            this.ViewModel.SetupPipeStateWatchdogs();
+            Task.Run(() => this.ViewModel.SetupPipeStateWatchdogs());
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

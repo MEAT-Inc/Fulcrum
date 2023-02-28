@@ -63,8 +63,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumSettingsPaneView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Populate our settings values here
+            // Populate our settings values here and refresh content from the injector constants
             this.ViewModel.PopulateAppSettingJsonViewer(this.JsonSettingsViewEditor);
+            this.ViewModel.SettingsEntrySets = new (FulcrumConstants.FulcrumSettings);
             this._viewLogger.WriteLog("BUILT AND LOADED IN SESSION SETTINGS FOR THIS VIEW CORRECTLY!");
         }
 

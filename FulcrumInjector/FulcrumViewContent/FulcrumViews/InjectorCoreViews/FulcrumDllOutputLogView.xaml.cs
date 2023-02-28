@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 // Log information, build new target output and return.
                 this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
                 ConfigurationItemFactory.Default.Targets.RegisterDefinition("LiveInjectorOutputTarget", typeof(InjectorOutputSyntaxHelper));
-                CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
+                CurrentConfig.AddRuleForAllLevels(new InjectorOutputSyntaxHelper(this.DebugRedirectOutputEdit));
                 this._viewLogger.WriteLog("BUILT EVENT PROCESSING OBJECTS FOR PIPE OUTPUT AND FOR INJECTOR DLL OUTPUT OK!", LogType.InfoLog);
             }
 

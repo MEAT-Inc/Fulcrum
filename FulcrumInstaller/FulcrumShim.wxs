@@ -40,7 +40,9 @@
                                 <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="OCTOKIT.DLL" Name="Octokit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.dll" />
                                 <File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
-                                <File Id="SHARPLOGGER.DLL" Name="SharpLogger.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogger.dll" />
+								<File Id="SHARPEXPRESSIONS.DLL" Name="SharpExpressions.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpExpressions.dll" />
+								<File Id="SHARPPIPES.DLL" Name="SharpPipes.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpPipes.dll" />
+                                <File Id="SHARPLOGGING.DLL" Name="SharpLogging.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogging.dll" />
                                 <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
                                 <File Id="SHARPWRAPPER.DLL" Name="SharpWrapper.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrapper.dll" />
                                 <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
@@ -54,7 +56,6 @@
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                                 <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />
                                 <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
-                                <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
                                 <File Id="OCTOKIT.XML" Name="Octokit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.xml" />
                                 <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
                                 <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
@@ -85,15 +86,13 @@
                                     <File Id="FULCRUMINSTALLEDHARDWAREVIEWSTYLES.XAML" Name="FulcrumInstalledHardwareViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml" />
                                     <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
                                     <File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
-                                    <File Id="FULCRUMPEERTOPEERVIEWSTYLES.XAML" Name="FulcrumPeerToPeerViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPeerToPeerViewStyles.xaml" />
-                                    <File Id="FULCRUMNETWORKANAYSISSTYLES.XAML" Name="FulcrumNetworkAnalysisStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml" />
                                     <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
                                     <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
                                     <File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />
                                     <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumTitleViewStyles.xaml" />
                                     <File Id="FULCRUMSIMULATIONPLAYBACKSTYLES.XAML" Name="FulcrumSimulationPlaybackStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
                                     <File Id="FULCRUMABOUTTHISAPPSTYLES.XAML" Name="FulcrumAboutThisAppStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
-                                    <File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
+                                    <File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml" />
                                 </Component>
                             </Directory>
                             <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
