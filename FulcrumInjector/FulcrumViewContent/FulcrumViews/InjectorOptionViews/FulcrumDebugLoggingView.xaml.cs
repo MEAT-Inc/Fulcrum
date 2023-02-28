@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,11 +53,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
             // Configure the new Logging Output Target.
             var CurrentConfig = LogManager.Configuration;
-            try { CurrentConfig.RemoveTarget("DebugLoggingRedirectTarget"); }
-            catch { this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog); }
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugLoggingRedirectTarget", typeof(DebugLoggingRedirectTarget));
-            CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
-            LogManager.ReconfigExistingLoggers();
+            if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "DebugLoggingRedirectTarget"))
+            {
+                // Log information, build new target output and return.
+                this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
+                ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugLoggingRedirectTarget", typeof(DebugLoggingRedirectTarget));
+                CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
+                LogManager.ReconfigExistingLoggers();
+            }
 
             // Log Added new target output ok
             this.ViewModel.LogContentHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
@@ -100,7 +104,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         private void LoggerNameComboBox_OnDropDownOpened(object sender, EventArgs e)
         {
             // Trigger refresh logger list
-            this.ViewModel.BuildLoggerNamesList();
+            this.ViewModel.LoggerNamesFound = this.ViewModel.BuildLoggerNamesList();
             this._viewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
         }
         /// <summary>

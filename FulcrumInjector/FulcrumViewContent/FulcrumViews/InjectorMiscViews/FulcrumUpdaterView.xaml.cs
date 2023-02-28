@@ -54,10 +54,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             // Initialize new UI Component
             InitializeComponent();
 
-            // Hook in a new event for the button click on the check for updates title button
-            FulcrumConstants.FulcrumTitleView.btnCheckForUpdates.Click += this.ToggleApplicationUpdateInformation_OnClick;
-            this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE CHECK FOR UPDATES BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
-
             // Setup our data context and log our information
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE UPDATER VIEW OK!", LogType.InfoLog);
@@ -89,6 +85,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
 
             // Open or close the flyout for updates based on what the view model found
             FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = this.ViewModel.UpdateReady;
+
+            // Hook in a new event for the button click on the check for updates title button
+            FulcrumConstants.FulcrumTitleView.btnCheckForUpdates.Click += this.ToggleApplicationUpdateInformation_OnClick;
+            this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE CHECK FOR UPDATES BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

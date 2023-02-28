@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
@@ -97,9 +98,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             }
 
             // Build a new instance object type here and store values.
-            TViewType ViewContent = (TViewType)Activator.CreateInstance(ViewType);
-            TViewModelType ViewModelContent = (TViewModelType)ViewContent.GetType().GetProperty("ViewModel")?.GetValue(ViewContent);
+            var CreatedViewContent = Activator.CreateInstance(ViewType);
+            var LocatedViewModel = CreatedViewContent.GetType()
+                .GetRuntimeProperties()
+                .FirstOrDefault(PropObj =>
+                    PropObj.PropertyType == typeof(TViewModelType) ||
+                    PropObj.PropertyType.BaseType == typeof(TViewModelType))
+                .GetValue(CreatedViewContent);
 
+            // Ensure neither object value pulled in is null at this point
+            if (CreatedViewContent == null) throw new NullReferenceException($"Error! Failed to find view content for type {ViewType.FullName}!");
+            if (LocatedViewModel == null) throw new NullReferenceException($"Error! Failed to find view model content for type {ViewModelType.FullName}!");
+
+            // Cast our view and view model to the generic types provided and store them now
+            TViewType ViewContent = (TViewType)CreatedViewContent;
+            TViewModelType ViewModelContent = (TViewModelType)LocatedViewModel;
+            
+            // Once we've found our view and view model content, store it on our singleton collection and exit out
             _singletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
             var NewSingletonInstance = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewContent, ViewModelContent);
             FulcrumSingletons = FulcrumSingletons.Append(NewSingletonInstance).ToArray();
@@ -168,7 +183,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             
             // Find first object with the type matching the given viewmodel type
             var PulledSingleton = FulcrumSingletons.FirstOrDefault(ViewObj => ViewObj.SingletonUserControl.GetType() == ViewTypeToLocate);
-            if (PulledSingleton == null) _singletonLogger.WriteLog("FAILED TO LOCATE VALID SINGLETON INSTANCE!", LogType.ErrorLog);
+            if (PulledSingleton == null) _singletonLogger.WriteLog($"NO MATCHING SINGLETON INSTANCE WAS FOUND FOR TYPE {ViewTypeToLocate.Name}!", LogType.ErrorLog);
             return PulledSingleton;
         }
         /// <summary>
