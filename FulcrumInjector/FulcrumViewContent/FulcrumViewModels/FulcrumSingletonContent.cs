@@ -59,7 +59,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             // Log building new singleton instance object
             this.SingletonUserControl = SingletonUserControlContent;
             this.SingletonViewModel = SingletonViewModelContent;
-            _singletonLogger.WriteLog($"STORED NEW SINGLETON INSTANCE OBJECT FOR TYPE {typeof(TViewType)}!", LogType.InfoLog);
+            _singletonLogger.WriteLog($"STORED NEW SINGLETON INSTANCE OBJECT FOR TYPE {SingletonUserControlContent.GetType().FullName}!", LogType.InfoLog);
         }
         /// <summary>
         /// Deconstruction routine for singleton helper class object 
@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         ~FulcrumSingletonContent()
         {
             // Log building new removed list and remove the object from static contents.
-            _singletonLogger.WriteLog($"DECONSTRUCTING A SINGLETON USER CONTROL OBJECT FOR TYPE {typeof(TViewType)}...", LogType.WarnLog);
+            _singletonLogger.WriteLog($"DECONSTRUCTING A SINGLETON USER CONTROL OBJECT FOR TYPE {this.SingletonUserControl.GetType().FullName}...", LogType.WarnLog);
             _singletonLogger.WriteLog($"INSTANCE HAS BEEN ALIVE FOR A TOTAL OF {(DateTime.Now - this.TimeCreated):g}", LogType.TraceLog);
         }
 
