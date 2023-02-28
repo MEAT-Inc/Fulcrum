@@ -56,7 +56,6 @@
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                                 <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />
                                 <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
-                                <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
                                 <File Id="OCTOKIT.XML" Name="Octokit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.xml" />
                                 <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
                                 <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
@@ -87,7 +86,6 @@
                                     <File Id="FULCRUMINSTALLEDHARDWAREVIEWSTYLES.XAML" Name="FulcrumInstalledHardwareViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml" />
                                     <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
                                     <File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
-                                    <File Id="FULCRUMNETWORKANAYSISSTYLES.XAML" Name="FulcrumNetworkAnalysisStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumNetworkAnalysisStyles.xaml" />
                                     <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
                                     <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
                                     <File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />

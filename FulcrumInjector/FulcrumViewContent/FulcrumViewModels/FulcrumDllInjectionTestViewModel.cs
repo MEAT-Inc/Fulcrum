@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
