@@ -43,14 +43,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormat
             this.OutputEditor = EditorObject;
             _formatLogger.WriteLog("STORED NEW CONTENT VALUES FOR USER CONTROL AND EDITOR INPUT OK!", LogType.InfoLog);
 
-            // Setup our Layout
-            this.Layout = new SimpleLayout(
-                "[${date:format=hh\\:mm\\:ss}][${level:uppercase=true}][${mdc:custom-name}][${mdc:item=calling-class-short}] ::: ${message}"
-            );
-            _formatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
-
-            // Startup highlighting for this output.
+            // Setup our Layout and define the default color formatting rules
+            this.Layout = SharpLogBroker.DefaultConsoleFormat.LoggerFormatString;
             base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDebugSyntaxFulcrumSettings.ToArray());
+            _formatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
             _formatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
 
             // Start output formatting here.
@@ -110,7 +106,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormat
         {
             // Write output using dispatcher to avoid threading issues.
             string RenderedText = this.Layout.Render(LogEvent);
-            this.OutputEditor.Dispatcher.Invoke(() => OutputEditor.Text += RenderedText + "\n");
+            this.OutputEditor.Dispatcher.InvokeAsync(() => OutputEditor.Text += RenderedText + "\n");
         }
     }
 }

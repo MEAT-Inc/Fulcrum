@@ -47,14 +47,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = new FulcrumHamburgerCoreViewModel(this);
 
+            // Initialize new UI Component
+            InitializeComponent();
+
             // Configure new Navigation Service helper
             this.NavService = new HamburgerNavService();
             this.InjectorHamburgerMenu.Content = NavService.NavigationFrame;
             this.NavService.Navigated += this.NavigationServiceEx_OnNavigated;
             this._viewLogger.WriteLog("CONFIGURED NEW NAV SERVICE FOR OUR HAMBURGER CORE OBJECT OK!", LogType.InfoLog);
-
-            // Initialize new UI Component
-            InitializeComponent();
 
             // Setup our data context and log information out
             this.DataContext = this.ViewModel;

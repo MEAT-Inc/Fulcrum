@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
+             Loaded="FulcrumDebugLoggingView_OnLoaded"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <!-- Style Sheets -->
@@ -72,7 +73,6 @@
                 HorizontalContentAlignment="Center" 
                 VerticalContentAlignment="Center"
                 Margin="10,0,5,0"
-                DropDownOpened="LoggerNameComboBox_OnDropDownOpened"
                 SelectionChanged="LoggerNameComboBox_OnSelectionChanged"
                 Style="{StaticResource MahApps.Styles.ComboBox}"
                 ItemsSource="{Binding Path=LoggerNamesFound}"/>

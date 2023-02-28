@@ -43,10 +43,15 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringForma
             this.DocumentEditor = InputEditor;
             this.OriginalInputLines = InputEditor.Text;
         }
+
         /// <summary>
         /// DCTOR For this object type. Resets the text content to be the input original contents
         /// </summary>
-        ~FilteringColorFormatter() { this.DocumentEditor.Text = OriginalInputLines; }
+        ~FilteringColorFormatter()
+        {
+            // Reset the content to default once our coloring editor has been released
+            this.DocumentEditor.Dispatcher.InvokeAsync(() => { this.DocumentEditor.Text = OriginalInputLines; });
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

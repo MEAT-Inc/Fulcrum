@@ -255,8 +255,8 @@
                                         VerticalAlignment="Stretch"
                                         ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                         ItemsSource="{Binding}"
-                                        Style="{StaticResource ListBoxSettingsStyle}"
-                                        DataContext="{Binding Path=SettingsEntries}">
+                                        DataContext="{Binding}"
+                                        Style="{StaticResource ListBoxSettingsStyle}">
                                         <ListBox.Background>
                                             <SolidColorBrush Color="Gray" Opacity=".50"/>
                                         </ListBox.Background>
