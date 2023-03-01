@@ -228,6 +228,7 @@
                         VerticalAlignment="Stretch" 
                         VerticalContentAlignment="Stretch"
                         HorizontalContentAlignment="Stretch"
+                        MouseWheel="SettingsListBoxView_OnMouseWheel"
                         ItemsSource="{Binding Path=SettingsEntrySets}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -254,6 +255,7 @@
                                         VerticalContentAlignment="Stretch"
                                         VerticalAlignment="Stretch"
                                         ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                        MouseWheel="SettingsListBoxView_OnMouseWheel"
                                         ItemsSource="{Binding}"
                                         DataContext="{Binding}"
                                         Style="{StaticResource ListBoxSettingsStyle}">

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
@@ -181,6 +182,29 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Toggle view visibility
             this._viewLogger.WriteLog("CLOSING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
             this.JsonViewerFlyout.IsOpen = false;
+        }
+        /// <summary>
+        /// Passes the scroll events from our listbox content up to the parent scroll viewer so scrolling operations work
+        /// </summary>
+        /// <param name="sender">Sending control for this event</param>
+        /// <param name="e">Event args fired along with this action</param>
+        private void SettingsListBoxView_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // If the event is handled, then return out
+            if (e.Handled) return;
+
+            // Mark it handled and setup a new mouse event arg to scroll our parent
+            e.Handled = true;
+            var ParentControl = ((Control)sender).Parent as UIElement;
+            var PassedEvents = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                // Setup the sending control and the event built in
+                Source = sender,
+                RoutedEvent = MouseWheelEvent,
+            };
+
+            // Finally raise the event provided in on the parent object
+            ParentControl.RaiseEvent(PassedEvents);
         }
     }
 }
