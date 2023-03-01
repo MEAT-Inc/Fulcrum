@@ -121,8 +121,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Find the name of the first file and use it as our base.
             string OutputPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultImportFilePath")
-            );
+                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportedFiles"));
 
             // Build file name here.
             string BaseFileName = $"{Guid.NewGuid().ToString("D").ToUpper()}";
@@ -206,9 +205,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 
-                    // Return passed and copy into our temp location
+                    // Build out the new log file name and ensure the output directory exists
                     string LogFileName = Path.GetFileName(NewLogFile);
-                    string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultImportFilePath");
+                    string DefaultImportLocation = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportedFiles"));
                     Directory.CreateDirectory(DefaultImportLocation);
                     File.Copy(NewLogFile, Path.Combine(DefaultImportLocation, LogFileName), true);
                     this.ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");
