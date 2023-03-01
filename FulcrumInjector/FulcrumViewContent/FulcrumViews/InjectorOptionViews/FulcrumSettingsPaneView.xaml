@@ -23,6 +23,7 @@
                                 BorderBrush="{StaticResource SecondaryColor}"
                                 BorderThickness="1.5" 
                                 CornerRadius="3"
+                                MouseWheel="SettingsListBoxView_OnMouseWheel"
                                 Background="{StaticResource SecondaryColor_Darker_65}">
                             <Grid Margin="20" Width="700">
                                 <Grid.RowDefinitions>
@@ -73,6 +74,7 @@
                                 BorderBrush="{StaticResource SecondaryColor}"
                                 BorderThickness="1.5" 
                                 CornerRadius="3"
+                                MouseWheel="SettingsListBoxView_OnMouseWheel"
                                 Background="{StaticResource SecondaryColor_Darker_65}">
                             <Grid Margin="20" Width="700">
                                 <Grid.RowDefinitions>
@@ -124,6 +126,7 @@
                                 BorderBrush="{StaticResource SecondaryColor}"
                                 BorderThickness="1.5" 
                                 CornerRadius="3"
+                                MouseWheel="SettingsListBoxView_OnMouseWheel"
                                 Background="{StaticResource SecondaryColor_Darker_65}">
                             <Grid Margin="20" Width="700">
                                 <Grid.RowDefinitions>
@@ -222,18 +225,21 @@
                 BorderBrush="{StaticResource  TextColorBase}"/>
 
         <!-- Content for the settings objects goes in here -->
-        <Border Grid.Row="1" Margin="10,-5,15,5" BorderBrush="White" BorderThickness="3" CornerRadius="5">
-            <ScrollViewer Background="Black">
+        <Border Grid.Row="1" Margin="10,-5,15,5" BorderBrush="White" BorderThickness="3" CornerRadius="5" MouseWheel="SettingsListBoxView_OnMouseWheel">
+            <ScrollViewer Background="Black" x:Name="SettingsScrollViewer">
                 <ListBox x:Name="SettingsListBoxView"
-                        VerticalAlignment="Stretch" 
-                        VerticalContentAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        MouseWheel="SettingsListBoxView_OnMouseWheel"
-                        ItemsSource="{Binding Path=SettingsEntrySets}">
+                         VerticalAlignment="Stretch" 
+                         VerticalContentAlignment="Stretch"
+                         HorizontalContentAlignment="Stretch"
+                         MouseWheel="SettingsListBoxView_OnMouseWheel"
+                         ItemsSource="{Binding Path=SettingsEntrySets}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3" CornerRadius="5" Margin="0,5">
-                                <Grid Margin="0, 5">
+                            <Border BorderThickness="3" 
+                                    CornerRadius="5" Margin="0,5" 
+                                    MouseWheel="SettingsListBoxView_OnMouseWheel"
+                                    BorderBrush="{StaticResource TextColorBase}">
+                                <Grid Margin="0, 5" MouseWheel="SettingsListBoxView_OnMouseWheel">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="50"/>
                                         <RowDefinition Height="*"/>

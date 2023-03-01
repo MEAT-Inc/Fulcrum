@@ -190,21 +190,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         /// <param name="e">Event args fired along with this action</param>
         private void SettingsListBoxView_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            // If the event is handled, then return out
-            if (e.Handled) return;
-
-            // Mark it handled and setup a new mouse event arg to scroll our parent
+            // Set the event to handled and raise the event provided in on the parent object
             e.Handled = true;
-            var ParentControl = ((Control)sender).Parent as UIElement;
-            var PassedEvents = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
-            {
-                // Setup the sending control and the event built in
-                Source = sender,
-                RoutedEvent = MouseWheelEvent,
-            };
-
-            // Finally raise the event provided in on the parent object
-            ParentControl.RaiseEvent(PassedEvents);
+            int NewDelta = (int)this.SettingsScrollViewer.VerticalOffset - (int)(e?.Delta);
+            this.SettingsScrollViewer.ScrollToVerticalOffset(NewDelta);
         }
     }
 }
