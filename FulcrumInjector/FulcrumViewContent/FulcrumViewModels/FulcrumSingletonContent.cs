@@ -49,17 +49,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// </summary>
         /// <param name="SingletonUserControlContent">The user control to register on our singleton</param>
         /// <param name="SingletonViewModelContent">The view model to register on our singleton</param>
-        private FulcrumSingletonContent(TViewType SingletonUserControlContent, TViewModelType SingletonViewModelContent)
+        /// <param name="RequireLogging">When true, this process will output diagnostic logging information</param>
+        private FulcrumSingletonContent(TViewType SingletonUserControlContent, TViewModelType SingletonViewModelContent, bool RequireLogging = true)
         {
             // Store time information.
             this.TimeCreated = DateTime.Now;
             FulcrumSingletons ??= Array.Empty<FulcrumSingletonContent<TViewType, TViewModelType>>();
-            _singletonLogger.WriteLog($"INSTANCE HAS BEEN CREATED AND TIMESTAMPED! TIME BUILT: {this.TimeCreated:s}", LogType.TraceLog);
+            if (RequireLogging) _singletonLogger.WriteLog($"INSTANCE HAS BEEN CREATED AND TIMESTAMPED! TIME BUILT: {this.TimeCreated:s}", LogType.TraceLog);
 
             // Log building new singleton instance object
             this.SingletonUserControl = SingletonUserControlContent;
             this.SingletonViewModel = SingletonViewModelContent;
-            _singletonLogger.WriteLog($"STORED NEW SINGLETON INSTANCE OBJECT FOR TYPE {SingletonUserControlContent.GetType().FullName}!", LogType.InfoLog);
+            if (RequireLogging) _singletonLogger.WriteLog($"STORED NEW SINGLETON INSTANCE OBJECT FOR TYPE {SingletonUserControlContent.GetType().FullName}!", LogType.InfoLog);
         }
         /// <summary>
         /// Deconstruction routine for singleton helper class object 
@@ -67,6 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         ~FulcrumSingletonContent()
         {
             // Log building new removed list and remove the object from static contents.
+            if (DateTime.Now - this.TimeCreated < TimeSpan.FromSeconds(5)) return;
             _singletonLogger.WriteLog($"DECONSTRUCTING A SINGLETON USER CONTROL OBJECT FOR TYPE {this.SingletonUserControl.GetType().FullName}...", LogType.WarnLog);
             _singletonLogger.WriteLog($"INSTANCE HAS BEEN ALIVE FOR A TOTAL OF {(DateTime.Now - this.TimeCreated):g}", LogType.TraceLog);
         }
@@ -155,7 +157,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
                 // Pull the singleton from our list and replace the content.
                 int IndexOfSingleton = FulcrumSingletons.ToList().IndexOf(LocatedSingleton);
-                FulcrumSingletons[IndexOfSingleton] = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject);
+                FulcrumSingletons[IndexOfSingleton] = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject, RequireLogging);
                 if (RequireLogging) _singletonLogger.WriteLog("UPDATED CONTENTS OF OUR SINGLETON VIEW OBJECT OK!", LogType.InfoLog);
 
                 // Return current instance.
@@ -164,7 +166,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
             // Build new instance and return output.
             if (RequireLogging) _singletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
-            var NewSingletonInstance = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject);
+            var NewSingletonInstance = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject, RequireLogging);
             FulcrumSingletons = FulcrumSingletons.Append(NewSingletonInstance).ToArray();
 
             // Log information and return.
