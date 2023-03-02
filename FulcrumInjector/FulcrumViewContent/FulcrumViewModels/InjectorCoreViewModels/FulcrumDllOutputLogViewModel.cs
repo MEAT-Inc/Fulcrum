@@ -107,8 +107,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         {
             // Log information and store values 
             this.ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-
+            
             // Make sure the view content exists first and that it's been setup correctly
             if (this.BaseViewControl is not FulcrumDllOutputLogView CastViewContent)
                 throw new InvalidOperationException($"Error! View content type was {this.BaseViewControl.GetType().Name}");
@@ -118,7 +117,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             {
                 // Log that we've already got a helper instance and exit out
                 this.ViewModelLogger.WriteLog($"WARNING! ALREADY FOUND AN EXISTING TARGET MATCHING THE NAME {this._dllContentTargetName}!", LogType.WarnLog);
-                this.ViewModelLogger.WriteLog("RECONFIGURING LOGGERS AND EXITING OUT", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("NOT ATTEMPTING TO REGISTER A NEW TARGET SINCE THAT WOULD BE A WASTE OF TIME (LIKE THIS LOG ENTRY)");
             }
             else
             {
@@ -135,10 +134,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
             }
 
-            // Configure our new output Logging format helper and store it on this window
-            this._injectorSyntaxHelper = new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit);
-            this._logFilteringHelper = new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
-            this.ViewModelLogger.WriteLog("CONFIGURED DLL OUTPUT VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+
+            // Hook an event to build our log highlighter when the view is loaded
+            CastViewContent.Loaded += (_, _) =>
+            {
+                // Configure our new output Logging format helper and store it on this window
+                this._logFilteringHelper = new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
+                this._injectorSyntaxHelper = new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit);
+                LogManager.ReconfigExistingLoggers();
+
+                // Log out that these routines are done and exit out
+                this.ViewModelLogger.WriteLog($"{CastViewContent.GetType().Name} WAS LOADED AT {DateTime.Now:G}", LogType.TraceLog);
+                this.ViewModelLogger.WriteLog($"CONFIGURED {CastViewContent.GetType().Name} VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            };
         }
 
         /// <summary>
