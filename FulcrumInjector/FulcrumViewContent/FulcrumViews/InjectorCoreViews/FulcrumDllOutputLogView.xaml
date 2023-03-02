@@ -6,8 +6,7 @@
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="500" 
-             d:DesignWidth="650"
-             Loaded="FulcrumDLLOutputLogView_OnLoaded">
+             d:DesignWidth="650">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
