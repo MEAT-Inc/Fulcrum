@@ -1,13 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
-using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormatters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
-using NLog;
-using NLog.Config;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
@@ -51,23 +47,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Initialize new UI Component
             InitializeComponent();
 
-            // Configure the new Logging Output Target.
-            var CurrentConfig = LogManager.Configuration;
-            if (CurrentConfig.AllTargets.All(TargetObj => TargetObj.Name != "DebugLoggingRedirectTarget"))
-            {
-                // Log information, build new target output and return.
-                this._viewLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
-                ConfigurationItemFactory.Default.Targets.RegisterDefinition("DebugLoggingRedirectTarget", typeof(DebugLoggingRedirectTarget));
-                CurrentConfig.AddRuleForAllLevels(new DebugLoggingRedirectTarget(this.DebugRedirectOutputEdit));
-                LogManager.ReconfigExistingLoggers();
-            }
+            // Setup the output logging helper once the component is alive
+            this.ViewModel.ConfigureOutputHighlighter();
+            this._viewLogger.WriteLog("BUILT NEW LOG CONTENT FORMATTER OK!", LogType.InfoLog);
 
-            // Log Added new target output ok
-            this.ViewModel.LogContentHelper = new LogOutputFilteringHelper(this.DebugRedirectOutputEdit);
-            this._viewLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
-            this._viewLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
-            this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
-            
             // Store our View model as the current context and log out some information
             this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE DEBUG LOGGING REVIEW VIEW OK!", LogType.InfoLog);
@@ -118,7 +101,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             ComboBox CastSendingBox = (ComboBox)sender;
 
             // Check for zero or no selection
-            if (CastSendingBox.SelectedIndex <= 0)
+            if (CastSendingBox.SelectedIndex < 0)
             {
                 this.ViewModel?.FilterByLoggerName(null);
                 this._viewLogger.WriteLog("REMOVED FILTER OBJECTS SINCE SELECTED INDEX WAS OUT OF RANGE!");
@@ -129,6 +112,50 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             string SelectedLoggerName = CastSendingBox.SelectedItem?.ToString();
             this._viewLogger.WriteLog($"CONFIGURING NEW FILTERING RULE FOR LOGGER NAME {SelectedLoggerName}...");
             this.ViewModel.FilterByLoggerName(SelectedLoggerName);
+        }
+        /// <summary>
+        /// Event handler used to open the current log file for this injector session in an external application
+        /// </summary>
+        /// <param name="sender">The sending control for this action</param>
+        /// <param name="e">Events fired along with the action</param>
+        private void OpenLogFileExternal_OnClick(object sender, RoutedEventArgs e)
+        {
+            // Find our log file name to view first
+            string LogFileName = SharpLogBroker.LogFilePath;
+            this._viewLogger.WriteLog($"OPENING UP LOG FILE {LogFileName} IN THE DEFAULT VIEWING APP NOW...");
+
+            // If VS code doesn't exist, then default to notepad here
+            string VsCodePath_32 = "C:\\Program Files (x86)\\Microsoft VS Code\\Code.exe";
+            string VsCodePath_64 = "C:\\Program Files\\Microsoft VS Code\\Code.exe";
+            if (File.Exists(VsCodePath_32))
+            {
+                // Log which VS code instance was found and start it up to view our log file
+                this._viewLogger.WriteLog("FOUND VS CODE (32 BIT)! OPENING OUR LOG FILE NOW...");
+                Process.Start(VsCodePath_32, LogFileName);
+            }
+            else if (File.Exists(VsCodePath_64))
+            {
+                // Log which VS code instance was found and start it up to view our log file
+                this._viewLogger.WriteLog("FOUND VS CODE (64 BIT)! OPENING OUR LOG FILE NOW...");
+                Process.Start(VsCodePath_64, LogFileName);
+            }
+            else
+            {
+                // If no VS Code instances exist, boot it up using notepad
+                this._viewLogger.WriteLog("NO VS CODE INSTALL WAS FOUND! OPENING LOG FILE IN NOTEPAD...");
+                Process.Start("notepad.exe", LogFileName);
+            }
+        }
+        /// <summary>
+        /// Event handler used to open the current log file for this injector session in a new
+        /// standalone window which will only hold the log file viewer
+        /// </summary>
+        /// <param name="sender">The sending control for this action</param>
+        /// <param name="e">Events fired along with the action</param>
+        private void OpenLogFileWindow_OnClick(object sender, RoutedEventArgs e)
+        {
+            // For now just log out this isn't supported
+            this._viewLogger.WriteLog("ERROR! OPENING STANDALONE LOG FILE WINDOWS IS NOT YET SUPPORTED!", LogType.WarnLog);
         }
     }
 }
