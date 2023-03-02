@@ -36,7 +36,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
-                    <ColumnDefinition Width=".60*"/>
+                    <ColumnDefinition Width=".55*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
                     Grid.Row="0"
@@ -44,14 +44,14 @@
                     Text="Injector Debug Logging" 
                     HorizontalAlignment="Left"
                     Style="{StaticResource TitleStringText}"/>
-                <Grid Grid.Column="2">
+                <Grid Grid.Column="1" Margin="0,0,15,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Click="OpenLogFileExternal_OnClick" Style="{StaticResource ActionButtonStyle}" Content="Open Log File" Margin="5"/>
+                    <Button Grid.Column="0" Click="OpenLogFileExternal_OnClick" Style="{StaticResource ActionButtonStyle}" Content="Open Externally" Margin="5"/>
                     <Button Grid.Column="1" Click="OpenLogFileWindow_OnClick" IsEnabled="False" ToolTip="Not Yet Built"
-                            Style="{StaticResource ActionButtonStyle}" Content="Open New Window" Margin="5"/>
+                            Style="{StaticResource ActionButtonStyle}" Content="Open Full Window" Margin="5"/>
                 </Grid>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
