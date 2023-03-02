@@ -146,5 +146,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
                 Process.Start("notepad.exe", LogFileName);
             }
         }
+        /// <summary>
+        /// Event handler used to open the current log file for this injector session in a new
+        /// standalone window which will only hold the log file viewer
+        /// </summary>
+        /// <param name="sender">The sending control for this action</param>
+        /// <param name="e">Events fired along with the action</param>
+        private void OpenLogFileWindow_OnClick(object sender, RoutedEventArgs e)
+        {
+            // For now just log out this isn't supported
+            this._viewLogger.WriteLog("ERROR! OPENING STANDALONE LOG FILE WINDOWS IS NOT YET SUPPORTED!", LogType.WarnLog);
+        }
     }
 }
