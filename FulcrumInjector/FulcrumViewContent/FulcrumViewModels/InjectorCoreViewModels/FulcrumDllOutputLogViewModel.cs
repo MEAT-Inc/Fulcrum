@@ -4,16 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
-using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters;
 using NLog.Config;
 using NLog;
 using SharpLogging;
 using SharpPipes;
-using System.Threading.Tasks;
-using System.Windows.Documents;
+using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormatters;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels
 {
@@ -117,29 +114,31 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 throw new InvalidOperationException($"Error! View content type was {this.BaseViewControl.GetType().Name}");
 
             // Configure the new Logging Output Target.
-            var ExistingTarget = LogManager.Configuration.FindTargetByName(this._dllContentTargetName);
-            if (ExistingTarget == null) this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
-            else
+            if (LogManager.Configuration.FindTargetByName(this._dllContentTargetName) != null)
             {
                 // Log that we've already got a helper instance and exit out
                 this.ViewModelLogger.WriteLog($"WARNING! ALREADY FOUND AN EXISTING TARGET MATCHING THE NAME {this._dllContentTargetName}!", LogType.WarnLog);
-                this.ViewModelLogger.WriteLog("REMOVING EXISTING INSTANCES OF OUR DEBUG LOG FORMATTER AND BUILDING A NEW ONE...", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("RECONFIGURING LOGGERS AND EXITING OUT", LogType.WarnLog);
+            }
+            else
+            {
+                // Log that we didn't find any targets to use for this Debug review window and build one
+                this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
 
-                // Remove the old target and then build a new one
-                LogManager.Configuration.RemoveTarget(ExistingTarget.Name);
+                // Register our new target instance based ont the debug logging target type
+                ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._dllContentTargetName, typeof(InjectorOutputSyntaxHelper));
+                LogManager.Configuration.AddRuleForAllLevels(new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit));
+                LogManager.ReconfigExistingLoggers();
+
+                // Store the new formatter on this class instance and log results out
+                this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DLL OUTPUT LOGGING REDIRECT OBJECT OK!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
             }
 
-            // Log information, build new target output and return.
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._dllContentTargetName, typeof(InjectorOutputSyntaxHelper));
-            LogManager.Configuration.AddRuleForAllLevels(new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit));
+            // Configure our new output Logging format helper and store it on this window
             this._injectorSyntaxHelper = new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit);
             this._logFilteringHelper = new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
-            LogManager.ReconfigExistingLoggers();
-
-            // Store the new formatter on this class instance and log results out
-            this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DLL OUTPUT REDIRECT OBJECT OK!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("ALL DLL OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("CONFIGURED DLL OUTPUT VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
         }
 
         /// <summary>
