@@ -65,7 +65,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         {
             // Refresh logger list each time this view is opened
             this.ViewModel.LoggerNamesFound = this.ViewModel.BuildLoggerNamesList();
-            this._viewLogger.WriteLog("REFRESHED ENTRIES OK! SHOWING THEM NOW...", LogType.InfoLog);
+            this._viewLogger.WriteLog("REFRESHED LOGGER NAME ENTRIES OK!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
