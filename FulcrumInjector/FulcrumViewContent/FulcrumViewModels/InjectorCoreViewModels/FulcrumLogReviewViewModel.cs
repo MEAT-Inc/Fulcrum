@@ -209,7 +209,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                     string LogFileName = Path.GetFileName(NewLogFile);
                     string DefaultImportLocation = Path.Combine(
                         Directory.GetCurrentDirectory(),
-                        ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportedFiles"));
+                        ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath"));
                     Directory.CreateDirectory(DefaultImportLocation);
                     File.Copy(NewLogFile, Path.Combine(DefaultImportLocation, LogFileName), true);
                     this.ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");
