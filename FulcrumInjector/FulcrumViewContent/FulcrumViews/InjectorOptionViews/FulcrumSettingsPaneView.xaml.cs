@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
@@ -181,6 +182,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Toggle view visibility
             this._viewLogger.WriteLog("CLOSING JSON VIEWER FLYOUT NOW...", LogType.TraceLog);
             this.JsonViewerFlyout.IsOpen = false;
+        }
+        /// <summary>
+        /// Passes the scroll events from our listbox content up to the parent scroll viewer so scrolling operations work
+        /// </summary>
+        /// <param name="sender">Sending control for this event</param>
+        /// <param name="e">Event args fired along with this action</param>
+        private void SettingsListBoxView_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // Set the event to handled and raise the event provided in on the parent object
+            e.Handled = true;
+            int NewDelta = (int)this.SettingsScrollViewer.VerticalOffset - (int)(e?.Delta);
+            this.SettingsScrollViewer.ScrollToVerticalOffset(NewDelta);
         }
     }
 }

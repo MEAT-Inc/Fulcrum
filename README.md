@@ -1,6 +1,6 @@
 # FulcrumInjector
 
-![Fulcrum_HomePage](https://user-images.githubusercontent.com/62027458/176723420-7d2c7228-a247-44d5-8928-0f1bb5aa171d.PNG)
+![InjectorHome_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954375-61d78751-85d6-4a93-923b-95d3d89079bd.PNG)
 
 ---
 
@@ -100,6 +100,7 @@ FulcrumInjector is the ultimate J2534 DLL Shim written in C++ which is able to p
 
 
 ## Development Setup
+- NOTE: As of 2/17/2023 - I've closed down the readonly access for anyone to use. If you want to use these packages, please contact zack.walsh@meatinc.autos for an API key, and someone will walk you through getting into this package repository. This decision was made after realizing that while the key was readonly and on a dedicated bot account, it's not the best idea to leave API keys exposed. And since making these projects public, it was only logical to remove the keys from here.
 - If you're looking to help develop this project, you'll need to add the NuGet server for the MEAT Inc workspace into your nuget configuration. 
 - To do so, navigate to your AppData\Roaming folder (You can do this by opening windows explorer and clicking the top path bar and typing %appdata%)
 - Now find the folder named NuGet and open the file named NuGet.config
@@ -108,8 +109,6 @@ FulcrumInjector is the ultimate J2534 DLL Shim written in C++ which is able to p
       <add key="MEAT-Inc" value="https://nuget.pkg.github.com/MEAT-Inc/index.json/" protocolVersion="3" />
     ```
 - Once added in, scroll down to packageSourceCredentials (if it's not there, just make a new section for it)
-- From here on out, when you see {INSERT_API_KEY_HERE} that means you need to insert the Base64 decoded version of the following string:
- ```Z2hwX0NEdkN6eDFMTmJjN2RGbm1UYWJFVFZwSkZ5bEQ5eTFHZnBVaw==```
 - Inside this section, put the following block of code into it.
    ```XML
     <MEAT-Inc>
@@ -158,16 +157,20 @@ FulcrumInjector is the ultimate J2534 DLL Shim written in C++ which is able to p
 
 ## Screenshots of The FulcrumInjector
 
-![Fulcrum_DllOutput](https://user-images.githubusercontent.com/62027458/176723498-299025eb-eb6d-4365-a10d-f31fd8e51e3d.PNG)
+![InjectorHome_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954375-61d78751-85d6-4a93-923b-95d3d89079bd.PNG)
 
-![Fulcrum_LogReview](https://user-images.githubusercontent.com/62027458/176723533-0199480c-3dfb-4f36-b0c3-c96ab5775429.PNG)
+![InjectorDLL-Output_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954412-4375380e-9e4d-417c-aae1-af19c66217bb.PNG)
 
-![Fulcrum_SimPlayback](https://user-images.githubusercontent.com/62027458/176723582-7863910b-5ebe-43f4-a209-8bc1816e3281.PNG)
+![InjectorLogReview_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954441-0d950219-b2a5-42e7-9f66-a9705a2ab7a0.PNG)
 
-![Fulcrum_EmailReport](https://user-images.githubusercontent.com/62027458/176723614-c6aefdc3-9579-4130-8533-60f46ebcd18b.PNG)
+![InjectorSimulations_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954460-1a1a73f2-d25b-4337-80aa-1c3297eb91df.PNG)
 
-![Fulcrum_SettingsPage](https://user-images.githubusercontent.com/62027458/176723657-ea7cb9aa-db55-48dd-b6a2-de9d841fd3ed.PNG)
+![InjectorSessionReporting_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954472-3e8e0642-d5f3-472c-8205-099674baa1d4.PNG)
 
-![Fulcrum_DebuggingView](https://user-images.githubusercontent.com/62027458/176723698-51e22e4c-8d9c-4120-8faa-e043050489bb.PNG)
+![InjectorSettings_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954488-1ccec29e-c4d4-45de-ae3c-5da655ecd248.PNG)
 
-![Fulcrum_AboutView](https://user-images.githubusercontent.com/62027458/176723734-6742fce9-31bc-47fc-b69a-809d9e508929.PNG)
+![InjectorSettings-Advanced_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954495-3b80be9b-92b7-4e12-b464-f9ec1856c67d.PNG)
+
+![InjectorDebugLogOutput_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954562-b4175dc7-dc8e-4ffe-a72d-0c2cfa7b5c87.PNG)
+
+![InjectorAbout_6 3 2 2283](https://user-images.githubusercontent.com/62027458/221954580-a7f61304-7683-4d49-bd7e-27086f4f3223.PNG)

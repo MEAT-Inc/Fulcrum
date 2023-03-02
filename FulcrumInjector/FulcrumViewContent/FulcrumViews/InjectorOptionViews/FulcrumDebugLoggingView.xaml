@@ -4,9 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-             mc:Ignorable="d" 
-             Loaded="FulcrumDebugLoggingView_OnLoaded"
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="FulcrumDebugLoggingView_OnLoaded">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
@@ -35,8 +34,8 @@
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".90*"/>
                     <ColumnDefinition/>
+                    <ColumnDefinition Width=".55*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
                     Grid.Row="0"
@@ -44,6 +43,15 @@
                     Text="Injector Debug Logging" 
                     HorizontalAlignment="Left"
                     Style="{StaticResource TitleStringText}"/>
+                <Grid Grid.Column="1" Margin="0,0,15,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Click="OpenLogFileExternal_OnClick" Style="{StaticResource ActionButtonStyle}" Content="Open Externally" Margin="5"/>
+                    <Button Grid.Column="1" Click="OpenLogFileWindow_OnClick" IsEnabled="False" ToolTip="Not Yet Built"
+                            Style="{StaticResource ActionButtonStyle}" Content="Open Full Window" Margin="5"/>
+                </Grid>
             </Grid>
             <TextBlock Grid.Row="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0,20,0" TextAlignment="Justify"> 
                 <Run Foreground="{StaticResource TextColorBase}" Text="This output view is used to search through the current Injector Application log file to review the status of some background operations which may not always throw a visible error to the user. This file can be searched by just typing into it or by using a custom regex defined as @r plus the regular expression desired. Use the combobox at the right to filter output by a logger type for more concise filtering."/></TextBlock>
