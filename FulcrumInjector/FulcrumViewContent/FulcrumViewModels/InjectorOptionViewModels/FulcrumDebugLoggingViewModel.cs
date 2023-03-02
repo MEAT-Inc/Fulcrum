@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
+using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
+using NLog.Config;
+using NLog;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels
@@ -17,7 +22,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         #region Fields
 
         // Helper for editing Text box contents
-        public LogOutputFilteringHelper LogContentHelper;
+        private LogOutputFilteringHelper _logContentHelper;
+        private readonly string _logContentTargetName = "DebugLoggingRedirectTarget";
 
         // Private backing fields for our public properties
         private bool _usingRegex;
@@ -48,10 +54,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         {
             // Spawn a new logger for this view model instance 
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-
-            // Log information and store values 
-            this.ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Store logger names here
             this.LoggerNamesFound = this.BuildLoggerNamesList();
@@ -87,8 +89,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         public void SearchForText(string TextToFind)
         {
             // Make sure transformer is built
-            if (LogContentHelper == null) return;
-            var OutputTransformer = this.LogContentHelper.SearchForText(TextToFind);
+            if (_logContentHelper == null) return;
+            var OutputTransformer = this._logContentHelper.SearchForText(TextToFind);
 
             // Store values here
             if (string.IsNullOrEmpty(TextToFind)) return;
@@ -99,6 +101,48 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         /// Filters log lines by logger name
         /// </summary>
         /// <param name="LoggerName"></param>
-        public void FilterByLoggerName(string LoggerName) { this.LogContentHelper?.FilterByText(LoggerName); }
+        public void FilterByLoggerName(string LoggerName)
+        {
+            // Find the content we need to based on the logger name
+            this._logContentHelper?.FilterByText(LoggerName);
+        }
+        /// <summary>
+        /// Builds and returns a new log content helper object
+        /// </summary>
+        /// <returns>The log content helper object built out from our view content</returns>
+        public void ConfigureOutputHighlighter()
+        {
+            // Log information and store values 
+            this.ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+
+            // Make sure the view content exists first and that it's been setup correctly
+            if (this.BaseViewControl is not FulcrumDebugLoggingView CastViewContent)
+                throw new InvalidOperationException($"Error! View content type was {this.BaseViewControl.GetType().Name}");
+
+            // Configure the new Logging Output Target.
+            var ExistingTarget = LogManager.Configuration.FindTargetByName(this._logContentTargetName);
+            if (ExistingTarget == null) this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
+            else
+            {
+                // Log that we've already got a helper instance and exit out
+                this.ViewModelLogger.WriteLog($"WARNING! ALREADY FOUND AN EXISTING TARGET MATCHING THE NAME {this._logContentTargetName}!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("REMOVING EXISTING INSTANCES OF OUR DEBUG LOG FORMATTER AND BUILDING A NEW ONE...", LogType.WarnLog);
+
+                // Remove the old target and then build a new one
+                LogManager.Configuration.RemoveTarget(ExistingTarget.Name);
+            }
+
+            // Log information, build new target output and return.
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._logContentTargetName, typeof(DebugLoggingRedirectTarget));
+            LogManager.Configuration.AddRuleForAllLevels(new DebugLoggingRedirectTarget(CastViewContent.DebugRedirectOutputEdit));
+            this._logContentHelper = new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
+            LogManager.ReconfigExistingLoggers();
+
+            // Store the new formatter on this class instance and log results out
+            this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+        }
     }
 }
