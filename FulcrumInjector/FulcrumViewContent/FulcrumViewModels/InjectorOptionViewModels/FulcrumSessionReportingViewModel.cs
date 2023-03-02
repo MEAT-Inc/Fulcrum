@@ -99,10 +99,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
 
             // Check how many files we pulled and return.
             this.ViewModelLogger.WriteLog(
-                FilesLocated.Length == 0 ? 
+                FilesLocated.Count == 0 ? 
                     "NO FILES WERE LOCATED ON THE VIEW MODEL OBJECT!" : 
-                    $"FOUND A TOTAL OF {FilesLocated.Length} SESSION LOG FILES!", 
-                FilesLocated.Length == 0 ?
+                    $"FOUND A TOTAL OF {FilesLocated.Count} SESSION LOG FILES!", 
+                FilesLocated.Count == 0 ?
                     LogType.WarnLog :
                     LogType.InfoLog);
 
@@ -114,7 +114,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
 
             // Return information and return out.
             this.ViewModelLogger.WriteLog("RETURNING OUTPUT FROM THE SESSION LOG EXTRACTION ROUTINE NOW...", LogType.InfoLog);
-            return FilesLocated;
+            return FilesLocated.ToArray();
         }
         /// <summary>
         /// Event object to run when the injector output gets new content.
