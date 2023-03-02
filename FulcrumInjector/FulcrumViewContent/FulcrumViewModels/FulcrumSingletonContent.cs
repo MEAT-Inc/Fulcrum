@@ -83,12 +83,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// <returns>True if built ok. False if not.</returns>
         public static FulcrumSingletonContent<TViewType, TViewModelType> CreateSingletonInstance(Type ViewType, Type ViewModelType)
         {
-            // Build new instance of this singleton helper and return it
+            // Log out some information about this new routine
             _singletonLogger.WriteLog($"TRYING TO BUILD NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewType.Name}...", LogType.WarnLog);
             _singletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelType.Name}", LogType.InfoLog);
+        
+            // Build new instance of this singleton helper and return it
             var LocatedSingleton = LocateSingletonViewInstance(ViewType);
             if (LocatedSingleton != null)
-            {
+            { 
                 // Log found existing instance and return it out
                 _singletonLogger.WriteLog("FOUND EXISTING INSTANCE OBJECT ENTRY! RETURNING IT NOW...", LogType.InfoLog);
                 _singletonLogger.WriteLog($"EXISTING INSTANCE HAS BEEN BUILT AND DEFINED SINCE: {LocatedSingleton.TimeCreated:s}", LogType.TraceLog);
@@ -130,36 +132,43 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// <typeparamref name="TViewModelType">Type of view model for the view model content</typeparamref>   
         /// <param name="ViewObject">The view we need to register on our singleton</param>
         /// <param name="ViewModelObject">The view model we need to register on our singleton</param>
+        /// <param name="RequireLogging">When true, this process will output diagnostic logging information</param>
         /// <returns>True if the singleton is registered correctly. False if not.</returns>
-        public static FulcrumSingletonContent<TViewType, TViewModelType> RegisterAsSingleton(TViewType ViewObject, TViewModelType ViewModelObject)
+        public static FulcrumSingletonContent<TViewType, TViewModelType> RegisterAsSingleton(TViewType ViewObject, TViewModelType ViewModelObject, bool RequireLogging = true)
         {
+            // Log out some information if needed
+            if (RequireLogging) {
+                _singletonLogger.WriteLog($"TRYING TO REGISTER NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewObject.GetType().Name}...", LogType.WarnLog);
+                _singletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelObject.GetType().Name}", LogType.InfoLog);
+            }
+
             // Build new instance of this singleton helper and return it
-            _singletonLogger.WriteLog($"TRYING TO REGISTER NEW SINGLETON INSTANCE FOR VIEW TYPE {ViewObject.GetType().Name}...", LogType.WarnLog);
-            _singletonLogger.WriteLog($"VIEWMODEL TYPE ASSOCIATED WITH CONTENT IS: {ViewModelObject.GetType().Name}", LogType.InfoLog);
             var LocatedSingleton = LocateSingletonViewInstance(ViewObject.GetType());
             if (LocatedSingleton != null)
             {
                 // Log found existing instance and return it out
-                _singletonLogger.WriteLog("FOUND EXISTING INSTANCE OBJECT ENTRY! RETURNING IT NOW...", LogType.InfoLog);
-                _singletonLogger.WriteLog($"EXISTING INSTANCE HAS BEEN BUILT AND DEFINED SINCE: {LocatedSingleton.TimeCreated:s}", LogType.TraceLog);
-                _singletonLogger.WriteLog("UPDATING DEFINITIONS FOR THIS OBJECT NOW...", LogType.WarnLog);
+                if (RequireLogging) {
+                    _singletonLogger.WriteLog("FOUND EXISTING INSTANCE OBJECT ENTRY! RETURNING IT NOW...", LogType.InfoLog);
+                    _singletonLogger.WriteLog($"EXISTING INSTANCE HAS BEEN BUILT AND DEFINED SINCE: {LocatedSingleton.TimeCreated:s}", LogType.TraceLog);
+                    _singletonLogger.WriteLog("UPDATING DEFINITIONS FOR THIS OBJECT NOW...", LogType.WarnLog);
+                }
 
                 // Pull the singleton from our list and replace the content.
                 int IndexOfSingleton = FulcrumSingletons.ToList().IndexOf(LocatedSingleton);
                 FulcrumSingletons[IndexOfSingleton] = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject);
-                _singletonLogger.WriteLog("UPDATED CONTENTS OF OUR SINGLETON VIEW OBJECT OK!", LogType.InfoLog);
+                if (RequireLogging) _singletonLogger.WriteLog("UPDATED CONTENTS OF OUR SINGLETON VIEW OBJECT OK!", LogType.InfoLog);
 
                 // Return current instance.
                 return FulcrumSingletons[IndexOfSingleton];
             }
 
             // Build new instance and return output.
-            _singletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
+            if (RequireLogging) _singletonLogger.WriteLog("BUILT NEW INSTANCE FOR VIEW AND VIEW MODEL CONTENT OK!", LogType.WarnLog);
             var NewSingletonInstance = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject);
             FulcrumSingletons = FulcrumSingletons.Append(NewSingletonInstance).ToArray();
 
             // Log information and return.
-            _singletonLogger.WriteLog("STORED NEW SINGLETON INSTANCE ON STATIC LIST OK!", LogType.InfoLog);
+            if (RequireLogging) _singletonLogger.WriteLog("STORED NEW SINGLETON INSTANCE ON STATIC LIST OK!", LogType.InfoLog);
             return NewSingletonInstance;
         }
 
