@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
-using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
-using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters;
 using NLog.Config;
 using NLog;
 using SharpLogging;
 using SharpPipes;
-using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormatters;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels
 {
@@ -30,7 +31,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Private backing fields for our public properties
         private bool _hasOutput;
-        private string[] _sessionLogs;
+        private List<string> _sessionLogs;
 
         #endregion // Fields
 
@@ -38,7 +39,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Public properties for the view to bind onto  
         public bool HasOutput { get => _hasOutput; set => PropertyUpdated(value); }
-        public string[] SessionLogs { get => _sessionLogs; set => PropertyUpdated(value); }
+        public List<string> SessionLogs { get => _sessionLogs; private set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -59,12 +60,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Build default value for session log files.
-            this.SessionLogs = Array.Empty<string>();
+            this.SessionLogs = new List<string>();
             this.ViewModelLogger.WriteLog("BUILT NEW EMPTY ARRAY FOR SESSION LOG FILES NOW...");
 
             // Build event for our pipe objects to process new pipe content into our output box
             PassThruPipeReader ReaderPipe = PassThruPipeReader.AllocatePipe();
-            ReaderPipe.PipeDataProcessed += this._onPipeReaderContentProcessed;
+            ReaderPipe.PipeDataProcessed += this._onPipeDataProcessed;
+            this.ViewModelLogger.WriteLog("ALLOCATED NEW READER PIPE WITHOUT ISSUES! (THANK FUCKIN GOD)", LogType.WarnLog);
             this.ViewModelLogger.WriteLog("STORED NEW EVENT BROKER FOR PIPE READING DATA PROCESSED OK!", LogType.InfoLog);
 
             // Build log content helper and return
@@ -112,42 +114,64 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 throw new InvalidOperationException($"Error! View content type was {this.BaseViewControl.GetType().Name}");
 
             // Configure the new Logging Output Target.
-            var ExistingTarget = LogManager.Configuration.FindTargetByName(this._dllContentTargetName);
-            if (ExistingTarget == null) this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
-            else
+            if (LogManager.Configuration.FindTargetByName(this._dllContentTargetName) != null)
             {
                 // Log that we've already got a helper instance and exit out
                 this.ViewModelLogger.WriteLog($"WARNING! ALREADY FOUND AN EXISTING TARGET MATCHING THE NAME {this._dllContentTargetName}!", LogType.WarnLog);
-                this.ViewModelLogger.WriteLog("REMOVING EXISTING INSTANCES OF OUR DEBUG LOG FORMATTER AND BUILDING A NEW ONE...", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("RECONFIGURING LOGGERS AND EXITING OUT", LogType.WarnLog);
+            }
+            else
+            {
+                // Log that we didn't find any targets to use for this Debug review window and build one
+                this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
 
-                // Remove the old target and then build a new one
-                LogManager.Configuration.RemoveTarget(ExistingTarget.Name);
+                // Register our new target instance based ont the debug logging target type
+                ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._dllContentTargetName, typeof(InjectorOutputSyntaxHelper));
+                LogManager.Configuration.AddRuleForAllLevels(new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit));
+                LogManager.ReconfigExistingLoggers();
+
+                // Store the new formatter on this class instance and log results out
+                this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DLL OUTPUT LOGGING REDIRECT OBJECT OK!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
             }
 
-            // Log information, build new target output and return.
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._dllContentTargetName, typeof(InjectorOutputSyntaxHelper));
-            LogManager.Configuration.AddRuleForAllLevels(new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit));
+            // Configure our new output Logging format helper and store it on this window
             this._injectorSyntaxHelper = new InjectorOutputSyntaxHelper(CastViewContent.DebugRedirectOutputEdit);
             this._logFilteringHelper = new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
-            LogManager.ReconfigExistingLoggers();
-
-            // Store the new formatter on this class instance and log results out
-            this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("CONFIGURED DLL OUTPUT VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
         }
 
         /// <summary>
-        /// Event object to run when the injector output gets new content.
+        /// Private event handler to fire when a reader pipe instance processes new content 
         /// </summary>
-        /// <param name="PipeInstance">Pipe object calling these events</param>
-        /// <param name="EventArgs">The events themselves.</param>
-        private void _onPipeReaderContentProcessed(object PipeInstance, PassThruPipe.PipeDataEventArgs EventArgs)
+        /// <param name="PassThruPiper">The sending pipe object</param>
+        /// <param name="PipeEventArgs">The sending event args fired along with this pipe data event</param>
+        private void _onPipeDataProcessed(object PassThruPiper, PassThruPipe.PipeDataEventArgs PipeEventArgs)
         {
-            // Attach output content into our session log box.
-            FulcrumDllOutputLogView ViewCast = this.BaseViewControl as FulcrumDllOutputLogView;
-            if (ViewCast == null) this.ViewModelLogger.WriteLog("WARNING: CAST VIEW ENTRY WAS NULL!", LogType.TraceLog);
-            else ViewCast?.Dispatcher.Invoke(() => { ViewCast.DebugRedirectOutputEdit.Text += EventArgs.PipeDataString + "\n"; });
+            // Make sure the view content exists first and that it's been setup correctly
+            if (this.BaseViewControl is not FulcrumDllOutputLogView CastViewContent)
+                throw new InvalidOperationException($"Error! View content type was {this.BaseViewControl.GetType().Name}");
+
+            // Write the new content out to our DLL view control and check to see if we've got a file name
+            CastViewContent?.Dispatcher.Invoke(() => { CastViewContent.DebugRedirectOutputEdit.Text += PipeEventArgs.PipeDataString + "\n"; });
+
+            // If we've found a potential file, then store it now
+            if (!PipeEventArgs.PipeDataString.Contains("Session Log File")) return;
+            string ParsedLogFileName = PipeEventArgs.PipeDataString.Split(':').Last();
+            if (!File.Exists(ParsedLogFileName)) this.ViewModelLogger.WriteLog($"WARNING! POTENTIAL SESSION LOG FILE {ParsedLogFileName} COULD NOT BE FOUND!", LogType.WarnLog);
+            else
+            {
+                // Setup and store the new log file name if needed
+                this.SessionLogs.Add(ParsedLogFileName);
+                this.SessionLogs = this.SessionLogs.Distinct().ToList();
+                this.ViewModelLogger.WriteLog($"FOUND LOG FILE NAMED {ParsedLogFileName} AND VALIDATED IT EXISTS ON THE SYSTEM!", LogType.InfoLog);
+                this.ViewModelLogger.WriteLog("LOCATED LOG FILE WILL BE STORED ON THE OUTPUT LOG FILES TO BE INCLUDED IN SESSION REPORTS");
+
+                // Log out all of the session log files we've found so far
+                string ProcessedStrings = string.Join(" | ", this.SessionLogs);
+                this.ViewModelLogger.WriteLog($"{this.SessionLogs.Count} SESSION FILES HAVE BEEN PARSED FROM DLL OUTPUT SO FAR", LogType.TraceLog);
+                this.ViewModelLogger.WriteLog($"LOG FILES PROCESSED: {ProcessedStrings}", LogType.TraceLog);
+            }
         }
     }
 }
