@@ -44,7 +44,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormat
             _formatLogger.WriteLog("STORED NEW CONTENT VALUES FOR USER CONTROL AND EDITOR INPUT OK!", LogType.InfoLog);
 
             // Setup our Layout and define the default color formatting rules
-            this.Layout = SharpLogBroker.DefaultConsoleFormat.LoggerFormatString;
+            string LoggerMessage = "${message}";
+            string LoggerLevel = "${level:uppercase=true}";
+            string LoggerDate = "${date:format=hh\\:mm\\:ss}";
+            string LoggerMethod = "${scope-property:calling-method-short:whenEmpty=NO_METHOD_FOUND}";
+            this.Layout = $"[{LoggerDate}][{LoggerLevel}]{LoggerMethod} ::: {LoggerMessage}";
+
+            // Finally build our color values for the logging entries we find
             base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDebugSyntaxFulcrumSettings.ToArray());
             _formatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
             _formatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
