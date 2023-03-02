@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormat
             string LoggerLevel = "${level:uppercase=true}";
             string LoggerDate = "${date:format=hh\\:mm\\:ss}";
             string LoggerMethod = "${scope-property:calling-method-short:whenEmpty=NO_METHOD_FOUND}";
-            this.Layout = $"[{LoggerDate}][{LoggerLevel}]{LoggerMethod} ::: {LoggerMessage}";
+            this.Layout = $"[{LoggerDate}][{LoggerLevel}][{LoggerMethod}] ::: {LoggerMessage}";
 
             // Finally build our color values for the logging entries we find
             base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDebugSyntaxFulcrumSettings.ToArray());
