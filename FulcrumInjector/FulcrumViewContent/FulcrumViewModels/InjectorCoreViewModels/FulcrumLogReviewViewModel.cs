@@ -254,7 +254,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 {
                     // Invoke a new progress update to our UI content using the generator built
                     if (this.BaseViewControl is not FulcrumLogReviewView CastView) return;
-                    this.ProcessingProgress = (int)GeneratorArgs.CurrentProgress;
+
+                    // If the progress value reported back is the same as it is currently, don't set it again
+                    int NextProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.ProcessingProgress != NextProgress)
+                        this.ProcessingProgress = NextProgress;
                 };
 
                 // Start by building PTExpressions from input string object sets.
@@ -302,8 +306,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this._expressionsGenerator.OnGeneratorProgress += (SendingGenerator, GeneratorArgs) =>
                 {
                     // Invoke a new progress update to our UI content using the generator built
-                    if (this.BaseViewControl is not FulcrumLogReviewView CastView) return; 
-                    this.ProcessingProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.BaseViewControl is not FulcrumLogReviewView CastView) return;
+
+                    // If the progress value reported back is the same as it is currently, don't set it again
+                    int NextProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.ProcessingProgress != NextProgress)
+                        this.ProcessingProgress = NextProgress;
                 };
 
                 // Now Build our simulation content objects for this generator
