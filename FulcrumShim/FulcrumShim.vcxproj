@@ -211,7 +211,8 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PreBuildEvent>
-      <Message>py "$(ProjectDir)FulcrumShim\FulcrumVersionTick.py" "$(ProjectDir)FulcrumShim"</Message>
+      <Message>Version Update</Message>
+      <Command>py "$(ProjectDir)FulcrumVersionTick.py" "$(ProjectDir)"</Command>
     </PreBuildEvent>
     <PreLinkEvent>
       <Message>
