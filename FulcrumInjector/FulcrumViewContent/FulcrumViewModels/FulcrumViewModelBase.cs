@@ -120,7 +120,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
                         // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
                         var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
+                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject, false);
                         return;
                     }
                     catch { return; }
@@ -140,7 +140,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
                         // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
                         var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject);
+                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject, false);
                         return;
                     }
                     catch { return; }
