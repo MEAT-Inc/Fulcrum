@@ -250,7 +250,6 @@
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConfigFile.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\DebugLogFormatters\DebugLoggingRedirectTarget.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumOeApplicationModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingEntryModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingsCollection.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\PropertyWatchdog.cs" />
@@ -482,7 +481,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="FulcrumViewSupport\FulcrumWatchdog\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
