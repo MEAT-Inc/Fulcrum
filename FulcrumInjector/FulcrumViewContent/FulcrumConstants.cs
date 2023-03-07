@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent
         #region Fields
 
         // Static fields for our injector application information
-        private static FulcrumSettingsShare _fulcrumSettings;                   // Collection of all setting objects for this instance
+        public static FulcrumSettingsShare FulcrumSettings;                     // Collection of all our settings objects loaded in
         public static readonly FulcrumVersionInfo FulcrumVersions = new();      // Current version information for this application
 
         // Public static fields for our injector sharp sessions
@@ -48,20 +48,6 @@ namespace FulcrumInjector.FulcrumViewContent
         #endregion //Fields
 
         #region Properties
-
-        // Public static setting share object for this instance of our injector app
-        public static FulcrumSettingsShare FulcrumSettings
-        {
-            get
-            {
-                // If the settings share exists, then just return it. Otherwise only build one if possible
-                if (_fulcrumSettings != null) return _fulcrumSettings;
-                if (string.IsNullOrWhiteSpace(JsonConfigFile.AppConfigFile)) return null;
-
-                // Return a new instance of the setting share if needed
-                return _fulcrumSettings ??= new FulcrumSettingsShare();
-            }
-        }
 
         // Public static property holding the current injector window instance
         public static FulcrumMainWindow FulcrumMainWindow

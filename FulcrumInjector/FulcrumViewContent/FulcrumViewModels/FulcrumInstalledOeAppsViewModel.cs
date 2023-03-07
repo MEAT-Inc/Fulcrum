@@ -26,8 +26,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         private bool _canBootApp;
         private bool _canKillApp;
         private Process _runningAppProcess;
-        private FulcrumOeApplicationModel _targetAppModel;
         private FulcrumOeApplicationModel _runningAppModel;
+        private FulcrumOeApplicationModel _selectedAppModel;
         private ObservableCollection<FulcrumOeApplicationModel> _installedOeApps;
 
         #endregion //Fields
@@ -35,10 +35,31 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         #region Properties
 
         // Public properties for the view to bind onto  
-        public bool CanBootApp { get => _canBootApp; private set => PropertyUpdated(value); }
-        public bool CanKillApp { get => _canKillApp; private set => PropertyUpdated(value); }
-        public FulcrumOeApplicationModel RunningAppModel { get => _runningAppModel; private set => PropertyUpdated(value); }
-        public ObservableCollection<FulcrumOeApplicationModel> InstalledOeApps { get => _installedOeApps; private set => PropertyUpdated(value); }
+        public bool CanBootApp
+        {
+            get => this._canBootApp;
+            private set => PropertyUpdated(value);
+        }
+        public bool CanKillApp
+        {
+            get => this._canKillApp;
+            private set => PropertyUpdated(value);
+        }
+        public FulcrumOeApplicationModel RunningAppModel
+        {
+            get => this._runningAppModel;
+            private set => PropertyUpdated(value);
+        }
+        public FulcrumOeApplicationModel SelectedAppModel
+        {
+            get => this._selectedAppModel;
+            private set => PropertyUpdated(value);
+        }
+        public ObservableCollection<FulcrumOeApplicationModel> InstalledOeApps
+        {
+            get => this._installedOeApps;
+            private set => PropertyUpdated(value);
+        }
 
         #endregion //Properties
 
@@ -159,7 +180,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this.ViewModelLogger.WriteLog("STORING CONTENT CONTROL BOOL VALUES FOR OUR BUTTON SENDER NOW...", LogType.InfoLog);
 
             // Store bool values for the state of the command button.
-            this._targetAppModel = AppToStore;
+            this.SelectedAppModel = AppToStore;
             this.CanBootApp = this.RunningAppModel == null;
             this.CanKillApp = this.RunningAppModel != null && this._runningAppProcess?.HasExited == false;   
 
@@ -176,17 +197,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         public bool LaunchOeApplication(out Process BootedAppProcess)
         {
             // Check if app to kill is not null.
-            if (this._targetAppModel == null || !this.CanBootApp) {
+            if (this.SelectedAppModel == null || !this.CanBootApp) {
                 this.ViewModelLogger.WriteLog("ERROR! SELECTED APP OBJECT WAS NULL! ENSURE ONE HAS BEEN CONFIRMED BEFORE RUNNING THIS METHOD!", LogType.ErrorLog);
                 BootedAppProcess = null;
                 return false;
             }
 
             // Boot the app here and return status. Build process object out and return it.
-            this.ViewModelLogger.WriteLog($"BOOTING OE APPLICATION NAMED {this._targetAppModel.OEAppName} NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog($"BOOTING OE APPLICATION NAMED {this.SelectedAppModel.OEAppName} NOW...", LogType.WarnLog);
             this._runningAppProcess = new Process() {
                 EnableRaisingEvents = true,
-                StartInfo = new ProcessStartInfo(this._targetAppModel.OEAppPath) {
+                StartInfo = new ProcessStartInfo(this.SelectedAppModel.OEAppPath) {
                     Verb = "runas", WindowStyle = ProcessWindowStyle.Maximized,
                 }
             };
@@ -205,7 +226,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this.CanKillApp = true;
             this.CanBootApp = false;
             BootedAppProcess = _runningAppProcess;
-            this.RunningAppModel = this._targetAppModel;
+            this.RunningAppModel = this.SelectedAppModel;
 
             // Return output state
             this.ViewModelLogger.WriteLog("TOGGLED OE APP STATE VALUES CORRECTLY! MOVING ON TO WAIT FOR EXIT NOW...", LogType.InfoLog);
@@ -216,23 +237,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// </summary>
         /// <param name="LastRunOeApp">The last built and run OE application model object</param>
         /// <returns>True if killed. false if failed.</returns>
-        public bool KillOeApplication(out FulcrumOeApplicationModel LastRunOeApp)
+        public bool KillOeApplication(out string LastAppName)
         {
             // Check if app to kill is not null.
             if (this.RunningAppModel == null || !this.CanKillApp) {
                 this.ViewModelLogger.WriteLog("ERROR! SELECTED APP OBJECT WAS NULL! ENSURE ONE HAS BEEN CONFIRMED BEFORE RUNNING THIS METHOD!", LogType.ErrorLog);
-                LastRunOeApp = null;
+                LastAppName = null;
                 return false;
             }
 
             // Kill the app here and return status.
             this.ViewModelLogger.WriteLog($"KILLING RUNNING OE APPLICATION NAMED {this.RunningAppModel.OEAppName} NOW...", LogType.WarnLog);
             this._runningAppProcess.Kill();
+            LastAppName = this.RunningAppModel.OEAppName;
 
             // Set Store values for controls.
             this.CanKillApp = false;
             this.CanBootApp = true;
-            LastRunOeApp = this.RunningAppModel;
             this.RunningAppModel = null;
 
             // Return passed output here.
