@@ -2,8 +2,12 @@
 using System.IO;
 using System.Linq;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+// Static using call for our OE application model objects
+using OEAppModel = FulcrumInjector.FulcrumViewContent.FulcrumViewModels.FulcrumInstalledOeAppsViewModel.FulcrumOeApplicationModel;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
@@ -17,7 +21,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// </summary>
         /// <param name="ObjectType"></param>
         /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumOeApplicationModel); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(OEAppModel); }
         /// <summary>
         /// Writes JSON output
         /// </summary>
@@ -28,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            FulcrumOeApplicationModel CastApp = (FulcrumOeApplicationModel)ValueObject;
+            OEAppModel CastApp = ValueObject as OEAppModel;
 
             // Build a dynamic output object
             var OutputObject = JObject.FromObject(new
@@ -73,7 +77,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                 !AppCommand.Contains("$OEAppPath$") ? AppCommand : AppCommand.Replace("$OEAppPath$", FinalAppPath);
 
             // Generate new output app model object.
-            FulcrumOeApplicationModel OutputApp = new FulcrumOeApplicationModel(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
+            OEAppModel OutputApp = new OEAppModel(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
             return OutputApp;
         }
     }
