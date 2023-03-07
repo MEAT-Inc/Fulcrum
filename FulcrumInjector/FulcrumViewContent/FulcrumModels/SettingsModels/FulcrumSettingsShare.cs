@@ -12,20 +12,39 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
     /// <summary>
     /// Static share class object for settings entries.
     /// </summary>
-    internal class FulcrumSettingsShare : IEnumerable<FulcrumSettingsCollection>
+    internal sealed class FulcrumSettingsShare : IEnumerable<FulcrumSettingsCollection>
     {
         #region Custom Events
         #endregion //Custom Events
 
         #region Fields
 
+        // Singleton configuration for our settings share 
+        private static FulcrumSettingsShare _settingsShareInstance;
+        private static readonly object _settingsShareLock = new object();
+
         // Logger instance for our settings share
-        private SharpLogger _settingsStoreLogger;
-        private List<FulcrumSettingsCollection> _settingsShare;
+        private readonly SharpLogger _settingsStoreLogger;
+        private readonly List<FulcrumSettingsCollection> _settingsCollections;
 
         #endregion //Fields
 
         #region Properties
+
+        // Singleton instance of our settings share object
+        public static FulcrumSettingsShare ShareInstance
+        {
+            get
+            {
+                // Lock our share object to avoid threading issues
+                lock (_settingsShareLock)
+                {
+                    // Spawn a new settings share if needed and return it out
+                    _settingsShareInstance ??= new FulcrumSettingsShare();
+                    return _settingsShareInstance;
+                }
+            }
+        }
 
         // Predefined settings collections for object values pulled in from our JSON Configuration file
         public FulcrumSettingsCollection InjectorGeneralFulcrumSettings =>
@@ -76,7 +95,36 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         public IEnumerator<FulcrumSettingsCollection> GetEnumerator()
         {
             // Return our settings share object ordered by their names as a collection
-            return this._settingsShare.GetEnumerator();
+            return this._settingsCollections.GetEnumerator();
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Private CTOR for the settings generation routines. Used to load settings objects when needed
+        /// </summary>
+        private FulcrumSettingsShare()
+        {
+            // Configure our new logger instance and the backing collection of settings
+            this._settingsCollections = new List<FulcrumSettingsCollection>();
+            this._settingsStoreLogger = new SharpLogger(LoggerActions.UniversalLogger);
+
+            // Finally import all of our settings values and exit out
+            this.GenerateSettingsModels();
+        }
+        /// <summary>
+        /// Static construction routine used to pull in a new fulcrum settings share instance if needed
+        /// </summary>
+        /// <returns>A spawned or existing instance of our fulcrum settings share</returns>
+        public static FulcrumSettingsShare GenerateSettingsShare()
+        {
+            // Lock our share object to avoid threading issues
+            lock (_settingsShareLock)
+            {
+                // Spawn a new settings share if needed and return it out
+                _settingsShareInstance ??= new FulcrumSettingsShare();
+                return _settingsShareInstance;
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,9 +135,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// <returns>Settings entries built output</returns>
         public IEnumerable<FulcrumSettingsCollection> GenerateSettingsModels()
         {
-            // Configure our new logger instance
-            this._settingsShare = new List<FulcrumSettingsCollection>();
-            this._settingsStoreLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            // If our application configuration file is not defined, then return an empty collection
+            if (string.IsNullOrWhiteSpace(JsonConfigFile.AppConfigFile))
+            {
+                // Log there's no settings file to load and exit out
+                this._settingsStoreLogger.WriteLog("ERROR! NO SETTINGS FILE WAS LOADED! UNABLE TO LOAD SETTINGS VALUES!", LogType.ErrorLog);
+                return new List<FulcrumSettingsCollection>();
+            }
 
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = ValueLoaders.GetConfigValue<JObject[]>("FulcrumUserSettings")
@@ -107,7 +159,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             foreach (var SettingSet in SettingsLoaded)
             {
                 // Add the newly loaded setting object into our collection instance and log it's been built 
-                this._settingsShare.Add(SettingSet);
+                this._settingsCollections.Add(SettingSet);
                 this._settingsStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet.SettingSectionTitle} HAS BEEN IMPORTED");
             }
 
