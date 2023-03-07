@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewContent;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
@@ -249,7 +250,7 @@ namespace FulcrumInjector
         private void _configureUserSettings()
         {
             // Pull our settings objects out from the settings file.
-            FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
+            FulcrumConstants.FulcrumSettings = FulcrumSettingsShare.GenerateSettingsShare();
             this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
             this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
         }

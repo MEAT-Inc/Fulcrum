@@ -58,13 +58,6 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
-"$(DevEnvDir)TextTransform.exe" -a !!build!true "$(SolutionDir)FulcrumInjector\Properties\AssemblyInfo.tt"
-
- "$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"
- "$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumInjector\FulcrumInjector.csproj"</PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
     <PostBuildEvent />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release (Installed)|x86' ">
@@ -91,6 +84,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug (Installed)|Any CPU' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
