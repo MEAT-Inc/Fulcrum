@@ -100,10 +100,10 @@
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\Ananke\packages\SharpSimulator.0.11.3.216\lib\net472\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\Ananke\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\Ananke\packages\SharpSimulator.0.11.3.216\lib\net472\NLog.dll</HintPath>
+      <HintPath>..\..\Ananke\packages\SharpLogger.2.5.16.293\lib\net472\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
@@ -114,8 +114,8 @@
     <Reference Include="SharpExpressions, Version=0.5.1.104, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\Ananke\packages\SharpSimulator.0.11.3.216\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.5.14.291, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\Ananke\packages\SharpSimulator.0.11.3.216\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.5.16.293, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\Ananke\packages\SharpLogger.2.5.16.293\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
     <Reference Include="SharpPipes, Version=0.2.3.32, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpPipes.0.2.3.32\lib\net472\SharpPipes.dll</HintPath>
@@ -169,7 +169,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumLogFileModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileSet.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />

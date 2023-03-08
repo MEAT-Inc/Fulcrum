@@ -54,6 +54,7 @@ namespace FulcrumInjector
 
             // Setup our logging instance information
             this._configureInjectorLogging();
+            this._configureExceptionHandlers();
 
             // Run single instance configuration
             this._configureSingleInstance();
@@ -109,6 +110,37 @@ namespace FulcrumInjector
                 SharpLogArchiver.CleanupArchiveHistory();
                 this._appLogger.WriteLog("ARCHIVE CLEANUP ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
             });
+        }
+        /// <summary>
+        /// Configures a new DispatcherUnhandledExceptionEventHandler for ths injector instance so we can track
+        /// logged failures as they occur inside this application in real time
+        /// </summary>
+        private void _configureExceptionHandlers()
+        {
+            // Start by spawning a dedicated exception catching logger instance
+            string LoggerName = $"{SharpLogBroker.LogBrokerName}_ExceptionsLogger";
+            SharpLogger ExceptionLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
+
+            // Log that our exception logger was built without issues
+            this._appLogger.WriteLog("CONFIGURING NEW UNHANDLED EXCEPTION LOGGER AND APP EVENT HANDLER NOW...");
+            ExceptionLogger.WriteLog($"BUILT NEW UNIVERSAL EXCEPTIONS LOGGER FOR THE INJECTOR APP OK!", LogType.InfoLog);
+
+            // Now that we've got this logger, hook in a new event to our app instance to deal with unhandled exceptions
+            this.DispatcherUnhandledException += (_, ExceptionArgs) =>
+            {
+                // Make sure our logging object is configured first
+                SharpLogger InstanceLogger =
+                    SharpLogBroker.FindLoggers(LoggerName).FirstOrDefault()
+                    ?? new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
+
+                // Now log the exception thrown and process the exception to a handled state
+                string ExInfo = $"UNHANDLED APP LEVEL EXCEPTION PROCESSED AT {DateTime.Now:g}!";
+                InstanceLogger.WriteException(ExInfo, ExceptionArgs.Exception, LogType.ErrorLog);
+                ExceptionArgs.Handled = true;
+
+                // Once our exception is handled, we can throw up our flyout for errors
+                // TODO: Build new flyout view content for showing failures as they come up
+            };
         }
         /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.
