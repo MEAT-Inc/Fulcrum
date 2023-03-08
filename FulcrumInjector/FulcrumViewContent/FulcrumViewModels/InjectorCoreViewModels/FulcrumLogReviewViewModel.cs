@@ -44,8 +44,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         // Private backing fields holding information about the currently loaded log files
         private FulcrumLogFileSet _currentLogSet;                   // The currently loaded log file set
         private FulcrumLogFileModel _currentLogFile;                // The log file being viewed at this time
-        private List<FulcrumLogFileSet> _loadedLogFileSets;         // All log file sets loaded in the past
-
+        
         #endregion // Fields
 
         #region Properties
@@ -80,11 +79,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.UNKNOWN_FILE)
                     this._toggleViewerContents(ViewerStateType.NoContent);
             }
-        }
-        public List<FulcrumLogFileSet> LoadedLogFileSets
-        {
-            get => this._loadedLogFileSets;
-            private set => PropertyUpdated(value);
         }
 
         // Public facing properties holding configuration values for our view content
@@ -123,7 +117,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Toggle parsed value based on contents.
             this.IsLogLoaded = false;
-            this.LoadedLogFileSets = new List<FulcrumLogFileSet>();
             this.ViewModelLogger.WriteLog("TOGGLED ENABLED STATUS OF TOGGLE BUTTON OK!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
@@ -164,16 +157,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             }
 
             // Try and find a model set where this file exists currently. If none are found, then build a new instance
-            FulcrumLogFileSet LogFileModelSet = this.LoadedLogFileSets
-                .FirstOrDefault(LogSet => 
-                    LogSet.PassThruLogFile.LogFilePath == LogFileToLoad || 
-                    LogSet.ExpressionsFile.LogFilePath == LogFileToLoad || 
-                    LogSet.SimulationsFile.LogFilePath == LogFileToLoad) ?? new FulcrumLogFileSet();
-            this.ViewModelLogger.WriteLog($"LOCATED/SPAWNED NEW LOG FILE MODEL SET FOR LOG FILE {LogFileToLoad}");
-
-            // Build our new log file model object here for this file instance
+            FulcrumLogFileSet LogFileModelSet = new FulcrumLogFileSet();
             FulcrumLogFileModel LoadedFileModel = new FulcrumLogFileModel(LogFileToLoad);
-            this.ViewModelLogger.WriteLog($"BUILT NEW FILE MODEL AND LOG FILE MODEL SETS FOR FILE {LogFileToLoad}");
+            this.ViewModelLogger.WriteLog($"BUILT NEW FILE MODEL AND LOG FILE MODEL SET FOR FILE {LogFileToLoad}");
 
             // Now store the new PassThru log file value on our model set and add it to our collection on the view model
             LogFileModelSet.StorePassThruLogFile(LoadedFileModel);
@@ -182,7 +168,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // If the current log file value is not set, then set it now
             this.CurrentLogSet = LogFileModelSet;
             this.CurrentLogFile = LoadedFileModel;
-            this.LoadedLogFileSets.Add(LogFileModelSet);
             this.ViewModelLogger.WriteLog("STORED NEW LOG FILE MODELS ON OUR VIEW MODEL INSTANCE FOR REVIEW CORRECTLY");
 
             // Build out the new log file name and ensure the output directory exists
