@@ -121,8 +121,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Find the name of the first file and use it as our base.
             string OutputPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultImportFilePath")
-            );
+                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportedFiles"));
 
             // Build file name here.
             string BaseFileName = $"{Guid.NewGuid().ToString("D").ToUpper()}";
@@ -206,9 +205,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                     if (!this.ToggleViewerContents(ViewerStateType.ShowingLogFile))
                         throw new InvalidOperationException("FAILED TO PROCESS NEW FILE!");
 
-                    // Return passed and copy into our temp location
+                    // Build out the new log file name and ensure the output directory exists
                     string LogFileName = Path.GetFileName(NewLogFile);
-                    string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultImportFilePath");
+                    string DefaultImportLocation = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath"));
                     Directory.CreateDirectory(DefaultImportLocation);
                     File.Copy(NewLogFile, Path.Combine(DefaultImportLocation, LogFileName), true);
                     this.ViewModelLogger.WriteLog("COPIED IMPORT LOG INTO OUR TEMP FOLDER!");
@@ -253,7 +254,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 {
                     // Invoke a new progress update to our UI content using the generator built
                     if (this.BaseViewControl is not FulcrumLogReviewView CastView) return;
-                    this.ProcessingProgress = (int)GeneratorArgs.CurrentProgress;
+
+                    // If the progress value reported back is the same as it is currently, don't set it again
+                    int NextProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.ProcessingProgress != NextProgress)
+                        this.ProcessingProgress = NextProgress;
                 };
 
                 // Start by building PTExpressions from input string object sets.
@@ -301,8 +306,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this._expressionsGenerator.OnGeneratorProgress += (SendingGenerator, GeneratorArgs) =>
                 {
                     // Invoke a new progress update to our UI content using the generator built
-                    if (this.BaseViewControl is not FulcrumLogReviewView CastView) return; 
-                    this.ProcessingProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.BaseViewControl is not FulcrumLogReviewView CastView) return;
+
+                    // If the progress value reported back is the same as it is currently, don't set it again
+                    int NextProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.ProcessingProgress != NextProgress)
+                        this.ProcessingProgress = NextProgress;
                 };
 
                 // Now Build our simulation content objects for this generator

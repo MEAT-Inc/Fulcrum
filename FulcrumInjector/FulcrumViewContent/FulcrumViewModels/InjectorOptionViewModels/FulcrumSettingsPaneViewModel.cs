@@ -84,8 +84,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             
             // Reload the settings into our view model now 
             this.PopulateAppSettingJsonViewer(EditorDocument);
-            FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
-            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ToList());
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
         }
         /// <summary>
         /// Saves a new setting object value onto the view model and settings share instance
@@ -114,9 +113,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             // Store our value in the JSON configuration files now.
             ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
             this.ViewModelLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
-
-            // Reload the settings into our view model now 
-            FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
 
             // If we've got a special setting value, then store it here.
             if (LocatedSettingSet.SettingSectionTitle != "FulcrumShim DLL Settings") return;

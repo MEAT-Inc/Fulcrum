@@ -71,7 +71,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
         public FulcrumVersionInfo()
         {
             // Build version information from current object executing
-            this.InjectorVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+            AssemblyName InjectorAssyName = Assembly.GetEntryAssembly()?.GetName();
+            this.InjectorVersion = InjectorAssyName?.Version;
             if (this.InjectorVersion == null)
                 throw new InvalidOperationException("FAILED TO FIND OUR CURRENT INJECTOR VERSION!");
 
@@ -90,6 +91,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
             // Store version information about the injector shim DLL
             FileVersionInfo InjectorShimFileInfo = FileVersionInfo.GetVersionInfo(InjectorDllPath);
             this.ShimVersion = Version.Parse(InjectorShimFileInfo.FileVersion);
+            if (this.ShimVersion == null)
+                throw new InvalidOperationException("FAILED TO FIND OUR CURRENT SHIM VERSION!");
         }
         /// <summary>
         /// Builds a new injector information version object
