@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
 {
@@ -33,6 +35,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         public FileInfo LogFileInfo => new FileInfo(this.LogFilePath);
 
         // Public facing properties holding our log file contents
+        public string LogFileSize => this.LogFileExists ? this.LogFileInfo.Length.ToFileSize() : "N/A";
         public string LogFileContents => this.LogFileExists ? File.ReadAllText(this.LogFilePath) : string.Empty;
 
         #endregion //Properties
