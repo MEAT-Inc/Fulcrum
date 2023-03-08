@@ -103,7 +103,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
                 ?.SingletonUserControl;
 
             // Check if our user control object output is defined or not.
-            if (NavigationOutputContent == null) {
+            if (NavigationOutputContent == null) 
+            {
+                // Log that we failed to find it and then construct a new singleton
                 this._navServiceLogger.WriteLog($"[NAVIGATE_TYPE] ::: FAILED TO LOCATE CONTENT FOR TYPE OBJECT: {UserControlType.Name}!", LogType.WarnLog);
                 this._navServiceLogger.WriteLog($"[NAVIGATE_TYPE] ::: BUILDING NEW VIEW CONTENT AND STORING NEW VALUES ON INJECTOR CONSTANTS FOR IT NOW...", LogType.WarnLog);
 

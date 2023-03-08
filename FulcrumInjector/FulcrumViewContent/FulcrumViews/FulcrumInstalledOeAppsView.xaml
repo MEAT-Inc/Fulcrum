@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" 
-             Width="400" Height="525">
+             mc:Ignorable="d" Width="400" Height="525">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
@@ -58,10 +57,10 @@
                 <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Path=CanBootApp}" Value="true">
-                            <Setter Property="Content" Value="Launch OE Application"/>
+                            <Setter Property="Content" Value="{Binding SelectedAppModel.OEAppName, StringFormat={}Launch {0}}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Path=CanKillApp}" Value="true">
-                            <Setter Property="Content" Value="Terminate OE Application"/>
+                            <Setter Property="Content" Value="{Binding Path=RunningAppModel.OEAppName, StringFormat={}Terminate {0}}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
                             <Setter Property="IsEnabled" Value="False"/>

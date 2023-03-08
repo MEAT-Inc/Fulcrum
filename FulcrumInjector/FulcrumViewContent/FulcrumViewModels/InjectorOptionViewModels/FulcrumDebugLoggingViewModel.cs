@@ -114,35 +114,44 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         {
             // Log information and store values 
             this.ViewModelLogger.WriteLog("SETTING UP DEBUG LOG TARGETS FOR UI LOGGING NOW...", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-
+            
             // Make sure the view content exists first and that it's been setup correctly
             if (this.BaseViewControl is not FulcrumDebugLoggingView CastViewContent)
                 throw new InvalidOperationException($"Error! View content type was {this.BaseViewControl.GetType().Name}");
 
             // Configure the new Logging Output Target.
-            var ExistingTarget = LogManager.Configuration.FindTargetByName(this._logContentTargetName);
-            if (ExistingTarget == null) this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
-            else
+            if (LogManager.Configuration.FindTargetByName(this._logContentTargetName) != null)
             {
                 // Log that we've already got a helper instance and exit out
                 this.ViewModelLogger.WriteLog($"WARNING! ALREADY FOUND AN EXISTING TARGET MATCHING THE NAME {this._logContentTargetName}!", LogType.WarnLog);
-                this.ViewModelLogger.WriteLog("REMOVING EXISTING INSTANCES OF OUR DEBUG LOG FORMATTER AND BUILDING A NEW ONE...", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("NOT ATTEMPTING TO REGISTER A NEW TARGET SINCE THAT WOULD BE A WASTE OF TIME (LIKE THIS LOG ENTRY)");
+            }
+            else
+            {
+                // Log that we didn't find any targets to use for this Debug review window and build one
+                this.ViewModelLogger.WriteLog("NO TARGETS MATCHING DEFINED TYPE WERE FOUND! THIS IS A GOOD THING", LogType.InfoLog);
 
-                // Remove the old target and then build a new one
-                LogManager.Configuration.RemoveTarget(ExistingTarget.Name);
+                // Register our new target instance based ont the debug logging target type
+                ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._logContentTargetName, typeof(DebugLoggingRedirectTarget));
+                LogManager.Configuration.AddRuleForAllLevels(new DebugLoggingRedirectTarget(CastViewContent.DebugRedirectOutputEdit));
+                LogManager.ReconfigExistingLoggers();
+
+                // Store the new formatter on this class instance and log results out
+                this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
             }
 
-            // Log information, build new target output and return.
-            ConfigurationItemFactory.Default.Targets.RegisterDefinition(this._logContentTargetName, typeof(DebugLoggingRedirectTarget));
-            LogManager.Configuration.AddRuleForAllLevels(new DebugLoggingRedirectTarget(CastViewContent.DebugRedirectOutputEdit));
-            this._logContentHelper = new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
-            LogManager.ReconfigExistingLoggers();
+            // Hook an event to build our log highlighter when the view is loaded
+            CastViewContent.Loaded += (_, _) =>
+            {
+                // Configure our new output Logging format helper and store it on this window
+                this._logContentHelper ??= new LogOutputFilteringHelper(CastViewContent.DebugRedirectOutputEdit);
+                LogManager.ReconfigExistingLoggers();
 
-            // Store the new formatter on this class instance and log results out
-            this.ViewModelLogger.WriteLog("INJECTOR HAS REGISTERED OUR DEBUGGING REDIRECT OBJECT OK!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("ALL LOG OUTPUT WILL APPEND TO OUR DEBUG VIEW ALONG WITH THE OUTPUT FILES NOW!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+                // Log out that these routines are done and exit out
+                this.ViewModelLogger.WriteLog($"{CastViewContent.GetType().Name} WAS LOADED AT {DateTime.Now:G}", LogType.TraceLog);
+                this.ViewModelLogger.WriteLog($"CONFIGURED {CastViewContent.GetType().Name} VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
+            };
         }
     }
 }

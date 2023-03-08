@@ -115,9 +115,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Store new values from our ViewModel onto the share and into JSON 
             Task.Run(() =>
             {
-                FulcrumConstants.FulcrumSettings.GenerateSettingsModels();
                 ValueSetters.SetValue("FulcrumUserSettings", FulcrumConstants.FulcrumSettings);
                 this._viewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
+                this.ViewModel.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
 
                 // Change Color and Set to Saved! on the content here.
                 string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;

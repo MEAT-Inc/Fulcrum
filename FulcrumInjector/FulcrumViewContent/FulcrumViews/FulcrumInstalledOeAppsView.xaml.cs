@@ -80,10 +80,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             this._viewLogger.WriteLog($"APP OBJECT SELECTED FOR TARGETING IS: {SelectedObject}", LogType.InfoLog);
             this._viewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
 
+            // Setup some default content values for states/status values
+            bool RanCommand = false;
+            Process BootedProcess = null;
+            string KilledAppNAme = string.Empty;
+            bool WasBooted = this.ViewModel.CanBootApp;
+
             // Check the view model of our object instance. If Can boot then boot. If can kill then kill
-            bool RanCommand = false; bool WasBooted = this.ViewModel.CanBootApp;
-            Process BootedProcess = null; FulcrumOeApplicationModel KilledApplication = null; 
-            if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication(out KilledApplication);
+            if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication(out KilledAppNAme);
             else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out BootedProcess);
             else throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
 
@@ -101,7 +105,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
                     SenderButton.Content = RanCommand ?
                         WasBooted ?
                             $"Booted {this.ViewModel.RunningAppModel.OEAppName} OK!" :
-                            $"Killed {(KilledApplication == null ? "OE Application" : KilledApplication.OEAppName)} OK!" :
+                            $"Killed {(string.IsNullOrWhiteSpace(KilledAppNAme) ? "OE Application" : KilledAppNAme)} OK!" :
                         WasBooted ?
                             $"Failed To Boot OE Application!" :
                             $"Failed To Kill OE Application!";
