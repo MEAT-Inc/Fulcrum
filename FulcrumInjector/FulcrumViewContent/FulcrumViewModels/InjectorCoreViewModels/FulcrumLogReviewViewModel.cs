@@ -4,9 +4,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters;
@@ -66,13 +72,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
                 // Based on the value we're storing, update our viewer contents
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.PASSTHRU_FILE)
-                    this.ToggleViewerContents(ViewerStateType.ShowingLogFile);
+                    this._toggleViewerContents(ViewerStateType.ShowingLogFile);
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.EXPRESSIONS_FILE)
-                    this.ToggleViewerContents(ViewerStateType.ShowingExpressions);
+                    this._toggleViewerContents(ViewerStateType.ShowingExpressions);
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.SIMULATIONS_FILE)
-                    this.ToggleViewerContents(ViewerStateType.ShowingSimulation);
+                    this._toggleViewerContents(ViewerStateType.ShowingSimulation);
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.UNKNOWN_FILE)
-                    this.ToggleViewerContents(ViewerStateType.NoContent);
+                    this._toggleViewerContents(ViewerStateType.NoContent);
             }
         }
         public List<FulcrumLogFileSet> LoadedLogFileSets
@@ -188,7 +194,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
             return true;
         }
-
         /// <summary>
         /// Splits out the input command lines into a set of PTObjects.
         /// </summary>
@@ -201,7 +206,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ProcessingProgress = 0;
                 this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
                 var ExpGenerator = PassThruExpressionsGenerator.LoadPassThruLogFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
-                ExpGenerator.OnGeneratorProgress += (SendingGenerator, GeneratorArgs) =>
+                ExpGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
                     // Invoke a new progress update to our UI content using the generator built
                     if (this.BaseViewControl is not FulcrumLogReviewView) return;
@@ -251,15 +256,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ProcessingProgress = 0;
                 this.ViewModelLogger.WriteLog("BUILDING SIMULATION FROM LOADED LOG FILE NOW...", LogType.InfoLog);
                 var SimGenerator = new PassThruSimulationGenerator(this.CurrentLogSet.PassThruLogFile.LogFilePath, this.CurrentLogSet.GeneratedExpressions);
-                SimGenerator.OnGeneratorProgress += (SendingGenerator, GeneratorArgs) =>
+                SimGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
                     // Invoke a new progress update to our UI content using the generator built
-                    if (this.BaseViewControl is not FulcrumLogReviewView CastView) return;
+                    if (this.BaseViewControl is not FulcrumLogReviewView) return;
 
                     // If the progress value reported back is the same as it is currently, don't set it again
                     int NextProgress = (int)GeneratorArgs.CurrentProgress;
-                    if (this.ProcessingProgress != NextProgress)
-                        this.ProcessingProgress = NextProgress;
+                    if (this.ProcessingProgress != NextProgress) this.ProcessingProgress = NextProgress;
                 };
 
                 // Now Build our simulation content objects for this generator
@@ -301,12 +305,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             if (LogFilteringHelper == null) return;
             this.LogFilteringHelper.SearchForText(TextToFind);
         }
+
         /// <summary>
         /// Toggles the current view contents around the processing output viewer
         /// </summary>
         /// <param name="StateToSet">State to apply</param>
         /// <returns></returns>
-        public bool ToggleViewerContents(ViewerStateType StateToSet)
+        private bool _toggleViewerContents(ViewerStateType StateToSet)
         {
             try
             {
@@ -324,30 +329,33 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 {
                     // For showing expressions
                     case ViewerStateType.ShowingExpressions:
-                        if (this._currentState == StateToSet) return true; 
-                        if (!this.CurrentLogSet.HasExpressions) return false;
+                        if (!this.CurrentLogSet.HasExpressions)
+                            throw new FileNotFoundException("Error! Current log set does not have expressions built!");
 
                         // Set our new current log file to the expressions file and break out
                         this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
-                        break;
+                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog);
+                        return true;
 
                     // For showing simulations
                     case ViewerStateType.ShowingSimulation:
-                        if (this._currentState == StateToSet) return true;
-                        if (!this.CurrentLogSet.HasSimulations) return false;
+                        if (!this.CurrentLogSet.HasSimulations)
+                            throw new FileNotFoundException("Error! Current log set does not have simulations built!");
 
                         // Set our new current log file to the simulations file and break out
                         this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
-                        break;
+                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
+                        return true;
 
                     // For showing raw log contents
                     case ViewerStateType.ShowingLogFile:
-                        if (this._currentState == StateToSet) return true;
-                        if (!this.CurrentLogSet.HasPassThruLog) return false;
+                        if (!this.CurrentLogSet.HasPassThruLog) 
+                            throw new FileNotFoundException("Error! Current log set does not a base log file built!");
 
                         // Set our new current log file to the base pass thru file and break out
                         this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
-                        break;
+                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
+                        return true;
 
                     // For showing nothing in the viewer
                     case ViewerStateType.NoContent:
@@ -356,7 +364,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                         break;
 
                     // On default, throw a failure out and move on. This should never happen really
-                    default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {StateToSet}!");
+                    default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {this._currentState}!");
                 }
 
                 // Store our contents for the log file view object back on our editor controls now
@@ -365,19 +373,37 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 {
                     // Set our new index value for the current file type, and setup our output content in text viewers
                     CastView.ViewerContentComboBox.SelectedIndex = (int)StateToSet - 1;
-                    CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Path Found!"; ;
+                    CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Loaded!"; ;
                     CastView.FilteringLogFileTextBox.Text = this.CurrentLogFile?.LogFileContents ?? $"No Log File Contents Loaded!";
                 });
 
                 // Toggle the showing parsed value.
-                this.ViewModelLogger.WriteLog("IMPORTED CONTENT WITHOUT ISSUES! RETURNING NOW.", LogType.InfoLog);
-                return true;
+                return false;
             }
             catch (Exception LoadEx)
             {
                 // Log failures. Return false.
                 this.ViewModelLogger.WriteLog("FAILED TO LOAD IN NEW CONTENTS FOR OUR FILE ENTRIES!");
                 this.ViewModelLogger.WriteException("EXCEPTIONS ARE BEING LOGGED BELOW", LoadEx);
+                
+                // Update our content values on the view for this failure if possible
+                if (this.BaseViewControl is not FulcrumLogReviewView CastView) return false;
+
+                // Store some default values here for the controls on our view content
+                string DefaultValue = CastView.FilteringLogFileTextBox.Text;
+                CastView.FilteringLogFileTextBox.Foreground = Brushes.Red;
+                CastView.FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
+                CastView.FilteringLogFileTextBox.Text = $"Failed To Load {this._currentState.ToDescriptionString()}! Did you build it?";
+
+                // Now Reset values for our view content in a background thread
+                Task.Run(() =>
+                {
+                    // Wait 3.5 seconds and reset the content for our view now 
+                    Thread.Sleep(3500);
+                    CastView.Dispatcher.Invoke(() => CastView.FilteringLogFileTextBox.Text = DefaultValue);
+                });
+                
+                // Return false at this point since something went wrong
                 return false;
             }
         }

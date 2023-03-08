@@ -237,6 +237,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 this._viewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }
+
         /// <summary>
         /// Sets up a processing window to show while an operation is processing
         /// </summary>
@@ -309,6 +310,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 });
             });
         }
+
         /// <summary>
         /// Searches for the provided text values
         /// </summary>
@@ -351,11 +353,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             });
 
             // Now apply new values to our button.
-            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? Brushes.DarkGreen : Brushes.DarkRed;
-            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting: ON" : "Syntax Highlighting: OFF";
+            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
+                ? Brushes.DarkGreen 
+                : Brushes.DarkRed;
+            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
+                ? "Syntax Highlighting: ON"
+                : "Syntax Highlighting: OFF";
 
             // Log toggle result.
-            this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
+            var HighlightState = this.ViewModel.InjectorSyntaxHelper.IsHighlighting;
+            this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {HighlightState}", LogType.InfoLog);
         }
         /// <summary>
         /// Changes the processing output actions of the comobox so it can show new values in the viewer
@@ -365,38 +372,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void ViewerContentComboBox_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
             // Start by finding what value is selected in our combobox.
-            ComboBox CastBox = (ComboBox)Sender;
-            int SelectedBoxIndex = CastBox.SelectedIndex;
+            int SelectedBoxIndex = ((ComboBox)Sender).SelectedIndex;
             this._viewLogger?.WriteLog("TOGGLING VIEW CONTENTS FOR PROCESSING OUTPUT VIEWER NOW...", LogType.InfoLog);
 
             // Now apply the new content based on what's in the box.
-            FulcrumLogReviewViewModel.ViewerStateType DesiredState = FulcrumLogReviewViewModel.ViewerStateType.NoContent;
-            if (SelectedBoxIndex == 0) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingLogFile;
-            if (SelectedBoxIndex == 1) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingExpressions;
-            if (SelectedBoxIndex == 2) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingSimulation;
-
-            // Now toggle the state value
-            string DefaultValue = FilteringLogFileTextBox.Text;
-            if (this.ViewModel.ToggleViewerContents(DesiredState)) this._viewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
-            else
-            {
-                // Set to failed 
-                FilteringLogFileTextBox.Foreground = Brushes.Red;
-                FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
-                FilteringLogFileTextBox.Text = $"Failed To Load {DesiredState.ToDescriptionString()}! Did you build it?";
-
-                // Reset the selected item value
-                ComboBoxItem CastItem = (ComboBoxItem)E.RemovedItems[0];
-                int IndexToSet = CastBox.Items.IndexOf(CastItem);
-                CastBox.SelectedIndex = IndexToSet;
-
-                // Now Reset values
-                Task.Run(() =>
-                {
-                    Thread.Sleep(3500);
-                    Dispatcher.Invoke(() => FilteringLogFileTextBox.Text = DefaultValue);
-                });
-            }
+            if (SelectedBoxIndex == -1) return;
+            if (SelectedBoxIndex == 0) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.PassThruLogFile;
+            if (SelectedBoxIndex == 1) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.ExpressionsFile;
+            if (SelectedBoxIndex == 2) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.SimulationsFile;
+            else throw new IndexOutOfRangeException("Error! Selected index could not be converted into a file type!");
         }
     }
 }
