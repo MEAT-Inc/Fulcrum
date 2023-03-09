@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -99,7 +101,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Now open the dialog and allow the user to pick some new files.
             this._viewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
-            if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
+            if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0)
+            {
                 // Log failed, set no file, reset sending button and return.
                 this._viewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
@@ -113,66 +116,72 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             // Run this in the background for smoother operation
             Task.Run(() =>
             {
-                // Check if we have multiple files. 
-                string FileToLoad = SelectAttachmentDialog.FileNames.Length == 1 ?
-                    SelectAttachmentDialog.FileName :
-                    this.ViewModel.CombineLogFiles(SelectAttachmentDialog.FileNames);
-
-                // Store new file object value. Validate it on the ViewModel object first.
-                bool LoadResult = this.ViewModel.LoadLogContents(FileToLoad);
-                if (LoadResult) this._viewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
-                else this._viewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
-
-                // Enable grid, remove click command.
-                Task.Run(() =>
+                try
                 {
-                    // Show new temp state
-                    Dispatcher.Invoke(() =>
+                    // Store new file object value. Validate it on the ViewModel object first.
+                    bool LoadResult = this.ViewModel.LoadLogContents(SelectAttachmentDialog.FileNames);
+                    if (LoadResult) this._viewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
+                    else this._viewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
+
+                    // Enable grid, remove click command.
+                    Task.Run(() =>
                     {
-                        // Control values for grid contents
-                        ParentGrid.IsEnabled = true;
-                        SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
-                        SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
-                        SenderButton.Click -= LoadInjectorLogFile_OnClick;
-
-                        // Disable input buttons
-                        this.BuildExpressionsButton.IsEnabled = false;
-                        this.BuildSimulationButton.IsEnabled = false;
-
-                        // Setup content view for a simulation file input
-                        if (FileToLoad.EndsWith(".ptSim"))
-                            this.ViewerContentComboBox.SelectedIndex = 2;
-
-                        // Setup for when we load an expression into here or a Simulation
-                        else if (FileToLoad.EndsWith(".ptExp")) {
-                            this.BuildSimulationButton.IsEnabled = true;
-                            this.ViewerContentComboBox.SelectedIndex = 1;
-                        }
-
-                        // Allow all buttons on and set them up to show index 0
-                        else 
+                        // Show new temp state
+                        Dispatcher.Invoke(() =>
                         {
-                            this.ViewerContentComboBox.SelectedIndex = 0;
-                            this.BuildExpressionsButton.IsEnabled = true;
-                            this.BuildSimulationButton.IsEnabled = true;
-                        }
-                    });
+                            // Control values for grid contents
+                            ParentGrid.IsEnabled = true;
+                            SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
+                            SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
+                            SenderButton.Click -= LoadInjectorLogFile_OnClick;
 
-                    // Wait for 3.5 Seconds
-                    Thread.Sleep(1500);
+                            // Disable input buttons
+                            this.BuildExpressionsButton.IsEnabled = false;
+                            this.BuildSimulationButton.IsEnabled = false;
+
+                            // Store the path of the currently loaded log file and enable controls based on the value found
+                            string LoadedFilePath = this.ViewModel.CurrentLogFile.LogFilePath;
+                            if (LoadedFilePath.EndsWith(".ptSim")) this.ViewerContentComboBox.SelectedIndex = 2;
+                            else if (LoadedFilePath.EndsWith(".ptExp"))
+                            {
+                                // Enable the build simulations button and toggle our index values
+                                this.BuildSimulationButton.IsEnabled = true;
+                                this.ViewerContentComboBox.SelectedIndex = 1;
+                            }
+                            else
+                            {
+                                // Enable both generate/build buttons and toggle our index values
+                                this.ViewerContentComboBox.SelectedIndex = 0;
+                                this.BuildExpressionsButton.IsEnabled = true;
+                                this.BuildSimulationButton.IsEnabled = true;
+                            }
+                        });
+
+                        // Wait for 3.5 Seconds
+                        Thread.Sleep(1500);
+                        Dispatcher.Invoke(() =>
+                        {
+                            // Reset button values and log the results out
+                            SenderButton.Content = DefaultContent;
+                            SenderButton.Background = DefaultColor;
+                            SenderButton.Click += LoadInjectorLogFile_OnClick;
+                            this._viewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                        });
+                    });
+                }
+                catch (Exception LoadLogFileEx)
+                {
+                    // Setup our viewer content to hold the exception thrown from our load routine
+                    string FailureMessage = LoadLogFileEx.Message + "\n" + "STACK TRACE:\n" + LoadLogFileEx.StackTrace;
                     Dispatcher.Invoke(() =>
                     {
-                        // Reset button values 
-                        SenderButton.Content = DefaultContent;
-                        SenderButton.Background = DefaultColor;
-                        SenderButton.Click += LoadInjectorLogFile_OnClick;
-
-                        // Log information
-                        this._viewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                        this.ReplayLogInputContent.Text = FailureMessage;
+                        this.FilteringLogFileTextBox.Text = $"Failed to Load Requested Log File!";
                     });
-                });
+                }
             });
         }
+
         /// <summary>
         /// Runs the processing command instance object commands for log processing.
         /// </summary>
@@ -189,7 +198,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             Task.Run(() =>
             {
                 // Store result from processing
-                bool ParseResult = this.ViewModel.BuildLogExpressions();
+                bool ParseResult = this.ViewModel.GenerateLogExpressions();
                 this._viewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
@@ -213,14 +222,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             Task.Run(() =>
             {
                 // Store result from processing if it's not yet done on the view model
-                if (this.ViewModel.ExpressionsBuilt == false) 
-                    if (!this.ViewModel.BuildLogExpressions()) {
+                if (!this.ViewModel.CurrentLogSet.HasExpressions) 
+                    if (!this.ViewModel.GenerateLogExpressions()) {
                         this.ProcessingActionFinished(false, SendingButton, Defaults);
                         return;
                     }
 
                 // Now build our simulation object here
-                bool SimResult = this.ViewModel.BuildLogSimulation(); 
+                bool SimResult = this.ViewModel.GenerateLogSimulation(); 
                 this._viewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
@@ -228,6 +237,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 this._viewLogger.WriteLog("SIMULATION PROCESSING IS NOW COMPLETE!", LogType.InfoLog);
             });
         }
+
         /// <summary>
         /// Sets up a processing window to show while an operation is processing
         /// </summary>
@@ -300,6 +310,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 });
             });
         }
+
         /// <summary>
         /// Searches for the provided text values
         /// </summary>
@@ -342,11 +353,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             });
 
             // Now apply new values to our button.
-            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? Brushes.DarkGreen : Brushes.DarkRed;
-            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting ? "Syntax Highlighting: ON" : "Syntax Highlighting: OFF";
+            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
+                ? Brushes.DarkGreen 
+                : Brushes.DarkRed;
+            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
+                ? "Syntax Highlighting: ON"
+                : "Syntax Highlighting: OFF";
 
             // Log toggle result.
-            this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {this.ViewModel.InjectorSyntaxHelper.IsHighlighting}", LogType.InfoLog);
+            var HighlightState = this.ViewModel.InjectorSyntaxHelper.IsHighlighting;
+            this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {HighlightState}", LogType.InfoLog);
         }
         /// <summary>
         /// Changes the processing output actions of the comobox so it can show new values in the viewer
@@ -356,38 +372,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void ViewerContentComboBox_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
             // Start by finding what value is selected in our combobox.
-            ComboBox CastBox = (ComboBox)Sender;
-            int SelectedBoxIndex = CastBox.SelectedIndex;
+            int SelectedBoxIndex = ((ComboBox)Sender).SelectedIndex;
             this._viewLogger?.WriteLog("TOGGLING VIEW CONTENTS FOR PROCESSING OUTPUT VIEWER NOW...", LogType.InfoLog);
 
             // Now apply the new content based on what's in the box.
-            FulcrumLogReviewViewModel.ViewerStateType DesiredState = FulcrumLogReviewViewModel.ViewerStateType.NoContent;
-            if (SelectedBoxIndex == 0) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingLogFile;
-            if (SelectedBoxIndex == 1) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingExpressions;
-            if (SelectedBoxIndex == 2) DesiredState = FulcrumLogReviewViewModel.ViewerStateType.ShowingSimulation;
-
-            // Now toggle the state value
-            string DefaultValue = FilteringLogFileTextBox.Text;
-            if (this.ViewModel.ToggleViewerContents(DesiredState)) this._viewLogger?.WriteLog("PROCESSED REQUEST CORRECTLY! SHOWING VIEW CONTENT AS EXPECTED!");
-            else
-            {
-                // Set to failed 
-                FilteringLogFileTextBox.Foreground = Brushes.Red;
-                FilteringLogFileTextBox.FontWeight = FontWeights.Bold;
-                FilteringLogFileTextBox.Text = $"Failed To Load {DesiredState.ToDescriptionString()}! Did you build it?";
-
-                // Reset the selected item value
-                ComboBoxItem CastItem = (ComboBoxItem)E.RemovedItems[0];
-                int IndexToSet = CastBox.Items.IndexOf(CastItem);
-                CastBox.SelectedIndex = IndexToSet;
-
-                // Now Reset values
-                Task.Run(() =>
-                {
-                    Thread.Sleep(3500);
-                    Dispatcher.Invoke(() => FilteringLogFileTextBox.Text = DefaultValue);
-                });
-            }
+            if (SelectedBoxIndex == -1) return;
+            if (SelectedBoxIndex == 0) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.PassThruLogFile;
+            if (SelectedBoxIndex == 1) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.ExpressionsFile;
+            if (SelectedBoxIndex == 2) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.SimulationsFile;
+            else throw new IndexOutOfRangeException("Error! Selected index could not be converted into a file type!");
         }
     }
 }
