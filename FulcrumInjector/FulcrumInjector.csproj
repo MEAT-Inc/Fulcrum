@@ -150,6 +150,7 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -171,6 +172,9 @@
     </ApplicationDefinition>
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileSet.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\FileAccessedEventArgs.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\FileEventArgs.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\FileModifiedEventArgs.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
@@ -239,6 +243,11 @@
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\BoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\HamburgerNavService.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\CustomColorShader.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogFolder.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogFile.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogService.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumWin32Invokers.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumWindowBlur.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleConfiguration.cs" />
@@ -483,9 +492,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FulcrumViewSupport\FulcrumWatchdog\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
