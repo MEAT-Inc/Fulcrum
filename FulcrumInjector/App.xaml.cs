@@ -12,6 +12,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
+using FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog;
 using SharpLogging;
 
 namespace FulcrumInjector
@@ -58,6 +59,7 @@ namespace FulcrumInjector
 
             // Run single instance configuration
             this._configureSingleInstance();
+            this._configureLoggerWatchdog();
             this._configureAppExitRoutine();
 
             // Configure settings and app theme
@@ -175,6 +177,14 @@ namespace FulcrumInjector
 
             // Return passed output.
             this._appLogger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
+        }
+        /// <summary>
+        /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
+        /// </summary>
+        private void _configureLoggerWatchdog()
+        {
+            // TODO: Build injector watchdog folders from AppSettings.json and import them
+            this._appLogger.WriteLog("SPAWNING NEW INJECTOR WATCHDOG HELPER NOW...", LogType.InfoLog);
         }
         /// <summary>
         /// Builds an event control object for methods to run when the app closes out.

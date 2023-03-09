@@ -6,8 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using Newtonsoft.Json.Linq;
 using NLog;
 using SharpLogging;
 
@@ -38,7 +41,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                 this._watchedFiles.Add(new WatchdogFile(EventArgs.FullPath));
 
             // Invoke the watchdog action here to refresh our contents
-            if (this.WatchdogAction == null) return;
             Task.Run(() => this._watchdogAction.Invoke());
         }
 
@@ -50,11 +52,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         private readonly SharpLogger _watchdogLogger;
 
         // Backing fields holding information about our watched directory and the watcher itself
-        private Action _watchdogAction;                                      // The action to run when events are fired
         private readonly string _watchedDirectory;                           // The path we're watching on the system
         private readonly string[] _watchedFileFilters;                       // The filters for our paths on the system
         private readonly List<FileSystemWatcher> _directoryWatchers;         // The file system watcher to track file changes
         private readonly ObservableCollection<WatchdogFile> _watchedFiles;   // Collection of our watched file objects.
+
+        // Backing fields holding information about the event/action to invoke for this folder
+        private bool _isExecuting;                   // Tells us if we're running the action or not
+        private Action _watchdogAction;              // The action to run when events are fired
+        private readonly int _executionGap;          // Time to wait between each execution 
+        private DateTime _lastExecutionTime;         // Time the action was last invoked
 
         #endregion //Fields
 
@@ -78,24 +85,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         public WatchdogFile[] WatchedFiles => this._watchedFiles.ToArray();
         public DirectoryInfo WatchedDirectoryInfo => new(this._watchedDirectory);
         public IEnumerable<string> WatchedFileFilters => this._watchedFileFilters;
-
-        // Public facing property which holds the action to invoke when the folder contents are changed around
-        public Action WatchdogAction
-        {
-            get => this._watchdogAction ?? (() => this._watchdogLogger?.WriteLog($"NO ACTION CONFIGURED FOR FOLDER {this.WatchedDirectoryPath}!", LogType.WarnLog));
-            set
-            {
-                // Store the new action value and log out we've set a new action routine
-                this._watchdogAction = value;
-                if (this._watchdogAction == null) this._watchdogLogger.WriteLog($"WARNING! NO ACTION IS SET FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.WarnLog);
-                else 
-                {
-                    // Log out that we've built a new action to set on this folder instance
-                    this._watchdogLogger.WriteLog($"STORED NEW ACTION FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.InfoLog);
-                    this._watchdogLogger.WriteLog("THIS EVENT WILL FIRE WHENEVER EVENTS ARE CALLED FROM THIS WATCHDOG", LogType.InfoLog);
-                }
-            }
-        }
 
         #endregion //Properties
 
@@ -217,6 +206,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
             this._watchedFileFilters = WatchdogFilters.ToArray();
             this._watchedDirectory = Path.GetFullPath(WatchedDirectory);
 
+            // Store the last execution time value as now and import our execution configuration value
+            this._lastExecutionTime = DateTime.Now;
+            this._executionGap = ValueLoaders.GetConfigValue<int>("FulcrumWatchdog.ExecutionGap");
+
             // Spawn a new logger based on the watched path name
             string LoggerName = Path.GetDirectoryName(WatchedDirectory);
             this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
@@ -268,6 +261,51 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
             // Log setup of this folder is now complete
             this._watchdogLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);
             this._watchdogLogger.WriteLog($"CONFIGURATION OF THIS INSTANCE IS BEING SHOWN BELOW:\n{this}", LogType.TraceLog);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Stores a new method value for the action to invoke on our folder when file contents are updated
+        /// </summary>
+        /// <param name="WatchdogAction">The action to execute when this folder content is updated</param>
+        public void SetWatchdogAction(Action WatchdogAction)
+        {
+            // Store the new action value and log out we've set a new action routine
+            this._watchdogAction = WatchdogAction;
+            if (this._watchdogAction == null) this._watchdogLogger.WriteLog($"WARNING! NO ACTION IS SET FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.WarnLog);
+            else
+            {
+                // Log out that we've built a new action to set on this folder instance
+                this._watchdogLogger.WriteLog($"STORED NEW ACTION FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.InfoLog);
+                this._watchdogLogger.WriteLog("THIS EVENT WILL FIRE WHENEVER EVENTS ARE CALLED FROM THIS WATCHDOG", LogType.InfoLog);
+            }
+        }
+        /// <summary>
+        /// Executes the watchdog action if we're able to do so.
+        /// If not, we wait for the given timespan needed then run the action again
+        /// </summary>
+        public void ExecuteWatchdogAction()
+        {
+            // Make sure we're not running at this point in time
+            if (this._isExecuting) return;
+            this._isExecuting = true;
+
+            // Check our execution time difference to see if we need to wait to run again or not
+            int ElapsedSinceRun = DateTime.Now.Subtract(this._lastExecutionTime).Milliseconds;
+            if (ElapsedSinceRun > this._executionGap)
+            {
+                // Log we're waiting for execution to be allowed and wait for it
+                this._watchdogLogger.WriteLog("DELAYING EXECUTION FOR GAP!", LogType.WarnLog);
+                Thread.Sleep(this._executionGap - ElapsedSinceRun);
+            }
+
+            // Now once we've waited long enough, invoke the action and set executing to false once done
+            this._watchdogAction.Invoke();
+
+            // Set executing to false and log out when it was run
+            this._isExecuting = false; this._lastExecutionTime = DateTime.Now;
+            this._watchdogLogger.WriteLog($"INVOKED ACTION WITHOUT ISSUES AT {this._lastExecutionTime:G}", LogType.TraceLog);
         }
     }
 }
