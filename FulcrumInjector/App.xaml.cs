@@ -105,7 +105,7 @@ namespace FulcrumInjector
             {
                 // Log archive routines have been queued
                 this._appLogger.WriteLog("LOGGING ARCHIVE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
-                this._appLogger.WriteLog("PROGRESS FOR THESE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+                this._appLogger.WriteLog("PROGRESS FOR ARCHIVAL ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
 
                 // Start with booting the archive routine
                 SharpLogArchiver.ArchiveLogFiles();
@@ -119,7 +119,7 @@ namespace FulcrumInjector
             {
                 // Log archive routines have been queued
                 this._appLogger.WriteLog("LOGGING SUBFOLDER PURGE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
-                this._appLogger.WriteLog("PROGRESS FOR THESE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+                this._appLogger.WriteLog("PROGRESS FOR SUBFOLDER PURGE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
 
                 // Call the cleanup method to purge our subdirectories if needed
                 SharpLogArchiver.CleanupSubdirectories();
