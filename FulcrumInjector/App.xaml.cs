@@ -67,8 +67,10 @@ namespace FulcrumInjector
             this._configureUserSettings();
             this._configureSingletonViews();
 
-            // Log out that all of our startup routines are complete
-            this._appLogger.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
+            // Log out that all of our startup routines are complete and prepare to open up the main window instance
+            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 125)), LogType.WarnLog);
+            this._appLogger.WriteLog("ALL REQUIRED FULCRUM INJECTOR STARTUP ROUTINES ARE DONE! MAIN WINDOW OPENING UP NOW...", LogType.InfoLog);
+            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 125)), LogType.WarnLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
