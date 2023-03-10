@@ -30,6 +30,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
             ? _backingLogger ??= new SharpLogger(LoggerActions.UniversalLogger)
             : null;
 
+        // Tells us if the application configuration is setup or not
+        public static bool IsConfigured => 
+            !string.IsNullOrWhiteSpace(AppConfigFile) && 
+            File.Exists(AppConfigFile) && ApplicationConfig != null;
+
         // Currently loaded app configuration file and the JSON object built from that file
         public static string AppConfigFile { get; private set; }
         public static JObject ApplicationConfig
