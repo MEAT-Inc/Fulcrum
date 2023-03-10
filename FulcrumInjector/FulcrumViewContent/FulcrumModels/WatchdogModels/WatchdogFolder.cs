@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using Newtonsoft.Json.Linq;
-using NLog;
-using NLog.Targets;
 using SharpLogging;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
+namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 {
     /// <summary>
     /// Host type for a file watchdog helper
@@ -214,7 +209,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
             // Spawn a new logger based on the watched path name
             string LoggerName = Path.GetDirectoryName(WatchedDirectory);
             this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
-            this._watchdogLogger.RegisterTarget(WatchdogService.LocateWatchdogTarget());
+            this._watchdogLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogTarget());
 
             // Log that we've built and registered our logger targets here
             this._watchdogLogger.WriteLog($"SPAWNED NEW WATCHDOG LOGGER FOR DIRECTORY {this._watchedDirectory}!", LogType.InfoLog);
