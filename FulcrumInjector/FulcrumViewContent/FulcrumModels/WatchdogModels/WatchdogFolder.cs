@@ -209,7 +209,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             // Spawn a new logger based on the watched path name
             string LoggerName = Path.GetDirectoryName(WatchedDirectory);
             this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
-            this._watchdogLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogTarget());
+            this._watchdogLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogLoggerTarget());
 
             // Log that we've built and registered our logger targets here
             this._watchdogLogger.WriteLog($"SPAWNED NEW WATCHDOG LOGGER FOR DIRECTORY {this._watchedDirectory}!", LogType.InfoLog);
@@ -268,7 +268,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 
             // Log setup of this folder is now complete
             this._watchdogLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);
-            this._watchdogLogger.WriteLog($"CONFIGURATION OF THIS INSTANCE IS BEING SHOWN BELOW:\n{this}", LogType.TraceLog);
+            if (this._watchedFiles.Count != 0) this._watchdogLogger.WriteLog($"FILES LOADED FOR PATH ARE BEING SHOWN BELOW:\n{this}", LogType.TraceLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
