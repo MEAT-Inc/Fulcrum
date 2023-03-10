@@ -99,20 +99,30 @@ namespace FulcrumInjector
             this._appLogger.WriteLog($"--> INJECTOR VERSION: {CurrentAppVersion}", LogType.WarnLog);
             this._appLogger.WriteLog($"--> SHIM DLL VERSION: {CurrentShimVersion}", LogType.WarnLog);
 
-            // Finally invoke an archive routine if needed
+            // Finally invoke an archive routine and child folder cleanup routine if needed
             Task.Run(() =>
             {
                 // Log archive routines have been queued
                 this._appLogger.WriteLog("LOGGING ARCHIVE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
                 this._appLogger.WriteLog("PROGRESS FOR THESE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
 
-                // Boot the archive routine first
+                // Start with booting the archive routine
                 SharpLogArchiver.ArchiveLogFiles();
                 this._appLogger.WriteLog("ARCHIVE ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
 
-                // Then invoke the archive cleanup routines
+                // Then finally invoke the archive cleanup routines
                 SharpLogArchiver.CleanupArchiveHistory();
                 this._appLogger.WriteLog("ARCHIVE CLEANUP ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+            });
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                this._appLogger.WriteLog("LOGGING SUBFOLDER PURGE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                this._appLogger.WriteLog("PROGRESS FOR THESE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Call the cleanup method to purge our subdirectories if needed
+                SharpLogArchiver.CleanupSubdirectories();
+                this._appLogger.WriteLog("CLEANED UP ALL CHILD LOGGING FOLDERS!", LogType.InfoLog);
             });
         }
         /// <summary>
