@@ -323,7 +323,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 // Build our logger here and store it on our instance
                 string LoggerName = Path.GetFileNameWithoutExtension(this.FileName);
                 this._fileLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
-                this._fileLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogTarget());
+
+                // TODO: Figure out if this is REALLY necessary or if it's just causing hangups
+                // this._fileLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogLoggerTarget());
             }
             catch (Exception SetFileInfoEx)
             {
