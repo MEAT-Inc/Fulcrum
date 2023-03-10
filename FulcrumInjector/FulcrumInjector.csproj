@@ -176,6 +176,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumVersionInfo.cs" />
