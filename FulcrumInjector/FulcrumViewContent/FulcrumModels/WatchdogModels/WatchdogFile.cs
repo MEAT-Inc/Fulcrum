@@ -282,8 +282,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 string OutputFileString =
                     $"Watchdog File: {this.FileName}\n" +
                     $"\t\\__ File Path:      {this.FullFilePath}\n" +
-                    $"\t\\__ File Exists:    {(this.FileExists ? "YES" : "NO")}\n" +
-                    $"\t\\__ File Size:      {this.FileSizeString} ({this.FileSize} bytes)\n" +
+                    $"\t\\__ File Exists:    {(this.FileExists ? "Yes" : "No")}\n" +
+                    $"\t\\__ File Size:      {this.FileSizeString}\n" +
                     $"\t\\__ File Extension: {this.FileExtension}\n" +
                     $"\t\\__ Time Created:   {this.TimeCreated:G}\n" +
                     $"\t\\__ Time Modified:  {this.TimeModified:G}\n" +

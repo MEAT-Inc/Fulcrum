@@ -120,14 +120,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         /// <returns>A text table holding all the information about each file inside of it</returns>
         public override string ToString()
         {
-            // Old watchdog configuration string override
-            // Build the output string and return it out
-            // string WatchdogString =
-            //     $"Watchdog Configuration - {(this.IsWatchable ? "Watchable Path" : "Not Watchable!")}\n" +
-            //     $"\t\\__ Directory:    {(string.IsNullOrWhiteSpace(this.WatchdogPath) ? "No Path Set!" : this.WatchdogPath)}\n" +
-            //     $"\t\\__ File Types:   {(this.FileExtensions.Length == 0 ? "No Supported File Types!" : string.Join(", ", this.FileExtensions))}\n" +
-            //     $"\t\\__ Path Exists:  {(Directory.Exists(this.WatchdogPath) ? $"Yes - {Directory.GetFiles(this.WatchdogPath).Length} Files Total" : "Directory Not Found!")}";
-
             // Build a string for our folder configuration
             string FolderConfiguration =
                 $"Watchdog Folder Configuration\n" +
@@ -138,31 +130,45 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 $"\t\\__ Directory File Count:    {this._watchedFiles.Count} File{((this._watchedFiles.Count == 1) ? string.Empty : "s")}\n" +
                 $"\t\\__ Directory Monitoring:    {(this.IsMonitoring ? "On" : "Off")}";
 
-            // If this folder has no files, then exit out of this routine
-            if (this._watchedFiles.Count == 0) return FolderConfiguration;
-
-            // Setup a list of values to show in our table and then build our output table object
-            string[] TableHeaders = new[] { "File", "Exists", "File Size", "Extension", "Time Created", "Time Accessed", "Time Modified", };
-            Tuple<string, string, string, string, string, string, string>[] FileValues = this.WatchedFiles.Select(FileObj =>
-            {
-                // Get the values of out file object here
-                string FileName = FileObj.FileName;
-                string ExistsString = FileObj.FileExists ? "YES" : "NO";
-                string FileSize = FileObj.FileSizeString;
-                string FileExtension = FileObj.FileExtension;
-                string TimeCreated = FileObj.TimeCreated.ToString("G");
-                string TimeAccessed = FileObj.TimeAccessed.ToString("G");
-                string TimeModified = FileObj.TimeModified.ToString("G");
-
-                // Build our new output tuple here
-                return new Tuple<string, string, string, string, string, string, string>(
-                    FileName, ExistsString, FileSize, FileExtension, TimeCreated, TimeAccessed, TimeModified
-                );
-            }).ToArray();
+            /* TODO: Enable this routine here again if I REALLY want to. Seems like this may cause big logging hang ups
+             *
+             * // If this folder has no files, then exit out of this routine
+             * if (this._watchedFiles.Count == 0) return FolderConfiguration;
+             *
+             * // Setup a list of values to show in our table and then build our output table object
+             * string[] TableHeaders = new[] { "File", "Exists", "File Size", "Extension", "Time Created", "Time Accessed", "Time Modified" };
+             * Tuple<string, string, string, string, string, string, string>[] FileValues = this.WatchedFiles.Select(FileObj =>
+             * {
+             *     // Get the values of out file object here
+             *     string FileName = FileObj.FileName;
+             *     string ExistsString = FileObj.FileExists ? "Yes" : "No";
+             *     string FileSize = FileObj.FileSizeString;
+             *     string FileExtension = FileObj.FileExtension;
+             *     string TimeCreated = FileObj.TimeCreated.ToString("G");
+             *     string TimeAccessed = FileObj.TimeAccessed.ToString("G");
+             *     string TimeModified = FileObj.TimeModified.ToString("G");
+             * 
+             *     // Build our new output tuple here
+             *     return new Tuple<string, string, string, string, string, string, string>(
+             *         FileName, ExistsString, FileSize, FileExtension, TimeCreated, TimeAccessed, TimeModified
+             *     );
+             * }).ToArray();
+             * 
+             * // Combine the base folder information with our file information now
+             * FolderConfiguration += $"\n\n{string.Join(string.Empty, Enumerable.Repeat("=", 100))}\n";
+             * FolderConfiguration += FileValues.ToStringTable(
+             *     TableHeaders,
+             *     FileObj => FileObj.Item1,
+             *     FileObj => FileObj.Item2,
+             *     FileObj => FileObj.Item3,
+             *     FileObj => FileObj.Item4,
+             *     FileObj => FileObj.Item5,
+             *     FileObj => FileObj.Item6,
+             *     FileObj => FileObj.Item7
+             * );
+             */
 
             // Return the built output string for our table instance
-            FolderConfiguration += $"\n{string.Join(string.Empty, Enumerable.Repeat("=", 100))}\n";
-            FolderConfiguration += FileValues.ToStringTable(TableHeaders);
             return FolderConfiguration;
         }
 
