@@ -120,85 +120,50 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         /// <returns>A text table holding all the information about each file inside of it</returns>
         public override string ToString()
         {
-            try
+            // Old watchdog configuration string override
+            // Build the output string and return it out
+            // string WatchdogString =
+            //     $"Watchdog Configuration - {(this.IsWatchable ? "Watchable Path" : "Not Watchable!")}\n" +
+            //     $"\t\\__ Directory:    {(string.IsNullOrWhiteSpace(this.WatchdogPath) ? "No Path Set!" : this.WatchdogPath)}\n" +
+            //     $"\t\\__ File Types:   {(this.FileExtensions.Length == 0 ? "No Supported File Types!" : string.Join(", ", this.FileExtensions))}\n" +
+            //     $"\t\\__ Path Exists:  {(Directory.Exists(this.WatchdogPath) ? $"Yes - {Directory.GetFiles(this.WatchdogPath).Length} Files Total" : "Directory Not Found!")}";
+
+            // Build a string for our folder configuration
+            string FolderConfiguration =
+                $"Watchdog Folder Configuration\n" +
+                $"\t\\__ Directory Name:          {this.WatchedDirectoryName}\n" +
+                $"\t\\__ Directory Path:          {this.WatchedDirectoryPath}\n" +
+                $"\t\\__ Directory Types:         {string.Join(", ", this.WatchedFileFilters)}\n" +
+                $"\t\\__ Directory Size:          {this._watchedFiles.Sum(FileObj => FileObj.FileSize).ToFileSize()}\n" +
+                $"\t\\__ Directory File Count:    {this._watchedFiles.Count} File{((this._watchedFiles.Count == 1) ? string.Empty : "s")}\n" +
+                $"\t\\__ Directory Monitoring:    {(this.IsMonitoring ? "On" : "Off")}";
+
+            // If this folder has no files, then exit out of this routine
+            if (this._watchedFiles.Count == 0) return FolderConfiguration;
+
+            // Setup a list of values to show in our table and then build our output table object
+            string[] TableHeaders = new[] { "File", "Exists", "File Size", "Extension", "Time Created", "Time Accessed", "Time Modified", };
+            Tuple<string, string, string, string, string, string, string>[] FileValues = this.WatchedFiles.Select(FileObj =>
             {
-                // Old watchdog configuration string override
-                // Build the output string and return it out
-                // string WatchdogString =
-                //     $"Watchdog Configuration - {(this.IsWatchable ? "Watchable Path" : "Not Watchable!")}\n" +
-                //     $"\t\\__ Directory:    {(string.IsNullOrWhiteSpace(this.WatchdogPath) ? "No Path Set!" : this.WatchdogPath)}\n" +
-                //     $"\t\\__ File Types:   {(this.FileExtensions.Length == 0 ? "No Supported File Types!" : string.Join(", ", this.FileExtensions))}\n" +
-                //     $"\t\\__ Path Exists:  {(Directory.Exists(this.WatchdogPath) ? $"Yes - {Directory.GetFiles(this.WatchdogPath).Length} Files Total" : "Directory Not Found!")}";
+                // Get the values of out file object here
+                string FileName = FileObj.FileName;
+                string ExistsString = FileObj.FileExists ? "YES" : "NO";
+                string FileSize = FileObj.FileSizeString;
+                string FileExtension = FileObj.FileExtension;
+                string TimeCreated = FileObj.TimeCreated.ToString("G");
+                string TimeAccessed = FileObj.TimeAccessed.ToString("G");
+                string TimeModified = FileObj.TimeModified.ToString("G");
 
-                // Setup a list of values to show in our table and then build our output table object
-                string[] TableHeaders = new[] { "File", "Exists", "File Size", "Extension", "Time Created", "Time Accessed", "Time Modified", };
-                Tuple<string, string, string, string, string, string, string>[] FileValues = this.WatchedFiles.Select(FileObj =>
-                {
-                    // Get the values of out file object here
-                    string FileName = FileObj.FileName;
-                    string ExistsString = FileObj.FileExists ? "YES" : "NO";
-                    string FileSize = FileObj.FileSizeString;
-                    string FileExtension = FileObj.FileExtension;
-                    string TimeCreated = FileObj.TimeCreated.ToString("G");
-                    string TimeAccessed = FileObj.TimeAccessed.ToString("G");
-                    string TimeModified = FileObj.TimeModified.ToString("G");
+                // Build our new output tuple here
+                return new Tuple<string, string, string, string, string, string, string>(
+                    FileName, ExistsString, FileSize, FileExtension, TimeCreated, TimeAccessed, TimeModified
+                );
+            }).ToArray();
 
-                    // Build our new output tuple here
-                    return new Tuple<string, string, string, string, string, string, string>(
-                        FileName, ExistsString, FileSize, FileExtension, TimeCreated, TimeAccessed, TimeModified
-                    );
-                }).ToArray();
-
-                // Get our output table object here and append the name of the folder at the top along with a file count
-                string TableOutput = FileValues.Length == 0
-                    ? $"No Files In Directory {this.WatchedDirectoryPath}!"
-                    : FileValues.ToStringTable(
-                        TableHeaders,
-                        FileObj => FileObj.Item1,
-                        FileObj => FileObj.Item2,
-                        FileObj => FileObj.Item3,
-                        FileObj => FileObj.Item4,
-                        FileObj => FileObj.Item5,
-                        FileObj => FileObj.Item6,
-                        FileObj => FileObj.Item7
-                    );
-
-                // Now build our final output string values and return the content generated
-                List<string> TableOutputSplit = TableOutput.Split('\n').ToList();
-                string[] InformationLines = new[]
-                {
-                    $"Watchdog Folder Configuration" + 
-                    $"\t\\__ Directory Name:          {this.WatchedDirectoryName}",
-                    $"\t\\__ Directory Path:          {this.WatchedDirectoryPath}",
-                    $"\t\\__ Directory Types:         {string.Join(", ", this.WatchedFileFilters)}",
-                    $"\t\\__ Directory Size:          {this._watchedFiles.Sum(FileObj => FileObj.FileSize).ToFileSize()}",
-                    $"\t\\__ Directory File Count:    {this._watchedFiles.Count} Files",
-                    $"\t\\__ Directory Monitoring:    {(this.IsMonitoring ? "On" : "Off")}"
-                };
-
-                // Format the strings to be the right length value to pad evenly
-                InformationLines = InformationLines.Select(StringValue =>
-                {
-                    // Find the size difference first and build the padding string
-                    int DifferenceInSize = TableOutputSplit[0].Length - StringValue.Length - 1;
-                    string PaddingString = string.Join(string.Empty, Enumerable.Repeat(" ", DifferenceInSize));
-
-                    // Add the padding string with a trailing | and return out
-                    return StringValue + PaddingString + "|";
-                }).ToArray();
-
-                // Insert a heading line at the start of the information lines and store it on our table output list content
-                TableOutputSplit.InsertRange(0, InformationLines.Prepend(TableOutputSplit[0]).ToArray());
-                string TableOutputWithInfo = string.Join("\n", TableOutputSplit);
-
-                // Return the built output string for our table instance
-                return TableOutputWithInfo;
-            }
-            catch
-            {
-                // If this fails out, then just return the name of the path of the folder
-                return this.WatchedDirectoryPath;
-            }
+            // Return the built output string for our table instance
+            FolderConfiguration += $"\n{string.Join(string.Empty, Enumerable.Repeat("=", 100))}\n";
+            FolderConfiguration += FileValues.ToStringTable(TableHeaders);
+            return FolderConfiguration;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -253,14 +218,21 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 
             // Now store our new watchdog file instances for this path location
             this._watchdogLogger.WriteLog("ATTEMPTING TO LOAD AND CREATE NEW WATCHDOG FILE INSTANCES NOW...");
-            foreach (string FilePath in Directory.GetFiles(this.WatchedDirectoryPath))
-            {
-                // Find the extension of this file and make sure we support it first
-                if (!this.WatchedFileFilters.Contains(Path.GetExtension(FilePath))) continue;
+            var MatchingFilesFound = this.WatchedFileFilters
+                .SelectMany(FileFilter => Directory.GetFiles(this.WatchedDirectoryPath, FileFilter))
+                .ToArray();
 
-                // Build a new file, store the execute routine as an event handler, and add it onto our list
-                this._watchedFiles.Add(new WatchdogFile(FilePath));
-                this._watchdogLogger.WriteLog($"--> ADDED NEW WATCHDOG FILE! FILE NAME {FilePath}", LogType.TraceLog);
+            // If no files were found, then don't import them
+            if (MatchingFilesFound.Length != 0)
+            {
+                // Loop all the found file values here and store them as watched file objects
+                this._watchdogLogger.WriteLog($"FOUND A TOTAL OF {MatchingFilesFound.Length} FILES IN {this.WatchedDirectoryPath}!", LogType.InfoLog);
+                foreach (string FilePath in MatchingFilesFound)
+                {
+                    // Build a new file, store the execute routine as an event handler, and add it onto our list
+                    this._watchedFiles.Add(new WatchdogFile(FilePath));
+                    this._watchdogLogger.WriteLog($"--> ADDED NEW WATCHDOG FILE! FILE NAME {FilePath}", LogType.TraceLog);
+                }
             }
 
             // Setup our default watchdog action here
@@ -274,7 +246,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 
             // Log setup of this folder is now complete
             this._watchdogLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);
-            if (this._watchedFiles.Count != 0) this._watchdogLogger.WriteLog($"FILES LOADED FOR PATH ARE BEING SHOWN BELOW:\n{this}", LogType.TraceLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

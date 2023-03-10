@@ -143,7 +143,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 {
                     // If no configuration was found, then just add it in to our collection
                     this._watchedDirectories.Add(FolderToAdd);
-                    this._watchdogLogger.WriteLog($"--> STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchedDirectoryPath}!\n{FolderToAdd}", LogType.TraceLog);
+                    this._watchdogLogger.WriteLog($"--> STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchedDirectoryPath}!\n{FolderToAdd.ToString()}", LogType.TraceLog);
                 }
                 else
                 {
