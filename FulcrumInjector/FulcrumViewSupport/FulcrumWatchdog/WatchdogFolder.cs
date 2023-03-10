@@ -12,6 +12,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using Newtonsoft.Json.Linq;
 using NLog;
+using NLog.Targets;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
@@ -213,6 +214,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
             // Spawn a new logger based on the watched path name
             string LoggerName = Path.GetDirectoryName(WatchedDirectory);
             this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
+            this._watchdogLogger.RegisterTarget(WatchdogService.LocateWatchdogTarget());
+
+            // Log that we've built and registered our logger targets here
             this._watchdogLogger.WriteLog($"SPAWNED NEW WATCHDOG LOGGER FOR DIRECTORY {this._watchedDirectory}!", LogType.InfoLog);
             this._watchdogLogger.WriteLog($"FILE FILTERS STORED: {string.Join(", ", this._watchedFileFilters)}");
             this._watchdogLogger.WriteLog("BUILDING NEW FILESYSTEM WATCHERS FOR THE FILERS REQUESTED NOW...");
@@ -257,6 +261,15 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                 this._watchedFiles.Add(new WatchdogFile(FilePath));
                 this._watchdogLogger.WriteLog($"--> ADDED NEW WATCHDOG FILE! FILE NAME {FilePath}", LogType.TraceLog);
             }
+
+            // Setup our default watchdog action here
+            this._watchdogLogger.WriteLog("STORING DEFAULT ACTION ROUTINE FOR THIS WATCHED FOLDER NOW...");
+            this._watchdogAction = () => 
+            {
+                // Log out the information about our watchdog event being fired here
+                this._watchdogLogger.WriteLog($"[WATCHDOG EVENT] ::: PROCESSED EVENT FOR WATCHDOG FOLDER {this.WatchedDirectoryName}!");
+                this._watchdogLogger.WriteLog($"[WATCHDOG EVENT] ::: TOTAL OF {this.WatchedFiles.Length} FILES ARE SEEN IN THIS PATH");
+            };
 
             // Log setup of this folder is now complete
             this._watchdogLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);

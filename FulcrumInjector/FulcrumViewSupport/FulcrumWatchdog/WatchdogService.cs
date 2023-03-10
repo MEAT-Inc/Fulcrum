@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceProcess;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using Newtonsoft.Json;
+using NLog.Targets;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
@@ -27,12 +30,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         // Private backing fields for our watchdog service configuration
         private readonly IContainer _components = null;                 // Component objects used by this service instance
         private List<WatchdogFolder> _watchedDirectories;               // The watchdog folder objects built for this service
-        private List<WatchdogConfiguration> _watchedFolderConfigs;      // The directory paths being watched by this service
 
         #endregion //Fields
 
         #region Properties
-
+        
         // Public facing properties holding information about our folders being watched and all their files
         public WatchdogFolder[] WatchedDirectories
         {
@@ -47,59 +49,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         #endregion //Properties
 
         #region Structs and Classes
-
-        /// <summary>
-        /// Simple structure used to help configure new Watchdog services
-        /// </summary>
-        public struct WatchdogConfiguration
-        {
-            // Public fields holding information about this service setup
-            public readonly string WatchdogPath;          // Path to watch on this service
-            public readonly string[] FileExtensions;      // Extensions being watched for this folder
-            public readonly Action WatchdogAction;        // Action to execute when invoked 
-
-            // --------------------------------------------------------------------------------------------------------------------------------------
-
-            /// <summary>
-            /// Spawns a new configuration for a watchdog service
-            /// </summary>
-            /// <param name="WatchdogPath">The path to monitor for our service</param>
-            /// <param name="WatchdogAction">The action our service will invoke</param>
-            public WatchdogConfiguration(string WatchdogPath, Action WatchdogAction = null)
-            {
-                // Store configuration values and exit out
-                this.WatchdogPath = WatchdogPath;
-                this.FileExtensions = new[] { "*.*" };
-                this.WatchdogAction = WatchdogAction ?? (() => { });
-            }
-            /// <summary>
-            /// Spawns a new configuration for a watchdog service
-            /// </summary>
-            /// <param name="WatchdogPath">The path to monitor for our service</param>
-            /// <param name="FileExtension">The file extension we need to use for monitoring</param>
-            /// <param name="WatchdogAction">The action our service will invoke</param>
-            public WatchdogConfiguration(string WatchdogPath, string FileExtension, Action WatchdogAction = null)
-            {
-                // Store configuration values and exit out
-                this.WatchdogPath = WatchdogPath;
-                this.FileExtensions = new[] { FileExtension };
-                this.WatchdogAction = WatchdogAction ?? (() => { });
-            }
-            /// <summary>
-            /// Spawns a new configuration for a watchdog service
-            /// </summary>
-            /// <param name="WatchdogPath">The path to monitor for our service</param>
-            /// <param name="FileExtensions">The file extensions we need to use for monitoring</param>
-            /// <param name="WatchdogAction">The action our service will invoke</param>
-            public WatchdogConfiguration(string WatchdogPath, IEnumerable<string> FileExtensions, Action WatchdogAction = null)
-            {
-                // Store configuration values and exit out
-                this.WatchdogPath = WatchdogPath;
-                this.FileExtensions = FileExtensions.ToArray();
-                this.WatchdogAction = WatchdogAction ?? (() => { });
-            }
-        }
-
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -122,32 +71,154 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         /// </summary>
         public WatchdogService()
         {
-            // Init our component object here
+            // Init our component object here and setup logging
             this._components = new Container();
+            this._watchdogLogger = new SharpLogger(LoggerActions.CustomLogger);
             this.ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
 
-            // Built main broker logger and write setup completed without issues
-            this._watchdogLogger = new SharpLogger(LoggerActions.CustomLogger);
-            this._watchdogLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE IS BOOTING NOW...", LogType.InfoLog);
+            // Log we're building this new service and log out the name we located for it
+            this._watchdogLogger.RegisterTarget(LocateWatchdogTarget());
+            this._watchdogLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
             this._watchdogLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
+            this._watchdogLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Spawns or locates a watchdog service instance
+        /// </summary>
+        /// <param name="WatchdogStatus">The status of the spawned or located watchdog service</param>
+        /// <returns>The watchdog service built or located from the system</returns>
+        public static ServiceController LocateWatchdogService()
+        {
+            // Try and find our service instance first based on the name of it
+            string WatchdogServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
+            SharpLogger ServiceLogger = new SharpLogger(LoggerActions.UniversalLogger, "WatchdogAllocationLogger");
+            ServiceLogger.WriteLog("ATTEMPTING TO FIND A CURRENTLY RUNNING INSTANCE OF OUR INJECTOR WATCHDOG NOW...", LogType.InfoLog);
+
+            // Find a service instance here. If one exists, return it out now. Otherwise spawn a new one
+            var LocatedService = ServiceController.GetServices().FirstOrDefault(Service => Service.ServiceName == WatchdogServiceName);
+            if (LocatedService != null)
+            {
+                // Log we found our service instance, set our status value and exit out
+                ServiceLogger.WriteLog($"FOUND WATCHDOG SERVICE OK!", LogType.InfoLog);
+                ServiceLogger.WriteLog($"--> SERVICE DISPLAY NAME: {LocatedService.ServiceName}");
+                ServiceLogger.WriteLog($"--> SERVICE STATUS VALUE: {LocatedService.Status}");
+
+                // Store the service status and return the controller for it
+                return LocatedService;
+            }
+
+            // Since no service was found, spawn in a new service controller and return that out
+            ServiceLogger.WriteLog("WARNING! NO WATCHDOG SERVICE WAS FOUND! SPAWNING A NEW ONE NOW...", LogType.InfoLog);
+
+            // Spawn a new service instance and get it from our system
+            Run(new WatchdogService());
+            LocatedService = ServiceController.GetServices().FirstOrDefault(Service => Service.ServiceName == WatchdogServiceName);
+            if (LocatedService == null) throw new ServiceActivationException("Error! Failed to spawn a new Watchdog Service!");
+
+            // Log we found our service instance, set our status value and exit out
+            ServiceLogger.WriteLog($"FOUND NEWLY BOOTED WATCHDOG SERVICE OK!", LogType.InfoLog);
+            ServiceLogger.WriteLog($"--> SERVICE DISPLAY NAME: {LocatedService.ServiceName}");
+            ServiceLogger.WriteLog($"--> SERVICE STATUS VALUE: {LocatedService.Status}");
+            return LocatedService;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Attempts to add in a set of new folder values for the given service
+        /// </summary>
+        /// <param name="FoldersToWatch">The folder objects we wish to watch</param>
+        public void AddWatchedFolders(params WatchdogConfiguration[] FoldersToWatch)
+        {
+            // Loop all the passed folder objects and add/update them one by one
+            this._watchdogLogger.WriteLog("ATTEMPTING TO REGISTER NEW FOLDERS ON A WATCHDOG SERVICE!", LogType.WarnLog);
+            foreach (var FolderToAdd in FoldersToWatch)
+            {
+                // Find if anything in our list exists like this currently
+                var LocatedFolder = this.WatchedDirectories.FirstOrDefault(WatchedDir =>
+                    WatchedDir.WatchedDirectoryPath == FolderToAdd.WatchdogPath);
+                
+                // If the index value exists, then just update this configuration
+                if (LocatedFolder == null) 
+                {
+                    // If no configuration was found, then just add it in to our collection
+                    this._watchedDirectories.Add(new WatchdogFolder(FolderToAdd.WatchdogPath, FolderToAdd.FileExtensions));
+                    if (FolderToAdd.WatchdogAction != null) this._watchedDirectories.Last().SetWatchdogAction(FolderToAdd.WatchdogAction);
+                    this._watchdogLogger.WriteLog($"STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchdogPath}", LogType.TraceLog);
+                }
+                else
+                {
+                    // Find the index of our folder we're replacing on our service
+                    int IndexOfFolder = this._watchedDirectories.IndexOf(LocatedFolder);
+
+                    // Now spawn a new folder and log that we've built a new one now
+                    this._watchedDirectories[IndexOfFolder].Dispose();
+                    this._watchedDirectories[IndexOfFolder] = new WatchdogFolder(FolderToAdd.WatchdogPath, FolderToAdd.FileExtensions);
+                    if (FolderToAdd.WatchdogAction != null) this._watchedDirectories[IndexOfFolder].SetWatchdogAction(FolderToAdd.WatchdogAction);
+                    this._watchdogLogger.WriteLog($"UPDATED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToAdd.WatchdogPath}!", LogType.TraceLog);
+                }
+            }
+            
+            // Log that we've looped all our values correctly and exit out
+            this._watchdogLogger.WriteLog("UPDATED AND STORED ALL NEEDED FOLDER CONFIGURATIONS WITHOUT ISSUES!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Attempts to remove a set of new folder values for the given service
+        /// </summary>
+        /// <param name="FoldersToRemove">The folder objects we wish to stop watching</param>
+        public void RemoveWatchedFolders(params WatchdogConfiguration[] FoldersToRemove)
+        {
+            // Loop all the passed folder objects and remove them one by one
+            this._watchdogLogger.WriteLog("ATTEMPTING TO REMOVE EXISTING FOLDERS FROM A WATCHDOG SERVICE!", LogType.WarnLog);
+            foreach (var FolderToRemove in FoldersToRemove)
+            {
+                // Find if anything in our list exists like this currently
+                var LocatedFolder = this.WatchedDirectories.FirstOrDefault(WatchedDir =>
+                    WatchedDir.WatchedDirectoryPath == FolderToRemove.WatchdogPath);
+
+                // If the index value exists, then remove it from our collection
+                if (LocatedFolder == null)
+                {
+                    // If no configuration was found, try and dispose any matching folders and move on
+                    this._watchedDirectories.FirstOrDefault(DirObj => DirObj.WatchedDirectoryPath == FolderToRemove.WatchdogPath)?.Dispose();
+
+                    // Log that no configuration was found and move onto our next folder path
+                    this._watchdogLogger.WriteLog($"CONFIGURATION PATH {FolderToRemove.WatchdogPath} WAS NOT FOUND!", LogType.TraceLog);
+                    this._watchdogLogger.WriteLog("THIS IS NORMAL WHEN A REMOVAL REQUEST IS RUN ON A PATH THAT ISN'T BEING WATCHED!", LogType.TraceLog);
+                }
+                else
+                {
+                    // Find the index of our folder we're replacing on our service
+                    int IndexOfFolder = this._watchedDirectories.IndexOf(LocatedFolder);
+                    this._watchedDirectories[IndexOfFolder].Dispose();
+                    this._watchedDirectories.RemoveAt(IndexOfFolder);
+
+                    // Log we've removed this configuration and move on to our next folder
+                    this._watchdogLogger.WriteLog($"REMOVED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToRemove.WatchdogPath}!", LogType.InfoLog);
+                }
+            }
+
+            // Log that we've looped all our values correctly and exit out
+            this._watchdogLogger.WriteLog("UPDATED AND REMOVED ALL NEEDED FOLDER CONFIGURATIONS WITHOUT ISSUES!", LogType.InfoLog);
+        }
+
+        /// <summary>
         /// Instance/debug startup method for the Watchdog service
         /// <param name="FoldersToWatch">Optional folder configurations to use for our service instance</param>
         /// </summary>
-        public void StartWatchdogService(params WatchdogConfiguration[] FoldersToWatch)
+        public void StartWatchdogService()
         {
-            // Store our folder instances and file extensions here
-            this._watchedFolderConfigs = FoldersToWatch.Length == 0
-                ? FoldersToWatch.ToList()
-                : new List<WatchdogConfiguration>()
-                    { new(SharpLogBroker.LogFileFolder, "*.log") };
+            // Check if we want to block execution of the service once we've kicked it off or not
+            if (!ValueLoaders.GetConfigValue<bool>("FulcrumWatchdog.WaitForBoot")) this.OnStart(null);
+            else
+            {
+                // If we want to block after booting, log that information and do so now
+                this._watchdogLogger.WriteLog("WARNING! BLOCKING EXECUTION SINCE OUR WAIT FOR BOOT FLAG IS SET TO TRUE!", LogType.WarnLog);
+                this.OnStart(null);
 
-            // Now fire off our service instance
-            this.OnStart(null);
+                // Block execution by adding a while true continue statement
+                while (true) continue;
+            }
         }
         /// <summary>
         /// Instance/debug custom command method for the Watchdog service.
@@ -191,13 +262,21 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                     this._watchedDirectories[WatchdogIndex].Dispose();
                     this._watchedDirectories[WatchdogIndex] = null;
                 }
-                foreach (var WatchdogConfiguration in this._watchedFolderConfigs)
-                {
-                    // Build our new watchdog and store it on our class
-                    this._watchedDirectories.Add(new WatchdogFolder(WatchdogConfiguration.WatchdogPath, WatchdogConfiguration.FileExtensions));
-                    this._watchdogLogger.WriteLog($"--> BUILT NEW WATCHDOG FOLDER FOR PATH: {WatchdogConfiguration}");
-                }
 
+                // Setup our default values for configuration lists
+                this._watchedDirectories = new List<WatchdogFolder>();
+                
+                // Now using the configuration file, load in our predefined folders to monitor
+                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogConfiguration[]>("FulcrumWatchdog.WatchedFolders").ToList();
+                this._watchdogLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Count} WATCHED PATH VALUES!");
+                this._watchdogLogger.WriteLog("STORING AND LOGGING OUT PATHS TO MONITOR BELOW", LogType.TraceLog);
+                foreach (var WatchdogConfig in WatchedConfigs)
+                {
+                    // Spawn our new folder instance and log it out on our file
+                    this._watchdogLogger.WriteLog($"{WatchdogConfig}\n", LogType.TraceLog);
+                    this._watchedDirectories.Add(new WatchdogFolder(WatchdogConfig.WatchdogPath, WatchdogConfig.FileExtensions));
+                }
+                
                 // Log booted service without issues here and exit out of this routine
                 this._watchdogLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);
             }
@@ -233,7 +312,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                         this._watchdogLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
                         this._watchdogLogger.WriteLog("", LogType.InfoLog);
                         this._watchdogLogger.WriteLog("Variable Actions", LogType.InfoLog);
-                        this._watchdogLogger.WriteLog("   Command 130:  Turns verbose logging on or off in our log files for the watched directories", LogType.InfoLog);
                         this._watchdogLogger.WriteLog("   Command 131:  Reloads the configuration file on our service and imports all folders again", LogType.InfoLog);
                         this._watchdogLogger.WriteLog("   Command 132:  (Not Built Yet) Adding a new directory instance to our service host", LogType.InfoLog);
                         this._watchdogLogger.WriteLog("   Command 133:  (Not Built Yet) Removing an existing directory instance from our service host", LogType.InfoLog);
@@ -253,7 +331,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                         // Log reimporting contents now
                         this._watchdogLogger.WriteLog("RELOADING CONFIGURATION FILE AND IMPORTING DIRECTORY ENTRIES NOW...", LogType.InfoLog);
 
-                        // Clear out the existing folder instances first then build a new configuration file instance.
+                        // Loop all of our folder instances and store them on our service instance
                         for (int WatchdogIndex = 0; WatchdogIndex < this._watchedDirectories.Count; WatchdogIndex++)
                         {
                             // Make sure this instance is not null before trying to use it
@@ -388,7 +466,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
 
                 // Clear out the list here and log closing out now
                 this._watchedDirectories.Clear();
-                this._watchedFolderConfigs.Clear();
                 this._watchdogLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN SHUT DOWN WITHOUT ISSUES!", LogType.InfoLog);
             }
             catch (Exception StopWatchdogEx)
@@ -397,6 +474,43 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                 this._watchdogLogger.WriteLog("ERROR! FAILED TO SHUTDOWN EXISTING WATCHDOG SERVICE INSTANCE!", LogType.ErrorLog);
                 this._watchdogLogger.WriteException($"EXCEPTION THROWN FROM THE STOP ROUTINE IS LOGGED BELOW", StopWatchdogEx);
             }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Configures the logger for this generator to output to a custom file path
+        /// </summary>
+        /// <returns>The configured sharp logger instance</returns>
+        public static FileTarget LocateWatchdogTarget()
+        {
+            // Make sure our output location exists first
+            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, "WatchdogLogs");
+            if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
+
+            // Configure our new logger name and the output log file path for this logger instance 
+            string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
+            string ServiceLoggerName = $"FulcrumWatchdog_ServiceLogging_{ServiceLoggerTime}";
+            string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
+            if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
+
+            // Spawn the new generation logger and attach in a new file target for it
+            var ExistingTarget = SharpLogBroker.LoggingTargets.FirstOrDefault(LoggerTarget => LoggerTarget.Name == ServiceLoggerName);
+            if (ExistingTarget is FileTarget LocatedFileTarget) return LocatedFileTarget; 
+
+            // Spawn the new generation logger and attach in a new file target for it
+            string LayoutString = SharpLogBroker.DefaultFileFormat.LoggerFormatString;
+            FileTarget ServiceFileTarget = new FileTarget(ServiceLoggerName)
+            {
+                KeepFileOpen = false,           // Allows multiple programs to access this file
+                Layout = LayoutString,          // The output log line layout for the logger
+                ConcurrentWrites = true,        // Allows multiple writes at one time or not
+                FileName = OutputFileName,      // The name/full log file being written out
+                Name = ServiceLoggerName,       // The name of the logger target being registered
+            };
+
+            // Return the output logger object built
+            return ServiceFileTarget;
         }
     }
 }

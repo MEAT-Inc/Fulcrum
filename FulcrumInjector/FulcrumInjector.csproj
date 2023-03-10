@@ -172,9 +172,10 @@
     </ApplicationDefinition>
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileSet.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\FileAccessedEventArgs.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\FileEventArgs.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\FileModifiedEventArgs.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogEvents\FileAccessedEventArgs.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogEvents\FileEventArgs.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumWatchdog\WatchdogEvents\FileModifiedEventArgs.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />

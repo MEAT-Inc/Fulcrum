@@ -59,8 +59,8 @@ namespace FulcrumInjector
 
             // Run single instance configuration
             this._configureSingleInstance();
-            this._configureLoggerWatchdog();
             this._configureAppExitRoutine();
+            this._configureInjectorWatchdog();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
@@ -179,14 +179,6 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
         }
         /// <summary>
-        /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
-        /// </summary>
-        private void _configureLoggerWatchdog()
-        {
-            // TODO: Build injector watchdog folders from AppSettings.json and import them
-            this._appLogger.WriteLog("SPAWNING NEW INJECTOR WATCHDOG HELPER NOW...", LogType.InfoLog);
-        }
-        /// <summary>
         /// Builds an event control object for methods to run when the app closes out.
         /// </summary>
         private void _configureAppExitRoutine()
@@ -232,6 +224,28 @@ namespace FulcrumInjector
             // Log that we've hooked in a new exit routine to our window instance
             this._appLogger?.WriteLog("TACKED ON NEW PROCESS EVENT WATCHDOG FOR EXIT ROUTINE!", LogType.InfoLog);
             this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
+        }
+        /// <summary>
+        /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
+        /// </summary>
+        private void _configureInjectorWatchdog()
+        {
+            // Make sure we actually want to use this watchdog service 
+            if (!ValueLoaders.GetConfigValue<bool>("FulcrumWatchdog.WatchdogEnabled"))
+            {
+                // Log that the watchdog is disabled and exit out
+                this._appLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                this._appLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD WatchdogEnabled TO TRUE TO ENABLE OUR WATCHDOG!", LogType.WarnLog);
+                return;
+            }
+
+            // Spin up a new injector watchdog service here if needed
+            WatchdogService InjectorService = new WatchdogService();
+            InjectorService.StartWatchdogService();
+
+            // Log that we've booted this new service instance correctly and exit out
+            this._appLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
+            this._appLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK! DIRECTORIES AND FILES WILL BE MONITORED!", LogType.InfoLog);
         }
         /// <summary>
         /// Pulls in the resource dictionaries from the given resource path and stores them in the app

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using SharpLogging;
+using NLog.Targets;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
 {
@@ -248,6 +249,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                 // Build our logger here and store it on our instance
                 string LoggerName = Path.GetFileNameWithoutExtension(this.FileName);
                 this._fileLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
+                this._fileLogger.RegisterTarget(WatchdogService.LocateWatchdogTarget());
             }
             catch (Exception SetFileInfoEx)
             {
