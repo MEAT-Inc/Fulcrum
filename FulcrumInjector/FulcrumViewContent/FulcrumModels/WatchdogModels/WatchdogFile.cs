@@ -280,14 +280,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             {
                 // Convert this file object into a text table object and return the output of it.
                 string OutputFileString =
-                    $"File: {this.FileName}\n" +
-                    $"--> File Path:      {this.FullFilePath}\n" +
-                    $"--> File Exists:    {(this.FileExists ? "YES" : "NO")}\n" +
-                    $"--> File Size:      {this.FileSizeString} ({this.FileSize} bytes)\n" +
-                    $"--> File Extension: {this.FileExtension}\n" +
-                    $"--> Time Created:   {this.TimeCreated:G}\n" +
-                    $"--> Time Modified:  {this.TimeModified:G}\n" +
-                    $"--> Time Accessed:  {this.TimeAccessed:G}\n";
+                    $"Watchdog File: {this.FileName}\n" +
+                    $"\t\\__ File Path:      {this.FullFilePath}\n" +
+                    $"\t\\__ File Exists:    {(this.FileExists ? "Yes" : "No")}\n" +
+                    $"\t\\__ File Size:      {this.FileSizeString}\n" +
+                    $"\t\\__ File Extension: {this.FileExtension}\n" +
+                    $"\t\\__ Time Created:   {this.TimeCreated:G}\n" +
+                    $"\t\\__ Time Modified:  {this.TimeModified:G}\n" +
+                    $"\t\\__ Time Accessed:  {this.TimeAccessed:G}\n";
 
                 // Return the built string output
                 return OutputFileString;
@@ -323,9 +323,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 // Build our logger here and store it on our instance
                 string LoggerName = Path.GetFileNameWithoutExtension(this.FileName);
                 this._fileLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
-
-                // TODO: Figure out if this is REALLY necessary or if it's just causing hangups
-                // this._fileLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogLoggerTarget());
             }
             catch (Exception SetFileInfoEx)
             {
