@@ -72,11 +72,13 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Init our component object here and setup logging
             this._components = new Container();
             this._watchedDirectories = new List<WatchdogFolder>();
-            this._watchdogLogger = new SharpLogger(LoggerActions.CustomLogger);
+            this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
 
+            // TODO: Figure out if this is REALLY necessary or if it's just causing hangups
+            // this._watchdogLogger.RegisterTarget(LocateWatchdogLoggerTarget());
+
             // Log we're building this new service and log out the name we located for it
-            this._watchdogLogger.RegisterTarget(LocateWatchdogLoggerTarget());
             this._watchdogLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
             this._watchdogLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
             this._watchdogLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
@@ -84,7 +86,6 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Spawns or locates a watchdog service instance
         /// </summary>
-        /// <param name="WatchdogStatus">The status of the spawned or located watchdog service</param>
         /// <returns>The watchdog service built or located from the system</returns>
         public static ServiceController LocateWatchdogService()
         {
@@ -127,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// Attempts to add in a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToWatch">The folder objects we wish to watch</param>
-        public void AddWatchedFolders(params WatchdogConfiguration[] FoldersToWatch)
+        public void AddWatchedFolders(params WatchdogFolder.WatchdogFolderConfig[] FoldersToWatch)
         {
             // Loop all the passed folder objects and add/update them one by one
             this._watchdogLogger.WriteLog("ATTEMPTING TO REGISTER NEW FOLDERS ON A WATCHDOG SERVICE!", LogType.WarnLog);
@@ -143,7 +144,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     // If no configuration was found, then just add it in to our collection
                     this._watchedDirectories.Add(new WatchdogFolder(FolderToAdd.WatchdogPath, FolderToAdd.FileExtensions));
                     if (FolderToAdd.WatchdogAction != null) this._watchedDirectories.Last().SetWatchdogAction(FolderToAdd.WatchdogAction);
-                    this._watchdogLogger.WriteLog($"--> STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchdogPath}", LogType.TraceLog);
+                    this._watchdogLogger.WriteLog($"--> STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchdogPath}!\n{FolderToAdd}", LogType.TraceLog);
                 }
                 else
                 {
@@ -154,7 +155,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     this._watchedDirectories[IndexOfFolder].Dispose();
                     this._watchedDirectories[IndexOfFolder] = new WatchdogFolder(FolderToAdd.WatchdogPath, FolderToAdd.FileExtensions);
                     if (FolderToAdd.WatchdogAction != null) this._watchedDirectories[IndexOfFolder].SetWatchdogAction(FolderToAdd.WatchdogAction);
-                    this._watchdogLogger.WriteLog($"--> UPDATED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToAdd.WatchdogPath}!", LogType.TraceLog);
+                    this._watchdogLogger.WriteLog($"--> UPDATED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToAdd.WatchdogPath}!\n{FolderToAdd}", LogType.TraceLog);
                 }
             }
             
@@ -165,7 +166,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// Attempts to remove a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToRemove">The folder objects we wish to stop watching</param>
-        public void RemoveWatchedFolders(params WatchdogConfiguration[] FoldersToRemove)
+        public void RemoveWatchedFolders(params WatchdogFolder.WatchdogFolderConfig[] FoldersToRemove)
         {
             // Loop all the passed folder objects and remove them one by one
             this._watchdogLogger.WriteLog("ATTEMPTING TO REMOVE EXISTING FOLDERS FROM A WATCHDOG SERVICE!", LogType.WarnLog);
@@ -266,7 +267,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 this._watchedDirectories = new List<WatchdogFolder>();
                 
                 // Now using the configuration file, load in our predefined folders to monitor
-                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogConfiguration[]>("FulcrumWatchdog.WatchedFolders");
+                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder.WatchdogFolderConfig[]>("FulcrumWatchdog.WatchedFolders");
                 this._watchdogLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Length} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
                 this._watchdogLogger.WriteLog("IMPORTED PATH CONFIGURATIONS WILL BE LOGGED BELOW", LogType.TraceLog);
                 this.AddWatchedFolders(WatchedConfigs);
@@ -472,39 +473,42 @@ namespace FulcrumInjector.FulcrumViewSupport
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// Configures the logger for this generator to output to a custom file path
-        /// </summary>
-        /// <returns>The configured sharp logger instance</returns>
-        public static FileTarget LocateWatchdogLoggerTarget()
-        {
-            // Make sure our output location exists first
-            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, "WatchdogLogs");
-            if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
-
-            // Configure our new logger name and the output log file path for this logger instance 
-            string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
-            string ServiceLoggerName = $"FulcrumWatchdog_ServiceLogging_{ServiceLoggerTime}";
-            string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
-            if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
-
-            // Spawn the new generation logger and attach in a new file target for it
-            var ExistingTarget = SharpLogBroker.LoggingTargets.FirstOrDefault(LoggerTarget => LoggerTarget.Name == ServiceLoggerName);
-            if (ExistingTarget is FileTarget LocatedFileTarget) return LocatedFileTarget; 
-
-            // Spawn the new generation logger and attach in a new file target for it
-            string LayoutString = SharpLogBroker.DefaultFileFormat.LoggerFormatString;
-            FileTarget ServiceFileTarget = new FileTarget(ServiceLoggerName)
-            {
-                KeepFileOpen = false,           // Allows multiple programs to access this file
-                Layout = LayoutString,          // The output log line layout for the logger
-                ConcurrentWrites = true,        // Allows multiple writes at one time or not
-                FileName = OutputFileName,      // The name/full log file being written out
-                Name = ServiceLoggerName,       // The name of the logger target being registered
-            };
-
-            // Return the output logger object built
-            return ServiceFileTarget;
-        }
+        /* TODO: Figure out if I really need this for some reason going forward. For expressions and sims, it's needed. But this seems overkill
+         *
+         * /// <summary>
+         * /// Configures the logger for this generator to output to a custom file path
+         * /// </summary>
+         * /// <returns>The configured sharp logger instance</returns>
+         * public static FileTarget LocateWatchdogLoggerTarget()
+         * {
+         *     // Make sure our output location exists first
+         *     string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, "WatchdogLogs");
+         *     if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
+         * 
+         *     // Configure our new logger name and the output log file path for this logger instance 
+         *     string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
+         *     string ServiceLoggerName = $"FulcrumWatchdog_ServiceLogging_{ServiceLoggerTime}";
+         *     string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
+         *     if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
+         * 
+         *     // Spawn the new generation logger and attach in a new file target for it
+         *     var ExistingTarget = SharpLogBroker.LoggingTargets.FirstOrDefault(LoggerTarget => LoggerTarget.Name == ServiceLoggerName);
+         *     if (ExistingTarget is FileTarget LocatedFileTarget) return LocatedFileTarget; 
+         * 
+         *     // Spawn the new generation logger and attach in a new file target for it
+         *     string LayoutString = SharpLogBroker.DefaultFileFormat.LoggerFormatString;
+         *     FileTarget ServiceFileTarget = new FileTarget(ServiceLoggerName)
+         *     {
+         *         KeepFileOpen = false,           // Allows multiple programs to access this file
+         *         Layout = LayoutString,          // The output log line layout for the logger
+         *         ConcurrentWrites = true,        // Allows multiple writes at one time or not
+         *         FileName = OutputFileName,      // The name/full log file being written out
+         *         Name = ServiceLoggerName,       // The name of the logger target being registered
+         *     };
+         * 
+         *     // Return the output logger object built
+         *     return ServiceFileTarget;
+         * }
+         */
     }
 }

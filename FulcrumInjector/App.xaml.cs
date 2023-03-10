@@ -13,6 +13,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
+using NLog.Targets;
 using SharpLogging;
 
 namespace FulcrumInjector
@@ -68,9 +69,9 @@ namespace FulcrumInjector
             this._configureSingletonViews();
 
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
-            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 125)), LogType.WarnLog);
+            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
             this._appLogger.WriteLog("ALL REQUIRED FULCRUM INJECTOR STARTUP ROUTINES ARE DONE! MAIN WINDOW OPENING UP NOW...", LogType.InfoLog);
-            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 125)), LogType.WarnLog);
+            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -133,19 +134,18 @@ namespace FulcrumInjector
         {
             // Start by spawning a dedicated exception catching logger instance
             string LoggerName = $"{SharpLogBroker.LogBrokerName}_ExceptionsLogger";
-            SharpLogger ExceptionLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
 
             // Log that our exception logger was built without issues
             this._appLogger.WriteLog("CONFIGURING NEW UNHANDLED EXCEPTION LOGGER AND APP EVENT HANDLER NOW...");
-            ExceptionLogger.WriteLog($"BUILT NEW UNIVERSAL EXCEPTIONS LOGGER FOR THE INJECTOR APP OK!", LogType.InfoLog);
+            this._appLogger.WriteLog($"BUILT NEW UNIVERSAL EXCEPTIONS LOGGER FOR THE INJECTOR APP OK!", LogType.InfoLog);
 
             // Now that we've got this logger, hook in a new event to our app instance to deal with unhandled exceptions
             this.DispatcherUnhandledException += (_, ExceptionArgs) =>
             {
                 // Make sure our logging object is configured first
                 SharpLogger InstanceLogger =
-                    SharpLogBroker.FindLoggers(LoggerName).FirstOrDefault()
-                    ?? new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
+                    SharpLogBroker.FindLoggers(LoggerName).FirstOrDefault() ??
+                    new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
 
                 // Now log the exception thrown and process the exception to a handled state
                 string ExInfo = $"UNHANDLED APP LEVEL EXCEPTION PROCESSED AT {DateTime.Now:g}!";
