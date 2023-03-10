@@ -278,7 +278,7 @@ namespace FulcrumInjector.Properties
   /// </remarks>
   /// <example><code>
   /// public class Foo : INotifyPropertyChanged {
-  ///   public event PropertyChangedEventHandler PropertyChanged;
+  ///   public event PropertyChangedEventHandler WatchedFileChanged;
   /// 
   ///   [NotifyPropertyChangedInvocator]
   ///   protected virtual void NotifyChanged(string propertyName) { ... }
