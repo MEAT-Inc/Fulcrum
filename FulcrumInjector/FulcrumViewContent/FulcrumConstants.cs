@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
@@ -9,7 +10,6 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 using SharpLogging;
 using SharpWrapper;
 

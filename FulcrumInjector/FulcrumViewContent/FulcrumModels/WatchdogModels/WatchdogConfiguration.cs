@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
+namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 {
     /// <summary>
     /// Simple structure used to help configure new Watchdog services

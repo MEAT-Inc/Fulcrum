@@ -10,9 +10,9 @@ using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
-using FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog;
 using SharpLogging;
 
 namespace FulcrumInjector
@@ -240,7 +240,7 @@ namespace FulcrumInjector
             }
 
             // Spin up a new injector watchdog service here if needed
-            WatchdogService InjectorService = new WatchdogService();
+            FulcrumWatchdogService InjectorService = new FulcrumWatchdogService();
             InjectorService.StartWatchdogService();
 
             // Log that we've booted this new service instance correctly and exit out

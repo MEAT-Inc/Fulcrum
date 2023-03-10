@@ -2,9 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
+namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
 {
     /// <summary>
     /// Class object containing information about the current version of this application

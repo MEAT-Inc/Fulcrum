@@ -1,18 +1,12 @@
-﻿using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
-using NLog;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Data;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
+using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using SharpLogging;
-using NLog.Targets;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
+namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 {
     /// <summary>
     /// Class structure for a watched file instance inside a watched directory
@@ -22,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         #region Custom Events
 
         // Events for states of the file object instance
-        public event EventHandler<FileEventArgs> FileChanged;
+        public event EventHandler<WatchdogFileEventArgs> FileChanged;
         public event EventHandler<FileAccessedEventArgs> FileAccessed;
         public event EventHandler<FileModifiedEventArgs> FileModified;
 
@@ -30,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         /// Method to invoke when a new file changed event occurs
         /// </summary>
         /// <param name="EventArgs">Args fire along with this event</param>
-        protected virtual void OnFileChanged(FileEventArgs EventArgs)
+        protected virtual void OnFileChanged(WatchdogFileEventArgs EventArgs)
         {
             // Invoke the event handler if it's not null and fire event to update our directory
             this.FileChanged?.Invoke(this, EventArgs);
@@ -180,6 +174,86 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Base class for a file event arg object to be fired when files are watched
+        /// </summary>
+        public class WatchdogFileEventArgs : EventArgs
+        {
+            // The sending file object and the time this event was fired
+            public readonly WatchdogFile SendingFile;
+            public readonly DateTime TimeEventSent;
+
+            // String name of the file being updated
+            public readonly string FileName;
+            public readonly string FullFilePath;
+
+            // --------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Builds a new instance of the file watchdog instance event args
+            /// </summary>
+            /// <param name="InputFile">File which sent out this event</param>
+            public WatchdogFileEventArgs(WatchdogFile InputFile)
+            {
+                // Store values for our watched file on the instance and set the date time value
+                this.SendingFile = InputFile;
+                this.TimeEventSent = DateTime.Now;
+
+                // Store file name and path values
+                this.FileName = this.SendingFile.FileName;
+                this.FullFilePath = this.SendingFile.FullFilePath;
+            }
+        }
+        /// <summary>
+        /// Event arguments for a file being modified
+        /// </summary>
+        public class FileModifiedEventArgs : WatchdogFileEventArgs
+        {
+            // Information for the file exists or not
+            public readonly bool FileExists;
+
+            // File size information
+            public readonly long FileSize;
+            public readonly string FileSizeString;
+
+            // --------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Builds a new instance of the file watchdog instance event args
+            /// </summary>
+            /// <param name="InputFile">File which sent out this event</param>
+            public FileModifiedEventArgs(WatchdogFile InputFile) : base(InputFile)
+            {
+                // Setup basic information for this file object event
+                this.FileExists = InputFile.FileExists;
+
+                // Now set the file size information
+                this.FileSize = InputFile.FileSize;
+                this.FileSizeString = InputFile.FileSizeString;
+            }
+        }
+        /// <summary>
+        /// Event arguments for a file being accessed
+        /// </summary>
+        public class FileAccessedEventArgs : WatchdogFileEventArgs
+        {
+            // Time the file was accessed
+            public readonly DateTime TimeAccessed;
+
+            // --------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Builds a new instance of the file watchdog instance event args
+            /// </summary>
+            /// <param name="InputFile">File which sent out this event</param>
+            public FileAccessedEventArgs(WatchdogFile InputFile) : base(InputFile)
+            {
+                // Now set the file access information
+                this.TimeAccessed = InputFile.TimeAccessed;
+            }
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -249,7 +323,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
                 // Build our logger here and store it on our instance
                 string LoggerName = Path.GetFileNameWithoutExtension(this.FileName);
                 this._fileLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
-                this._fileLogger.RegisterTarget(WatchdogService.LocateWatchdogTarget());
+                this._fileLogger.RegisterTarget(FulcrumWatchdogService.LocateWatchdogTarget());
             }
             catch (Exception SetFileInfoEx)
             {

@@ -4,20 +4,18 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using System.ServiceProcess;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using Newtonsoft.Json;
 using NLog.Targets;
 using SharpLogging;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// The actual service base component used for the injector watchdog helper
     /// </summary>
-    internal class WatchdogService : ServiceBase
+    internal class FulcrumWatchdogService : ServiceBase
     {
         #region Custom Events
         #endregion //Custom Events
@@ -69,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
         /// <summary>
         /// CTOR routine for this watchdog service. Sets up our component object and our logger instance
         /// </summary>
-        public WatchdogService()
+        public FulcrumWatchdogService()
         {
             // Init our component object here and setup logging
             this._components = new Container();
@@ -111,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumWatchdog
             ServiceLogger.WriteLog("WARNING! NO WATCHDOG SERVICE WAS FOUND! SPAWNING A NEW ONE NOW...", LogType.InfoLog);
 
             // Spawn a new service instance and get it from our system
-            Run(new WatchdogService());
+            Run(new FulcrumWatchdogService());
             LocatedService = ServiceController.GetServices().FirstOrDefault(Service => Service.ServiceName == WatchdogServiceName);
             if (LocatedService == null) throw new ServiceActivationException("Error! Failed to spawn a new Watchdog Service!");
 

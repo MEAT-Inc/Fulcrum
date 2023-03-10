@@ -9,7 +9,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using Octokit;
 using SharpLogging;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumUpdater
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Class which houses the logic for pulling in a new Fulcrum Injector MSI File.
