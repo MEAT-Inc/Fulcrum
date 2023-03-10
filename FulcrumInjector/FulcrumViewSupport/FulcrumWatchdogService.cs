@@ -128,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// Attempts to add in a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToWatch">The folder objects we wish to watch</param>
-        public void AddWatchedFolders(params WatchdogFolder.WatchdogFolderConfig[] FoldersToWatch)
+        public void AddWatchedFolders(params WatchdogFolder[] FoldersToWatch)
         {
             // Loop all the passed folder objects and add/update them one by one
             this._watchdogLogger.WriteLog("ATTEMPTING TO REGISTER NEW FOLDERS ON A WATCHDOG SERVICE!", LogType.WarnLog);
@@ -136,15 +136,14 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // Find if anything in our list exists like this currently
                 var LocatedFolder = this.WatchedDirectories.FirstOrDefault(WatchedDir =>
-                    WatchedDir.WatchedDirectoryPath == FolderToAdd.WatchdogPath);
+                    WatchedDir.WatchedDirectoryPath == FolderToAdd.WatchedDirectoryPath);
                 
                 // If the index value exists, then just update this configuration
                 if (LocatedFolder == null) 
                 {
                     // If no configuration was found, then just add it in to our collection
-                    this._watchedDirectories.Add(new WatchdogFolder(FolderToAdd.WatchdogPath, FolderToAdd.FileExtensions));
-                    if (FolderToAdd.WatchdogAction != null) this._watchedDirectories.Last().SetWatchdogAction(FolderToAdd.WatchdogAction);
-                    this._watchdogLogger.WriteLog($"--> STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchdogPath}!\n{FolderToAdd}", LogType.TraceLog);
+                    this._watchedDirectories.Add(FolderToAdd);
+                    this._watchdogLogger.WriteLog($"--> STORED NEW CONFIGURATION FOR FOLDER {FolderToAdd.WatchedDirectoryPath}!\n{FolderToAdd}", LogType.TraceLog);
                 }
                 else
                 {
@@ -153,9 +152,8 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Now spawn a new folder and log that we've built a new one now
                     this._watchedDirectories[IndexOfFolder].Dispose();
-                    this._watchedDirectories[IndexOfFolder] = new WatchdogFolder(FolderToAdd.WatchdogPath, FolderToAdd.FileExtensions);
-                    if (FolderToAdd.WatchdogAction != null) this._watchedDirectories[IndexOfFolder].SetWatchdogAction(FolderToAdd.WatchdogAction);
-                    this._watchdogLogger.WriteLog($"--> UPDATED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToAdd.WatchdogPath}!\n{FolderToAdd}", LogType.TraceLog);
+                    this._watchedDirectories[IndexOfFolder] = FolderToAdd;
+                    this._watchdogLogger.WriteLog($"--> UPDATED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToAdd.WatchedDirectoryPath}!\n{FolderToAdd}", LogType.TraceLog);
                 }
             }
             
@@ -166,7 +164,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// Attempts to remove a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToRemove">The folder objects we wish to stop watching</param>
-        public void RemoveWatchedFolders(params WatchdogFolder.WatchdogFolderConfig[] FoldersToRemove)
+        public void RemoveWatchedFolders(params WatchdogFolder[] FoldersToRemove)
         {
             // Loop all the passed folder objects and remove them one by one
             this._watchdogLogger.WriteLog("ATTEMPTING TO REMOVE EXISTING FOLDERS FROM A WATCHDOG SERVICE!", LogType.WarnLog);
@@ -174,16 +172,16 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // Find if anything in our list exists like this currently
                 var LocatedFolder = this.WatchedDirectories.FirstOrDefault(WatchedDir =>
-                    WatchedDir.WatchedDirectoryPath == FolderToRemove.WatchdogPath);
+                    WatchedDir.WatchedDirectoryPath == FolderToRemove.WatchedDirectoryPath);
 
                 // If the index value exists, then remove it from our collection
                 if (LocatedFolder == null)
                 {
                     // If no configuration was found, try and dispose any matching folders and move on
-                    this._watchedDirectories.FirstOrDefault(DirObj => DirObj.WatchedDirectoryPath == FolderToRemove.WatchdogPath)?.Dispose();
+                    this._watchedDirectories.FirstOrDefault(DirObj => DirObj.WatchedDirectoryPath == FolderToRemove.WatchedDirectoryPath)?.Dispose();
 
                     // Log that no configuration was found and move onto our next folder path
-                    this._watchdogLogger.WriteLog($"--> CONFIGURATION PATH {FolderToRemove.WatchdogPath} WAS NOT FOUND!", LogType.TraceLog);
+                    this._watchdogLogger.WriteLog($"--> CONFIGURATION PATH {FolderToRemove.WatchedDirectoryPath} WAS NOT FOUND!", LogType.TraceLog);
                     this._watchdogLogger.WriteLog("--> THIS IS NORMAL WHEN A REMOVAL REQUEST IS RUN ON A PATH THAT ISN'T BEING WATCHED!", LogType.TraceLog);
                 }
                 else
@@ -194,7 +192,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     this._watchedDirectories.RemoveAt(IndexOfFolder);
 
                     // Log we've removed this configuration and move on to our next folder
-                    this._watchdogLogger.WriteLog($"--> REMOVED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToRemove.WatchdogPath}!", LogType.InfoLog);
+                    this._watchdogLogger.WriteLog($"--> REMOVED CONFIGURATION AND RESET WATCHDOG OBJECTS FOR FOLDER {FolderToRemove.WatchedDirectoryPath}!", LogType.InfoLog);
                 }
             }
 
@@ -263,13 +261,13 @@ namespace FulcrumInjector.FulcrumViewSupport
                     this._watchedDirectories[WatchdogIndex] = null;
                 }
 
-                // Setup our default values for configuration lists
-                this._watchedDirectories = new List<WatchdogFolder>();
-                
                 // Now using the configuration file, load in our predefined folders to monitor
-                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder.WatchdogFolderConfig[]>("FulcrumWatchdog.WatchedFolders");
+                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder[]>("FulcrumWatchdog.WatchedFolders");
                 this._watchdogLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Length} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
                 this._watchdogLogger.WriteLog("IMPORTED PATH CONFIGURATIONS WILL BE LOGGED BELOW", LogType.TraceLog);
+
+                // Clear out any previous configurations/folders and add our new ones now
+                this._watchedDirectories = new List<WatchdogFolder>();
                 this.AddWatchedFolders(WatchedConfigs);
                 
                 // Log booted service without issues here and exit out of this routine
