@@ -252,8 +252,8 @@ namespace FulcrumInjector
             }
 
             // Spin up a new injector watchdog service here if needed
-            FulcrumWatchdogService InjectorService = new FulcrumWatchdogService();
-            InjectorService.StartWatchdogService();
+            FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService();
+            FulcrumConstants.FulcrumWatchdog.StartWatchdogService();
 
             // Log that we've booted this new service instance correctly and exit out
             this._appLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
