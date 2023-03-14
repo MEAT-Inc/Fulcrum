@@ -9,6 +9,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
 using SharpWrapper;
@@ -33,8 +34,9 @@ namespace FulcrumInjector.FulcrumViewContent
         public static Sharp2534Session SharpSessionAlpha;                       // Sharp Session used for configuring hardware
         public static Sharp2534Session SharpSessionBravo;                       // Sharp Session for setting up simulations
 
-        // Private static backing field for the injector main window
+        // Private static backing field for the injector main window and watchdog
         private static FulcrumMainWindow _fulcrumMainWindow;                    // Main window of the injector application
+        private static FulcrumWatchdogService _fulcrumWatchdog;                 // Watchdog service for the injector app
 
         // Private static Singleton Injector DLL Core Output View Contents. These get set to control view contents on the Main window
         private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumInstalledHardwareSingleton;
@@ -48,6 +50,18 @@ namespace FulcrumInjector.FulcrumViewContent
         #endregion //Fields
 
         #region Properties
+
+        // Public static property holding the watchdog for the injector instance
+        public static FulcrumWatchdogService FulcrumWatchdog
+        {
+            get => _fulcrumWatchdog ??= new FulcrumWatchdogService();
+            set
+            {
+                // Check if the watchdog is null or not
+                if (_fulcrumWatchdog == null) return;
+                _fulcrumWatchdog = value;
+            }
+        }
 
         // Public static property holding the current injector window instance
         public static FulcrumMainWindow FulcrumMainWindow
