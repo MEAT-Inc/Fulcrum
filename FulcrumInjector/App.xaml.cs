@@ -10,6 +10,8 @@ using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
@@ -279,6 +281,12 @@ namespace FulcrumInjector
             var ViewTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("View")).ToArray();
             var ViewModelTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("ViewModel")).ToArray();
             if (ViewTypes.Length != ViewModelTypes.Length) this._appLogger?.WriteLog("WARNING! TYPE OUTPUT LISTS ARE NOT EQUAL SIZES!", LogType.ErrorLog);
+
+            // Configure a new Viewmodel base for the hamburger now
+            this._appLogger.WriteLog("SPAWNING NEW HAMBURGER CORE VIEW AND VIEW MODEL...", LogType.InfoLog);
+            FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(
+                typeof(FulcrumHamburgerCoreView),
+                typeof(FulcrumHamburgerCoreViewModel));
 
             // Loop operation here
             int MaxLoopIndex = Math.Min(ViewTypes.Length, ViewModelTypes.Length);
