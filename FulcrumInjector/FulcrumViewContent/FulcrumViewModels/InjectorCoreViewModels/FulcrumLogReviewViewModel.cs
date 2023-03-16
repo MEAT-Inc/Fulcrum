@@ -57,7 +57,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             {
                 // Update the value of IsLoaded and store our value
                 this.IsLogLoaded = value != null;
-                this.CurrentLogFile = null;
+                this._currentLogFile = null;
                 PropertyUpdated(value);
             } 
         }
