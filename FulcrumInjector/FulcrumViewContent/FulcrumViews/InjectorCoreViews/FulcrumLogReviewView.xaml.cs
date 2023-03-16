@@ -175,8 +175,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                     string FailureMessage = LoadLogFileEx.Message + "\n" + "STACK TRACE:\n" + LoadLogFileEx.StackTrace;
                     Dispatcher.Invoke(() =>
                     {
+                        // Log out this failure and move on
                         this.ReplayLogInputContent.Text = FailureMessage;
                         this.FilteringLogFileTextBox.Text = $"Failed to Load Requested Log File!";
+                        this._viewLogger.WriteException("FAILED TO IMPORT NEW LOG FILE!", LoadLogFileEx);
+
+                        // Enable both generate/build buttons and toggle our index values
+                        this.ViewerContentComboBox.SelectedIndex = 0;
+                        this.BuildExpressionsButton.IsEnabled = true;
+                        this.BuildSimulationButton.IsEnabled = true;
                     });
                 }
             });
@@ -229,7 +236,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                     }
 
                 // Now build our simulation object here
-                bool SimResult = this.ViewModel.GenerateLogSimulation(); 
+                bool SimResult = this.ViewModel.GenerateLogSimulation();
                 this._viewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
@@ -377,9 +384,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Now apply the new content based on what's in the box.
             if (SelectedBoxIndex == -1) return;
-            if (SelectedBoxIndex == 0) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.PassThruLogFile;
-            if (SelectedBoxIndex == 1) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.ExpressionsFile;
-            if (SelectedBoxIndex == 2) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.SimulationsFile;
+            else if (SelectedBoxIndex == 0) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.PassThruLogFile;
+            else if (SelectedBoxIndex == 1) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.ExpressionsFile;
+            else if (SelectedBoxIndex == 2) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.SimulationsFile;
             else throw new IndexOutOfRangeException("Error! Selected index could not be converted into a file type!");
         }
     }

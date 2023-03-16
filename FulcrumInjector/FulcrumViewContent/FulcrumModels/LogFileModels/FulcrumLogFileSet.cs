@@ -98,9 +98,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
             // Now try and find the log file type for the given path extension
             LogFileTypes LogFileType = Path.GetExtension(LogFileModel.LogFilePath) switch
             {
-                "txt" => LogFileTypes.PASSTHRU_FILE,
-                "ptExp" => LogFileTypes.EXPRESSIONS_FILE,
-                "ptSim" => LogFileTypes.SIMULATIONS_FILE,
+                ".txt" => LogFileTypes.PASSTHRU_FILE,
+                ".ptExp" => LogFileTypes.EXPRESSIONS_FILE,
+                ".ptSim" => LogFileTypes.SIMULATIONS_FILE,
                 _ => LogFileTypes.UNKNOWN_FILE
             };
 

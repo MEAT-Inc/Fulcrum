@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         #region Fields
 
         // Logger object used for this watchdog instance
-        private readonly SharpLogger _watchdogLogger;
+        private static readonly SharpLogger _watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger, "WatchdogFolderLogger");
 
         // Backing fields holding information about our watched directory and the watcher itself
         private readonly List<FileSystemWatcher> _directoryWatchers;                      // The file system watcher to track file changes
@@ -100,7 +100,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         {
             // Dispose the process and watcher objects first
             foreach (FileSystemWatcher WatcherObject in this._directoryWatchers) WatcherObject.Dispose();
-            this._watchdogLogger.WriteLog($"DISPOSED ALL FILESYSTEM WATCHERS FOR WATCHDOG INSTANCE {this.WatchedDirectoryName}", LogType.TraceLog);
+            _watchdogLogger.WriteLog($"DISPOSED ALL FILESYSTEM WATCHERS FOR WATCHDOG INSTANCE {this.WatchedDirectoryName}", LogType.TraceLog);
 
             // Now dispose all the objects on our collection list
             for (int FileIndex = 0; FileIndex < this._watchedFiles.Count; FileIndex++)
@@ -112,7 +112,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 
             // Clear our list of files
             this._watchedFiles.Clear();
-            this._watchdogLogger.WriteLog($"DISPOSED ALL FILE INSTANCES FOR WATCHDOG INSTANCE {this.WatchedDirectoryName}", LogType.TraceLog);
+            _watchdogLogger.WriteLog($"DISPOSED ALL FILE INSTANCES FOR WATCHDOG INSTANCE {this.WatchedDirectoryName}", LogType.TraceLog);
         }
         /// <summary>
         /// Converts this file directory into a formatted text table which contains all the information about the files inside of it
@@ -187,16 +187,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this._watchedDirectory = Path.GetFullPath(WatchedDirectory);
             this._watchedFiles = new ObservableCollection<WatchdogFile>();
             this._executionGap = ValueLoaders.GetConfigValue<int>("FulcrumWatchdog.ExecutionGap");
-
-            // Spawn a new logger based on the watched path name
-            string LoggerName = Path.GetDirectoryName(this._watchedDirectory);
-            this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
-
+         
             // Log that we've built and registered our logger targets here
-            this._watchdogLogger.WriteLog($"SPAWNED NEW WATCHDOG LOGGER FOR DIRECTORY {this._watchedDirectory}!", LogType.InfoLog);
-            this._watchdogLogger.WriteLog($"FILE FILTERS STORED: {string.Join(", ", this._watchedFileFilters)}");
-            this._watchdogLogger.WriteLog("BUILDING NEW FILESYSTEM WATCHERS FOR THE FILERS REQUESTED NOW...");
-            this._watchdogLogger.WriteLog("BUILT NEW COLLECTIONS FOR WATCHDOG FILES AND FILESYSTEM WATCHERS OK!", LogType.InfoLog);
+            _watchdogLogger.WriteLog($"SPAWNED NEW WATCHDOG LOGGER FOR DIRECTORY {this._watchedDirectory}!", LogType.InfoLog);
+            _watchdogLogger.WriteLog($"FILE FILTERS STORED: {string.Join(", ", this._watchedFileFilters)}");
+            _watchdogLogger.WriteLog("BUILDING NEW FILESYSTEM WATCHERS FOR THE FILERS REQUESTED NOW...");
+            _watchdogLogger.WriteLog("BUILT NEW COLLECTIONS FOR WATCHDOG FILES AND FILESYSTEM WATCHERS OK!", LogType.InfoLog);
 
             // Loop all of the supported extension types and build watcher objects for each of them
             foreach (string FileExtension in this._watchedFileFilters.Select(ExtValue => $"*{ExtValue}"))
@@ -223,7 +219,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             }
 
             // Now store our new watchdog file instances for this path location
-            this._watchdogLogger.WriteLog("ATTEMPTING TO LOAD AND CREATE NEW WATCHDOG FILE INSTANCES NOW...");
+            _watchdogLogger.WriteLog("ATTEMPTING TO LOAD AND CREATE NEW WATCHDOG FILE INSTANCES NOW...");
             var MatchingFilesFound = this.WatchedFileFilters
                 .SelectMany(FileFilter => Directory.GetFiles(this.WatchedDirectoryPath, FileFilter))
                 .ToArray();
@@ -232,26 +228,26 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             if (MatchingFilesFound.Length != 0)
             {
                 // Loop all the found file values here and store them as watched file objects
-                this._watchdogLogger.WriteLog($"FOUND A TOTAL OF {MatchingFilesFound.Length} FILES IN {this.WatchedDirectoryPath}!", LogType.InfoLog);
+                _watchdogLogger.WriteLog($"FOUND A TOTAL OF {MatchingFilesFound.Length} FILES IN {this.WatchedDirectoryPath}!", LogType.InfoLog);
                 foreach (string FilePath in MatchingFilesFound)
                 {
                     // Build a new file, store the execute routine as an event handler, and add it onto our list
                     this._watchedFiles.Add(new WatchdogFile(FilePath));
-                    this._watchdogLogger.WriteLog($"--> ADDED NEW WATCHDOG FILE! FILE NAME {FilePath}", LogType.TraceLog);
+                    _watchdogLogger.WriteLog($"--> ADDED NEW WATCHDOG FILE! FILE NAME {FilePath}", LogType.TraceLog);
                 }
             }
 
             // Setup our default watchdog action here
-            this._watchdogLogger.WriteLog("STORING DEFAULT ACTION ROUTINE FOR THIS WATCHED FOLDER NOW...");
+            _watchdogLogger.WriteLog("STORING DEFAULT ACTION ROUTINE FOR THIS WATCHED FOLDER NOW...");
             this._watchdogAction = () =>
             {
                 // Log out the information about our watchdog event being fired here
-                this._watchdogLogger.WriteLog($"[WATCHDOG EVENT] ::: PROCESSED EVENT FOR WATCHDOG FOLDER {this.WatchedDirectoryName}!");
-                this._watchdogLogger.WriteLog($"[WATCHDOG EVENT] ::: TOTAL OF {this.WatchedFiles.Length} FILES ARE SEEN IN THIS PATH");
+                _watchdogLogger.WriteLog($"[WATCHDOG EVENT] ::: PROCESSED EVENT FOR WATCHDOG FOLDER {this.WatchedDirectoryName}!");
+                _watchdogLogger.WriteLog($"[WATCHDOG EVENT] ::: TOTAL OF {this.WatchedFiles.Length} FILES ARE SEEN IN THIS PATH");
             };
 
             // Log setup of this folder is now complete
-            this._watchdogLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);
+            _watchdogLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -264,12 +260,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         {
             // Store the new action value and log out we've set a new action routine
             this._watchdogAction = WatchdogAction;
-            if (this._watchdogAction == null) this._watchdogLogger.WriteLog($"WARNING! NO ACTION IS SET FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.WarnLog);
+            if (this._watchdogAction == null) _watchdogLogger.WriteLog($"WARNING! NO ACTION IS SET FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.WarnLog);
             else
             {
                 // Log out that we've built a new action to set on this folder instance
-                this._watchdogLogger.WriteLog($"STORED NEW ACTION FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.InfoLog);
-                this._watchdogLogger.WriteLog("THIS EVENT WILL FIRE WHENEVER EVENTS ARE CALLED FROM THIS WATCHDOG", LogType.InfoLog);
+                _watchdogLogger.WriteLog($"STORED NEW ACTION FOR DIRECTORY {this.WatchedDirectoryName}!", LogType.InfoLog);
+                _watchdogLogger.WriteLog("THIS EVENT WILL FIRE WHENEVER EVENTS ARE CALLED FROM THIS WATCHDOG", LogType.InfoLog);
             }
         }
         /// <summary>
@@ -287,7 +283,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             if (ElapsedSinceRun > this._executionGap)
             {
                 // Log we're waiting for execution to be allowed and wait for it
-                this._watchdogLogger.WriteLog("DELAYING EXECUTION FOR GAP!", LogType.WarnLog);
+                _watchdogLogger.WriteLog("DELAYING EXECUTION FOR GAP!", LogType.WarnLog);
                 Thread.Sleep(this._executionGap - ElapsedSinceRun);
             }
 
@@ -296,7 +292,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 
             // Set executing to false and log out when it was run
             this._isExecuting = false; this._lastExecutionTime = DateTime.Now;
-            this._watchdogLogger.WriteLog($"INVOKED ACTION WITHOUT ISSUES AT {this._lastExecutionTime:G}", LogType.TraceLog);
+            _watchdogLogger.WriteLog($"INVOKED ACTION WITHOUT ISSUES AT {this._lastExecutionTime:G}", LogType.TraceLog);
         }
     }
 }
