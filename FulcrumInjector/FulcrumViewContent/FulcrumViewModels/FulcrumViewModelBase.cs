@@ -118,6 +118,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             // Find the member information object used to perform our update routine
             string ViewModelNameCleaned = ViewModelType.Name.Replace("ViewModel", string.Empty);
             var MemberToUpdate = typeof(FulcrumConstants).GetMembers()
+                .Where(MemberObj => MemberObj.Name.Contains("ViewModel"))
                 .FirstOrDefault(MemberObj => MemberObj.Name.StartsWith(ViewModelNameCleaned));
 
             // If the member type is null, and make sure it's a field or property type here
@@ -180,12 +181,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
                 {
                     // For fields, set them here using the field setter
                     case FieldInfo FieldToUpdate:
-                        FieldToUpdate.SetValue(this, NewPropValue);
+                        FieldToUpdate.SetValue(NotifierObject, NewPropValue);
                         break;
 
                     // For properties, set them here using the property setter
                     case PropertyInfo PropertyToUpdate:
-                        PropertyToUpdate.SetValue(this, NewPropValue);
+                        PropertyToUpdate.SetValue(NotifierObject, NewPropValue);
                         break;
                 }
             }
