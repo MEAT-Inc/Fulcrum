@@ -67,15 +67,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Store a new value for our model instance type
                 PropertyUpdated(value);
                 this.IsLogLoaded = value != null;
-
+                
                 // Based on the value we're storing, update our viewer contents
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.PASSTHRU_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingLogFile);
-                if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.EXPRESSIONS_FILE)
+                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.EXPRESSIONS_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingExpressions);
-                if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.SIMULATIONS_FILE)
+                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.SIMULATIONS_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingSimulation);
-                if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.UNKNOWN_FILE)
+                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.UNKNOWN_FILE)
                     this._toggleViewerContents(ViewerStateType.NoContent);
             }
         }
@@ -134,7 +134,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Check if we've got more than one log file loaded in 
             string LogFileToLoad = string.Empty;
             if (LogFilePaths.Length == 0) throw new ArgumentException("Error! One or more file paths must be provided!");
-            if (LogFilePaths.Length == 1) LogFileToLoad = LogFilePaths.FirstOrDefault();
+            else if (LogFilePaths.Length == 1) LogFileToLoad = LogFilePaths.FirstOrDefault();
             else
             {
                 // Build our output combined content file name using the first file name provided in our set
@@ -171,6 +171,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Build out the new log file name and ensure the output directory exists
             string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath");
+            if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
             File.Copy(LogFileToLoad, Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad)), true);
             this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
 
@@ -216,7 +217,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ProcessingProgress = 100;
 
                 // Set our new log file model so the view content updates and exit out
-                this.CurrentLogFile = ExpressionsFileModel;
+                FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
+                CastView.Dispatcher.Invoke(() => { CastView.ViewerContentComboBox.SelectedIndex = 1; });
                 return true;
             }
             catch (Exception Ex)
@@ -266,7 +268,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ProcessingProgress = 100;
 
                 // Set our new log file model so the view content updates and exit out
-                this.CurrentLogFile = SimulationsFileModel;
+                FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
+                CastView.Dispatcher.Invoke(() => { CastView.ViewerContentComboBox.SelectedIndex = 2; });
                 return true;
             } 
             catch (Exception BuildSimEx) 
@@ -317,7 +320,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                             throw new FileNotFoundException("Error! Current log set does not have expressions built!");
 
                         // Set our new current log file to the expressions file and break out
-                        this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
+                        // this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
                         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog);
                         return true;
 
@@ -327,7 +330,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                             throw new FileNotFoundException("Error! Current log set does not have simulations built!");
 
                         // Set our new current log file to the simulations file and break out
-                        this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
+                        // this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
                         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
                         return true;
 
@@ -337,12 +340,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                             throw new FileNotFoundException("Error! Current log set does not a base log file built!");
 
                         // Set our new current log file to the base pass thru file and break out
-                        this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
+                        // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
                         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
                         return true;
 
                     // For showing nothing in the viewer
                     case ViewerStateType.NoContent:
+                        // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
                         this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
                         break;
 
@@ -353,13 +357,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Store our contents for the log file view object back on our editor controls now
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
                 CastView.Dispatcher.Invoke(() => 
-                {
-                    // Find the requested new idex value now
-                    // int NewIndex = (int)StateToSet;
-                    // if (NewIndex > 2) NewIndex = -1;
-
+                {                   
                     // Set our new index value for the current file type, and setup our output content in text viewers
-                    // CastView.ViewerContentComboBox.SelectedIndex = NewIndex;
                     CastView.FilteringLogFileTextBox.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Loaded!"; ;
                     CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFileContents ?? $"No Log File Contents Loaded!";
                 });

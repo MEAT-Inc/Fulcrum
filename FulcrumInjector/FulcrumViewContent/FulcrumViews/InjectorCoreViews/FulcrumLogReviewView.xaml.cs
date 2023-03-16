@@ -175,8 +175,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                     string FailureMessage = LoadLogFileEx.Message + "\n" + "STACK TRACE:\n" + LoadLogFileEx.StackTrace;
                     Dispatcher.Invoke(() =>
                     {
+                        // Log out this failure and move on
                         this.ReplayLogInputContent.Text = FailureMessage;
                         this.FilteringLogFileTextBox.Text = $"Failed to Load Requested Log File!";
+                        this._viewLogger.WriteException("FAILED TO IMPORT NEW LOG FILE!", LoadLogFileEx);
+
+                        // Enable both generate/build buttons and toggle our index values
+                        this.ViewerContentComboBox.SelectedIndex = 0;
+                        this.BuildExpressionsButton.IsEnabled = true;
+                        this.BuildSimulationButton.IsEnabled = true;
                     });
                 }
             });
@@ -229,7 +236,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                     }
 
                 // Now build our simulation object here
-                bool SimResult = this.ViewModel.GenerateLogSimulation(); 
+                bool SimResult = this.ViewModel.GenerateLogSimulation();
                 this._viewLogger.WriteLog("PROCESSING INPUT CONTENT IS NOW COMPLETE!", LogType.InfoLog);
 
                 // Invoke via dispatcher
