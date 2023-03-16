@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this.TimeModified = NewFileInfos.LastWriteTime;
 
             // Log the file event being processed
-            this._fileLogger.WriteLog($"PROCESSING A FILECHANGED (GENERIC) EVENT FOR FILE {this.FileName}", LogType.TraceLog);
+            _fileLogger.WriteLog($"PROCESSING A FILECHANGED (GENERIC) EVENT FOR FILE {this.FileName}", LogType.TraceLog);
         }
         /// <summary>
         /// Method to invoke when a new file changed event occurs
@@ -50,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this.FileAccessed?.Invoke(this, EventArgs);
 
             // Log file event being processed
-            this._fileLogger.WriteLog($"PROCESSING A FILEACCESSED EVENT FOR FILE {this.FileName}", LogType.TraceLog);
+            _fileLogger.WriteLog($"PROCESSING A FILEACCESSED EVENT FOR FILE {this.FileName}", LogType.TraceLog);
         }
         /// <summary>
         /// Method to invoke when a new file changed event occurs
@@ -63,7 +63,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this.FileModified?.Invoke(this, EventArgs);
 
             // Log file event being processed
-            this._fileLogger.WriteLog($"PROCESSING A FILEMODIFIED EVENT FOR FILE {this.FileName}", LogType.TraceLog);
+            _fileLogger.WriteLog($"PROCESSING A FILEMODIFIED EVENT FOR FILE {this.FileName}", LogType.TraceLog);
         }
 
         #endregion //Custom Events
@@ -71,7 +71,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         #region Fields
 
         // Logger object for this file instance
-        private readonly SharpLogger _fileLogger;
+        private static readonly SharpLogger _fileLogger = new SharpLogger(LoggerActions.UniversalLogger, "WatchdogFileLogger");
 
         // Sets if we're watching this file or not 
         private int _refreshTime = 250;
@@ -135,7 +135,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                         catch (Exception CompareFilesEx)
                         {
                             // Catch the exception and log it out
-                            this._fileLogger?.WriteException(CompareFilesEx);
+                            _fileLogger?.WriteException(CompareFilesEx);
                         }
                     }
                 }, this._watchToken);
@@ -268,7 +268,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this._watchTokenSource?.Dispose();
 
             // Log disposing and exit out
-            this._fileLogger.WriteLog($"DISPOSING LOGGER FOR FILE INSTANCE {this.FileName}", LogType.TraceLog);
+            _fileLogger.WriteLog($"DISPOSING LOGGER FOR FILE INSTANCE {this.FileName}", LogType.TraceLog);
         }
         /// <summary>
         /// Converts this file object into a formatted string output which contains all the information about this file
@@ -319,15 +319,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 this.FileName = Path.GetFileName(this.FullFilePath);
                 this.FileExtension = Path.GetExtension(this.FullFilePath);
                 this.FileFolder = Path.GetDirectoryName(this.FullFilePath);
-
-                // Build our logger here and store it on our instance
-                string LoggerName = Path.GetFileNameWithoutExtension(this.FileName);
-                this._fileLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
             }
             catch (Exception SetFileInfoEx)
             {
                 // Catch the exception and log it out
-                this._fileLogger?.WriteException(SetFileInfoEx);
+                _fileLogger?.WriteException(SetFileInfoEx);
                 return;
             }
 
@@ -343,7 +339,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             catch (Exception SetFileTimeEx)
             {
                 // Catch the exception and log it out
-                this._fileLogger?.WriteException(SetFileTimeEx);
+                _fileLogger?.WriteException(SetFileTimeEx);
                 return;
             }
 
@@ -355,7 +351,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             catch (Exception SetMonitoringStateEx)
             {
                 // Catch the exception and log it out
-                this._fileLogger?.WriteException(SetMonitoringStateEx);
+                _fileLogger?.WriteException(SetMonitoringStateEx);
                 return;
             }
         }

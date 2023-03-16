@@ -61,7 +61,7 @@ namespace FulcrumInjector
             // Run single instance configuration
             this._configureSingleInstance();
             this._configureAppExitRoutine();
-            this._configureInjectorWatchdog();
+            // this._configureInjectorWatchdog();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
@@ -251,9 +251,13 @@ namespace FulcrumInjector
                 return;
             }
 
-            // Spin up a new injector watchdog service here if needed
-            FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService();
-            FulcrumConstants.FulcrumWatchdog.StartWatchdogService();
+            // BUG: Starting new watchdog instances for many log files is broken
+            // Spin up a new injector watchdog service here if needed           
+            Task.Run(() =>
+            {
+                FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService();
+                FulcrumConstants.FulcrumWatchdog.StartWatchdogService();
+            });
 
             // Log that we've booted this new service instance correctly and exit out
             this._appLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);

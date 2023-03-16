@@ -180,12 +180,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
                 {
                     // For fields, set them here using the field setter
                     case FieldInfo FieldToUpdate:
-                        FieldToUpdate.SetValue(null, NewPropValue);
+                        FieldToUpdate.SetValue(this, NewPropValue);
                         break;
 
                     // For properties, set them here using the property setter
                     case PropertyInfo PropertyToUpdate:
-                        PropertyToUpdate.SetValue(null, NewPropValue);
+                        PropertyToUpdate.SetValue(this, NewPropValue);
                         break;
                 }
             }

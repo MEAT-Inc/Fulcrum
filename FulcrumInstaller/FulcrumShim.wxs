@@ -50,7 +50,7 @@
                                 <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
                                 <File Id="SYSTEM.NUMERICS.VECTORS.DLL" Name="System.Numerics.Vectors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.dll" />
 								<File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.DLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
-								<File Id="SYSTEM.SERVICEPROCESS.DLL" Name="System.ServiceProcess.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.ServiceProcess.dll" />
+								<!--<File Id="SYSTEM.SERVICEPROCESS.DLL" Name="System.ServiceProcess.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.ServiceProcess.dll" />-->
                                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
                                 <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
