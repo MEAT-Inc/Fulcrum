@@ -56,8 +56,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             set
             {
                 // Update the value of IsLoaded and store our value
-                this.IsLogLoaded = value != null;
-                this._currentLogFile = null;
                 PropertyUpdated(value);
             } 
         }
@@ -68,6 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             {
                 // Store a new value for our model instance type
                 PropertyUpdated(value);
+                this.IsLogLoaded = value != null;
 
                 // Based on the value we're storing, update our viewer contents
                 if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.PASSTHRU_FILE)
@@ -344,7 +343,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
                     // For showing nothing in the viewer
                     case ViewerStateType.NoContent:
-                        this.CurrentLogFile = null;
                         this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
                         break;
 
@@ -356,10 +354,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
                 CastView.Dispatcher.Invoke(() => 
                 {
+                    // Find the requested new idex value now
+                    // int NewIndex = (int)StateToSet;
+                    // if (NewIndex > 2) NewIndex = -1;
+
                     // Set our new index value for the current file type, and setup our output content in text viewers
-                    CastView.ViewerContentComboBox.SelectedIndex = (int)StateToSet - 1;
-                    CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Loaded!"; ;
-                    CastView.FilteringLogFileTextBox.Text = this.CurrentLogFile?.LogFileContents ?? $"No Log File Contents Loaded!";
+                    // CastView.ViewerContentComboBox.SelectedIndex = NewIndex;
+                    CastView.FilteringLogFileTextBox.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Loaded!"; ;
+                    CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFileContents ?? $"No Log File Contents Loaded!";
                 });
 
                 // Toggle the showing parsed value.

@@ -141,6 +141,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
                     // For properties, set them here using the property setter
                     case PropertyInfo PropertyToUpdate:
+                        if (PropertyToUpdate.SetMethod == null) break;
                         PropertyToUpdate.SetValue(null, ViewModelObject);
                         break;
                 }
