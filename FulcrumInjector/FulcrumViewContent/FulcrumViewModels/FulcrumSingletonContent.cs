@@ -155,7 +155,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
                     _singletonLogger.WriteLog("UPDATING DEFINITIONS FOR THIS OBJECT NOW...", LogType.WarnLog);
                 }
 
-                // Pull the singleton from our list and replace the content.
+                // Pull the singleton from our list and replace the content if it can be found
+                if (!FulcrumSingletons.Contains(LocatedSingleton)) return LocatedSingleton;
                 int IndexOfSingleton = FulcrumSingletons.ToList().IndexOf(LocatedSingleton);
                 FulcrumSingletons[IndexOfSingleton] = new FulcrumSingletonContent<TViewType, TViewModelType>(ViewObject, ViewModelObject, RequireLogging);
                 if (RequireLogging) _singletonLogger.WriteLog("UPDATED CONTENTS OF OUR SINGLETON VIEW OBJECT OK!", LogType.InfoLog);

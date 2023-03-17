@@ -10,8 +10,12 @@ using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
+using NLog.Targets;
 using SharpLogging;
 
 namespace FulcrumInjector
@@ -59,14 +63,17 @@ namespace FulcrumInjector
             // Run single instance configuration
             this._configureSingleInstance();
             this._configureAppExitRoutine();
+            // this._configureInjectorWatchdog();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
             this._configureUserSettings();
             this._configureSingletonViews();
 
-            // Log out that all of our startup routines are complete
-            this._appLogger.WriteLog("SETTINGS AND THEME SETUP ARE COMPLETE! BOOTING INTO MAIN INSTANCE NOW...", LogType.InfoLog);
+            // Log out that all of our startup routines are complete and prepare to open up the main window instance
+            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
+            this._appLogger.WriteLog("ALL REQUIRED FULCRUM INJECTOR STARTUP ROUTINES ARE DONE! MAIN WINDOW OPENING UP NOW...", LogType.InfoLog);
+            this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,20 +102,30 @@ namespace FulcrumInjector
             this._appLogger.WriteLog($"--> INJECTOR VERSION: {CurrentAppVersion}", LogType.WarnLog);
             this._appLogger.WriteLog($"--> SHIM DLL VERSION: {CurrentShimVersion}", LogType.WarnLog);
 
-            // Finally invoke an archive routine if needed
+            // Finally invoke an archive routine and child folder cleanup routine if needed
             Task.Run(() =>
             {
                 // Log archive routines have been queued
                 this._appLogger.WriteLog("LOGGING ARCHIVE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
-                this._appLogger.WriteLog("PROGRESS FOR THESE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+                this._appLogger.WriteLog("PROGRESS FOR ARCHIVAL ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
 
-                // Boot the archive routine first
+                // Start with booting the archive routine
                 SharpLogArchiver.ArchiveLogFiles();
                 this._appLogger.WriteLog("ARCHIVE ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
 
-                // Then invoke the archive cleanup routines
+                // Then finally invoke the archive cleanup routines
                 SharpLogArchiver.CleanupArchiveHistory();
                 this._appLogger.WriteLog("ARCHIVE CLEANUP ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+            });
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                this._appLogger.WriteLog("LOGGING SUBFOLDER PURGE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                this._appLogger.WriteLog("PROGRESS FOR SUBFOLDER PURGE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Call the cleanup method to purge our subdirectories if needed
+                SharpLogArchiver.CleanupSubdirectories();
+                this._appLogger.WriteLog("CLEANED UP ALL CHILD LOGGING FOLDERS!", LogType.InfoLog);
             });
         }
         /// <summary>
@@ -119,19 +136,18 @@ namespace FulcrumInjector
         {
             // Start by spawning a dedicated exception catching logger instance
             string LoggerName = $"{SharpLogBroker.LogBrokerName}_ExceptionsLogger";
-            SharpLogger ExceptionLogger = new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
 
             // Log that our exception logger was built without issues
             this._appLogger.WriteLog("CONFIGURING NEW UNHANDLED EXCEPTION LOGGER AND APP EVENT HANDLER NOW...");
-            ExceptionLogger.WriteLog($"BUILT NEW UNIVERSAL EXCEPTIONS LOGGER FOR THE INJECTOR APP OK!", LogType.InfoLog);
+            this._appLogger.WriteLog($"BUILT NEW UNIVERSAL EXCEPTIONS LOGGER FOR THE INJECTOR APP OK!", LogType.InfoLog);
 
             // Now that we've got this logger, hook in a new event to our app instance to deal with unhandled exceptions
             this.DispatcherUnhandledException += (_, ExceptionArgs) =>
             {
                 // Make sure our logging object is configured first
                 SharpLogger InstanceLogger =
-                    SharpLogBroker.FindLoggers(LoggerName).FirstOrDefault()
-                    ?? new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
+                    SharpLogBroker.FindLoggers(LoggerName).FirstOrDefault() ??
+                    new SharpLogger(LoggerActions.UniversalLogger, LoggerName);
 
                 // Now log the exception thrown and process the exception to a handled state
                 string ExInfo = $"UNHANDLED APP LEVEL EXCEPTION PROCESSED AT {DateTime.Now:g}!";
@@ -224,6 +240,32 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
         /// <summary>
+        /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
+        /// </summary>
+        private void _configureInjectorWatchdog()
+        {
+            // Make sure we actually want to use this watchdog service 
+            if (!ValueLoaders.GetConfigValue<bool>("FulcrumWatchdog.WatchdogEnabled"))
+            {
+                // Log that the watchdog is disabled and exit out
+                this._appLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                this._appLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD WatchdogEnabled TO TRUE TO ENABLE OUR WATCHDOG!", LogType.WarnLog);
+                return;
+            }
+
+            // BUG: Starting new watchdog instances for many log files is broken
+            // Spin up a new injector watchdog service here if needed           
+            Task.Run(() =>
+            {
+                FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService();
+                FulcrumConstants.FulcrumWatchdog.StartWatchdogService();
+            });
+
+            // Log that we've booted this new service instance correctly and exit out
+            this._appLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
+            this._appLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK! DIRECTORIES AND FILES WILL BE MONITORED!", LogType.InfoLog);
+        }
+        /// <summary>
         /// Pulls in the resource dictionaries from the given resource path and stores them in the app
         /// </summary>
         private void _configureSingletonViews()
@@ -239,6 +281,12 @@ namespace FulcrumInjector
             var ViewTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("View")).ToArray();
             var ViewModelTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("ViewModel")).ToArray();
             if (ViewTypes.Length != ViewModelTypes.Length) this._appLogger?.WriteLog("WARNING! TYPE OUTPUT LISTS ARE NOT EQUAL SIZES!", LogType.ErrorLog);
+
+            // Configure a new Viewmodel base for the hamburger now
+            this._appLogger.WriteLog("SPAWNING NEW HAMBURGER CORE VIEW AND VIEW MODEL...", LogType.InfoLog);
+            FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(
+                typeof(FulcrumHamburgerCoreView),
+                typeof(FulcrumHamburgerCoreViewModel));
 
             // Loop operation here
             int MaxLoopIndex = Math.Min(ViewTypes.Length, ViewModelTypes.Length);

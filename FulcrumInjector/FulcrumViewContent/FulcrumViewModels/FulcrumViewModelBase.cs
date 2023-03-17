@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -11,13 +14,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// Base class for Model objects on the UI
     /// </summary>
-    internal class FulcrumViewModelBase : INotifyPropertyChanged
+    internal class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
     {
         #region Custom Events
 
-        // Public facing event for hooking into property changed calls
+        // Public facing event for hooking into property or collection changed calls
         public event PropertyChangedEventHandler PropertyChanged;
-
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        
         /// <summary>
         /// Event handler for when a property is updated on this view model controller
         /// </summary>
@@ -25,7 +29,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         protected virtual void OnPropertyChanged([CallerMemberName] string PropertyName = null)
         {
             // Invoke the event for our property if the event handler is configured
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        }
+        /// <summary>
+        /// Event handler for when a collection is updated on this view model controller
+        /// </summary>
+        /// <param name="CollectionAction">The action for the collection changed or updated</param>
+        /// <param name="CollectionChanged">The collection which is being updated</param>
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedAction CollectionAction, IList CollectionChanged)
+        {
+            // Invoke the event for our property if the event handler is configured
+            this.CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(CollectionAction, CollectionChanged));
         }
 
         #endregion //Custom Events
@@ -33,8 +47,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         #region Fields
 
         // Private fields used to help configure our view model base object
-        public UserControl BaseViewControl;         // The base view content we're controlling with this view model
-        protected SharpLogger ViewModelLogger;      // The logger object which will be used on all view models
+        protected SharpLogger ViewModelLogger;               // The logger object which will be used on all view models
+        public readonly UserControl BaseViewControl;         // The base view content we're controlling with this view model
 
         #endregion //Fields
 
@@ -72,81 +86,74 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this._updateSingletonProperty(this);
             this._updateBackingField(this, PropertyName, Value);
         }
+        /// <summary>
+        /// Updates the Collection on this view model and sets a collection changed notify event
+        /// </summary>
+        /// <param name="Value">Value being used</param>
+        /// <param name="CollectionAction">The action of the collection being updated</param>
+        /// <param name="CollectionName">The name of the collection being updated</param>
+        public void CollectionUpdated(IList Value, NotifyCollectionChangedAction CollectionAction, [CallerMemberName] string CollectionName = null)
+        {
+            // Collection Changed Event
+            this.OnCollectionChanged(CollectionAction, Value);
+
+            // Update the VM and Global value
+            this._updateSingletonProperty(this);
+            this._updateBackingField(this, CollectionName, Value);
+        }
 
         /// <summary>
-        /// Updates the globals with the new values configured into this object 
+        /// Updates the globals with the new values configured into this object
+        /// The member being stored/updated is accessed from the static FulcrumConstants class which is why we don't need objects
+        /// to reflect onto when setting values
         /// </summary>
         /// <param name="ViewModelObject">Object to update</param>
         private void _updateSingletonProperty(FulcrumViewModelBase ViewModelObject)
         {
-            // Get the types on the globals first.
-            var AppViewStoreType = typeof(FulcrumConstants);
-            var ViewModelTypeName = Type.GetType(ViewModelObject.ToString());
-            if (AppViewStoreType == null) { throw new NullReferenceException($"THE TYPE {typeof(FulcrumConstants).ToString()} COULD NOT BE FOUND!"); }
-
-            // Gets all the members and sets one to update
-            var AppStoreMembers = AppViewStoreType.GetMembers();
+            // Get the type of the view model and make sure the main window instance is built
+            var ViewModelType = ViewModelObject.GetType();
+            if (ViewModelType.FullName == null) { return; }
             if (FulcrumConstants.FulcrumMainWindow == null) { return; }
+            
+            // Find the member information object used to perform our update routine
+            string ViewModelNameCleaned = ViewModelType.Name.Replace("ViewModel", string.Empty);
+            var MemberToUpdate = typeof(FulcrumConstants).GetMembers()
+                .Where(MemberObj => MemberObj.Name.Contains("ViewModel"))
+                .FirstOrDefault(MemberObj => MemberObj.Name.StartsWith(ViewModelNameCleaned));
 
-            // If the main window isn't null keep going.
-            var MemberToUpdate = AppStoreMembers.FirstOrDefault((MemberObj) =>
+            // If the member type is null, and make sure it's a field or property type here
+            if (MemberToUpdate == null) return;
+            if (MemberToUpdate.MemberType != MemberTypes.Field && MemberToUpdate.MemberType != MemberTypes.Property) return;
+
+            // Find if the VM is a core option or misc singleton. If it's none of those types, exit out
+            string[] SupportedTypes = { "CoreViewModels", "OptionViewModels", "MiscViewModels" };
+            if (!SupportedTypes.Any(SupportedType => ViewModelType.FullName.Contains(SupportedType))) return;
+
+            try
             {
-                // Remove the viewmodel text and search.
-                string ComponentTypeRemoved = ViewModelTypeName.Name.Replace("ViewModel", string.Empty);
-                return MemberObj.Name.StartsWith(ComponentTypeRemoved) && MemberObj.Name.Contains("ViewModel");
-            });
+                // Check if we've got a field or property and update accordingly
+                switch (MemberToUpdate)
+                {
+                    // For fields, set them here using the field setter
+                    case FieldInfo FieldToUpdate:
+                        FieldToUpdate.SetValue(null, ViewModelObject);
+                        break;
 
-            // Find if the VM is a core option or misc singleton
-            bool IsViewModelType =
-                ViewModelTypeName.FullName.Contains("CoreViewModels") ||
-                ViewModelTypeName.FullName.Contains("OptionViewModels") ||
-                ViewModelTypeName.FullName.Contains("MiscViewModels");
+                    // For properties, set them here using the property setter
+                    case PropertyInfo PropertyToUpdate:
+                        if (PropertyToUpdate.SetMethod == null) break;
+                        PropertyToUpdate.SetValue(null, ViewModelObject);
+                        break;
+                }
 
-            // Switch for fields vs properties
-            switch (MemberToUpdate.MemberType)
+                // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
+                var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
+                FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject, false);
+            }
+            catch (Exception UpdateMemberEx)
             {
-                // For Field based objects
-                case MemberTypes.Field:
-                    FieldInfo MemberAsField = (FieldInfo)MemberToUpdate;
-                    try
-                    {
-                        // Check for singleton content object
-                        if (!IsViewModelType)
-                        {
-                            // Try setting value inside this block in case VM value has no public setter.
-                            MemberAsField.SetValue(null, ViewModelObject);
-                            return;
-                        }
-
-                        // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
-                        var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject, false);
-                        return;
-                    }
-                    catch { return; }
-
-                // For Property Based objects
-                case MemberTypes.Property:
-                    PropertyInfo MemberAsProperty = (PropertyInfo)MemberToUpdate;
-                    try
-                    {
-                        // Check for singleton content object
-                        if (!IsViewModelType)
-                        {
-                            // Try setting value inside this block in case VM value has no public setter.
-                            MemberAsProperty.SetValue(null, ViewModelObject);
-                            return;
-                        }
-
-                        // Try and find Object for our singleton instance and store a value to it. If this fails, default back to no singleton.
-                        var PulledSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(ViewModelObject.GetType());
-                        FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(PulledSingleton.SingletonUserControl, ViewModelObject, false);
-                        return;
-                    }
-                    catch { return; }
-
-                // If neither field or property fail out
-                default: throw new InvalidEnumArgumentException($"THE REQUESTED MEMBER {nameof(ViewModelObject)} COULD NOT BE FOUND!");
+                // Log the thrown exception here and return out
+                this.ViewModelLogger.WriteException("ERROR! FAILED TO UPDATE A SINGLETON FIELD!", UpdateMemberEx, LogType.TraceLog);
             }
         }
         /// <summary>
@@ -156,32 +163,38 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// <param name="NotifierObject">Object sending this out</param>
         private void _updateBackingField(object NotifierObject, string PropertyName, object NewPropValue)
         {
-            // Store the type of the sender
+            // Store the type of the sender and get the field being setup now
             var InputObjType = NotifierObject.GetType();
+            var MemberToUpdate = InputObjType
+                .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .FirstOrDefault(FieldObj =>
+                    FieldObj.Name.Contains("_") && 
+                    string.Equals(FieldObj.Name.Substring(1), PropertyName, StringComparison.CurrentCultureIgnoreCase));
 
-            // Loop all fields, find the private value and store it
-            var MembersFound = InputObjType.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            var MemberObject = MembersFound.FirstOrDefault(FieldObj =>
-                FieldObj.Name.Contains("_") &&
-                FieldObj.Name.Substring(1).ToUpper() == PropertyName.ToUpper());
+            // If the member type is null, and make sure it's a field or property type here
+            if (MemberToUpdate == null) return;
+            if (MemberToUpdate.MemberType != MemberTypes.Field && MemberToUpdate.MemberType != MemberTypes.Property) return;
 
-            // Try serialization here. Set if failed.
-            switch (MemberObject.MemberType)
+            try
             {
-                // For Field Objects
-                case MemberTypes.Field:
-                    FieldInfo InvokerField = (FieldInfo)MemberObject;
-                    InvokerField.SetValue(NotifierObject, NewPropValue);
-                    break;
+                // Check if we've got a field or property and update accordingly
+                switch (MemberToUpdate)
+                {
+                    // For fields, set them here using the field setter
+                    case FieldInfo FieldToUpdate:
+                        FieldToUpdate.SetValue(NotifierObject, NewPropValue);
+                        break;
 
-                // For Property objects
-                case MemberTypes.Property:
-                    PropertyInfo InvokerProperty = (PropertyInfo)MemberObject;
-                    InvokerProperty.SetValue(NotifierObject, NewPropValue);
-                    break;
-
-                // Throw if value to modify is not found
-                default: throw new NotImplementedException($"THE INVOKED MEMBER {PropertyName} COULD NOT BE FOUND!");
+                    // For properties, set them here using the property setter
+                    case PropertyInfo PropertyToUpdate:
+                        PropertyToUpdate.SetValue(NotifierObject, NewPropValue);
+                        break;
+                }
+            }
+            catch (Exception UpdateMemberEx)
+            {
+                // Log the thrown exception here and return out
+                this.ViewModelLogger.WriteException("ERROR! FAILED TO UPDATE A BACKING FIELD!", UpdateMemberEx, LogType.TraceLog);
             }
         }
     }

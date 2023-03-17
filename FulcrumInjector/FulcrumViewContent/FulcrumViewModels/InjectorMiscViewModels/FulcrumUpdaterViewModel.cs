@@ -2,8 +2,8 @@
 using System.IO;
 using System.Net;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels
