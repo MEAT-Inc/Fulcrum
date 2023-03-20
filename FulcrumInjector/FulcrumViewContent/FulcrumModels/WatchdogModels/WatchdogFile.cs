@@ -319,7 +319,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             {
                 // Try and find an existing logger for the service instance first
                 string ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
-                var LocatedLogger = SharpLogBroker.FindLoggers($"{ServiceName}_FileLogger").First();
+                var LocatedLogger = SharpLogBroker.FindLoggers($"{ServiceName}_FileLogger").FirstOrDefault();
                 if (LocatedLogger != null)
                 {
                     // Store the found logger and write we've built it out here

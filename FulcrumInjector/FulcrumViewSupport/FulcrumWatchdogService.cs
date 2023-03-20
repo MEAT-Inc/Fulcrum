@@ -73,7 +73,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             this._components = new Container();
             this._watchedDirectories = new List<WatchdogFolder>();
             this.ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
-            this._watchdogLogger = new SharpLogger(LoggerActions.CustomLogger, $"{this.ServiceName}_Logger");
+            this._watchdogLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}_Logger");
 
             // Build and register a new watchdog logging target here for a file and the console
             var WatchdogFileTarget = LocateWatchdogFileTarget();
