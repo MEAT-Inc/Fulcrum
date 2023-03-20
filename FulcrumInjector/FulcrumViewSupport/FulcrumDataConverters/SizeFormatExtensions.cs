@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
             var NormalizedSize = AbsSize / Math.Pow(1000, IUint);
 
             // Build output value string.
-            return $"{(InputSize < 0 ? "-" : string.Empty, NormalizedSize)} {_sizeSuffixes[IUint]}";
+            return $"{(InputSize < 0 ? "-" : string.Empty)}{NormalizedSize} {_sizeSuffixes[IUint]}";
         }
     }
 }
