@@ -72,12 +72,13 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Init our component object here and setup logging
             this._components = new Container();
             this._watchedDirectories = new List<WatchdogFolder>();
-            this._watchdogLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
+            this._watchdogLogger = new SharpLogger(LoggerActions.CustomLogger, $"{this.ServiceName}_Logger");
 
-            // TODO: Figure out if this is REALLY necessary or if it's just causing hangups
-            // this._watchdogLogger.RegisterTarget(LocateWatchdogLoggerTarget());
-
+            // Build and register a new watchdog logging target here for a file and the console
+            var WatchdogFileTarget = LocateWatchdogFileTarget();
+            this._watchdogLogger.RegisterTarget(WatchdogFileTarget);
+            
             // Log we're building this new service and log out the name we located for it
             this._watchdogLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
             this._watchdogLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
@@ -471,42 +472,38 @@ namespace FulcrumInjector.FulcrumViewSupport
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
-        /* TODO: Figure out if I really need this for some reason going forward. For expressions and sims, it's needed. But this seems overkill
-         *
-         * /// <summary>
-         * /// Configures the logger for this generator to output to a custom file path
-         * /// </summary>
-         * /// <returns>The configured sharp logger instance</returns>
-         * public static FileTarget LocateWatchdogLoggerTarget()
-         * {
-         *     // Make sure our output location exists first
-         *     string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, "WatchdogLogs");
-         *     if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
-         * 
-         *     // Configure our new logger name and the output log file path for this logger instance 
-         *     string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
-         *     string ServiceLoggerName = $"FulcrumWatchdog_ServiceLogging_{ServiceLoggerTime}";
-         *     string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
-         *     if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
-         * 
-         *     // Spawn the new generation logger and attach in a new file target for it
-         *     var ExistingTarget = SharpLogBroker.LoggingTargets.FirstOrDefault(LoggerTarget => LoggerTarget.Name == ServiceLoggerName);
-         *     if (ExistingTarget is FileTarget LocatedFileTarget) return LocatedFileTarget; 
-         * 
-         *     // Spawn the new generation logger and attach in a new file target for it
-         *     string LayoutString = SharpLogBroker.DefaultFileFormat.LoggerFormatString;
-         *     FileTarget ServiceFileTarget = new FileTarget(ServiceLoggerName)
-         *     {
-         *         KeepFileOpen = false,           // Allows multiple programs to access this file
-         *         Layout = LayoutString,          // The output log line layout for the logger
-         *         ConcurrentWrites = true,        // Allows multiple writes at one time or not
-         *         FileName = OutputFileName,      // The name/full log file being written out
-         *         Name = ServiceLoggerName,       // The name of the logger target being registered
-         *     };
-         * 
-         *     // Return the output logger object built
-         *     return ServiceFileTarget;
-         * }
-         */
-    }
+        /// <summary>
+        /// Configures the logger for this generator to output to a custom file path
+        /// </summary>
+        /// <returns>The configured sharp logger instance</returns>
+        internal static FileTarget LocateWatchdogFileTarget()
+        {
+            // Make sure our output location exists first
+            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, "WatchdogLogs");
+            if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
+        
+            // Configure our new logger name and the output log file path for this logger instance 
+            string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
+            string ServiceLoggerName = $"FulcrumWatchdog_ServiceLogging_{ServiceLoggerTime}";
+            string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
+            if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
+        
+            // Spawn the new generation logger and attach in a new file target for it
+            var ExistingTarget = SharpLogBroker.LoggingTargets.FirstOrDefault(LoggerTarget => LoggerTarget.Name == ServiceLoggerName);
+            if (ExistingTarget is FileTarget LocatedFileTarget) return LocatedFileTarget; 
+        
+            // Spawn the new generation logger and attach in a new file target for it
+            string LayoutString = SharpLogBroker.DefaultFileFormat.LoggerFormatString;
+            FileTarget ServiceFileTarget = new FileTarget(ServiceLoggerName)
+            {
+                KeepFileOpen = false,           // Allows multiple programs to access this file
+                Layout = LayoutString,          // The output log line layout for the logger
+                ConcurrentWrites = true,        // Allows multiple writes at one time or not
+                FileName = OutputFileName,      // The name/full log file being written out
+                Name = ServiceLoggerName,       // The name of the logger target being registered
+            };
+        
+            // Return the output logger object built
+            return ServiceFileTarget;
+        } }
 }

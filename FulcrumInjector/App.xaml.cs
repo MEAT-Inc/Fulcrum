@@ -63,7 +63,7 @@ namespace FulcrumInjector
             // Run single instance configuration
             this._configureSingleInstance();
             this._configureAppExitRoutine();
-            // this._configureInjectorWatchdog();
+            this._configureInjectorWatchdog();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
