@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -114,17 +114,17 @@
     <Reference Include="SharpExpressions, Version=0.5.5.135, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpExpressions.0.5.5.144\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.6.2.302, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.6.2.302\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.6.3.303, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.6.3.303\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
     <Reference Include="SharpPipes, Version=0.2.3.34, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpPipes.0.2.3.34\lib\net472\SharpPipes.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.11.4.220, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.11.4.220\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.11.5.223, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.11.5.223\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrapper, Version=6.1.5.454, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrapper.6.1.5.454\lib\net472\SharpWrapper.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=6.1.8.456, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrapper.6.1.8.456\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
