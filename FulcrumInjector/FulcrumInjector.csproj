@@ -123,9 +123,6 @@
     <Reference Include="SharpSimulator, Version=0.11.3.218, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpSimulator.0.11.3.218\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSupport, Version=0.1.2.3, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.11.3.218\lib\net472\SharpSupport.dll</HintPath>
-    </Reference>
     <Reference Include="SharpWrapper, Version=6.1.5.443, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\packages\SharpSimulator.0.11.3.218\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
