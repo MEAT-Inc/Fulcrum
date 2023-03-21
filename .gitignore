@@ -431,3 +431,6 @@ FodyWeavers.xsd
 ProtechSalesInvoice_Fulcrum.xlsx
 
 ProtechSalesInvoice_FulcrumInjector_Final_02012022.pdf
+
+FulcrumShim/[Dd]ebug/
+FulcrumShim/[Rr]elease*/
