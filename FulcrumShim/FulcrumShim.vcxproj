@@ -149,7 +149,8 @@
     <ExecutablePath>$(IncludePath);$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files %28x86%29\Windows Kits\8.1\Include;C:\Program Files %28x86%29\Windows Kits\8.1\Include\shared;C:\Program Files %28x86%29\Windows Kits\8.1\Include\winrt;C:\Program Files %28x86%29\Windows Kits\8.1\Include\um;C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.18362.0\ucrt;C:\Users\$(USERNAME)\source\repos\MEAT-Inc\FulcrumShim\FulcrumShim\nlohmann_json;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Windows Kits\8.1\Lib;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.18362.0\ucrt;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.18362.0\ucrt\x86;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.18362.0\ucrt\x64;$(LibraryPath)</LibraryPath>
-    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -275,9 +276,17 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <CustomBuildStep>
-      <Message>Building Injector Logic</Message>
-      <Command>"$(DevEnvDir)TextTransform.exe" -a !!build!true "$(SolutionDir)FulcrumInjector\Properties\AssemblyInfo.tt" "$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumInjector\FulcrumInjector.csproj" &amp;&amp; py "$(ProjectDir)FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"</Command>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
     </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>py "$(ProjectDir)FulcrumVersionTick.py" "$(ProjectDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Building Injector Logic</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
