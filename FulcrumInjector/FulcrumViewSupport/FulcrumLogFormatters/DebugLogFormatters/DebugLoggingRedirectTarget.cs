@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.DebugLogFormat
             this.Layout = $"[{LoggerDate}][{LoggerLevel}][{LoggerMethod}] ::: {LoggerMessage}";
 
             // Finally build our color values for the logging entries we find
-            base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDebugSyntaxFulcrumSettings.ToArray());
+            base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDebugSyntaxSettings.ToArray());
             _formatLogger.WriteLog("BUILT LAYOUT FORMAT CORRECTLY! READY TO PULL COLORS", LogType.InfoLog);
             _formatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
 
