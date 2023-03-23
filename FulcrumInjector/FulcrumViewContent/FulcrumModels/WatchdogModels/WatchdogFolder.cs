@@ -183,10 +183,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         public WatchdogFolder(string WatchedDirectory, params string[] WatchdogFilters)
         {
             // Store our configuration values first
-            this._watchedFileFilters = WatchdogFilters.ToArray();
             this._directoryWatchers = new List<FileSystemWatcher>();
             this._watchedDirectory = Path.GetFullPath(WatchedDirectory);
             this._watchedFiles = new ObservableCollection<WatchdogFile>();
+            this._watchedFileFilters = WatchdogFilters.Length == 0 ? new[] { "*.*" } : WatchdogFilters.ToArray();
             this._executionGap = FulcrumConstants.FulcrumSettings.InjectorWatchdogSettings.GetSettingValue("Watchdog Execution Gap", 5000);
 
             // If our logger instance is null, build it now
