@@ -268,38 +268,8 @@ namespace FulcrumInjector.FulcrumViewSupport
                 }
 
                 // Load in our watched folder content from the settings file here. We can insert more objects to this list later on
-                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder[]>("FulcrumWatchdog.WatchedFolders").ToList();
-
-                // Check to see if we're requesting to watch all logging folders.
-                var WatchdogSettings = FulcrumConstants.FulcrumSettings[SectionType.FILE_WATCHDOG_SETTINGS];
-                bool WatchLoggingFolders = WatchdogSettings.GetSettingValue("Monitor All Logging Folders", false);
-                if (WatchLoggingFolders)
-                {
-                    // Log that we're using all the new logging folders requested and store them on the app configuration before loading them in
-                    this._watchdogLogger.WriteLog("WARING! ALL CHILD FOLDERS INSIDE OUR MAIN LOGGING FOLDER ARE BEING MONITORED!", LogType.WarnLog);
-                    this._watchdogLogger.WriteLog("IMPORTING AND CONFIGURING THOSE CHILD FOLDERS NOW...", LogType.InfoLog);
-
-                    // Find what folders need to be imported and log them out if needed.
-                    var LoggingFolders = SharpLogBroker.LoggingSubfolders;
-                    if (LoggingFolders.Length == 0) this._watchdogLogger.WriteLog("WARNING! NO CHILD LOGGING FOLDERS COULD BE FOUND!", LogType.WarnLog); 
-                    else 
-                    {
-                        // Log out how many folders we found inside our logging folder path and create watched folders for them all now
-                        this._watchdogLogger.WriteLog($"LOCATED A TOTAL OF {LoggingFolders.Length} FOLDER{(LoggingFolders.Length == 1 ? string.Empty : "s")}!");
-
-                        // Loop all the folders found and insert them into our configuration file
-                        string[] WatchedExtensions = new[] { "*.txt", "*.log", "*.ptSim", "*.ptExp" };
-                        WatchedConfigs.AddRange(LoggingFolders.Select(LoggingFolder => new WatchdogFolder(LoggingFolder, WatchedExtensions)));
-                        if (!ValueSetters.SetValue("FulcrumWatchdog.WatchedFolders", WatchedConfigs.ToArray()))
-                            this._watchdogLogger.WriteLog("ERROR! FAILED TO SAVE OUR NEWLY BUILT WATCHDOG FOLDERS BACK TO OUR SETTINGS FILE!", LogType.ErrorLog);
-
-                        // Once we've set the new value for our watchdog folders, we can print them out here
-                        this._watchdogLogger.WriteLog("IMPORTED NEW LOGGING FOLDERS TO WATCH WITHOUT ISSUES!", LogType.InfoLog);
-                    }
-                }
-
-                // Now using the configuration file, load in our predefined folders to monitor
-                this._watchdogLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Count} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
+                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder[]>("FulcrumWatchdog.WatchedFolders");
+                this._watchdogLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Length} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
                 this._watchdogLogger.WriteLog("IMPORTED PATH CONFIGURATIONS WILL BE LOGGED BELOW", LogType.TraceLog);
 
                 // Clear out any previous configurations/folders and add our new ones now

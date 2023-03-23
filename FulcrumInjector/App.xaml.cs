@@ -258,7 +258,9 @@ namespace FulcrumInjector
         private void _configureInjectorWatchdog()
         {
             // Make sure we actually want to use this watchdog service 
-            if (!FulcrumConstants.FulcrumSettings.InjectorWatchdogSettings.GetSettingValue("Watchdog Enabled", false))
+            var WatchdogSettings = FulcrumConstants.FulcrumSettings[SectionType.FILE_WATCHDOG_SETTINGS];
+            bool WatchdogEnabled = WatchdogSettings.GetSettingValue("Enable Directory Watchdog", false);
+            if (!WatchdogEnabled)
             {
                 // Log that the watchdog is disabled and exit out
                 this._appLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);

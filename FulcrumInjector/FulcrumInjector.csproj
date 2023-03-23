@@ -502,7 +502,6 @@ cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
-cmd.exe /C mkdir "$(TargetDir)FulcrumImages"
 cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
 cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
