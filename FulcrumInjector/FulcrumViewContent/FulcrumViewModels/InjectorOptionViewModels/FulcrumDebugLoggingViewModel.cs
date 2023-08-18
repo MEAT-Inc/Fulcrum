@@ -70,12 +70,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         /// <returns>Names of all loggers</returns>
         public List<string> BuildLoggerNamesList()
         {
-            // Spawn a new logger for this view model instance 
-            this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModelLogger.WriteLog("PULLING LOGGER NAMES FROM QUEUE NOW TO POPULATE DEBUG DROPDOWN...");
-
             // Build filtering list and return them
             var PulledNames = new List<string>() { "--- Select A Logger ---" };
+            this.ViewModelLogger.WriteLog("PULLING LOGGER NAMES FROM QUEUE NOW TO POPULATE DEBUG DROPDOWN...");
             PulledNames.AddRange(SharpLogBroker.LoggerPool.Select(LoggerObj => LoggerObj.LoggerName));
 
             // Return them here
