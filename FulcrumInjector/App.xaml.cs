@@ -18,6 +18,9 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using NLog.Targets;
 using SharpLogging;
 
+// Static using for setting section types
+using SectionType = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
+
 namespace FulcrumInjector
 {
     /// <summary>
@@ -63,11 +66,11 @@ namespace FulcrumInjector
             // Run single instance configuration
             this._configureSingleInstance();
             this._configureAppExitRoutine();
+            this._configureInjectorSettings();
             this._configureInjectorWatchdog();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
-            this._configureUserSettings();
             this._configureSingletonViews();
 
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
@@ -240,12 +243,24 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
         /// <summary>
+        /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
+        /// </summary>
+        private void _configureInjectorSettings()
+        {
+            // Pull our settings objects out from the settings file.
+            FulcrumConstants.FulcrumSettings = FulcrumSettingsShare.GenerateSettingsShare();
+            this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
+            this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
+        }
+        /// <summary>
         /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
         /// </summary>
         private void _configureInjectorWatchdog()
         {
             // Make sure we actually want to use this watchdog service 
-            if (!ValueLoaders.GetConfigValue<bool>("FulcrumWatchdog.WatchdogEnabled"))
+            var WatchdogSettings = FulcrumConstants.FulcrumSettings[SectionType.FILE_WATCHDOG_SETTINGS];
+            bool WatchdogEnabled = WatchdogSettings.GetSettingValue("Enable Directory Watchdog", false);
+            if (!WatchdogEnabled)
             {
                 // Log that the watchdog is disabled and exit out
                 this._appLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
@@ -323,16 +338,6 @@ namespace FulcrumInjector
             this.ThemeConfiguration = new AppThemeConfiguration();
             this.ThemeConfiguration.CurrentAppStyleModel = ThemeConfiguration.PresetThemes[0];
             this._appLogger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
-        }
-        /// <summary>
-        /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
-        /// </summary>
-        private void _configureUserSettings()
-        {
-            // Pull our settings objects out from the settings file.
-            FulcrumConstants.FulcrumSettings = FulcrumSettingsShare.GenerateSettingsShare();
-            this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
-            this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
         }
     }
 }

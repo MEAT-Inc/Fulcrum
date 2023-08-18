@@ -3,10 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
+
+// Static using for setting section types
+using SectionTypes = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 {
@@ -76,7 +80,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         private static SharpLogger _fileLogger;
 
         // Sets if we're watching this file or not 
-        private int _refreshTime = 250;
+        private readonly int _refreshTime;
         private CancellationToken _watchToken;
         private CancellationTokenSource _watchTokenSource;
 
@@ -347,40 +351,25 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 this.FileName = Path.GetFileName(this.FullFilePath);
                 this.FileExtension = Path.GetExtension(this.FullFilePath);
                 this.FileFolder = Path.GetDirectoryName(this.FullFilePath);
-            }
-            catch (Exception SetFileInfoEx)
-            {
-                // Catch the exception and log it out
-                _fileLogger?.WriteException(SetFileInfoEx);
-                return;
-            }
 
-            try
-            {
+                // Find out refresh delay time here and store it on our instance
+                var WatchdogSettings = FulcrumConstants.FulcrumSettings[SectionTypes.FILE_WATCHDOG_SETTINGS];
+                this._refreshTime = WatchdogSettings.GetSettingValue("Watchdog Execution Gap", 5000);
+                
                 // If the file exists, then we set up the time values and size information
-                if (!this.FileExists) return;
                 FileInfo WatchedFileInfo = new FileInfo(this.FullFilePath);
                 this.TimeCreated = WatchedFileInfo.CreationTime;
                 this.TimeModified = WatchedFileInfo.LastWriteTime;
                 this.TimeAccessed = WatchedFileInfo.LastAccessTime;
-            }
-            catch (Exception SetFileTimeEx)
-            {
-                // Catch the exception and log it out
-                _fileLogger?.WriteException(SetFileTimeEx);
-                return;
-            }
 
-            try
-            {
                 // Now try and start monitoring our file instance here
                 this.IsMonitoring = true;
             }
-            catch (Exception SetMonitoringStateEx)
+            catch (Exception SetFileInfoEx)
             {
                 // Catch the exception and log it out
-                _fileLogger?.WriteException(SetMonitoringStateEx);
-                return;
+                _fileLogger.WriteLog($"ERROR! FAILED TO START MONITORING FOR A WATCHDOG FILE NAMED {this.FileName}!", LogType.ErrorLog);
+                _fileLogger?.WriteException("EXCEPTION INFORMATION IS BEING SHOWN BELOW", SetFileInfoEx);
             }
         }
     }

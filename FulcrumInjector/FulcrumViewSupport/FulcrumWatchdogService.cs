@@ -5,10 +5,15 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceProcess;
+using FulcrumInjector.FulcrumViewContent;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using NLog.Targets;
 using SharpLogging;
+
+// Static using for setting section types
+using SectionType = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
 
 namespace FulcrumInjector.FulcrumViewSupport
 {
@@ -32,17 +37,17 @@ namespace FulcrumInjector.FulcrumViewSupport
         #endregion //Fields
 
         #region Properties
-        
+
         // Public facing properties holding information about our folders being watched and all their files
+        public WatchdogFile[] WatchedFiles => this.WatchedDirectories
+            .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
+            .OrderBy(WatchedFile => WatchedFile.FullFilePath)
+            .ToArray();
         public WatchdogFolder[] WatchedDirectories
         {
             get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
             private set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
         }
-        public WatchdogFile[] WatchedFiles => this.WatchedDirectories
-            .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
-            .OrderBy(WatchedFile => WatchedFile.FullFilePath)
-            .ToArray();
 
         #endregion //Properties
 
@@ -262,14 +267,14 @@ namespace FulcrumInjector.FulcrumViewSupport
                     this._watchedDirectories[WatchdogIndex] = null;
                 }
 
-                // Now using the configuration file, load in our predefined folders to monitor
+                // Load in our watched folder content from the settings file here. We can insert more objects to this list later on
                 var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder[]>("FulcrumWatchdog.WatchedFolders");
                 this._watchdogLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Length} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
                 this._watchdogLogger.WriteLog("IMPORTED PATH CONFIGURATIONS WILL BE LOGGED BELOW", LogType.TraceLog);
 
                 // Clear out any previous configurations/folders and add our new ones now
                 this._watchedDirectories = new List<WatchdogFolder>();
-                this.AddWatchedFolders(WatchedConfigs);
+                this.AddWatchedFolders(WatchedConfigs.ToArray());
                 
                 // Log booted service without issues here and exit out of this routine
                 this._watchdogLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);

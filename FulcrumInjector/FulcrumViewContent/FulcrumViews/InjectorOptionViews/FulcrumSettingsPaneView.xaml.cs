@@ -66,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         {
             // Populate our settings values here and refresh content from the injector constants
             this.ViewModel.PopulateAppSettingJsonViewer(this.JsonSettingsViewEditor);
-            this.ViewModel.SettingsEntrySets = new (FulcrumConstants.FulcrumSettings);
+            this.ViewModel.SettingsEntrySets = new (FulcrumConstants.FulcrumSettings.Values);
             this._viewLogger.WriteLog("BUILT AND LOADED IN SESSION SETTINGS FOR THIS VIEW CORRECTLY!");
         }
 

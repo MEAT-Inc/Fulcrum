@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using Newtonsoft.Json;
 using SharpLogging;
+
+// Static using for setting section types
+using SectionTypes = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 {
@@ -181,13 +186,24 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         /// <param name="WatchdogFilters">Optional filters used to filter what files we're watching</param>
         public WatchdogFolder(string WatchedDirectory, params string[] WatchdogFilters)
         {
+            // Make sure our path is valid here and append a leading folder path if needed
+            if (!Path.IsPathRooted(WatchedDirectory))
+                WatchedDirectory = Path.Combine(Directory.GetCurrentDirectory(), WatchedDirectory);
+
             // Store our configuration values first
-            this._watchedFileFilters = WatchdogFilters.ToArray();
             this._directoryWatchers = new List<FileSystemWatcher>();
             this._watchedDirectory = Path.GetFullPath(WatchedDirectory);
             this._watchedFiles = new ObservableCollection<WatchdogFile>();
-            this._executionGap = ValueLoaders.GetConfigValue<int>("FulcrumWatchdog.ExecutionGap");
+            this._watchedFileFilters = WatchdogFilters.Length == 0 ? new[] { "*.*" } : WatchdogFilters.ToArray();
 
+            // If this folder is not real, throw an exception 
+            if (!Directory.Exists(this._watchedDirectory))
+                throw new DirectoryNotFoundException($"Error! Could not find path {this._watchedDirectory} to monitor!");
+
+            // Find out refresh delay time here and store it on our instance
+            var WatchdogSettings = FulcrumConstants.FulcrumSettings[SectionTypes.FILE_WATCHDOG_SETTINGS];
+            this._executionGap = WatchdogSettings.GetSettingValue("Watchdog Execution Gap", 5000);
+            
             // If our logger instance is null, build it now
             if (_folderLogger == null)
             {
@@ -228,10 +244,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 NextWatcher.IncludeSubdirectories = false;
                 NextWatcher.Filter = FileExtension;
                 NextWatcher.NotifyFilter =
-                    NotifyFilters.Attributes | NotifyFilters.CreationTime |
                     NotifyFilters.DirectoryName | NotifyFilters.FileName |
-                    NotifyFilters.LastAccess | NotifyFilters.LastWrite |
-                    NotifyFilters.Security | NotifyFilters.Size;
+                     NotifyFilters.LastWrite | NotifyFilters.Size;
 
                 // Event ties for changes and modified files we can't process directly here
                 // These three event types can't be compared inside our file objects because they would require pointless
