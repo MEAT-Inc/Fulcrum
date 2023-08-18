@@ -3,6 +3,9 @@ using System.Windows.Forms;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using Newtonsoft.Json;
 
+// Static using for setting section types 
+using SectionType = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
+
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 {
     /// <summary>
@@ -25,8 +28,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         public string SettingDescription { get; set; }
 
         // The type of control used to setup the settings entries
-        public ControlTypes TypeOfControl { get; set; }
         public Type SettingControlType { get; set; }
+        public SectionType ParentSection { get; set; }
+        public ControlTypes TypeOfControl { get; set; }
 
         #endregion //Properties
 

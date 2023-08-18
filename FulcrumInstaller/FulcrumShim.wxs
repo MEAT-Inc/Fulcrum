@@ -75,8 +75,8 @@
 		                            </Shortcut>
 	                            </File>                            
 	                        </Component>
-                            <Directory Id="FULCRUMXAML" Name="FulcrumXAML">
-                                <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
+                            <Directory Id="FULCRUMSTYLES" Name="FulcrumStyles">
+                                <Component Id="FulcrumStyleSheets" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
                                     <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml" />
                                     <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumControlStyles.xaml" />
                                     <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
@@ -121,12 +121,7 @@
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-                            <Directory Id="FULCRUMCONVERSIONS" Name="FulcrumConversions">
-                                <Component Id="CreateFulcrumConversionsFolder" Guid="A88D5BF2-516C-4838-B79F-BFDE9ACF6BD5">
-                                    <CreateFolder />
-                                </Component>
-                            </Directory>
-                            <Directory Id="FULCRUMDEFAULTIMPORTS" Name="FulcrumImports">
+							<Directory Id="FULCRUMDEFAULTIMPORTS" Name="FulcrumImports">
                                 <Component Id="CreateFulcrumImportsFolder" Guid="77D91A92-6EF7-4E05-984E-9DA575EABEFD">
                                     <CreateFolder />
                                 </Component>
@@ -222,17 +217,16 @@
         <Feature Id="ProductFeature" Title="installer" Level="1">
             <ComponentRef Id="V0404RegKey" />
             <ComponentRef Id="V0500RegKey" />
-            <ComponentRef Id="FulcrumXamlFiles" />
-            <ComponentRef Id="FulcrumShimFiles" />
+			<ComponentRef Id="FulcrumShimFiles" />
+			<ComponentRef Id="FulcrumStyleSheets" />
             <ComponentRef Id="FulcrumResourceFiles" />
-            <ComponentRef Id="CreateFulcrumIconsFolder" />
+			<ComponentRef Id="CreateFulcrumIconsFolder" />
             <ComponentRef Id="CreateFulcrumImportsFolder" />
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
 			<ComponentRef Id="CreateFulcrumArchivesFolder" />
 			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
             <ComponentRef Id="CreateFulcrumSimulationsFolder" />
-            <ComponentRef Id="CreateFulcrumConversionsFolder" />
         </Feature>
         <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 

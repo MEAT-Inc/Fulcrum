@@ -53,7 +53,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Store the settings sets for our instance on the view model
-            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ToList());
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.Values);
             this.ViewModelLogger.WriteLog("IMPORTED AND STORED NEW SETTINGS CONFIGURATION VALUES OK!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
@@ -94,21 +94,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         {
             // Store the setting value back onto our view model content and save it's JSON Value.
             this.ViewModelLogger.WriteLog($"SETTING VALUE BEING WRITTEN OUT: {JsonConvert.SerializeObject(SenderContext, Formatting.None)}", LogType.TraceLog);
-            var LocatedSettingSet = FulcrumConstants.FulcrumSettings
-                .FirstOrDefault(SettingSet => SettingSet
-                    .Any(SettingObj => SettingObj.SettingName == SenderContext.SettingName));
+            var LocatedSettingSet = FulcrumConstants.FulcrumSettings[SenderContext.ParentSection];
 
             // Find the location of the setting value.
             if (LocatedSettingSet == null) { this.ViewModelLogger.WriteLog("FAILED TO FIND SETTING ENTRY SET WITH SETTING VALUE!", LogType.ErrorLog); return; }
             LocatedSettingSet.UpdateSetting(new[] { SenderContext });
-
-            // Now write the new setting value to our JSON configuration and refresh values.
-            int SettingSetIndex = FulcrumConstants.FulcrumSettings.ToList()
-                .FindIndex(ImportedSettingSet => ImportedSettingSet.SettingSectionTitle == LocatedSettingSet.SettingSectionTitle);
-
+            
             // Store the settings value here.
-            var SettingObjects = FulcrumConstants.FulcrumSettings.ToList();
-            SettingObjects[SettingSetIndex] = LocatedSettingSet;
+            var SettingObjects = FulcrumConstants.FulcrumSettings;
+            SettingObjects[SenderContext.ParentSection] = LocatedSettingSet;
 
             // Store our value in the JSON configuration files now.
             ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
