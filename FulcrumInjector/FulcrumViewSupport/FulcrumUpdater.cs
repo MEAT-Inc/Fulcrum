@@ -100,7 +100,8 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Construct a new logger instance and build a new configuration for the updater
             this._injectorUpdateLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this._updaterConfiguration = ValueLoaders.GetConfigValue<UpdateConfiguration>("FulcrumConstants.InjectorUpdates");
-            this._updaterConfiguration.UpdaterSecretKey = Encoding.UTF8.GetString(Convert.FromBase64String(this._updaterConfiguration.UpdaterSecretKey));
+            string UpdaterKeyString = this._updaterConfiguration.UpdaterSecretKey.Reverse().ToString();
+            this._updaterConfiguration.UpdaterSecretKey = Encoding.UTF8.GetString(Convert.FromBase64String(UpdaterKeyString));
             this._injectorUpdateLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
 
             // Configure updater here
