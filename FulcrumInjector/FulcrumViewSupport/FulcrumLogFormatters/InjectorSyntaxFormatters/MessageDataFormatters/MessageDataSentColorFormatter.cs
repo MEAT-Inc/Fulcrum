@@ -27,17 +27,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         {
             // Convert input regex into a multiline ready expression
             List<Regex> BuiltLineExpressions = new List<Regex>();
-            var MessageDataRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionTypes.MessageSentInfo];
-            MatchCollection RegexStrings = Regex.Matches(MessageDataRegex.ExpressionPattern, @"\(\?<[^\)]+\)");
+            string MessageDataRegexString = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionTypes.MessageSentInfo]
+                .ExpressionPattern; MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
             for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
-            {
-                // Check for edge cases where our parens count isn't even
-                string RegexString = RegexStrings[StringIndex].Value;
-                if (RegexString.Contains("(?>")) RegexString += ")";
-
-                // Once we make sure the regex string is valid, store it on our collection
-                BuiltLineExpressions.Add(new Regex(RegexString));
-            }
+                BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));
 
             // Search for our matches here and then loop our doc lines to apply coloring
             string CurrentLine = CurrentContext.Document.GetText(InputLine);

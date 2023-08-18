@@ -99,29 +99,32 @@
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.6.2.302\lib\net472\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.6.2.302\lib\net472\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="Octokit, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.2.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.4.4.129, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.4.4.129\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.4.3.127, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.4.3.127\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
-    <Reference Include="SharpExpressions, Version=0.5.6.146, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpExpressions.0.5.6.146\lib\net472\SharpExpressions.dll</HintPath>
+    <Reference Include="SharpExpressions, Version=0.5.5.135, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpExpressions.0.5.5.144\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.7.8.334, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.7.8.334\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.6.4.319, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.6.4.319\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
-    <Reference Include="SharpPipes, Version=0.2.4.35, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpPipes.0.2.4.35\lib\net472\SharpPipes.dll</HintPath>
+    <Reference Include="SharpPipes, Version=0.2.3.34, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpPipes.0.2.3.34\lib\net472\SharpPipes.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.11.6.225, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.11.6.225\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.11.5.223, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.11.5.223\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSupport, Version=0.1.2.3, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrapper.6.1.9.459\lib\net472\SharpSupport.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpWrapper, Version=6.1.9.459, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrapper.6.1.9.459\lib\net472\SharpWrapper.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=6.1.8.456, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrapper.6.1.8.456\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
@@ -170,7 +173,7 @@
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileSet.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringQuantityExtensions.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
@@ -498,6 +501,7 @@ cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
+cmd.exe /C mkdir "$(TargetDir)FulcrumImages"
 cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
 cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"

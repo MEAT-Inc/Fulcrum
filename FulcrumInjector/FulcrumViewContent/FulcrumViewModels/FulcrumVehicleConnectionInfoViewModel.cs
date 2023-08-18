@@ -81,7 +81,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
                 }
 
                 // Check if we want to use voltage monitoring or not.
-                bool UseMonitoring = FulcrumConstants.FulcrumSettings.InjectorHardwareSettings.GetSettingValue("Enable Vehicle Monitoring", true);
+                bool UseMonitoring = FulcrumConstants.FulcrumSettings.InjectorGeneralFulcrumSettings.GetSettingValue("Enable Vehicle Monitoring", true);
                 if (!UseMonitoring)
                 {
                     this.ViewModelLogger.WriteLog("NOT USING VOLTAGE MONITORING ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
@@ -242,7 +242,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
             // Find out VIN Number values here.
             FulcrumConstants.SharpSessionAlpha.PTOpen();
-            bool CheckVinNumber = FulcrumConstants.FulcrumSettings.InjectorHardwareSettings.GetSettingValue("Enable Auto ID Routines", true);
+            bool CheckVinNumber = FulcrumConstants.FulcrumSettings.InjectorGeneralFulcrumSettings.GetSettingValue("Enable Auto ID Routines", true);
             if (!CheckVinNumber) this.ViewModelLogger.WriteLog("NOT USING VEHICLE AUTO ID ROUTINES SINCE THE USER HAS SET THEM TO OFF!", LogType.WarnLog);
 
             // Run as a task to avoid locking up UI
