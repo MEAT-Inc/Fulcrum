@@ -7,15 +7,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
 
-// Static using for settings collection types
-using SectionType = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
-
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 {
     /// <summary>
     /// Static share class object for settings entries.
     /// </summary>
-    internal sealed class FulcrumSettingsShare : Dictionary<SectionType, FulcrumSettingsCollection>
+    internal sealed class FulcrumSettingsShare : IEnumerable<FulcrumSettingsCollection>
     {
         #region Custom Events
         #endregion //Custom Events
@@ -28,6 +25,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 
         // Logger instance for our settings share
         private readonly SharpLogger _settingsStoreLogger;
+        private readonly List<FulcrumSettingsCollection> _settingsCollections;
 
         #endregion //Fields
 
@@ -49,22 +47,30 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         }
 
         // Predefined settings collections for object values pulled in from our JSON Configuration file
-        public FulcrumSettingsCollection InjectorShimDllSettings =>
-            this[SectionType.SHIM_DLL_SETTINGS] ??= new FulcrumSettingsCollection("FulcrumShim DLL Settings", SectionType.SHIM_DLL_SETTINGS);
-        public FulcrumSettingsCollection InjectorHardwareSettings =>
-            this[SectionType.HARDWARE_SETTINGS] ??= new FulcrumSettingsCollection("Hardware Configuration Settings", SectionType.HARDWARE_SETTINGS);
-        public FulcrumSettingsCollection InjectorPipeServerSettings =>
-            this[SectionType.PIPE_SERVER_SETTINGS] ??= new FulcrumSettingsCollection("Injector Pipe Settings", SectionType.PIPE_SERVER_SETTINGS);
-        public FulcrumSettingsCollection InjectorWatchdogSettings =>
-            this[SectionType.FILE_WATCHDOG_SETTINGS] ??= new FulcrumSettingsCollection("Fulcrum Watchdog Settings", SectionType.FILE_WATCHDOG_SETTINGS);
-        public FulcrumSettingsCollection InjectorDllOutputRegexSettings =>
-            this[SectionType.DLL_OUTPUT_REGEX_SETTINGS] ??= new FulcrumSettingsCollection("PassThru DLL Output Regex Settings", SectionType.DLL_OUTPUT_REGEX_SETTINGS);
-        public FulcrumSettingsCollection InjectorDllSyntaxSettings =>
-            this[SectionType.DLL_OUTPUT_SYNTAX_SETTINGS] ??= new FulcrumSettingsCollection("PassThru DLL Output Syntax Settings", SectionType.DLL_OUTPUT_SYNTAX_SETTINGS);
-        public FulcrumSettingsCollection InjectorDebugLogViewerSettings =>
-            this[SectionType.DEBUG_VIEWER_SETTINGS] ??= new FulcrumSettingsCollection("Debug Log Viewer Settings", SectionType.DEBUG_VIEWER_SETTINGS);
-        public FulcrumSettingsCollection InjectorDebugSyntaxSettings =>
-            this[SectionType.DEBUG_VIEWER_SYNTAX] ??= new FulcrumSettingsCollection("Debug Log Viewer Syntax Settings", SectionType.DEBUG_VIEWER_SYNTAX);
+        public FulcrumSettingsCollection InjectorGeneralFulcrumSettings =>
+            this.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Hardware Configuration Settings")
+            ) ?? new FulcrumSettingsCollection("Hardware Configuration Settings", Array.Empty<FulcrumSettingEntryModel>());
+        public FulcrumSettingsCollection DebugLogViewerFulcrumSettings =>
+            this?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Settings")
+            ) ?? new FulcrumSettingsCollection("Debug Log Viewer Settings", Array.Empty<FulcrumSettingEntryModel>());
+        public FulcrumSettingsCollection InjectorPipeConfigFulcrumSettings =>
+            this?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Injector Pipe Settings")
+            ) ?? new FulcrumSettingsCollection("Injector Pipe Settings", Array.Empty<FulcrumSettingEntryModel>()); 
+        public FulcrumSettingsCollection InjectorRegexFulcrumSettings =>
+            this?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Regex Settings")
+            ) ?? new FulcrumSettingsCollection("PassThru Regex Settings", Array.Empty<FulcrumSettingEntryModel>());
+        public FulcrumSettingsCollection InjectorDllSyntaxFulcrumSettings =>
+            this?.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("PassThru DLL Output Syntax Settings")
+            ) ?? new FulcrumSettingsCollection("PassThru Syntax Settings", Array.Empty<FulcrumSettingEntryModel>()); 
+        public FulcrumSettingsCollection InjectorDebugSyntaxFulcrumSettings =>
+            this.FirstOrDefault(SettingObj =>
+                SettingObj.SettingSectionTitle.Contains("Debug Log Viewer Syntax Settings")
+            ) ?? new FulcrumSettingsCollection("Debug Log Viewer Syntax Settings", Array.Empty<FulcrumSettingEntryModel>());
 
         #endregion //Properties
 
@@ -74,11 +80,33 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Returns our generic enumerator for this collection
+        /// </summary>
+        /// <returns>An IEnumerator collection of objects holding our settings</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            // Return the enumerator object
+            return GetEnumerator();
+        }
+        /// <summary>
+        /// Returns our enumerator using the cast collection of settings on this class instance
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<FulcrumSettingsCollection> GetEnumerator()
+        {
+            // Return our settings share object ordered by their names as a collection
+            return this._settingsCollections.GetEnumerator();
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
         /// Private CTOR for the settings generation routines. Used to load settings objects when needed
         /// </summary>
         private FulcrumSettingsShare()
         {
             // Configure our new logger instance and the backing collection of settings
+            this._settingsCollections = new List<FulcrumSettingsCollection>();
             this._settingsStoreLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Finally import all of our settings values and exit out
@@ -100,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
-  
+
         /// <summary>
         /// Builds a list of settings model objects to use from our input json objects
         /// </summary>
@@ -117,35 +145,27 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 
             // Pull our settings objects out from the settings file.
             var SettingsLoaded = ValueLoaders.GetConfigValue<JObject[]>("FulcrumUserSettings")
-                .Select(JsonObject => new Tuple<string, SectionType, FulcrumSettingEntryModel[]>(
-                    JsonObject["SettingSectionTitle"].Value<string>(), 
-                    (SectionType)Enum.Parse(typeof(SectionType), JsonObject["SettingSectionType"].Value<string>()),
+                .Select(JsonObject => new Tuple<string, FulcrumSettingEntryModel[]>(
+                    JsonObject["SettingSectionTitle"].Value<string>(),
                     JsonObject["SettingsEntries"].ToObject<FulcrumSettingEntryModel[]>()))
-                .Select(SettingCollection => new FulcrumSettingsCollection(
-                    SettingCollection.Item1, 
-                    SettingCollection.Item2,
-                    SettingCollection.Item3))
+                .Select(SettingCollection => new FulcrumSettingsCollection(SettingCollection.Item1, SettingCollection.Item2))
                 .ToArray();
 
             // Log out how many setting values were loaded in this routine
             this._settingsStoreLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
             this._settingsStoreLogger.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
 
-            // Clear out old settings values and then load the new ones in 
-            this.Clear();
-            this._settingsStoreLogger.WriteLog("CLEARED OUT OLD SETTINGS STORE VALUES OK! STORING NEW VALUES NOW...");
-
             // Loop all the setting objects loaded in from our configuration file and store them
             foreach (var SettingSet in SettingsLoaded)
             {
                 // Add the newly loaded setting object into our collection instance and log it's been built 
-                this.Add(SettingSet.SettingSectionType, SettingSet);
+                this._settingsCollections.Add(SettingSet);
                 this._settingsStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet.SettingSectionTitle} HAS BEEN IMPORTED");
             }
 
             // Log passed and return output
             this._settingsStoreLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
-            return SettingsLoaded;
+            return this;
         }
     }
 }

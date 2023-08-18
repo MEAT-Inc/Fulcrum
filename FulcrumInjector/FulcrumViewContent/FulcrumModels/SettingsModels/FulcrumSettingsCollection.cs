@@ -18,7 +18,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 
         // Private backing fields for our collections of settings and the title of the setting set
         private string _settingSectionTitle;
-        private SettingSectionTypes _settingSectionType;
         private readonly List<FulcrumSettingEntryModel> _settingsEntries;
 
         #endregion //Fields
@@ -31,33 +30,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             get => this._settingSectionTitle;
             private set => this._settingSectionTitle = value;
         }
-        public SettingSectionTypes SettingSectionType
-        {
-            get => this._settingSectionType;
-            private set => this._settingSectionType = value;
-        }
 
         #endregion //Properties
 
         #region Structs and Classes
-
-        /// <summary>
-        /// Enumeration used to index settings sets and to lookup values easier
-        /// Stored on each of the settings collection types and inherited by child values
-        /// </summary>
-        public enum SettingSectionTypes
-        {
-            NO_SECTION_TYPE = 0,
-            SHIM_DLL_SETTINGS = 1,
-            HARDWARE_SETTINGS = 2,
-            PIPE_SERVER_SETTINGS = 3,
-            FILE_WATCHDOG_SETTINGS = 4,
-            DLL_OUTPUT_REGEX_SETTINGS = 5,
-            DLL_OUTPUT_SYNTAX_SETTINGS = 6,
-            DEBUG_VIEWER_SETTINGS = 7,
-            DEBUG_VIEWER_SYNTAX = 8
-        }
-
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,18 +78,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// <summary>
         /// Build new collection of settings objects
         /// </summary>
-        /// <param name="SectionName">The name of the settings section set</param>
-        /// <param name="SectionType">The type of setting section we're building</param>
-        /// <param name="SettingsEntries">Entries for the settings set being stored</param>
-        public FulcrumSettingsCollection(string SectionName, SettingSectionTypes SectionType, IEnumerable<FulcrumSettingEntryModel> SettingsEntries = null)
+        /// <param name="SectionName"></param>
+        /// <param name="SettingsEntries"></param>
+        public FulcrumSettingsCollection(string SectionName, IEnumerable<FulcrumSettingEntryModel> SettingsEntries)
         {
             // Store values for the setting collection name and setting objects 
-            this.SettingSectionType = SectionType;
             this.SettingSectionTitle = SectionName;
-            this._settingsEntries = (SettingsEntries ?? new List<FulcrumSettingEntryModel>()).ToList();
-
-            // Apply our setting value type to all the settings entries now and exit out
-            foreach (var SettingEntry in this._settingsEntries) SettingEntry.ParentSection = SectionType;
+            this._settingsEntries = SettingsEntries.ToList();
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -133,9 +104,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
                 .SettingValue;
 
             // Check if the located value is null. If so, return the default. Otherwise return cast value
-            return LocatedSettingValue != null
-                ? (TResultType)Convert.ChangeType(LocatedSettingValue, typeof(TResultType))
-                : DefaultValue;
+            return LocatedSettingValue != null ?
+                (TResultType)Convert.ChangeType(LocatedSettingValue, typeof(TResultType)) :
+                DefaultValue;
         }
         /// <summary>
         /// Adds new settings into our list of setting entries here.
