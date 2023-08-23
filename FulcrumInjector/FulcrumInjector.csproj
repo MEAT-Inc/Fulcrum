@@ -503,12 +503,14 @@
     <PostBuildEvent>cmd.exe /C rmdir /s /q "$(TargetDir)de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
 cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
 cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
 cmd.exe /C mkdir "$(TargetDir)FulcrumSimulations"
+cmd.exe /C mkdir "$(TargetDir)FuclumLogs\FulcrumArchives"
 
 copy /Y "$(ProjectDir)FulcrumViewSupport\FulcrumStyles\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
 copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"
