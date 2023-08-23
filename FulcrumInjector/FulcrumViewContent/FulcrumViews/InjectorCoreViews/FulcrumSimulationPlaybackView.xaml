@@ -288,7 +288,7 @@
                         <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Simulation Hardware Selected!"/>
                         <LineBreak/>
                         <LineBreak/>
-                        <Run FontSize="16" Text="Using the Fulcrum Hardware tab from the menu at the left, please select a DLL and J2534 Device you wish to use for this simulation. The device you select will NOT be usable inside any other software while this simulation is running. If you don't see your device or thing something is wrong, please contact Neo Smith."/>
+                        <Run FontSize="16" Text="Using the Fulcrum Hardware tab from the menu at the left, please select a DLL and J2534 Device you wish to use for this simulation. The device you select will NOT be usable inside any other software while this simulation is running. If you don't see your device or thing something is wrong, please contact Zack Walsh."/>
                     </TextBlock>
                 </Grid>
 
@@ -371,7 +371,7 @@
                             <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="24" Text="No Simulation Events Processed!"/>
                             <LineBreak/>
                             <LineBreak/>
-                            <Run FontSize="16" Text="Once a simulation is running, events processed by the simulation reader will populate in this view here. If no events show up during execution, please contact Neo Smith for support."/>
+                            <Run FontSize="16" Text="Once a simulation is running, events processed by the simulation reader will populate in this view here. If no events show up during execution, please contact Zack Walsh for support."/>
                         </TextBlock>
                 </Grid>
 
@@ -427,7 +427,7 @@
                             <!-- Temporary Content -->
                             <TextBlock
                                 Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Margin="50" FontWeight="DemiBold"
-                                Text="Oh look, yet another piece of this software Neo is yet to complete. Yeah yeah I know. I'll get here eventually" 
+                                Text="Oh look, yet another piece of this software Zack is yet to complete. Yeah yeah I know. I'll get here eventually" 
                                 Foreground="{StaticResource PrimaryColor_Lighter_35}"
                                 VerticalAlignment="Center" 
                                 HorizontalAlignment="Center"

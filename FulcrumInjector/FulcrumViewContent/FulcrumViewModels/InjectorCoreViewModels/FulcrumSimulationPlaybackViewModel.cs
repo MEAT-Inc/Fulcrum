@@ -119,26 +119,28 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Clear out all of our old values first
             int FailedCounter = 0;
-            this.IsSimLoaded = false; this.IsSimulationRunning = false;
-            this.LoadedSimFile = string.Empty; this.LoadedSimFileContent = string.Empty;
+            this.IsSimLoaded = false; 
+            this.IsSimulationRunning = false;
+            this.LoadedSimFile = string.Empty;
+            this.LoadedSimFileContent = string.Empty;
             this._simulationChannels ??= new List<PassThruSimulationChannel>();
 
             try
             {
                 // Store all the file content on this view model instance and load in the Simulation channels from it now
                 this.LoadedSimFileContent = File.ReadAllText(SimFile);
-                var PulledChannels = JObject.Parse(this.LoadedSimFileContent);
+                var PulledChannels = JArray.Parse(this.LoadedSimFileContent);
                 foreach (var ChannelInstance in PulledChannels.Children())
                 {
                     try
                     {
                         // Try and build our channel here
-                        JToken ChannelToken = ChannelInstance.First;
+                        JToken ChannelToken = ChannelInstance.Last;
                         if (ChannelToken == null) 
                             throw new InvalidDataException("Error! Input channel was seen to be an invalid layout!");
 
                         // Now using the JSON Converter, unwrap the channel into a simulation object and store it on our player
-                        PassThruSimulationChannel BuiltChannel = ChannelToken.ToObject<PassThruSimulationChannel>();
+                        PassThruSimulationChannel BuiltChannel = ChannelToken.First.ToObject<PassThruSimulationChannel>();
                         this._simulationChannels.Add(BuiltChannel);
                     }
                     catch (Exception ConvertEx)
