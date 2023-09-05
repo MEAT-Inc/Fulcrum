@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:simEvents="clr-namespace:SharpSimulator;assembly=SharpSimulator"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -17,7 +18,7 @@
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
                 <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumSimulationPlaybackStyles.xaml"/>
                 <ResourceDictionary>
-                    <DataTemplate x:Key="MessageContentTemplate">
+                    <DataTemplate x:Key="MessageContentTemplate" DataType="{x:Type simEvents:PassThruSimulationPlayer+SimMessageEventArgs}">
                         <Border Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}"
                                 Margin="-5,0,-5,0" BorderBrush="{StaticResource TextColorBase}"
                                 BorderThickness="1" CornerRadius="0" Padding="5">
@@ -52,18 +53,18 @@
                                                FontWeight="DemiBold" FontSize="12" 
                                                Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
                                     <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                               Text="{Binding MessageReadString}" FontFamily="Consolas"/>
+                                               Text="{Binding ReadMessageString}" FontFamily="Consolas"/>
                                 </Grid>
                                 <TextBlock Grid.Row="4" Text="Responses Sent:" FontSize="12" Width="100" HorizontalAlignment="Left"
                                            FontWeight="DemiBold" Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
-                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_65}" Margin="0,5,10,5"
+                                <ListBox Grid.Row="5" Background="{StaticResource PrimaryColor_Darker_35}" Margin="0,5,10,5"
                                          BorderBrush="{StaticResource PrimaryColor_Darker_65}" BorderThickness="2" 
-                                         Width="770" HorizontalAlignment="Left" ItemsSource="{Binding MessageResponseStrings}" 
+                                         Width="770" HorizontalAlignment="Left" ItemsSource="{Binding ResponseStrings}" 
                                          FontFamily="Consolas"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
-                    <DataTemplate x:Key="ChannelContentTemplate">
+                    <DataTemplate x:Key="ChannelContentTemplate" DataType="{x:Type simEvents:PassThruSimulationPlayer+SimChannelEventArgs}">
                         <Border Width="{Binding ElementName=MainMessagesDataGrid, Path=ActualWidth}"
                                 Margin="-5,0,-5,0" BorderBrush="{StaticResource TextColorBase}"
                                 BorderThickness="1" CornerRadius="0" Background="#3333" Padding="5">
@@ -97,7 +98,7 @@
                                                FontWeight="DemiBold" FontSize="12" 
                                                Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
                                     <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
-                                               Text="{Binding ChannelId}" FontFamily="Consolas"/>
+                                               Text="{Binding SessionChannel.ChannelId}" FontFamily="Consolas"/>
                                 </Grid>
                                 <Grid Grid.Row="4">
                                     <Grid.ColumnDefinitions>
@@ -108,7 +109,7 @@
                                                FontWeight="DemiBold" FontSize="12" 
                                                Foreground="{StaticResource PrimaryColor_Lighter_35}"/>
                                     <TextBlock Grid.Column="1" Width="500" HorizontalAlignment="Left" VerticalAlignment="Center" FontStyle="Italic"
-                                               Text="{Binding ChannelProtocol}" FontFamily="Consolas"/>
+                                               Text="{Binding SessionChannel.ProtocolId}" FontFamily="Consolas"/>
                                 </Grid>
                             </Grid>
                         </Border>
@@ -256,7 +257,10 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                <DataTrigger Binding="{Binding IsHardwareSetup, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSimLoaded, UpdateSourceTrigger=PropertyChanged}" Value="false">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                                 <MultiDataTrigger>
