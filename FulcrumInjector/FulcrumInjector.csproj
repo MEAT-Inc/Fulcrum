@@ -79,7 +79,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.5.0.1\lib\net462\ControlzEx.dll</HintPath>
+      <HintPath>..\packages\ControlzEx.5.0.2\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
     <Reference Include="Fizzler, Version=1.3.0.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
       <HintPath>..\packages\Fizzler.1.3.0\lib\netstandard2.0\Fizzler.dll</HintPath>
@@ -90,8 +90,8 @@
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.2.4.10\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
-    <Reference Include="Markdig, Version=0.32.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Markdig.0.32.0\lib\net462\Markdig.dll</HintPath>
+    <Reference Include="Markdig, Version=0.33.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Markdig.0.33.0\lib\net462\Markdig.dll</HintPath>
     </Reference>
     <Reference Include="Markdig.Wpf, Version=0.5.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Markdig.Wpf.0.5.0.1\lib\net452\Markdig.Wpf.dll</HintPath>
@@ -108,26 +108,26 @@
     <Reference Include="Octokit, Version=7.1.0.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.7.1.0\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.4.4.129, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.4.4.129\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.4.4.135, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.4.4.135\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
-    <Reference Include="SharpExpressions, Version=0.5.6.146, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpExpressions.0.5.6.146\lib\net472\SharpExpressions.dll</HintPath>
+    <Reference Include="SharpExpressions, Version=0.5.12.210, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpExpressions.0.5.12.210\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogging, Version=2.7.8.334, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpLogger.2.7.8.334\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
-    <Reference Include="SharpPipes, Version=0.2.4.35, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpPipes.0.2.4.35\lib\net472\SharpPipes.dll</HintPath>
+    <Reference Include="SharpPipes, Version=0.2.4.39, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpPipes.0.2.4.39\lib\net472\SharpPipes.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.11.6.225, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.11.6.225\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.12.2.245, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.12.2.245\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
     <Reference Include="SharpSupport, Version=0.1.2.3, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpWrapper.6.1.9.459\lib\net472\SharpSupport.dll</HintPath>
+      <HintPath>..\packages\SharpWrapper.6.1.10.468\lib\net472\SharpSupport.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrapper, Version=6.1.9.459, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrapper.6.1.9.459\lib\net472\SharpWrapper.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=6.1.10.468, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrapper.6.1.10.468\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
@@ -497,18 +497,22 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
+    <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"
+py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
+"$(MSBuildBinPath)\MSBuild.exe" /p:Configuration=$(Configuration) /p:PreBuildEvent= "$(SolutionDir)FulcrumShim\FulcrumShim.vcxproj"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>cmd.exe /C rmdir /s /q "$(TargetDir)de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
 cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
 cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
 cmd.exe /C mkdir "$(TargetDir)FulcrumSimulations"
+cmd.exe /C mkdir "$(TargetDir)FuclumLogs\FulcrumArchives"
 
 copy /Y "$(ProjectDir)FulcrumViewSupport\FulcrumStyles\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
 copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"
