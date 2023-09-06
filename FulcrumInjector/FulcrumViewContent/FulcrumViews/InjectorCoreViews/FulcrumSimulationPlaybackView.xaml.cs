@@ -176,7 +176,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             // Start by checking if we have hardware selected for simulations on the hardware view page.
             this._viewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
-            
+
+            // If the simulation configuration is not defined, open the viewer
+            if (this.ViewModel.SimulationConfiguration == null) {
+                this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
+                return;
+            }
+
             // Now using the given hardware, run our start simulation 
             if (!this.ViewModel.IsSimulationRunning)
             {
@@ -214,8 +220,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void SimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
             // Pull our selected sim configuration and store it on the view model.
-            ComboBox SendingComboBox = Sender as ComboBox;
-            this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)SendingComboBox.SelectedItem;
+            this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
+            this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.SimulationConfiguration));
             this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.SimulationConfiguration.ConfigurationName}!");
         }
     }
