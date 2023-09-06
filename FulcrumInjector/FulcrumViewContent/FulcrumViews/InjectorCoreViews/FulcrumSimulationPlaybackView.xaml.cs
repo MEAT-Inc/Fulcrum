@@ -7,6 +7,7 @@ using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
+using SharpSimulator;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 {
@@ -204,6 +205,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 // Log done and exit out of this routine
                 this._viewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
             });
+        }
+        /// <summary>
+        /// Event handler to fire when the selected simulation configuration is updated/changed
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void SimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        {
+            // Pull our selected sim configuration and store it on the view model.
+            ComboBox SendingComboBox = Sender as ComboBox;
+            this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)SendingComboBox.SelectedItem;
+            this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.SimulationConfiguration.ConfigurationName}!");
         }
     }
 }
