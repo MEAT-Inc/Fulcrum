@@ -120,16 +120,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 // Store new file object value. Validate it on the ViewModel object first.
                 bool LoadResult = this.ViewModel.LoadSimulation(FileToLoad);
                 if (!LoadResult) this._viewLogger.WriteLog("FAILED TO LOAD NEW SIMULATION FILE! THIS IS FATAL", LogType.ErrorLog); 
-                else
-                {
-                    // Show the configuration window for the playback routines here
-                    this._viewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
-
-                    // Toggle the view for our simulation editor flyout
-                    Dispatcher.Invoke(() => this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen);
-                    this._viewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
-                    this._viewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
-                }
+                else this._viewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
 
                 // Enable grid, remove click command.
                 Task.Run(() =>
@@ -141,6 +132,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                         SenderButton.Content = LoadResult ? "Loaded File!" : "Failed!";
                         SenderButton.Background = LoadResult ? Brushes.DarkGreen : Brushes.DarkRed;
                         SenderButton.Click -= this.LoadSimulationButton_OnClick;
+
+                        // If the load routine passed, show the configuration flyout
+                        if (!LoadResult) return;
+
+                        // Toggle the view for our simulation editor flyout
+                        this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
+                        this._viewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
+                        this._viewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
+
                     });
 
                     // Wait for 3.5 Seconds
