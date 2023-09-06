@@ -7,6 +7,7 @@ using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
+using SharpSimulator;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 {
@@ -162,7 +163,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             // Toggle the content of the sending button
             Button SendButton = (Button)Sender;
             SendButton.Content = this.SimulationEditorFlyout.IsOpen ?
-                "Close Editor" : "Setup Simulation";
+                "Close Configuration" : "Setup Simulation";
             this._viewLogger.WriteLog("TOGGLED EDITOR TOGGLE SENDING BUTTON CONTENT VALUES OK!", LogType.InfoLog);
         }
         /// <summary>
@@ -175,7 +176,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             // Start by checking if we have hardware selected for simulations on the hardware view page.
             this._viewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
-            
+
+            // If the simulation configuration is not defined, open the viewer
+            if (this.ViewModel.SimulationConfiguration == null) {
+                this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
+                return;
+            }
+
             // Now using the given hardware, run our start simulation 
             if (!this.ViewModel.IsSimulationRunning)
             {
@@ -204,6 +211,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 // Log done and exit out of this routine
                 this._viewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
             });
+        }
+        /// <summary>
+        /// Event handler to fire when the selected simulation configuration is updated/changed
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void SimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        {
+            // Pull our selected sim configuration and store it on the view model.
+            this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
+            this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.SimulationConfiguration));
+            this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.SimulationConfiguration.ConfigurationName}!");
         }
     }
 }

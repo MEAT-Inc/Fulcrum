@@ -31,13 +31,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         /// <exception cref="IndexOutOfRangeException">Thrown when the file to remove can not be found</exception>
         private void OnWatchdogFolderChanged(object SendingWatcher, FileSystemEventArgs EventArgs)
         {
-            // Get the name of our new file object and clear out files that no longer exist
-            var FilesToRemove = this._watchedFiles.Where(FileObj => FileObj.FullFilePath == EventArgs.FullPath);
-            foreach (var FileToRemove in FilesToRemove) this._watchedFiles.Remove(FileToRemove);
+            // Lock our collection so nothing else can touch it while this routine is running
+            lock (this._watchedFiles)
+            {
+                // Get the name of our new file object and clear out files that no longer exist
+                var FilesToRemove = this._watchedFiles.Where(FileObj => FileObj.FullFilePath == EventArgs.FullPath);
+                foreach (var FileToRemove in FilesToRemove)
+                {
+                    // Remove each of the needed files from our watchdog object
+                    // BUG: This is failing when files are purged too quickly!
+                    try { this._watchedFiles.Remove(FileToRemove); }
+                    catch { _folderLogger.WriteLog("WARNING! FAILED TO PURGE AN EXISTING FILE DUE TO COLLECTION MODIFICATION!", LogType.WarnLog); }
+                }
 
-            // Switch the type of event being processed on our instance and fire actions accordingly
-            if (EventArgs.ChangeType is WatcherChangeTypes.Changed or WatcherChangeTypes.Renamed)
-                this._watchedFiles.Add(new WatchdogFile(EventArgs.FullPath));
+                // Switch the type of event being processed on our instance and fire actions accordingly
+                if (EventArgs.ChangeType is WatcherChangeTypes.Changed or WatcherChangeTypes.Renamed)
+                    this._watchedFiles.Add(new WatchdogFile(EventArgs.FullPath));
+            }
 
             // Invoke the watchdog action here to refresh our contents
             Task.Run(() => this._watchdogAction.Invoke());

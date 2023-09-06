@@ -213,6 +213,11 @@
                                     <CreateFolder />
                                 </Component>
                             </Directory>
+                            <Directory Name="WatchdogLogs" Id="FULCRUMWATCHDOGLOGSFOLDER">
+	                            <Component Id="CreateFulcrumWatchdogLogsFolder" Guid="753D8563-B5EC-4D68-BF12-AE6B43C83207">
+		                            <CreateFolder />
+	                            </Component>
+                            </Directory>
                         </Directory>
                     </Directory>
                 </Directory>
@@ -230,7 +235,8 @@
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
 			<ComponentRef Id="CreateFulcrumArchivesFolder" />
-			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
+			<ComponentRef Id="CreateFulcrumWatchdogLogsFolder" />
+            <ComponentRef Id="CreateFulcrumExpressionsFolder" />
             <ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
         </Feature>

@@ -171,9 +171,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Build out the new log file name and ensure the output directory exists
             string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath");
-            if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
-            File.Copy(LogFileToLoad, Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad)), true);
-            this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
+            if (!File.Exists(Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad))))
+            {
+                // Only do this if the log file is not built
+                if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
+                File.Copy(LogFileToLoad, Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad)), true);
+                this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
+            }
 
             // Log out that we've finally imported this file instance correctly and return passed
             this.ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);

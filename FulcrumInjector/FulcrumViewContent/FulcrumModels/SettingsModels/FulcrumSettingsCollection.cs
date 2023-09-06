@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +34,24 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Enumeration used to index settings sets and to lookup values easier
+        /// Stored on each of the settings collection types and inherited by child values
+        /// </summary>
+        public enum SettingSectionTypes
+        {
+            NO_SECTION_TYPE = 0,
+            SHIM_DLL_SETTINGS = 1,
+            HARDWARE_SETTINGS = 2,
+            PIPE_SERVER_SETTINGS = 3,
+            FILE_WATCHDOG_SETTINGS = 4,
+            DLL_OUTPUT_REGEX_SETTINGS = 5,
+            DLL_OUTPUT_SYNTAX_SETTINGS = 6,
+            DEBUG_VIEWER_SETTINGS = 7,
+            DEBUG_VIEWER_SYNTAX = 8,
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

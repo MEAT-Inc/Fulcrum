@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
+using NLog;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
@@ -64,6 +65,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         private void FulcrumDebugLoggingView_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Refresh logger list each time this view is opened
+            LogManager.ReconfigExistingLoggers();
             this.ViewModel.LoggerNamesFound = this.ViewModel.BuildLoggerNamesList();
             this._viewLogger.WriteLog("REFRESHED LOGGER NAME ENTRIES OK!", LogType.InfoLog);
         }
