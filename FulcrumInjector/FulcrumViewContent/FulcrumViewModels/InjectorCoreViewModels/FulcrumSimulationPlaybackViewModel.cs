@@ -194,9 +194,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Setup the simulation player
             this.ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
 
-            // Pull in a base configuration and build a new reader
-            // TODO: CONFIGURE THIS TO USE INPUT VALUES FROM SETUP
-            this._simulationConfiguration = PassThruSimulationConfiguration.LoadSimulationConfig(ProtocolId.CAN);
+            // Pull in a base configuration and build a new reader. If no configuration is given, return out
+            if (this._simulationConfiguration == null) return false;
             this._simulationPlayer = FulcrumConstants.SharpSessionAlpha == null
                 ? new PassThruSimulationPlayer(this.SimulationChannels, Version, DllName, DeviceName)
                 : new PassThruSimulationPlayer(this.SimulationChannels, FulcrumConstants.SharpSessionAlpha);
