@@ -405,21 +405,21 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height=".50*"/>
                                 <RowDefinition Height="5"/>
-                                <RowDefinition Height="1.5*"/>
+                                <RowDefinition Height="1.6*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0" VerticalAlignment="Top">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
-                                    <RowDefinition Height="2.15*"/>
+                                    <RowDefinition Height="1.5*"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock
-                                    Text="Simulation Editor" Margin="5,0,0,0"
+                                    Text="Simulation Configuration" Margin="5,0,0,0"
                                     VerticalAlignment="Stretch" HorizontalAlignment="Left" 
                                     Style="{StaticResource TitleStringText}" Foreground="Yellow"/>
                                 <TextBlock 
-                                    Grid.Row="1" TextWrapping="Wrap" FontSize="13"
+                                    Grid.Row="1" TextWrapping="Wrap" FontSize="12"
                                     Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"
-                                    Text="Use this view to edit simulation files loaded into our simulation replaying view. This editor will provide access to the raw .ptSim JSON contents for easy modifications and changes on the fly.  When this editor is closed, file changes are saved automatically but the simulation must be reloaded using the Reload Simulation button on the bottom right corner of this view.">
+                                    Text="Use this view to setup the configuration for a simulation playback routine. There are some preset configurations to choose from below. For the most part, the presets are accurate enough to make most simulations work. Keep in mind you need to pick the correct configuration for the simulation in use, otherwise no messages will be processed.">
                                 </TextBlock>
                             </Grid>
 
@@ -429,18 +429,50 @@
                                     BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
                             <!-- Temporary Content -->
-                            <TextBlock
-                                Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Margin="50" FontWeight="DemiBold"
-                                Text="Oh look, yet another piece of this software Zack is yet to complete. Yeah yeah I know. I'll get here eventually" 
-                                Foreground="{StaticResource PrimaryColor_Lighter_35}"
-                                VerticalAlignment="Center" 
-                                HorizontalAlignment="Center"
-                                FontSize="24"/>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width=".5*"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Simulation Configurations -->
+                                <Grid Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height=".15*"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Configuration Selection Box -->
+                                    <ComboBox Grid.Row="0" Margin="5" ItemsSource="{Binding SimulationConfigurations}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
+                                                <TextBlock Text="{Binding ConfigurationName}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <!-- Information about the configurations -->
+                                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                                        <TextBlock Margin="5,2"
+                                                   TextAlignment="Left" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource TextColorBase}" 
+                                                   Text="Use the dropdown box above the pick a simulation configuration for playback. Each of the listed configurations contains a set of defined filters and channel allocations needed to host a simulation for the given protocol."/>
+                                        <TextBlock Margin="5,2"
+                                                   TextAlignment="Left" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource TextColorBase}" 
+                                                   Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. Generally, the CAN - 11 Bit configuration will cover most of (if not all) European Makes/Models, and the CAN - 29 Bit configuration will cover a vast majority of the Asian market. Obviously, there are some edge cases, but for the most part those rules work. If you get stuck, reach out to Zack Walsh, and he can help find the right configuration. "/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Splitting Border -->
+                                <Border Grid.Column="1" Margin="0,-2,0,0"
+                                        BorderBrush="{StaticResource TextColorBase}" 
+                                        BorderThickness="2,0,0,0"/>
+                            </Grid>
                         </Grid>
                     </mah:Flyout>
                 </mah:FlyoutsControl>
             </Grid>
-
         </Grid>
     </Grid>
 </UserControl>
