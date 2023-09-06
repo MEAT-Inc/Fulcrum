@@ -6,6 +6,7 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:simEvents="clr-namespace:SharpSimulator;assembly=SharpSimulator"
+             xmlns:ptObjects="clr-namespace:SharpWrapper.J2534Objects;assembly=SharpWrapper"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -405,21 +406,21 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height=".50*"/>
                                 <RowDefinition Height="5"/>
-                                <RowDefinition Height="1.5*"/>
+                                <RowDefinition Height="1.7*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0" VerticalAlignment="Top">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
-                                    <RowDefinition Height="2.15*"/>
+                                    <RowDefinition Height="1.5*"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock
-                                    Text="Simulation Editor" Margin="5,0,0,0"
+                                    Text="Simulation Configuration" Margin="5,0,0,0"
                                     VerticalAlignment="Stretch" HorizontalAlignment="Left" 
                                     Style="{StaticResource TitleStringText}" Foreground="Yellow"/>
                                 <TextBlock 
-                                    Grid.Row="1" TextWrapping="Wrap" FontSize="13"
-                                    Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"
-                                    Text="Use this view to edit simulation files loaded into our simulation replaying view. This editor will provide access to the raw .ptSim JSON contents for easy modifications and changes on the fly.  When this editor is closed, file changes are saved automatically but the simulation must be reloaded using the Reload Simulation button on the bottom right corner of this view.">
+                                    Grid.Row="1" TextWrapping="Wrap" FontSize="12"
+                                    Margin="5,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"
+                                    Text="Please actually read all of this information! Failure to do so will likely result in PEBKAC! Use this view to setup the configuration for a simulation playback routine. There are some preset configurations to choose from below. For the most part, the presets are accurate enough to make most simulations work. Keep in mind you need to pick the correct configuration for the simulation in use, otherwise no messages will be processed.">
                                 </TextBlock>
                             </Grid>
 
@@ -429,18 +430,172 @@
                                     BorderThickness="0,2,0,0" VerticalAlignment="Center"/>
 
                             <!-- Temporary Content -->
-                            <TextBlock
-                                Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Margin="50" FontWeight="DemiBold"
-                                Text="Oh look, yet another piece of this software Zack is yet to complete. Yeah yeah I know. I'll get here eventually" 
-                                Foreground="{StaticResource PrimaryColor_Lighter_35}"
-                                VerticalAlignment="Center" 
-                                HorizontalAlignment="Center"
-                                FontSize="24"/>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width=".425*"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Information about the configurations -->
+                                <StackPanel Grid.Column="0" Orientation="Vertical">
+                                    <TextBlock Margin="5,2"
+                                               TextAlignment="Left" TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextColorBase}" 
+                                               Text="Use the dropdown box to the right the pick a simulation configuration for playback. Each of the listed configurations is built to support different vehicle protocols based on the simulation being loaded."/>
+                                    <TextBlock Margin="5,2"
+                                               TextAlignment="Left" TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextColorBase}" 
+                                               Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. Generally, the ISO15765 - 11 Bit (Pass All) configuration will cover most of (if not all) European Makes/Models, and the CAN - 29 Bit configuration will cover a vast majority of the Asian market (We don't talk about domestic. I have no idea what is or isn't supported yet). If you get stuck, reach out to Zack Walsh, and he can help find the right configuration. "/>
+                                </StackPanel>
+
+                                <!-- Splitting Border -->
+                                <Border Grid.Column="1" Margin="-2,-2,0,0"
+                                        BorderBrush="{StaticResource TextColorBase}" 
+                                        BorderThickness="2,0,0,0"/>
+
+                                <!-- Configuration Properties -->
+                                <Grid Grid.Column="1" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width=".875*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Basic Configuration Information -->
+                                    <Grid Grid.Column="0" Margin="1,-1,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition Height="60"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Configuration:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,4,10,0" FontSize="14"/>
+                                        <ComboBox SelectionChanged="SimConfiguration_OnSelectionChanged"
+                                                  Grid.Row="0" Grid.Column="1" Margin="5,0" Height="30"
+                                                  VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                                                  ItemsSource="{Binding SimulationConfigurations}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
+                                                    <TextBlock Text="{Binding ConfigurationName}" FontSize="12"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                        <TextBlock Text="Channel Protocol:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,5,10,0" FontSize="14"/>
+                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                 Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderProtocol}"/>
+                                        <TextBlock Text="Channel Baudrate:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                 Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderBaudRate}"/>
+                                        <TextBlock Text="Channel Flags:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" 
+                                                 Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderChannelFlags}"/>
+                                        <TextBlock Text="Message Count:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                 Grid.Row="4" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderMsgCount}"/>
+                                        <TextBlock Text="Reader Timeout:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                 Grid.Row="5" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderTimeout}"/>
+                                        <TextBlock Text="Response Timeout:" Foreground="Yellow"
+                                                   VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"
+                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                 Grid.Row="6" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ResponseTimeout}"/>
+
+                                        <!-- Buttons to build and save simulation configurations. Not yet supported -->
+                                        <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,15">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="0" Margin="0,5,5,-5"
+                                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="New Configuration" IsEnabled="False"/>
+                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" Margin="0,5,5,-5"
+                                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="Save Configuration" IsEnabled="False"/>
+                                        </Grid>
+                                    </Grid>
+
+                                    <!-- Channel Filters -->
+                                    <ListBox Grid.Column="1" Margin="5"
+                                                 ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
+                                                 BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
+                                                <Grid Margin="-0,3,4,5">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Row="0" Grid.RowSpan="5"
+                                                                Grid.Column="0" Grid.ColumnSpan="2" 
+                                                                BorderThickness="2" CornerRadius="2" Margin="-2,-1"
+                                                                BorderBrush="{StaticResource PrimaryColor_Darker_35}"/>
+                                                    <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
+                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                                 Grid.Row="0" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                                 Tag="N/A" Text="{Binding FilterMask}"/>
+                                                    <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
+                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                                 Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                                 Tag="N/A" Text="{Binding FilterPattern}"/>
+                                                    <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
+                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                                 Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                                 Tag="No Flow Control" Text="{Binding FilterFlowCtl}"/>
+                                                    <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
+                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                                 Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                                 Tag="N/A" Text="{Binding FilterFlags}"/>
+                                                    <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
+                                                                   FontWeight="DemiBold" Margin="2,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                                 Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" IsReadOnly="True"
+                                                                 Tag="N/A" Text="{Binding FilterType}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Grid>
+                            </Grid>
                         </Grid>
                     </mah:Flyout>
                 </mah:FlyoutsControl>
             </Grid>
-
         </Grid>
     </Grid>
 </UserControl>

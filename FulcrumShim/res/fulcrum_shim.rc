@@ -69,8 +69,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,12,17,3227
- PRODUCTVERSION 2,12,17,3227
+ FILEVERSION 2,12,17,3243
+ PRODUCTVERSION 2,12,17,3243
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -87,12 +87,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "MEAT Inc."
             VALUE "FileDescription", "FulcrumShim DLL used for debugging J2534 issues."
-            VALUE "FileVersion", "2.12.17.3227"
+            VALUE "FileVersion", "2.12.17.3243"
             VALUE "InternalName", "FulcrumShim.dll"
             VALUE "LegalCopyright", "Copyright (C) 2022 MEAT Inc."
             VALUE "OriginalFilename", "FulcrumShum.dll"
             VALUE "ProductName", "FulcrumShim"
-            VALUE "ProductVersion", "2.12.17.3227"
+            VALUE "ProductVersion", "2.12.17.3243"
         END
     END
     BLOCK "VarFileInfo"

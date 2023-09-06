@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
@@ -46,15 +47,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Fields
 
         // Private backing fields for our public properties
-        private bool _isSimLoaded;
-        private bool _isHardwareSetup;
-        private bool _isSimStarting;
-        private bool _isSimulationRunning;
-        private string _loadedSimFile;
-        private string _loadedSimFileContent;
-        private EventArgs[] _simEventsProcessed;
-        private PassThruSimulationPlayer _simulationPlayer;
-        private List<PassThruSimulationChannel> _simulationChannels;
+        private bool _isSimLoaded;                                                  // Determines if the simulation is loaded
+        private bool _isHardwareSetup;                                              // Determines if hardware is configured
+        private bool _isSimStarting;                                                // Determines if the simulation is booting
+        private bool _isSimulationRunning;                                          // Determines if the simulation is running
+        private string _loadedSimFile;                                              // Currently loaded simulation file
+        private string _loadedSimFileContent;                                       // Currently loaded simulation file content
+        private EventArgs[] _simEventsProcessed;                                    // Events fired during the simulation
+        private PassThruSimulationPlayer _simulationPlayer;                         // The player running the simulation
+        private List<PassThruSimulationChannel> _simulationChannels;                // The channels being simulated
+        private PassThruSimulationConfiguration _simulationConfiguration;           // Configuration being used for the simulation
+        private List<PassThruSimulationConfiguration> _simulationConfigurations;    // All supported simulation configurations
 
         #endregion // Fields
 
@@ -70,9 +73,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         public string LoadedSimFile { get => this._loadedSimFile; set => PropertyUpdated(value); }
         public string LoadedSimFileContent { get => this._loadedSimFileContent; set => PropertyUpdated(value); }
 
-        // Lists of Messages that are being tracked by our simulation
+        // Lists of Messages that are being tracked by our simulation along with the simulation configuration
         public EventArgs[] SimEventsProcessed { get => this._simEventsProcessed; set => PropertyUpdated(value); }
         public PassThruSimulationChannel[] SimulationChannels { get => this._simulationChannels.ToArray(); set => PropertyUpdated(value); }
+
+        // Currently applied simulation configuration and configurations we're able to load in
+        public PassThruSimulationConfiguration SimulationConfiguration { get => this._simulationConfiguration; set => PropertyUpdated(value); }
+        public List<PassThruSimulationConfiguration> SimulationConfigurations { get => this._simulationConfigurations; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -93,9 +100,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog("SETTING UP SIMULATION PLAYBACK VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
-            // Setup empty list of our events here
+            // Setup empty list of our events here and build a collection of simulation configurations
             this.SimEventsProcessed ??= Array.Empty<EventArgs>();
-            this._simulationChannels = new List<PassThruSimulationChannel>();
+            this.SimulationChannels = new PassThruSimulationChannel[] { };
+            this.SimulationConfigurations = PassThruSimulationConfiguration.SupportedConfigurations.ToList();
 
             // Log completed building view model instance and exit out
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
@@ -186,9 +194,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Setup the simulation player
             this.ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
 
-            // Pull in a base configuration and build a new reader
-            // TODO: CONFIGURE THIS TO USE INPUT VALUES FROM SETUP
-            var SimConfig = PassThruSimulationConfiguration.LoadSimulationConfig(ProtocolId.ISO15765);
+            // Pull in a base configuration and build a new reader. If no configuration is given, return out
+            if (this._simulationConfiguration == null) return false;
             this._simulationPlayer = FulcrumConstants.SharpSessionAlpha == null
                 ? new PassThruSimulationPlayer(this.SimulationChannels, Version, DllName, DeviceName)
                 : new PassThruSimulationPlayer(this.SimulationChannels, FulcrumConstants.SharpSessionAlpha);
@@ -204,10 +211,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Configure our simulation player here
             this._simulationPlayer.SetResponsesEnabled(true);
-            this._simulationPlayer.SetDefaultConfigurations(SimConfig.ReaderConfigs);
-            this._simulationPlayer.SetDefaultMessageFilters(SimConfig.ReaderFilters);
-            this._simulationPlayer.SetDefaultConnectionType(SimConfig.ReaderProtocol, SimConfig.ReaderChannelFlags, SimConfig.ReaderBaudRate);
-            this._simulationPlayer.SetDefaultMessageValues(SimConfig.ReaderTimeout, SimConfig.ReaderMsgCount, SimConfig.ResponseTimeout);
+            this._simulationPlayer.SetDefaultConfigurations(this._simulationConfiguration.ReaderConfigs);
+            this._simulationPlayer.SetDefaultMessageFilters(this._simulationConfiguration.ReaderFilters);
+            this._simulationPlayer.SetDefaultConnectionType(
+                this._simulationConfiguration.ReaderProtocol, 
+                this._simulationConfiguration.ReaderChannelFlags, 
+                this._simulationConfiguration.ReaderBaudRate);
+            this._simulationPlayer.SetDefaultMessageValues(
+                this._simulationConfiguration.ReaderTimeout, 
+                this._simulationConfiguration.ReaderMsgCount, 
+                this._simulationConfiguration.ResponseTimeout);
             this.ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

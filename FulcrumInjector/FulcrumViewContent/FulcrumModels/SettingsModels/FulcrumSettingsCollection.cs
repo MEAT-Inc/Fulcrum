@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             DLL_OUTPUT_REGEX_SETTINGS = 5,
             DLL_OUTPUT_SYNTAX_SETTINGS = 6,
             DEBUG_VIEWER_SETTINGS = 7,
-            DEBUG_VIEWER_SYNTAX = 8
+            DEBUG_VIEWER_SYNTAX = 8,
         }
 
         #endregion //Structs and Classes
