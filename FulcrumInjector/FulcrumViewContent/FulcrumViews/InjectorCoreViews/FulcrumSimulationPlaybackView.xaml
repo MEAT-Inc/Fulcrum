@@ -479,7 +479,7 @@
                                         <TextBlock Text="Configuration:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,4,10,0" FontSize="14"/>
-                                        <ComboBox SelectionChanged="SimConfiguration_OnSelectionChanged"
+                                        <ComboBox SelectionChanged="SimConfiguration_OnSelectionChanged" SelectedIndex="0"
                                                   Grid.Row="0" Grid.Column="1" Margin="5,0" Height="30"
                                                   VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                                                   ItemsSource="{Binding SimulationConfigurations}">
@@ -541,8 +541,8 @@
 
                                     <!-- Channel Filters -->
                                     <ListBox Grid.Column="1" Margin="5"
-                                                 ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
-                                                 BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
+                                             ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
+                                             BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
                                                 <Grid Margin="-0,3,4,5">
@@ -590,6 +590,31 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
+
+                                    <!-- Placeholder for no filters (this shouldn't happen) -->
+                                    <Grid Grid.Column="1" Visibility="Collapsed" Margin="5"> 
+                                        <Border Opacity=".50" BorderThickness="3"
+                                            BorderBrush="{StaticResource TextColorBase}"
+                                            Background="{StaticResource SecondaryColor_Darker_65}"/>
+                                        <TextBlock Foreground="{StaticResource TextColorBase}" TextWrapping="Wrap"
+                                               Margin="15,10" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Run FontWeight="DemiBold" Foreground="Yellow" FontSize="18" Text="No Configuration Filters!"/>
+                                            <LineBreak/>
+                                            <LineBreak/>
+                                            <Run FontSize="16" Text="No filters are setup for this simulation configuration! This is likely an issue!"/>
+                                        </TextBlock>
+                                        <Grid.Style>
+                                            <Style TargetType="Grid">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=lbConfigurationFilters, Path=Items.Count, UpdateSourceTrigger=PropertyChanged}" Value="0">
+                                                        <DataTrigger.Setters>
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger.Setters>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
