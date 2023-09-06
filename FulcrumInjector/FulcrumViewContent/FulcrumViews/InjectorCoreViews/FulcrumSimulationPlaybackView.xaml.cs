@@ -134,7 +134,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                         SenderButton.Click -= this.LoadSimulationButton_OnClick;
 
                         // If the load routine passed, show the configuration flyout
-                        if (LoadResult) this.ToggleSimulationEditor_OnClick(this.btnToggleSimEditor, null);
+                        if (LoadResult && !this.SimulationEditorFlyout.IsOpen) 
+                            this.ToggleSimulationEditor_OnClick(this.btnToggleSimEditor, null);
                     });
 
                     // Wait for 3.5 Seconds
