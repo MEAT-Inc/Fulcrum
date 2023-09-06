@@ -99,7 +99,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Now open the dialog and allow the user to pick some new files.
             this._viewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
-            if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
+            if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) 
+            {
                 // Log failed, set no file, reset sending button and return.
                 this._viewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
                 return;
@@ -118,8 +119,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
                 // Store new file object value. Validate it on the ViewModel object first.
                 bool LoadResult = this.ViewModel.LoadSimulation(FileToLoad);
-                if (LoadResult) this._viewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
-                else this._viewLogger.WriteLog("FAILED TO LOAD NEW SIMULATION FILE! THIS IS FATAL", LogType.ErrorLog);
+                if (!LoadResult) this._viewLogger.WriteLog("FAILED TO LOAD NEW SIMULATION FILE! THIS IS FATAL", LogType.ErrorLog); 
+                else
+                {
+                    // Show the configuration window for the playback routines here
+                    this._viewLogger.WriteLog("LOADED SIMULATION FILE OK! READY TO PLAYBACK", LogType.InfoLog);
+
+                    // Toggle the view for our simulation editor flyout
+                    Dispatcher.Invoke(() => this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen);
+                    this._viewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
+                    this._viewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
+                }
 
                 // Enable grid, remove click command.
                 Task.Run(() =>
@@ -177,15 +187,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this._viewLogger.WriteLog("FINDING CURRENTLY SELECTED HARDWARE FOR OUR SIMULATION HOST INSTANCE NOW...", LogType.InfoLog);
             var CurrentHwInfo = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel;
 
-            // If the simulation configuration is not defined, open the viewer
-            if (this.ViewModel.SimulationConfiguration == null) {
-                this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
-                return;
-            }
-
             // Now using the given hardware, run our start simulation 
             if (!this.ViewModel.IsSimulationRunning)
             {
+                // If the simulation configuration is not defined, open the viewer
+                if (this.ViewModel.SimulationConfiguration == null) 
+                {
+                    // Toggle the viewer and log out the state of it.
+                    this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
+                    this._viewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
+                    this._viewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog); 
+                    return;
+                }
+
                 // Invoke this on a new thread
                 this.ViewModel.IsSimStarting = true;
                 Task.Run(() =>
