@@ -134,13 +134,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                         SenderButton.Click -= this.LoadSimulationButton_OnClick;
 
                         // If the load routine passed, show the configuration flyout
-                        if (!LoadResult) return;
-
-                        // Toggle the view for our simulation editor flyout
-                        this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
-                        this._viewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
-                        this._viewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog);
-
+                        if (LoadResult) this.ToggleSimulationEditor_OnClick(this.btnToggleSimEditor, null);
                     });
 
                     // Wait for 3.5 Seconds
@@ -191,12 +185,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             if (!this.ViewModel.IsSimulationRunning)
             {
                 // If the simulation configuration is not defined, open the viewer
-                if (this.ViewModel.SimulationConfiguration == null) 
-                {
-                    // Toggle the viewer and log out the state of it.
-                    this.SimulationEditorFlyout.IsOpen = !this.SimulationEditorFlyout.IsOpen;
-                    this._viewLogger.WriteLog("TOGGLED SIMULATION EDITOR FLYOUT VALUE OK!", LogType.InfoLog);
-                    this._viewLogger.WriteLog($"NEW VALUE IS {this.SimulationEditorFlyout.IsOpen}", LogType.TraceLog); 
+                if (this.ViewModel.SimulationConfiguration == null) {
+                    this.ToggleSimulationEditor_OnClick(this.btnToggleSimEditor, null);
                     return;
                 }
 

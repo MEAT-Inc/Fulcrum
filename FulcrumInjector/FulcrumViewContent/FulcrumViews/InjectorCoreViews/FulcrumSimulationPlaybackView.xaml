@@ -186,7 +186,7 @@
                 <Button Grid.Column="2" Click="ToggleSimulationEditor_OnClick"
                         Content="Setup Simulation" Margin="5,0,0,0"
                         Style="{StaticResource ActionButtonStyle}"
-                        IsEnabled="{Binding Path=IsSimLoaded}"/>
+                        IsEnabled="{Binding Path=IsSimLoaded}" x:Name="btnToggleSimEditor"/>
                 <Button Grid.Column="3"
                         Click="ToggleSimulationButton_OnClick" Margin="5,0,0,0">
                     <Button.Style>
