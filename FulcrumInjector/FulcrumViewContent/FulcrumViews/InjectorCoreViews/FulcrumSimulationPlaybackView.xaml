@@ -512,19 +512,19 @@
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
                                         <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="4" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderMsgCount}"/>
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
                                         <TextBlock Text="Reader Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
                                         <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="5" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderTimeout}"/>
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
                                         <TextBlock Text="Response Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
                                         <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="6" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ResponseTimeout}"/>
+                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
                                         <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,15">
@@ -540,7 +540,7 @@
                                     </Grid>
 
                                     <!-- Channel Filters -->
-                                    <ListBox Grid.Column="1" Margin="5" x:Name="lbConfigurationFilters"
+                                    <ListBox Grid.Column="1" Margin="5,4,5,5" x:Name="lbConfigurationFilters"
                                              ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
                                              BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
                                         <ListBox.ItemTemplate>
