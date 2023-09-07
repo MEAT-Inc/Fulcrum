@@ -192,7 +192,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 }
 
                 // Invoke this on a new thread
-                this.ViewModel.IsSimStarting = true;
+                Dispatcher.Invoke(() => this.ViewModel.IsSimStarting = true);
                 Task.Run(() =>
                 {
                     // Stop monitoring and begin simulation reading

@@ -201,7 +201,7 @@
                                 <DataTrigger Binding="{Binding IsHardwareSetup}" Value="false">
                                     <Setter Property="IsEnabled" Value="False"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSimStarting}" Value="true">
+                                <DataTrigger Binding="{Binding IsSimStarting, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                     <Setter Property="Background" Value="DarkOrange"/>
                                     <Setter Property="Content" Value="Starting..."/>
                                 </DataTrigger>
@@ -442,7 +442,7 @@
                                                TextAlignment="Left" TextWrapping="Wrap"
                                                Foreground="{StaticResource TextColorBase}" 
                                                Text="Use the dropdown box to the right the pick a simulation configuration for playback. Each of the listed configurations is built to support different vehicle protocols based on the simulation being loaded."/>
-                                    <TextBlock Margin="5,2"
+                                    <TextBlock Margin="5,0,5,5"
                                                TextAlignment="Left" TextWrapping="Wrap"
                                                Foreground="{StaticResource TextColorBase}" 
                                                Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. Generally, the ISO15765 - 11 Bit (Pass All) configuration will cover most of (if not all) European Makes/Models, and the CAN - 29 Bit configuration will cover a vast majority of the Asian market (We don't talk about domestic. I have no idea what is or isn't supported yet). If you get stuck, reach out to Zack Walsh, and he can help find the right configuration. "/>
@@ -532,9 +532,9 @@
                                                 <ColumnDefinition/>
                                                 <ColumnDefinition/>
                                             </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="0" Margin="-1,5,5,-5"
+                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="0" Margin="-1,10,5,-10"
                                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="New Configuration" IsEnabled="False"/>
-                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" Margin="5,5,5,-5"
+                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" Margin="5,10,5,-10"
                                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="Save Configuration" IsEnabled="False"/>
                                         </Grid>
                                     </Grid>
