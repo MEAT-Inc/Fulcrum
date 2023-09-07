@@ -540,7 +540,7 @@
                                     </Grid>
 
                                     <!-- Channel Filters -->
-                                    <ListBox Grid.Column="1" Margin="5"
+                                    <ListBox Grid.Column="1" Margin="5" x:Name="lbConfigurationFilters"
                                              ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
                                              BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
                                         <ListBox.ItemTemplate>
