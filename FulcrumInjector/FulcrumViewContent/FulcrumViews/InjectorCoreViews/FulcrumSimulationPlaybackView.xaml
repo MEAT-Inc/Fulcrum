@@ -492,37 +492,37 @@
                                         <TextBlock Text="Channel Protocol:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,5,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                  Tag="N/A" Text="{Binding SimulationConfiguration.ReaderProtocol}"/>
                                         <TextBlock Text="Channel Baudrate:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                  Tag="N/A" Text="{Binding SimulationConfiguration.ReaderBaudRate}"/>
                                         <TextBlock Text="Channel Flags:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" 
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas" 
                                                  Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                  Tag="N/A" Text="{Binding SimulationConfiguration.ReaderChannelFlags}"/>
                                         <TextBlock Text="Message Count:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="4" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                  Tag="N/A" Text="{Binding SimulationConfiguration.ReaderMsgCount}"/>
                                         <TextBlock Text="Reader Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="5" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                  Tag="N/A" Text="{Binding SimulationConfiguration.ReaderTimeout}"/>
                                         <TextBlock Text="Response Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
                                                  Grid.Row="6" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                  Tag="N/A" Text="{Binding SimulationConfiguration.ResponseTimeout}"/>
 
@@ -532,9 +532,9 @@
                                                 <ColumnDefinition/>
                                                 <ColumnDefinition/>
                                             </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="0" Margin="0,5,5,-5"
+                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="0" Margin="-1,5,5,-5"
                                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="New Configuration" IsEnabled="False"/>
-                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" Margin="0,5,5,-5"
+                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" Margin="5,5,5,-5"
                                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="Save Configuration" IsEnabled="False"/>
                                         </Grid>
                                     </Grid>
@@ -545,7 +545,7 @@
                                              BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
-                                                <Grid Margin="-0,3,4,5">
+                                                <Grid Margin="-2,2,3,0">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition/>
                                                         <RowDefinition/>
@@ -558,34 +558,34 @@
                                                         <ColumnDefinition/>
                                                     </Grid.ColumnDefinitions>
                                                     <Border Grid.Row="0" Grid.RowSpan="5"
-                                                                Grid.Column="0" Grid.ColumnSpan="2" 
-                                                                BorderThickness="2" CornerRadius="2" Margin="-2,-1"
-                                                                BorderBrush="{StaticResource PrimaryColor_Darker_35}"/>
+                                                            Grid.Column="0" Grid.ColumnSpan="2" 
+                                                            BorderThickness="1" CornerRadius="0" Margin="-2,-1"
+                                                            BorderBrush="{StaticResource DarkGreyThemeColor}"/>
                                                     <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
-                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
                                                     <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                                 Grid.Row="0" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                                 Tag="N/A" Text="{Binding FilterMask}"/>
+                                                             Grid.Row="0" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                             Tag="N/A" Text="{Binding FilterMask}" FontFamily="Consolas"/>
                                                     <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
-                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
                                                     <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                                 Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                                 Tag="N/A" Text="{Binding FilterPattern}"/>
+                                                             Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                             Tag="N/A" Text="{Binding FilterPattern}" FontFamily="Consolas"/>
                                                     <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
-                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
                                                     <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                                 Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                                 Tag="No Flow Control" Text="{Binding FilterFlowCtl}"/>
+                                                             Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                             Tag="No Flow Control" Text="{Binding FilterFlowCtl}" FontFamily="Consolas"/>
                                                     <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
-                                                                   FontWeight="DemiBold" Margin="3,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
                                                     <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                                 Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                                 Tag="N/A" Text="{Binding FilterFlags}"/>
+                                                             Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
+                                                             Tag="N/A" Text="{Binding FilterFlags}" FontFamily="Consolas"/>
                                                     <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
-                                                                   FontWeight="DemiBold" Margin="2,2,0,2" FontSize="12" Foreground="Yellow"/>
+                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
                                                     <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                                 Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" IsReadOnly="True"
-                                                                 Tag="N/A" Text="{Binding FilterType}"/>
+                                                             Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" IsReadOnly="True"
+                                                             Tag="N/A" Text="{Binding FilterType}" FontFamily="Consolas"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>

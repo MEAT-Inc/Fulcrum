@@ -155,13 +155,15 @@
                             <Grid>
                                 <TextBox Text="{Binding Path=Text,
                                                 RelativeSource={RelativeSource TemplatedParent}, 
-                                                Mode=TwoWay,
-                                                UpdateSourceTrigger=PropertyChanged}"
-                                 x:Name="textSource" 
-                                 Background="Transparent" 
-                                 Panel.ZIndex="2"
-                                 HorizontalContentAlignment="Center"
-                                 Style="{StaticResource StaticBackgroundInputTextBox}"/>
+                                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         FontFamily="{Binding Path=FontFamily,
+                                              RelativeSource={RelativeSource TemplatedParent}, 
+                                              Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         x:Name="textSource" 
+                                         Background="Transparent" 
+                                         Panel.ZIndex="2"
+                                         HorizontalContentAlignment="Center"
+                                         Style="{StaticResource StaticBackgroundInputTextBox}"/>
                                 <TextBox Text="{TemplateBinding Tag}" Background="Black" Panel.ZIndex="1">
                                     <TextBox.Style>
                                         <Style TargetType="{x:Type TextBox}">
