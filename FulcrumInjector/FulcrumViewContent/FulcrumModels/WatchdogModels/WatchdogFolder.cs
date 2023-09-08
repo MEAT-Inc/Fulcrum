@@ -146,6 +146,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 $"\t\\__ Directory Monitoring:    {(this.IsMonitoring ? "On" : "Off")}";
 
             /* TODO: Enable this routine here again if I REALLY want to. Seems like this may cause big logging hang ups
+             * BUG: Some fucking jackass (likely myself) thought this was a good choice. Why the FUCK would one consider expanding the properties of an object
+             * BUG: THOUSANDS of times in a fraction of a second to generate debug information????
              *
              * // If this folder has no files, then exit out of this routine
              * if (this._watchedFiles.Count == 0) return FolderConfiguration;
