@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews.FulcrumGoogleDriveView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews"
+             Loaded="FulcrumGoogleDriveView_OnLoaded" mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <!-- Style Sheets -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumGoogleDriveStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Content View -->
+    <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="210"/>
+            <RowDefinition/>
+            <RowDefinition Height=".30*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Close out button -->
+        <Button Grid.Row="2" 
+                FontSize="18"
+                VerticalAlignment="Top"
+                x:Name="CloseInfoFlyoutButton"
+                Click="ToggleGoogleDriveFlyout_OnClick"
+                Style="{StaticResource ActionButtonStyle}"
+                Content="Close Information" Width="250" Height="35" />
+    </Grid>
+</UserControl>

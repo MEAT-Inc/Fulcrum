@@ -86,7 +86,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Structs and Classes
         #endregion // Structs and Classes
 
-
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
