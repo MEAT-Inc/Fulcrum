@@ -35,8 +35,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("SETTING UP GOOGLE DRIVE VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
+            // Configure a new google drive helper for the log files
+            // TODO: Build new Drive helper
+
             // Log completed building view model instance and exit out
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+
     }
 }
