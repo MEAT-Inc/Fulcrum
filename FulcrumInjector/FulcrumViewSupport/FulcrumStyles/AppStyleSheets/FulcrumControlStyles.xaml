@@ -159,6 +159,9 @@
                                          FontFamily="{Binding Path=FontFamily,
                                               RelativeSource={RelativeSource TemplatedParent}, 
                                               Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="{Binding Path=MaxLength,
+                                              RelativeSource={RelativeSource TemplatedParent}, 
+                                              Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                          x:Name="textSource" 
                                          Background="Transparent" 
                                          Panel.ZIndex="2"

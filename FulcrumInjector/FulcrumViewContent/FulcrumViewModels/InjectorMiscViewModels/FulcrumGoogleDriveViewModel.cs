@@ -54,7 +54,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// <summary>
         /// Class object used to define the JSON object of a google drive explorer configuration
         /// </summary>
-        private class DriveExplorerConfiguration
+        public class DriveExplorerConfiguration
         {
             public string DriveApiKey { get; set; }
             public string[] DriveScopes { get; set; }

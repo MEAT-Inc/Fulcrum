@@ -31,7 +31,7 @@
                 Foreground="{StaticResource TextColorBase}"
                 FontWeight="DemiBold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
             <TextBlock 
-                FontSize="14" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="{StaticResource SecondaryColor}"
+                FontSize="14" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="{StaticResource PrimaryColor_Lighter_35}"
                 Text="Use this window to search the MEAT-Inc Google Drive containing all of our built and shared logs/simulations/expressions files for use inside the FulrcumInjector. Located files can be downloaded locally for review or simulation playback."/>
         </StackPanel>
 
