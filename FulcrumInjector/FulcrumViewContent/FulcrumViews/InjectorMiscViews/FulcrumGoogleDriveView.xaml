@@ -18,20 +18,51 @@
     </UserControl.Resources>
 
     <!-- Content View -->
-    <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
+    <Grid Margin="15,20,20,15" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="210"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height=".30*"/>
         </Grid.RowDefinitions>
 
+        <!-- Title Text -->
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+            <TextBlock 
+                Text="Google Drive Explorer" FontSize="24"
+                Foreground="{StaticResource TextColorBase}"
+                FontWeight="DemiBold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+            <TextBlock 
+                FontSize="14" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="{StaticResource SecondaryColor}"
+                Text="This view contains a handy explorer which allows users to navigate the MEAT-Inc Google Drive containing all of our built and shared logs/simulations/expressions files for use inside the FulrcumInjector"/>
+        </StackPanel>
+
         <!-- Close out button -->
-        <Button Grid.Row="2" 
-                FontSize="18"
+        <Button Grid.Row="0" 
+                Width="25" Height="25"
                 VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                ToolTip="Close Drive Explorer"
                 x:Name="CloseGoogleDriveFlyout"
                 Click="ToggleGoogleDriveFlyout_OnClick"
-                Style="{StaticResource ActionButtonStyle}"
-                Content="Close Information" Width="250" Height="35" />
+                Style="{StaticResource ActionButtonStyle}">
+            <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,3,1">
+                <Path.Data>
+                    <PathGeometry Figures="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                </Path.Data>
+            </Path>
+            <Button.LayoutTransform>
+                <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
+            </Button.LayoutTransform>
+        </Button>
+        
+        <!-- Splitting Border -->
+        <Border 
+            Grid.Row="0" BorderThickness="0,1,0,0" 
+            BorderBrush="{StaticResource TextColorBase}"
+            Margin="0,0,0,-5" VerticalAlignment="Bottom"/>
+
+        <!-- Drive Explorer Content -->
+        <Grid Grid.Row="1" Margin="0,10,0,0" Background="{StaticResource SecondaryColor_Darker_65}">
+
+        </Grid>
     </Grid>
 </UserControl>
