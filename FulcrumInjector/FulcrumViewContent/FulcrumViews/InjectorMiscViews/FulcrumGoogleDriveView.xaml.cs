@@ -58,7 +58,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         private void FulcrumGoogleDriveView_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Hook in a new event for the button click on the check for updates title button
-            FulcrumConstants.FulcrumTitleView.btnAboutTheInjetor.Click += this.ToggleGoogleDriveFlyout_OnClick;
+            FulcrumConstants.FulcrumTitleView.btnGoogleDrive.Click += this.ToggleGoogleDriveFlyout_OnClick;
             this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE ABOUT THIS APP BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
         }
 
