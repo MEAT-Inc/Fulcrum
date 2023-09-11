@@ -78,7 +78,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Private class instance used to hold our injector configuration values for updates
         /// </summary>
-        public class UpdateConfiguration
+        private class UpdateConfiguration
         {
             public bool ForceUpdateReady { get; set; }
             public string UpdaterOrgName { get; set; }
