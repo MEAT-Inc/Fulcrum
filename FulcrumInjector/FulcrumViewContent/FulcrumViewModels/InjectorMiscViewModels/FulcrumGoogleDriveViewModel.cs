@@ -239,7 +239,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             // Stop our timer and log out the results of this routine
             InjectorLogSets = this.LocatedLogFiles.ToList();
             this.ViewModelLogger.WriteLog("DONE REFRESHING INJECTOR LOG FILE SETS!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {InjectorLogSets.Count} FILES IN {this.RefreshTimer.Elapsed:hh\\:mm\\:ss}");
+            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {InjectorLogSets.Count} FILES IN {this.RefreshTimer.Elapsed:mm\\:ss\\:fff}");
             this.RefreshTimer.Stop();
 
             // Return out based on the number of files loaded in 
