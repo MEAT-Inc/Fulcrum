@@ -59,7 +59,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 PropertyUpdated(value);
             } 
         }
-        public FulcrumLogFileModel CurrentLogFile
+        public LogFileModel CurrentLogFile
         {
             get => this._currentLogFile;
             set
@@ -69,13 +69,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.IsLogLoaded = value != null;
                 
                 // Based on the value we're storing, update our viewer contents
-                if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.PASSTHRU_FILE)
+                if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.PASSTHRU_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingLogFile);
-                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.EXPRESSIONS_FILE)
+                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.EXPRESSIONS_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingExpressions);
-                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.SIMULATIONS_FILE)
+                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.SIMULATIONS_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingSimulation);
-                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.UNKNOWN_FILE)
+                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.UNKNOWN_FILE)
                     this._toggleViewerContents(ViewerStateType.NoContent);
             }
         }

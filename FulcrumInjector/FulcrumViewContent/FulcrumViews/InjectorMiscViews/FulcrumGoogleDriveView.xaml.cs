@@ -62,6 +62,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             // Hook in a new event for the button click on the check for updates title button
             FulcrumConstants.FulcrumTitleView.btnGoogleDrive.Click += this.ToggleGoogleDriveFlyout_OnClick;
             this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE ABOUT THIS APP BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
+
+            // Invoke a background refresh for pulling in all log files for our explorer
+            Task.Run(() =>
+            {
+                // Run the refresh routine and log out if it fails to execute or not
+                this._viewLogger.WriteLog("REFRESHING LOG FILES ON GOOGLE DRIVE EXPLORER IN THE BACKGROUND...", LogType.WarnLog);
+                if (!this.ViewModel.LocateInjectorLogSets(out _))
+                    this._viewLogger.WriteLog("ERROR! FAILED TO REFRESH LOG FILE ENTRIES FROM OUR EXPLORER! THIS IS WEIRD!", LogType.ErrorLog);
+            });
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
