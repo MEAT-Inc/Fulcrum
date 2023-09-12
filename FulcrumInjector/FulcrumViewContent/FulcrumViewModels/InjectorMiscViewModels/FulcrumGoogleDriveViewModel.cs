@@ -230,7 +230,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 RespObj => RespObj.Files);
 
             // Execute the request for pulling files from the drive here combining paged results one at a time
-            LocatedLogFiles.Clear();
+            this.LocatedLogFiles.Clear();
             this.ViewModelLogger.WriteLog("EXECUTING REQUEST FOR DRIVE CONTENTS NOW...");
             GoogleDriveFileList CombinedFileLists = new GoogleDriveFileList { Files = new List<GoogleDriveFile>() };
             foreach (var LocatedFile in FilePageStreamer.Fetch(ListFilesRequest)) CombinedFileLists.Files.Add(LocatedFile);
@@ -239,7 +239,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             // Stop our timer and log out the results of this routine
             InjectorLogSets = this.LocatedLogFiles.ToList();
             this.ViewModelLogger.WriteLog("DONE REFRESHING INJECTOR LOG FILE SETS!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {InjectorLogSets.Count} FILES IN {this.RefreshTimer.Elapsed:hh:mm:ss}");
+            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {InjectorLogSets.Count} FILES IN {this.RefreshTimer.Elapsed:hh\\:mm\\:ss}");
             this.RefreshTimer.Stop();
 
             // Return out based on the number of files loaded in 
