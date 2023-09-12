@@ -198,7 +198,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// <returns>True if the files are queried correctly and one or more are found. False if none are located.</returns>
         /// <param name="InjectorLogSets">The located injector log file sets</param>
         /// <exception cref="InvalidOperationException">Thrown when the google drive helper service is not yet built and can not be configured</exception>
-        public bool LocateInjectorLogSets(out List<DriveLogFileModel> InjectorLogSets)
+        public bool LocateInjectorLogFiles(out List<DriveLogFileModel> InjectorLogSets)
         {
             // Initialize our list of output files and a timer for diagnostic purposes
             this.ViewModelLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS NOW...");
