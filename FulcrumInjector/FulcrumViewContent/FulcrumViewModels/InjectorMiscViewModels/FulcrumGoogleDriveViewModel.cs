@@ -156,10 +156,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this._explorerAuth.ClientId = this._explorerAuth.ClientId.UnscrambleString();
             this._explorerAuth.ProjectId = this._explorerAuth.ProjectId.UnscrambleString();
             this._explorerAuth.ClientEmail = this._explorerAuth.ClientEmail.UnscrambleString();
-            this._explorerAuth.PrivateKey = this._explorerAuth.PrivateKey.UnscrambleString();
             this._explorerAuth.PrivateKeyId = this._explorerAuth.PrivateKeyId.UnscrambleString();
-            this._explorerAuth.AuthProviderUrl = this._explorerAuth.AuthProviderUrl.UnscrambleString();
-            
+            this._explorerAuth.ClientCertUrl = this._explorerAuth.ClientCertUrl.UnscrambleString();
+            this._explorerAuth.PrivateKey = this._explorerAuth.PrivateKey.UnscrambleString().Replace("\\n", string.Empty);
+
             // Log out that our unscramble routines have been completed
             this.ViewModelLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"DRIVE CLIENT ID: {this._explorerConfig.ClientId}");
