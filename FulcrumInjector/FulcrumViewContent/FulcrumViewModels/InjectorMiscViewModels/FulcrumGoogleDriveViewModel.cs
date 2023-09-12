@@ -155,7 +155,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this._explorerAuth = ValueLoaders.GetConfigValue<DriveExplorerAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
             this._explorerAuth.ClientId = this._explorerAuth.ClientId.UnscrambleString();
             this._explorerAuth.ProjectId = this._explorerAuth.ProjectId.UnscrambleString();
-            this._explorerAuth.ClientEmail = this._explorerAuth.ClientId.UnscrambleString();
+            this._explorerAuth.ClientEmail = this._explorerAuth.ClientEmail.UnscrambleString();
             this._explorerAuth.PrivateKey = this._explorerAuth.PrivateKey.UnscrambleString();
             this._explorerAuth.PrivateKeyId = this._explorerAuth.PrivateKeyId.UnscrambleString();
             this._explorerAuth.AuthProviderUrl = this._explorerAuth.AuthProviderUrl.UnscrambleString();
