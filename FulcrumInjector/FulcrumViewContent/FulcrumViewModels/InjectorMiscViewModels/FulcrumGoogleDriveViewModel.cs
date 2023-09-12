@@ -133,7 +133,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// <summary>
         /// Builds a new google drive explorer service for finding files 
         /// </summary>
-        /// <returns>The built google drive explorer service</returns>
+        /// <returns>True if the service is built. False if not</returns>
+        /// <param name="BuiltService">The built google drive service. Null if failed to build</param>
         public bool ConfigureDriveService(out DriveService BuiltService)
         {
             // Pull in the drive ID and application name first
@@ -244,6 +245,30 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Return out based on the number of files loaded in 
             return InjectorLogSets.Count != 0;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Helper method used to build filters for all the injector log files located in the google drive.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when no log files are located for filtering</exception>
+        public void _buildInjectorLogFilters()
+        {
+            // Check to make sure log files exist at this point
+            this.ViewModelLogger.WriteLog("FILTERING LOGS LOCATED FROM GOOGLE DRIVE NOW...", LogType.WarnLog);
+            if (this.LocatedLogFiles.Count == 0 && !this.LocateInjectorLogFiles(out _))
+                throw new InvalidOperationException("Error! Failed to find any log files to filter!");
+
+            // Setup filtering lists
+            this.YearFilters = new ObservableCollection<string>();
+            this.MakeFilters = new ObservableCollection<string>(); 
+            this.ModelFilters = new ObservableCollection<string>();
+            this.ViewModelLogger.WriteLog($"FILTERING {this.LocatedLogFiles.Count} LOG FILES NOW...");
+            this.ViewModelLogger.WriteLog("CONFIGURED EMPTY FILTERING LISTS CORRECTLY!", LogType.InfoLog);
+
+            // Iterate all the log files and pull out the parts of each name to build filtering context
+
         }
     }
 }
