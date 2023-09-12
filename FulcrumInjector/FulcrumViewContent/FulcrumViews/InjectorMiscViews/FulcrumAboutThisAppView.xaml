@@ -47,7 +47,6 @@
         <Button Grid.Row="2" 
                 FontSize="18"
                 VerticalAlignment="Top"
-                x:Name="CloseInfoFlyoutButton"
                 Click="ToggleAboutThisApplicationFlyout_OnClick"
                 Style="{StaticResource ActionButtonStyle}"
                 Content="Close Information" Width="250" Height="35" />

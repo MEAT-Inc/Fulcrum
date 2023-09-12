@@ -104,6 +104,7 @@
 
         <!-- Flyouts for About, Updates, and the Drive Helper -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+
             <!-- About this app flyout-->
             <mah:Flyout 
                 Margin="70,85,0,0"
@@ -151,7 +152,7 @@
                 </mah:Flyout.HeaderTemplate>
 
 
-                <!-- Content for About this app-->
+                <!-- Content for Updater View-->
                 <injectorMiscViews:FulcrumUpdaterView x:Name="FulcrumUpdaterView"/>
             </mah:Flyout>
 
@@ -176,7 +177,7 @@
                     <DataTemplate/>
                 </mah:Flyout.HeaderTemplate>
 
-                <!-- Content for About this app-->
+                <!-- Content for Google Drive Explorer-->
                 <injectorMiscViews:FulcrumGoogleDriveView x:Name="FulcrumGoogleDriveView"/>
             </mah:Flyout>
         </mah:FlyoutsControl>

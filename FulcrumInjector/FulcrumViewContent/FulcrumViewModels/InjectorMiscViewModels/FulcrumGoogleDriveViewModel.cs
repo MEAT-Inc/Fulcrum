@@ -3,6 +3,7 @@ using SharpSimulator;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
@@ -11,9 +12,18 @@ using Google.Apis.Drive.v3;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using static FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Forms.VisualStyles;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Services;
+using Newtonsoft.Json;
+using Octokit.Internal;
+
+// Static using calls for Google Drive API objects
+using GoogleDriveFile = Google.Apis.Drive.v3.Data.File;
+using GoogleDriveFileList = Google.Apis.Drive.v3.Data.FileList;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels
 {
@@ -28,19 +38,32 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         #region Fields
 
         // Private backing fields for google drive explorer
-        private string _driveApiKey;                            // API key used to explore the google drive
-        private string[] _driveScopes;                          // The scopes authorized for the drive service
-        private string _applicationName;                        // Name of the authorized drive application
-        private DriveService _driveService;                     // The service used to navigate our google drive
+        private string _googleDriveId;                                      // ID of the drive we're searching 
+        private string _applicationName;                                    // The name of the application searching the drive
+        private DriveService _driveService;                                 // The service used to navigate our google drive
+        private DriveExplorerAuthorization _explorerAuth;                   // Authorization object used for drive explorer auth
+        private DriveExplorerConfiguration _explorerConfig;                 // Configuration object used for drive explorer setup
+
+        // Private backing field for refresh timer
+        private Stopwatch _refreshTimer;                                    // Timer used to track refresh duration
+
+        // Private backing field for the collection of loaded logs 
+        private ObservableCollection<DriveLogFileModel> _locatedLogFiles;   // Collection of all loaded log files found
 
         // Private backing fields for filtering collections
-        private ObservableCollection<string> _yearFilters;      // Years we can filter by 
-        private ObservableCollection<string> _makeFilters;      // Makes we can filter by
-        private ObservableCollection<string> _modelFilters;     // Models we can filter by
+        private ObservableCollection<string> _yearFilters;                  // Years we can filter by 
+        private ObservableCollection<string> _makeFilters;                  // Makes we can filter by
+        private ObservableCollection<string> _modelFilters;                 // Models we can filter by
 
         #endregion // Fields
 
         #region Properties
+
+        // Public property for refresh timer
+        public Stopwatch RefreshTimer { get => _refreshTimer; set => PropertyUpdated(value); }
+
+        // Public facing properties holding our collection of log files loaded
+        public ObservableCollection<DriveLogFileModel> LocatedLogFiles { get => this._locatedLogFiles; set => PropertyUpdated(value); }
 
         // Public facing properties holding our different filter lists for the file filtering configuration
         public ObservableCollection<string> YearFilters { get => this._yearFilters; set => PropertyUpdated(value); }
@@ -56,9 +79,30 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// </summary>
         public class DriveExplorerConfiguration
         {
-            public string DriveApiKey { get; set; }
-            public string[] DriveScopes { get; set; }
-            public string ApplicationName { get; set; }
+            [JsonProperty("auth_uri")] public string AuthUri { get; set; }
+            [JsonProperty("token_uri")] public string TokenUri { get; set; }
+            [JsonProperty("client_id")] public string ClientId { get; set; } 
+            [JsonProperty("project_id")] public string ProjectId { get; set; }
+            [JsonProperty("client_secret")] public string ClientSecret { get; set; }
+            [JsonProperty("redirect_uris")] public string[] RedirectUris { get; set; }
+            [JsonProperty("auth_provider_x509_cert_url")] public string AuthProvider { get; set; }
+        }
+        /// <summary>
+        /// Class object used to define the JSON object of our google drive authorization
+        /// </summary>
+        public class DriveExplorerAuthorization
+        {
+            [JsonProperty("type")] public string Type { get; set; }
+            [JsonProperty("auth_uri")] public string AuthUri { get; set; }
+            [JsonProperty("token_uri")] public string TokenUri { get; set; }
+            [JsonProperty("client_id")] public string ClientId { get; set; }
+            [JsonProperty("project_id")] public string ProjectId { get; set; }
+            [JsonProperty("private_key")] public string PrivateKey { get; set; }
+            [JsonProperty("client_email")] public string ClientEmail { get; set; }
+            [JsonProperty("private_key_id")] public string PrivateKeyId { get; set; }
+            [JsonProperty("universe_domain")] public string UniverseDomain { get; set; }
+            [JsonProperty("client_x509_cert_url")] public string ClientCertUrl { get; set; }
+            [JsonProperty("auth_provider_x509_cert_url")] public string AuthProviderUrl { get; set; }
         }
 
         #endregion // Structs and Classes
@@ -92,17 +136,35 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// <returns>The built google drive explorer service</returns>
         public bool ConfigureDriveService(out DriveService BuiltService)
         {
-            // Load the google drive API login information and store it on this class instance
-            var ExplorerConfiguration = ValueLoaders.GetConfigValue<DriveExplorerConfiguration>("FulcrumConstants.InjectorDriveExplorer");
-            this._driveScopes = ExplorerConfiguration.DriveScopes;
-            this._applicationName = ExplorerConfiguration.ApplicationName;
-            this._driveApiKey = Encoding.UTF8.GetString(Convert.FromBase64String(string.Join(string.Empty, ExplorerConfiguration.DriveApiKey.Reverse())));
+            // Pull in the drive ID and application name first
+            this._applicationName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.ApplicationName");
+            this._googleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId").UnscrambleString();
+            this.ViewModelLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"DRIVE ID: {this._googleDriveId}");
+            this.ViewModelLogger.WriteLog($"APPLICATION NAME: {this._applicationName}");
 
-            // Log out the information built for the drive explorer object here
-            this.ViewModelLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER LOGIN INFORMATION CORRECTLY!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog($"GOOGLE DRIVE APP NAME: {this._applicationName}");
-            this.ViewModelLogger.WriteLog($"GOOGLE DRIVE EXPLORER API KEY: {this._driveApiKey}");
-            this.ViewModelLogger.WriteLog($"GOOGLE DRIVE SCOPES: {string.Join(",", this._driveScopes)}");
+            // Pull in the configuration values for the drive explorer and unscramble needed strings
+            this.ViewModelLogger.WriteLog("LOADING AND UNSCRAMBLING CONFIGURATION FOR DRIVE SERVICE NOW...");
+            this._explorerConfig = ValueLoaders.GetConfigValue<DriveExplorerConfiguration>("FulcrumConstants.InjectorDriveExplorer.ExplorerConfiguration");
+            this._explorerConfig.ClientId = this._explorerConfig.ClientId.UnscrambleString();
+            this._explorerConfig.ProjectId = this._explorerConfig.ProjectId.UnscrambleString();
+            this._explorerConfig.ClientSecret = this._explorerConfig.ClientSecret.UnscrambleString();
+
+            // Pull in the configuration values for the drive explorer authorization and unscramble needed strings
+            this.ViewModelLogger.WriteLog("LOADING AND UNSCRAMBLING AUTHORIZATION FOR DRIVE SERVICE NOW...");
+            this._explorerAuth = ValueLoaders.GetConfigValue<DriveExplorerAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
+            this._explorerAuth.ClientId = this._explorerAuth.ClientId.UnscrambleString();
+            this._explorerAuth.ProjectId = this._explorerAuth.ProjectId.UnscrambleString();
+            this._explorerAuth.ClientEmail = this._explorerAuth.ClientId.UnscrambleString();
+            this._explorerAuth.PrivateKey = this._explorerAuth.PrivateKey.UnscrambleString();
+            this._explorerAuth.PrivateKeyId = this._explorerAuth.PrivateKeyId.UnscrambleString();
+            this._explorerAuth.AuthProviderUrl = this._explorerAuth.AuthProviderUrl.UnscrambleString();
+            
+            // Log out that our unscramble routines have been completed
+            this.ViewModelLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"DRIVE CLIENT ID: {this._explorerConfig.ClientId}");
+            this.ViewModelLogger.WriteLog($"DRIVE PROJECT ID: {this._explorerConfig.ProjectId}");
+            this.ViewModelLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._explorerAuth.ClientEmail}");
 
             try
             {
@@ -110,9 +172,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 this.ViewModelLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
                 BuiltService = new DriveService(new BaseClientService.Initializer()
                 {
-                    // Store the API key and Application name for the authorization helper
-                    ApiKey = this._driveApiKey,
-                    ApplicationName = this._applicationName
+                    // Store the API configuration and Application name for the authorization helper
+                    ApplicationName = this._applicationName,
+                    HttpClientInitializer = GoogleCredential.FromJson(
+                        JsonConvert.SerializeObject(this._explorerAuth))
+                        .CreateScoped(DriveService.Scope.DriveReadonly)
                 });
 
                 // Return the new drive service object 
@@ -134,17 +198,51 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// <returns>True if the files are queried correctly and one or more are found. False if none are located.</returns>
         /// <param name="InjectorLogSets">The located injector log file sets</param>
         /// <exception cref="InvalidOperationException">Thrown when the google drive helper service is not yet built and can not be configured</exception>
-        public bool LocateInjectorLogSets(out List<string> InjectorLogSets)
+        public bool LocateInjectorLogSets(out List<DriveLogFileModel> InjectorLogSets)
         {
+            // Initialize our list of output files and a timer for diagnostic purposes
+            this.ViewModelLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS NOW...");
+            this.LocatedLogFiles ??= new ObservableCollection<DriveLogFileModel>();
+            this.RefreshTimer = new Stopwatch();
+            this.RefreshTimer.Start();
+
             // Validate our Drive Explorer service is built and ready for use
-            if (this._driveService == null && !this.ConfigureDriveService(out this._driveService)) 
+            this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
+            if (this._driveService == null && !this.ConfigureDriveService(out this._driveService))
                 throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
 
-            // TODO: Configure list query for finding log files
-            // Initialize the list of log file sets we're returning out from the drive
-            InjectorLogSets = new List<string>();
+            // Build a new request to list all the files in the drive
+            this.ViewModelLogger.WriteLog("DRIVE SERVICE IS CONFIGURED!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
+            var ListFilesRequest = this._driveService.Files.List();
+            ListFilesRequest.PageSize = 1000;
+            ListFilesRequest.Corpora = "drive";
+            ListFilesRequest.SupportsTeamDrives = true;
+            ListFilesRequest.IncludeTeamDriveItems = true;
+            ListFilesRequest.DriveId = this._googleDriveId;
+            ListFilesRequest.IncludeItemsFromAllDrives = true;
 
-            // Return out based on the number of log file sets located
+            // Build a new PageStreamer to automatically page through results of files
+            this.ViewModelLogger.WriteLog("BUILDING PAGE STREAMER TO COMBINE ALL LISTED FILE RESULTS...");
+            var FilePageStreamer = new Google.Apis.Requests.PageStreamer<GoogleDriveFile, FilesResource.ListRequest, GoogleDriveFileList, string>(
+                (ReqObj, TokenObj) => ListFilesRequest.PageToken = TokenObj,
+                RespObj => RespObj.NextPageToken,
+                RespObj => RespObj.Files);
+
+            // Execute the request for pulling files from the drive here combining paged results one at a time
+            this.LocatedLogFiles.Clear();
+            this.ViewModelLogger.WriteLog("EXECUTING REQUEST FOR DRIVE CONTENTS NOW...");
+            GoogleDriveFileList CombinedFileLists = new GoogleDriveFileList { Files = new List<GoogleDriveFile>() };
+            foreach (var LocatedFile in FilePageStreamer.Fetch(ListFilesRequest)) CombinedFileLists.Files.Add(LocatedFile);
+            foreach (var FileLocated in CombinedFileLists.Files) this.LocatedLogFiles.Add(new DriveLogFileModel(FileLocated));
+
+            // Stop our timer and log out the results of this routine
+            InjectorLogSets = this.LocatedLogFiles.ToList();
+            this.ViewModelLogger.WriteLog("DONE REFRESHING INJECTOR LOG FILE SETS!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {InjectorLogSets.Count} FILES IN {this.RefreshTimer.Elapsed:hh:mm:ss}");
+            this.RefreshTimer.Stop();
+
+            // Return out based on the number of files loaded in 
             return InjectorLogSets.Count != 0;
         }
     }

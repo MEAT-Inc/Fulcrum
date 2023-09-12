@@ -10,14 +10,14 @@ using SharpLogging;
 using SharpSimulator;
 
 // Static using for the LogFileTypes enumeration
-using LogFileTypes = FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumLogFileModel.LogFileTypes;
+using LogFileTypes = FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.LogFileModel.LogFileTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
 {
     /// <summary>
     /// Internal class holding the values for our different types of log files supported
     /// </summary>
-    internal class FulcrumLogFileSet
+    internal class LogFileSet
     {
         #region Custom Events
         #endregion //Custom Events
@@ -36,9 +36,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         #region Properties
 
         // Public facing properties holding the path values for all of our file types
-        public FulcrumLogFileModel PassThruLogFile { get; private set; }                    // The set path to our PassThru base log file
-        public FulcrumLogFileModel ExpressionsFile { get; private set; }                    // The set path to our built Expressions file
-        public FulcrumLogFileModel SimulationsFile { get; private set; }                    // The set path to our built Simulations file
+        public LogFileModel PassThruLogFile { get; private set; }                    // The set path to our PassThru base log file
+        public LogFileModel ExpressionsFile { get; private set; }                    // The set path to our built Expressions file
+        public LogFileModel SimulationsFile { get; private set; }                    // The set path to our built Simulations file
 
         // Public facing properties which will hold our expressions and simulations content once generated
         public PassThruExpression[] GeneratedExpressions => this._generatedExpressions;     // Collection of all built expression objects
@@ -60,9 +60,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         /// CTOR for a new file object. Takes in the log file path to open.
         /// Defaults to a PassThru log file unless the Expressions or simulations file type is found
         /// </summary>
-        /// <param name="LogFilePath">Path to the log file to load for this model</param>
         /// <exception cref="FileLoadException">Thrown when the file being loaded in does not have a valid extension</exception>
-        public FulcrumLogFileSet()
+        public LogFileSet()
         {
             // Spawn our new logger instance and exit out
             this._fileModelLogger = new SharpLogger(LoggerActions.UniversalLogger);

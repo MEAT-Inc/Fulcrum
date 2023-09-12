@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              Loaded="FulcrumGoogleDriveView_OnLoaded" mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -35,25 +36,42 @@
                 Text="Use this window to search the MEAT-Inc Google Drive containing all of our built and shared logs/simulations/expressions files for use inside the FulrcumInjector. Located files can be downloaded locally for review or simulation playback."/>
         </StackPanel>
 
-        <!-- Close out button -->
-        <Button Grid.Row="0" 
-                Width="25" Height="25"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Right"
-                ToolTip="Close Drive Explorer"
-                x:Name="CloseGoogleDriveFlyout"
-                Click="ToggleGoogleDriveFlyout_OnClick"
-                Style="{StaticResource ActionButtonStyle}">
-            <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,3,1">
-                <Path.Data>
-                    <PathGeometry Figures="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                </Path.Data>
-            </Path>
-            <Button.LayoutTransform>
-                <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
-            </Button.LayoutTransform>
-        </Button>
-        
+        <!-- Close and Refresh Buttons -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
+
+            <!-- Refresh button -->
+            <Button Width="25" Height="25"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Right"
+                    ToolTip="Refresh Drive Explorer"
+                    Click="RefreshGoogleDrive_OnClick"
+                    Style="{StaticResource ActionButtonStyle}">
+                <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,3,1">
+                    <Path.Data>
+                        <PathGeometry Figures="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </Path.Data>
+                </Path>
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
+                </Button.LayoutTransform>
+            </Button>
+
+            <!-- Close out button -->
+            <Button Width="25" Height="25"
+                    ToolTip="Close Drive Explorer" Click="ToggleGoogleDriveFlyout_OnClick" 
+                    Margin="10,0" Style="{StaticResource ActionButtonStyle}">
+                <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,3,1">
+                    <Path.Data>
+                        <PathGeometry Figures="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                    </Path.Data>
+                </Path>
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
+                </Button.LayoutTransform>
+            </Button>
+
+        </StackPanel>
+
         <!-- Splitting Border -->
         <Border 
             Grid.Row="0" BorderThickness="0,1,0,0" 
@@ -87,5 +105,54 @@
 
             </ListBox>
         </Grid>
+
+        <!-- Loading Flyouts -->
+        <mah:FlyoutsControl Grid.Row="1">
+
+            <!-- Drive Refreshing Flyout-->
+            <mah:Flyout 
+                x:Name="GoogleDriveRefreshingFlyout" 
+                Height="85" Margin="50,150,50,0" 
+                Position="Top" VerticalAlignment="Center" HorizontalAlignment="Center"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+
+                <!-- Refreshing Content -->
+                <Grid Margin="5,15,5,15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".5*"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Refreshing Text -->
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="0,0,5,0" FontWeight="DemiBold"
+                        Text="Refreshing Injector Drive Files..." FontSize="20"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <!-- Endless Refreshing Progress Bar -->
+                    <Grid Grid.Row="1">
+                        <ProgressBar
+                            Margin="0,15,15,0" IsIndeterminate="True"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        <TextBlock 
+                            Foreground="Black"
+                            Margin="0,13,0,0" FontWeight="DemiBold"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Text="{Binding Path=RefreshTimer.Elapsed, Mode=OneWayToSource, StringFormat=Time Elapsed: {0:mm\\:ss}}"/>
+                    </Grid>
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl> 
     </Grid>
 </UserControl>

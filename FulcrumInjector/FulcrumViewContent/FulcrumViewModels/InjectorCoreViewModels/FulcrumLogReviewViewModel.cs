@@ -42,7 +42,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         private ViewerStateType _currentState;                      // Current view type for our output viewer
 
         // Private backing fields holding information about the currently loaded log files
-        private FulcrumLogFileSet _currentLogSet;                   // The currently loaded log file set
+        private LogFileSet _currentLogSet;                   // The currently loaded log file set
         private FulcrumLogFileModel _currentLogFile;                // The log file being viewed at this time
         
         #endregion // Fields
@@ -50,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Properties
 
         // Public properties holding information about the loaded log file and log file sets
-        public FulcrumLogFileSet CurrentLogSet
+        public LogFileSet CurrentLogSet
         {
             get => this._currentLogSet;
             set
@@ -156,7 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             }
 
             // Try and find a model set where this file exists currently. If none are found, then build a new instance
-            FulcrumLogFileSet LogFileModelSet = new FulcrumLogFileSet();
+            LogFileSet LogFileModelSet = new LogFileSet();
             FulcrumLogFileModel LoadedFileModel = new FulcrumLogFileModel(LogFileToLoad);
             this.ViewModelLogger.WriteLog($"BUILT NEW FILE MODEL AND LOG FILE MODEL SET FOR FILE {LogFileToLoad}");
 
@@ -364,7 +364,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 {                   
                     // Set our new index value for the current file type, and setup our output content in text viewers
                     CastView.FilteringLogFileTextBox.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Loaded!"; ;
-                    CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFileContents ?? $"No Log File Contents Loaded!";
+                    CastView.ReplayLogInputContent.Text = File.Exists(this.CurrentLogFile?.LogFilePath) 
+                        ? File.ReadAllText(this.CurrentLogFile?.LogFilePath ?? string.Empty) 
+                        : $"No Log File Contents Loaded!";
                 });
 
                 // Toggle the showing parsed value.
