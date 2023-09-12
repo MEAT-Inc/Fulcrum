@@ -171,16 +171,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
 
         #region Fields
 
-        // Private backing field for our log object 
-        private readonly GoogleDriveFile _inputLogModel;
+        // Readonly field for our log object 
+        public readonly GoogleDriveFile SourceDriveFile;
 
         #endregion // Fields
 
         #region Properties
 
         // Public facing properties holding information about the log file instance
-        public bool LogFileExists => (bool)!this._inputLogModel.Trashed;
-        public string LogFileSize => this.LogFileExists ? this._inputLogModel.Size.Value.ToFileSize() : "N/A";
+        public bool LogFileExists => (bool)!this.SourceDriveFile?.Trashed;
+        public string LogFileSize => this.LogFileExists ? this.SourceDriveFile?.Size.Value.ToFileSize() : "N/A";
 
         #endregion // Properties
 
@@ -196,7 +196,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         public DriveLogFileModel(GoogleDriveFile InputLogFile) : base(InputLogFile)
         {
             // Store the base log file object 
-            this._inputLogModel = InputLogFile;
+            this.SourceDriveFile = InputLogFile;
         }
     }
 }
