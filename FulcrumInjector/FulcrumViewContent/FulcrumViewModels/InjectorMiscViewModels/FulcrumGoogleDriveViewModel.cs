@@ -230,7 +230,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 RespObj => RespObj.Files);
 
             // Execute the request for pulling files from the drive here combining paged results one at a time
-            this.LocatedLogFiles.Clear();
+            LocatedLogFiles.Clear();
             this.ViewModelLogger.WriteLog("EXECUTING REQUEST FOR DRIVE CONTENTS NOW...");
             GoogleDriveFileList CombinedFileLists = new GoogleDriveFileList { Files = new List<GoogleDriveFile>() };
             foreach (var LocatedFile in FilePageStreamer.Fetch(ListFilesRequest)) CombinedFileLists.Files.Add(LocatedFile);
