@@ -105,6 +105,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             this.GoogleDriveRefreshingFlyout.IsOpen = true;
             SendingButton.IsEnabled = false;
 
+            // Disable the filtering ComboBoxes
+            this.cbYearFilter.IsEnabled = false; 
+            this.cbMakeFilter.IsEnabled = false; 
+            this.cbModelFilter.IsEnabled = false;
+
             // Background refresh all files from the drive here
             this._viewLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS IN THE BACKGROUND NOW...", LogType.InfoLog);
             Task.Run(() =>
@@ -132,6 +137,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                     // Close the refreshing flyout and enable the sending button
                     this.GoogleDriveRefreshingFlyout.IsOpen = false;
                     SendingButton.IsEnabled = true;
+
+                    // Enable the filtering ComboBoxes
+                    this.cbYearFilter.IsEnabled = true;
+                    this.cbMakeFilter.IsEnabled = true;
+                    this.cbModelFilter.IsEnabled = true;
                 });
             });
         }
