@@ -93,11 +93,15 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="250"/>
                 </Grid.ColumnDefinitions>
-                <ComboBox Grid.Column="0" Margin="0,0,5,0" x:Name="cbYearFilter"/>
-                <ComboBox Grid.Column="1" Margin="0,0,0,0" x:Name="cbMakeFilter"/>
-                <ComboBox Grid.Column="2" Margin="5,0,0,0" x:Name="cbModelFilter"/>
-                <TextBox Grid.Column="3" Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
-                         Margin="5,0,0,0" Tag="VIN Number (17 Characters)" x:Name="tbVinFilter" MaxLength="17"/>
+                <ComboBox Grid.Column="0" Margin="0,0,5,0" SelectedIndex="0"
+                          x:Name="cbYearFilter" ItemsSource="{Binding YearFilters}"/>
+                <ComboBox Grid.Column="1" Margin="0,0,0,0" SelectedIndex="0"
+                          x:Name="cbMakeFilter" ItemsSource="{Binding MakeFilters}"/>
+                <ComboBox Grid.Column="2" Margin="5,0,0,0" SelectedIndex="0"
+                          x:Name="cbModelFilter" ItemsSource="{Binding ModelFilters}"/>
+                <TextBox Grid.Column="3" Style="{StaticResource InputTextWithHolder}" 
+                         FontFamily="Consolas" IsEnabled="False" Margin="5,0,0,0" 
+                         Tag="VIN Number (17 Characters)" x:Name="tbVinFilter" MaxLength="17"/>
             </Grid>
 
             <!-- Files Located Listbox -->

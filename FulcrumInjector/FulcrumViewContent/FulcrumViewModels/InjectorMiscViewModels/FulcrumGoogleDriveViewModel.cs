@@ -132,7 +132,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("CLEARED OUT EXISTING LOG FILE AND FOLDER SETS CORRECTLY!");
 
             // Build a new request to list all the files in the drive
-            this.ViewModelLogger.WriteLog("DRIVE SERVICE IS CONFIGURED!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
             if (!FulcrumDriveBroker.ListDriveContents(this._googleDriveId, out var LocatedDriveFolders))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._googleDriveId}!");

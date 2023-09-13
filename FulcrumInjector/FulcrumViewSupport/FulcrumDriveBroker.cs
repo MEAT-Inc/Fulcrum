@@ -168,19 +168,20 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Build a new list request for pulling all files in from the drive location
             var ListRequest = _driveService.Files.List();
             ListRequest.PageSize = 1000;
-            ListRequest.Corpora = "drive";
             ListRequest.DriveId = DriveId;
+            ListRequest.Corpora = "drive";
             ListRequest.SupportsTeamDrives = true;
             ListRequest.IncludeTeamDriveItems = true;
             ListRequest.IncludeItemsFromAllDrives = true;
 
             // Build a new PageStreamer to automatically page through results of files
-            LocatedFiles = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
+            var PageStreamer = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
                 (ReqObj, TokenObj) => ListRequest.PageToken = TokenObj,
                 RespObj => RespObj.NextPageToken,
-                RespObj => RespObj.Files)
-                .Fetch(ListRequest)
-                .ToList();
+                RespObj => RespObj.Files);
+
+            // Execute the request for pulling files from the drive here combining paged results one at a time
+            LocatedFiles = PageStreamer.Fetch(ListRequest).ToList();
 
             // Return out based on the number of logs found 
             if (LocatedFiles.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {DriveId}!", LogType.WarnLog);
