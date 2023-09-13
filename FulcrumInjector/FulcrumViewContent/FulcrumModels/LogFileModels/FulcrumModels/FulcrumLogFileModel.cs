@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels
@@ -31,6 +32,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.Fulcrum
         /// Spawns a new log file object instance and configures fields/properties of it
         /// </summary>
         /// <param name="InputLogPath">The path to the input log file object</param>
-        public FulcrumLogFileModel(string InputLogPath) : base(InputLogPath) { }
+        public FulcrumLogFileModel(string InputLogPath) : base(InputLogPath)
+        {
+            // Validate our input object is a file type 
+            if (InputLogPath == null)
+                throw new NullReferenceException("Error! Path provided can not be null!");
+            if (!Path.HasExtension(InputLogPath))
+                throw new ArgumentException("Error! Path provided must be a file!");
+        }
     }
 }

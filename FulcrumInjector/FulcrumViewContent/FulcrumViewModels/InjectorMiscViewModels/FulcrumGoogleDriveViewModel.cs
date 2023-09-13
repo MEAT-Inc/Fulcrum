@@ -143,9 +143,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             int TotalFolderCount = LocatedDriveFolders.Count; 
             foreach (var FolderLocated in LocatedDriveFolders)
             {
-                // Parallel.ForEach(LocatedDriveFolders, (FolderLocated) =>
-                // {
-
                 // Update our progress counter value here
                 this.RefreshProgress = (FoldersIterated++ / (double)TotalFolderCount) * 100.00;
 
@@ -179,11 +176,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 string FilteredMake = FilterResults.Groups[1].Value;
                 string FilteredModel = FilterResults.Groups[2].Value;
 
-                // Store the filtering values here
+                // Store the filtering values here and log that this folder is stored
                 if (!this.YearFilters.Contains(FilteredYear)) this.YearFilters.Add(FilteredYear);
                 if (!this.MakeFilters.Contains(FilteredMake)) this.MakeFilters.Add(FilteredMake);
                 if (!this.ModelFilters.Contains(FilteredModel)) this.ModelFilters.Add(FilteredModel);
-                // });
+
+                // Log that this folder has been processed correctly and move onto the next one
+                this.ViewModelLogger.WriteLog($"PROCESSED DRIVE FOLDER {FolderLocated.Name}");
             }
 
             // Stop our timer and log out the results of this routine
