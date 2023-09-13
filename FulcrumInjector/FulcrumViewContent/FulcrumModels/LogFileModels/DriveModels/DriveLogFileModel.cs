@@ -69,7 +69,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
             if (InputDriveFile == null)
                 throw new NullReferenceException("Error! Input drive object is null!");
             if (InputDriveFile.MimeType.Contains("folder"))
-                throw new ArgumentException("Error! Input drive object is not a file!");
+                throw new ArgumentException("Error! Input drive object can not be a folder!");
 
             // Store the base log file object
             this._sourceDriveFile = InputDriveFile;
