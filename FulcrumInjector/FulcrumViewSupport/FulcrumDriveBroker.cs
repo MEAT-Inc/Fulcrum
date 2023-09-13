@@ -101,7 +101,9 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Pull in the drive ID and application name first
             ApplicationName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.ApplicationName");
-            _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE ID APPLICATION NAME CORRECTLY!", LogType.InfoLog);
+            GoogleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId").UnscrambleString();
+            _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
+            _driveServiceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
             _driveServiceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
 
             // Pull in the configuration values for the drive explorer and unscramble needed strings
@@ -155,25 +157,27 @@ namespace FulcrumInjector.FulcrumViewSupport
                 return false;
             }
         }
+
         /// <summary>
         /// Helper method used to query a given location on a google drive and return all files found for it
         /// </summary>
         /// <param name="DriveId">The ID of the location to search</param>
-        /// <param name="LocatedFiles">The files/folders found in the location</param>
+        /// <param name="LocatedObjects">The files/folders found in the location</param>
         /// <returns>True if one or more files/folders are found</returns>
-        public static bool ListDriveContents(string DriveId, out List<File> LocatedFiles)
+        public static bool ListDriveContents(out List<File> LocatedObjects)
         {
             // Build a new list request for pulling all files in from the drive location
             var ListRequest = _driveService.Files.List();
             ListRequest.PageSize = 1000;
-            ListRequest.DriveId = DriveId;
             ListRequest.Corpora = "drive";
+            ListRequest.DriveId = GoogleDriveId;
             ListRequest.SupportsTeamDrives = true;
             ListRequest.IncludeTeamDriveItems = true;
             ListRequest.IncludeItemsFromAllDrives = true;
+            ListRequest.Q = "trashed=false&fields=files(*)";
 
             // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
-            LocatedFiles = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
+            LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
                 (ReqObj, TokenObj) => ListRequest.PageToken = TokenObj,
                 RespObj => RespObj.NextPageToken,
                 RespObj => RespObj.Files)
@@ -181,9 +185,40 @@ namespace FulcrumInjector.FulcrumViewSupport
                 .ToList();
 
             // Return out based on the number of logs found 
-            if (LocatedFiles.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {DriveId}!", LogType.WarnLog);
-            else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {DriveId} CORRECTLY! LOCATED A TOTAL OF {LocatedFiles.Count} OBJECTS!", LogType.InfoLog);
-            return LocatedFiles.Count > 0;
+            if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {GoogleDriveId}!", LogType.WarnLog);
+            else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {GoogleDriveId} CORRECTLY! LOCATED A TOTAL OF {LocatedObjects.Count} OBJECTS!", LogType.InfoLog);
+            return LocatedObjects.Count > 0;
+        }
+        /// <summary>
+        /// Helper method used to query a given location on a google drive and return all files found for it
+        /// </summary>
+        /// <param name="FolderId">The ID of the location to search</param>
+        /// <param name="LocatedObjects">The files/folders found in the location</param>
+        /// <returns>True if one or more files/folders are found</returns>
+        public static bool ListFolderContents(string FolderId, out List<File> LocatedObjects)
+        {
+            // Build a new list request for pulling all files in from the drive location
+            var ListRequest = _driveService.Files.List();
+            ListRequest.PageSize = 1000;
+            ListRequest.Corpora = "drive";
+            ListRequest.DriveId = GoogleDriveId;
+            ListRequest.SupportsTeamDrives = true;
+            ListRequest.IncludeTeamDriveItems = true;
+            ListRequest.IncludeItemsFromAllDrives = true;
+            ListRequest.Q = $"{FolderId} in parents and trashed=false&fields=files(*)";
+
+            // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
+            LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
+                    (ReqObj, TokenObj) => ListRequest.PageToken = TokenObj,
+                    RespObj => RespObj.NextPageToken,
+                    RespObj => RespObj.Files)
+                .Fetch(ListRequest)
+                .ToList();
+
+            // Return out based on the number of logs found 
+            if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {FolderId}!", LogType.WarnLog);
+            else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {FolderId} CORRECTLY! LOCATED A TOTAL OF {LocatedObjects.Count} OBJECTS!", LogType.InfoLog);
+            return LocatedObjects.Count > 0;
         }
     }
 }

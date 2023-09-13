@@ -59,7 +59,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
         public bool RefreshFolderFiles()
         {
             // Build a request to list all the files in the folder 
-            if (!FulcrumDriveBroker.ListDriveContents(this._sourceDriveFolder.Id, out var LocatedFiles))
+            if (!FulcrumDriveBroker.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._sourceDriveFolder.Id}!");
 
             // Clear out the existing log file models if needed
