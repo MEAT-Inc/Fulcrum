@@ -90,6 +90,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("SETTING UP GOOGLE DRIVE VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
+            // Load in the ID of the google drive we're querying for log files
+            this._googleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId").UnscrambleString();
+            this.ViewModelLogger.WriteLog($"PULLED GOOGLE DRIVE BASE LOCATION FOR INJECTOR LOGS! ID PULLED: {this._googleDriveId}");
+
             // Try and build our drive service here
             if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
                 throw new InvalidComObjectException("Error! Failed to build new Drive Explorer Service!");

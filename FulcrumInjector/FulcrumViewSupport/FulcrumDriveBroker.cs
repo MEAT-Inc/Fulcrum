@@ -101,9 +101,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Pull in the drive ID and application name first
             ApplicationName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.ApplicationName");
-            GoogleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId").UnscrambleString();
-            _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
-            _driveServiceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
+            _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE ID APPLICATION NAME CORRECTLY!", LogType.InfoLog);
             _driveServiceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
 
             // Pull in the configuration values for the drive explorer and unscramble needed strings
