@@ -161,11 +161,15 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Helper method used to query a given location on a google drive and return all files found for it
         /// </summary>
-        /// <param name="DriveId">The ID of the location to search</param>
         /// <param name="LocatedObjects">The files/folders found in the location</param>
         /// <returns>True if one or more files/folders are found</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
         public static bool ListDriveContents(out List<File> LocatedObjects)
         {
+            // Validate our drive service first
+            if (_driveService == null && !ConfigureDriveService(out _driveService))
+                throw new InvalidOperationException("Error! Failed to configure Drive Service!");
+
             // Build a new list request for pulling all files in from the drive location
             var ListRequest = _driveService.Files.List();
             ListRequest.PageSize = 1000;
@@ -195,8 +199,13 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <param name="FolderId">The ID of the location to search</param>
         /// <param name="LocatedObjects">The files/folders found in the location</param>
         /// <returns>True if one or more files/folders are found</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
         public static bool ListFolderContents(string FolderId, out List<File> LocatedObjects)
         {
+            // Validate our drive service first
+            if (_driveService == null && !ConfigureDriveService(out _driveService))
+                throw new InvalidOperationException("Error! Failed to configure Drive Service!");
+
             // Build a new list request for pulling all files in from the drive location
             var ListRequest = _driveService.Files.List();
             ListRequest.PageSize = 1000;

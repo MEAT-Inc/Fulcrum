@@ -24,10 +24,6 @@ using Google.Apis.Services;
 using Newtonsoft.Json;
 using Octokit.Internal;
 
-// Static using calls for Google Drive API objects
-using GoogleDriveFile = Google.Apis.Drive.v3.Data.File;
-using GoogleDriveFileList = Google.Apis.Drive.v3.Data.FileList;
-
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels
 {
     /// <summary>
@@ -41,7 +37,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         #region Fields
 
         // Private backing fields for google drive explorer
-        private string _googleDriveId;                                      // ID of the drive we're searching 
         private DriveService _driveService;                                 // The service used to navigate our google drive
         
         // Private backing field for refresh timer
@@ -89,11 +84,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModelLogger.WriteLog("SETTING UP GOOGLE DRIVE VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
-
-            // Load in the ID of the google drive we're querying for log files
-            this._googleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId").UnscrambleString();
-            this.ViewModelLogger.WriteLog($"PULLED GOOGLE DRIVE BASE LOCATION FOR INJECTOR LOGS! ID PULLED: {this._googleDriveId}");
-
+            
             // Try and build our drive service here
             if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
                 throw new InvalidComObjectException("Error! Failed to build new Drive Explorer Service!");
@@ -138,7 +129,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             // Build a new request to list all the files in the drive
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
             if (!FulcrumDriveBroker.ListDriveContents(out var LocatedDriveFolders))
-                throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._googleDriveId}!");
+                throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumDriveBroker.GoogleDriveId})!");
 
             // Configure a new filtering regex for building log file sets here
             Regex FilterParseRegex = new Regex(@"(\d{4})_([^_]+)_([^_]+)_([^\s]+)");
