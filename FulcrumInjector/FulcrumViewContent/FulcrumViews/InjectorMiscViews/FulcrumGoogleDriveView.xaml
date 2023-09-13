@@ -152,11 +152,11 @@
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                             Foreground="{StaticResource PrimaryColor_Darker_35}">
                         <ProgressBar.Style>
-                            <Style TargetType="ProgressBar">
+                            <Style TargetType="ProgressBar" BasedOn="{StaticResource MahApps.Styles.ProgressBar}"> 
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Path=Value}" Value="0">
+                                    <Trigger Property="Value" Value="0">
                                         <Setter Property="IsIndeterminate" Value="True"/>
-                                    </DataTrigger>
+                                    </Trigger>
                                 </Style.Triggers>
                             </Style>
                         </ProgressBar.Style>
