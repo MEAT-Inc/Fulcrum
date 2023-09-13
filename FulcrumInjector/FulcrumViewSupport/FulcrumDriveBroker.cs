@@ -199,8 +199,18 @@ namespace FulcrumInjector.FulcrumViewSupport
                 .ToList();
 
             // Filter our results based on the result type provided if needed
-            if (!string.IsNullOrWhiteSpace(ResultFilter.ToDescriptionString()))
-                LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultFilter.ToDescriptionString()).ToList();
+            switch (ResultFilter)
+            {
+                // Filter for files only (Excludes folder mimeTypes)
+                case ResultTypes.FILES_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType != ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+
+                // Filter for folders only (Includes only folder mimeTypes)
+                case ResultTypes.FOLDERS_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+            }
 
             // Return out based on the number of logs found 
             if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {GoogleDriveId}!", LogType.WarnLog);
@@ -239,8 +249,18 @@ namespace FulcrumInjector.FulcrumViewSupport
                 .ToList();
 
             // Filter our results based on the result type provided if needed
-            if (!string.IsNullOrWhiteSpace(ResultFilter.ToDescriptionString()))
-                LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultFilter.ToDescriptionString()).ToList();
+            switch (ResultFilter)
+            {
+                // Filter for files only (Excludes folder mimeTypes)
+                case ResultTypes.FILES_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType != ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+
+                // Filter for folders only (Includes only folder mimeTypes)
+                case ResultTypes.FOLDERS_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+            }
 
             // Return out based on the number of logs found 
             if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {FolderId}!", LogType.WarnLog);
