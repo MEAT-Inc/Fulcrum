@@ -115,6 +115,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
             this.Add(LogFileTypes.PASSTHRU_FILE, new List<LogFileModel>());
             this.Add(LogFileTypes.EXPRESSIONS_FILE, new List<LogFileModel>());
             this.Add(LogFileTypes.SIMULATIONS_FILE, new List<LogFileModel>());
+            this.Add(LogFileTypes.UNKNOWN_FILE, new List<LogFileModel>());
         }
     }
 }

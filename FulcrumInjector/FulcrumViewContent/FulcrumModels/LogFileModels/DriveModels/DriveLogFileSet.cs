@@ -67,6 +67,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
             this[LogFileModel.LogFileTypes.PASSTHRU_FILE].Clear();
             this[LogFileModel.LogFileTypes.EXPRESSIONS_FILE].Clear();
             this[LogFileModel.LogFileTypes.SIMULATIONS_FILE].Clear(); 
+            this[LogFileModel.LogFileTypes.UNKNOWN_FILE].Clear();
 
             // Iterate all the located files and store them for this set object one by one
             foreach (var LocatedFile in LocatedFiles)

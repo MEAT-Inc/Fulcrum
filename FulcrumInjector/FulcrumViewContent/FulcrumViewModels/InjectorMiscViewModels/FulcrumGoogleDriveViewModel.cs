@@ -140,7 +140,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Iterate the contents and build a new list of files to filter 
             int FoldersIterated = 0;
-            int TotalFolderCount = LocatedDriveFolders.Count; 
+            int TotalFolderCount = LocatedDriveFolders.Count;
             foreach (var FolderLocated in LocatedDriveFolders)
             {
                 // Update our progress counter value here
@@ -182,7 +182,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 if (!this.ModelFilters.Contains(FilteredModel)) this.ModelFilters.Add(FilteredModel);
 
                 // Log that this folder has been processed correctly and move onto the next one
-                this.ViewModelLogger.WriteLog($"PROCESSED DRIVE FOLDER {FolderLocated.Name}");
+                this.ViewModelLogger.WriteLog($"LOCATED {NextFileSet.TotalLogCount} LOGS FROM DRIVE FOLDER {FolderLocated.Name} CORRECTLY!", LogType.InfoLog);
             }
 
             // Stop our timer and log out the results of this routine

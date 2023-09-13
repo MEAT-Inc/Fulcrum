@@ -115,6 +115,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
             this.LogFileType = Path.GetExtension(this.LogFilePath) switch
             {
                 ".txt" => LogFileTypes.PASSTHRU_FILE,
+                ".log" => LogFileTypes.PASSTHRU_FILE,
+                ".shimLog" => LogFileTypes.PASSTHRU_FILE,
                 ".ptExp" => LogFileTypes.EXPRESSIONS_FILE,
                 ".ptSim" => LogFileTypes.SIMULATIONS_FILE,
                 _ => LogFileTypes.UNKNOWN_FILE
@@ -137,6 +139,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
             this.LogFileType = Path.GetExtension(this.LogFilePath) switch
             {
                 ".txt" => LogFileTypes.PASSTHRU_FILE,
+                ".log" => LogFileTypes.PASSTHRU_FILE,
+                ".shimLog" => LogFileTypes.PASSTHRU_FILE,
                 ".ptExp" => LogFileTypes.EXPRESSIONS_FILE,
                 ".ptSim" => LogFileTypes.SIMULATIONS_FILE,
                 _ => LogFileTypes.UNKNOWN_FILE

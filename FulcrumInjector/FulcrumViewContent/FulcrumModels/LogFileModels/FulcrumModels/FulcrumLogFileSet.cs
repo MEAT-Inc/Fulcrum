@@ -82,6 +82,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.Fulcrum
             LogFileTypes LogFileType = Path.GetExtension(LogFileModel.LogFilePath) switch
             {
                 ".txt" => LogFileTypes.PASSTHRU_FILE,
+                ".log" => LogFileTypes.PASSTHRU_FILE,
+                ".shimLog" => LogFileTypes.PASSTHRU_FILE,
                 ".ptExp" => LogFileTypes.EXPRESSIONS_FILE,
                 ".ptSim" => LogFileTypes.SIMULATIONS_FILE,
                 _ => LogFileTypes.UNKNOWN_FILE
@@ -92,7 +94,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.Fulcrum
             switch (LogFileType)
             {
                 // Store the input path as a base log file
-                case LogFileTypes.UNKNOWN_FILE:
                 case LogFileTypes.PASSTHRU_FILE:
                     this.PassThruLogFile = LogFileModel;
                     _logSetLogger.WriteLog("STORED PROVIDED FILE AS A PASSTHRU FILE!", LogType.InfoLog);
@@ -108,6 +109,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.Fulcrum
                 case LogFileTypes.SIMULATIONS_FILE:
                     this.SimulationsFile = LogFileModel;
                     _logSetLogger.WriteLog("STORED PROVIDED FILE AS A SIMULATIONS FILE!", LogType.InfoLog);
+                    return true;
+
+                // For any unknown files, we store them as a default type
+                case LogFileTypes.UNKNOWN_FILE:
+                    if (!this[LogFileTypes.UNKNOWN_FILE].Contains(LogFileModel)) this[LogFileTypes.UNKNOWN_FILE].Add(LogFileModel);
+                    _logSetLogger.WriteLog("WARNING! UNKNOWN LOG TYPE PROVIDED! SAVED ACCORDINGLY!", LogType.WarnLog);
                     return true;
 
                 // For default cases, throw a failure since we've got invalid enum values
