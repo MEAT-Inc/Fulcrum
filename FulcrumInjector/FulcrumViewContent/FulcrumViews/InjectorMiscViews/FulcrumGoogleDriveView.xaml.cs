@@ -110,11 +110,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             Task.Run(() =>
             {
                 // Wrap this routine in a try catch to avoid bombing/hanging the UI
-                bool RefreshResult = false;
                 try
                 {
                     // Run the refresh routine. Enable the sending button once the refresh is complete
-                    RefreshResult = this.ViewModel.LocateInjectorLogFiles(out _);
+                    var RefreshResult = this.ViewModel.LocateInjectorLogFiles(out _);
 
                     // Throw an exception if the refresh routine fails
                     if (!RefreshResult) throw new InvalidOperationException("Error! Failed to load any files in from the Injector Google Drive!");

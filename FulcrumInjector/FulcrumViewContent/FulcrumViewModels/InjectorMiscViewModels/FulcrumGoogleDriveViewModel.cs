@@ -114,7 +114,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             // Setup filtering lists and our log file collection list
             this.LocatedLogFolders ??= new List<DriveLogFileSet>();
             this.LocatedLogFiles ??= new List<DriveLogFileModel>();
-            this.YearFilters = new List<string>() { "--- Year --"};
+            this.YearFilters = new List<string>() { "-- Year --"};
             this.MakeFilters = new List<string>() { "-- Make --"};
             this.ModelFilters = new List<string>() { "-- Model -- "};
             this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
@@ -180,9 +180,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 if (!this.YearFilters.Contains(FilteredYear)) this.YearFilters.Add(FilteredYear);
                 if (!this.MakeFilters.Contains(FilteredMake)) this.MakeFilters.Add(FilteredMake);
                 if (!this.ModelFilters.Contains(FilteredModel)) this.ModelFilters.Add(FilteredModel);
-
-                // Log that this folder has been processed correctly and move onto the next one
-                // this.ViewModelLogger.WriteLog($"LOCATED {NextFileSet.TotalLogCount} LOGS FROM DRIVE FOLDER {FolderLocated.Name} CORRECTLY!", LogType.InfoLog);
             }
 
             // Stop our timer and log out the results of this routine

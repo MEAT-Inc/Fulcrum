@@ -149,8 +149,8 @@
                             Grid.Row="1"
                             Margin="0,10,15,0"  
                             Value="{Binding RefreshProgress}"
-                            Foreground="{StaticResource PrimaryColor_Darker_35}"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            Foreground="{StaticResource PrimaryColor_Darker_35}">
                         <ProgressBar.Style>
                             <Style TargetType="ProgressBar">
                                 <Style.Triggers>
