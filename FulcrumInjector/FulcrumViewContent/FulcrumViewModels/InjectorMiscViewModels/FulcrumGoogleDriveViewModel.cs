@@ -44,13 +44,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         private Stopwatch _refreshTimer;                                    // Timer used to track refresh duration
 
         // Private backing field for the collection of loaded logs 
-        private ObservableCollection<DriveLogFileSet> _locatedLogFolders;   // Collection of all loaded log files found
-        private ObservableCollection<DriveLogFileModel> _locatedLogFiles;   // Collection of all loaded log files found
+        private List<DriveLogFileSet> _locatedLogFolders;   // Collection of all loaded log files found
+        private List<DriveLogFileModel> _locatedLogFiles;   // Collection of all loaded log files found
 
         // Private backing fields for filtering collections
-        private ObservableCollection<string> _yearFilters;                  // Years we can filter by 
-        private ObservableCollection<string> _makeFilters;                  // Makes we can filter by
-        private ObservableCollection<string> _modelFilters;                 // Models we can filter by
+        private List<string> _yearFilters;                  // Years we can filter by 
+        private List<string> _makeFilters;                  // Makes we can filter by
+        private List<string> _modelFilters;                 // Models we can filter by
 
         #endregion // Fields
 
@@ -61,13 +61,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         public double RefreshProgress { get => this._refreshProgress; set => PropertyUpdated(value); }
 
         // Public facing properties holding our collection of log files loaded
-        public ObservableCollection<DriveLogFileModel> LocatedLogFiles { get => this._locatedLogFiles; set => PropertyUpdated(value); }
-        public ObservableCollection<DriveLogFileSet> LocatedLogFolders { get => this._locatedLogFolders; set => PropertyUpdated(value); }
+        public List<DriveLogFileModel> LocatedLogFiles { get => this._locatedLogFiles; set => PropertyUpdated(value); }
+        public List<DriveLogFileSet> LocatedLogFolders { get => this._locatedLogFolders; set => PropertyUpdated(value); }
 
         // Public facing properties holding our different filter lists for the file filtering configuration
-        public ObservableCollection<string> YearFilters { get => this._yearFilters; set => PropertyUpdated(value); }
-        public ObservableCollection<string> MakeFilters { get => this._makeFilters; set => PropertyUpdated(value); }
-        public ObservableCollection<string> ModelFilters { get => this._modelFilters; set => PropertyUpdated(value); }
+        public List<string> YearFilters { get => this._yearFilters; set => PropertyUpdated(value); }
+        public List<string> MakeFilters { get => this._makeFilters; set => PropertyUpdated(value); }
+        public List<string> ModelFilters { get => this._modelFilters; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -112,11 +112,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.RefreshProgress = 0;
 
             // Setup filtering lists and our log file collection list
-            this.LocatedLogFolders ??= new ObservableCollection<DriveLogFileSet>();
-            this.LocatedLogFiles ??= new ObservableCollection<DriveLogFileModel>();
-            this.YearFilters = new ObservableCollection<string>() { "--- Year --"};
-            this.MakeFilters = new ObservableCollection<string>() { "-- Make --"};
-            this.ModelFilters = new ObservableCollection<string>() { "-- Model -- "};
+            this.LocatedLogFolders ??= new List<DriveLogFileSet>();
+            this.LocatedLogFiles ??= new List<DriveLogFileModel>();
+            this.YearFilters = new List<string>() { "--- Year --"};
+            this.MakeFilters = new List<string>() { "-- Make --"};
+            this.ModelFilters = new List<string>() { "-- Model -- "};
             this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
 
             // Validate our Drive Explorer service is built and ready for use
@@ -172,9 +172,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 }
 
                 // Pull out the year make and model values here and add them to our filter lists
-                string FilteredYear = FilterResults.Groups[0].Value;
-                string FilteredMake = FilterResults.Groups[1].Value;
-                string FilteredModel = FilterResults.Groups[2].Value;
+                string FilteredYear = FilterResults.Groups[1].Value;
+                string FilteredMake = FilterResults.Groups[2].Value;
+                string FilteredModel = FilterResults.Groups[3].Value;
 
                 // Store the filtering values here and log that this folder is stored
                 if (!this.YearFilters.Contains(FilteredYear)) this.YearFilters.Add(FilteredYear);
