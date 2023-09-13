@@ -68,7 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             {
                 // Run the refresh routine and log out if it fails to execute or not
                 this._viewLogger.WriteLog("REFRESHING LOG FILES ON GOOGLE DRIVE EXPLORER IN THE BACKGROUND...", LogType.WarnLog);
-                if (!this.ViewModel.LocateInjectorLogSets(out _))
+                if (!this.ViewModel.LocateInjectorLogFiles(out _))
                     this._viewLogger.WriteLog("ERROR! FAILED TO REFRESH LOG FILE ENTRIES FROM OUR EXPLORER! THIS IS WEIRD!", LogType.ErrorLog);
             });
         }
@@ -110,7 +110,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             Task.Run(() =>
             {
                 // Run the refresh routine. Enable the sending button once the refresh is complete
-                bool RefreshResult = this.ViewModel.LocateInjectorLogSets(out var LocatedLogSets);
+                bool RefreshResult = this.ViewModel.LocateInjectorLogFiles(out var LocatedLogSets);
                 Dispatcher.Invoke(() =>
                 {
                     // Close the refreshing flyout and enable the sending button

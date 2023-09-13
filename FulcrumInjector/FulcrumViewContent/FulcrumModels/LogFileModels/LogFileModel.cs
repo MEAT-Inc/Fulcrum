@@ -5,7 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using SharpLogging;
 
 // Static using call for a google drive log file model
 using GoogleDriveFile = Google.Apis.Drive.v3.Data.File;
@@ -22,6 +25,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         #endregion // Custom Events
 
         #region Fields
+
+        // Static shared logger for log file models
+        protected static SharpLogger _logFileLogger; 
+
         #endregion // Fields
 
         #region Properties
@@ -97,6 +104,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         /// <param name="InputLogPath">The path to the input log file object</param>
         protected LogFileModel(string InputLogPath)
         {
+            // Configure a new file logger if needed
+            _logFileLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
+
             // Setup our log file fields and properties now
             this.LogFilePath = InputLogPath;
             this.LogLocation = LogFileLocations.LOCAL_LOG;
@@ -116,6 +126,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         /// <param name="InputDriveFile">The google drive file object built for our log file</param>
         protected LogFileModel(GoogleDriveFile InputDriveFile)
         {
+            // Configure a new file logger if needed
+            _logFileLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
+
             // Setup our log file fields and properties now
             this.LogFilePath = InputDriveFile.Name;
             this.LogLocation = LogFileLocations.DRIVE_LOG;
@@ -128,75 +141,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
                 "ptSim" => LogFileTypes.SIMULATIONS_FILE,
                 _ => LogFileTypes.UNKNOWN_FILE
             };
-        }
-    }
-
-    /// <summary>
-    /// Class which holds information about a log file path from the local machine
-    /// </summary>
-    internal class FulcrumLogFileModel : LogFileModel
-    {
-        #region Custom Events
-        #endregion //Custom Events
-
-        #region Fields
-        #endregion //Fields
-
-        #region Properties
-
-        // Public facing properties holding information about the file and the contents of it
-        public bool LogFileExists => File.Exists(this.LogFilePath);
-        public string LogFileSize => this.LogFileExists ? new FileInfo(this.LogFilePath).Length.ToFileSize() : "N/A";
-
-        #endregion //Properties
-
-        #region Structs and Classes
-        #endregion //Structs and Classes
-
-        // --------------------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Spawns a new log file object instance and configures fields/properties of it
-        /// </summary>
-        /// <param name="InputLogPath">The path to the input log file object</param>
-        public FulcrumLogFileModel(string InputLogPath) : base(InputLogPath) { }
-    }
-    /// <summary>
-    /// Class which holds information about a log file path pulled in from our google drive
-    /// </summary>
-    internal class DriveLogFileModel : LogFileModel
-    {
-        #region Custom Events
-        #endregion // Custom Events
-
-        #region Fields
-
-        // Readonly field for our log object 
-        public readonly GoogleDriveFile SourceDriveFile;
-
-        #endregion // Fields
-
-        #region Properties
-
-        // Public facing properties holding information about the log file instance
-        public bool LogFileExists => (bool)!this.SourceDriveFile?.Trashed;
-        public string LogFileSize => this.LogFileExists ? this.SourceDriveFile?.Size.Value.ToFileSize() : "N/A";
-
-        #endregion // Properties
-
-        #region Structs and Classes
-        #endregion // Structs and Classes
-
-        // --------------------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Spawns a new log file object instance and configures fields/properties of it
-        /// </summary>
-        /// <param name="InputLogFile">The google drive log file we're building this log from</param>
-        public DriveLogFileModel(GoogleDriveFile InputLogFile) : base(InputLogFile)
-        {
-            // Store the base log file object 
-            this.SourceDriveFile = InputLogFile;
         }
     }
 }

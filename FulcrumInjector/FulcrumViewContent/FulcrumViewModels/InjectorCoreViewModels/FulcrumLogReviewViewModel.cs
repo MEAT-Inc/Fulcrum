@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
@@ -42,7 +43,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         private ViewerStateType _currentState;                      // Current view type for our output viewer
 
         // Private backing fields holding information about the currently loaded log files
-        private LogFileSet _currentLogSet;                   // The currently loaded log file set
+        private FulcrumLogFileSet _currentLogSet;                   // The currently loaded log file set
         private FulcrumLogFileModel _currentLogFile;                // The log file being viewed at this time
         
         #endregion // Fields
@@ -50,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Properties
 
         // Public properties holding information about the loaded log file and log file sets
-        public LogFileSet CurrentLogSet
+        public FulcrumLogFileSet CurrentLogSet
         {
             get => this._currentLogSet;
             set
@@ -59,7 +60,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 PropertyUpdated(value);
             } 
         }
-        public LogFileModel CurrentLogFile
+        public FulcrumLogFileModel CurrentLogFile
         {
             get => this._currentLogFile;
             set
@@ -156,12 +157,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             }
 
             // Try and find a model set where this file exists currently. If none are found, then build a new instance
-            LogFileSet LogFileModelSet = new LogFileSet();
+            FulcrumLogFileSet LogFileModelSet = new FulcrumLogFileSet();
             FulcrumLogFileModel LoadedFileModel = new FulcrumLogFileModel(LogFileToLoad);
             this.ViewModelLogger.WriteLog($"BUILT NEW FILE MODEL AND LOG FILE MODEL SET FOR FILE {LogFileToLoad}");
 
             // Now store the new PassThru log file value on our model set and add it to our collection on the view model
-            LogFileModelSet.StorePassThruLogFile(LoadedFileModel);
+            LogFileModelSet.SetPassThruLogFile(LoadedFileModel);
             this.ViewModelLogger.WriteLog("LOG FILE MODEL HAS BEEN STORED ON THE LOG FILE SET CORRECTLY");
 
             // If the current log file value is not set, then set it now
@@ -213,7 +214,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 
                 // Once we've built the new expressions file contents and files, we can store them on our log file set
                 var ExpressionsFileModel = new FulcrumLogFileModel(BuiltExpressionsFile);
-                this.CurrentLogSet.StoreExpressionsFile(ExpressionsFileModel, BuiltExpressions);
+                this.CurrentLogSet.SetExpressionsFile(ExpressionsFileModel, BuiltExpressions);
 
                 // Log out some information about the expressions built and toggle our view contents
                 this.ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
@@ -264,7 +265,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
                 // Once we've built the new simulations file contents and files, we can store them on our log file set
                 var SimulationsFileModel = new FulcrumLogFileModel(BuiltSimFileName);
-                this.CurrentLogSet.StoreSimulationsFile(SimulationsFileModel, BuiltSimChannels);
+                this.CurrentLogSet.SetSimulationsFile(SimulationsFileModel, BuiltSimChannels);
 
                 // Log out some information about the simulations built and toggle our view contents
                 this.ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {BuiltSimFileName} FROM INPUT EXPRESSIONS!", LogType.InfoLog);

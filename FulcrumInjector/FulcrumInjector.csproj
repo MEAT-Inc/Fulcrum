@@ -192,8 +192,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumLogFileSet.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\DriveModels\DriveLogFileModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFileModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\LogFileModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFileSet.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\DriveModels\DriveLogFileSet.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\LogFileSet.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorMiscViewModels\FulcrumGoogleDriveViewModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
@@ -202,6 +206,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringScrambler.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumDriveBroker.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
