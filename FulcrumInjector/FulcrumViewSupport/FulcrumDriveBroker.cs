@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -76,6 +77,16 @@ namespace FulcrumInjector.FulcrumViewSupport
             [JsonProperty("universe_domain")] public string UniverseDomain { get; set; }
             [JsonProperty("client_x509_cert_url")] public string ClientCertUrl { get; set; }
             [JsonProperty("auth_provider_x509_cert_url")] public string AuthProviderUrl { get; set; }
+        }
+
+        /// <summary>
+        /// Enumeration used to help filter the resulting object types from a query to the drive/folder
+        /// </summary>
+        public enum ResultTypes
+        {
+            [Description("")] ALL_RESULTS,                                      // Pulls in all results from the search 
+            [Description("application/vnd.google-apps.file")] FILES_ONLY,       // Pulls only files in from the search
+            [Description("application/vnd.google-apps.folder")] FOLDERS_ONLY    // Pulls only folders in from the search
         }
 
         #endregion // Structs and Classes
@@ -164,7 +175,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <param name="LocatedObjects">The files/folders found in the location</param>
         /// <returns>True if one or more files/folders are found</returns>
         /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
-        public static bool ListDriveContents(out List<File> LocatedObjects)
+        public static bool ListDriveContents(out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
             // Validate our drive service first
             if (_driveService == null && !ConfigureDriveService(out _driveService))
@@ -178,15 +189,18 @@ namespace FulcrumInjector.FulcrumViewSupport
             ListRequest.SupportsTeamDrives = true;
             ListRequest.IncludeTeamDriveItems = true;
             ListRequest.IncludeItemsFromAllDrives = true;
-            ListRequest.Q = "trashed=false&fields=files(*)";
 
             // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
             LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
-                (ReqObj, TokenObj) => ListRequest.PageToken = TokenObj,
+                (_, TokenObj) => ListRequest.PageToken = TokenObj,
                 RespObj => RespObj.NextPageToken,
                 RespObj => RespObj.Files)
                 .Fetch(ListRequest)
                 .ToList();
+
+            // Filter our results based on the result type provided if needed
+            if (!string.IsNullOrWhiteSpace(ResultFilter.ToDescriptionString()))
+                LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultFilter.ToDescriptionString()).ToList();
 
             // Return out based on the number of logs found 
             if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {GoogleDriveId}!", LogType.WarnLog);
@@ -200,7 +214,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <param name="LocatedObjects">The files/folders found in the location</param>
         /// <returns>True if one or more files/folders are found</returns>
         /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
-        public static bool ListFolderContents(string FolderId, out List<File> LocatedObjects)
+        public static bool ListFolderContents(string FolderId, out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
             // Validate our drive service first
             if (_driveService == null && !ConfigureDriveService(out _driveService))
@@ -214,15 +228,19 @@ namespace FulcrumInjector.FulcrumViewSupport
             ListRequest.SupportsTeamDrives = true;
             ListRequest.IncludeTeamDriveItems = true;
             ListRequest.IncludeItemsFromAllDrives = true;
-            ListRequest.Q = $"{FolderId} in parents and trashed=false&fields=files(*)";
+            ListRequest.Q = $"'{FolderId}' in parents";
 
             // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
             LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
-                    (ReqObj, TokenObj) => ListRequest.PageToken = TokenObj,
+                    (_, TokenObj) => ListRequest.PageToken = TokenObj,
                     RespObj => RespObj.NextPageToken,
                     RespObj => RespObj.Files)
                 .Fetch(ListRequest)
                 .ToList();
+
+            // Filter our results based on the result type provided if needed
+            if (!string.IsNullOrWhiteSpace(ResultFilter.ToDescriptionString()))
+                LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultFilter.ToDescriptionString()).ToList();
 
             // Return out based on the number of logs found 
             if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {FolderId}!", LogType.WarnLog);

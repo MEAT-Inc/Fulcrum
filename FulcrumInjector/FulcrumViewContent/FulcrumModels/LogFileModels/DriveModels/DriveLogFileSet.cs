@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using SharpLogging;
@@ -42,7 +43,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
             // Make sure the input file object is a type of folder
             if (SourceDriveFolder == null)
                 throw new NullReferenceException("Error! Input log folder was null!");
-            if (SourceDriveFolder.MimeType != "application/vnd.google-apps.folder")
+            if (SourceDriveFolder.MimeType != FulcrumDriveBroker.ResultTypes.FOLDERS_ONLY.ToDescriptionString())
                 throw new ArgumentException("Error! Input drive object is not a folder!");
 
             // Store the input log folder and find the files in it
@@ -59,7 +60,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
         public bool RefreshFolderFiles()
         {
             // Build a request to list all the files in the folder 
-            if (!FulcrumDriveBroker.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles))
+            if (!FulcrumDriveBroker.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles, FulcrumDriveBroker.ResultTypes.FILES_ONLY))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._sourceDriveFolder.Id}!");
 
             // Clear out the existing log file models if needed

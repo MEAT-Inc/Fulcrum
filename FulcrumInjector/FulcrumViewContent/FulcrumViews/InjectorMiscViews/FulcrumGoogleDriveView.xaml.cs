@@ -109,18 +109,31 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             this._viewLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS IN THE BACKGROUND NOW...", LogType.InfoLog);
             Task.Run(() =>
             {
-                // Run the refresh routine. Enable the sending button once the refresh is complete
-                bool RefreshResult = this.ViewModel.LocateInjectorLogFiles(out var LocatedLogSets);
+                // Wrap this routine in a try catch to avoid bombing/hanging the UI
+                bool RefreshResult = false;
+                try
+                {
+                    // Run the refresh routine. Enable the sending button once the refresh is complete
+                    RefreshResult = this.ViewModel.LocateInjectorLogFiles(out _);
+
+                    // Throw an exception if the refresh routine fails
+                    if (!RefreshResult) throw new InvalidOperationException("Error! Failed to load any files in from the Injector Google Drive!");
+                    this._viewLogger.WriteLog("REFRESHED INJECTOR LOG SETS CORRECTLY! RESULTS ARE STORED ON OUR VIEW MODEL FOR DOWNLOADING!", LogType.InfoLog);
+                }
+                catch (Exception RefreshEx)
+                {
+                    // Log out the exception and move on
+                    this._viewLogger.WriteLog("ERROR! FAILED TO REFRESH LOG FILES IN THE INJECTOR DRIVE!", LogType.ErrorLog);
+                    this._viewLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", RefreshEx);
+                }
+
+                // Reset our UI contents here and close the refreshing progress bar
                 Dispatcher.Invoke(() =>
                 {
                     // Close the refreshing flyout and enable the sending button
-                    this.GoogleDriveRefreshingFlyout.IsOpen = false; 
+                    this.GoogleDriveRefreshingFlyout.IsOpen = false;
                     SendingButton.IsEnabled = true;
-                }); 
-
-                // Throw an exception if the refresh routine fails
-                if (!RefreshResult) throw new InvalidOperationException("Error! Failed to load any files in from the Injector Google Drive!");
-                this._viewLogger.WriteLog("REFRESHED INJECTOR LOG SETS CORRECTLY! RESULTS ARE STORED ON OUR VIEW MODEL FOR DOWNLOADING!", LogType.InfoLog);
+                });
             });
         }
     }

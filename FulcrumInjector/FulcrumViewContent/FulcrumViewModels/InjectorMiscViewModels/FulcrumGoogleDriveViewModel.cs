@@ -38,8 +38,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
         // Private backing fields for google drive explorer
         private DriveService _driveService;                                 // The service used to navigate our google drive
-        
-        // Private backing field for refresh timer
+
+        // Private backing field for refresh timer and progress
+        private double _refreshProgress;                                    // Progress for refresh routines
         private Stopwatch _refreshTimer;                                    // Timer used to track refresh duration
 
         // Private backing field for the collection of loaded logs 
@@ -56,7 +57,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         #region Properties
 
         // Public property for refresh timer
-        public Stopwatch RefreshTimer { get => _refreshTimer; set => PropertyUpdated(value); }
+        public Stopwatch RefreshTimer { get => this._refreshTimer; set => PropertyUpdated(value); }
+        public double RefreshProgress { get => this._refreshProgress; set => PropertyUpdated(value); }
 
         // Public facing properties holding our collection of log files loaded
         public ObservableCollection<DriveLogFileModel> LocatedLogFiles { get => this._locatedLogFiles; set => PropertyUpdated(value); }
@@ -107,6 +109,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS NOW...");
             this.RefreshTimer = new Stopwatch();
             this.RefreshTimer.Start();
+            this.RefreshProgress = 0;
 
             // Setup filtering lists and our log file collection list
             this.LocatedLogFolders ??= new ObservableCollection<DriveLogFileSet>();
@@ -128,7 +131,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Build a new request to list all the files in the drive
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
-            if (!FulcrumDriveBroker.ListDriveContents(out var LocatedDriveFolders))
+            if (!FulcrumDriveBroker.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveBroker.ResultTypes.FOLDERS_ONLY))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumDriveBroker.GoogleDriveId})!");
 
             // Configure a new filtering regex for building log file sets here
@@ -136,10 +139,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("CONFIGURED NEW REGEX FOR PARSING FOLDER NAMES OK!");
 
             // Iterate the contents and build a new list of files to filter 
+            int FoldersIterated = 0;
+            int TotalFolderCount = LocatedDriveFolders.Count; 
             foreach (var FolderLocated in LocatedDriveFolders)
             {
                 // Parallel.ForEach(LocatedDriveFolders, (FolderLocated) =>
                 // {
+
+                // Update our progress counter value here
+                this.RefreshProgress = (FoldersIterated++ / (double)TotalFolderCount) * 100.00;
+
                 // Parse the name and build our folders for YMM
                 Match FilterResults = FilterParseRegex.Match(FolderLocated.Name);
                 if (!FilterResults.Success)

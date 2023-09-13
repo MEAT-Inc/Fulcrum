@@ -68,7 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
             // Validate our input object is a file type 
             if (InputDriveFile == null)
                 throw new NullReferenceException("Error! Input drive object is null!");
-            if (InputDriveFile.MimeType != "application/vnd.google-apps.file")
+            if (InputDriveFile.MimeType != FulcrumDriveBroker.ResultTypes.FILES_ONLY.ToDescriptionString())
                 throw new ArgumentException("Error! Input drive object is not a file!");
 
             // Store the base log file object

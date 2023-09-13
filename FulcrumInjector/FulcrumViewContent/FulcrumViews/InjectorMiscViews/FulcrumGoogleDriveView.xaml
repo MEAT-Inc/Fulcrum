@@ -147,8 +147,19 @@
                     <!-- Endless Refreshing Progress Bar -->
                     <Grid Grid.Row="1">
                         <ProgressBar
-                            Margin="0,10,15,0" IsIndeterminate="True"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            Margin="0,10,15,0"  
+                            Value="{Binding RefreshProgress}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <ProgressBar.Style>
+                                <Style TargetType="ProgressBar">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Value}" Value="0">
+                                            <Setter Property="IsIndeterminate" Value="True"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ProgressBar.Style>
+                        </ProgressBar>
                         <TextBlock 
                             Foreground="Black"
                             Margin="0,13,0,0" FontWeight="DemiBold"
