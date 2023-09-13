@@ -21,15 +21,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
         #region Fields
 
         // Private backing fields for a drive log file object
-        private readonly GoogleDriveFile _sourceDriveFile;        
+        private readonly GoogleDriveFile _sourceDriveFile;
 
         #endregion // Fields
 
         #region Properties
-
-        // Public facing properties holding information about the log file instance
-        public bool LogFileExists => (bool)!this._sourceDriveFile?.Trashed;
-        public string LogFileSize => this.LogFileExists ? this._sourceDriveFile?.Size.Value.ToFileSize() : "N/A";
 
         // Private property holding our drive service object
         private DriveService _driveService
@@ -49,6 +45,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
 
             }
         }
+
+        // Public facing properties holding information about the log file instance
+        public new bool LogFileExists => (bool)!this._sourceDriveFile?.Trashed;
+        public new string LogFileSize => this.LogFileExists ? this._sourceDriveFile?.Size.Value.ToFileSize() : "N/A";
 
         #endregion // Properties
 

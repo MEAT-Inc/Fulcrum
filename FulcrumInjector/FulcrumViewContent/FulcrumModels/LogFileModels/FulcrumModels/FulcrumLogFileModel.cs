@@ -18,8 +18,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.Fulcrum
         #region Properties
 
         // Public facing properties holding information about the file and the contents of it
-        public bool LogFileExists => File.Exists(this.LogFilePath);
-        public string LogFileSize => this.LogFileExists ? new FileInfo(this.LogFilePath).Length.ToFileSize() : "N/A";
+        public new bool LogFileExists => File.Exists(this.LogFilePath);
+        public new string LogFileSize => this.LogFileExists ? new FileInfo(this.LogFilePath).Length.ToFileSize() : "N/A";
 
         #endregion //Properties
 
