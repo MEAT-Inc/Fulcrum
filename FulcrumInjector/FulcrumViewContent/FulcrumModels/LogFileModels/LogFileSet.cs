@@ -109,7 +109,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
         protected LogFileSet()
         {
             // Spawn our new logger instance
-            _logSetLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            _logSetLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
 
             // Configure our dictionary of log types and exit out
             this.Add(LogFileTypes.PASSTHRU_FILE, new List<LogFileModel>());
