@@ -64,13 +64,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE ABOUT THIS APP BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
 
             // Invoke a background refresh for pulling in all log files for our explorer
-            Task.Run(() =>
-            {
-                // Run the refresh routine and log out if it fails to execute or not
-                this._viewLogger.WriteLog("REFRESHING LOG FILES ON GOOGLE DRIVE EXPLORER IN THE BACKGROUND...", LogType.WarnLog);
-                if (!this.ViewModel.LocateInjectorLogFiles(out _))
-                    this._viewLogger.WriteLog("ERROR! FAILED TO REFRESH LOG FILE ENTRIES FROM OUR EXPLORER! THIS IS WEIRD!", LogType.ErrorLog);
-            });
+            this.RefreshGoogleDrive_OnClick(this.btnRefreshInjectorFiles, null);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -105,7 +99,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             this.GoogleDriveRefreshingFlyout.IsOpen = true;
             SendingButton.IsEnabled = false;
 
-            // Disable the filtering ComboBoxes
+            // Disable the filtering ComboBoxes and text boxes
+            this.tbVinFilter.IsEnabled = false;
             this.cbYearFilter.IsEnabled = false; 
             this.cbMakeFilter.IsEnabled = false; 
             this.cbModelFilter.IsEnabled = false;
@@ -132,13 +127,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                 }
 
                 // Reset our UI contents here and close the refreshing progress bar
-                Dispatcher.Invoke(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     // Close the refreshing flyout and enable the sending button
                     this.GoogleDriveRefreshingFlyout.IsOpen = false;
                     SendingButton.IsEnabled = true;
 
-                    // Enable the filtering ComboBoxes
+                    // Enable the filtering ComboBoxes and text boxes
+                    this.tbVinFilter.IsEnabled = true;
                     this.cbYearFilter.IsEnabled = true;
                     this.cbMakeFilter.IsEnabled = true;
                     this.cbModelFilter.IsEnabled = true;

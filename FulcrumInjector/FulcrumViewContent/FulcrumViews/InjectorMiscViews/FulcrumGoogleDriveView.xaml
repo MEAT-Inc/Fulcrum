@@ -43,6 +43,7 @@
             <Button Width="25" Height="25"
                     VerticalAlignment="Top"
                     HorizontalAlignment="Right"
+                    x:Name="btnRefreshInjectorFiles"
                     ToolTip="Refresh Drive Explorer"
                     Click="RefreshGoogleDrive_OnClick"
                     Style="{StaticResource ActionButtonStyle}">
@@ -100,7 +101,7 @@
                 <ComboBox Grid.Column="2" Margin="5,0,0,0" SelectedIndex="0"
                           x:Name="cbModelFilter" ItemsSource="{Binding ModelFilters, Mode=OneWay}"/>
                 <TextBox Grid.Column="3" Style="{StaticResource InputTextWithHolder}" 
-                         FontFamily="Consolas" IsEnabled="False" Margin="5,0,0,0" 
+                         FontFamily="Consolas" Margin="5,0,0,0" 
                          Tag="VIN Number (17 Characters)" x:Name="tbVinFilter" MaxLength="17"/>
             </Grid>
 
