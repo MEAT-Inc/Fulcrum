@@ -213,8 +213,8 @@ namespace FulcrumInjector.FulcrumViewSupport
             }
 
             // Return out based on the number of logs found 
-            if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {GoogleDriveId}!", LogType.WarnLog);
-            else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {GoogleDriveId} CORRECTLY! LOCATED A TOTAL OF {LocatedObjects.Count} OBJECTS!", LogType.InfoLog);
+            // if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {GoogleDriveId}!", LogType.WarnLog);
+            // else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {GoogleDriveId} CORRECTLY! LOCATED A TOTAL OF {LocatedObjects.Count} OBJECTS!", LogType.InfoLog);
             return LocatedObjects.Count > 0;
         }
         /// <summary>
@@ -263,8 +263,8 @@ namespace FulcrumInjector.FulcrumViewSupport
             }
 
             // Return out based on the number of logs found 
-            if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {FolderId}!", LogType.WarnLog);
-            else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {FolderId} CORRECTLY! LOCATED A TOTAL OF {LocatedObjects.Count} OBJECTS!", LogType.InfoLog);
+            // if (LocatedObjects.Count == 0) _driveServiceLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER ID {FolderId}!", LogType.WarnLog);
+            // else _driveServiceLogger.WriteLog($"REFRESHED FOLDER {FolderId} CORRECTLY! LOCATED A TOTAL OF {LocatedObjects.Count} OBJECTS!", LogType.InfoLog);
             return LocatedObjects.Count > 0;
         }
     }

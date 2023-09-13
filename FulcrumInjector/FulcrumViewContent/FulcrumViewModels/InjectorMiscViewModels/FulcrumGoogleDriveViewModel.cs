@@ -182,7 +182,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 if (!this.ModelFilters.Contains(FilteredModel)) this.ModelFilters.Add(FilteredModel);
 
                 // Log that this folder has been processed correctly and move onto the next one
-                this.ViewModelLogger.WriteLog($"LOCATED {NextFileSet.TotalLogCount} LOGS FROM DRIVE FOLDER {FolderLocated.Name} CORRECTLY!", LogType.InfoLog);
+                // this.ViewModelLogger.WriteLog($"LOCATED {NextFileSet.TotalLogCount} LOGS FROM DRIVE FOLDER {FolderLocated.Name} CORRECTLY!", LogType.InfoLog);
             }
 
             // Stop our timer and log out the results of this routine

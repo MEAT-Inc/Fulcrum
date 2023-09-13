@@ -144,28 +144,23 @@
                         Text="Refreshing Injector Drive Files..." FontSize="20"
                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                    <!-- Endless Refreshing Progress Bar -->
-                    <Grid Grid.Row="1">
-                        <ProgressBar
+                    <!-- Refreshing Progress Bar -->
+                    <ProgressBar
+                            Grid.Row="1"
                             Margin="0,10,15,0"  
                             Value="{Binding RefreshProgress}"
+                            Foreground="{StaticResource PrimaryColor_Darker_35}"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <ProgressBar.Style>
-                                <Style TargetType="ProgressBar">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=Value}" Value="0">
-                                            <Setter Property="IsIndeterminate" Value="True"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ProgressBar.Style>
-                        </ProgressBar>
-                        <TextBlock 
-                            Foreground="Black"
-                            Margin="0,13,0,0" FontWeight="DemiBold"
-                            HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Text="{Binding Path=RefreshTimer.Elapsed, Mode=OneWayToSource, StringFormat=Time Elapsed: {0:mm\\:ss}}"/>
-                    </Grid>
+                        <ProgressBar.Style>
+                            <Style TargetType="ProgressBar">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Value}" Value="0">
+                                        <Setter Property="IsIndeterminate" Value="True"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ProgressBar.Style>
+                    </ProgressBar>
                 </Grid>
             </mah:Flyout>
         </mah:FlyoutsControl> 
