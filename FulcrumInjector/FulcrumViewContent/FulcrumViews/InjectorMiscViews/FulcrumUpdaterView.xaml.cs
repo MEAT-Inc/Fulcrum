@@ -121,7 +121,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        internal void ToggleApplicationUpdateInformation_OnClick(object Sender, RoutedEventArgs E)
+        private void ToggleApplicationUpdateInformation_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
             this._viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);

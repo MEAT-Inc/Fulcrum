@@ -274,7 +274,9 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("GENERATING STATIC VIEW CONTENTS FOR HAMBURGER CORE CONTENTS NOW...", LogType.WarnLog);
             var LoopResultCast = Assembly.GetExecutingAssembly().GetTypes().Where(TypePulled =>
                     TypePulled.Namespace != null && !TypePulled.Name.Contains("HamburgerCore") && 
-                    (TypePulled.Namespace.Contains("InjectorCoreView") || TypePulled.Namespace.Contains("InjectorOptionView")))
+                    (TypePulled.Namespace.Contains("InjectorCoreView") ||
+                     TypePulled.Namespace.Contains("InjectorOptionView") || 
+                    TypePulled.Namespace.Contains("InjectorMiscView")))
                 .ToLookup(TypePulled => TypePulled.Name.EndsWith("View") || TypePulled.Name.EndsWith("ViewModel"));
 
             // Now build singleton instances for the types required.
