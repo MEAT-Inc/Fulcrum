@@ -146,6 +146,8 @@ namespace FulcrumInjector.FulcrumViewContent
             get => FulcrumInstalledOeAppsView.ViewModel;
             set => FulcrumInstalledOeAppsView.ViewModel = value;
         }
+
+        // Public static properties used to configure constant views used in the title view
         public static FulcrumAboutThisAppView FulcrumAboutThisAppView
         {
             get => FulcrumMainWindow?.FulcrumAboutThisAppView;
@@ -165,6 +167,16 @@ namespace FulcrumInjector.FulcrumViewContent
         {
             get => FulcrumMainWindow?.FulcrumUpdaterView.ViewModel;
             set => FulcrumMainWindow.FulcrumUpdaterView.ViewModel = value;
+        }
+        public static FulcrumGoogleDriveView FulcrumGoogleDriveView
+        {
+            get => FulcrumMainWindow?.FulcrumGoogleDriveView;
+            set => FulcrumMainWindow.FulcrumGoogleDriveView = value;
+        }
+        public static FulcrumGoogleDriveViewModel FulcrumGoogleDriveViewModel
+        {
+            get => FulcrumMainWindow?.FulcrumGoogleDriveView.ViewModel;
+            set => FulcrumMainWindow.FulcrumGoogleDriveView.ViewModel = value;
         }
 
         // Public facing singletons used to pull information about our views and view models in the hamburger content

@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
@@ -69,13 +70,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.IsLogLoaded = value != null;
                 
                 // Based on the value we're storing, update our viewer contents
-                if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.PASSTHRU_FILE)
+                if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.PASSTHRU_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingLogFile);
-                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.EXPRESSIONS_FILE)
+                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.EXPRESSIONS_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingExpressions);
-                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.SIMULATIONS_FILE)
+                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.SIMULATIONS_FILE)
                     this._toggleViewerContents(ViewerStateType.ShowingSimulation);
-                else if (this._currentLogFile.LogFileType == FulcrumLogFileModel.LogFileTypes.UNKNOWN_FILE)
+                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.UNKNOWN_FILE)
                     this._toggleViewerContents(ViewerStateType.NoContent);
             }
         }
@@ -161,7 +162,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog($"BUILT NEW FILE MODEL AND LOG FILE MODEL SET FOR FILE {LogFileToLoad}");
 
             // Now store the new PassThru log file value on our model set and add it to our collection on the view model
-            LogFileModelSet.StorePassThruLogFile(LoadedFileModel);
+            LogFileModelSet.SetPassThruLogFile(LoadedFileModel);
             this.ViewModelLogger.WriteLog("LOG FILE MODEL HAS BEEN STORED ON THE LOG FILE SET CORRECTLY");
 
             // If the current log file value is not set, then set it now
@@ -213,7 +214,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 
                 // Once we've built the new expressions file contents and files, we can store them on our log file set
                 var ExpressionsFileModel = new FulcrumLogFileModel(BuiltExpressionsFile);
-                this.CurrentLogSet.StoreExpressionsFile(ExpressionsFileModel, BuiltExpressions);
+                this.CurrentLogSet.SetExpressionsFile(ExpressionsFileModel, BuiltExpressions);
 
                 // Log out some information about the expressions built and toggle our view contents
                 this.ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
@@ -264,7 +265,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
                 // Once we've built the new simulations file contents and files, we can store them on our log file set
                 var SimulationsFileModel = new FulcrumLogFileModel(BuiltSimFileName);
-                this.CurrentLogSet.StoreSimulationsFile(SimulationsFileModel, BuiltSimChannels);
+                this.CurrentLogSet.SetSimulationsFile(SimulationsFileModel, BuiltSimChannels);
 
                 // Log out some information about the simulations built and toggle our view contents
                 this.ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {BuiltSimFileName} FROM INPUT EXPRESSIONS!", LogType.InfoLog);
@@ -364,7 +365,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 {                   
                     // Set our new index value for the current file type, and setup our output content in text viewers
                     CastView.FilteringLogFileTextBox.Text = this.CurrentLogFile?.LogFilePath ?? $"No Log File Loaded!"; ;
-                    CastView.ReplayLogInputContent.Text = this.CurrentLogFile?.LogFileContents ?? $"No Log File Contents Loaded!";
+                    CastView.ReplayLogInputContent.Text = File.Exists(this.CurrentLogFile?.LogFilePath) 
+                        ? File.ReadAllText(this.CurrentLogFile?.LogFilePath ?? string.Empty) 
+                        : $"No Log File Contents Loaded!";
                 });
 
                 // Toggle the showing parsed value.
