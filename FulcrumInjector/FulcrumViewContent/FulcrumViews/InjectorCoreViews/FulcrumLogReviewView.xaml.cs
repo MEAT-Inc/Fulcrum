@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
@@ -384,9 +385,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Now apply the new content based on what's in the box.
             if (SelectedBoxIndex == -1) return;
-            else if (SelectedBoxIndex == 0) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.PassThruLogFile;
-            else if (SelectedBoxIndex == 1) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.ExpressionsFile;
-            else if (SelectedBoxIndex == 2) this.ViewModel.CurrentLogFile = this.ViewModel.CurrentLogSet.SimulationsFile;
+            else if (SelectedBoxIndex == 0) this.ViewModel.CurrentLogFile = (FulcrumLogFileModel)this.ViewModel.CurrentLogSet.PassThruLogFile;
+            else if (SelectedBoxIndex == 1) this.ViewModel.CurrentLogFile = (FulcrumLogFileModel)this.ViewModel.CurrentLogSet.ExpressionsFile;
+            else if (SelectedBoxIndex == 2) this.ViewModel.CurrentLogFile = (FulcrumLogFileModel)this.ViewModel.CurrentLogSet.SimulationsFile;
             else throw new IndexOutOfRangeException("Error! Selected index could not be converted into a file type!");
         }
     }

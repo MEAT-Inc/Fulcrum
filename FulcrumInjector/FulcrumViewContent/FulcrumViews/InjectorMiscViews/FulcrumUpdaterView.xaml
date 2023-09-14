@@ -116,7 +116,6 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" 
                     FontSize="18"
-                    x:Name="StartUpdateFlyoutButton"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Left"
                     Style="{StaticResource ActionButtonStyle}"
@@ -127,7 +126,6 @@
                     FontSize="18"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"
-                    x:Name="CloseUpdatesFlyoutButton"
                     Click="ToggleApplicationUpdateInformation_OnClick"
                     Style="{StaticResource ActionButtonStyle}"
                     Content="Close Updater" Width="250" Height="35" />

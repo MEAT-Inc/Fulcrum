@@ -68,7 +68,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        internal void ToggleAboutThisApplicationFlyout_OnClick(object Sender, RoutedEventArgs E)
+        private void ToggleAboutThisApplicationFlyout_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
             this._viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR ABOUT THIS APPLICATION ICON CORRECTLY!", LogType.WarnLog);

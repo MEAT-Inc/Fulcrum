@@ -1,0 +1,190 @@
+﻿<UserControl x:Class="FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews.FulcrumGoogleDriveView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:driveModels="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels"
+             Loaded="FulcrumGoogleDriveView_OnLoaded" mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <!-- Style Sheets -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumGoogleDriveStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Content View -->
+    <Grid Margin="15,20,20,15" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Text -->
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+            <TextBlock 
+                Text="Google Drive Explorer" FontSize="24"
+                Foreground="{StaticResource TextColorBase}"
+                FontWeight="DemiBold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+            <TextBlock 
+                FontSize="14" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="{StaticResource PrimaryColor_Lighter_35}"
+                Text="Use this window to search the MEAT-Inc Google Drive containing all of our built and shared logs/simulations/expressions files for use inside the FulrcumInjector. Use the refresh button above to refresh the list of located log files."/>
+        </StackPanel>
+
+        <!-- Close and Refresh Buttons -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
+
+            <!-- Refresh button -->
+            <Button Width="25" Height="25"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Right"
+                    x:Name="btnRefreshInjectorFiles"
+                    ToolTip="Refresh Drive Explorer"
+                    Click="RefreshGoogleDrive_OnClick"
+                    Style="{StaticResource ActionButtonStyle}">
+                <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,3,1">
+                    <Path.Data>
+                        <PathGeometry Figures="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </Path.Data>
+                </Path>
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
+                </Button.LayoutTransform>
+            </Button>
+
+            <!-- Close out button -->
+            <Button Width="25" Height="25"
+                    ToolTip="Close Drive Explorer" Click="ToggleGoogleDriveFlyout_OnClick" 
+                    Margin="10,0" Style="{StaticResource ActionButtonStyle}">
+                <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,3,1">
+                    <Path.Data>
+                        <PathGeometry Figures="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                    </Path.Data>
+                </Path>
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
+                </Button.LayoutTransform>
+            </Button>
+
+        </StackPanel>
+
+        <!-- Splitting Border -->
+        <Border 
+            Grid.Row="0" BorderThickness="0,1,0,0" 
+            BorderBrush="{StaticResource TextColorBase}"
+            Margin="0,0,0,-7" VerticalAlignment="Bottom"/>
+
+        <!-- Drive Explorer Content -->
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".105*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Filtering Options -->
+            <Grid Grid.Row="0" Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="250"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0" 
+                          Margin="0,0,5,0" 
+                          SelectedIndex="0" x:Name="cbYearFilter" 
+                          SelectionChanged="cbLogSetFilter_OnSelectionChanged"
+                          ItemsSource="{Binding YearFilters, Mode=OneWay}"/>
+                <ComboBox Grid.Column="1" 
+                          Margin="0,0,0,0" 
+                          SelectedIndex="0" x:Name="cbMakeFilter" 
+                          ItemsSource="{Binding MakeFilters, Mode=OneWay}"/>
+                <ComboBox Grid.Column="2"
+                          Margin="5,0,0,0" 
+                          SelectedIndex="0" x:Name="cbModelFilter" 
+                          ItemsSource="{Binding ModelFilters, Mode=OneWay}"/>
+                <TextBox Grid.Column="3" x:Name="tbVinFilter" MaxLength="17"
+                         FontFamily="Consolas" Margin="5,0,0,0" 
+                         Style="{StaticResource InputTextWithHolder}" 
+                         TextChanged="tbVinFilter_OnTextChanged" Tag="VIN Number (17 Characters)"/>
+            </Grid>
+
+            <!-- Files Located Listbox -->
+            <ListBox Grid.Row="1" x:Name="lbLocatedInjectorFiles"
+                     ItemsSource="{Binding FilteredLogFolders}"
+                     BorderBrush="{StaticResource TextColorBase}"
+                     BorderThickness="1" Margin="0,3,0,0" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type driveModels:DriveLogFileSet}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" FontSize="12" Text="{Binding Path=LogSetName}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <!-- Loading Flyouts -->
+        <mah:FlyoutsControl Grid.Row="1">
+
+            <!-- Drive Refreshing Flyout-->
+            <mah:Flyout 
+                x:Name="GoogleDriveRefreshingFlyout" 
+                Height="85" Margin="50,150,50,0" 
+                Position="Top" VerticalAlignment="Center" HorizontalAlignment="Center"
+                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
+
+                <!-- Semi Transparent Background -->
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="#020202" Opacity=".90"/>
+                </mah:Flyout.Background>
+
+                <!-- Empty Header Template -->
+                <mah:Flyout.HeaderTemplate>
+                    <DataTemplate/>
+                </mah:Flyout.HeaderTemplate>
+
+                <!-- Refreshing Content -->
+                <Grid Margin="5,15,5,15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Refreshing Text -->
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="0,0,5,0" FontWeight="DemiBold"
+                        Text="Refreshing Injector Drive Files..." FontSize="20"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <!-- Refreshing Progress Bar -->
+                    <ProgressBar
+                            Grid.Row="1"
+                            Margin="0,10,15,0"  
+                            Value="{Binding RefreshProgress}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            Foreground="{StaticResource PrimaryColor_Darker_35}">
+                        <ProgressBar.Style>
+                            <Style TargetType="ProgressBar" BasedOn="{StaticResource MahApps.Styles.ProgressBar}"> 
+                                <Style.Triggers>
+                                    <Trigger Property="Value" Value="0">
+                                        <Setter Property="IsIndeterminate" Value="True"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ProgressBar.Style>
+                    </ProgressBar>
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl> 
+    </Grid>
+</UserControl>
