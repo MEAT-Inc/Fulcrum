@@ -44,13 +44,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         private Stopwatch _refreshTimer;                                    // Timer used to track refresh duration
 
         // Private backing field for the collection of loaded logs 
-        private ObservableCollection<DriveLogFileSet> _locatedLogFolders;   // Collection of all loaded log files found
-        private ObservableCollection<DriveLogFileModel> _locatedLogFiles;   // Collection of all loaded log files found
+        private ObservableCollection<DriveLogFileSet> _locatedLogFolders;   // Collection of all loaded log folders found
+        private ObservableCollection<DriveLogFileSet> _filteredLogFolders;  // Collection of all filtered log folders found
 
         // Private backing fields for filtering collections
         private ObservableCollection<string> _yearFilters;                  // Years we can filter by 
         private ObservableCollection<string> _makeFilters;                  // Makes we can filter by
         private ObservableCollection<string> _modelFilters;                 // Models we can filter by
+        private Dictionary<FilterTypes, string> _appliedFilters;            // Currently applied filter values
 
         #endregion // Fields
 
@@ -61,17 +62,30 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         public double RefreshProgress { get => this._refreshProgress; set => PropertyUpdated(value); }
 
         // Public facing properties holding our collection of log files loaded
-        public ObservableCollection<DriveLogFileModel> LocatedLogFiles { get => this._locatedLogFiles; set => PropertyUpdated(value); }
         public ObservableCollection<DriveLogFileSet> LocatedLogFolders { get => this._locatedLogFolders; set => PropertyUpdated(value); }
+        public ObservableCollection<DriveLogFileSet> FilteredLogFolders { get => this._filteredLogFolders; set => PropertyUpdated(value);  }
 
         // Public facing properties holding our different filter lists for the file filtering configuration
         public ObservableCollection<string> YearFilters { get => this._yearFilters; set => PropertyUpdated(value); }
         public ObservableCollection<string> MakeFilters { get => this._makeFilters; set => PropertyUpdated(value); }
         public ObservableCollection<string> ModelFilters { get => this._modelFilters; set => PropertyUpdated(value); }
+        public Dictionary<FilterTypes, string> AppliedFilters { get => this._appliedFilters; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Enumeration holding our different types of filters supported on the UI
+        /// </summary>
+        public enum FilterTypes
+        {
+            YEAR_FILTER,    // Sets a filter type of Year
+            MAKE_FILTER,    // Sets a filter type of Make
+            MODEL_FILTER,   // Sets a filter type of Model
+            VIN_FILTER,     // Sets a filter type of VIN
+        }
+
         #endregion // Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,12 +100,22 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModelLogger.WriteLog("SETTING UP GOOGLE DRIVE VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
+
+            // Build the default applied filters dictionary
+            this.AppliedFilters = new Dictionary<FilterTypes, string>()
+            {
+                { FilterTypes.YEAR_FILTER, "" },
+                { FilterTypes.MAKE_FILTER, "" },
+                { FilterTypes.MODEL_FILTER, "" },
+                { FilterTypes.VIN_FILTER, "" }
+            };
             
             // Try and build our drive service here
             if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
                 throw new InvalidComObjectException("Error! Failed to build new Drive Explorer Service!");
 
             // Log completed building view model instance and exit out
+            this.ViewModelLogger.WriteLog("CONFIGURED GOOGLE DRIVE SERVICE AND DEFAULT FILTERING DICTIONARY CORRECTLY!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
 
@@ -115,8 +139,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.YearFilters ??= new ObservableCollection<string>();
             this.MakeFilters ??= new ObservableCollection<string>();
             this.ModelFilters ??= new ObservableCollection<string>();
-            this.LocatedLogFiles ??= new ObservableCollection<DriveLogFileModel>();
             this.LocatedLogFolders ??= new ObservableCollection<DriveLogFileSet>();
+            this.FilteredLogFolders ??= new ObservableCollection<DriveLogFileSet>();
             this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
 
             // Validate our Drive Explorer service is built and ready for use
@@ -125,24 +149,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
 
             // Clear out the old list of log folders here
-            this.LocatedLogFiles.Clear(); 
             this.LocatedLogFolders.Clear();
-            this.ViewModelLogger.WriteLog("CLEARED OUT EXISTING LOG FILE AND FOLDER SETS CORRECTLY!");
+            this.FilteredLogFolders.Clear();
+            this.ViewModelLogger.WriteLog("CLEARED OUT EXISTING LOG FOLDER SETS CORRECTLY!");
 
             // Build a new request to list all the files in the drive
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
             if (!FulcrumDriveBroker.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveBroker.ResultTypes.FOLDERS_ONLY))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumDriveBroker.GoogleDriveId})!");
-
-            // Configure new temp lists for our filtering output
-            List<string> NewYearFilters = new List<string>();
-            List<string> NewMakeFilters = new List<string>();
-            List<string> NewModelFilters = new List<string>();
-
-            // Configure a new filtering regex for building log file sets here
-            Regex FilterParseRegex = new Regex(@"(\d{4})_([^_]+)_([^_]+)_([^\s]+)");
-            this.ViewModelLogger.WriteLog("CONFIGURED NEW REGEX FOR PARSING FOLDER NAMES OK!");
-
+            
             // Iterate the contents and build a new list of files to filter 
             int FoldersIterated = 0;
             int TotalFolderCount = LocatedDriveFolders.Count;
@@ -151,68 +166,105 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 // Update our progress counter value here
                 this.RefreshProgress = (FoldersIterated++ / (double)TotalFolderCount) * 100.00;
 
-                // Parse the name and build our folders for YMM
-                Match FilterResults = FilterParseRegex.Match(FolderLocated.Name);
-                if (!FilterResults.Success)
-                {
-                    // If the regex fails to match then don't bother moving past this point
-                    this.ViewModelLogger.WriteLog($"ERROR! FAILED TO PARSE FOLDER NAME: {FolderLocated.Name}!", LogType.ErrorLog);
-                    continue;
-                }
-
-                // Build a new folder set and pull in all files for it. 
+                // Build a new folder set and pull in all files for it.
                 DriveLogFileSet NextFileSet = new DriveLogFileSet(FolderLocated);
-                if (NextFileSet.RefreshFolderFiles())
-                {
-                    // Add this folder to our set of stored sets and append all files found inside it
-                    this.LocatedLogFolders.Add(NextFileSet);
-                    foreach (var LogFileModel in NextFileSet.LogSetFiles)
-                        this.LocatedLogFiles.Add((DriveLogFileModel)LogFileModel);
-                }
-                else
-                {
-                    // If the refresh fails, ignore the log folder set and move on
-                    this.ViewModelLogger.WriteLog($"WARNING! NO LOG FILES WERE FOUND FOR FOLDER: {FolderLocated.Name}!", LogType.WarnLog);
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(NextFileSet.LogSetName)) continue;
+                if (!NextFileSet.RefreshFolderFiles()) continue;
 
-                // Pull out the year make and model values here and add them to our filter lists
-                string FilteredYear = FilterResults.Groups[1].Value;
-                string FilteredMake = FilterResults.Groups[2].Value;
-                string FilteredModel = FilterResults.Groups[3].Value;
-                
-                // Store the filtering values here and log that this folder is stored
-                if (!NewYearFilters.Contains(FilteredYear)) NewYearFilters.Add(FilteredYear);
-                if (!NewMakeFilters.Contains(FilteredMake)) NewMakeFilters.Add(FilteredMake);
-                if (!NewModelFilters.Contains(FilteredModel)) NewModelFilters.Add(FilteredModel);
+                // Add this folder to our set of stored sets and append all files found inside it
+                this.LocatedLogFolders.Add(NextFileSet);
+                this.BaseViewControl.Dispatcher.Invoke(() => this.FilteredLogFolders.Add(NextFileSet));
             }
 
-            // Order the year filters 
-            this.YearFilters = new ObservableCollection<string>() { "-- Year --" };
-            NewYearFilters = NewYearFilters.OrderBy(FilterObj => FilterObj).ToList();
-            foreach (var FilterValue in NewYearFilters) this.YearFilters.Add(FilterValue);
+            // Refresh the filtering sets here and stop the refresh timer once done
+            this._refreshLogFilters();
+            this.RefreshTimer.Stop();
 
-            // Order the make filters
-            this.MakeFilters = new ObservableCollection<string>() { "-- Make --" };
-            NewMakeFilters = NewMakeFilters.OrderBy(FilterObj => FilterObj).ToList();
-            foreach (var FilterValue in NewMakeFilters) this.MakeFilters.Add(FilterValue);
-
-            // Order the model filters
-            this.ModelFilters = new ObservableCollection<string>() { "-- Model -- " };
-            NewModelFilters = NewModelFilters.OrderBy(FilterObj => FilterObj).ToList();
-            foreach (var FilterValue in NewModelFilters) this.ModelFilters.Add(FilterValue);
-
-            // Stop our timer and log out the results of this routine
+            // Log out how many folder sets we've configured and store them on our view model
+            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {this.LocatedLogFolders.Count} FOLDERS IN {this.RefreshTimer.Elapsed:mm\\:ss\\:fff}");
             InjectorLogSets = this.LocatedLogFolders.ToList();
-            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {InjectorLogSets.Count} FOLDERS IN {this.RefreshTimer.Elapsed:mm\\:ss\\:fff}");
+
+            // Return out based on the number of files loaded in 
+            return InjectorLogSets.Count != 0;
+        }
+        /// <summary>
+        /// Helper function used to apply a filter to the collection of currently stored log sets
+        /// </summary>
+        /// <param name="TypeOfFilter">The type of filter being applied</param>
+        /// <param name="FilterValue">The value of the filter being applied</param>
+        public void ApplyLogSetFilter(FilterTypes TypeOfFilter, string FilterValue)
+        {
+            // Make sure we're able to apply filters first
+            if (this.FilteredLogFolders == null) return;
+            this.FilteredLogFolders.Clear();
+
+            // Store the new filter type value and filter our log sets
+            this.AppliedFilters[TypeOfFilter] = FilterValue;
+
+            // Find any log sets matching all filters now and store those values
+            foreach (var LocatedLogFolder in this.LocatedLogFolders)
+            {
+                // Check our filters for each filter type and check to see if it's supported
+                bool MatchesYear = string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.YEAR_FILTER]) ||
+                                   LocatedLogFolder.LogSetYear == this.AppliedFilters[FilterTypes.YEAR_FILTER];
+                bool MatchesMake = string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.MAKE_FILTER]) ||
+                                   LocatedLogFolder.LogSetMake == this.AppliedFilters[FilterTypes.MAKE_FILTER];
+                bool MatchesModel = string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.MODEL_FILTER]) ||
+                                   LocatedLogFolder.LogSetModel == this.AppliedFilters[FilterTypes.MODEL_FILTER];
+                bool MatchesVIN = string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.VIN_FILTER]) ||
+                                  LocatedLogFolder.LogSetVIN.Contains(this.AppliedFilters[FilterTypes.VIN_FILTER]);
+
+                // If we match all three filter values, then keep this log file set on our collection
+                if (MatchesYear && MatchesMake && MatchesModel && MatchesVIN) 
+                    this.FilteredLogFolders.Add(LocatedLogFolder);
+            }
+
+            // Once we've filtered all of our results, we refresh the filter sets
+            this._refreshLogFilters();
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Private helper method used to refresh the filters stored on the UI for the log filtering
+        /// </summary>
+        private void _refreshLogFilters()
+        {
+            // Configure new year filters using the built folder objects here
+            List<string> FilteringYears = new List<string>() { "-- Year -- " };
+            FilteringYears.AddRange(this.FilteredLogFolders
+                .GroupBy(FolderSet => FolderSet.LogSetYear)
+                .Select(FilterGroup => FilterGroup.Key)
+                .OrderBy(FilterSet => FilterSet));
+
+            // Configure new make filters using the built folder objects here
+            List<string> FilteringMakes = new List<string>() { "-- Make -- " };
+            FilteringMakes.AddRange(this.FilteredLogFolders
+                .GroupBy(FolderSet => FolderSet.LogSetMake)
+                .Select(FilterGroup => FilterGroup.Key)
+                .OrderBy(FilterSet => FilterSet));
+
+            // Configure new model filters using the built folder objects here
+            List<string> FilteringModels = new List<string>() { "-- Model -- " };
+            FilteringModels.AddRange(this.FilteredLogFolders
+                .GroupBy(FolderSet => FolderSet.LogSetModel)
+                .Select(FilterGroup => FilterGroup.Key)
+                .OrderBy(FilterSet => FilterSet));
+
+            // Build our new observable collections for the filter sets
+            this.YearFilters = new ObservableCollection<string>(FilteringYears); 
+            OnPropertyChanged(nameof(this.YearFilters));
+            this.MakeFilters = new ObservableCollection<string>(FilteringMakes);
+            OnPropertyChanged(nameof(this.MakeFilters));
+            this.ModelFilters = new ObservableCollection<string>(FilteringModels);
+            OnPropertyChanged(nameof(this.ModelFilters));
+
+            // Log out the properties of our filtering configuration
+            this.ViewModelLogger.WriteLog($"FILTERED DOWN TO {this.FilteredLogFolders.Count} LOG SETS FROM {this.LocatedLogFolders.Count} LOCATED", LogType.TraceLog);
             this.ViewModelLogger.WriteLog($"CONFIGURED {this.YearFilters.Count} YEAR FILTERS", LogType.TraceLog);
             this.ViewModelLogger.WriteLog($"CONFIGURED {this.MakeFilters.Count} MAKE FILTERS", LogType.TraceLog);
             this.ViewModelLogger.WriteLog($"CONFIGURED {this.ModelFilters.Count} MODEL FILTERS", LogType.TraceLog);
             this.ViewModelLogger.WriteLog("DONE REFRESHING INJECTOR LOG FILE SETS!", LogType.InfoLog);
-            this.RefreshTimer.Stop();
-
-            // Return out based on the number of files loaded in 
-            return InjectorLogSets.Count != 0;
         }
     }
 }

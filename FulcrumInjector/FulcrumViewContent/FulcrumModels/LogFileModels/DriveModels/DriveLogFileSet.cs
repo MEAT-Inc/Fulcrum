@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
+using NLog.Filters;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels
@@ -18,12 +20,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
 
         #region Fields
 
-        // Private field for our input log folder 
-        private readonly File _sourceDriveFolder;
+        // Private backing fields for folder configuration
+        private readonly File _sourceDriveFolder;           // Folder object used to build this log model set
+        private readonly Regex _nameParseRegex = new(       // The regex used to filter names of file sets
+            @"(\d{4})_([^_]+)_([^_]+)_([^\s]+)", 
+            RegexOptions.Compiled);
 
         #endregion // Fields
 
         #region Properties
+
+        // Public facing readonly properties holding information about our log set
+        public string LogSetVIN { get; private set; }
+        public string LogSetYear { get; private set; }
+        public string LogSetMake { get; private set; }
+        public string LogSetModel { get; private set; }
+        public string LogSetName { get; private set; }
+
         #endregion // Properties
 
         #region Structs and Classes
@@ -48,6 +61,22 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
 
             // Store the input log folder and find the files in it
             this._sourceDriveFolder = SourceDriveFolder;
+
+            // Configure properties of the log folder
+            var FilterResults = this._nameParseRegex.Match(SourceDriveFolder.Name);
+            if (!FilterResults.Success)
+            {
+                // Log out that this parse routine failed and exit out
+                _logSetLogger.WriteLog($"ERROR! FAILED TO PARSE LOG FOLDER NAME {SourceDriveFolder.Name}!", LogType.ErrorLog);
+                return; 
+            }
+
+            // Only store these values if the parse routine passes correctly.
+            this.LogSetName = this._sourceDriveFolder.Name;
+            this.LogSetYear = FilterResults.Groups[1].Value;
+            this.LogSetMake = FilterResults.Groups[2].Value;
+            this.LogSetModel = FilterResults.Groups[3].Value;
+            this.LogSetVIN = FilterResults.Groups[4].Value;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

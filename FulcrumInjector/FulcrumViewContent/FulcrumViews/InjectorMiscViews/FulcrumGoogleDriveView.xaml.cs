@@ -74,7 +74,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        internal void ToggleGoogleDriveFlyout_OnClick(object Sender, RoutedEventArgs E)
+        private void ToggleGoogleDriveFlyout_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
             this._viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR THE GOOGLE DRIVE ICON CORRECTLY!", LogType.WarnLog);
@@ -140,6 +140,49 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                     this.cbModelFilter.IsEnabled = true;
                 });
             });
+        }
+        /// <summary>
+        /// Event handler used to process a selection changed event on any of the filtering combo boxes for the log set list
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void cbLogSetFilter_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        {
+            // Store the sending ComboBox and pull the selected filter value
+            if (Sender is not ComboBox SendingComboBox) return;
+
+            // Pull the value from it and clear it out if it's a default
+            string FilterValue = SendingComboBox.SelectedItem.ToString();
+            if (FilterValue.Contains("--")) FilterValue = string.Empty;
+
+            // Find the filter type based on the name of the combo box provided
+            FulcrumGoogleDriveViewModel.FilterTypes FilterType = SendingComboBox.Name switch
+            {
+                // Switch on the name of the sending object. Store the filter matching our name
+                nameof(this.cbYearFilter) => FulcrumGoogleDriveViewModel.FilterTypes.YEAR_FILTER,
+                nameof(this.cbMakeFilter) => FulcrumGoogleDriveViewModel.FilterTypes.MAKE_FILTER,
+                nameof(this.cbModelFilter) => FulcrumGoogleDriveViewModel.FilterTypes.MODEL_FILTER,
+                _ => throw new InvalidOperationException("Error! Can not determine filter type from sending ComboBox!")
+            };
+
+            // Apply the filter on the view model now
+            this.ViewModel.ApplyLogSetFilter(FilterType, FilterValue);
+        }
+        /// <summary>
+        /// Event handler used to process a text changed event on the VIN filtering text box for the log set list
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void tbVinFilter_OnTextChanged(object Sender, TextChangedEventArgs E)
+        {
+            // Store the sending TextBox and pull the selected filter value
+            if (Sender is not TextBox SendingTextBox) return;
+
+            // Pull the value from it and clear it out if it's a default
+            string FilterValue = SendingTextBox.Text;
+            this.ViewModel.ApplyLogSetFilter(FulcrumGoogleDriveViewModel.FilterTypes.VIN_FILTER, FilterValue);
         }
     }
 }
