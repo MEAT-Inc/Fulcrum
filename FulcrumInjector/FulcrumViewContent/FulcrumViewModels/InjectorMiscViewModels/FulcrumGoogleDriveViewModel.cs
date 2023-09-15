@@ -18,6 +18,7 @@ using System.Windows.Documents;
 using System.Windows.Forms.VisualStyles;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Services;
@@ -109,7 +110,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 { FilterTypes.MODEL_FILTER, "" },
                 { FilterTypes.VIN_FILTER, "" }
             };
-            
+
+            // Setup filtering lists and our log file collection list
+            this.RefreshTimer ??= new Stopwatch();
+            this.YearFilters ??= new ObservableCollection<string>();
+            this.MakeFilters ??= new ObservableCollection<string>();
+            this.ModelFilters ??= new ObservableCollection<string>();
+            this.LocatedLogFolders ??= new ObservableCollection<DriveLogFileSet>();
+            this.FilteredLogFolders ??= new ObservableCollection<DriveLogFileSet>();
+            this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
+
             // Try and build our drive service here
             if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
                 throw new InvalidComObjectException("Error! Failed to build new Drive Explorer Service!");
@@ -131,36 +141,31 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         {
             // Initialize our list of output files and a timer for diagnostic purposes
             this.ViewModelLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS NOW...");
-            this.RefreshTimer = new Stopwatch();
             this.RefreshTimer.Start();
             this.RefreshProgress = 0;
-
-            // Setup filtering lists and our log file collection list
-            this.YearFilters ??= new ObservableCollection<string>();
-            this.MakeFilters ??= new ObservableCollection<string>();
-            this.ModelFilters ??= new ObservableCollection<string>();
-            this.LocatedLogFolders ??= new ObservableCollection<DriveLogFileSet>();
-            this.FilteredLogFolders ??= new ObservableCollection<DriveLogFileSet>();
-            this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
 
             // Validate our Drive Explorer service is built and ready for use
             this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
             if (this._driveService == null && !FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
                 throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
 
-            // Clear out the old list of log folders here
-            this.LocatedLogFolders.Clear();
-            this.FilteredLogFolders.Clear();
-            this.ViewModelLogger.WriteLog("CLEARED OUT EXISTING LOG FOLDER SETS CORRECTLY!");
+            // Control our items sources in the dispatcher
+            this.BaseViewControl.Dispatcher.Invoke(() =>
+            {
+                // Clear out the old list of log folders here
+                this.LocatedLogFolders.Clear();
+                this.FilteredLogFolders.Clear();
+                this.ViewModelLogger.WriteLog("CLEARED OUT EXISTING LOG FOLDER SETS CORRECTLY!");
+            });
 
             // Build a new request to list all the files in the drive
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
             if (!FulcrumDriveBroker.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveBroker.ResultTypes.FOLDERS_ONLY))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumDriveBroker.GoogleDriveId})!");
-            
+
             // Iterate the contents and build a new list of files to filter 
             int FoldersIterated = 0;
-            int TotalFolderCount = LocatedDriveFolders.Count;
+            int TotalFolderCount = LocatedDriveFolders.Count - 1;
             foreach (var FolderLocated in LocatedDriveFolders)
             {
                 // Update our progress counter value here
@@ -173,8 +178,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
                 // Add this folder to our set of stored sets and append all files found inside it
                 this.LocatedLogFolders.Add(NextFileSet);
-                this.BaseViewControl.Dispatcher.Invoke(() => this.FilteredLogFolders.Add(NextFileSet));
             }
+
+            // Reorder all of the log set entries by name and store them on our UI
+            foreach (var LocatedLogFolder in this.LocatedLogFolders.OrderBy(LogSet => LogSet.LogSetName)) 
+                this.BaseViewControl.Dispatcher.Invoke(() => this.FilteredLogFolders.Add(LocatedLogFolder));
 
             // Refresh the filtering sets here and stop the refresh timer once done
             this._refreshLogFilters();
@@ -196,12 +204,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         {
             // Make sure we're able to apply filters first
             if (this.FilteredLogFolders == null) return;
-            this.FilteredLogFolders.Clear();
-
+            
             // Store the new filter type value and filter our log sets
             this.AppliedFilters[TypeOfFilter] = FilterValue;
 
             // Find any log sets matching all filters now and store those values
+            List<DriveLogFileSet> UpdatedLogSets = new List<DriveLogFileSet>();
             foreach (var LocatedLogFolder in this.LocatedLogFolders)
             {
                 // Check our filters for each filter type and check to see if it's supported
@@ -212,12 +220,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 bool MatchesModel = string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.MODEL_FILTER]) ||
                                    LocatedLogFolder.LogSetModel == this.AppliedFilters[FilterTypes.MODEL_FILTER];
                 bool MatchesVIN = string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.VIN_FILTER]) ||
-                                  LocatedLogFolder.LogSetVIN.Contains(this.AppliedFilters[FilterTypes.VIN_FILTER]);
+                                  LocatedLogFolder.LogSetVIN.ToUpper().Contains(this.AppliedFilters[FilterTypes.VIN_FILTER].ToUpper());
 
                 // If we match all three filter values, then keep this log file set on our collection
                 if (MatchesYear && MatchesMake && MatchesModel && MatchesVIN) 
-                    this.FilteredLogFolders.Add(LocatedLogFolder);
+                    UpdatedLogSets.Add(LocatedLogFolder);
             }
+
+            // Order the contents of our updated log set list and store them all on our UI
+            this.BaseViewControl.Dispatcher.Invoke(() => this.FilteredLogFolders.Clear());
+            UpdatedLogSets = UpdatedLogSets.OrderBy(LogSet => LogSet.LogSetName).ToList();
+            foreach (var UpdatedLogSet in UpdatedLogSets) this.FilteredLogFolders.Add(UpdatedLogSet);
 
             // Once we've filtered all of our results, we refresh the filter sets
             this._refreshLogFilters();
@@ -230,6 +243,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// </summary>
         private void _refreshLogFilters()
         {
+            // Determine if other filters are applied first
+            bool HasYearFilter = !string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.YEAR_FILTER]);
+            bool HasMakeFilter = !string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.MAKE_FILTER]);
+            bool HasModelFilter = !string.IsNullOrWhiteSpace(this.AppliedFilters[FilterTypes.MODEL_FILTER]);
+
             // Configure new year filters using the built folder objects here
             List<string> FilteringYears = new List<string>() { "-- Year -- " };
             FilteringYears.AddRange(this.FilteredLogFolders
@@ -251,20 +269,45 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 .Select(FilterGroup => FilterGroup.Key)
                 .OrderBy(FilterSet => FilterSet));
 
-            // Build our new observable collections for the filter sets
-            this.YearFilters = new ObservableCollection<string>(FilteringYears); 
-            OnPropertyChanged(nameof(this.YearFilters));
-            this.MakeFilters = new ObservableCollection<string>(FilteringMakes);
-            OnPropertyChanged(nameof(this.MakeFilters));
-            this.ModelFilters = new ObservableCollection<string>(FilteringModels);
-            OnPropertyChanged(nameof(this.ModelFilters));
+            // Update our observable collections for the filter sets
+            this.BaseViewControl.Dispatcher.Invoke(() =>
+            {
+                // Check for year filters
+                if (!HasYearFilter)
+                {
+                    // Append all of our year filters
+                    this.YearFilters.Clear();
+                    foreach (var FilteringYear in FilteringYears)
+                        this.YearFilters.Add(FilteringYear);
 
-            // Log out the properties of our filtering configuration
-            this.ViewModelLogger.WriteLog($"FILTERED DOWN TO {this.FilteredLogFolders.Count} LOG SETS FROM {this.LocatedLogFolders.Count} LOCATED", LogType.TraceLog);
-            this.ViewModelLogger.WriteLog($"CONFIGURED {this.YearFilters.Count} YEAR FILTERS", LogType.TraceLog);
-            this.ViewModelLogger.WriteLog($"CONFIGURED {this.MakeFilters.Count} MAKE FILTERS", LogType.TraceLog);
-            this.ViewModelLogger.WriteLog($"CONFIGURED {this.ModelFilters.Count} MODEL FILTERS", LogType.TraceLog);
-            this.ViewModelLogger.WriteLog("DONE REFRESHING INJECTOR LOG FILE SETS!", LogType.InfoLog);
+                    // Select the first value in our list
+                    ((FulcrumGoogleDriveView)this.BaseViewControl).cbYearFilter.SelectedIndex = 0;
+                }
+
+                // Check for make filters
+                if (!HasMakeFilter)
+                {
+                    // Append all of our make filters
+                    this.MakeFilters.Clear();
+                    foreach (var FilteringMake in FilteringMakes)
+                        this.MakeFilters.Add(FilteringMake);
+
+                    // Select the first value in our list
+                    ((FulcrumGoogleDriveView)this.BaseViewControl).cbMakeFilter.SelectedIndex = 0;
+                }
+
+                // Check for model filters
+                if (!HasModelFilter)
+                {
+                    // Append all of our model filters
+                    this.ModelFilters.Clear();
+                    foreach (var FilteringModel in FilteringModels)
+                        this.ModelFilters.Add(FilteringModel);
+
+                    // Select the first value in our list
+                    ((FulcrumGoogleDriveView)this.BaseViewControl).cbModelFilter.SelectedIndex = 0;
+                }
+            });
         }
     }
 }
