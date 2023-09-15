@@ -94,18 +94,17 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="250"/>
                 </Grid.ColumnDefinitions>
-                <ComboBox Grid.Column="0" 
-                          Margin="0,0,5,0" 
-                          SelectedIndex="0" x:Name="cbYearFilter" 
+                <ComboBox Grid.Column="0" SelectedIndex="0"
                           SelectionChanged="cbLogSetFilter_OnSelectionChanged"
+                          Margin="0,0,5,0" x:Name="cbYearFilter" 
                           ItemsSource="{Binding YearFilters, Mode=OneWay}"/>
-                <ComboBox Grid.Column="1" 
-                          Margin="0,0,0,0" 
-                          SelectedIndex="0" x:Name="cbMakeFilter" 
+                <ComboBox Grid.Column="1" SelectedIndex="0"
+                          SelectionChanged="cbLogSetFilter_OnSelectionChanged"
+                          Margin="0,0,0,0" x:Name="cbMakeFilter" 
                           ItemsSource="{Binding MakeFilters, Mode=OneWay}"/>
-                <ComboBox Grid.Column="2"
-                          Margin="5,0,0,0" 
-                          SelectedIndex="0" x:Name="cbModelFilter" 
+                <ComboBox Grid.Column="2" SelectedIndex="0"
+                          SelectionChanged="cbLogSetFilter_OnSelectionChanged"
+                          Margin="5,0,0,0" x:Name="cbModelFilter" 
                           ItemsSource="{Binding ModelFilters, Mode=OneWay}"/>
                 <TextBox Grid.Column="3" x:Name="tbVinFilter" MaxLength="17"
                          FontFamily="Consolas" Margin="5,0,0,0" 

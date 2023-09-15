@@ -151,6 +151,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         {
             // Store the sending ComboBox and pull the selected filter value
             if (Sender is not ComboBox SendingComboBox) return;
+            if (SendingComboBox.SelectedItem == null) return;
 
             // Pull the value from it and clear it out if it's a default
             string FilterValue = SendingComboBox.SelectedItem.ToString();
@@ -166,7 +167,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                 _ => throw new InvalidOperationException("Error! Can not determine filter type from sending ComboBox!")
             };
 
-            // Apply the filter on the view model now
+            // Apply the filter on the view model now if it's different than the current one
+            if (this.ViewModel.AppliedFilters[FilterType] == FilterValue) return; 
             this.ViewModel.ApplyLogSetFilter(FilterType, FilterValue);
         }
         /// <summary>
