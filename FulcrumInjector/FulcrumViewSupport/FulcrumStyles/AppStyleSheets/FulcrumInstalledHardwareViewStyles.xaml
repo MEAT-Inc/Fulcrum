@@ -22,7 +22,7 @@
                 <Setter Property="FontSize" Value="20"/>
                 <Setter Property="FontStyle" Value="Normal"/>
                 <Setter Property="FontWeight" Value="DemiBold"/>
-                <Setter Property="Foreground" Value="{StaticResource PrimaryColor_Lighter_35}"/>
+                <Setter Property="Foreground" Value="Yellow"/>
             </Style>
 
             <!-- Attachments Listbox File Content -->

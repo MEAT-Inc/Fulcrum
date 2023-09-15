@@ -93,7 +93,8 @@
                                     <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumTitleViewStyles.xaml" />
                                     <File Id="FULCRUMSIMULATIONPLAYBACKSTYLES.XAML" Name="FulcrumSimulationPlaybackStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
                                     <File Id="FULCRUMABOUTTHISAPPSTYLES.XAML" Name="FulcrumAboutThisAppStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
-                                    <File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml" />
+									<File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml" />
+									<File Id="FULCRUMGOOGLEDRIVESTYLES.XAML" Name="FulcrumGoogleDriveStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumGoogleDriveStyles.xaml" />
                                 </Component>
                             </Directory>
                             <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
