@@ -165,7 +165,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Iterate the contents and build a new list of files to filter 
             int FoldersIterated = 0;
-            int TotalFolderCount = LocatedDriveFolders.Count;
+            int TotalFolderCount = LocatedDriveFolders.Count - 1;
             foreach (var FolderLocated in LocatedDriveFolders)
             {
                 // Update our progress counter value here
