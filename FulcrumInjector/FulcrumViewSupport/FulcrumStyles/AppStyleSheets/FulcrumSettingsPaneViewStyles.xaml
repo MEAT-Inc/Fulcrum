@@ -64,7 +64,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="TextWrapping" Value="Wrap"/>
-                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="Foreground" Value="Yellow"/>
             </Style>
 
             <!-- Scroll Viewer to hold settings style -->

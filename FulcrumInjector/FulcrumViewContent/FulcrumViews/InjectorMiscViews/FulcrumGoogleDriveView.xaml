@@ -144,7 +144,8 @@
                                 <!-- VIN Number Information -->
                                 <StackPanel Grid.Row="1" Orientation="Horizontal">
                                     <TextBlock FontSize="12" Text="VIN: "/>
-                                    <TextBlock FontSize="12" FontWeight="DemiBold" Text="{Binding Path=LogSetVIN}"/>
+                                    <TextBlock FontSize="12" FontWeight="DemiBold" 
+                                               Text="{Binding Path=LogSetVIN}"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
