@@ -30,8 +30,18 @@
 							<!-- Supporting DLLs and Logic -->
 	                        <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
 	                            <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
-                                <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
-                                <File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
+								<File Id="GOOGLE.APIS.AUTH.DLL" Name="Google.Apis.Auth.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
+								<File Id="GOOGLE.APIS.AUTH.PLATFORMSERVICES.DLL" Name="Google.Apis.Auth.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.PlatformServices.dll" />
+								<File Id="GOOGLE.APIS.AUTH.DLL" Name="Google.Apis.Auth.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
+								<File Id="GOOGLE.APIS.AUTH.XML" Name="Google.Apis.Auth.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.xml" />
+								<File Id="GOOGLE.APIS.CORE.DLL" Name="Google.Apis.Core.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.dll" />
+								<File Id="GOOGLE.APIS.CORE.XML" Name="Google.Apis.Core.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.xml" />
+								<File Id="GOOGLE.APIS.DLL" Name="Google.Apis.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.dll" />
+								<File Id="GOOGLE.APIS.DRIVE.V3.DLL" Name="Google.Apis.Drive.v3.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.dll" />
+								<File Id="GOOGLE.APIS.DRIVE.V3.XML" Name="Google.Apis.Drive.v3.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.xml" />
+								<File Id="GOOGLE.APIS.PLATFORMSERVICES.DLL" Name="Google.Apis.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.PlatformServices.dll" />
+								<File Id="GOOGLE.APIS.XML" Name="Google.Apis.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.xml" />
+								<File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
                                 <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.dll" />
                                 <File Id="MARKDIG.DLL" Name="Markdig.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.dll" />
                                 <File Id="MARKDIG.WPF.DLL" Name="Markdig.Wpf.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.Wpf.dll" />
