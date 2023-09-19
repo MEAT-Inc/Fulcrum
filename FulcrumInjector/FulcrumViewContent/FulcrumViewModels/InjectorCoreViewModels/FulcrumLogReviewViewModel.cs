@@ -135,7 +135,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Check if we've got more than one log file loaded in 
             string LogFileToLoad = string.Empty;
             if (LogFilePaths.Length == 0) throw new ArgumentException("Error! One or more file paths must be provided!");
-            else if (LogFilePaths.Length == 1) LogFileToLoad = LogFilePaths.FirstOrDefault();
+            if (LogFilePaths.Length == 1) LogFileToLoad = LogFilePaths.FirstOrDefault();
             else
             {
                 // Build our output combined content file name using the first file name provided in our set
@@ -156,6 +156,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
             }
 
+            // Build out the new log file name and ensure the output directory exists
+            string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath");
+            if (!File.Exists(Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad))))
+            {
+                // Only do this if the log file is not built
+                if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
+                string ImportedFilePath = Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad));
+                File.Copy(LogFileToLoad, ImportedFilePath, true);
+                this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
+
+                // Set our log file to load as the newly built file 
+                LogFileToLoad = ImportedFilePath;
+            }
+
             // Try and find a model set where this file exists currently. If none are found, then build a new instance
             FulcrumLogFileSet LogFileModelSet = new FulcrumLogFileSet();
             FulcrumLogFileModel LoadedFileModel = new FulcrumLogFileModel(LogFileToLoad);
@@ -169,16 +183,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.CurrentLogSet = LogFileModelSet;
             this.CurrentLogFile = LoadedFileModel;
             this.ViewModelLogger.WriteLog("STORED NEW LOG FILE MODELS ON OUR VIEW MODEL INSTANCE FOR REVIEW CORRECTLY");
-
-            // Build out the new log file name and ensure the output directory exists
-            string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath");
-            if (!File.Exists(Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad))))
-            {
-                // Only do this if the log file is not built
-                if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
-                File.Copy(LogFileToLoad, Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad)), true);
-                this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
-            }
 
             // Log out that we've finally imported this file instance correctly and return passed
             this.ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
@@ -317,47 +321,47 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 }
 
                 // Based on the state value we're storing, find the correct log file contents
-                switch (this._currentState = StateToSet)
-                {
-                    // For showing expressions
-                    case ViewerStateType.ShowingExpressions:
-                        if (!this.CurrentLogSet.HasExpressions)
-                            throw new FileNotFoundException("Error! Current log set does not have expressions built!");
-
-                        // Set our new current log file to the expressions file and break out
-                        // this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
-                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog);
-                        return true;
-
-                    // For showing simulations
-                    case ViewerStateType.ShowingSimulation:
-                        if (!this.CurrentLogSet.HasSimulations)
-                            throw new FileNotFoundException("Error! Current log set does not have simulations built!");
-
-                        // Set our new current log file to the simulations file and break out
-                        // this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
-                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
-                        return true;
-
-                    // For showing raw log contents
-                    case ViewerStateType.ShowingLogFile:
-                        if (!this.CurrentLogSet.HasPassThruLog) 
-                            throw new FileNotFoundException("Error! Current log set does not a base log file built!");
-
-                        // Set our new current log file to the base pass thru file and break out
-                        // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
-                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
-                        return true;
-
-                    // For showing nothing in the viewer
-                    case ViewerStateType.NoContent:
-                        // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
-                        this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
-                        break;
-
-                    // On default, throw a failure out and move on. This should never happen really
-                    default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {this._currentState}!");
-                }
+                // switch (this._currentState = StateToSet)
+                // {
+                //     // For showing expressions
+                //     case ViewerStateType.ShowingExpressions:
+                //         if (!this.CurrentLogSet.HasExpressions)
+                //             throw new FileNotFoundException("Error! Current log set does not have expressions built!");
+                // 
+                //         // Set our new current log file to the expressions file and break out
+                //         // this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
+                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog); 
+                //         return true;
+                // 
+                //     // For showing simulations
+                //     case ViewerStateType.ShowingSimulation:
+                //         if (!this.CurrentLogSet.HasSimulations)
+                //             throw new FileNotFoundException("Error! Current log set does not have simulations built!");
+                // 
+                //         // Set our new current log file to the simulations file and break out
+                //         // this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
+                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
+                //         return true;
+                // 
+                //     // For showing raw log contents
+                //     case ViewerStateType.ShowingLogFile:
+                //         if (!this.CurrentLogSet.HasPassThruLog) 
+                //             throw new FileNotFoundException("Error! Current log set does not a base log file built!");
+                // 
+                //         // Set our new current log file to the base pass thru file and break out
+                //         // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
+                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
+                //         return true;
+                // 
+                //     // For showing nothing in the viewer
+                //     case ViewerStateType.NoContent:
+                //         // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
+                //         this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
+                //         break;
+                // 
+                //     // On default, throw a failure out and move on. This should never happen really
+                //     default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {this._currentState}!");
+                // }
 
                 // Store our contents for the log file view object back on our editor controls now
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
@@ -371,7 +375,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 });
 
                 // Toggle the showing parsed value.
-                return false;
+                return this.CurrentLogFile.LogFileExists;
             }
             catch (Exception LoadEx)
             {
