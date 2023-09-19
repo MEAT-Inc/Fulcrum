@@ -321,47 +321,47 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 }
 
                 // Based on the state value we're storing, find the correct log file contents
-                switch (this._currentState = StateToSet)
-                {
-                    // For showing expressions
-                    case ViewerStateType.ShowingExpressions:
-                        if (!this.CurrentLogSet.HasExpressions)
-                            throw new FileNotFoundException("Error! Current log set does not have expressions built!");
-
-                        // Set our new current log file to the expressions file and break out
-                        // this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
-                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog);
-                        return true;
-
-                    // For showing simulations
-                    case ViewerStateType.ShowingSimulation:
-                        if (!this.CurrentLogSet.HasSimulations)
-                            throw new FileNotFoundException("Error! Current log set does not have simulations built!");
-
-                        // Set our new current log file to the simulations file and break out
-                        // this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
-                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
-                        return true;
-
-                    // For showing raw log contents
-                    case ViewerStateType.ShowingLogFile:
-                        if (!this.CurrentLogSet.HasPassThruLog) 
-                            throw new FileNotFoundException("Error! Current log set does not a base log file built!");
-
-                        // Set our new current log file to the base pass thru file and break out
-                        // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
-                        this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
-                        return true;
-
-                    // For showing nothing in the viewer
-                    case ViewerStateType.NoContent:
-                        // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
-                        this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
-                        break;
-
-                    // On default, throw a failure out and move on. This should never happen really
-                    default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {this._currentState}!");
-                }
+                // switch (this._currentState = StateToSet)
+                // {
+                //     // For showing expressions
+                //     case ViewerStateType.ShowingExpressions:
+                //         if (!this.CurrentLogSet.HasExpressions)
+                //             throw new FileNotFoundException("Error! Current log set does not have expressions built!");
+                // 
+                //         // Set our new current log file to the expressions file and break out
+                //         // this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
+                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog); 
+                //         return true;
+                // 
+                //     // For showing simulations
+                //     case ViewerStateType.ShowingSimulation:
+                //         if (!this.CurrentLogSet.HasSimulations)
+                //             throw new FileNotFoundException("Error! Current log set does not have simulations built!");
+                // 
+                //         // Set our new current log file to the simulations file and break out
+                //         // this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
+                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
+                //         return true;
+                // 
+                //     // For showing raw log contents
+                //     case ViewerStateType.ShowingLogFile:
+                //         if (!this.CurrentLogSet.HasPassThruLog) 
+                //             throw new FileNotFoundException("Error! Current log set does not a base log file built!");
+                // 
+                //         // Set our new current log file to the base pass thru file and break out
+                //         // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
+                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
+                //         return true;
+                // 
+                //     // For showing nothing in the viewer
+                //     case ViewerStateType.NoContent:
+                //         // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
+                //         this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
+                //         break;
+                // 
+                //     // On default, throw a failure out and move on. This should never happen really
+                //     default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {this._currentState}!");
+                // }
 
                 // Store our contents for the log file view object back on our editor controls now
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
@@ -375,7 +375,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 });
 
                 // Toggle the showing parsed value.
-                return false;
+                return this.CurrentLogFile.LogFileExists;
             }
             catch (Exception LoadEx)
             {
