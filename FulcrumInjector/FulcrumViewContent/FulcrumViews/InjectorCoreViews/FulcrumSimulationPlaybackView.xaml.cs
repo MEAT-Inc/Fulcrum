@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -212,6 +213,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 // Stop simulation playback and restart monitoring if needed
                 this.ViewModel.StopSimulation();
                 CurrentHwInfo.StartVehicleMonitoring();
+                this.ViewModel.SimEventsProcessed = Array.Empty<EventArgs>();
 
                 // Log done and exit out of this routine
                 this._viewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
