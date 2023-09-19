@@ -142,7 +142,23 @@
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-                        </Directory>
+							<Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
+								<Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
+									<CreateFolder />
+								</Component>
+								<Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
+									<Component Id="CreateFulcrumArchivesFolder" Guid="CD71C6E7-D573-4A21-8DBF-628557CC1DA1">
+										<CreateFolder />
+									</Component>
+								</Directory>
+								<Directory Name="WatchdogLogs" Id="FULCRUMWATCHDOGLOGSFOLDER">
+									<Component Id="CreateFulcrumWatchdogLogsFolder" Guid="753D8563-B5EC-4D68-BF12-AE6B43C83207">
+										<CreateFolder />
+									</Component>
+								</Directory>
+							</Directory>
+
+						</Directory>
                         <!-- DLL Files for the Fulcrum -->
                         <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
                             <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\$(var.Configuration)\FulcrumShim.dll" />
@@ -213,23 +229,6 @@
                                 <RegistryValue Id="V0500_RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
                             </RegistryKey>
                         </Component>
-                        <!-- Program Files Folders for Logging -->
-                        <Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
-                            <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
-                                <CreateFolder />
-                            </Component>
-                            <!-- J2534 Logging Archives -->
-                            <Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
-                                <Component Id="CreateFulcrumArchivesFolder" Guid="CD71C6E7-D573-4A21-8DBF-628557CC1DA1">
-                                    <CreateFolder />
-                                </Component>
-                            </Directory>
-                            <Directory Name="WatchdogLogs" Id="FULCRUMWATCHDOGLOGSFOLDER">
-	                            <Component Id="CreateFulcrumWatchdogLogsFolder" Guid="753D8563-B5EC-4D68-BF12-AE6B43C83207">
-		                            <CreateFolder />
-	                            </Component>
-                            </Directory>
-                        </Directory>
                     </Directory>
                 </Directory>
             </Directory>
@@ -241,16 +240,16 @@
             <ComponentRef Id="FulcrumXamlFiles" />
             <ComponentRef Id="FulcrumShimFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
-            <ComponentRef Id="CreateFulcrumIconsFolder" />
-            <ComponentRef Id="CreateFulcrumImportsFolder" />
-            <ComponentRef Id="CreateFulcrumLoggingFolder" />
-			<ComponentRef Id="FulcrumInjectorProgramFiles" />
+			<ComponentRef Id="CreateFulcrumIconsFolder" />
+			<ComponentRef Id="CreateFulcrumLoggingFolder" />
 			<ComponentRef Id="CreateFulcrumArchivesFolder" />
+            <ComponentRef Id="CreateFulcrumImportsFolder" />
+			<ComponentRef Id="FulcrumInjectorProgramFiles" />
 			<ComponentRef Id="CreateFulcrumWatchdogLogsFolder" />
             <ComponentRef Id="CreateFulcrumExpressionsFolder" />
             <ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
-        </Feature>
+		</Feature>
         <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 
          here for support information entry -->
