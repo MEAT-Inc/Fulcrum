@@ -135,7 +135,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             // Check if we've got more than one log file loaded in 
             string LogFileToLoad = string.Empty;
             if (LogFilePaths.Length == 0) throw new ArgumentException("Error! One or more file paths must be provided!");
-            else if (LogFilePaths.Length == 1) LogFileToLoad = LogFilePaths.FirstOrDefault();
+            if (LogFilePaths.Length == 1) LogFileToLoad = LogFilePaths.FirstOrDefault();
             else
             {
                 // Build our output combined content file name using the first file name provided in our set
@@ -156,6 +156,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 throw new FileNotFoundException("FAILED TO LOCATE THE DESIRED FILE! ENSURE ONE IS LOADED FIRST!");
             }
 
+            // Build out the new log file name and ensure the output directory exists
+            string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath");
+            if (!File.Exists(Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad))))
+            {
+                // Only do this if the log file is not built
+                if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
+                string ImportedFilePath = Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad));
+                File.Copy(LogFileToLoad, ImportedFilePath, true);
+                this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
+
+                // Set our log file to load as the newly built file 
+                LogFileToLoad = ImportedFilePath;
+            }
+
             // Try and find a model set where this file exists currently. If none are found, then build a new instance
             FulcrumLogFileSet LogFileModelSet = new FulcrumLogFileSet();
             FulcrumLogFileModel LoadedFileModel = new FulcrumLogFileModel(LogFileToLoad);
@@ -169,16 +183,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.CurrentLogSet = LogFileModelSet;
             this.CurrentLogFile = LoadedFileModel;
             this.ViewModelLogger.WriteLog("STORED NEW LOG FILE MODELS ON OUR VIEW MODEL INSTANCE FOR REVIEW CORRECTLY");
-
-            // Build out the new log file name and ensure the output directory exists
-            string DefaultImportLocation = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumImportFilePath");
-            if (!File.Exists(Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad))))
-            {
-                // Only do this if the log file is not built
-                if (!Directory.Exists(DefaultImportLocation)) Directory.CreateDirectory(DefaultImportLocation);
-                File.Copy(LogFileToLoad, Path.Combine(DefaultImportLocation, Path.GetFileName(LogFileToLoad)), true);
-                this.ViewModelLogger.WriteLog("IMPORTED LOCAL LOG FILE INTO OUR INJECTOR IMPORT FOLDER CORRECTLY");
-            }
 
             // Log out that we've finally imported this file instance correctly and return passed
             this.ViewModelLogger.WriteLog("PROCESSED NEW LOG CONTENT INTO THE MAIN VIEW OK!", LogType.InfoLog);
