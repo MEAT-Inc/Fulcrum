@@ -31,22 +31,27 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         /// <exception cref="IndexOutOfRangeException">Thrown when the file to remove can not be found</exception>
         private void OnWatchdogFolderChanged(object SendingWatcher, FileSystemEventArgs EventArgs)
         {
-            // Lock our collection so nothing else can touch it while this routine is running
-            lock (this._watchedFiles)
+            // Switch the type of event being processed on our instance and fire actions accordingly
+            switch (EventArgs.ChangeType)
             {
-                // Get the name of our new file object and clear out files that no longer exist
-                var FilesToRemove = this._watchedFiles.Where(FileObj => FileObj.FullFilePath == EventArgs.FullPath);
-                foreach (var FileToRemove in FilesToRemove)
-                {
-                    // Remove each of the needed files from our watchdog object
-                    // BUG: This is failing when files are purged too quickly!
-                    try { this._watchedFiles.Remove(FileToRemove); }
-                    catch { _folderLogger.WriteLog("WARNING! FAILED TO PURGE AN EXISTING FILE DUE TO COLLECTION MODIFICATION!", LogType.WarnLog); }
-                }
+                // For changed or renamed files, add in existing objects
+                case WatcherChangeTypes.Changed or WatcherChangeTypes.Renamed:
+                    if (this._watchedFiles.All(FileObj => FileObj.FullFilePath != EventArgs.FullPath)) 
+                        this._watchedFiles.Add(new WatchdogFile(EventArgs.FullPath));
 
-                // Switch the type of event being processed on our instance and fire actions accordingly
-                if (EventArgs.ChangeType is WatcherChangeTypes.Changed or WatcherChangeTypes.Renamed)
-                    this._watchedFiles.Add(new WatchdogFile(EventArgs.FullPath));
+                    // Break out once we've added our new file
+                    break;
+
+                // For removed events, prune out old files
+                case WatcherChangeTypes.Deleted:
+                {
+                    // Find the file we need to remove and pull it from our list
+                    WatchdogFile RemovedFile = this._watchedFiles.FirstOrDefault(FileObj => FileObj.FullFilePath == EventArgs.FullPath);
+                    if (RemovedFile != null) this._watchedFiles.Remove(RemovedFile);
+
+                    // Break out once we've removed the old file
+                    break;
+                }
             }
 
             // Invoke the watchdog action here to refresh our contents
@@ -79,7 +84,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         // Public facing properties about our watched directory
         [JsonIgnore] public Action WatchdogAction => this._watchdogAction;
         [JsonIgnore] public string WatchedDirectoryPath => this._watchedDirectory;
-        [JsonIgnore] public string WatchedDirectoryName => Path.GetDirectoryName(this._watchedDirectory);
+        [JsonIgnore] public string WatchedDirectoryName => this._watchedDirectory.Split(Path.DirectorySeparatorChar).Last(); 
 
         // Public facing filter set and directory information for the watched path
         [JsonIgnore] public bool IsMonitoring
@@ -141,6 +146,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 $"\t\\__ Directory Monitoring:    {(this.IsMonitoring ? "On" : "Off")}";
 
             /* TODO: Enable this routine here again if I REALLY want to. Seems like this may cause big logging hang ups
+             * BUG: Some fucking jackass (likely myself) thought this was a good choice. Why the FUCK would one consider expanding the properties of an object
+             * BUG: THOUSANDS of times in a fraction of a second to generate debug information????
              *
              * // If this folder has no files, then exit out of this routine
              * if (this._watchedFiles.Count == 0) return FolderConfiguration;
@@ -254,23 +261,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 this._directoryWatchers.Add(NextWatcher);
             }
 
-            // Now store our new watchdog file instances for this path location
+            // Find all matching files once again and append them all to our collection of files
             _folderLogger.WriteLog("ATTEMPTING TO LOAD AND CREATE NEW WATCHDOG FILE INSTANCES NOW...");
             var MatchingFilesFound = this.WatchedFileFilters
                 .SelectMany(FileFilter => Directory.GetFiles(this.WatchedDirectoryPath, FileFilter))
                 .ToArray();
 
-            // If no files were found, then don't import them
-            if (MatchingFilesFound.Length != 0)
+            // Add in new files that were not seen before
+            foreach (var MatchingPath in MatchingFilesFound)
             {
-                // Loop all the found file values here and store them as watched file objects
-                _folderLogger.WriteLog($"FOUND A TOTAL OF {MatchingFilesFound.Length} FILES IN {this.WatchedDirectoryPath}!", LogType.InfoLog);
-                foreach (string FilePath in MatchingFilesFound)
-                {
-                    // Build a new file, store the execute routine as an event handler, and add it onto our list
-                    this._watchedFiles.Add(new WatchdogFile(FilePath));
-                    _folderLogger.WriteLog($"--> ADDED NEW WATCHDOG FILE! FILE NAME {FilePath}", LogType.TraceLog);
-                }
+                // Check if this file exists in our collection already
+                if (this._watchedFiles.Any(FileObj => FileObj.FullFilePath == MatchingPath)) continue;
+                this._watchedFiles.Add(new WatchdogFile(MatchingPath));
+                _folderLogger.WriteLog($"[WATCHDOG EVENT] ::: ADDED NEW WATCHDOG FILE: {MatchingPath}", LogType.TraceLog);
             }
 
             // Setup our default watchdog action here
@@ -278,11 +281,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this._watchdogAction = () =>
             {
                 // Log out the information about our watchdog event being fired here
-                _folderLogger.WriteLog($"[WATCHDOG EVENT] ::: PROCESSED EVENT FOR WATCHDOG FOLDER {this.WatchedDirectoryName}!");
+                _folderLogger.WriteLog($"[WATCHDOG EVENT] ::: PROCESSED EVENT FOR WATCHDOG FOLDER {this.WatchedDirectoryPath}!");
                 _folderLogger.WriteLog($"[WATCHDOG EVENT] ::: TOTAL OF {this.WatchedFiles.Length} FILES ARE SEEN IN THIS PATH");
             };
 
-            // Log setup of this folder is now complete
+            // Log that we're firing a first run of the watchdog event and execute it
             _folderLogger.WriteLog($"CONFIGURED NEW WATCHDOG DIRECTORY {this.WatchedDirectoryName} OK!", LogType.InfoLog);
         }
 

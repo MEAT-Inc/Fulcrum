@@ -75,7 +75,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Lists of Messages that are being tracked by our simulation along with the simulation configuration
         public EventArgs[] SimEventsProcessed { get => this._simEventsProcessed; set => PropertyUpdated(value); }
-        public PassThruSimulationChannel[] SimulationChannels { get => this._simulationChannels.ToArray(); set => PropertyUpdated(value); }
+        public PassThruSimulationChannel[] SimulationChannels { get => this._simulationChannels.ToArray(); set => PropertyUpdated(value.ToList()); }
 
         // Currently applied simulation configuration and configurations we're able to load in
         public PassThruSimulationConfiguration SimulationConfiguration { get => this._simulationConfiguration; set => PropertyUpdated(value); }
@@ -85,7 +85,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         #region Structs and Classes
         #endregion // Structs and Classes
-
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -137,6 +137,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                         catch (Exception CompareFilesEx)
                         {
                             // Catch the exception and log it out
+                            if (CompareFilesEx is ObjectDisposedException) return;
                             _fileLogger?.WriteException(CompareFilesEx);
                         }
                     }
@@ -270,7 +271,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this._watchTokenSource?.Dispose();
 
             // Log disposing and exit out
-            _fileLogger.WriteLog($"DISPOSING LOGGER FOR FILE INSTANCE {this.FileName}", LogType.TraceLog);
+            // _fileLogger?.WriteLog($"DISPOSING LOGGER FOR FILE INSTANCE {this.FileName}", LogType.TraceLog);
         }
         /// <summary>
         /// Converts this file object into a formatted string output which contains all the information about this file
