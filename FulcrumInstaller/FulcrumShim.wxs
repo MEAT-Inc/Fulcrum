@@ -30,9 +30,9 @@
 							<!-- Supporting DLLs and Logic -->
 	                        <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
 	                            <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
+	                            <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
 								<File Id="GOOGLE.APIS.AUTH.DLL" Name="Google.Apis.Auth.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
 								<File Id="GOOGLE.APIS.AUTH.PLATFORMSERVICES.DLL" Name="Google.Apis.Auth.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.PlatformServices.dll" />
-								<File Id="GOOGLE.APIS.AUTH.DLL" Name="Google.Apis.Auth.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
 								<File Id="GOOGLE.APIS.AUTH.XML" Name="Google.Apis.Auth.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.xml" />
 								<File Id="GOOGLE.APIS.CORE.DLL" Name="Google.Apis.Core.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.dll" />
 								<File Id="GOOGLE.APIS.CORE.XML" Name="Google.Apis.Core.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.xml" />
