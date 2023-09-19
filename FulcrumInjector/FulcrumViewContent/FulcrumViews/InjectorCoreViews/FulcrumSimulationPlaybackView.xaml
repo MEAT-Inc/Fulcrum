@@ -545,48 +545,46 @@
                                              BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
-                                                <Grid Margin="-2,2,3,0">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition/>
-                                                        <RowDefinition/>
-                                                        <RowDefinition/>
-                                                        <RowDefinition/>
-                                                        <RowDefinition/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Border Grid.Row="0" Grid.RowSpan="5"
-                                                            Grid.Column="0" Grid.ColumnSpan="2" 
-                                                            BorderThickness="1" CornerRadius="0" Margin="-2,-1"
-                                                            BorderBrush="{StaticResource DarkGreyThemeColor}"/>
-                                                    <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
+                                                <Border BorderBrush="{StaticResource DarkGreyThemeColor}" BorderThickness="2" Margin="-4,0,0,0">
+                                                    <Grid Margin="-2,2,3,0">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
                                                                 FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="0" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterMask}" FontFamily="Consolas"/>
-                                                    <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
+                                                        <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterPattern}" FontFamily="Consolas"/>
-                                                    <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
+                                                        <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="No Flow Control" Text="{Binding FilterFlowCtl}" FontFamily="Consolas"/>
-                                                    <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
+                                                        <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterFlags}" FontFamily="Consolas"/>
-                                                    <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
+                                                        <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                    <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterType}" FontFamily="Consolas"/>
-                                                </Grid>
+                                                    </Grid>
+                                                </Border>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
