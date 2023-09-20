@@ -217,7 +217,7 @@
 
             <!-- Drive Refreshing Flyout-->
             <mah:Flyout 
-                x:Name="GoogleDriveRefreshingFlyout" 
+                x:Name="GoogleDriveProcessingFlyout" 
                 Height="85" Margin="50,150,50,0" 
                 Position="Top" VerticalAlignment="Center" HorizontalAlignment="Center"
                 BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
@@ -239,18 +239,18 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
 
-                    <!-- Refreshing Text -->
+                    <!-- Operation Text -->
                     <TextBlock
                         Grid.Row="0"
                         Margin="0,0,5,0" FontWeight="DemiBold"
-                        Text="Refreshing Injector Drive Files..." FontSize="20"
+                        Text="{Binding DriveOperationText}" FontSize="20"
                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                    <!-- Refreshing Progress Bar -->
+                    <!-- Operation Progress Bar -->
                     <ProgressBar
                             Grid.Row="1"
                             Margin="0,10,15,0"  
-                            Value="{Binding RefreshProgress}"
+                            Value="{Binding DriveOperationProgress}"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                             Foreground="{StaticResource PrimaryColor_Darker_35}">
                         <ProgressBar.Style>

@@ -18,6 +18,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
     internal class DriveLogFileSet : LogFileSet
     {
         #region Custom Events
+
+        // Event handler for download progress during folder downloads
+        public EventHandler<DownloadProgressEventArgs> OnDownloadProgress;
+
         #endregion // Custom Events
 
         #region Fields
@@ -42,6 +46,45 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
         #endregion // Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Event argument object for downloading progress
+        /// </summary>
+        public class DownloadProgressEventArgs : EventArgs
+        {
+            #region Custom Events
+            #endregion // Custom Events
+
+            #region Fields
+            
+            // Public readonly fields for the drive event args
+            public readonly int TotalFileCount;
+            public readonly int DownloadedFileCount;
+            public readonly double DownloadProgress;
+
+            #endregion // Fields
+
+            #region Properties
+            #endregion // Properties
+
+            #region Structs and Classes
+            #endregion // Structs and Classes
+
+            /// <summary>
+            /// Builds a new download progress event argument object
+            /// </summary>
+            /// <param name="TotalFileCount">Total number of files to pull in</param>
+            /// <param name="DownloadedFileCount">The number of files pulled in so far</param>
+            /// <param name="DownloadProgress">The progress of the download routine</param>
+            public DownloadProgressEventArgs(int TotalFileCount, int DownloadedFileCount, double DownloadProgress)
+            {
+                // Store values for the backing fields
+                this.TotalFileCount = TotalFileCount;
+                this.DownloadProgress = DownloadProgress;
+                this.DownloadedFileCount = DownloadedFileCount;
+            }
+        }
+
         #endregion // Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -127,15 +170,24 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
             Directory.CreateDirectory(LogSetFolder);
 
             // Pull all the files in parallel for speed
+            int FilesDownloaded = 0;
             bool DownloadsPassed = true;
             Parallel.ForEach(this.LogSetFiles, (LogFileObject) =>
             {
                 // Get the new path for our downloaded file here
-                string LogPath = Path.Combine(LogSetFolder, LogFileObject.LogFileName); 
+                string LogPath = Path.Combine(LogSetFolder, LogFileObject.LogFileName);
                 if (LogFileObject is not DriveLogFileModel DriveModel) return;
 
                 // Download the file here and store the status of it
                 if (!DriveModel.DownloadLogFile(LogPath)) DownloadsPassed = false;
+
+                // If configured, invoke a download event
+                this.OnDownloadProgress?.Invoke(
+                    DriveModel, 
+                    new DownloadProgressEventArgs(
+                        this.TotalLogCount,
+                        FilesDownloaded++,
+                        (double)FilesDownloaded / TotalLogCount * 100));
             });
 
             // Return out based on the download results for all log files

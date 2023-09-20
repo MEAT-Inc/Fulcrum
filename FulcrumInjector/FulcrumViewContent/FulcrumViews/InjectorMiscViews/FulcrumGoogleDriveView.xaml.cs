@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -98,7 +99,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         {
             // Disable the sending button and open the refreshing flyout 
             if (Sender is not Button SendingButton) return;
-            this.GoogleDriveRefreshingFlyout.IsOpen = true;
+            this.GoogleDriveProcessingFlyout.IsOpen = true;
             SendingButton.IsEnabled = false;
 
             // Disable the filtering ComboBoxes and text boxes
@@ -106,6 +107,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             this.cbYearFilter.IsEnabled = false; 
             this.cbMakeFilter.IsEnabled = false; 
             this.cbModelFilter.IsEnabled = false;
+            this.lbDriveLogSets.IsEnabled = false;
 
             // Background refresh all files from the drive here
             this._viewLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS IN THE BACKGROUND NOW...", LogType.InfoLog);
@@ -132,7 +134,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                 this.Dispatcher.Invoke(() =>
                 {
                     // Close the refreshing flyout and enable the sending button
-                    this.GoogleDriveRefreshingFlyout.IsOpen = false;
+                    this.GoogleDriveProcessingFlyout.IsOpen = false;
                     SendingButton.IsEnabled = true;
 
                     // Enable the filtering ComboBoxes and text boxes
@@ -140,6 +142,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                     this.cbYearFilter.IsEnabled = true;
                     this.cbMakeFilter.IsEnabled = true;
                     this.cbModelFilter.IsEnabled = true;
+                    this.lbDriveLogSets.IsEnabled = true;
                 });
             });
         }
@@ -214,11 +217,55 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
                 return;
             }
 
-            // Download the log folder here 
-            // TODO: Thread this and invoke updates on the UI for the download process
+            // Configure some local variables to determine the download progress
             string SelectedFolder = SelectFolderDialog.SelectedPath;
             this._viewLogger.WriteLog($"DOWNLOADING LOG SET INTO FOLDER {SelectedFolder}...");
-            LogSetContext.DownloadLogSet(SelectedFolder);
+
+            // Disable the filtering ComboBoxes and text boxes
+            this.tbVinFilter.IsEnabled = false;
+            this.cbYearFilter.IsEnabled = false;
+            this.cbMakeFilter.IsEnabled = false;
+            this.cbModelFilter.IsEnabled = false;
+            this.lbDriveLogSets.IsEnabled = false;
+            this.btnRefreshInjectorFiles.IsEnabled = false;
+            this.GoogleDriveProcessingFlyout.IsOpen = true;
+
+            // Invoke the download routine in a background thread
+            Task.Run(() =>
+            {
+                // Wrap this routine in a try catch to avoid bombing/hanging the UI
+                try
+                {
+                    // Run the download routine and enable our UI controls once done
+                    var DownloadResult = this.ViewModel.DownloadInjectorLogSet(LogSetContext, SelectedFolder);
+
+                    // Throw an exception if the refresh routine fails
+                    if (!DownloadResult) throw new InvalidOperationException("Error! Failed to download files in from the Injector Google Drive!");
+                    this._viewLogger.WriteLog($"DOWNLOADED INJECTOR LOG SET {LogSetContext.LogSetName} CORRECTLY!", LogType.InfoLog);
+                    this._viewLogger.WriteLog($"LOGS ARE DOWNLOADED INTO PARENT FOLDER {SelectedFolder}", LogType.InfoLog);
+                }
+                catch (Exception DownloadEx)
+                {
+                    // Log out the exception and move on
+                    this._viewLogger.WriteLog("ERROR! FAILED TO DOWNLOAD LOG FILES FROM THE INJECTOR DRIVE!", LogType.ErrorLog);
+                    this._viewLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", DownloadEx);
+                }
+
+                // Reset our UI contents here and close the refreshing progress bar
+                this.Dispatcher.Invoke(() =>
+                {
+                    // Close the refreshing flyout and enable the UI Controls
+                    this.GoogleDriveProcessingFlyout.IsOpen = false;
+
+                    // Enable the filtering ComboBoxes and text boxes
+                    this.tbVinFilter.IsEnabled = true;
+                    this.cbYearFilter.IsEnabled = true;
+                    this.cbMakeFilter.IsEnabled = true;
+                    this.cbModelFilter.IsEnabled = true;
+                    this.lbDriveLogSets.IsEnabled = true;
+                    this.btnRefreshInjectorFiles.IsEnabled = true;
+                });
+            });
         }
         /// <summary>
         /// Event handler used to process a show log set contents button click
