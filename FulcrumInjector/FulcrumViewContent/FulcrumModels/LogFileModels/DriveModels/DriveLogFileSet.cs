@@ -110,5 +110,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
             // Return out based on how many files exist for this set
             return this.TotalLogCount != 0;
         }
+        /// <summary>
+        /// Helper method used to download all the log files for a given log set and store them on the disk
+        /// </summary>
+        /// <param name="DownloadPath">The path of the folder to save log files into</param>
+        /// <returns>True if all logs are pulled in. False if not </returns>
+        public bool DownloadLogSet(string DownloadPath)
+        {
+            // TODO: Build logic for downloading all log files
+            return true;
+        }
     }
 }

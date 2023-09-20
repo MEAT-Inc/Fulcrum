@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
 using SharpLogging;
@@ -196,8 +197,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         {
             // Get the currently selected item in our log file set view
             if (Sender is not Button SendingButton) return;
-            if (SendingButton.Parent is not Grid SendingParentGrid) return;
+            if (SendingButton.DataContext is not DriveLogFileSet LogSetContext) return;
 
+            // Log out what set of logs we're trying to pull in here and attempt to download them to a user defined path
+            this._viewLogger.WriteLog($"ATTEMPTING TO DOWNLOAD LOG SET {LogSetContext.LogSetName}...", LogType.WarnLog);
         }
         /// <summary>
         /// Event handler used to process a show log set contents button click
@@ -206,6 +209,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// <param name="E">Event args fired along with this click </param>
         private void btnShowLogSetContents_OnClick(object Sender, RoutedEventArgs E)
         {
+            // TODO: Configure list view to show all log files in the collection being used
         }
     }
 }
