@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using NLog.Filters;
 using SharpLogging;
+using File = Google.Apis.Drive.v3.Data.File;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels
 {
@@ -16,6 +18,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
     internal class DriveLogFileSet : LogFileSet
     {
         #region Custom Events
+
+        // Event handler for download progress during folder downloads
+        public EventHandler<DownloadProgressEventArgs> OnDownloadProgress;
+
         #endregion // Custom Events
 
         #region Fields
@@ -40,6 +46,45 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
         #endregion // Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Event argument object for downloading progress
+        /// </summary>
+        public class DownloadProgressEventArgs : EventArgs
+        {
+            #region Custom Events
+            #endregion // Custom Events
+
+            #region Fields
+            
+            // Public readonly fields for the drive event args
+            public readonly int TotalFileCount;
+            public readonly int DownloadedFileCount;
+            public readonly double DownloadProgress;
+
+            #endregion // Fields
+
+            #region Properties
+            #endregion // Properties
+
+            #region Structs and Classes
+            #endregion // Structs and Classes
+
+            /// <summary>
+            /// Builds a new download progress event argument object
+            /// </summary>
+            /// <param name="TotalFileCount">Total number of files to pull in</param>
+            /// <param name="DownloadedFileCount">The number of files pulled in so far</param>
+            /// <param name="DownloadProgress">The progress of the download routine</param>
+            public DownloadProgressEventArgs(int TotalFileCount, int DownloadedFileCount, double DownloadProgress)
+            {
+                // Store values for the backing fields
+                this.TotalFileCount = TotalFileCount;
+                this.DownloadProgress = DownloadProgress;
+                this.DownloadedFileCount = DownloadedFileCount;
+            }
+        }
+
         #endregion // Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,6 +154,44 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
 
             // Return out based on how many files exist for this set
             return this.TotalLogCount != 0;
+        }
+        /// <summary>
+        /// Helper method used to download all the log files for a given log set and store them on the disk
+        /// </summary>
+        /// <param name="DownloadPath">The path of the folder to save log files into</param>
+        /// <returns>True if all logs are pulled in. False if not </returns>
+        public bool DownloadLogSet(string DownloadPath)
+        {
+            // Ensure the requested path exists for the download output
+            if (!Directory.Exists(DownloadPath)) Directory.CreateDirectory(DownloadPath);
+
+            // Build a folder for all downloaded files for this set 
+            string LogSetFolder = Path.Combine(DownloadPath, this.LogSetName);
+            Directory.CreateDirectory(LogSetFolder);
+
+            // Pull all the files in parallel for speed
+            int FilesDownloaded = 0;
+            bool DownloadsPassed = true;
+            Parallel.ForEach(this.LogSetFiles, (LogFileObject) =>
+            {
+                // Get the new path for our downloaded file here
+                string LogPath = Path.Combine(LogSetFolder, LogFileObject.LogFileName);
+                if (LogFileObject is not DriveLogFileModel DriveModel) return;
+
+                // Download the file here and store the status of it
+                if (!DriveModel.DownloadLogFile(LogPath)) DownloadsPassed = false;
+
+                // If configured, invoke a download event
+                this.OnDownloadProgress?.Invoke(
+                    DriveModel, 
+                    new DownloadProgressEventArgs(
+                        this.TotalLogCount,
+                        FilesDownloaded++,
+                        (double)FilesDownloaded / TotalLogCount * 100));
+            });
+
+            // Return out based on the download results for all log files
+            return DownloadsPassed;
         }
     }
 }

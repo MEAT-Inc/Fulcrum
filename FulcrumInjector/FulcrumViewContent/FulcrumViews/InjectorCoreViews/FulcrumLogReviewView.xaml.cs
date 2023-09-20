@@ -89,7 +89,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Log information about opening appending box and begin selection
             this._viewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
-            using var SelectAttachmentDialog = new System.Windows.Forms.OpenFileDialog()
+            using var SelectLogFileDialog = new System.Windows.Forms.OpenFileDialog()
             {
                 Multiselect = true,
                 CheckFileExists = true,
@@ -102,7 +102,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Now open the dialog and allow the user to pick some new files.
             this._viewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
-            if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0)
+            if (SelectLogFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectLogFileDialog.FileNames.Length == 0)
             {
                 // Log failed, set no file, reset sending button and return.
                 this._viewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
@@ -120,7 +120,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 try
                 {
                     // Store new file object value. Validate it on the ViewModel object first.
-                    bool LoadResult = this.ViewModel.LoadLogContents(SelectAttachmentDialog.FileNames);
+                    bool LoadResult = this.ViewModel.LoadLogContents(SelectLogFileDialog.FileNames);
                     if (LoadResult) this._viewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
                     else this._viewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
