@@ -197,6 +197,7 @@
                                             Background="{StaticResource SecondaryColor_Darker_65}"/>
                                         <Button  
                                             Grid.Column="1"
+                                            IsEnabled="False"
                                             Margin="10,2,0,2" 
                                             Click="btnShowLogSetContents_OnClick"
                                             Content="Show Log Set Contents" FontSize="12"

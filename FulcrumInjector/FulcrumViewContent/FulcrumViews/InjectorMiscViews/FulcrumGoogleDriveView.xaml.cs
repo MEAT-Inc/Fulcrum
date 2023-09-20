@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
@@ -201,6 +202,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
 
             // Log out what set of logs we're trying to pull in here and attempt to download them to a user defined path
             this._viewLogger.WriteLog($"ATTEMPTING TO DOWNLOAD LOG SET {LogSetContext.LogSetName}...", LogType.WarnLog);
+            using var SelectFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            SelectFolderDialog.Description = "Select a Downloads Folder";
+
+            // Now open the dialog and allow the user to pick some new files.
+            this._viewLogger.WriteLog("OPENING NEW FOLDER DIALOG OBJECT NOW...", LogType.WarnLog);
+            if (SelectFolderDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectFolderDialog.SelectedPath.Length == 0)
+            {
+                // Log failed, set no file, reset sending button and return.
+                this._viewLogger.WriteLog("FAILED TO SELECT A NEW FOLDER OBJECT! EXITING NOW...", LogType.ErrorLog);
+                return;
+            }
+
+            // Download the log folder here 
+            // TODO: Thread this and invoke updates on the UI for the download process
+            string SelectedFolder = SelectFolderDialog.SelectedPath;
+            this._viewLogger.WriteLog($"DOWNLOADING LOG SET INTO FOLDER {SelectedFolder}...");
+            LogSetContext.DownloadLogSet(SelectedFolder);
         }
         /// <summary>
         /// Event handler used to process a show log set contents button click

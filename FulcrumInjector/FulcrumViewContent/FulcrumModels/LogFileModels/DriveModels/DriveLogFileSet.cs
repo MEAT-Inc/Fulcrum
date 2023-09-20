@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using NLog.Filters;
 using SharpLogging;
+using File = Google.Apis.Drive.v3.Data.File;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels
 {
@@ -117,8 +119,27 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
         /// <returns>True if all logs are pulled in. False if not </returns>
         public bool DownloadLogSet(string DownloadPath)
         {
-            // TODO: Build logic for downloading all log files
-            return true;
+            // Ensure the requested path exists for the download output
+            if (!Directory.Exists(DownloadPath)) Directory.CreateDirectory(DownloadPath);
+
+            // Build a folder for all downloaded files for this set 
+            string LogSetFolder = Path.Combine(DownloadPath, this.LogSetName);
+            Directory.CreateDirectory(LogSetFolder);
+
+            // Pull all the files in parallel for speed
+            bool DownloadsPassed = true;
+            Parallel.ForEach(this.LogSetFiles, (LogFileObject) =>
+            {
+                // Get the new path for our downloaded file here
+                string LogPath = Path.Combine(LogSetFolder, LogFileObject.LogFileName); 
+                if (LogFileObject is not DriveLogFileModel DriveModel) return;
+
+                // Download the file here and store the status of it
+                if (!DriveModel.DownloadLogFile(LogPath)) DownloadsPassed = false;
+            });
+
+            // Return out based on the download results for all log files
+            return DownloadsPassed;
         }
     }
 }
