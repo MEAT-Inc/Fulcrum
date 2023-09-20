@@ -107,8 +107,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
                 .FindIndex(ImportedSettingSet => ImportedSettingSet.SettingSectionTitle == LocatedSettingSet.SettingSectionTitle);
 
             // Store the settings value here.
-            var SettingObjects = FulcrumConstants.FulcrumSettings.ToList();
-            SettingObjects[SettingSetIndex] = LocatedSettingSet;
+            var SettingObjects = FulcrumConstants.FulcrumSettings.Select(SettingObj => JObject.FromObject(new {
+                SettingObj.SettingSectionTitle,
+                SettingsEntries = SettingObj.ToList()
+            })).ToList();
+
+            // Build the new setting value and store it
+            SettingObjects[SettingSetIndex] = JObject.FromObject(new
+            {
+                LocatedSettingSet.SettingSectionTitle,
+                SettingsEntries = LocatedSettingSet.ToList()
+            });
 
             // Store our value in the JSON configuration files now.
             ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);

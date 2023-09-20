@@ -186,5 +186,26 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             string FilterValue = SendingTextBox.Text;
             this.ViewModel.ApplyLogSetFilter(FulcrumGoogleDriveViewModel.FilterTypes.VIN_FILTER, FilterValue);
         }
+
+        /// <summary>
+        /// Event handler used to process a download log set button click
+        /// </summary>
+        /// <param name="Sender">The button that sends this event</param>
+        /// <param name="E">Event args fired along with this click </param>
+        private void btnDownloadLogSet_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Get the currently selected item in our log file set view
+            if (Sender is not Button SendingButton) return;
+            if (SendingButton.Parent is not Grid SendingParentGrid) return;
+
+        }
+        /// <summary>
+        /// Event handler used to process a show log set contents button click
+        /// </summary>
+        /// <param name="Sender">The button that sends this event</param>
+        /// <param name="E">Event args fired along with this click </param>
+        private void btnShowLogSetContents_OnClick(object Sender, RoutedEventArgs E)
+        {
+        }
     }
 }

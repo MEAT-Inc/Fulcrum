@@ -69,15 +69,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 PropertyUpdated(value);
                 this.IsLogLoaded = value != null;
                 
-                // Based on the value we're storing, update our viewer contents
-                if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.PASSTHRU_FILE)
-                    this._toggleViewerContents(ViewerStateType.ShowingLogFile);
-                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.EXPRESSIONS_FILE)
-                    this._toggleViewerContents(ViewerStateType.ShowingExpressions);
-                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.SIMULATIONS_FILE)
-                    this._toggleViewerContents(ViewerStateType.ShowingSimulation);
-                else if (this._currentLogFile.LogFileType == LogFileModel.LogFileTypes.UNKNOWN_FILE)
-                    this._toggleViewerContents(ViewerStateType.NoContent);
+                // Update our viewer contents and throw an exception if the routine fails
+                if (!this._toggleViewerContents())
+                    throw new InvalidOperationException("Error! Failed to toggle viewer contents!");
             }
         }
 
@@ -307,7 +301,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         /// </summary>
         /// <param name="StateToSet">State to apply</param>
         /// <returns></returns>
-        private bool _toggleViewerContents(ViewerStateType StateToSet)
+        private bool _toggleViewerContents()
         {
             try
             {
@@ -319,49 +313,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                     this.ViewModelLogger.WriteLog("CAN NOT TOGGLE TO A FILE INSTANCE WHEN NO VALUE IS CONFIGURED FOR A LOG SET!", LogType.ErrorLog);
                     return false;
                 }
-
-                // Based on the state value we're storing, find the correct log file contents
-                // switch (this._currentState = StateToSet)
-                // {
-                //     // For showing expressions
-                //     case ViewerStateType.ShowingExpressions:
-                //         if (!this.CurrentLogSet.HasExpressions)
-                //             throw new FileNotFoundException("Error! Current log set does not have expressions built!");
-                // 
-                //         // Set our new current log file to the expressions file and break out
-                //         // this.CurrentLogFile = this.CurrentLogSet.ExpressionsFile;
-                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD EXPRESSIONS FILE CONTENT!", LogType.InfoLog); 
-                //         return true;
-                // 
-                //     // For showing simulations
-                //     case ViewerStateType.ShowingSimulation:
-                //         if (!this.CurrentLogSet.HasSimulations)
-                //             throw new FileNotFoundException("Error! Current log set does not have simulations built!");
-                // 
-                //         // Set our new current log file to the simulations file and break out
-                //         // this.CurrentLogFile = this.CurrentLogSet.SimulationsFile;
-                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD SIMULATION FILE CONTENT!", LogType.InfoLog);
-                //         return true;
-                // 
-                //     // For showing raw log contents
-                //     case ViewerStateType.ShowingLogFile:
-                //         if (!this.CurrentLogSet.HasPassThruLog) 
-                //             throw new FileNotFoundException("Error! Current log set does not a base log file built!");
-                // 
-                //         // Set our new current log file to the base pass thru file and break out
-                //         // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
-                //         this.ViewModelLogger.WriteLog("UPDATED LOG REVIEW UI TO HOLD BASE LOG FILE FILE CONTENT!", LogType.InfoLog);
-                //         return true;
-                // 
-                //     // For showing nothing in the viewer
-                //     case ViewerStateType.NoContent:
-                //         // this.CurrentLogFile = this.CurrentLogSet.PassThruLogFile;
-                //         this.ViewModelLogger.WriteLog("WARNING! RESETTING THE CURRENT LOG FILE MODEL TO NULL FOR NO CONTENT!", LogType.TraceLog);
-                //         break;
-                // 
-                //     // On default, throw a failure out and move on. This should never happen really
-                //     default: throw new InvalidEnumArgumentException($"Error! Unable to process view type {this._currentState}!");
-                // }
 
                 // Store our contents for the log file view object back on our editor controls now
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;

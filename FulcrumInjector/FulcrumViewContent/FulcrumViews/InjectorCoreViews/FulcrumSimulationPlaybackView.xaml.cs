@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -94,7 +95,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 Filter = Debugger.IsAttached ? "All Files (*.*)|*.*" : "Injector Simulations (*.ptSim)|*.ptSim|All Files (*.*)|*.*",
                 InitialDirectory = Debugger.IsAttached ?
                     "C:\\Drewtech\\logs" :
-                    ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorLogging.DefaultSimulationsPath")
+                    ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorResources.FulcrumSimulationsPath")
             };
 
             // Now open the dialog and allow the user to pick some new files.
@@ -212,6 +213,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 // Stop simulation playback and restart monitoring if needed
                 this.ViewModel.StopSimulation();
                 CurrentHwInfo.StartVehicleMonitoring();
+                this.ViewModel.SimEventsProcessed = Array.Empty<EventArgs>();
 
                 // Log done and exit out of this routine
                 this._viewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);

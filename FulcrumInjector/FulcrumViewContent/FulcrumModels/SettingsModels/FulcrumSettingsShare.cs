@@ -147,8 +147,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             var SettingsLoaded = ValueLoaders.GetConfigValue<JObject[]>("FulcrumUserSettings")
                 .Select(JsonObject => new Tuple<string, FulcrumSettingEntryModel[]>(
                     JsonObject["SettingSectionTitle"].Value<string>(),
-                    JsonObject["SettingsEntries"].ToObject<FulcrumSettingEntryModel[]>()))
-                .Select(SettingCollection => new FulcrumSettingsCollection(SettingCollection.Item1, SettingCollection.Item2))
+                    JsonConvert.DeserializeObject<FulcrumSettingEntryModel[]>(JsonObject["SettingsEntries"].ToString())))
                 .ToArray();
 
             // Log out how many setting values were loaded in this routine
@@ -159,8 +158,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             foreach (var SettingSet in SettingsLoaded)
             {
                 // Add the newly loaded setting object into our collection instance and log it's been built 
-                this._settingsCollections.Add(SettingSet);
-                this._settingsStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet.SettingSectionTitle} HAS BEEN IMPORTED");
+                this._settingsCollections.Add(new FulcrumSettingsCollection(SettingSet.Item1, SettingSet.Item2));
+                this._settingsStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet.Item1} HAS BEEN IMPORTED");
             }
 
             // Log passed and return output
