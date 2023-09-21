@@ -67,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         public override void StartColorHighlighting()
         {
             // Stop old format helpers and clear them.
-            this.StopColorHighlighting();
+            if (this.IsHighlighting) this.StopColorHighlighting();
             _formatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
 
             // Make sure to control our UI contents on the dispatcher
@@ -86,6 +86,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         /// </summary>
         public override void StopColorHighlighting()
         {
+            // Make sure we need to stop first 
+            if (!this.IsHighlighting) return;
+
             // Remove all previous transformers and return out.
             _formatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
             this.OutputEditor.Dispatcher.Invoke(() =>
