@@ -117,8 +117,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             {
                 // Save all settings objects into our settings file
                 this.ViewModel.SaveAllSettings();
-                this.ViewModel.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
-
+                
                 // Change Color and Set to Saved! on the content here.
                 string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;
                 SendButton.Content = "Saved OK!"; SendButton.Background = Brushes.DarkGreen;
