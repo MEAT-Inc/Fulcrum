@@ -11,10 +11,35 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
     /// </summary>
     internal class MessageFilterDataColorFormatter : InjectorDocFormatterBase
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Private list of regular expressions for formatting
+        private readonly List<Regex> _builtLineExpressions;
+
+        #endregion // Fields
+
+        #region Properties
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
         /// <summary>
-        /// Builds a new color format helping object.
+        /// Builds a new PTRead messages data format helper
         /// </summary>
-        public MessageFilterDataColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
+        public MessageFilterDataColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) 
+        {
+            // Convert input regex into a multiline ready expression
+            string FilterRegexString = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionTypes.MessageFilterInfo]
+                .ExpressionPattern;
+
+            // Configure formatting regular expressions for output helpers
+            this._builtLineExpressions = this.GenerateColorExpressions(FilterRegexString);
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,15 +49,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         /// <param name="InputLine"></param>
         protected override void ColorizeLine(DocumentLine InputLine)
         {
-            // Convert input regex into a multiline ready expression
-            string FilterRegexString = PassThruExpressionRegex
-                .LoadedExpressions[PassThruExpressionTypes.MessageFilterInfo]
-                .ExpressionPattern;
-
             // Search for our matches here and then loop our doc lines to apply coloring
-            List<Regex> BuiltLineExpressions = this.GenerateColorExpressions(FilterRegexString);
             string CurrentLine = CurrentContext.Document.GetText(InputLine);
-            Match[] MatchesFound = BuiltLineExpressions
+            Match[] MatchesFound = this._builtLineExpressions
                 .Select(RegexPattern => RegexPattern.Match(CurrentLine))
                 .ToArray();
 

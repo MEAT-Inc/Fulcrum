@@ -11,10 +11,35 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
     /// </summary>
     internal class CommandParameterColorFormatter : InjectorDocFormatterBase
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Private list of regular expressions for formatting
+        private readonly List<Regex> _builtLineExpressions;
+
+        #endregion // Fields
+
+        #region Properties
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
         /// <summary>
         /// Builds a new color format helping object.
         /// </summary>
-        public CommandParameterColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
+        public CommandParameterColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
+        {
+            // Convert input regex into a multiline ready expression
+            string CommandParamsRegex = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionTypes.CommandParameterInfo]
+                .ExpressionPattern;
+
+            // Configure formatting regular expressions for output helpers
+            this._builtLineExpressions = this.GenerateColorExpressions(CommandParamsRegex);
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,14 +50,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Find the command type for our input object here. If none, drop out
-            string CommandParamsRegex = PassThruExpressionRegex
-                .LoadedExpressions[PassThruExpressionTypes.CommandParameterInfo]
-                .ExpressionPattern;
-
-            // Search for our matches here and then loop our doc lines to apply coloring
-            List<Regex> BuiltLineExpressions = this.GenerateColorExpressions(CommandParamsRegex);
             string CurrentLine = CurrentContext.Document.GetText(InputLine);
-            Match[] MatchesFound = BuiltLineExpressions
+            Match[] MatchesFound = this._builtLineExpressions
                 .Select(RegexPattern => RegexPattern.Match(CurrentLine))
                 .ToArray();
 
