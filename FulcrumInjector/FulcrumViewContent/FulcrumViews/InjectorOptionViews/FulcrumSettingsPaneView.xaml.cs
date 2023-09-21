@@ -66,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         {
             // Populate our settings values here and refresh content from the injector constants
             this.ViewModel.PopulateAppSettingJsonViewer(this.JsonSettingsViewEditor);
-            this.ViewModel.SettingsEntrySets = new (FulcrumConstants.FulcrumSettings);
+            this.ViewModel.SettingsEntrySets = new (FulcrumConstants.FulcrumSettings.Values);
             this._viewLogger.WriteLog("BUILT AND LOADED IN SESSION SETTINGS FOR THIS VIEW CORRECTLY!");
         }
 
@@ -115,10 +115,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             // Store new values from our ViewModel onto the share and into JSON 
             Task.Run(() =>
             {
-                ValueSetters.SetValue("FulcrumUserSettings", FulcrumConstants.FulcrumSettings);
-                this._viewLogger.WriteLog("STORED NEW SETTINGS VALUES WITHOUT ISSUE!", LogType.InfoLog);
-                this.ViewModel.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
-
+                // Save all settings objects into our settings file
+                this.ViewModel.SaveAllSettings();
+                
                 // Change Color and Set to Saved! on the content here.
                 string OriginalContent = SendButton.Content.ToString(); var OriginalBackground = SendButton.Background;
                 SendButton.Content = "Saved OK!"; SendButton.Background = Brushes.DarkGreen;

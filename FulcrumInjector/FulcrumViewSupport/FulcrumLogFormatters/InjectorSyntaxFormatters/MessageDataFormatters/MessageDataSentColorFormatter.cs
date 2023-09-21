@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
@@ -26,20 +27,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Convert input regex into a multiline ready expression
-            List<Regex> BuiltLineExpressions = new List<Regex>();
             string MessageDataRegexString = PassThruExpressionRegex
                 .LoadedExpressions[PassThruExpressionTypes.MessageSentInfo]
-                .ExpressionPattern; MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
-            for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
-                BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));
+                .ExpressionPattern;
 
             // Search for our matches here and then loop our doc lines to apply coloring
+            List<Regex> BuiltLineExpressions = this.GenerateColorExpressions(MessageDataRegexString);
             string CurrentLine = CurrentContext.Document.GetText(InputLine);
             Match[] MatchesFound = BuiltLineExpressions
                 .Select(RegexPattern => RegexPattern.Match(CurrentLine))
                 .ToArray();
 
-            // See if anything matched up
+            // See if anything matched up or not.
             if (!MatchesFound.Any(MatchSet => MatchSet.Success)) return;
 
             try

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Documents;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters.CommandParamFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters.MessageDataFormatters;
@@ -12,6 +14,26 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
     /// </summary>
     internal sealed class InjectorOutputSyntaxHelper : OutputFormatHelperBase
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Static instances of the color formatters for use on UI controls
+        private InjectorDocFormatterBase _typeTimeFormatter;
+        private InjectorDocFormatterBase _commandParameterFormatter;
+        private InjectorDocFormatterBase _messageDataReadFormatter;
+        private InjectorDocFormatterBase _messageSentDataFormatter;
+        private InjectorDocFormatterBase _messageFilterFormatter;
+
+        #endregion // Fields
+
+        #region Properties
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
         /// <summary>
         /// Builds a new instance of our redirecting target object.
         /// </summary>
@@ -24,6 +46,17 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
             // Build color objects here.
             base.BuildColorFormatValues(FulcrumConstants.FulcrumSettings.InjectorDllSyntaxFulcrumSettings.ToArray());
             _formatLogger.WriteLog("PULLED COLOR VALUES IN CORRECTLY AND BEGAN OUTPUT FORMATTING ON THIS EDITOR!", LogType.InfoLog);
+
+            // Always consume UI contents inside the dispatcher
+            this.OutputEditor.Dispatcher.Invoke(() =>
+            {
+                // Build new formatter objects here
+                this._typeTimeFormatter = new TypeAndTimeColorFormatter(this);
+                this._commandParameterFormatter = new CommandParameterColorFormatter(this);
+                this._messageDataReadFormatter = new MessageDataReadColorFormatter(this);
+                this._messageSentDataFormatter = new MessageDataSentColorFormatter(this);
+                this._messageFilterFormatter = new MessageFilterDataColorFormatter(this);
+            });
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -34,20 +67,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         public override void StartColorHighlighting()
         {
             // Stop old format helpers and clear them.
-            this.StopColorHighlighting(); 
+            if (this.IsHighlighting) this.StopColorHighlighting();
             _formatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
 
-            // Invoke this on a background thread
+            // Make sure to control our UI contents on the dispatcher
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
-                // Add in our output objects now.
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));          // Time coloring
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));     // Command value coloring 
-
-                // Add in the output objects for command types and information
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataReadColorFormatter(this));      // Messages Read
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataSentColorFormatter(this));      // Messages Sent
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageFilterDataColorFormatter(this));    // Message Filters
+                // Append all the color helpers into our TextBox here
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(this._typeTimeFormatter);
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(this._commandParameterFormatter);
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(this._messageDataReadFormatter);
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(this._messageSentDataFormatter);
+                this.OutputEditor.TextArea.TextView.LineTransformers.Add(this._messageFilterFormatter);
             });
         }
         /// <summary>
@@ -55,6 +86,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         /// </summary>
         public override void StopColorHighlighting()
         {
+            // Make sure we need to stop first 
+            if (!this.IsHighlighting) return;
+
             // Remove all previous transformers and return out.
             _formatLogger.WriteLog("STOPPING OUTPUT FORMAT!", LogType.WarnLog);
             this.OutputEditor.Dispatcher.Invoke(() =>

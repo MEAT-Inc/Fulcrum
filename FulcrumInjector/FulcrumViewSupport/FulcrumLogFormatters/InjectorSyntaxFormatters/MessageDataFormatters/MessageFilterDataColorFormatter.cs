@@ -25,15 +25,12 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         protected override void ColorizeLine(DocumentLine InputLine)
         {
             // Convert input regex into a multiline ready expression
-            List<Regex> BuiltLineExpressions = new List<Regex>();
             string FilterRegexString = PassThruExpressionRegex
                 .LoadedExpressions[PassThruExpressionTypes.MessageFilterInfo]
                 .ExpressionPattern;
-            MatchCollection RegexStrings = Regex.Matches(FilterRegexString, @"\(\?<[^\)]+\)");
-            for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++) 
-                BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));
-            
+
             // Search for our matches here and then loop our doc lines to apply coloring
+            List<Regex> BuiltLineExpressions = this.GenerateColorExpressions(FilterRegexString);
             string CurrentLine = CurrentContext.Document.GetText(InputLine);
             Match[] MatchesFound = BuiltLineExpressions
                 .Select(RegexPattern => RegexPattern.Match(CurrentLine))
