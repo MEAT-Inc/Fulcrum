@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
@@ -11,11 +12,36 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
     /// </summary>
     internal class MessageDataSentColorFormatter : InjectorDocFormatterBase
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Private list of regular expressions for formatting
+        private readonly List<Regex> _builtLineExpressions;
+
+        #endregion // Fields
+
+        #region Properties
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+        
         /// <summary>
         /// Builds a new PTRead messages data format helper
         /// </summary>
         /// <param name="FormatBase"></param>
-        public MessageDataSentColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
+        public MessageDataSentColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase)
+        {
+            // Convert input regex into a multiline ready expression
+            string MessageDataRegexString = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionTypes.MessageSentInfo]
+                .ExpressionPattern;
+
+            // Configure formatting regular expressions for output helpers
+            this._builtLineExpressions = this.GenerateColorExpressions(MessageDataRegexString);
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,21 +51,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         /// <param name="InputLine"></param>
         protected override void ColorizeLine(DocumentLine InputLine)
         {
-            // Convert input regex into a multiline ready expression
-            List<Regex> BuiltLineExpressions = new List<Regex>();
-            string MessageDataRegexString = PassThruExpressionRegex
-                .LoadedExpressions[PassThruExpressionTypes.MessageSentInfo]
-                .ExpressionPattern; MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
-            for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
-                BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));
-
             // Search for our matches here and then loop our doc lines to apply coloring
             string CurrentLine = CurrentContext.Document.GetText(InputLine);
-            Match[] MatchesFound = BuiltLineExpressions
+            Match[] MatchesFound = this._builtLineExpressions
                 .Select(RegexPattern => RegexPattern.Match(CurrentLine))
                 .ToArray();
 
-            // See if anything matched up
+            // See if anything matched up or not.
             if (!MatchesFound.Any(MatchSet => MatchSet.Success)) return;
 
             try

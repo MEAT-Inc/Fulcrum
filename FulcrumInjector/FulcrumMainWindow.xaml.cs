@@ -76,7 +76,7 @@ namespace FulcrumInjector
 
             // Log Version information output
             this._injectorMainLogger.WriteLog("INJECTOR VERSION INFORMATION BUILT OK!", LogType.InfoLog);
-        }
+        }   
         /// <summary>
         /// Routine method for closing actions when the main window instance is closed out.
         /// </summary>

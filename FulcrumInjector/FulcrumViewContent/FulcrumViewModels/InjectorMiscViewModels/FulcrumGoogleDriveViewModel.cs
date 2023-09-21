@@ -41,8 +41,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         private DriveService _driveService;                                 // The service used to navigate our google drive
 
         // Private backing field for refresh timer and progress
-        private double _refreshProgress;                                    // Progress for refresh routines
-        private Stopwatch _refreshTimer;                                    // Timer used to track refresh duration
+        private string _driveOperationText;                                 // Status text for drive operation             
+        private double _driveOperationProgress;                             // Progress for drive routines
+        private Stopwatch _driveOperationTimer;                             // Timer used to track duration of drive routines
 
         // Private backing field for the collection of loaded logs 
         private ObservableCollection<DriveLogFileSet> _locatedLogFolders;   // Collection of all loaded log folders found
@@ -59,8 +60,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         #region Properties
 
         // Public property for refresh timer
-        public Stopwatch RefreshTimer { get => this._refreshTimer; set => PropertyUpdated(value); }
-        public double RefreshProgress { get => this._refreshProgress; set => PropertyUpdated(value); }
+        public string DriveOperationText { get => this._driveOperationText; set => PropertyUpdated(value); }
+        public Stopwatch DriveOperationTimer { get => this._driveOperationTimer; set => PropertyUpdated(value); }
+        public double DriveOperationProgress { get => this._driveOperationProgress; set => PropertyUpdated(value); }
 
         // Public facing properties holding our collection of log files loaded
         public ObservableCollection<DriveLogFileSet> LocatedLogFolders { get => this._locatedLogFolders; set => PropertyUpdated(value); }
@@ -112,7 +114,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             };
 
             // Setup filtering lists and our log file collection list
-            this.RefreshTimer ??= new Stopwatch();
+            this.DriveOperationTimer ??= new Stopwatch();
             this.YearFilters ??= new ObservableCollection<string>();
             this.MakeFilters ??= new ObservableCollection<string>();
             this.ModelFilters ??= new ObservableCollection<string>();
@@ -141,8 +143,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         {
             // Initialize our list of output files and a timer for diagnostic purposes
             this.ViewModelLogger.WriteLog("REFRESHING INJECTOR LOG FILE SETS NOW...");
-            this.RefreshTimer.Start();
-            this.RefreshProgress = 0;
+            this.DriveOperationText = "Refreshing Injector Log Files...";
+            this.DriveOperationTimer.Restart();
+            this.DriveOperationProgress = 0;
 
             // Validate our Drive Explorer service is built and ready for use
             this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
@@ -169,7 +172,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             foreach (var FolderLocated in LocatedDriveFolders)
             {
                 // Update our progress counter value here
-                this.RefreshProgress = (FoldersIterated++ / (double)TotalFolderCount) * 100.00;
+                this.DriveOperationProgress = (FoldersIterated++ / (double)TotalFolderCount) * 100.00;
 
                 // Build a new folder set and pull in all files for it.
                 DriveLogFileSet NextFileSet = new DriveLogFileSet(FolderLocated);
@@ -186,15 +189,57 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Refresh the filtering sets here and stop the refresh timer once done
             this._refreshLogFilters();
-            this.RefreshTimer.Stop();
+            this.DriveOperationTimer.Stop();
 
             // Log out how many folder sets we've configured and store them on our view model
-            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {this.LocatedLogFolders.Count} FOLDERS IN {this.RefreshTimer.Elapsed:mm\\:ss\\:fff}");
+            this.ViewModelLogger.WriteLog($"FOUND A TOTAL OF {this.LocatedLogFolders.Count} FOLDERS IN {this.DriveOperationTimer.Elapsed:mm\\:ss\\:fff}");
             InjectorLogSets = this.LocatedLogFolders.ToList();
 
             // Return out based on the number of files loaded in 
             return InjectorLogSets.Count != 0;
         }
+        /// <summary>
+        /// Downloads the requested log set into the given google drive location
+        /// </summary>
+        /// <param name="LogSet">The set of logs we're pulling down from the drive</param>
+        /// <param name="DownloadPath">The path to the logs we're pulling in</param>
+        /// <returns>True if all logs are downlaoded. False if not</returns>
+        public bool DownloadInjectorLogSet(DriveLogFileSet LogSet, string DownloadPath)
+        {
+            // Initialize our list of output files and a timer for diagnostic purposes
+            this.ViewModelLogger.WriteLog($"DOWNLOADING INJECTOR LOG SET {LogSet.LogSetName} NOW...");
+            this.DriveOperationText = "Downloading Injector Log Files...";
+            this.DriveOperationTimer.Restart();
+            this.DriveOperationProgress = 0;
+
+            // Validate our Drive Explorer service is built and ready for use
+            this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
+            if (this._driveService == null && !FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
+                throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
+
+            // Configure an event handler for the log context object
+            LogSet.OnDownloadProgress = null;
+            LogSet.OnDownloadProgress += (SendingLog, EventArgs) =>
+            {
+                // Make sure the sending object is a log model
+                if (SendingLog is not DriveLogFileModel SendingDriveLog) return;
+
+                // Update our progress counter value here
+                this.DriveOperationProgress = EventArgs.DownloadProgress;
+                this.ViewModelLogger.WriteLog($"DOWNLOADED LOG FILE {SendingDriveLog.LogFileName}!", LogType.TraceLog);
+            };
+
+            // Invoke the download routine now
+            this.ViewModelLogger.WriteLog("CONFIGURED DOWNLOAD EVENT HANDLER CORRECTLY!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("DOWNLOADING LOG SET NOW...", LogType.WarnLog);
+            bool DownloadResult = LogSet.DownloadLogSet(DownloadPath);
+
+            // Stop the download timer and return out the result
+            this.DriveOperationTimer.Stop();
+            this.ViewModelLogger.WriteLog("DOWNLOAD ROUTINE FOR LOG SET COMPLETE!");
+            return DownloadResult;
+        }
+
         /// <summary>
         /// Helper function used to apply a filter to the collection of currently stored log sets
         /// </summary>

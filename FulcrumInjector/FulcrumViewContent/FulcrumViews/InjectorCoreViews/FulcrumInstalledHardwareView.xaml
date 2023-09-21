@@ -185,7 +185,12 @@
                              SelectionChanged="InstalledDevicesListBox_OnSelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
+                            <Border
+                                Grid.IsSharedSizeScope="True"
+                                BorderThickness="2" Padding="5" Margin="-5,0,0,0"
+                                BorderBrush="{StaticResource DarkGreyThemeColor}" >
+                                <TextBlock Text="{Binding}" FontSize="14" Padding="5"/>
+                            </Border>
                             <!-- 
                             <Grid>
                                 <Grid.ColumnDefinitions>

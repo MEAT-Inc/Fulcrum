@@ -89,7 +89,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Log information about opening appending box and begin selection
             this._viewLogger.WriteLog("OPENING NEW FILE SELECTION DIALOGUE FOR APPENDING OUTPUT FILES NOW...", LogType.InfoLog);
-            using var SelectAttachmentDialog = new System.Windows.Forms.OpenFileDialog()
+            using var SelectLogFileDialog = new System.Windows.Forms.OpenFileDialog()
             {
                 Multiselect = true,
                 CheckFileExists = true,
@@ -102,7 +102,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 
             // Now open the dialog and allow the user to pick some new files.
             this._viewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
-            if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0)
+            if (SelectLogFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectLogFileDialog.FileNames.Length == 0)
             {
                 // Log failed, set no file, reset sending button and return.
                 this._viewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
@@ -120,7 +120,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 try
                 {
                     // Store new file object value. Validate it on the ViewModel object first.
-                    bool LoadResult = this.ViewModel.LoadLogContents(SelectAttachmentDialog.FileNames);
+                    bool LoadResult = this.ViewModel.LoadLogContents(SelectLogFileDialog.FileNames);
                     if (LoadResult) this._viewLogger.WriteLog("PROCESSED OUTPUT CONTENT OK! READY TO PARSE", LogType.InfoLog);
                     else this._viewLogger.WriteLog("FAILED TO SPLIT INPUT CONTENT! THIS IS FATAL!", LogType.ErrorLog);
 
@@ -344,33 +344,37 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private async void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
+        private void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
         {
             // Build new button object.
             Button SendButton = (Button)Sender;
             SendButton.Content = "Toggling...";
             SendButton.Background = Brushes.DarkOrange;
 
-            // Async toggle button content and output format.
-            await Task.Run(() =>
+            // Toggle button content and output format inside a task to avoid hanging up the UI 
+            Task.Run(() =>
             {
                 // Check the current state and toggle it.
                 if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting)
                     this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
                 else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+
+                // Control our UI contents inside the dispatcher
+                this.Dispatcher.Invoke(() =>
+                {
+                    // Now apply new values to our button.
+                    SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting
+                        ? Brushes.DarkGreen
+                        : Brushes.DarkRed;
+                    SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting
+                        ? "Syntax Highlighting: ON"
+                        : "Syntax Highlighting: OFF";
+
+                    // Log toggle result.
+                    var HighlightState = this.ViewModel.InjectorSyntaxHelper.IsHighlighting;
+                    this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {HighlightState}", LogType.InfoLog);
+                });
             });
-
-            // Now apply new values to our button.
-            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
-                ? Brushes.DarkGreen 
-                : Brushes.DarkRed;
-            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
-                ? "Syntax Highlighting: ON"
-                : "Syntax Highlighting: OFF";
-
-            // Log toggle result.
-            var HighlightState = this.ViewModel.InjectorSyntaxHelper.IsHighlighting;
-            this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {HighlightState}", LogType.InfoLog);
         }
         /// <summary>
         /// Changes the processing output actions of the comobox so it can show new values in the viewer

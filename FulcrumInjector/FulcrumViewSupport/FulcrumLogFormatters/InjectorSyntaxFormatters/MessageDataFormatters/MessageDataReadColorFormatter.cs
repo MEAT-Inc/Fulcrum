@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
+using Newtonsoft.Json.Linq;
 using SharpExpressions;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters.MessageDataFormatters
@@ -11,11 +13,35 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
     /// </summary>
     internal class MessageDataReadColorFormatter : InjectorDocFormatterBase
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+
+        // Private list of regular expressions for formatting
+        private readonly List<Regex> _builtLineExpressions;
+
+        #endregion // Fields
+
+        #region Properties
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
         /// <summary>
         /// Builds a new PTRead messages data format helper
         /// </summary>
-        /// <param name="FormatBase"></param>
-        public MessageDataReadColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) { }
+        public MessageDataReadColorFormatter(OutputFormatHelperBase FormatBase) : base(FormatBase) 
+        {
+            // Convert input regex into a multiline ready expression
+            string MessageDataRegexString = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionTypes.MessageReadInfo]
+                .ExpressionPattern;
+
+            // Configure formatting regular expressions for output helpers
+            this._builtLineExpressions = this.GenerateColorExpressions(MessageDataRegexString);
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,18 +51,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         /// <param name="InputLine"></param>
         protected override void ColorizeLine(DocumentLine InputLine)
         {
-            // Convert input regex into a multiline ready expression
-            List<Regex> BuiltLineExpressions = new List<Regex>();
-            string MessageDataRegexString = PassThruExpressionRegex
-                .LoadedExpressions[PassThruExpressionTypes.MessageReadInfo]
-                .ExpressionPattern;
-            MatchCollection RegexStrings = Regex.Matches(MessageDataRegexString, @"\(\?<[^\)]+\)");
-            for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
-                BuiltLineExpressions.Add(new Regex(RegexStrings[StringIndex].Value));
-
             // Search for our matches here and then loop our doc lines to apply coloring
             string CurrentLine = CurrentContext.Document.GetText(InputLine);
-            Match[] MatchesFound = BuiltLineExpressions
+            Match[] MatchesFound = this._builtLineExpressions
                 .Select(RegexPattern => RegexPattern.Match(CurrentLine))
                 .ToArray();
 
@@ -50,7 +67,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
                 if (CurrentLine.Contains("RxStatus")) this._colorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(5).Take(1).ToArray());
                 if (CurrentLine.Contains("\\__")) this._colorForMatchSet(InputLine, MatchesFound, MatchesFound.Skip(6).ToArray());
             }
-            catch {
+            catch 
+            {
                 // Do nothing here since we don't want to fail on any color issues
             }
         }
