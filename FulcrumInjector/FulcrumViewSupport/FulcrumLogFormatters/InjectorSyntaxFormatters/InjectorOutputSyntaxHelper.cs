@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Documents;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters.CommandParamFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters.MessageDataFormatters;
@@ -37,17 +39,22 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
             this.StopColorHighlighting(); 
             _formatLogger.WriteLog("BUILDING NEW HIGHLIGHT HELPER OUTPUT NOW...", LogType.WarnLog);
 
-            // Invoke this on a background thread
+            // Build our new formatter objects and add them to our UI controls
+            List<InjectorDocFormatterBase> ColorFormatters = new List<InjectorDocFormatterBase>()
+            {
+                new TypeAndTimeColorFormatter(this),
+                new CommandParameterColorFormatter(this),
+                new MessageDataReadColorFormatter(this),
+                new MessageDataSentColorFormatter(this),
+                new MessageFilterDataColorFormatter(this)
+            };
+
+            // Make sure to control our UI contents on the dispatcher
             this.OutputEditor.Dispatcher.Invoke(() =>
             {
-                // Add in our output objects now.
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new TypeAndTimeColorFormatter(this));          // Time coloring
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new CommandParameterColorFormatter(this));     // Command value coloring 
-
-                // Add in the output objects for command types and information
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataReadColorFormatter(this));      // Messages Read
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageDataSentColorFormatter(this));      // Messages Sent
-                this.OutputEditor.TextArea.TextView.LineTransformers.Add(new MessageFilterDataColorFormatter(this));    // Message Filters
+                // Append all the color helpers into our TextBox here
+                foreach (var ColorFormatter in ColorFormatters)
+                    this.OutputEditor.TextArea.TextView.LineTransformers.Add(ColorFormatter);
             });
         }
         /// <summary>
