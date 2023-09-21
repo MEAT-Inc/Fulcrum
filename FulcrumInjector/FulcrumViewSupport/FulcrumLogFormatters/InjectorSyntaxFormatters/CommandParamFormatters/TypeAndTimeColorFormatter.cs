@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
 using SharpExpressions;
 
@@ -22,13 +24,21 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntax
         /// <param name="InputLine"></param>
         protected override void ColorizeLine(DocumentLine InputLine)
         {
-            // Find the command type for our input object here. If none, drop out
-            Regex TimeMatchRegex = PassThruExpressionRegex.LoadedExpressions[PassThruExpressionTypes.CommandTime].ExpressionRegex;
-            Match MatchesFound = TimeMatchRegex.Match(CurrentContext.Document.GetText(InputLine));
+            // Search for our matches here and then loop our doc lines to apply coloring
+            string TimeMatchRegex = PassThruExpressionRegex
+                .LoadedExpressions[PassThruExpressionTypes.CommandTime]
+                .ExpressionPattern;
 
-            // Now run our coloring definitions and return out.
-            if (!MatchesFound.Success) return;
-            this.ColorNewMatches(InputLine, MatchesFound);
+            // Search for our matches here and then loop our doc lines to apply coloring
+            List<Regex> BuiltLineExpressions = this.GenerateColorExpressions(TimeMatchRegex);
+            string CurrentLine = CurrentContext.Document.GetText(InputLine);
+            Match[] MatchesFound = BuiltLineExpressions
+                .Select(RegexPattern => RegexPattern.Match(CurrentLine))
+                .ToArray();
+
+            // See if anything matched up
+            if (!MatchesFound.Any(MatchSet => MatchSet.Success)) return;
+            foreach (var MatchFound in MatchesFound) this.ColorNewMatches(InputLine, MatchFound);
         }
     }
 }

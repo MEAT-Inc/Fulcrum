@@ -344,33 +344,37 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private async void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
+        private void SyntaxHighlightingButton_OnClick(object Sender, RoutedEventArgs E)
         {
             // Build new button object.
             Button SendButton = (Button)Sender;
             SendButton.Content = "Toggling...";
             SendButton.Background = Brushes.DarkOrange;
 
-            // Async toggle button content and output format.
-            await Task.Run(() =>
+            // Toggle button content and output format inside a task to avoid hanging up the UI 
+            Task.Run(() =>
             {
                 // Check the current state and toggle it.
                 if (this.ViewModel.InjectorSyntaxHelper.IsHighlighting)
                     this.ViewModel.InjectorSyntaxHelper.StopColorHighlighting();
                 else this.ViewModel.InjectorSyntaxHelper.StartColorHighlighting();
+
+                // Control our UI contents inside the dispatcher
+                this.Dispatcher.Invoke(() =>
+                {
+                    // Now apply new values to our button.
+                    SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting
+                        ? Brushes.DarkGreen
+                        : Brushes.DarkRed;
+                    SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting
+                        ? "Syntax Highlighting: ON"
+                        : "Syntax Highlighting: OFF";
+
+                    // Log toggle result.
+                    var HighlightState = this.ViewModel.InjectorSyntaxHelper.IsHighlighting;
+                    this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {HighlightState}", LogType.InfoLog);
+                });
             });
-
-            // Now apply new values to our button.
-            SendButton.Background = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
-                ? Brushes.DarkGreen 
-                : Brushes.DarkRed;
-            SendButton.Content = this.ViewModel.InjectorSyntaxHelper.IsHighlighting 
-                ? "Syntax Highlighting: ON"
-                : "Syntax Highlighting: OFF";
-
-            // Log toggle result.
-            var HighlightState = this.ViewModel.InjectorSyntaxHelper.IsHighlighting;
-            this._viewLogger.WriteLog($"TOGGLED HIGHLIGHTING STATE OK! NEW STATE IS {HighlightState}", LogType.InfoLog);
         }
         /// <summary>
         /// Changes the processing output actions of the comobox so it can show new values in the viewer

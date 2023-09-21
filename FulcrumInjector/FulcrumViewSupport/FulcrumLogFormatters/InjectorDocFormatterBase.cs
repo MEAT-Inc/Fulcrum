@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Documents;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
+using Newtonsoft.Json.Linq;
 using SharpLogging;
 
 // Color Brushes
@@ -50,6 +53,85 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Builds all the filtering regex values needed based on a given input regex value
+        /// </summary>
+        /// <param name="InputRegex">The input regex to parse</param>
+        /// <returns>A list of all the built regex string from the input</returns>
+        protected internal List<Regex> GenerateColorExpressions(string InputRegex)
+        {
+            // Setup an output list and match our input regex string
+            List<Regex> BuiltLineExpressions = new List<Regex>();
+            MatchCollection RegexStrings = Regex.Matches(InputRegex, @"\(\?<[^\)]+\)");
+
+            // Build a new set of colorizing regular expressions using the loaded regex values here
+            for (int StringIndex = 0; StringIndex < RegexStrings.Count; StringIndex++)
+            {
+                // Store our next string value and try to build a regex from it
+                string NextRegexString = RegexStrings[StringIndex].Value;
+
+                // Try and build a new regex for this match. If it fails, build the string out more
+                try { BuiltLineExpressions.Add(new Regex(NextRegexString)); }
+                catch
+                {
+                    // If the regex fails to build, substring over our input until we get a valid string
+                    int StartingIndex = RegexStrings[StringIndex].Index;
+                    int EndingIndex = StringIndex == RegexStrings.Count - 1
+                        ? InputRegex.Length
+                        : RegexStrings[StringIndex + 1].Index;
+
+                    // If we're at the end of the regex, store the value and compute it
+                    if (StringIndex == RegexStrings.Count - 1)
+                    {
+                        // Build our new regex string and store it for this value
+                        NextRegexString = InputRegex.Substring(StartingIndex);
+                        BuiltLineExpressions.Add(new Regex(NextRegexString));
+                        continue;
+                    }
+
+                    // Build a substring to search for our ending
+                    int SearchSize = EndingIndex - StartingIndex;
+                    string SearchString = InputRegex.Substring(StartingIndex, SearchSize);
+
+                    // Find all closing brace locations and try each one
+                    bool IsAdded = false;
+                    for (int NextIndex = 0; ; NextIndex += ")".Length)
+                    {
+                        // Build a new substring value here
+                        NextIndex = SearchString.IndexOf(")", NextIndex);
+                        NextRegexString = SearchString.Substring(0, NextIndex + 1);
+
+                        // Wrap our new attempts in another try/catch block
+                        try
+                        {
+                            // Try and build a regex from the new substring value
+                            BuiltLineExpressions.Add(new Regex(NextRegexString));
+                            IsAdded = true;
+                            break;
+                        }
+                        catch
+                        {
+                            // TODO: Figure out a better way to try and validate regex objects
+                            // Ignored since we're able to hopefully retry at the next index
+                        }
+                    }
+
+                    // Throw an exception if we're at this point since we couldn't close the regex
+                    if (!IsAdded) throw new IndexOutOfRangeException("Error! Could not close regex for filtering!");
+                }
+            }
+
+            // Return out the built list of regex values here if any are built
+            if (BuiltLineExpressions.Count != 0) return BuiltLineExpressions;
+ 
+            // If no list values are found, try and reconfigure the input regex once more
+            try { return new List<Regex>() { new Regex(InputRegex) }; }
+            catch
+            {
+                // Return out an empty list if we're unable to build any regex values
+                return new List<Regex>();
+            }
+        }
         /// <summary>
         /// Appends a new set of brushes for the number of matches if they are not equal numbers.
         /// </summary>
