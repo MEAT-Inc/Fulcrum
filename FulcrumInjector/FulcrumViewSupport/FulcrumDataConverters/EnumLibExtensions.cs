@@ -27,7 +27,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// </summary>
         /// <param name="EnumDescription">The enum object output we wish to use.</param>
         /// <returns>A parsed enum if passed. Otherwise an invalid arg exception is thrown</returns>
-        public static TEnumType FromDescriptionString<TEnumType>(this string EnumDescription)
+        public static TEnumType ToEnumValue<TEnumType>(this string EnumDescription)
         {
             // Find the types first, then pull the potential file value types.
             foreach (var EnumFieldObj in typeof(TEnumType).GetFields())
@@ -39,7 +39,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
             }
 
             // Throw invalid description type 
-            throw new ArgumentException($"Unable to convert the input type {EnumDescription} to a valid MessengerHubTypes enum", nameof(EnumDescription));
+            throw new ArgumentException($"Unable to convert the input type {EnumDescription} to a valid {typeof(TEnumType).Name} enum", nameof(EnumDescription));
         }
     }
 }
