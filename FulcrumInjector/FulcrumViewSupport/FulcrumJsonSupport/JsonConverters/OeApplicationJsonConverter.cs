@@ -7,21 +7,20 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 // Static using call for our OE application model objects
-using OEAppModel = FulcrumInjector.FulcrumViewContent.FulcrumViewModels.FulcrumInstalledOeAppsViewModel.FulcrumOeApplicationModel;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
     /// <summary>
     /// JSON Converter for converting input OE Scan App Path objects
     /// </summary>
-    internal class OeApplicationJsonConverter : JsonConverter
+    internal class FulcrumOeApplicationJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if the object can be converted or not.
         /// </summary>
         /// <param name="ObjectType"></param>
         /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(OEAppModel); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumInstalledOeAppsViewModel.FulcrumOeApplication); }
         /// <summary>
         /// Writes JSON output
         /// </summary>
@@ -32,7 +31,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            OEAppModel CastApp = ValueObject as OEAppModel;
+            FulcrumInstalledOeAppsViewModel.FulcrumOeApplication CastApp = ValueObject as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
 
             // Build a dynamic output object
             var OutputObject = JObject.FromObject(new
@@ -77,7 +76,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                 !AppCommand.Contains("$OEAppPath$") ? AppCommand : AppCommand.Replace("$OEAppPath$", FinalAppPath);
 
             // Generate new output app model object.
-            OEAppModel OutputApp = new OEAppModel(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
+            FulcrumInstalledOeAppsViewModel.FulcrumOeApplication OutputApp = new FulcrumInstalledOeAppsViewModel.FulcrumOeApplication(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
             return OutputApp;
         }
     }

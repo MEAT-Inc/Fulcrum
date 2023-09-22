@@ -37,11 +37,13 @@
                     Content="Starting..."
                     IsEnabled="False"
                     Margin="5"
+                    FontSize="12"
                     Click="TestInjectionButton_Click"/>
             <TextBox Grid.Row="0" Grid.Column="1"
                      HorizontalAlignment="Stretch"
                      HorizontalContentAlignment="Center"
                      FontWeight="DemiBold"
+                     FontSize="12"
                      Text="{Binding InjectorTestResult}" 
                      IsReadOnly="True"
                      Style="{StaticResource TestResultBoxStyle}"
