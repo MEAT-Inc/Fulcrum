@@ -63,6 +63,7 @@
                 <!-- DLL Loading Test Pane -->
                 <fulcrumViews:FulcrumDllInjectionTestView 
                     Grid.Row="0"
+                    VerticalAlignment="Stretch"
                     x:Name="FulcrumDllInjectionTest"/>
 
                 <!-- Pipe State And Information Pane -->
