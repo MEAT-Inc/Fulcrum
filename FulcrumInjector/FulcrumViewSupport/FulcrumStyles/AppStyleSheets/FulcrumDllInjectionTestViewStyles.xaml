@@ -7,7 +7,7 @@
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="FontSize" Value="26"/>
+                <Setter Property="FontSize" Value="18"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="FontStyle" Value="Italic"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Width="400" Height="525">
+             mc:Ignorable="d" Width="Auto" Height="Auto">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
@@ -18,16 +18,14 @@
     <!-- Content for showing OE Apps -->
     <Grid Margin="0,5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".10*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height=".125*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <!-- Title Value -->
         <TextBlock
-            Text="Installed OE Applications"
-            VerticalAlignment="Center" 
-            Margin="0,5"
+            Text="Installed OE Applications" Margin="0,3"
             Style="{StaticResource TitleStringText}"/>
 
         <!-- List of OE Apps -->
@@ -38,9 +36,9 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="2" BorderBrush="{StaticResource TextColorBase}" BorderThickness="1" CornerRadius="5">
-                        <Grid ToolTip="Double Click to Change App Configuration (Not Yet Built In. Use Settings JSON For Now)">
+                        <Grid ToolTip="Double Click to Change App Configuration (Not Yet Built In. Use Settings JSON For Now)" Margin="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <TextBlock ToolTip="{Binding Path=OEAppPath}" Padding="5" Grid.Column="0" Style="{StaticResource OeAppPropertyBox}" Text="{Binding OEAppName}"/>
@@ -52,7 +50,7 @@
         </ListView>
 
         <!-- Button to control OE Apps -->
-        <Button Grid.Row="2" Margin="10,8" FontSize="20" Click="ControlOeApplicationButton_OnClick">
+        <Button Grid.Row="2" Margin="10,0,10,0" Height="30" FontSize="16" Click="ControlOeApplicationButton_OnClick" VerticalAlignment="Stretch">
             <Button.Style>
                 <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
                     <Style.Triggers>
