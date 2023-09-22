@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
-             Width="400" Height="110">
+             Width="Auto" Height="Auto">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
@@ -19,49 +19,35 @@
     <!-- Content For Testing -->
     <Grid Margin="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".5*"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Title Of the Pane -->
-        <TextBlock Text="Fulcrum DLL Injection Test" Style="{StaticResource TitleStringText}"/>
+        <TextBlock Grid.Row="0" Text="Fulcrum DLL Injection Test" Style="{StaticResource TitleStringText}"/>
 
-        <!-- Testing Content -->
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="5"/>
-            </Grid.RowDefinitions>
-
-            <!-- Info Grids -->
-            <Grid Grid.Row="0" Margin="5">
-                <Grid Grid.Row="0" Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width=".65*"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Button
-                        x:Name="TestInjectionButton"
-                        Style="{StaticResource ActionButtonStyle}"
-                        Content="Starting..."
-                        IsEnabled="False"
-                        Margin="5"
-                        FontSize="18"
-                        Click="TestInjectionButton_Click"/>
-                    <TextBox 
-                        Grid.Row="0" 
-                        Grid.Column="1"
-                        FontSize="18"
-                        HorizontalAlignment="Stretch"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        FontWeight="DemiBold"
-                        Text="{Binding InjectorTestResult}" 
-                        IsReadOnly="True"
-                        Style="{StaticResource TestResultBoxStyle}"
-                        Margin="5"/>
-                </Grid>
-            </Grid>
+        <!-- Info Grids -->
+        <Grid Grid.Row="1" Margin="5,0,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width=".65*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="TestInjectionButton"
+                    Style="{StaticResource ActionButtonStyle}"
+                    Content="Starting..."
+                    IsEnabled="False"
+                    Margin="5"
+                    FontSize="12"
+                    Click="TestInjectionButton_Click"/>
+            <TextBox Grid.Row="0" Grid.Column="1"
+                     HorizontalAlignment="Stretch"
+                     HorizontalContentAlignment="Center"
+                     FontWeight="DemiBold"
+                     FontSize="12"
+                     Text="{Binding InjectorTestResult}" 
+                     IsReadOnly="True"
+                     Style="{StaticResource TestResultBoxStyle}"
+                     Margin="5"/>
         </Grid>
     </Grid>
 </UserControl>

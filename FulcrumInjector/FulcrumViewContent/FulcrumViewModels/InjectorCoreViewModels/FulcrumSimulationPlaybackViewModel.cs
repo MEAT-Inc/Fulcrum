@@ -113,20 +113,21 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         /// <summary>
         /// Loads in a new simulation file and stores it onto our view model and view
         /// </summary>
-        /// <param name="SimFile">File to load into our simulation playback helper</param>
+        /// <param name="SimulationFile">File to load into our simulation playback helper</param>
         /// <returns>True if loaded, false if not</returns>
-        public bool LoadSimulation(string SimFile)
+        public bool LoadSimulation(string SimulationFile)
         {
             // Try and load the simulation file in first
-            if (!File.Exists(SimFile)) {
-                this.ViewModelLogger.WriteLog($"FILE {SimFile} DOES NOT EXIST! CAN NOT LOAD NEW FILE!");
+            if (!File.Exists(SimulationFile))
+            {
+                this.ViewModelLogger.WriteLog($"FILE {SimulationFile} DOES NOT EXIST! CAN NOT LOAD NEW FILE!");
                 this.IsSimLoaded = false;
                 return false;
             }
 
             // Clear out all of our old values first
             int FailedCounter = 0;
-            this.IsSimLoaded = false; 
+            this.IsSimLoaded = false;
             this.IsSimulationRunning = false;
             this.LoadedSimFile = string.Empty;
             this.LoadedSimFileContent = string.Empty;
@@ -135,7 +136,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             try
             {
                 // Store all the file content on this view model instance and load in the Simulation channels from it now
-                this.LoadedSimFileContent = File.ReadAllText(SimFile);
+                this.LoadedSimFileContent = File.ReadAllText(SimulationFile);
                 var PulledChannels = JArray.Parse(this.LoadedSimFileContent);
                 foreach (var ChannelInstance in PulledChannels.Children())
                 {
@@ -143,7 +144,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                     {
                         // Try and build our channel here
                         JToken ChannelToken = ChannelInstance.Last;
-                        if (ChannelToken == null) 
+                        if (ChannelToken == null)
                             throw new InvalidDataException("Error! Input channel was seen to be an invalid layout!");
 
                         // Now using the JSON Converter, unwrap the channel into a simulation object and store it on our player
@@ -164,8 +165,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Load file contents and store name of file on our view model
                 this.IsSimLoaded = true;
                 this.IsSimLoaded = true;
-                this.LoadedSimFile = SimFile;
-                this.ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
+                this.LoadedSimFile = SimulationFile;
+                this.ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimulationFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
                 this.ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {this._simulationChannels.Count} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
                 this.ViewModelLogger.WriteLog($"ENCOUNTERED A TOTAL OF {FailedCounter} FAILURES WHILE LOADING CHANNELS!", LogType.InfoLog);
                 return true;
@@ -173,7 +174,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             catch (Exception LoadSimEx)
             {
                 // Log failure out and return false
-                this.ViewModelLogger.WriteLog($"FAILED TO LOAD IN SIMULATION FILE {SimFile}!", LogType.ErrorLog);
+                this.ViewModelLogger.WriteLog($"FAILED TO LOAD IN SIMULATION FILE {SimulationFile}!", LogType.ErrorLog);
                 this.ViewModelLogger.WriteException("SIMULATION LOAD EXCEPTION IS BEING LOGGED BELOW!", LoadSimEx);
 
                 // Set Loaded to false and return false
@@ -210,16 +211,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Configure our simulation player here
             this._simulationPlayer.SetResponsesEnabled(true);
-            this._simulationPlayer.SetDefaultConfigurations(this._simulationConfiguration.ReaderConfigs);
-            this._simulationPlayer.SetDefaultMessageFilters(this._simulationConfiguration.ReaderFilters);
-            this._simulationPlayer.SetDefaultConnectionType(
-                this._simulationConfiguration.ReaderProtocol, 
-                this._simulationConfiguration.ReaderChannelFlags, 
-                this._simulationConfiguration.ReaderBaudRate);
-            this._simulationPlayer.SetDefaultMessageValues(
-                this._simulationConfiguration.ReaderTimeout, 
-                this._simulationConfiguration.ReaderMsgCount, 
-                this._simulationConfiguration.ResponseTimeout);
+            this._simulationPlayer.SetPlaybackConfiguration(this._simulationConfiguration);
             this.ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

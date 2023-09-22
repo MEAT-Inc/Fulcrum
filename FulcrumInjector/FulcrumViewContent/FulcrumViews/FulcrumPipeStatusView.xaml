@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
-             Width="400" Height="165">
+             Width="Auto" Height="Auto">
 
     <!-- Style Sheets -->
     <UserControl.Resources>
@@ -19,15 +19,15 @@
     <!-- Status Content Grid -->
     <Grid Margin="5,5,5,10">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".60*"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Title View -->
         <TextBlock Text="Fulcrum Pipe States" Style="{StaticResource TitleStringText}"/>
 
         <!-- Content Grid -->
-        <Grid Grid.Row="1" Margin="5,0">
+        <Grid Grid.Row="1" Margin="0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".45*"/>
                 <ColumnDefinition/>
@@ -49,12 +49,12 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Margin="10,5"
+                <TextBox Grid.Row="0" Margin="10,0,10,3"
                          VerticalAlignment="Stretch"
                          Style="{StaticResource PipeStateValueText}"
                          DataContext="{Binding ReaderPipeState}"
                          Text="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"/>
-                <TextBox Grid.Row="1" Margin="10,5" 
+                <TextBox Grid.Row="1" Margin="10,3,10,0" 
                          VerticalAlignment="Stretch"
                          Style="{StaticResource PipeStateValueText}" 
                          DataContext="{Binding WriterPipeState}"

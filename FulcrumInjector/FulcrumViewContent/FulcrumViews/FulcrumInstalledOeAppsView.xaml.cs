@@ -68,32 +68,32 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         {
             // Build selected object output here.
             int SelectedIndexValue = this.InstalledAppsListView.SelectedIndex;
-            var SelectedObject = this.ViewModel.InstalledOeApps[SelectedIndexValue];
-            this._viewLogger.WriteLog($"PULLED IN NEW SELECTED INDEX VALUE OF AN OE APP AS {SelectedIndexValue}", LogType.InfoLog);
-            if (SelectedIndexValue == -1 || SelectedIndexValue > this.ViewModel.InstalledOeApps.Count) {
-                this._viewLogger.WriteLog("ERROR! INDEX WAS OUT OF RANGE FOR POSSIBLE OE APP OBJECTS!", LogType.ErrorLog);
-                return;
-            }
-
-            // Now using this index value, find our current model object.
-            this.ViewModel.SetTargetOeApplication(SelectedObject);
-            this._viewLogger.WriteLog($"APP OBJECT SELECTED FOR TARGETING IS: {SelectedObject}", LogType.InfoLog);
-            this._viewLogger.WriteLog("SELECTED A NEW OE APPLICATION OBJECT OK! READY TO CONTROL IS ASSUMING VALUES FOR THE APP ARE VALID", LogType.WarnLog);
+            if (SelectedIndexValue == -1) return;
 
             // Setup some default content values for states/status values
-            bool RanCommand = false;
+            bool ExecutedAction = false;
             Process BootedProcess = null;
             string KilledAppNAme = string.Empty;
-            bool WasBooted = this.ViewModel.CanBootApp;
+            this._viewLogger.WriteLog("PROCESSING OE APP CONTROL BUTTON EVENT NOW...");
+
+            // Make sure we're able to either boot or kill the process at this point
+            if (!this.ViewModel.CanKillApp && !this.ViewModel.CanBootApp)
+                throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
 
             // Check the view model of our object instance. If Can boot then boot. If can kill then kill
-            if (this.ViewModel.CanKillApp) RanCommand = this.ViewModel.KillOeApplication(out KilledAppNAme);
-            else if (this.ViewModel.CanBootApp) RanCommand = this.ViewModel.LaunchOeApplication(out BootedProcess);
-            else throw new InvalidOperationException("FAILED TO CONFIGURE START OR KILL COMMANDS OF AN OE APP OBJECT!");
+            if (this.ViewModel.CanKillApp) {
+                ExecutedAction = this.ViewModel.KillOeApplication(out KilledAppNAme);
+                this._viewLogger.WriteLog($"KILLED OE APPLICATION {KilledAppNAme} CORRECTLY!");
+            }
+            else if (this.ViewModel.CanBootApp) {
+                ExecutedAction = this.ViewModel.LaunchOeApplication(out BootedProcess);
+                this._viewLogger.WriteLog($"BOOTED OE APPLICATION {KilledAppNAme} CORRECTLY!");
+            }
 
             // Pull in the current object from our sender.
             Button SenderButton = (Button)SendingButton;
             Brush DefaultColor = SenderButton.Background;
+            bool WasBooted = string.IsNullOrWhiteSpace(KilledAppNAme);
 
             // Now setup temp values for booted or not.
             Task.Run(() =>
@@ -102,17 +102,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
                 Dispatcher.Invoke(() =>
                 {
                     // Show our new temp values. Set content based on if the command passed or failed.
-                    SenderButton.Content = RanCommand ?
-                        WasBooted ?
-                            $"Booted {this.ViewModel.RunningAppModel.OEAppName} OK!" :
-                            $"Killed {(string.IsNullOrWhiteSpace(KilledAppNAme) ? "OE Application" : KilledAppNAme)} OK!" :
-                        WasBooted ?
-                            $"Failed To Boot OE Application!" :
-                            $"Failed To Kill OE Application!";
+                    SenderButton.Content = ExecutedAction 
+                        ? WasBooted 
+                            ? $"Booted {this.ViewModel.RunningApp.OEAppName} OK!"
+                            : $"Killed {(string.IsNullOrWhiteSpace(KilledAppNAme) ? "OE Application" : KilledAppNAme)} OK!" 
+                        : WasBooted 
+                            ? $"Failed To Boot {this.ViewModel.SelectedApp.OEAppName}!" 
+                            : $"Failed To Kill {this.ViewModel.SelectedApp.OEAppName}!";
 
                     // Set background value here.
                     SenderButton.Click -= this.ControlOeApplicationButton_OnClick;
-                    SenderButton.Background = RanCommand ? Brushes.DarkGreen : Brushes.DarkRed;
+                    SenderButton.Background = ExecutedAction ? Brushes.DarkGreen : Brushes.DarkRed;
                 });
 
                 // Wait for 3.5 Seconds
@@ -126,34 +126,52 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
                     SenderButton.Click += this.ControlOeApplicationButton_OnClick;
 
                     // Set content values here.  If the command passed, then show the inverse of the last shown state.
-                    SenderButton.Content = RanCommand ?
-                        WasBooted ?
-                            $"Terminate OE Application" :
-                            $"Launch OE Application" :
-                        WasBooted ?
-                            $"Launch OE Application" :
-                            $"Terminate OE Application";
-
-                    // Log information
-                    this._viewLogger.WriteLog("RESET SENDING BUTTON CONTENT VALUES OK! RETURNING TO NORMAL OPERATION NOW.", LogType.WarnLog);
+                    SenderButton.Content = ExecutedAction 
+                        ? WasBooted
+                            ? $"Terminate {this.ViewModel.SelectedApp.OEAppName}" 
+                            : $"Launch {this.ViewModel.SelectedApp.OEAppName}" 
+                        : WasBooted 
+                            ? $"Launch {this.ViewModel.SelectedApp.OEAppName}" 
+                            : $"Terminate {this.ViewModel.SelectedApp.OEAppName}";
                 });
             });
-
-            // Log Passed output and return here
-            this._viewLogger.WriteLog("BUILT NEW COMMAND INSTANCE FOR OE APP OBJECT OK!", LogType.InfoLog);
-            this._viewLogger.WriteLog("TOGGLED CONTENT VALUES, AND TRIGGERED APP METHOD CORRECTLY!", LogType.InfoLog);
         }
         /// <summary>
-        /// Event for a double click on an OE Application object.
-        /// THIS IS NOT YET DONE!
+        /// Event handler fired when the user selects an object inside the OE Apps list view
         /// </summary>
-        /// <param name="SendingGrid"></param>
-        /// <param name="GridClickedArgs"></param>
-        private void OEApplicationMouseDown_Twice(object SendingGrid, MouseButtonEventArgs GridClickedArgs)
+        /// <param name="Sender">The list view that sent this change</param>
+        /// <param name="E">Event args fired along with the event</param>
+        private void InstalledAppsListView_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
-            // Check for a double click event action. If not, return out. If it is, show a new flyout object to allow user to modify the app object.
-            bool DoubleClick = GridClickedArgs.LeftButton == MouseButtonState.Pressed && GridClickedArgs.ClickCount == 2;
-            if (DoubleClick) this._viewLogger.WriteLog("PROCESSED REQUEST TO CHANGE OE APP CONTENT! THIS IS NOT YET BUILT!");
+            // Pull the newly selected OE App model object 
+            if (Sender is not ListView SendingListView) return;
+            var SelectedApp = SendingListView.SelectedItem as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
+
+            // Log out what application is being controlled here
+            this._viewLogger.WriteLog(SelectedApp != null
+                ? $"SETTING CURRENT OE APP MODEL TO {SelectedApp.OEAppName}"
+                : "CLEARING SELECTED OE APPLICATION MODEL AND RESETTING CONTROL BUTTON");
+
+            // Store the app model on the ViewModel and update our button for controlling apps
+            this.ViewModel.SetTargetOeApplication(SelectedApp);
+            if (SelectedApp == null)
+            {
+                // If no app is selected, reset our button to idle
+                this.btnOeApControl.IsEnabled = false;
+                this.btnOeApControl.Content = "Select An OE Application";
+                return;
+            }
+            
+            // Update the button content based on the currently selected App model
+            this.btnOeApControl.IsEnabled = this.ViewModel.CanBootApp || this.ViewModel.CanKillApp;
+            if (this.ViewModel.CanKillApp) this.btnOeApControl.Content = $"Terminate {SelectedApp.OEAppName}";
+            else 
+            {
+                // Show our button state as launch or missing based on boot status
+                this.btnOeApControl.Content = this.ViewModel.CanBootApp
+                    ? $"Launch {SelectedApp.OEAppName}"
+                    : $"{SelectedApp.OEAppName} Is Missing!";
+            }
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
@@ -85,62 +87,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             
             // Reload the settings into our view model now 
             this.PopulateAppSettingJsonViewer(EditorDocument);
-            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
-        }
-
-        /// <summary>
-        /// Saves a new setting object value onto the view model and settings share instance
-        /// </summary>
-        /// <param name="SenderContext"></param>
-        public void SaveSettingValue(FulcrumSettingEntryModel SenderContext)
-        {
-            // Store the setting value back onto our view model content and save it's JSON Value.
-            this.ViewModelLogger.WriteLog($"SETTING VALUE BEING WRITTEN OUT: {JsonConvert.SerializeObject(SenderContext, Formatting.None)}", LogType.TraceLog);
-            var LocatedSettingSet = FulcrumConstants.FulcrumSettings
-                .FirstOrDefault(SettingSet => SettingSet.Value
-                    .Any(SettingObj => SettingObj.SettingName == SenderContext.SettingName)).Value;
-
-            // Find the location of the setting value.
-            if (LocatedSettingSet == null) { this.ViewModelLogger.WriteLog("FAILED TO FIND SETTING ENTRY SET WITH SETTING VALUE!", LogType.ErrorLog); return; }
-            LocatedSettingSet.UpdateSetting(new[] { SenderContext });
-
-            // Now write the new setting value to our JSON configuration and refresh values.
-            int SettingSetIndex = FulcrumConstants.FulcrumSettings.ToList()
-                .FindIndex(ImportedSettingSet => ImportedSettingSet.Key == LocatedSettingSet.SectionType);
-
-            // Store the settings value here.
-            var SettingObjects = FulcrumConstants.FulcrumSettings.Select(SettingObj => JObject.FromObject(new {
-                SettingSectionTitle = SettingObj.Key.ToDescriptionString(),
-                SettingsEntries = SettingObj.Value.ToList()
-            })).ToList();
-
-            // Build the new setting value and store it on the list of settings
-            SettingObjects[SettingSetIndex] = JObject.FromObject(new
-            {
-                LocatedSettingSet.SettingSectionTitle,
-                SettingsEntries = LocatedSettingSet.ToList()
-            });
-
-            // Store our value in the JSON configuration files now.
-            ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
-            this.ViewModelLogger.WriteLog("STORED NEW VALUE SETTINGS CORRECTLY! JSON CONFIGURATION WAS UPDATED ACCORDINGLY!", LogType.InfoLog);
-            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
-
-            // If we've got a special setting value, then store it here.
-            if (LocatedSettingSet.SectionType != FulcrumSettingsCollection.SettingSectionTypes.SHIM_DLL_SETTINGS) return;
-            this.ViewModelLogger.WriteLog("STORING SETTINGS FOR SHIM CONFIGURATION IN A TEMP TEXT FILE NOW...", LogType.WarnLog);
-            string ConfigFilePath = Path.GetDirectoryName(JsonConfigFile.AppConfigFile);
-            ConfigFilePath = Path.Combine(ConfigFilePath, "FulcrumShimDLLConfig.txt");
-
-            // Store the value of the settings and their names in here.
-            string[] ValuesPulled = LocatedSettingSet
-                .Select(SettingObj => SettingObj.SettingValue.ToString())
-                .Prepend("FulcrumShimDLLConfig.txt")
-                .ToArray();
-
-            // Write final output values here.
-            File.WriteAllText(ConfigFilePath, string.Join("|", ValuesPulled));
-            this.ViewModelLogger.WriteLog("UPDATED SHIM SETTINGS CONFIGURATION FILE CORRECTLY!", LogType.InfoLog);
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ReloadSettings());
         }
 
         /// <summary>
@@ -149,31 +96,50 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         /// </summary>
         public void SaveAllSettings()
         {
-            // Log that we're saving all settings values and build a new setting model for the JSON file
-            this.ViewModelLogger.WriteLog("SAVING ALL USER SETTINGS TO APPLICATION JSON SETTINGS FILE NOW...", LogType.WarnLog);
-            var SettingObjects = FulcrumConstants.FulcrumSettings.Select(SettingObj => JObject.FromObject(new
+            // Pull the setting share object and write the values of it out to our JSON file
+            if (!FulcrumConstants.FulcrumSettings.SaveSettings())
             {
-                SettingSectionTitle = SettingObj.Key.ToDescriptionString(),
-                SettingsEntries = SettingObj.Value.ToList()
-            })).ToList();
+                // If the save routine failed, just exit out and don't reload settings
+                this.ViewModelLogger.WriteLog("ERROR! FAILED TO SAVE SETTINGS FOR THE INJECTOR APP!", LogType.ErrorLog);
+                return;
+            }
 
-            // Write the new values to our JSON configuration file
-            ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
-            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.GenerateSettingsModels());
-            this.ViewModelLogger.WriteLog("UPDATED FULCRUM SETTINGS MODELS ON THE GLOBAL SHARE CORRECTLY!", LogType.InfoLog);
+            // Build a new set of settings objects from our share instance
+            this.ViewModelLogger.WriteLog("RELOADING SETTINGS FROM JSON SETTINGS FILE NOW...", LogType.WarnLog);
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ReloadSettings());
+            this.ViewModelLogger.WriteLog("RELOADED SETTINGS FOR INJECTOR APPLICATION CORRECTLY!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Saves a new setting object value onto the view model and settings share instance
+        /// </summary>
+        /// <param name="SenderContext"></param>
+        public void SaveSettingValue(FulcrumSettingEntryModel SenderContext)
+        {
+            // Store the setting value back onto our view model content and save it's JSON Value.
+            this.ViewModelLogger.WriteLog($"SETTING VALUE BEING WRITTEN OUT: {JsonConvert.SerializeObject(SenderContext, Formatting.None)}", LogType.TraceLog);
+            if (!FulcrumConstants.FulcrumSettings.ContainsKey(SenderContext.SettingSection))
+            {
+                // If we failed to find our setting set, log this failure and exit out
+                this.ViewModelLogger.WriteLog("FAILED TO FIND SETTING ENTRY SET WITH SETTING VALUE!", LogType.ErrorLog);
+                return;
+            }
+        
+            // Now write the new setting value to our JSON configuration and refresh values.
+            var LocatedSettingSet = FulcrumConstants.FulcrumSettings[SenderContext.SettingSection];
+            LocatedSettingSet.UpdateSetting(SenderContext);
 
-            // Find the settings set for the shim values here and store them
-            var ShimSettingsSet = FulcrumConstants.FulcrumSettings[FulcrumSettingsCollection.SettingSectionTypes.SHIM_DLL_SETTINGS];
-            string[] ValuesPulled = ShimSettingsSet
-                .Select(SettingObj => SettingObj.ToString())
-                .Prepend("FulcrumShimDLLConfig.txt")
-                .ToArray();
+            // Store the settings values updated here and exit out
+            if (!FulcrumConstants.FulcrumSettings.SaveSettings())
+            {
+                // If the save routine failed, just exit out and don't reload settings
+                this.ViewModelLogger.WriteLog("ERROR! FAILED TO SAVE SETTINGS FOR THE INJECTOR APP!", LogType.ErrorLog);
+                return;
+            }
 
-            // Write final output values here.
-            string ConfigFilePath = Path.GetDirectoryName(JsonConfigFile.AppConfigFile);
-            ConfigFilePath = Path.Combine(ConfigFilePath, "FulcrumShimDLLConfig.txt");
-            File.WriteAllText(ConfigFilePath, string.Join("|", ValuesPulled));
-            this.ViewModelLogger.WriteLog("UPDATED SHIM SETTINGS CONFIGURATION FILE CORRECTLY!", LogType.InfoLog);
+            // Build a new set of settings objects from our share instance
+            this.ViewModelLogger.WriteLog("RELOADING SETTINGS FROM JSON SETTINGS FILE NOW...", LogType.WarnLog);
+            this.SettingsEntrySets = new(FulcrumConstants.FulcrumSettings.ReloadSettings());
+            this.ViewModelLogger.WriteLog("RELOADED SETTINGS FOR INJECTOR APPLICATION CORRECTLY!", LogType.InfoLog);
         }
     }
 }

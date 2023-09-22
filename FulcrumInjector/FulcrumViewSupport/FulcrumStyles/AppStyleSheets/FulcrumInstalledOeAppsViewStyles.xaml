@@ -7,7 +7,7 @@
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="FontSize" Value="26"/>
+                <Setter Property="FontSize" Value="18"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="TextAlignment" Value="Center"/>
@@ -18,16 +18,14 @@
 
             <!-- ListView Style for Apps -->
             <Style x:Key="ListViewOeAppsStyle" TargetType="ListView">
-                <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
-                <Setter Property="BorderThickness" Value="3"/>
-                <Setter Property="Margin" Value="10, 5"/>
-                <Setter Property="Background" Value="{StaticResource PrimaryColor_Darker_65}"/>
+                <Setter Property="Margin" Value="10, 5,10,10"/>
+                <Setter Property="Background" Value="{StaticResource SecondaryColor_Darker_65}"/>
             </Style>
 
             <!-- TextBox For OE Apps -->
             <Style x:Key="OeAppPropertyBox" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Regular"/>
-                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontSize" Value="12"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="TextAlignment" Value="Left"/>
@@ -38,7 +36,7 @@
             <!-- App Ready OE Box -->
             <Style x:Key="IsAppReadyBoxStyle" TargetType="TextBox">
                 <Setter Property="FontWeight" Value="Regular"/>
-                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontSize" Value="12"/>
                 <Setter Property="VerticalAlignment" Value="Stretch"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
