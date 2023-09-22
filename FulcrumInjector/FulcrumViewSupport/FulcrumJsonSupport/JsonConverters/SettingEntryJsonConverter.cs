@@ -3,6 +3,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpExpressions;
+using SharpSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
@@ -60,7 +61,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             string SettingName = InputObject["SettingName"]?.Value<string>();
             object SettingValue = InputObject["SettingValue"]?.Value<object>();
             string SettingDescription = InputObject["SettingDescription"]?.Value<string>();
-            Enum.TryParse(InputObject["SettingControlType"]?.Value<object>()?.ToString(), out FulcrumSettingEntryModel.ControlTypes SettingControlType);
+            Enum.TryParse(InputObject["SettingSection"]?.Value<string>(), out FulcrumSettingsCollection.SettingSectionTypes SettingSection);
+            Enum.TryParse(InputObject["SettingControlType"]?.Value<string>(), out FulcrumSettingEntryModel.ControlTypes SettingControlType);
 
             // Double check that this is NOT a PassThruRegex value. If it is, then we apply a new Regex based on loaded values
             if (SettingName.Contains("Regex") && string.IsNullOrEmpty(SettingValue?.ToString()))
@@ -81,7 +83,12 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             }
 
             // Return built output object
-            return new FulcrumSettingEntryModel(SettingName, SettingValue, SettingControlType, SettingDescription);
+            return new FulcrumSettingEntryModel(
+                SettingName,            // Name of the setting object
+                SettingValue,           // Value of the setting object
+                SettingControlType,     // The template type for the setting object
+                SettingSection,         // The section this setting belongs to 
+                SettingDescription);    // The description for this setting
         }
     }
 }

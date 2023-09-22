@@ -7,7 +7,7 @@
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="FontSize" Value="26"/>
+                <Setter Property="FontSize" Value="18"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="TextAlignment" Value="Center"/>
@@ -19,7 +19,7 @@
             <!-- Pipe Title Names -->
             <Style x:Key="PipeNameText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="DemiBold"/>
-                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="FontSize" Value="13"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="TextAlignment" Value="Center"/>
@@ -30,7 +30,7 @@
             <!-- Pipe State Values -->
             <Style x:Key="PipeStateValueText" TargetType="TextBox" BasedOn="{StaticResource StaticBackgroundInputTextBox}">
                 <Setter Property="FontFamily" Value="Consolas"/>
-                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontSize" Value="12"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Foreground" Value="{StaticResource SecondaryColor_Lighter_35}"/>
