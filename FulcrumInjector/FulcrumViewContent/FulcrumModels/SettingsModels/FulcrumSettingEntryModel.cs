@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using Newtonsoft.Json;
+using SettingSectionTypes = FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels.FulcrumSettingsCollection.SettingSectionTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 {
@@ -23,10 +24,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         public string SettingName { get; set; }
         public object SettingValue { get; set; }
         public string SettingDescription { get; set; }
+        public SettingSectionTypes SettingSection { get; set; }
 
         // The type of control used to setup the settings entries
-        public ControlTypes TypeOfControl { get; set; }
         public Type SettingControlType { get; set; }
+        public ControlTypes TypeOfControl { get; set; }
 
         #endregion //Properties
 
@@ -53,12 +55,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// <param name="Name">Setting name</param>
         /// <param name="Value">Setting value</param>
         /// <param name="ControlType">Type of UI Control</param>
+        /// <param name="SettingSection">The type of setting being stored</param>
         /// <param name="Description">Description of setting</param>
-        public FulcrumSettingEntryModel(string Name, object Value, ControlTypes ControlType, string Description = "No Description")
+        public FulcrumSettingEntryModel(string Name, object Value, ControlTypes ControlType, SettingSectionTypes SettingSection, string Description = "No Description")
         {
             // Store values for object onto class now.
             this.SettingName = Name;
             this.SettingValue = Value;
+            this.SettingSection = SettingSection;
             this.SettingDescription = Description;
 
             // Configure a new settings logger

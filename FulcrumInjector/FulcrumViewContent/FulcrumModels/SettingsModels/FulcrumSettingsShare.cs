@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
@@ -71,7 +72,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         {
             // Setup our local dictionary for all settings objects
             this.Add(SettingSectionTypes.SHIM_DLL_SETTINGS, new FulcrumSettingsCollection(
-                SettingSectionTypes.SHIM_DLL_SETTINGS, 
+                SettingSectionTypes.SHIM_DLL_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS,
@@ -94,7 +95,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 
             // Configure our new logger instance and the backing collection of settings, then import all needed values
             this._settingsStoreLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.GenerateSettingsModels();
+            this.ReloadSettings();
         }
         /// <summary>
         /// Static construction routine used to pull in a new fulcrum settings share instance if needed
@@ -117,7 +118,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         /// Builds a list of settings model objects to use from our input json objects
         /// </summary>
         /// <returns>Settings entries built output</returns>
-        public IEnumerable<FulcrumSettingsCollection> GenerateSettingsModels()
+        public IEnumerable<FulcrumSettingsCollection> ReloadSettings()
         {
             // If our application configuration file is not defined, then return an empty collection
             if (string.IsNullOrWhiteSpace(JsonConfigFile.AppConfigFile))
@@ -134,6 +135,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
                     JsonConvert.DeserializeObject<FulcrumSettingEntryModel[]>(JsonObject["SettingsEntries"].ToString())))
                 .ToArray();
 
+            // Store the section type on each setting instance found
+            foreach (var LoadedSettingSet in SettingsLoaded)
+            {
+                // Store the section type for the parent object on each setting if needed
+                var SectionType = LoadedSettingSet.Item1;
+                foreach (var SettingEntry in LoadedSettingSet.Item2) 
+                    if (SettingEntry.SettingSection == SettingSectionTypes.NO_SECTION_TYPE)
+                        SettingEntry.SettingSection = SectionType;
+            }
+
             // Log out how many setting values were loaded in this routine
             this._settingsStoreLogger.WriteLog($"PULLED IN {SettingsLoaded.Length} SETTINGS SEGMENTS OK!", LogType.InfoLog);
             this._settingsStoreLogger.WriteLog("SETTINGS ARE BEING LOGGED OUT TO THE DEBUG LOG FILE NOW...", LogType.InfoLog);
@@ -149,6 +160,60 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             // Log passed and return output
             this._settingsStoreLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
             return this.Values.ToList();
+        }
+        /// <summary>
+        /// Saves the current share instance of settings onto our app settings json file.
+        /// This routine also includes logic for formatting the written JSON so it's still sanitized
+        /// </summary>
+        /// <returns>True if the settings file is saved, false if it is not</returns>
+        public bool SaveSettings()
+        {
+            // Pull all of our settings objects and build our JSON output for them here
+            this._settingsStoreLogger.WriteLog("SAVING ALL USER SETTINGS TO APPLICATION JSON SETTINGS FILE NOW...", LogType.WarnLog);
+            var SettingObjects = FulcrumConstants.FulcrumSettings.Select(SettingObj => JObject.FromObject(new
+            {
+                // Configure a title and entry value for each setting object
+                SettingSectionTitle = SettingObj.Key.ToDescriptionString(),
+                SettingsEntries = SettingObj.Value.ToList()
+            })).ToList();
+
+            // Write the new values to our JSON configuration file
+            bool SetValues = ValueSetters.SetValue("FulcrumUserSettings", SettingObjects);
+            if (SetValues) this._settingsStoreLogger.WriteLog("WROTE OUT NEW SETTINGS VALUES FOR INJECTOR APP CORRECTLY!", LogType.InfoLog);
+            else
+            {
+                // Log out that we failed to set our new values for the settings file and exit out
+                this._settingsStoreLogger.WriteLog("ERROR! FAILED TO SET SETTINGS VALUES FOR THE INJECTOR APPLICATION!", LogType.ErrorLog);
+                return false;
+            }
+
+            try
+            {
+                // Find the settings set for the shim values here and store them
+                var ShimSettingsSet = FulcrumConstants.FulcrumSettings[SettingSectionTypes.SHIM_DLL_SETTINGS];
+                string[] ValuesPulled = ShimSettingsSet
+                    .Select(SettingObj => SettingObj.ToString())
+                    .Prepend("FulcrumShimDLLConfig.txt")
+                    .ToArray();
+
+                // Write final output values here.
+                string ConfigFilePath = Path.GetDirectoryName(JsonConfigFile.AppConfigFile);
+                ConfigFilePath = Path.Combine(ConfigFilePath, "FulcrumShimDLLConfig.txt");
+                File.WriteAllText(ConfigFilePath, string.Join("|", ValuesPulled));
+                this._settingsStoreLogger.WriteLog("UPDATED SHIM SETTINGS CONFIGURATION FILE CORRECTLY!", LogType.InfoLog);
+
+                // Return true once all settings are updated
+                return true;
+            }
+            catch (Exception UpdateShimSettingsEx)
+            {
+                // If we failed to update the shim settings, exit out failed
+                this._settingsStoreLogger.WriteLog("ERROR! FAILED TO SAVE SHIM DLL CONFIGURATION!", LogType.ErrorLog);
+                this._settingsStoreLogger.WriteException("EXCEPTION THROWN DURING SAVE ROUTINE: ", UpdateShimSettingsEx);
+
+                // Return out false if we failed to set these values 
+                return false; 
+            }
         }
     }
 }
