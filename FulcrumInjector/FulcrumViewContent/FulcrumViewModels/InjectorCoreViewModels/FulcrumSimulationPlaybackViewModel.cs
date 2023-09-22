@@ -113,21 +113,21 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         /// <summary>
         /// Loads in a new simulation file and stores it onto our view model and view
         /// </summary>
-        /// <param name="SimFile">File to load into our simulation playback helper</param>
+        /// <param name="SimulationFile">File to load into our simulation playback helper</param>
         /// <returns>True if loaded, false if not</returns>
-        public bool LoadSimulation(string SimFile)
+        public bool LoadSimulation(string SimulationFile)
         {
             // Try and load the simulation file in first
-            if (!File.Exists(SimFile)) 
+            if (!File.Exists(SimulationFile))
             {
-                // Log out that the file does not exist and exit this method
-                this.ViewModelLogger.WriteLog($"SIMULATION FILE {SimFile} DOES NOT EXIST! CAN NOT LOAD NEW FILE!");
+                this.ViewModelLogger.WriteLog($"FILE {SimulationFile} DOES NOT EXIST! CAN NOT LOAD NEW FILE!");
                 this.IsSimLoaded = false;
                 return false;
             }
 
             // Clear out all of our old values first
-            this.IsSimLoaded = false; 
+            int FailedCounter = 0;
+            this.IsSimLoaded = false;
             this.IsSimulationRunning = false;
             this.LoadedSimFile = string.Empty;
             this.LoadedSimFileContent = string.Empty;
@@ -135,15 +135,46 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             try
             {
-                // Load the simulation and return out passed once done
-                this._simulationPlayer.LoadSimulationFile(SimFile);
+                // Store all the file content on this view model instance and load in the Simulation channels from it now
+                this.LoadedSimFileContent = File.ReadAllText(SimulationFile);
+                var PulledChannels = JArray.Parse(this.LoadedSimFileContent);
+                foreach (var ChannelInstance in PulledChannels.Children())
+                {
+                    try
+                    {
+                        // Try and build our channel here
+                        JToken ChannelToken = ChannelInstance.Last;
+                        if (ChannelToken == null)
+                            throw new InvalidDataException("Error! Input channel was seen to be an invalid layout!");
+
+                        // Now using the JSON Converter, unwrap the channel into a simulation object and store it on our player
+                        PassThruSimulationChannel BuiltChannel = ChannelToken.First.ToObject<PassThruSimulationChannel>();
+                        this._simulationChannels.Add(BuiltChannel);
+                    }
+                    catch (Exception ConvertEx)
+                    {
+                        // Log failures out here
+                        FailedCounter++;
+                        this.ViewModelLogger.WriteLog("FAILED TO CONVERT SIMULATION CHANNEL FROM JSON TO OBJECT!", LogType.ErrorLog);
+                        this.ViewModelLogger.WriteLog("EXCEPTION AND CHANNEL OBJECT ARE BEING LOGGED BELOW...", LogType.WarnLog);
+                        this.ViewModelLogger.WriteLog($"SIM CHANNEL JSON:\n{ChannelInstance.ToString(Formatting.Indented)}", LogType.TraceLog);
+                        this.ViewModelLogger.WriteException("EXCEPTION THROWN:", ConvertEx);
+                    }
+                }
+
+                // Load file contents and store name of file on our view model
                 this.IsSimLoaded = true;
+                this.IsSimLoaded = true;
+                this.LoadedSimFile = SimulationFile;
+                this.ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimulationFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {this._simulationChannels.Count} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
+                this.ViewModelLogger.WriteLog($"ENCOUNTERED A TOTAL OF {FailedCounter} FAILURES WHILE LOADING CHANNELS!", LogType.InfoLog);
                 return true;
             }
             catch (Exception LoadSimEx)
             {
                 // Log failure out and return false
-                this.ViewModelLogger.WriteLog($"FAILED TO LOAD IN SIMULATION FILE {SimFile}!", LogType.ErrorLog);
+                this.ViewModelLogger.WriteLog($"FAILED TO LOAD IN SIMULATION FILE {SimulationFile}!", LogType.ErrorLog);
                 this.ViewModelLogger.WriteException("SIMULATION LOAD EXCEPTION IS BEING LOGGED BELOW!", LoadSimEx);
 
                 // Set Loaded to false and return false
