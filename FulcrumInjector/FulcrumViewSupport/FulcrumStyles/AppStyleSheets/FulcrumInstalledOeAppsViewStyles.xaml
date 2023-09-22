@@ -19,7 +19,7 @@
             <!-- ListView Style for Apps -->
             <Style x:Key="ListViewOeAppsStyle" TargetType="ListView">
                 <Setter Property="Margin" Value="10, 5,10,10"/>
-                <Setter Property="Background" Value="{StaticResource PrimaryColor_Darker_65}"/>
+                <Setter Property="Background" Value="{StaticResource SecondaryColor_Darker_65}"/>
             </Style>
 
             <!-- TextBox For OE Apps -->
