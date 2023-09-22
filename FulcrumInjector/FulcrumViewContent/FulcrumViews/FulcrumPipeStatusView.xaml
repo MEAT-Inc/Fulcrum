@@ -27,7 +27,7 @@
         <TextBlock Text="Fulcrum Pipe States" Style="{StaticResource TitleStringText}"/>
 
         <!-- Content Grid -->
-        <Grid Grid.Row="1" Margin="5,0">
+        <Grid Grid.Row="1" Margin="0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".45*"/>
                 <ColumnDefinition/>
