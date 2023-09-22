@@ -118,14 +118,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         public bool LoadSimulation(string SimFile)
         {
             // Try and load the simulation file in first
-            if (!File.Exists(SimFile)) {
-                this.ViewModelLogger.WriteLog($"FILE {SimFile} DOES NOT EXIST! CAN NOT LOAD NEW FILE!");
+            if (!File.Exists(SimFile)) 
+            {
+                // Log out that the file does not exist and exit this method
+                this.ViewModelLogger.WriteLog($"SIMULATION FILE {SimFile} DOES NOT EXIST! CAN NOT LOAD NEW FILE!");
                 this.IsSimLoaded = false;
                 return false;
             }
 
             // Clear out all of our old values first
-            int FailedCounter = 0;
             this.IsSimLoaded = false; 
             this.IsSimulationRunning = false;
             this.LoadedSimFile = string.Empty;
@@ -134,40 +135,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             try
             {
-                // Store all the file content on this view model instance and load in the Simulation channels from it now
-                this.LoadedSimFileContent = File.ReadAllText(SimFile);
-                var PulledChannels = JArray.Parse(this.LoadedSimFileContent);
-                foreach (var ChannelInstance in PulledChannels.Children())
-                {
-                    try
-                    {
-                        // Try and build our channel here
-                        JToken ChannelToken = ChannelInstance.Last;
-                        if (ChannelToken == null) 
-                            throw new InvalidDataException("Error! Input channel was seen to be an invalid layout!");
-
-                        // Now using the JSON Converter, unwrap the channel into a simulation object and store it on our player
-                        PassThruSimulationChannel BuiltChannel = ChannelToken.First.ToObject<PassThruSimulationChannel>();
-                        this._simulationChannels.Add(BuiltChannel);
-                    }
-                    catch (Exception ConvertEx)
-                    {
-                        // Log failures out here
-                        FailedCounter++;
-                        this.ViewModelLogger.WriteLog("FAILED TO CONVERT SIMULATION CHANNEL FROM JSON TO OBJECT!", LogType.ErrorLog);
-                        this.ViewModelLogger.WriteLog("EXCEPTION AND CHANNEL OBJECT ARE BEING LOGGED BELOW...", LogType.WarnLog);
-                        this.ViewModelLogger.WriteLog($"SIM CHANNEL JSON:\n{ChannelInstance.ToString(Formatting.Indented)}", LogType.TraceLog);
-                        this.ViewModelLogger.WriteException("EXCEPTION THROWN:", ConvertEx);
-                    }
-                }
-
-                // Load file contents and store name of file on our view model
+                // Load the simulation and return out passed once done
+                this._simulationPlayer.LoadSimulationFile(SimFile);
                 this.IsSimLoaded = true;
-                this.IsSimLoaded = true;
-                this.LoadedSimFile = SimFile;
-                this.ViewModelLogger.WriteLog($"LOADED NEW SIMULATION FILE {SimFile} OK! STORING CONTENTS OF IT ON VIEW MODEL FOR EDITOR NOW...", LogType.WarnLog);
-                this.ViewModelLogger.WriteLog($"PULLED IN A TOTAL OF {this._simulationChannels.Count} INPUT SIMULATION CHANNELS INTO OUR LOADER WITHOUT FAILURE!", LogType.InfoLog);
-                this.ViewModelLogger.WriteLog($"ENCOUNTERED A TOTAL OF {FailedCounter} FAILURES WHILE LOADING CHANNELS!", LogType.InfoLog);
                 return true;
             }
             catch (Exception LoadSimEx)
@@ -210,16 +180,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Configure our simulation player here
             this._simulationPlayer.SetResponsesEnabled(true);
-            this._simulationPlayer.SetDefaultConfigurations(this._simulationConfiguration.ReaderConfigs);
-            this._simulationPlayer.SetDefaultMessageFilters(this._simulationConfiguration.ReaderFilters);
-            this._simulationPlayer.SetDefaultConnectionType(
-                this._simulationConfiguration.ReaderProtocol, 
-                this._simulationConfiguration.ReaderChannelFlags, 
-                this._simulationConfiguration.ReaderBaudRate);
-            this._simulationPlayer.SetDefaultMessageValues(
-                this._simulationConfiguration.ReaderTimeout, 
-                this._simulationConfiguration.ReaderMsgCount, 
-                this._simulationConfiguration.ResponseTimeout);
+            this._simulationPlayer.SetPlaybackConfiguration(this._simulationConfiguration);
             this.ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

@@ -31,8 +31,9 @@
         <!-- List of OE Apps -->
         <ListView Grid.Row="1" 
                   Name="InstalledAppsListView"
+                  ItemsSource="{Binding InstalledOeApps}"
                   Style="{StaticResource ListViewOeAppsStyle}" 
-                  ItemsSource="{Binding InstalledOeApps}">
+                  SelectionChanged="InstalledAppsListView_OnSelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="2" BorderBrush="{StaticResource TextColorBase}" Margin="-3,0" BorderThickness="1" CornerRadius="5">
@@ -50,23 +51,11 @@
         </ListView>
 
         <!-- Button to control OE Apps -->
-        <Button Grid.Row="2" Margin="10,0,10,0" Height="30" FontSize="14" Click="ControlOeApplicationButton_OnClick" VerticalAlignment="Stretch">
-            <Button.Style>
-                <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Path=CanBootApp}" Value="true">
-                            <Setter Property="Content" Value="{Binding SelectedAppModel.OEAppName, StringFormat={}Launch {0}}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Path=CanKillApp}" Value="true">
-                            <Setter Property="Content" Value="{Binding Path=RunningAppModel.OEAppName, StringFormat={}Terminate {0}}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
-                            <Setter Property="IsEnabled" Value="False"/>
-                            <Setter Property="Content" Value="Select An OE Application"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
+        <Button Grid.Row="2" 
+                x:Name="btnOeApControl" 
+                Content="Select An OE Application"
+                Style="{StaticResource ActionButtonStyle}"
+                Margin="10,0,10,0" Height="30" IsEnabled="False"
+                Click="ControlOeApplicationButton_OnClick" VerticalAlignment="Stretch"/>
     </Grid>
 </UserControl>
