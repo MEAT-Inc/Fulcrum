@@ -49,7 +49,7 @@
             <!-- Parsing Progress Bar Style -->
             <Style x:Key="ParsingBarStyle" TargetType="ProgressBar" BasedOn="{StaticResource MahApps.Styles.ProgressBar}">
                 <Setter Property="Foreground" Value="{StaticResource PrimaryColor_Darker_35}"/>
-                <Setter Property="Value" Value="{Binding Path=ProcessingProgress}"/>
+                <Setter Property="Value" Value="{Binding Path=ProcessingProgress, Mode=OneWay}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Darker_65}"/>
                 <Setter Property="BorderThickness" Value="3"/>
                 <Style.Triggers>

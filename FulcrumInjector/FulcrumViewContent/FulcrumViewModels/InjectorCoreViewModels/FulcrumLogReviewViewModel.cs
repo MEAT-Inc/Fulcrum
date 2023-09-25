@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
@@ -45,6 +46,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         // Private backing fields holding information about the currently loaded log files
         private FulcrumLogFileSet _currentLogSet;                   // The currently loaded log file set
         private FulcrumLogFileModel _currentLogFile;                // The log file being viewed at this time
+
+        // Private backing fields for an expressions and simulations generator
+        private PassThruExpressionsGenerator _expGenerator;         // The expressions generator for this view model
+        private PassThruExpressionsGenerator _simGenerator;         // The simulation generator for this view model
         
         #endregion // Fields
 
@@ -193,21 +198,23 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Log we're building a expression file set and build a new expressions generator here 
                 this.ProcessingProgress = 0;
                 this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
-                var ExpGenerator = PassThruExpressionsGenerator.LoadPassThruLogFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
-                ExpGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
+                this._expGenerator = PassThruExpressionsGenerator.LoadPassThruLogFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
+                this._expGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
-                    // Invoke a new progress update to our UI content using the generator built
-                    if (this.BaseViewControl is not FulcrumLogReviewView) return;
-
                     // If the progress value reported back is the same as it is currently, don't set it again
                     int NextProgress = (int)GeneratorArgs.CurrentProgress;
                     if (this.ProcessingProgress != NextProgress) this.ProcessingProgress = NextProgress;
                 };
 
+                // Get our debug configuration value for enabling generator debugging
+                var ConversionSettings = FulcrumConstants.FulcrumSettings[FulcrumSettingsCollection.SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS];
+                var EnableGeneratorLogging = ConversionSettings.GetSettingValue("Debug Expressions Generator", false);
+                this.ViewModelLogger.WriteLog($"EXPRESSIONS GENERATOR DEBUG LOGGING IS SET TO: {EnableGeneratorLogging}");
+
                 // Start by building PTExpressions from input string object sets.
                 this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
-                var BuiltExpressions = ExpGenerator.GenerateLogExpressions();
-                var BuiltExpressionsFile = ExpGenerator.SaveExpressionsFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
+                var BuiltExpressions = this._expGenerator.GenerateLogExpressions(EnableGeneratorLogging);
+                var BuiltExpressionsFile = this._expGenerator.SaveExpressionsFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
                 if (BuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
                 
                 // Once we've built the new expressions file contents and files, we can store them on our log file set
@@ -247,17 +254,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 var SimGenerator = new PassThruSimulationGenerator(this.CurrentLogSet.PassThruLogFile.LogFilePath, this.CurrentLogSet.GeneratedExpressions);
                 SimGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
-                    // Invoke a new progress update to our UI content using the generator built
-                    if (this.BaseViewControl is not FulcrumLogReviewView) return;
-
                     // If the progress value reported back is the same as it is currently, don't set it again
                     int NextProgress = (int)GeneratorArgs.CurrentProgress;
                     if (this.ProcessingProgress != NextProgress) this.ProcessingProgress = NextProgress;
                 };
 
+                // Get our debug configuration value for enabling generator debugging
+                var ConversionSettings = FulcrumConstants.FulcrumSettings[FulcrumSettingsCollection.SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS];
+                var EnableGeneratorLogging = ConversionSettings.GetSettingValue("Debug Simulations Generator", false);
+                this.ViewModelLogger.WriteLog($"EXPRESSIONS GENERATOR DEBUG LOGGING IS SET TO: {EnableGeneratorLogging}");
+
                 // Now Build our simulation content objects for this generator
                 this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO SIM CHANNEL OBJECTS NOW...", LogType.InfoLog);
-                var BuiltSimChannels = SimGenerator.GenerateLogSimulation();
+                var BuiltSimChannels = SimGenerator.GenerateLogSimulation(EnableGeneratorLogging);
                 var BuiltSimFileName = SimGenerator.SaveSimulationFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
                 if (BuiltSimFileName == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW SIMULATION CONTENT!");
 
@@ -284,7 +293,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 return false;
             }
         }
-
         /// <summary>
         /// Searches the AvalonEdit object for text matching what we want.
         /// </summary>
