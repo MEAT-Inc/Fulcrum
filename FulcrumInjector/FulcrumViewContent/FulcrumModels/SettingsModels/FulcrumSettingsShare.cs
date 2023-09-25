@@ -51,10 +51,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 
         // Predefined settings collections for object values pulled in from our JSON Configuration file
         public FulcrumSettingsCollection InjectorShimDllSettings => this[SettingSectionTypes.SHIM_DLL_SETTINGS];
-        public FulcrumSettingsCollection InjectorGeneralFulcrumSettings => this[SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS];
+        public FulcrumSettingsCollection InjectorRegexFulcrumSettings => this[SettingSectionTypes.DLL_OUTPUT_REGEX_SETTINGS];
         public FulcrumSettingsCollection DebugLogViewerFulcrumSettings => this[SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS];
         public FulcrumSettingsCollection InjectorPipeConfigFulcrumSettings => this[SettingSectionTypes.INJECTOR_PIPE_SETTINGS];
-        public FulcrumSettingsCollection InjectorRegexFulcrumSettings => this[SettingSectionTypes.DLL_OUTPUT_REGEX_SETTINGS];
+        public FulcrumSettingsCollection InjectorHardwareSettings => this[SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS];
+        public FulcrumSettingsCollection InjectorLogConversionSettings => this[SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS];
         public FulcrumSettingsCollection InjectorDllSyntaxFulcrumSettings => this[SettingSectionTypes.DLL_OUTPUT_SYNTAX_SETTINGS];
         public FulcrumSettingsCollection InjectorDebugSyntaxFulcrumSettings => this[SettingSectionTypes.DEBUG_LOG_VIEWER_SYNTAX_SETTINGS];
 
@@ -76,6 +77,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS,
+                Array.Empty<FulcrumSettingEntryModel>()));
+            this.Add(SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS, new FulcrumSettingsCollection(
+                SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS,
