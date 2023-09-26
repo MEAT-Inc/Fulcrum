@@ -235,11 +235,21 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 return false;
             }
 
-            // Stop it now and log passed
-            this.IsSimulationRunning = false;
-            this._simulationPlayer.StopSimulationReader();
-            this.ViewModelLogger.WriteLog("STOPPED SIMULATION READER WITHOUT ISSUES!", LogType.InfoLog);
-            return true;
+            try
+            {
+                // Stop it now and log passed
+                this.IsSimulationRunning = false;
+                this._simulationPlayer.StopSimulationReader();
+                this.ViewModelLogger.WriteLog("STOPPED SIMULATION READER WITHOUT ISSUES!", LogType.InfoLog);
+                return true;
+            }
+            catch
+            {
+                // Ignored since no matter what happens the reader is killed
+                this.ViewModelLogger.WriteLog("WARNING! SESSION CLOSE ROUTINE EXITED INCORRECTLY!", LogType.WarnLog);
+                this.ViewModelLogger.WriteLog("THIS IS NOT THE END OF THE WORLD, BUT SHOULD BE ADDRESSED!", LogType.WarnLog);
+                return true;
+            }
         }
 
         /// <summary>
