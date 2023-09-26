@@ -100,10 +100,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Setup empty list of our events here and build a collection of simulation configurations
+            this._importSimulationConfigurations();
             this.SimEventsProcessed ??= Array.Empty<EventArgs>();
             this.SimulationChannels = new PassThruSimulationChannel[] { };
-            this.SimulationConfigurations = PassThruSimulationConfiguration.SupportedConfigurations.ToList();
-
+            
             // Log completed building view model instance and exit out
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
         }
@@ -240,6 +240,47 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this._simulationPlayer.StopSimulationReader();
             this.ViewModelLogger.WriteLog("STOPPED SIMULATION READER WITHOUT ISSUES!", LogType.InfoLog);
             return true;
+        }
+
+        /// <summary>
+        /// Helper method used to load the simulation configurations from both the simulation package and user defined configurations
+        /// </summary>
+        private void _importSimulationConfigurations()
+        {
+            // Store the predefined configurations on our view model instance first
+            this.SimulationConfigurations = PassThruSimulationConfiguration.SupportedConfigurations.ToList();
+            List<ProtocolId> SupportedProtocols = PassThruSimulationConfiguration.SupportedProtocols.ToList();
+
+            // Store the default configurations and the default protocols on our settings object
+            ValueSetters.SetValue("FulcrumSimConfigurations.PredefinedConfigurations", this.SimulationConfigurations);
+            this.ViewModelLogger.WriteLog($"PULLED IN {this.SimulationConfigurations.Count} PREDEFINED SIM CONFIGURATIONS FOR {SupportedProtocols.Count} PROTOCOLS!");
+
+            // Look at our settings object for user defined configurations here
+            var CustomConfigsObject = ValueLoaders.GetConfigValue<object>("FulcrumSimConfigurations.CustomConfigurations");
+            if (CustomConfigsObject is not PassThruSimulationConfiguration[] CustomConfigs) 
+                this.ViewModelLogger.WriteLog("NO CUSTOM SIM CONFIGURATIONS WERE FOUND!", LogType.WarnLog);
+            else
+            {
+                // Import all the user defined configurations and update our protocol list
+                this.ViewModelLogger.WriteLog($"IMPORTING {CustomConfigs.Length} CUSTOM SIMULATION CONFIGURATIONS...");
+                foreach (var PassThruSimConfig in CustomConfigs)
+                {
+                    // Store the configuration and protocol if they're unique to this configuration
+                    if (this.SimulationConfigurations.All(SimConfig => SimConfig.ConfigurationName != PassThruSimConfig.ConfigurationName)) 
+                        this.SimulationConfigurations.Add(PassThruSimConfig);
+                    if (!SupportedProtocols.Contains(PassThruSimConfig.ReaderProtocol))
+                        SupportedProtocols.Add(PassThruSimConfig.ReaderProtocol);
+
+                    // Log out the configuration added in and move on to the next one
+                    this.ViewModelLogger.WriteLog($"IMPORTED CONFIGURATION {PassThruSimConfig.ConfigurationName}!");
+                }
+            }
+
+            // Write the new list of supported protocol values out to the settings file 
+            List<string> ProtocolStrings = SupportedProtocols.Select(ProcId => ProcId.ToString()).ToList();
+            ValueSetters.SetValue("FulcrumSimConfigurations.SupportedProtocols", ProtocolStrings);
+            this.ViewModelLogger.WriteLog("UPDATED SUPPORTED PROTOCOL LIST CORRECTLY!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"CONFIGURATIONS SUPPORT {SupportedProtocols.Count} PROTOCOLS TOTAL!");
         }
     }
 }

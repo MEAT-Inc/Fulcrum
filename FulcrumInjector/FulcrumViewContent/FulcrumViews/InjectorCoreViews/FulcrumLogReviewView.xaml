@@ -208,7 +208,7 @@
                                    Text="This process may take a long time if the file requested to parse out is a rather large log file. For log files around 25,000 lines long, conversion takes about 10 seconds. Should this process fail, or if it takes an extremely long time, enable generator debugging in the settings and try again. Then please create a ticket using the email page in this app so someone can look into conversion issues with this log file." Foreground="{StaticResource TextColorBase}"/>
                         <Grid VerticalAlignment="Bottom" Height="30" Grid.Row="2">
                             <Border BorderBrush="{StaticResource TextColorBase}" BorderThickness="3">
-                                <ProgressBar Style="{StaticResource ParsingBarStyle}"/>
+                                <ProgressBar Style="{StaticResource ParsingBarStyle}" x:Name="pbLogConversionProgress"/>
                             </Border>
                             <TextBlock Style="{StaticResource ParsingProgressTextStyle}"/>
                         </Grid>
