@@ -82,6 +82,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Public facing properties holding configuration values for our view content
         public bool IsLogLoaded { get => _isLogLoaded; set => PropertyUpdated(value); }
+        public int ProcessingProgress { get => _processingProgress; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -194,18 +195,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         {
             try
             {
-                // Find our view instance object and pull the parsing progress bar for it
-                FulcrumLogReviewView LogReviewView = this.BaseViewControl as FulcrumLogReviewView;
-                if (LogReviewView != null) LogReviewView.pbLogConversionProgress.Value = 0; 
-
                 // Log we're building a expression file set and build a new expressions generator here 
+                this.ProcessingProgress = 0;
                 this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO EXPRESSIONS NOW...", LogType.InfoLog);
                 this._expGenerator = PassThruExpressionsGenerator.LoadPassThruLogFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
                 this._expGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
-                    // Update the log review progress bar value to the new value passed
-                    if (LogReviewView == null) return;
-                    LogReviewView.pbLogConversionProgress.Value = GeneratorArgs.CurrentProgress;
+                    // If the progress value reported back is the same as it is currently, don't set it again
+                    int NextProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.ProcessingProgress != NextProgress) this.ProcessingProgress = NextProgress;
                 };
 
                 // Get our debug configuration value for enabling generator debugging
@@ -214,11 +212,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ViewModelLogger.WriteLog($"EXPRESSIONS GENERATOR DEBUG LOGGING IS SET TO: {EnableGeneratorLogging}");
 
                 // Start by building PTExpressions from input string object sets.
-                this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
+                this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
                 var BuiltExpressions = this._expGenerator.GenerateLogExpressions(EnableGeneratorLogging);
                 var BuiltExpressionsFile = this._expGenerator.SaveExpressionsFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
                 if (BuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
-                
+
                 // Once we've built the new expressions file contents and files, we can store them on our log file set
                 var ExpressionsFileModel = new FulcrumLogFileModel(BuiltExpressionsFile);
                 this.CurrentLogSet.SetExpressionsFile(ExpressionsFileModel, BuiltExpressions);
@@ -226,7 +224,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Log out some information about the expressions built and toggle our view contents
                 this.ViewModelLogger.WriteLog($"GENERATED A TOTAL OF {BuiltExpressions.Length} EXPRESSION OBJECTS!", LogType.InfoLog);
                 this.ViewModelLogger.WriteLog($"SAVED EXPRESSIONS TO NEW FILE OBJECT NAMED: {BuiltExpressionsFile}!", LogType.InfoLog);
-                if (LogReviewView != null) LogReviewView.pbLogConversionProgress.Value = 100;
+                this.ProcessingProgress = 100;
 
                 // Set our new log file model so the view content updates and exit out
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
@@ -235,11 +233,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             }
             catch (Exception Ex)
             {
-                // Update progress for the view content if needed
-                if (this.BaseViewControl is FulcrumLogReviewView LogReviewView)
-                    LogReviewView.pbLogConversionProgress.Value = 0;
-
                 // Log failures, return nothing
+                this.ProcessingProgress = 100;
                 this.ViewModelLogger.WriteLog("FAILED TO GENERATE NEW EXPRESSION SETUP FROM INPUT CONTENT!", LogType.ErrorLog);
                 this.ViewModelLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", Ex);
                 return false;
@@ -253,18 +248,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         {
             try
             {
-                // Find our view instance object and pull the parsing progress bar for it
-                FulcrumLogReviewView LogReviewView = this.BaseViewControl as FulcrumLogReviewView;
-                if (LogReviewView != null) LogReviewView.pbLogConversionProgress.Value = 0;
-
                 // Log we're building a simulation file set and build a new expressions generator here 
+                this.ProcessingProgress = 0;
                 this.ViewModelLogger.WriteLog("BUILDING SIMULATION FROM LOADED LOG FILE NOW...", LogType.InfoLog);
                 this._simGenerator = new PassThruSimulationGenerator(this.CurrentLogSet.PassThruLogFile.LogFilePath, this.CurrentLogSet.GeneratedExpressions);
                 this._simGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
-                    // Update the log review progress bar value to the new value passed
-                    if (LogReviewView == null) return;
-                    LogReviewView.pbLogConversionProgress.Value = GeneratorArgs.CurrentProgress;
+                    // If the progress value reported back is the same as it is currently, don't set it again
+                    int NextProgress = (int)GeneratorArgs.CurrentProgress;
+                    if (this.ProcessingProgress != NextProgress) this.ProcessingProgress = NextProgress;
                 };
 
                 // Get our debug configuration value for enabling generator debugging
@@ -285,20 +277,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Log out some information about the simulations built and toggle our view contents
                 this.ViewModelLogger.WriteLog($"SAVED SIMULATION FILE AT PATH {BuiltSimFileName} FROM INPUT EXPRESSIONS!", LogType.InfoLog);
                 this.ViewModelLogger.WriteLog($"BUILT A TOTAL OF {BuiltSimChannels} SIM CHANNELS!", LogType.InfoLog);
-                if (LogReviewView != null) LogReviewView.pbLogConversionProgress.Value = 100;
+                this.ProcessingProgress = 100;
 
                 // Set our new log file model so the view content updates and exit out
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
                 CastView.Dispatcher.Invoke(() => { CastView.ViewerContentComboBox.SelectedIndex = 2; });
                 return true;
-            } 
-            catch (Exception BuildSimEx) 
+            }
+            catch (Exception BuildSimEx)
             {
-                // Update progress for the view content if needed
-                if (this.BaseViewControl is FulcrumLogReviewView LogReviewView)
-                    LogReviewView.pbLogConversionProgress.Value = 0;
-
                 // Log failures out and return nothing
+                this.ProcessingProgress = 100;
                 this.ViewModelLogger.WriteLog("FAILED TO BUILD NEW SIMULATION FILE USING INPUT EXPRESSIONS!", LogType.ErrorLog);
                 this.ViewModelLogger.WriteException("EXCEPTION THROWN IS BEING LOGGED BELOW NOW...", BuildSimEx);
                 return false;
