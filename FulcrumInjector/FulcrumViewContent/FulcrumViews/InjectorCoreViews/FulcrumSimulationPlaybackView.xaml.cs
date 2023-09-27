@@ -241,7 +241,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// <param name="E">Arguments fired along with this event</param>
         private void btnNewSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
-
+            // Toggle edit mode on our view model
+            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
         }
         /// <summary>
         /// Event handler to fire when the user clicks the edit configuration button.
@@ -252,9 +253,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void btnEditSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
             // Toggle edit mode on our view model
-            this._viewLogger.WriteLog("TOGGLING SIMULATION EDIT MODE");
             this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
-            this._viewLogger.WriteLog($"NEW EDIT CONFIG STATE VALUE: {this.ViewModel.IsEditingConfig}");
         }
         /// <summary>
         /// Event handler to fire when the user clicks the save configuration button.
@@ -264,7 +263,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// <param name="E">Arguments fired along with this event</param>
         private void btnSaveSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
-
+            // TODO: Build logic for saving a new configuration
+            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
+        }
+        /// <summary>
+        /// Event handler to fire when the user clicks the delete configuration button.
+        /// This will toggle edit mode and remove the current configuration routine from our settings store
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnDeleteSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Build logic for removing these configurations
+            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
         }
     }
 }

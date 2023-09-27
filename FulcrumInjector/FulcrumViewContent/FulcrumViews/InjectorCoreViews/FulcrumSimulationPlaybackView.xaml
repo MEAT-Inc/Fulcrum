@@ -503,16 +503,21 @@
                                         <TextBlock Text="Configuration:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,4,10,0" FontSize="14"/>
-                                        <ComboBox ItemsSource="{Binding SimulationConfigurations}"
-                                                  SelectionChanged="cboSimConfiguration_OnSelectionChanged" 
-                                                  SelectedIndex="0" Grid.Row="0" Grid.Column="1" Margin="5,0" Height="30"
-                                                  VerticalAlignment="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
-                                                    <TextBlock Text="{Binding ConfigurationName}" FontSize="12"/>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                        </ComboBox>
+                                        <Grid Grid.Row="0" Grid.Column="1">
+                                            <ComboBox SelectedIndex="0" Margin="5,0" Height="30"
+                                                      ItemsSource="{Binding SimulationConfigurations}"
+                                                      SelectionChanged="cboSimConfiguration_OnSelectionChanged" 
+                                                      VerticalAlignment="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                                      Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
+                                                        <TextBlock Text="{Binding ConfigurationName}" FontSize="12"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                            <TextBox Tag="Enter A Name" x:Name="tbEditConfigName"
+                                                     Style="{StaticResource EditConfigTextBox}"/>                                        
+                                        </Grid>
 
                                         <!-- Protocol ID Configuration -->
                                         <TextBlock Text="Channel Protocol:" Foreground="Yellow"
@@ -537,6 +542,7 @@
                                                      Text="{Binding SimulationConfiguration.ReaderBaudRate}" />
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditBaudRate"
+                                                DefaultValue="BaudRate"
                                                 Style="{StaticResource EditConfigComboBox}"
                                                 EnumerationType="{x:Type passThruTypes:BaudRate}"/>
                                         </Grid>                                        
@@ -550,6 +556,7 @@
                                                      Text="{Binding SimulationConfiguration.ReaderChannelFlags}" />
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditConnectFlags"
+                                                DefaultValue="Connect Flags"
                                                 Style="{StaticResource EditConfigComboBox}"
                                                 EnumerationType="{x:Type passThruTypes:PassThroughConnect}"/>
                                         </Grid>
@@ -596,11 +603,23 @@
                                             <Button Style="{StaticResource ActionButtonStyle}"
                                                     Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
                                                     Margin="0,0,5,0" Content="New Configuration" 
-                                                    VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick" />
+                                                    VerticalAlignment="Stretch" Click="btnNewSimulationConfig_OnClick" 
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            <Button Style="{StaticResource ActionButtonStyle}"
+                                                    Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
+                                                    Margin="0,0,5,0" Content="Save Configuration" 
+                                                    VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick" 
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             <Button Style="{StaticResource ActionButtonStyle}"
                                                     Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
                                                     Margin="5,0,0,0" Content="Edit Configuration"
-                                                    VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick"/>
+                                                    VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick"
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            <Button Style="{StaticResource ActionButtonStyle}"
+                                                    Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
+                                                    Margin="5,0,0,0" Content="Delete Configuration"
+                                                    VerticalAlignment="Stretch" Click="btnDeleteSimulationConfig_OnClick"
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                         </Grid>
                                     </Grid>
 
