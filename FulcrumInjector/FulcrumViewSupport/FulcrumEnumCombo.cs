@@ -73,33 +73,23 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // Update our backing field and setup the items collection 
                 this.SetField(ref this._enumerationType, value);
-                this._enumComboLogger ??= new SharpLogger(
-                    LoggerActions.UniversalLogger,
-                    $"{value.Name}_EnumComboLogger");
-
-                // Build our enumeration items source here
-                List<string> LoadedValues = Enum.GetNames(value).ToList();
-                LoadedValues.Insert(0, string.IsNullOrWhiteSpace(this.DefaultValue)
-                    ? $"-- {value.Name} --"
-                    : $"-- {this.DefaultValue} --");
-
-                // Store the enumeration items and set our selected index to 0
-                this.ItemsSource = LoadedValues;
-                this.SelectedIndex = 0;
-
-                // Log out how many values we've entered into the ComobBox
-                this._enumComboLogger.WriteLog($"STORED {this.Items.Count - 1} VALUES FOR ENUM {value.Name}");
+                this._generateItemsSource();
+            }
+        }
+        public string DefaultValue
+        {
+            get => this._defaultValue;
+            set
+            {
+                // Update our backing field and setup the items collection
+                this.SetField(ref this._defaultValue, value);
+                this._generateItemsSource();
             }
         }
         public bool IsMultiSelect
         {
             get => this._isMultiSelect;
             set => this.SetField(ref this._isMultiSelect, value);
-        }
-        public string DefaultValue
-        {
-            get => this._defaultValue;
-            set => this.SetField(ref this._defaultValue, value);
         }
 
         #endregion // Properties
@@ -127,5 +117,34 @@ namespace FulcrumInjector.FulcrumViewSupport
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Generates or updates the collection of items we're using for our ItemsSource
+        /// </summary>
+        private void _generateItemsSource()
+        {
+            // Make sure the enumeration type is configured
+            if (this.EnumerationType == null) return;
+
+            // Build a new logger instance if needed
+            this._enumComboLogger ??= new SharpLogger(
+                LoggerActions.UniversalLogger,
+                $"{this.EnumerationType.Name}_EnumComboLogger");
+
+            // Build our enumeration items source here
+            List<string> LoadedValues = Enum.GetNames(this.EnumerationType).ToList();
+            LoadedValues.Insert(0, string.IsNullOrWhiteSpace(this.DefaultValue)
+                ? $"-- {this.EnumerationType.Name} --"
+                : $"-- {this.DefaultValue} --");
+
+            // Store the enumeration items and set our selected index to 0
+            int CurrentIndex = this.SelectedIndex;
+            this.ItemsSource = LoadedValues;
+            this.SelectedIndex = CurrentIndex >= 0 ? CurrentIndex : 0;
+
+            // Log out how many values we've entered into the ComobBox
+            this._enumComboLogger.WriteLog($"STORED {this.Items.Count - 1} VALUES FOR ENUM {this.EnumerationType.Name}");
+            this._enumComboLogger.WriteLog($"SET {this.DefaultValue} AS DEFAULT VALUE FOR {this.EnumerationType.Namespace} ENUM COMBO");
+        }
     }
 }

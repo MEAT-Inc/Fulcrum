@@ -475,7 +475,6 @@
                                                 <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             </Style>
                                             <Style TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}" x:Key="EditConfigTextBox">
-                                                <Setter Property="Tag" Value="N/A"/>
                                                 <Setter Property="FontFamily" Value="Consolas"/>
                                                 <Setter Property="TextAlignment" Value="Center"/>
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
@@ -523,6 +522,8 @@
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderProtocol}" />
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                x:Name="cboEditProtocolId"
+                                                DefaultValue="Protocol ID"
                                                 Style="{StaticResource EditConfigComboBox}"
                                                 EnumerationType="{x:Type passThruTypes:ProtocolId}"/>
                                         </Grid>
@@ -535,6 +536,7 @@
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderBaudRate}" />
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                x:Name="cboEditBaudRate"
                                                 Style="{StaticResource EditConfigComboBox}"
                                                 EnumerationType="{x:Type passThruTypes:BaudRate}"/>
                                         </Grid>                                        
@@ -547,6 +549,7 @@
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderChannelFlags}" />
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                x:Name="cboEditConnectFlags"
                                                 Style="{StaticResource EditConfigComboBox}"
                                                 EnumerationType="{x:Type passThruTypes:PassThroughConnect}"/>
                                         </Grid>
@@ -558,18 +561,31 @@
                                         <Grid Grid.Row="4" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
-
+                                            <TextBox Tag="Read Count" x:Name="tbEditReaderCount"
+                                                     Style="{StaticResource EditConfigTextBox}"/>
                                         </Grid>
+
+                                        <!-- Reader Timeout Configuration -->
                                         <TextBlock Text="Reader Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                 Grid.Row="5" Grid.Column="1" Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
+                                        <Grid Grid.Row="5" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
+                                            <TextBox Tag="Milliseconds" x:Name="tbEditReaderTimeout"
+                                                     Style="{StaticResource EditConfigTextBox}"/>
+                                        </Grid>
+
+                                        <!-- Response Timeout Configuration -->
                                         <TextBlock Text="Response Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                 Grid.Row="6" Grid.Column="1" Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
+                                        <Grid Grid.Row="6" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
+                                            <TextBox Tag="Milliseconds" x:Name="tbEditResponseTimeout"
+                                                     Style="{StaticResource EditConfigTextBox}"/>
+                                        </Grid>
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
                                         <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,25,5,5">
