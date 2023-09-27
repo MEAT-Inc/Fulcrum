@@ -48,10 +48,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Private backing fields for our public properties
         private bool _isSimLoaded;                                                  // Determines if the simulation is loaded
-        private bool _isHardwareSetup;                                              // Determines if hardware is configured
         private bool _isSimStarting;                                                // Determines if the simulation is booting
-        private bool _isSimulationRunning;                                          // Determines if the simulation is running
+        private bool _isEditingConfig;                                              // Tells us if we're in edit mode or not
+        private bool _isHardwareSetup;                                              // Determines if hardware is configured
         private string _loadedSimFile;                                              // Currently loaded simulation file
+        private bool _isSimulationRunning;                                          // Determines if the simulation is running
         private string _loadedSimFileContent;                                       // Currently loaded simulation file content
         private EventArgs[] _simEventsProcessed;                                    // Events fired during the simulation
         private PassThruSimulationPlayer _simulationPlayer;                         // The player running the simulation
@@ -65,8 +66,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Public properties for the view to bind onto  
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
-        public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
         public bool IsSimStarting { get => this._isSimStarting; set => PropertyUpdated(value); }
+        public bool IsEditingConfig { get => this._isEditingConfig; set => PropertyUpdated(value); }
+        public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
         public bool IsSimulationRunning { get => this._isSimulationRunning; set => PropertyUpdated(value); }
 
         // Content for the current loaded simulation file
@@ -100,6 +102,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Setup empty list of our events here and build a collection of simulation configurations
+            this.IsEditingConfig = false;
             this._importSimulationConfigurations();
             this.SimEventsProcessed ??= Array.Empty<EventArgs>();
             this.SimulationChannels = new PassThruSimulationChannel[] { };

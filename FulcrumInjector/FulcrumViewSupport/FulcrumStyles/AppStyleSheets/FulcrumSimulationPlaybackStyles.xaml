@@ -1,10 +1,16 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
+                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                    xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
+
+            <!-- Data Converters -->
+            <fulcrumDataConverters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <fulcrumDataConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <fulcrumDataConverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
 
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">

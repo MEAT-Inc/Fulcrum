@@ -219,17 +219,52 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 this._viewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
             });
         }
+
         /// <summary>
         /// Event handler to fire when the selected simulation configuration is updated/changed
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void SimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        private void cboSimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
             // Pull our selected sim configuration and store it on the view model.
             this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
             this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.SimulationConfiguration));
             this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.SimulationConfiguration.ConfigurationName}!");
+        }
+
+        /// <summary>
+        /// Event handler to fire when the user clicks the new configuration button.
+        /// This will toggle edit mode and generate a new dummy configuration value set
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnNewSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+
+        }
+        /// <summary>
+        /// Event handler to fire when the user clicks the edit configuration button.
+        /// This will toggle edit mode and show new editing UI controls
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnEditSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Toggle edit mode on our view model
+            this._viewLogger.WriteLog("TOGGLING SIMULATION EDIT MODE");
+            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
+            this._viewLogger.WriteLog($"NEW EDIT CONFIG STATE VALUE: {this.ViewModel.IsEditingConfig}");
+        }
+        /// <summary>
+        /// Event handler to fire when the user clicks the save configuration button.
+        /// This will toggle edit mode and write the current configuration values out to our settings file
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnSaveSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+
         }
     }
 }

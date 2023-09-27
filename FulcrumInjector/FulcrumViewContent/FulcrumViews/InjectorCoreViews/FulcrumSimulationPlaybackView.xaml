@@ -7,7 +7,9 @@
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:simEvents="clr-namespace:SharpSimulator;assembly=SharpSimulator"
              xmlns:ptObjects="clr-namespace:SharpWrapper.J2534Objects;assembly=SharpWrapper"
+             xmlns:fulcrumViewSupport="clr-namespace:FulcrumInjector.FulcrumViewSupport"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
+             xmlns:passThruTypes="clr-namespace:SharpWrapper.PassThruTypes;assembly=SharpWrapper"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="FulcrumSimulationPlaybackView_OnLoaded">
@@ -402,20 +404,20 @@
                         </mah:Flyout.HeaderTemplate>
 
                         <!-- Flyout Content -->
-                        <Grid Margin="5,-30,5,0">
+                        <Grid Margin="5,-25,5,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height=".50*"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="1.7*"/>
                             </Grid.RowDefinitions>
-                            <Grid Grid.Row="0" VerticalAlignment="Top">
+                            <Grid Grid.Row="0" VerticalAlignment="Top" Margin="0,0,0,5">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="1.5*"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock
                                     Text="Simulation Configuration" Margin="5,0,0,0"
-                                    VerticalAlignment="Stretch" HorizontalAlignment="Left" 
+                                    VerticalAlignment="Stretch" HorizontalAlignment="Left" FontSize="20"
                                     Style="{StaticResource TitleStringText}" Foreground="Yellow"/>
                                 <TextBlock 
                                     Grid.Row="1" TextWrapping="Wrap" FontSize="12" TextAlignment="Justify"
@@ -432,29 +434,30 @@
                             <!-- Temporary Content -->
                             <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width=".425*"/>
+                                    <ColumnDefinition Width=".420*"/>
+                                    <ColumnDefinition Width="5"/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
 
                                 <!-- Information about the configurations -->
                                 <StackPanel Grid.Column="0" Orientation="Vertical">
-                                    <TextBlock Margin="5,3,10,-2"
+                                    <TextBlock Margin="5,3,10,5"
                                                TextAlignment="Justify" TextWrapping="Wrap"
                                                Foreground="{StaticResource TextColorBase}" 
                                                Text="Use the dropdown box to the right the pick a simulation configuration for playback. Each one of the configurations listed in the dropdown are built to support different vehicle protocols based on the simulation being loaded."/>
-                                    <TextBlock Margin="5,5,10,5"
+                                    <TextBlock Margin="5,0,10,0"
                                                TextAlignment="Justify" TextWrapping="Wrap"
                                                Foreground="{StaticResource TextColorBase}" 
-                                               Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. The try using the ISO15765 - 11 Bit configuration for Euro/Domestic vehicles, and the CAN - 29 Bit Configuration for Asian vehicles. If the simulation in use covers both 11 and 29 bit communications, use the Mixed Mode configuration. If you get stuck, reach out to Zack Walsh, and he can help find or build the right configuration. "/>
+                                               Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. The try using the ISO15765 - 11 Bit configuration for Euro/Domestic vehicles, and the CAN - 29 Bit Configuration for Asian vehicles. If the simulation in use covers both 11 and 29 bit communications, use the Mixed Mode configuration. If you get stuck, reach out to Zack Walsh, and he can help find or build the right configuration for your simulation file."/>
                                 </StackPanel>
 
                                 <!-- Splitting Border -->
-                                <Border Grid.Column="1" Margin="-2,-2,0,0"
+                                <Border Grid.Column="1" Margin="0,0,0,0"
                                         BorderBrush="{StaticResource TextColorBase}" 
                                         BorderThickness="2,0,0,0"/>
 
                                 <!-- Configuration Properties -->
-                                <Grid Grid.Column="1" Margin="5">
+                                <Grid Grid.Column="2" Margin="5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
                                         <ColumnDefinition Width=".875*"/>
@@ -462,6 +465,28 @@
 
                                     <!-- Basic Configuration Information -->
                                     <Grid Grid.Column="0" Margin="1,-1,0,0">
+                                        <Grid.Resources>
+                                            <Style TargetType="TextBox" BasedOn="{StaticResource StaticReadonlyTextBoxStyle}" x:Key="ReadonlyTextBoxStyle">
+                                                <Setter Property="Tag" Value="N/A"/>
+                                                <Setter Property="IsReadOnly" Value="True"/>
+                                                <Setter Property="FontFamily" Value="Consolas"/>
+                                                <Setter Property="TextAlignment" Value="Center"/>
+                                                <Setter Property="Margin" Value="5,5,5,0"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            </Style>
+                                            <Style TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}" x:Key="EditConfigTextBox">
+                                                <Setter Property="Tag" Value="N/A"/>
+                                                <Setter Property="FontFamily" Value="Consolas"/>
+                                                <Setter Property="TextAlignment" Value="Center"/>
+                                                <Setter Property="Margin" Value="5,5,5,0"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                            </Style>
+                                            <Style TargetType="ComboBox" x:Key="EditConfigComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                                                <Setter Property="Margin" Value="5,5,5,0"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                            </Style>
+                                        </Grid.Resources>
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
                                             <RowDefinition/>
@@ -479,63 +504,87 @@
                                         <TextBlock Text="Configuration:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,4,10,0" FontSize="14"/>
-                                        <ComboBox SelectionChanged="SimConfiguration_OnSelectionChanged" SelectedIndex="0"
-                                                  Grid.Row="0" Grid.Column="1" Margin="5,0" Height="30"
-                                                  VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
-                                                  ItemsSource="{Binding SimulationConfigurations}">
+                                        <ComboBox ItemsSource="{Binding SimulationConfigurations}"
+                                                  SelectionChanged="cboSimConfiguration_OnSelectionChanged" 
+                                                  SelectedIndex="0" Grid.Row="0" Grid.Column="1" Margin="5,0" Height="30"
+                                                  VerticalAlignment="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
                                                     <TextBlock Text="{Binding ConfigurationName}" FontSize="12"/>
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
                                         </ComboBox>
+
+                                        <!-- Protocol ID Configuration -->
                                         <TextBlock Text="Channel Protocol:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,5,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
-                                                 Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderProtocol}"/>
+                                        <Grid Grid.Row="1" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderProtocol}" />
+                                            <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                Style="{StaticResource EditConfigComboBox}"
+                                                EnumerationType="{x:Type passThruTypes:ProtocolId}"/>
+                                        </Grid>
+
+                                        <!-- BaudRate Configuration -->
                                         <TextBlock Text="Channel Baudrate:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
-                                                 Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderBaudRate}"/>
+                                        <Grid Grid.Row="2" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderBaudRate}" />
+                                            <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                Style="{StaticResource EditConfigComboBox}"
+                                                EnumerationType="{x:Type passThruTypes:BaudRate}"/>
+                                        </Grid>                                        
+                                        
+                                        <!-- Connect Flags Configuration -->
                                         <TextBlock Text="Channel Flags:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas" 
-                                                 Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderChannelFlags}"/>
+                                        <Grid Grid.Row="3" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderChannelFlags}" />
+                                            <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                Style="{StaticResource EditConfigComboBox}"
+                                                EnumerationType="{x:Type passThruTypes:PassThroughConnect}"/>
+                                        </Grid>
+
+                                        <!-- Read Message Count Configuration -->
                                         <TextBlock Text="Message Count:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
-                                                 Grid.Row="4" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
+                                        <Grid Grid.Row="4" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
+
+                                        </Grid>
                                         <TextBlock Text="Reader Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
-                                                 Grid.Row="5" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
+                                        <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                 Grid.Row="5" Grid.Column="1" Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
                                         <TextBlock Text="Response Timeout:" Foreground="Yellow"
                                                    VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"
                                                    FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
-                                        <TextBox Style="{StaticResource InputTextWithHolder}" FontFamily="Consolas"
-                                                 Grid.Row="6" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                 Tag="N/A" Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
+                                        <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                 Grid.Row="6" Grid.Column="1" Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
-                                        <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,15">
+                                        <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,25,5,5">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>
                                                 <ColumnDefinition/>
                                             </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="0" Margin="-1,10,5,-10"
-                                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="New Configuration" IsEnabled="False"/>
-                                            <Button Style="{StaticResource ActionButtonStyle}" Grid.Column="1" Margin="5,10,5,-10"
-                                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="Save Configuration" IsEnabled="False"/>
+                                            <Button Style="{StaticResource ActionButtonStyle}"
+                                                    Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
+                                                    Margin="0,0,5,0" Content="New Configuration" 
+                                                    VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick" />
+                                            <Button Style="{StaticResource ActionButtonStyle}"
+                                                    Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
+                                                    Margin="5,0,0,0" Content="Edit Configuration"
+                                                    VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick"/>
                                         </Grid>
                                     </Grid>
 
@@ -546,7 +595,7 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
                                                 <Border BorderBrush="{StaticResource DarkGreyThemeColor}" BorderThickness="2" Margin="-4,0,0,0">
-                                                    <Grid Margin="-2,2,3,0">
+                                                    <Grid Margin="-0,2,3,0">
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition/>
                                                             <RowDefinition/>
