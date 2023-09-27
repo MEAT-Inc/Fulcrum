@@ -8,7 +8,6 @@
              xmlns:simEvents="clr-namespace:SharpSimulator;assembly=SharpSimulator"
              xmlns:ptObjects="clr-namespace:SharpWrapper.J2534Objects;assembly=SharpWrapper"
              xmlns:fulcrumViewSupport="clr-namespace:FulcrumInjector.FulcrumViewSupport"
-             xmlns:fulcrumViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              xmlns:passThruTypes="clr-namespace:SharpWrapper.PassThruTypes;assembly=SharpWrapper"
              mc:Ignorable="d" 
@@ -458,7 +457,7 @@
                                         BorderThickness="2,0,0,0"/>
 
                                 <!-- Configuration Properties -->
-                                <Grid Grid.Column="2" Margin="5" x:Name="gdConfigurationProperties">
+                                <Grid Grid.Column="2" Margin="5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
                                         <ColumnDefinition Width=".875*"/>
@@ -480,6 +479,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
+
+                                        <!-- Configuration Name -->
                                         <TextBlock Text="Configuration:" Grid.Row="0" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="0" Grid.Column="1">
                                             <ComboBox SelectedIndex="0" Margin="5,0,5,5" Height="25"
@@ -505,7 +506,7 @@
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditProtocolId"
                                                 DefaultValue="Protocol ID"
-                                                Style="{StaticResource EditConfigComboBox}"
+                                                Style="{StaticResource EditConfigComboBoxStyle}"
                                                 EnumerationType="{x:Type passThruTypes:ProtocolId}"/>
                                         </Grid>
 
@@ -517,7 +518,7 @@
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditBaudRate"
                                                 DefaultValue="BaudRate"
-                                                Style="{StaticResource EditConfigComboBox}"
+                                                Style="{StaticResource EditConfigComboBoxStyle}"
                                                 EnumerationType="{x:Type passThruTypes:BaudRate}"/>
                                         </Grid>                                        
                                         
@@ -529,7 +530,7 @@
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditConnectFlags"
                                                 DefaultValue="Connect Flags"
-                                                Style="{StaticResource EditConfigComboBox}"
+                                                Style="{StaticResource EditConfigComboBoxStyle}"
                                                 EnumerationType="{x:Type passThruTypes:PassThroughConnect}"/>
                                         </Grid>
 
@@ -630,7 +631,7 @@
                                                             <TextBlock Text="Mask:" Grid.Row="0" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
                                                             <Grid Grid.Row="0" Grid.Column="1">
                                                                 <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                                         Tag="No Mask" Text="{Binding FilterMask}" />
+                                                                         Tag="No Mask" Text="{Binding FilterMask}"/>
                                                                 <TextBox Tag="Filter Mask"
                                                                          x:Name="tbEditFilterMask"
                                                                          Style="{StaticResource EditConfigTextBoxStyle}"
@@ -654,7 +655,6 @@
                                                                 <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                                          Tag="No Flow Control" Text="{Binding FilterFlowCtl}"/>
                                                                 <TextBox Tag="Filter Flow Control"
-                                                                         x:Name="tbEditFilterFlowCtl"
                                                                          Style="{StaticResource EditConfigTextBoxStyle}"
                                                                          DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
@@ -665,9 +665,9 @@
                                                                 <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                                          Tag="No Flags" Text="{Binding FilterFlags}"/>
                                                                 <fulcrumViewSupport:FulcrumEnumComboBox 
-                                                                    DefaultValue="TX Flags"
+                                                                    DefaultValue="Tx Flags"
                                                                     x:Name="cboEditFilterFlags"
-                                                                    Style="{StaticResource EditConfigComboBox}"
+                                                                    Style="{StaticResource EditConfigComboBoxStyle}"
                                                                     EnumerationType="{x:Type passThruTypes:TxFlags}"
                                                                     DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
@@ -680,7 +680,7 @@
                                                                 <fulcrumViewSupport:FulcrumEnumComboBox 
                                                                     DefaultValue="Filter Type"
                                                                     x:Name="cboEditFilterType"
-                                                                    Style="{StaticResource EditConfigComboBox}"
+                                                                    Style="{StaticResource EditConfigComboBoxStyle}"
                                                                     EnumerationType="{x:Type passThruTypes:FilterDef}"
                                                                     DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
