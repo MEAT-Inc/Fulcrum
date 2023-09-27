@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModel
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
 using SharpSimulator;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 {
@@ -63,6 +65,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumSimulationPlaybackView_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // Set our editing state value to false
+            this.ViewModel.IsEditingConfig = false;
+            this._viewLogger.WriteLog("TOGGLED EDIT MODE FOR CONFIGURATIONS TO FALSE!");
+
             // Check for hardware selection from the monitoring view
             var HardwareConfigView = FulcrumConstants.FulcrumInstalledHardwareViewModel;
             this.ViewModel.IsHardwareSetup = !(HardwareConfigView.SelectedDLL == null || string.IsNullOrEmpty(HardwareConfigView.SelectedDevice));
@@ -242,7 +248,31 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void btnNewSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
             // Toggle edit mode on our view model
-            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
+            this.ViewModel.IsNewConfig = true;
+            this.ViewModel.IsEditingConfig = true;
+            this._viewLogger.WriteLog("BUILDING AND STORING NEW CONFIGURATION FOR SIMULATION PLAYBACK NOW");
+
+            // Build a new configuration object for the view model to bind onto. Apply config values to it as well
+            this.ViewModel.SimulationConfiguration = new PassThruSimulationConfiguration {
+                ReaderConfigs = new PassThruStructs.SConfigList(1) {
+                    ConfigList = new List<PassThruStructs.SConfig>() {
+                        new() {
+                            SConfigValue = 1,
+                            SConfigParamId = ConfigParamId.CAN_MIXED_FORMAT
+                        }
+                    }
+                }
+            };
+
+            // Store all existing values on our edit controls so we can update them here
+            this.tbEditConfigName.Text = this.ViewModel.SimulationConfiguration.ConfigurationName;
+            this.cboEditProtocolId.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderProtocol;
+            this.cboEditBaudRate.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderBaudRate;
+            this.cboEditConnectFlags.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderChannelFlags;
+            this.tbEditReaderCount.Text = $"{this.ViewModel.SimulationConfiguration.ReaderMsgCount} Messages";
+            this.tbEditReaderTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ReaderTimeout}ms";
+            this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
+            this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
         /// <summary>
         /// Event handler to fire when the user clicks the edit configuration button.
@@ -253,7 +283,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void btnEditSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
             // Toggle edit mode on our view model
-            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
+            this.ViewModel.IsNewConfig = false;
+            this.ViewModel.IsEditingConfig = true;
+            this._viewLogger.WriteLog("TOGGLING EDIT MODE FOR CURRENT SIMULATION OBJECT");
+
+            // Store all existing values on our edit controls so we can update them here
+            this.tbEditConfigName.Text = this.ViewModel.SimulationConfiguration.ConfigurationName;
+            this.cboEditProtocolId.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderProtocol;
+            this.cboEditBaudRate.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderBaudRate;
+            this.cboEditConnectFlags.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderChannelFlags;
+            this.tbEditReaderCount.Text = $"{this.ViewModel.SimulationConfiguration.ReaderMsgCount} Messages";
+            this.tbEditReaderTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ReaderTimeout}ms";
+            this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
+            this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
         /// <summary>
         /// Event handler to fire when the user clicks the save configuration button.
@@ -264,7 +306,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void btnSaveSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
             // TODO: Build logic for saving a new configuration
-            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
+            this.ViewModel.IsEditingConfig = false;
         }
         /// <summary>
         /// Event handler to fire when the user clicks the delete configuration button.
@@ -275,7 +317,26 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void btnDeleteSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
             // TODO: Build logic for removing these configurations
-            this.ViewModel.IsEditingConfig = !this.ViewModel.IsEditingConfig;
+            this.ViewModel.IsEditingConfig = false;
+        }
+
+        /// <summary>
+        /// Event handler to fire when the user tries to add a new message filter to a configuration
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnCreateMessageFilter_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Configure logic for adding filters
+        }
+        /// <summary>
+        /// Event handler to fire when the user tries to delete an existing message filter for a configuration
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnDeleteMessageFilter_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Configure logic for removing filters
         }
     }
 }

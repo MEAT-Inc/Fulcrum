@@ -472,18 +472,18 @@
                                                 <Setter Property="FontFamily" Value="Consolas"/>
                                                 <Setter Property="TextAlignment" Value="Center"/>
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             </Style>
                                             <Style TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}" x:Key="EditConfigTextBox">
                                                 <Setter Property="FontFamily" Value="Consolas"/>
                                                 <Setter Property="TextAlignment" Value="Center"/>
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             </Style>
                                             <Style TargetType="ComboBox" x:Key="EditConfigComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             </Style>
                                         </Grid.Resources>
                                         <Grid.RowDefinitions>
@@ -508,7 +508,7 @@
                                                       ItemsSource="{Binding SimulationConfigurations}"
                                                       SelectionChanged="cboSimConfiguration_OnSelectionChanged" 
                                                       VerticalAlignment="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                                      Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                      Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
                                                         <TextBlock Text="{Binding ConfigurationName}" FontSize="12"/>
@@ -604,74 +604,100 @@
                                                     Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
                                                     Margin="0,0,5,0" Content="New Configuration" 
                                                     VerticalAlignment="Stretch" Click="btnNewSimulationConfig_OnClick" 
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             <Button Style="{StaticResource ActionButtonStyle}"
                                                     Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
-                                                    Margin="0,0,5,0" Content="Save Configuration" 
-                                                    VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick" 
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                    Margin="0,0,5,0" Content="Delete Configuration"
+                                                    VerticalAlignment="Stretch" Click="btnDeleteSimulationConfig_OnClick"
+                                                    IsEnabled="{Binding Path=IsNewConfig, Converter={StaticResource InverseBoolConverter}}"
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             <Button Style="{StaticResource ActionButtonStyle}"
                                                     Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
                                                     Margin="5,0,0,0" Content="Edit Configuration"
                                                     VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick"
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             <Button Style="{StaticResource ActionButtonStyle}"
                                                     Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
-                                                    Margin="5,0,0,0" Content="Delete Configuration"
-                                                    VerticalAlignment="Stretch" Click="btnDeleteSimulationConfig_OnClick"
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                    Margin="5,0,0,0" Content="Save Configuration" 
+                                                    VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick" 
+                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                         </Grid>
                                     </Grid>
 
-                                    <!-- Channel Filters -->
-                                    <ListBox Grid.Column="1" Margin="5,4,5,5" x:Name="lbConfigurationFilters"
-                                             ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
-                                             BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
-                                                <Border BorderBrush="{StaticResource DarkGreyThemeColor}" BorderThickness="2" Margin="-4,0,0,0">
-                                                    <Grid Margin="-0,2,3,0">
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition/>
-                                                            <RowDefinition/>
-                                                            <RowDefinition/>
-                                                            <RowDefinition/>
-                                                            <RowDefinition/>
-                                                        </Grid.RowDefinitions>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
+                                    <!-- Channel Filters and Configuration -->
+                                    <Grid Grid.Column="1" Margin="5,4,5,5" >
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Filters ListBox -->
+                                        <ListBox Grid.Row="0" x:Name="lbConfigurationFilters"
+                                                 ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
+                                                 BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
+                                                    <Border BorderBrush="{StaticResource DarkGreyThemeColor}" BorderThickness="2" Margin="-4,0,0,0">
+                                                        <Grid Margin="-0,2,3,0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                            </Grid.RowDefinitions>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
                                                                 FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="0" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterMask}" FontFamily="Consolas"/>
-                                                        <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
+                                                            <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterPattern}" FontFamily="Consolas"/>
-                                                        <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
+                                                            <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="No Flow Control" Text="{Binding FilterFlowCtl}" FontFamily="Consolas"/>
-                                                        <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
+                                                            <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterFlags}" FontFamily="Consolas"/>
-                                                        <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
+                                                            <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                        <TextBox Style="{StaticResource InputTextWithHolder}"
+                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
                                                              Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" IsReadOnly="True"
                                                              Tag="N/A" Text="{Binding FilterType}" FontFamily="Consolas"/>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+
+                                        <!-- Configure filter Buttons -->
+                                        <Grid Grid.Row="1" Margin="0,25,0,0" Height="30"
+                                              Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0"
+                                                    Click="btnCreateMessageFilter_OnClick"
+                                                    Margin="0,0,5,0" FontSize="12"
+                                                    Content="Create Filter" Style="{StaticResource ActionButtonStyle}"/>
+                                            <Button Grid.Column="1" 
+                                                    Click="btnDeleteMessageFilter_OnClick"
+                                                    Margin="5,0,0,0" FontSize="12"
+                                                    Content="Remove Filter" Style="{StaticResource ActionButtonStyle}"/>
+                                        </Grid>
+                                    </Grid>
 
                                     <!-- Placeholder for no filters (this shouldn't happen) -->
                                     <Grid Grid.Column="1" Visibility="Collapsed" Margin="5"> 
