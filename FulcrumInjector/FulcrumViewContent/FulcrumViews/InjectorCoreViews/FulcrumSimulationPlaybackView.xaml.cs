@@ -279,7 +279,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void btnEditSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
         {
             // Toggle edit mode on our view model
-            this.ViewModel.IsNewConfig = false;
             this.ViewModel.IsEditingConfig = true;
             this._viewLogger.WriteLog("TOGGLING EDIT MODE FOR CURRENT SIMULATION OBJECT");
 

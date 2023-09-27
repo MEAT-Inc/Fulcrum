@@ -587,7 +587,7 @@
                                                         Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
                                                         Margin="0,0,5,0" Content="Delete"
                                                         VerticalAlignment="Stretch" Click="btnDeleteSimulationConfig_OnClick"
-                                                        IsEnabled="{Binding Path=IsNewConfig, Converter={StaticResource InverseBoolConverter}}"/>
+                                                        IsEnabled="{Binding Path=CanDeleteConfig}"/>
                                                 <Button Style="{StaticResource ActionButtonStyle}"
                                                         Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
                                                         Margin="5,0,5,0" Content="Save" 

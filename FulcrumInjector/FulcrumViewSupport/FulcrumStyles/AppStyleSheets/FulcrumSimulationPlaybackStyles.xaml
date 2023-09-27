@@ -46,12 +46,16 @@
 
             <!-- TextBoxes and ComboBoxes for Configuration -->
             <Style x:Key="ReadonlyTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource StaticReadonlyTextBoxStyle}">
-                <Setter Property="Tag" Value="N/A"/>
                 <Setter Property="IsReadOnly" Value="True"/>
                 <Setter Property="FontFamily" Value="Consolas"/>
                 <Setter Property="TextAlignment" Value="Center"/>
                 <Setter Property="Margin" Value="5,5,5,5"/>
-                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Mode=TwoWay, Path=Text}" Value="">
+                        <Setter Property="Text" Value="{Binding RelativeSource={RelativeSource Self}, Path=Tag}"/>
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
             <Style x:Key="EditConfigTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
                 <Setter Property="FontSize" Value="12"/>
