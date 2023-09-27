@@ -118,7 +118,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Setup empty list of our events here and build a collection of simulation configurations
-            this.IsEditingConfig = false;
             this._importSimulationConfigurations();
             this.SimEventsProcessed ??= Array.Empty<EventArgs>();
             this.SimulationChannels = new PassThruSimulationChannel[] { };

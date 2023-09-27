@@ -472,18 +472,18 @@
                                                 <Setter Property="FontFamily" Value="Consolas"/>
                                                 <Setter Property="TextAlignment" Value="Center"/>
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             </Style>
                                             <Style TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}" x:Key="EditConfigTextBox">
                                                 <Setter Property="FontFamily" Value="Consolas"/>
                                                 <Setter Property="TextAlignment" Value="Center"/>
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             </Style>
                                             <Style TargetType="ComboBox" x:Key="EditConfigComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
                                                 <Setter Property="Margin" Value="5,5,5,0"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             </Style>
                                         </Grid.Resources>
                                         <Grid.RowDefinitions>
@@ -508,7 +508,7 @@
                                                       ItemsSource="{Binding SimulationConfigurations}"
                                                       SelectionChanged="cboSimConfiguration_OnSelectionChanged" 
                                                       VerticalAlignment="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                                      Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                      Visibility="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate DataType="{x:Type simEvents:PassThruSimulationConfiguration}">
                                                         <TextBlock Text="{Binding ConfigurationName}" FontSize="12"/>
@@ -596,31 +596,40 @@
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
                                         <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,25,5,5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource ActionButtonStyle}"
-                                                    Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
-                                                    Margin="0,0,5,0" Content="New Configuration" 
-                                                    VerticalAlignment="Stretch" Click="btnNewSimulationConfig_OnClick" 
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                            <Button Style="{StaticResource ActionButtonStyle}"
-                                                    Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
-                                                    Margin="0,0,5,0" Content="Delete Configuration"
-                                                    VerticalAlignment="Stretch" Click="btnDeleteSimulationConfig_OnClick"
-                                                    IsEnabled="{Binding Path=IsNewConfig, Converter={StaticResource InverseBoolConverter}}"
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                            <Button Style="{StaticResource ActionButtonStyle}"
-                                                    Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
-                                                    Margin="5,0,0,0" Content="Edit Configuration"
-                                                    VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick"
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                            <Button Style="{StaticResource ActionButtonStyle}"
-                                                    Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
-                                                    Margin="5,0,0,0" Content="Save Configuration" 
-                                                    VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick" 
-                                                    Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            <Grid Visibility="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/> 
+                                                    <ColumnDefinition/> 
+                                                </Grid.ColumnDefinitions>
+                                                <Button Style="{StaticResource ActionButtonStyle}"
+                                                        Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
+                                                        Margin="0,0,5,0" Content="New Configuration" 
+                                                        VerticalAlignment="Stretch" Click="btnNewSimulationConfig_OnClick"/>
+                                                <Button Style="{StaticResource ActionButtonStyle}"
+                                                        Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
+                                                        Margin="5,0,0,0" Content="Edit Configuration"
+                                                        VerticalAlignment="Stretch" Click="btnEditSimulationConfig_OnClick"/>
+                                            </Grid>
+                                            <Grid Visibility="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Style="{StaticResource ActionButtonStyle}"
+                                                        Grid.Column="0" FontSize="12" HorizontalAlignment="Stretch" 
+                                                        Margin="0,0,5,0" Content="Delete"
+                                                        VerticalAlignment="Stretch" Click="btnDeleteSimulationConfig_OnClick"
+                                                        IsEnabled="{Binding Path=IsNewConfig, Converter={StaticResource InverseBoolConverter}}"/>
+                                                <Button Style="{StaticResource ActionButtonStyle}"
+                                                        Grid.Column="1" FontSize="12" HorizontalAlignment="Stretch" 
+                                                        Margin="5,0,5,0" Content="Save" 
+                                                        VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick"/>
+                                                <Button Style="{StaticResource ActionButtonStyle}"
+                                                        Grid.Column="2" FontSize="12" HorizontalAlignment="Stretch" 
+                                                        Margin="5,0,0,0" Content="Discard" 
+                                                        VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick"/>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
 

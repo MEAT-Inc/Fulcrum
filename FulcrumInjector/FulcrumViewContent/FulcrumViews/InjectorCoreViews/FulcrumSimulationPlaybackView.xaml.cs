@@ -65,10 +65,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumSimulationPlaybackView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Set our editing state value to false
-            this.ViewModel.IsEditingConfig = false;
-            this._viewLogger.WriteLog("TOGGLED EDIT MODE FOR CONFIGURATIONS TO FALSE!");
-
             // Check for hardware selection from the monitoring view
             var HardwareConfigView = FulcrumConstants.FulcrumInstalledHardwareViewModel;
             this.ViewModel.IsHardwareSetup = !(HardwareConfigView.SelectedDLL == null || string.IsNullOrEmpty(HardwareConfigView.SelectedDevice));
@@ -297,6 +293,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
             this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
+
+        /// <summary>
+        /// Event handler to fire when the user clicks the delete configuration button.
+        /// This will toggle edit mode and remove the current configuration routine from our settings store
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnDeleteSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Build logic for removing these configurations
+            this.ViewModel.IsEditingConfig = false;
+        }
         /// <summary>
         /// Event handler to fire when the user clicks the save configuration button.
         /// This will toggle edit mode and write the current configuration values out to our settings file
@@ -309,14 +317,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this.ViewModel.IsEditingConfig = false;
         }
         /// <summary>
-        /// Event handler to fire when the user clicks the delete configuration button.
-        /// This will toggle edit mode and remove the current configuration routine from our settings store
+        /// Event handler to fire when the user clicks the discard changes button.
+        /// This will toggle edit mode and discard any changes to the configuration currently loaded
         /// </summary>
         /// <param name="Sender">Object which fired this event</param>
         /// <param name="E">Arguments fired along with this event</param>
-        private void btnDeleteSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        private void btnDiscardSimConfigChanges_OnClick(object Sender, RoutedEventArgs E)
         {
-            // TODO: Build logic for removing these configurations
+            // TODO: Build logic for discarding changes to a configuration
             this.ViewModel.IsEditingConfig = false;
         }
 
