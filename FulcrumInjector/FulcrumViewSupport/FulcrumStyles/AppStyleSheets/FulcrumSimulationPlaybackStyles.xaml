@@ -44,6 +44,40 @@
                 <Setter Property="ShowLineNumbers" Value="True"/>
             </Style>
 
+            <!-- TextBoxes and ComboBoxes for Configuration -->
+            <Style TargetType="TextBox" BasedOn="{StaticResource StaticReadonlyTextBoxStyle}" x:Key="ReadonlyTextBoxStyle">
+                <Setter Property="Tag" Value="N/A"/>
+                <Setter Property="IsReadOnly" Value="True"/>
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+            </Style>
+            <Style TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}" x:Key="EditConfigTextBoxStyle">
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </Style>
+            <Style TargetType="ComboBox" x:Key="EditConfigComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </Style>
+
+            <!-- TextBlocks for Configuration Information -->
+            <Style TargetType="TextBlock" x:Key="ConfigInfoTextBlockStyle">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,0,10,5"/>
+            </Style>
+            <Style TargetType="TextBlock" x:Key="FilterInfoTextBlockStyle" BasedOn="{StaticResource ConfigInfoTextBlockStyle}">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Margin" Value="4,2,0,2"/>
+            </Style>
+
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

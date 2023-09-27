@@ -8,6 +8,7 @@
              xmlns:simEvents="clr-namespace:SharpSimulator;assembly=SharpSimulator"
              xmlns:ptObjects="clr-namespace:SharpWrapper.J2534Objects;assembly=SharpWrapper"
              xmlns:fulcrumViewSupport="clr-namespace:FulcrumInjector.FulcrumViewSupport"
+             xmlns:fulcrumViewModels="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              xmlns:passThruTypes="clr-namespace:SharpWrapper.PassThruTypes;assembly=SharpWrapper"
              mc:Ignorable="d" 
@@ -457,7 +458,7 @@
                                         BorderThickness="2,0,0,0"/>
 
                                 <!-- Configuration Properties -->
-                                <Grid Grid.Column="2" Margin="5">
+                                <Grid Grid.Column="2" Margin="5" x:Name="gdConfigurationProperties">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
                                         <ColumnDefinition Width=".875*"/>
@@ -465,27 +466,6 @@
 
                                     <!-- Basic Configuration Information -->
                                     <Grid Grid.Column="0" Margin="1,-1,0,0">
-                                        <Grid.Resources>
-                                            <Style TargetType="TextBox" BasedOn="{StaticResource StaticReadonlyTextBoxStyle}" x:Key="ReadonlyTextBoxStyle">
-                                                <Setter Property="Tag" Value="N/A"/>
-                                                <Setter Property="IsReadOnly" Value="True"/>
-                                                <Setter Property="FontFamily" Value="Consolas"/>
-                                                <Setter Property="TextAlignment" Value="Center"/>
-                                                <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                            </Style>
-                                            <Style TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}" x:Key="EditConfigTextBox">
-                                                <Setter Property="FontFamily" Value="Consolas"/>
-                                                <Setter Property="TextAlignment" Value="Center"/>
-                                                <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                            </Style>
-                                            <Style TargetType="ComboBox" x:Key="EditConfigComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
-                                                <Setter Property="Margin" Value="5,5,5,0"/>
-                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                            </Style>
-                                        </Grid.Resources>
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
                                             <RowDefinition/>
@@ -500,11 +480,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Configuration:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,4,10,0" FontSize="14"/>
+                                        <TextBlock Text="Configuration:" Grid.Row="0" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="0" Grid.Column="1">
-                                            <ComboBox SelectedIndex="0" Margin="5,0" Height="30"
+                                            <ComboBox SelectedIndex="0" Margin="5,0,5,5" Height="25"
                                                       ItemsSource="{Binding SimulationConfigurations}"
                                                       SelectionChanged="cboSimConfiguration_OnSelectionChanged" 
                                                       VerticalAlignment="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
@@ -516,13 +494,11 @@
                                                 </ComboBox.ItemTemplate>
                                             </ComboBox>
                                             <TextBox Tag="Enter A Name" x:Name="tbEditConfigName"
-                                                     Style="{StaticResource EditConfigTextBox}"/>                                        
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>                                        
                                         </Grid>
 
                                         <!-- Protocol ID Configuration -->
-                                        <TextBlock Text="Channel Protocol:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,5,10,0" FontSize="14"/>
+                                        <TextBlock Text="Channel Protocol:" Grid.Row="1" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="1" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderProtocol}" />
@@ -534,9 +510,7 @@
                                         </Grid>
 
                                         <!-- BaudRate Configuration -->
-                                        <TextBlock Text="Channel Baudrate:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBlock Text="Channel Baudrate:" Grid.Row="2" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="2" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderBaudRate}" />
@@ -548,9 +522,7 @@
                                         </Grid>                                        
                                         
                                         <!-- Connect Flags Configuration -->
-                                        <TextBlock Text="Channel Flags:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBlock Text="Channel Flags:" Grid.Row="3" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="3" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderChannelFlags}" />
@@ -562,36 +534,30 @@
                                         </Grid>
 
                                         <!-- Read Message Count Configuration -->
-                                        <TextBlock Text="Message Count:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBlock Text="Message Count:" Grid.Row="4" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="4" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
                                             <TextBox Tag="Read Count" x:Name="tbEditReaderCount"
-                                                     Style="{StaticResource EditConfigTextBox}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
                                         </Grid>
 
                                         <!-- Reader Timeout Configuration -->
-                                        <TextBlock Text="Reader Timeout:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBlock Text="Reader Timeout:" Grid.Row="5" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="5" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditReaderTimeout"
-                                                     Style="{StaticResource EditConfigTextBox}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
                                         </Grid>
 
                                         <!-- Response Timeout Configuration -->
-                                        <TextBlock Text="Response Timeout:" Foreground="Yellow"
-                                                   VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"
-                                                   FontWeight="DemiBold" Margin="0,0,10,0" FontSize="14"/>
+                                        <TextBlock Text="Response Timeout:" Grid.Row="6" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="6" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditResponseTimeout"
-                                                     Style="{StaticResource EditConfigTextBox}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
                                         </Grid>
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
@@ -628,7 +594,7 @@
                                                 <Button Style="{StaticResource ActionButtonStyle}"
                                                         Grid.Column="2" FontSize="12" HorizontalAlignment="Stretch" 
                                                         Margin="5,0,0,0" Content="Discard" 
-                                                        VerticalAlignment="Stretch" Click="btnSaveSimulationConfig_OnClick"/>
+                                                        VerticalAlignment="Stretch" Click="btnDiscardSimConfigChanges_OnClick"/>
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -647,7 +613,7 @@
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
                                                     <Border BorderBrush="{StaticResource DarkGreyThemeColor}" BorderThickness="2" Margin="-4,0,0,0">
-                                                        <Grid Margin="-0,2,3,0">
+                                                        <Grid Margin="-0,2,3,5">
                                                             <Grid.RowDefinitions>
                                                                 <RowDefinition/>
                                                                 <RowDefinition/>
@@ -659,31 +625,65 @@
                                                                 <ColumnDefinition Width="Auto"/>
                                                                 <ColumnDefinition/>
                                                             </Grid.ColumnDefinitions>
-                                                            <TextBlock Text="Mask:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
-                                                                FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                             Grid.Row="0" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                             Tag="N/A" Text="{Binding FilterMask}" FontFamily="Consolas"/>
-                                                            <TextBlock Text="Pattern:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"
-                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                             Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                             Tag="N/A" Text="{Binding FilterPattern}" FontFamily="Consolas"/>
-                                                            <TextBlock Text="Flow:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"
-                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                             Grid.Row="2" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                             Tag="No Flow Control" Text="{Binding FilterFlowCtl}" FontFamily="Consolas"/>
-                                                            <TextBlock Text="Flags:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"
-                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                             Grid.Row="3" Grid.Column="1" Margin="5,5,5,0" IsReadOnly="True"
-                                                             Tag="N/A" Text="{Binding FilterFlags}" FontFamily="Consolas"/>
-                                                            <TextBlock Text="Type:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
-                                                               FontWeight="DemiBold" Margin="4,2,0,2" FontSize="12" Foreground="Yellow"/>
-                                                            <TextBox Style="{StaticResource InputTextWithHolder}"
-                                                             Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" IsReadOnly="True"
-                                                             Tag="N/A" Text="{Binding FilterType}" FontFamily="Consolas"/>
+
+                                                            <!-- Filter Mask Configuration -->
+                                                            <TextBlock Text="Mask:" Grid.Row="0" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
+                                                            <Grid Grid.Row="0" Grid.Column="1">
+                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Mask" Text="{Binding FilterMask}" />
+                                                                <TextBox Tag="Filter Mask"
+                                                                         x:Name="tbEditFilterMask"
+                                                                         Style="{StaticResource EditConfigTextBoxStyle}"
+                                                                         DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
+                                                            </Grid>
+
+                                                            <!-- Filter Pattern Configuration -->
+                                                            <TextBlock Text="Pattern:" Grid.Row="1" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
+                                                            <Grid Grid.Row="1" Grid.Column="1">
+                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Pattern" Text="{Binding FilterPattern}"/>
+                                                                <TextBox Tag="Filter Pattern"
+                                                                         x:Name="tbEditFilterPatten"
+                                                                         Style="{StaticResource EditConfigTextBoxStyle}"
+                                                                         DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
+                                                            </Grid>
+
+                                                            <!-- Filter Flow Control Configuration -->
+                                                            <TextBlock Text="Flow:" Grid.Row="2" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
+                                                            <Grid Grid.Row="2" Grid.Column="1">
+                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Flow Control" Text="{Binding FilterFlowCtl}"/>
+                                                                <TextBox Tag="Filter Flow Control"
+                                                                         x:Name="tbEditFilterFlowCtl"
+                                                                         Style="{StaticResource EditConfigTextBoxStyle}"
+                                                                         DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
+                                                            </Grid>
+                                                           
+                                                            <!-- Filter Flags Configuration -->
+                                                            <TextBlock Text="Flags:" Grid.Row="3" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
+                                                            <Grid Grid.Row="3" Grid.Column="1">
+                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Flags" Text="{Binding FilterFlags}"/>
+                                                                <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                                    DefaultValue="TX Flags"
+                                                                    x:Name="cboEditFilterFlags"
+                                                                    Style="{StaticResource EditConfigComboBox}"
+                                                                    EnumerationType="{x:Type passThruTypes:TxFlags}"
+                                                                    DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
+                                                            </Grid>
+
+                                                            <!-- Filter Type Configuration -->
+                                                            <TextBlock Text="Type:" Grid.Row="4" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
+                                                            <Grid Grid.Row="4" Grid.Column="1">
+                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="Filter Type" Text="{Binding FilterType}"/>
+                                                                <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                                    DefaultValue="Filter Type"
+                                                                    x:Name="cboEditFilterType"
+                                                                    Style="{StaticResource EditConfigComboBox}"
+                                                                    EnumerationType="{x:Type passThruTypes:FilterDef}"
+                                                                    DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
+                                                            </Grid>
                                                         </Grid>
                                                     </Border>
                                                 </DataTemplate>
