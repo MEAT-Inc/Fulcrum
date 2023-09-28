@@ -1,0 +1,27 @@
+﻿<ComboBox x:Class="FulcrumInjector.FulcrumViewSupport.FulcrumEnumComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" SelectionChanged="FulcrumEnumComboBox_OnSelectionChanged">
+
+    <!-- DataTemplates for the ComboBox items -->
+    <ComboBox.Resources>
+        <ResourceDictionary>
+
+            <!-- Data Template for Single Item Selection -->
+            <DataTemplate x:Key="SingleItemTemplate">
+                <TextBlock x:Name="tbSelectionName" Text="{Binding}"/>
+            </DataTemplate>
+
+            <!-- Data Template for Multiple Item Selection -->
+            <DataTemplate x:Key="MultipleItemTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox x:Name="cbIsSelected" Checked="cbIsSelected_OnChecked"/>
+                    <TextBlock x:Name="tbSelectionName" Text="{Binding}"/>
+                </StackPanel>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </ComboBox.Resources>
+</ComboBox>

@@ -501,37 +501,46 @@
                                         <!-- Protocol ID Configuration -->
                                         <TextBlock Text="Channel Protocol:" Grid.Row="1" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="1" Grid.Column="1">
-                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderProtocol}" />
+                                            <TextBox x:Name="tbChannelProtocol"
+                                                     Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderProtocol}" 
+                                                     Visibility="{Binding ElementName=cboEditProtocolId, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditProtocolId"
                                                 DefaultValue="Protocol ID"
                                                 Style="{StaticResource EditConfigComboBoxStyle}"
-                                                EnumerationType="{x:Type passThruTypes:ProtocolId}"/>
+                                                EnumerationType="{x:Type passThruTypes:ProtocolId}"
+                                                SelectedItem="{Binding ElementName=tbChannelProtocol, Path=Text, Mode=OneWay}"/>
                                         </Grid>
 
                                         <!-- BaudRate Configuration -->
                                         <TextBlock Text="Channel Baudrate:" Grid.Row="2" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="2" Grid.Column="1">
-                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderBaudRate}" />
+                                            <TextBox x:Name="tbChannelBaudRate"
+                                                     Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderBaudRate}" 
+                                                     Visibility="{Binding ElementName=cboEditBaudRate, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
-                                                x:Name="cboEditBaudRate"
-                                                DefaultValue="BaudRate"
-                                                Style="{StaticResource EditConfigComboBoxStyle}"
-                                                EnumerationType="{x:Type passThruTypes:BaudRate}"/>
+                                                  x:Name="cboEditBaudRate"
+                                                  DefaultValue="BaudRate"
+                                                  EnumerationType="{x:Type passThruTypes:BaudRate}"
+                                                  Style="{StaticResource EditConfigComboBoxStyle}"
+                                                  SelectedItem="{Binding ElementName=tbChannelBaudRate, Path=Text, Mode=OneWay}"/>
                                         </Grid>                                        
                                         
                                         <!-- Connect Flags Configuration -->
                                         <TextBlock Text="Channel Flags:" Grid.Row="3" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="3" Grid.Column="1">
-                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderChannelFlags}" />
+                                            <TextBox x:Name="tbChannelFlags"
+                                                     Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ReaderChannelFlags}" 
+                                                     Visibility="{Binding ElementName=cboEditConnectFlags, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
                                             <fulcrumViewSupport:FulcrumEnumComboBox 
                                                 x:Name="cboEditConnectFlags"
                                                 DefaultValue="Connect Flags"
                                                 Style="{StaticResource EditConfigComboBoxStyle}"
-                                                EnumerationType="{x:Type passThruTypes:PassThroughConnect}"/>
+                                                EnumerationType="{x:Type passThruTypes:PassThroughConnect}"
+                                                SelectedItem="{Binding ElementName=tbChannelFlags, Path=Text, Mode=OneWay}"/>
                                         </Grid>
 
                                         <!-- Read Message Count Configuration -->
@@ -630,58 +639,79 @@
                                                             <!-- Filter Mask Configuration -->
                                                             <TextBlock Text="Mask:" Grid.Row="0" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
                                                             <Grid Grid.Row="0" Grid.Column="1">
-                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                                         Tag="No Mask" Text="{Binding FilterMask}"/>
-                                                                <TextBox Tag="Filter Mask"
+                                                                <TextBox x:Name="tbFilterMask"
+                                                                         Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Mask" Text="{Binding FilterMask}"
+                                                                         Visibility="{Binding ElementName=tbEditFilterMask, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
+                                                                <TextBox Tag="Filter Mask" 
                                                                          x:Name="tbEditFilterMask"
+                                                                         Margin="5,5,5,0"
                                                                          Style="{StaticResource EditConfigTextBoxStyle}"
+                                                                         Text="{Binding ElementName=tbFilterMask, Path=Text, Mode=OneWay}"
                                                                          DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
 
                                                             <!-- Filter Pattern Configuration -->
                                                             <TextBlock Text="Pattern:" Grid.Row="1" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
                                                             <Grid Grid.Row="1" Grid.Column="1">
-                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                                         Tag="No Pattern" Text="{Binding FilterPattern}"/>
+                                                                <TextBox x:Name="tbFilterPattern"
+                                                                         Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Pattern" Text="{Binding FilterPattern}"
+                                                                         Visibility="{Binding ElementName=tbEditFilterPatten, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
                                                                 <TextBox Tag="Filter Pattern"
                                                                          x:Name="tbEditFilterPatten"
+                                                                         Margin="5,5,5,0"
                                                                          Style="{StaticResource EditConfigTextBoxStyle}"
+                                                                         Text="{Binding ElementName=tbFilterPattern, Path=Text, Mode=OneWay}"
                                                                          DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
 
                                                             <!-- Filter Flow Control Configuration -->
                                                             <TextBlock Text="Flow:" Grid.Row="2" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
                                                             <Grid Grid.Row="2" Grid.Column="1">
-                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                                         Tag="No Flow Control" Text="{Binding FilterFlowCtl}"/>
-                                                                <TextBox Tag="Filter Flow Control"
+                                                                <TextBox x:Name="tbFilterFlowCtl"
+                                                                         Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Flow Control" Text="{Binding FilterFlowCtl}"
+                                                                         Visibility="{Binding ElementName=tbEditFlowCtrl, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
+                                                                <TextBox x:Name="tbEditFlowCtrl"
+                                                                         Tag="Filter Flow Control"
+                                                                         Margin="5,5,5,0"
                                                                          Style="{StaticResource EditConfigTextBoxStyle}"
+                                                                         Text="{Binding ElementName=tbFilterFlowCtl, Path=Text, Mode=OneWay}"
                                                                          DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
                                                            
                                                             <!-- Filter Flags Configuration -->
                                                             <TextBlock Text="Flags:" Grid.Row="3" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
                                                             <Grid Grid.Row="3" Grid.Column="1">
-                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                                         Tag="No Flags" Text="{Binding FilterFlags}"/>
+                                                                <TextBox x:Name="tbFilterFlags"
+                                                                         Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="No Flags" Text="{Binding FilterFlags}"
+                                                                         Visibility="{Binding ElementName=cboEditFilterFlags, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
                                                                 <fulcrumViewSupport:FulcrumEnumComboBox 
                                                                     DefaultValue="Tx Flags"
                                                                     x:Name="cboEditFilterFlags"
-                                                                    Style="{StaticResource EditConfigComboBoxStyle}"
+                                                                    Margin="5,5,5,0"
                                                                     EnumerationType="{x:Type passThruTypes:TxFlags}"
+                                                                    Style="{StaticResource EditConfigComboBoxStyle}"
+                                                                    SelectedItem="{Binding ElementName=tbFilterFlags, Path=Text, Mode=OneWay}"
                                                                     DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
 
                                                             <!-- Filter Type Configuration -->
                                                             <TextBlock Text="Type:" Grid.Row="4" Grid.Column="0" Style="{StaticResource FilterInfoTextBlockStyle}"/>
                                                             <Grid Grid.Row="4" Grid.Column="1">
-                                                                <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                                         Tag="Filter Type" Text="{Binding FilterType}"/>
+                                                                <TextBox x:Name="tbFilterType"
+                                                                         Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                                         Tag="Filter Type" Text="{Binding FilterType}"
+                                                                         Visibility="{Binding ElementName=cboEditFilterType, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
                                                                 <fulcrumViewSupport:FulcrumEnumComboBox 
                                                                     DefaultValue="Filter Type"
                                                                     x:Name="cboEditFilterType"
-                                                                    Style="{StaticResource EditConfigComboBoxStyle}"
+                                                                    Margin="5,5,5,0"
                                                                     EnumerationType="{x:Type passThruTypes:FilterDef}"
+                                                                    Style="{StaticResource EditConfigComboBoxStyle}"
+                                                                    SelectedItem="{Binding ElementName=tbFilterType, Path=Text, Mode=OneWay}"
                                                                     DataContext="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
                                                             </Grid>
                                                         </Grid>

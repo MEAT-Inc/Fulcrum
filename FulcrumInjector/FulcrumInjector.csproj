@@ -199,13 +199,16 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewSupport\FulcrumEnumCombo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringScrambler.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDriveBroker.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumEnumCombo.xaml.cs">
+      <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
@@ -356,6 +359,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewContent\FulcrumViews\InjectorOptionViews\FulcrumSessionReportingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumEnumCombo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
