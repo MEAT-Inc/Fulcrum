@@ -49,7 +49,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
         // Private backing fields for an expressions and simulations generator
         private PassThruExpressionsGenerator _expGenerator;         // The expressions generator for this view model
-        private PassThruExpressionsGenerator _simGenerator;         // The simulation generator for this view model
+        private PassThruSimulationGenerator _simGenerator;          // The simulation generator for this view model
         
         #endregion // Fields
 
@@ -212,11 +212,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.ViewModelLogger.WriteLog($"EXPRESSIONS GENERATOR DEBUG LOGGING IS SET TO: {EnableGeneratorLogging}");
 
                 // Start by building PTExpressions from input string object sets.
-                this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog); 
+                this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO PT EXPRESSION OBJECTS FOR BINDING NOW...", LogType.InfoLog);
                 var BuiltExpressions = this._expGenerator.GenerateLogExpressions(EnableGeneratorLogging);
                 var BuiltExpressionsFile = this._expGenerator.SaveExpressionsFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
                 if (BuiltExpressionsFile == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW EXPRESSIONS CONTENT!");
-                
+
                 // Once we've built the new expressions file contents and files, we can store them on our log file set
                 var ExpressionsFileModel = new FulcrumLogFileModel(BuiltExpressionsFile);
                 this.CurrentLogSet.SetExpressionsFile(ExpressionsFileModel, BuiltExpressions);
@@ -247,12 +247,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         public bool GenerateLogSimulation()
         {
             try
-            { 
+            {
                 // Log we're building a simulation file set and build a new expressions generator here 
                 this.ProcessingProgress = 0;
                 this.ViewModelLogger.WriteLog("BUILDING SIMULATION FROM LOADED LOG FILE NOW...", LogType.InfoLog);
-                var SimGenerator = new PassThruSimulationGenerator(this.CurrentLogSet.PassThruLogFile.LogFilePath, this.CurrentLogSet.GeneratedExpressions);
-                SimGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
+                this._simGenerator = new PassThruSimulationGenerator(this.CurrentLogSet.PassThruLogFile.LogFilePath, this.CurrentLogSet.GeneratedExpressions);
+                this._simGenerator.OnGeneratorProgress += (_, GeneratorArgs) =>
                 {
                     // If the progress value reported back is the same as it is currently, don't set it again
                     int NextProgress = (int)GeneratorArgs.CurrentProgress;
@@ -262,12 +262,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 // Get our debug configuration value for enabling generator debugging
                 var ConversionSettings = FulcrumConstants.FulcrumSettings[FulcrumSettingsCollection.SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS];
                 var EnableGeneratorLogging = ConversionSettings.GetSettingValue("Debug Simulations Generator", false);
-                this.ViewModelLogger.WriteLog($"EXPRESSIONS GENERATOR DEBUG LOGGING IS SET TO: {EnableGeneratorLogging}");
+                this.ViewModelLogger.WriteLog($"SIMULATOR GENERATOR DEBUG LOGGING IS SET TO: {EnableGeneratorLogging}");
 
                 // Now Build our simulation content objects for this generator
                 this.ViewModelLogger.WriteLog("PROCESSING LOG LINES INTO SIM CHANNEL OBJECTS NOW...", LogType.InfoLog);
-                var BuiltSimChannels = SimGenerator.GenerateLogSimulation(EnableGeneratorLogging);
-                var BuiltSimFileName = SimGenerator.SaveSimulationFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
+                var BuiltSimChannels = this._simGenerator.GenerateLogSimulation(EnableGeneratorLogging);
+                var BuiltSimFileName = this._simGenerator.SaveSimulationFile(this.CurrentLogSet.PassThruLogFile.LogFilePath);
                 if (BuiltSimFileName == "") throw new InvalidOperationException("FAILED TO FIND OUT NEW SIMULATION CONTENT!");
 
                 // Once we've built the new simulations file contents and files, we can store them on our log file set
@@ -283,8 +283,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 FulcrumLogReviewView CastView = this.BaseViewControl as FulcrumLogReviewView;
                 CastView.Dispatcher.Invoke(() => { CastView.ViewerContentComboBox.SelectedIndex = 2; });
                 return true;
-            } 
-            catch (Exception BuildSimEx) 
+            }
+            catch (Exception BuildSimEx)
             {
                 // Log failures out and return nothing
                 this.ProcessingProgress = 100;
@@ -307,8 +307,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         /// <summary>
         /// Toggles the current view contents around the processing output viewer
         /// </summary>
-        /// <param name="StateToSet">State to apply</param>
-        /// <returns></returns>
+        /// <returns>True if the viewer state is updated, false if it is not</returns>
         private bool _toggleViewerContents()
         {
             try

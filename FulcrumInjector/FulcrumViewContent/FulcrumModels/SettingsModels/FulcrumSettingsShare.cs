@@ -161,6 +161,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
                 this._settingsStoreLogger.WriteLog($"[SETTINGS COLLECTION] ::: {SettingSet.Item1.ToDescriptionString()} HAS BEEN IMPORTED");
             }
 
+            // Save our settings to the JSON file to update our regex values loaded in 
+            this._settingsStoreLogger.WriteLog("SAVING IMPORTED SETTINGS FOR CONSISTENCY ACROSS SHARE AND JSON FILE...");
+            this.SaveSettings();
+
             // Log passed and return output
             this._settingsStoreLogger.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
             return this.Values.ToList();
@@ -174,7 +178,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
         {
             // Pull all of our settings objects and build our JSON output for them here
             this._settingsStoreLogger.WriteLog("SAVING ALL USER SETTINGS TO APPLICATION JSON SETTINGS FILE NOW...", LogType.WarnLog);
-            var SettingObjects = FulcrumConstants.FulcrumSettings.Select(SettingObj => JObject.FromObject(new
+            var SettingObjects = this.Select(SettingObj => JObject.FromObject(new
             {
                 // Configure a title and entry value for each setting object
                 SettingSectionTitle = SettingObj.Key.ToDescriptionString(),
@@ -194,7 +198,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             try
             {
                 // Find the settings set for the shim values here and store them
-                var ShimSettingsSet = FulcrumConstants.FulcrumSettings[SettingSectionTypes.SHIM_DLL_SETTINGS];
+                var ShimSettingsSet = this[SettingSectionTypes.SHIM_DLL_SETTINGS];
                 string[] ValuesPulled = ShimSettingsSet
                     .Select(SettingObj => SettingObj.ToString())
                     .Prepend("FulcrumShimDLLConfig.txt")

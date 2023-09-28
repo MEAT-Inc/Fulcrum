@@ -53,7 +53,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
             {
                 // If our output object is null, then just return a generic output of the type passed
                 _valueLoadersLogger?.WriteLog($"ERROR! VALUE PULLED AT PATH GIVEN WAS NULL!", LogType.TraceLog);
-                return (TValueType)new object();
+                return Activator.CreateInstance<TValueType>();
             }
 
             // If not null, convert and return the object into the desired generic type
