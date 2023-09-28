@@ -182,6 +182,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         /// <returns>True if the configuration is deleted, false if it is not</returns>
         public bool DeleteSimConfiguration(string ConfigurationName)
         {
+            // TODO: Build logic for removing configurations from view model list
             return false;
         }
 

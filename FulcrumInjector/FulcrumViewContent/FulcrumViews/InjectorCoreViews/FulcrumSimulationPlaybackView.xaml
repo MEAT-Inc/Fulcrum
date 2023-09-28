@@ -422,7 +422,7 @@
                                 <TextBlock 
                                     Grid.Row="1" TextWrapping="Wrap" FontSize="12" TextAlignment="Justify"
                                     Margin="5,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"
-                                    Text="Please actually read all of this information! Failure to do so will likely result in PEBKAC! Use this view to setup the configuration for a simulation playback routine. There are some preset configurations to choose from below. For the most part, the presets are accurate enough to get things going for your simulation. Keep in mind you need to pick the correct configuration for the simulation in use, otherwise no messages will be processed.">
+                                    Text="Please actually read all of this information! Failure to do so will likely result in PEBKAC! Use this view to setup the configuration for a simulation playback routine. There are some preset configurations to choose from below. All configurations can be modified to help improve the reliability of your simulation if needed. If you want to use a configuration from another machine, add it to the settings JSON file to import it.">
                                 </TextBlock>
                             </Grid>
 
