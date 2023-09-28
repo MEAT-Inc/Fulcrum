@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
 {
     /// <summary>
-    /// Converts a boolean value into a visibility but inverse based on value.
-    /// True = Hidden. False = Visible 
+    /// Inverts a given visibility value and returns it out
     /// </summary>
-    internal class BoolToObjectConverter<TValueType> : IValueConverter
+    internal class InverseVisibilityConverter : IValueConverter
     {
         #region Custom Events
         #endregion //Custom Events
@@ -17,11 +17,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         #endregion //Fields
 
         #region Properties
-
-        // True and false value object types for output types.
-        public TValueType TrueOutput { get; set; }
-        public TValueType FalseOutput { get; set; }
-
         #endregion //Properties
 
         #region Structs and Classes
@@ -32,42 +27,37 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// <summary>
         /// Builds a new converter 
         /// </summary>
-        /// <param name="TrueValue">Value to return for true conversions</param>
-        /// <param name="FalseValue">Value to return for false conversions</param>
-        public BoolToObjectConverter(TValueType TrueValue, TValueType FalseValue)
-        {
-            // Store value for true and false values
-            TrueOutput = TrueValue;
-            FalseOutput = FalseValue;
-        }
-        
+        public InverseVisibilityConverter() { }
+
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Convert into a visibility type based on an input value of boolean
+        /// Inverts a given visibility value assuming it is valid.
+        /// Providing Visible returns collapsed. Anything else will return visible
         /// </summary>
         /// <param name="InputValue">Value to check</param>
         /// <param name="TargetType">Type to cast into</param>
         /// <param name="Paramater">Object to apply into</param>
         /// <param name="CultureType">Culture information</param>
-        /// <returns>Output object based on what the input value is</returns>
+        /// <returns>Visible output if the input object is collapsed</returns>
         public virtual object Convert(object InputValue, Type TargetType, object Paramater, CultureInfo CultureType)
         {
-            // Convert bool and return output value based on what was setup in our CTOR
-            return InputValue is bool BoolValue && BoolValue ? TrueOutput : FalseOutput;
+            // Convert the input argument into a visibility value and return out based on the input
+            if (InputValue is not Visibility InputVisibility) return Visibility.Visible; 
+            return InputVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
         /// <summary>
-        /// Convert into a visibility type based on an input value of boolean
+        /// Return the original visibility state for the input object
         /// </summary>
         /// <param name="InputValue">Value to check</param>
         /// <param name="TargetType">Type to cast into</param>
         /// <param name="Paramater">Object to apply into</param>
         /// <param name="CultureType">Culture information</param>
-        /// <returns>TrueOutput if value is the true</returns>
+        /// <returns>Visible output if value is the true</returns>
         public virtual object ConvertBack(object InputValue, Type TargetType, object Paramater, CultureInfo CultureType)
         {
-            // Convert bool and return true or false based on if the input value is equal to our true value
-            return InputValue is TValueType && Equals(InputValue, TrueOutput);
+            // Return the inverse of the input conversion based on the arguments given
+            return InputValue is not Visibility InputVisibility ? Visibility.Collapsed : InputVisibility;
         }
     }
 }

@@ -47,11 +47,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Fields
 
         // Private backing fields for our public properties
+        private bool _isNewConfig;                                                  // Sets if we're building a new config or not
         private bool _isSimLoaded;                                                  // Determines if the simulation is loaded
-        private bool _isHardwareSetup;                                              // Determines if hardware is configured
         private bool _isSimStarting;                                                // Determines if the simulation is booting
-        private bool _isSimulationRunning;                                          // Determines if the simulation is running
+        private bool _isEditingConfig;                                              // Tells us if we're in edit mode or not
+        private bool _isHardwareSetup;                                              // Determines if hardware is configured
+        private bool _canDeleteConfig;                                              // Determines if we can delete a configuration
         private string _loadedSimFile;                                              // Currently loaded simulation file
+        private bool _isSimulationRunning;                                          // Determines if the simulation is running
         private string _loadedSimFileContent;                                       // Currently loaded simulation file content
         private EventArgs[] _simEventsProcessed;                                    // Events fired during the simulation
         private PassThruSimulationPlayer _simulationPlayer;                         // The player running the simulation
@@ -64,9 +67,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Properties
 
         // Public properties for the view to bind onto  
+        public bool IsNewConfig { get => this._isNewConfig; set => PropertyUpdated(value); }
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
-        public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
         public bool IsSimStarting { get => this._isSimStarting; set => PropertyUpdated(value); }
+        public bool IsEditingConfig { get => this._isEditingConfig; set => PropertyUpdated(value); }
+        public bool CanDeleteConfig { get => this._canDeleteConfig; set => PropertyUpdated(value); }
+        public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
         public bool IsSimulationRunning { get => this._isSimulationRunning; set => PropertyUpdated(value); }
 
         // Content for the current loaded simulation file
@@ -78,7 +84,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         public PassThruSimulationChannel[] SimulationChannels { get => this._simulationChannels.ToArray(); set => PropertyUpdated(value.ToList()); }
 
         // Currently applied simulation configuration and configurations we're able to load in
-        public PassThruSimulationConfiguration SimulationConfiguration { get => this._simulationConfiguration; set => PropertyUpdated(value); }
+        public PassThruSimulationConfiguration SimulationConfiguration
+        {
+            get => this._simulationConfiguration;
+            set
+            {
+                // Update our backing field and configure some other values for editing
+                PropertyUpdated(value);
+                
+                // Set if we can delete this configuration or not
+                this.IsNewConfig = string.IsNullOrWhiteSpace(value.ConfigurationName);
+                this.CanDeleteConfig = !PassThruSimulationConfiguration.SupportedConfigurations.ToList().Contains(value);
+            }
+        }
         public List<PassThruSimulationConfiguration> SimulationConfigurations { get => this._simulationConfigurations; set => PropertyUpdated(value); }
 
         #endregion // Properties
@@ -109,6 +127,64 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         }
         
         // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Helper method used to save a given configuration object to our view model and settings page
+        /// </summary>
+        /// <param name="UpdatedConfiguration">The configuration we're saving</param>
+        /// <returns>True if the configuration is saved, false if it is not</returns>
+        public bool SaveSimConfiguration(PassThruSimulationConfiguration UpdatedConfiguration)
+        {
+            // Add this configuration to our list of imported values and store it on our settings file
+            string ConfigurationName = UpdatedConfiguration.ConfigurationName;
+            this.ViewModelLogger.WriteLog($"SAVING OR UPDATING VALUES FOR CONFIGURATION {ConfigurationName}...");
+            int IndexOfConfig = this.SimulationConfigurations.FindIndex(ConfigObj => ConfigObj.ConfigurationName == ConfigurationName);
+            if (IndexOfConfig != -1)
+            {
+                // Find the existing value and just replace it
+                this.SimulationConfigurations[IndexOfConfig] = UpdatedConfiguration;
+                this.OnPropertyChanged(nameof(this.SimulationConfigurations));
+                this.ViewModelLogger.WriteLog($"REPLACED CONFIGURATION {ConfigurationName} WITH UPDATED VALUES!");
+            }
+            else
+            {
+                // Add the configuration as a new object here
+                this.SimulationConfigurations.Add(UpdatedConfiguration);
+                this.ViewModelLogger.WriteLog($"ADDED CONFIGURATION {ConfigurationName} TO CONFIGURATIONS LIST!");
+            }
+
+            // Build a new list of configurations to write out to our JSON file
+            var CustomConfigsObject = ValueLoaders.GetConfigValue<object>("FulcrumSimConfigurations.CustomConfigurations");
+            if (CustomConfigsObject is not PassThruSimulationConfiguration[] CustomConfigs) CustomConfigs = new[] { UpdatedConfiguration }; 
+            else CustomConfigs = CustomConfigs.Append(UpdatedConfiguration).ToArray();
+
+            // Build a new list of protocols to write out to our JSON file 
+            List<ProtocolId> SupportedProtocols = PassThruSimulationConfiguration.SupportedProtocols.ToList();
+            foreach (var CustomConfig in CustomConfigs)
+                if (!SupportedProtocols.Contains(CustomConfig.ReaderProtocol))
+                    SupportedProtocols.Add(CustomConfig.ReaderProtocol);
+
+            // Write the JSON contents out for our configurations
+            this.ViewModelLogger.WriteLog("STORING USER DEFINED CONFIGURATIONS ON OUR SETTINGS FILE NOW", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"TOTAL OF {CustomConfigs.Length} CUSTOM CONFIGURATIONS AND {SupportedProtocols.Count} PROTOCOLS");
+            ValueSetters.SetValue("FulcrumSimConfigurations.SupportedProtocols", SupportedProtocols);
+            ValueSetters.SetValue("FulcrumSimConfigurations.CustomConfigurations", CustomConfigs);
+
+            // Log that we've saved the content requested and exit out
+            this.ViewModelLogger.WriteLog("STORED UPDATED CONFIGURATION VALUES ON SETTINGS FILE CORRECTLY!", LogType.InfoLog);
+            this.SimulationConfiguration = UpdatedConfiguration;
+            return true;
+        }
+        /// <summary>
+        /// Helper method used to delete a given configuration object from view model and settings page
+        /// </summary>
+        /// <param name="ConfigurationName">The configuration name we're deleting</param>
+        /// <returns>True if the configuration is deleted, false if it is not</returns>
+        public bool DeleteSimConfiguration(string ConfigurationName)
+        {
+            // TODO: Build logic for removing configurations from view model list
+            return false;
+        }
 
         /// <summary>
         /// Loads in a new simulation file and stores it onto our view model and view
@@ -258,8 +334,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         private void _importSimulationConfigurations()
         {
             // Store the predefined configurations on our view model instance first
-            this.SimulationConfigurations = PassThruSimulationConfiguration.SupportedConfigurations.ToList();
             List<ProtocolId> SupportedProtocols = PassThruSimulationConfiguration.SupportedProtocols.ToList();
+            this.SimulationConfigurations = PassThruSimulationConfiguration.SupportedConfigurations.ToList();
 
             // Store the default configurations and the default protocols on our settings object
             ValueSetters.SetValue("FulcrumSimConfigurations.PredefinedConfigurations", this.SimulationConfigurations);

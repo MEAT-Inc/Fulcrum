@@ -1,10 +1,17 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
+                    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                    xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
+
+            <!-- Data Converters -->
+            <fulcrumDataConverters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <fulcrumDataConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <fulcrumDataConverters:InverseVisibilityConverter x:Key="InverseVisibilityConverter"/>
+            <fulcrumDataConverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
 
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
@@ -36,6 +43,90 @@
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Padding" Value="5,5,5,10"/>
                 <Setter Property="ShowLineNumbers" Value="True"/>
+            </Style>
+
+            <!-- TextBoxes and ComboBoxes for Configuration -->
+            <Style x:Key="ReadonlyTextBoxStyle" TargetType="TextBox">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Grid>
+                                <TextBox x:Name="textSource" Panel.ZIndex="2"
+                                         Text="{Binding Path=Text,
+                                                RelativeSource={RelativeSource TemplatedParent}, 
+                                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="FontSize" Value="14"/>
+                                            <Setter Property="IsReadOnly" Value="True"/>
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="Margin" Value="5,5,5,5"/>
+                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="Background" Value="{StaticResource PrimaryColor_Darker_65}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <TextBox Text="{TemplateBinding Tag}" Background="{StaticResource PrimaryColor_Darker_65}" Panel.ZIndex="1">
+                                    <TextBox.Style>
+                                        <Style TargetType="{x:Type TextBox}">
+                                            <Setter Property="FontSize" Value="14"/>
+                                            <Setter Property="IsReadOnly" Value="True"/>
+                                            <Setter Property="FontStyle" Value="Italic"/>
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="Foreground" Value="Transparent"/>
+                                            <Setter Property="Margin" Value="5,5,5,5"/>
+                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=Text, Source={x:Reference textSource}}" Value="">
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="EditConfigTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextWithHolder}">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </Style>
+            <Style x:Key="EditConfigComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}" >
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </Style>
+
+            <!-- TextBlocks for Configuration Information -->
+            <Style x:Key="ConfigInfoTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,0,10,5"/>
+            </Style>
+            <Style x:Key="FilterInfoTextBlockStyle"  TargetType="TextBlock" BasedOn="{StaticResource ConfigInfoTextBlockStyle}">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Margin" Value="4,2,0,2"/>
+                <Setter Property="DataContext" Value="{Binding ElementName=lbConfigurationFilters, Path=DataContext}"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
             </Style>
 
         </ResourceDictionary>
