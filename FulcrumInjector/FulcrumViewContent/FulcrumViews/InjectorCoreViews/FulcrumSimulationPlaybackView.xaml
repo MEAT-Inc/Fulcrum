@@ -422,7 +422,7 @@
                                 <TextBlock 
                                     Grid.Row="1" TextWrapping="Wrap" FontSize="12" TextAlignment="Justify"
                                     Margin="5,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"
-                                    Text="Please actually read all of this information! Failure to do so will likely result in PEBKAC! Use this view to setup the configuration for a simulation playback routine. There are some preset configurations to choose from below. All configurations can be modified to help improve the reliability of your simulation if needed. If you want to use a configuration from another machine, add it to the settings JSON file to import it.">
+                                    Text="Please actually read all of this information! Failure to do so will likely result in PEBKAC! Use this view to setup the configuration for a simulation playback routine. There are some preset configurations to choose from below.">
                                 </TextBlock>
                             </Grid>
 
@@ -448,8 +448,8 @@
                                     <TextBlock Margin="5,0,10,0"
                                                TextAlignment="Justify" TextWrapping="Wrap"
                                                Foreground="{StaticResource TextColorBase}" 
-                                               Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. The try using the ISO15765 - 11 Bit configuration for Euro/Domestic vehicles, and the CAN - 29 Bit Configuration for Asian vehicles. If the simulation in use covers both 11 and 29 bit communications, use the Mixed Mode configuration. If you get stuck, reach out to Zack Walsh, and he can help find or build the right configuration for your simulation file."/>
-                                </StackPanel>
+                                               Text="Since the simulation files don't contain any configuration data (yet), you need to determine what configuration works best for your simulation. The try using the ISO15765 - 11 Bit configuration for Euro/Domestic vehicles, and the CAN - 29 Bit Configuration for Asian vehicles. If the simulation in use covers both 11 and 29 bit communications, use the Mixed Mode configuration. For other protocols, you will need to build a configuration. If you get stuck, reach out to Zack Walsh, and he can help find or build the right configuration for your simulation file."/>
+                                </StackPanel> 
 
                                 <!-- Splitting Border -->
                                 <Border Grid.Column="1" Margin="0,0,0,0"
@@ -457,7 +457,7 @@
                                         BorderThickness="2,0,0,0"/>
 
                                 <!-- Configuration Properties -->
-                                <Grid Grid.Column="2" Margin="5">
+                                <Grid Grid.Column="2" Margin="5,0,5,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
                                         <ColumnDefinition Width=".875*"/>
@@ -474,7 +474,7 @@
                                             <RowDefinition/>
                                             <RowDefinition/>
                                             <RowDefinition/>
-                                            <RowDefinition Height="60"/>
+                                            <RowDefinition Height="1.2*"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
@@ -572,8 +572,8 @@
                                         </Grid>
 
                                         <!-- Response Attempts Configuration -->
-                                        <TextBlock Text="Response Attempts:" Grid.Row="6" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
-                                        <Grid Grid.Row="6" Grid.Column="1">
+                                        <TextBlock Text="Response Attempts:" Grid.Row="7" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
+                                        <Grid Grid.Row="7" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ResponseAttempts, StringFormat={}{0} Attempts}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditResponseAttempts"
@@ -581,7 +581,7 @@
                                         </Grid>
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
-                                        <Grid Grid.Row="7" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,25,5,5">
+                                        <Grid Grid.Row="8" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,9,5,7">
                                             <Grid Visibility="{Binding Path=IsEditingConfig, Mode=TwoWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/> 
@@ -731,7 +731,7 @@
                                         </ListBox>
 
                                         <!-- Configure filter Buttons -->
-                                        <Grid Grid.Row="1" Margin="0,25,0,0" Height="30"
+                                        <Grid Grid.Row="1" Margin="0,26,0,1" Height="30"
                                               Visibility="{Binding Path=IsEditingConfig, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>
@@ -739,11 +739,11 @@
                                             </Grid.ColumnDefinitions>
                                             <Button Grid.Column="0"
                                                     Click="btnCreateMessageFilter_OnClick"
-                                                    Margin="0,0,5,0" FontSize="12"
+                                                    Margin="0,1,5,0" FontSize="12"
                                                     Content="Create Filter" Style="{StaticResource ActionButtonStyle}"/>
                                             <Button Grid.Column="1" 
                                                     Click="btnDeleteMessageFilter_OnClick"
-                                                    Margin="5,0,0,0" FontSize="12"
+                                                    Margin="5,1,0,0" FontSize="12"
                                                     Content="Remove Filter" Style="{StaticResource ActionButtonStyle}"/>
                                         </Grid>
                                     </Grid>
