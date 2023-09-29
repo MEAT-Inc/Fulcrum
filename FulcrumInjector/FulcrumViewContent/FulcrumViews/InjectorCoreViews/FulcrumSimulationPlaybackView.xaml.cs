@@ -249,7 +249,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this._viewLogger.WriteLog("BUILDING AND STORING NEW CONFIGURATION FOR SIMULATION PLAYBACK NOW");
 
             // Build a new configuration object for the view model to bind onto. Apply config values to it as well
-            this.ViewModel.SimulationConfiguration = new PassThruSimulationConfiguration {
+            this.ViewModel.SimulationConfiguration = new PassThruSimulationConfiguration("My Configuration") {
                 ReaderConfigs = new PassThruStructs.SConfigList(1) {
                     ConfigList = new List<PassThruStructs.SConfig>() {
                         new() {
@@ -268,6 +268,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this.tbEditReaderCount.Text = $"{this.ViewModel.SimulationConfiguration.ReaderMsgCount} Messages";
             this.tbEditReaderTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ReaderTimeout}ms";
             this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
+            this.tbEditResponseAttempts.Text = $"{this.ViewModel.SimulationConfiguration.ResponseAttempts} Attempts";
             this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
         /// <summary>
@@ -290,6 +291,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this.tbEditReaderCount.Text = $"{this.ViewModel.SimulationConfiguration.ReaderMsgCount} Messages";
             this.tbEditReaderTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ReaderTimeout}ms";
             this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
+            this.tbEditResponseAttempts.Text = $"{this.ViewModel.SimulationConfiguration.ResponseAttempts} Attempts";
             this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
 
