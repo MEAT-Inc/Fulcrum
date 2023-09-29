@@ -473,6 +473,7 @@
                                             <RowDefinition/>
                                             <RowDefinition/>
                                             <RowDefinition/>
+                                            <RowDefinition/>
                                             <RowDefinition Height="60"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
@@ -567,6 +568,15 @@
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditResponseTimeout"
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
+                                        </Grid>
+
+                                        <!-- Response Attempts Configuration -->
+                                        <TextBlock Text="Response Attempts:" Grid.Row="6" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
+                                        <Grid Grid.Row="6" Grid.Column="1">
+                                            <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
+                                                     Text="{Binding SimulationConfiguration.ResponseAttempts, StringFormat={}{0} Attempts}"/>
+                                            <TextBox Tag="Milliseconds" x:Name="tbEditResponseAttempts"
                                                      Style="{StaticResource EditConfigTextBoxStyle}"/>
                                         </Grid>
 
