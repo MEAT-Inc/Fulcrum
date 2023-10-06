@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModel
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
 using SharpSimulator;
+using SharpWrapper.PassThruTypes;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
 {
@@ -30,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
+        public FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -52,7 +54,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             InitializeComponent();
 
             // Setup our data context and log information out
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE SIMULATION PLAYBACK VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
@@ -187,7 +189,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             if (!this.ViewModel.IsSimulationRunning)
             {
                 // If the simulation configuration is not defined, open the viewer
-                if (this.ViewModel.SimulationConfiguration == null) {
+                if (this.ViewModel.LoadedConfiguration == null) {
                     this.ToggleSimulationEditor_OnClick(this.btnToggleSimEditor, null);
                     return;
                 }
@@ -219,17 +221,109 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                 this._viewLogger.WriteLog("STOPPED SIMULATION SESSION WITHOUT ISSUES!", LogType.WarnLog);
             });
         }
+
         /// <summary>
         /// Event handler to fire when the selected simulation configuration is updated/changed
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void SimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
+        private void cboSimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
             // Pull our selected sim configuration and store it on the view model.
-            this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
-            this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.SimulationConfiguration));
-            this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.SimulationConfiguration.ConfigurationName}!");
+            this.ViewModel.LoadedConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
+            this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.LoadedConfiguration));
+            this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.LoadedConfiguration.ConfigurationName}!");
+        }
+
+        /// <summary>
+        /// Event handler to fire when the user clicks the new configuration button.
+        /// This will toggle edit mode and generate a new dummy configuration value set
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnNewSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Toggle edit mode on our view model
+            this.ViewModel.IsNewConfig = true;
+            this.ViewModel.IsEditingConfig = true;
+            this._viewLogger.WriteLog("BUILDING AND STORING NEW CONFIGURATION FOR SIMULATION PLAYBACK NOW");
+
+            // Build a new configuration object for the view model to bind onto. Apply config values to it as well
+            this.ViewModel.CustomConfiguration = new PassThruSimulationConfiguration("My Configuration") {
+                ReaderConfigs = new PassThruStructs.SConfigList(1) {
+                    ConfigList = new List<PassThruStructs.SConfig>() {
+                        new() {
+                            SConfigValue = 1,
+                            SConfigParamId = ConfigParamId.CAN_MIXED_FORMAT
+                        }
+                    }
+                }
+            };
+        }
+        /// <summary>
+        /// Event handler to fire when the user clicks the edit configuration button.
+        /// This will toggle edit mode and show new editing UI controls
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnEditSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Toggle edit mode on our view model
+            this.ViewModel.IsEditingConfig = true;
+            this._viewLogger.WriteLog("TOGGLING EDIT MODE FOR CURRENT SIMULATION OBJECT");
+        }
+
+        /// <summary>
+        /// Event handler to fire when the user clicks the delete configuration button.
+        /// This will toggle edit mode and remove the current configuration routine from our settings store
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnDeleteSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Build logic for removing these configurations
+            this.ViewModel.IsEditingConfig = false;
+        }
+        /// <summary>
+        /// Event handler to fire when the user clicks the save configuration button.
+        /// This will toggle edit mode and write the current configuration values out to our settings file
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnSaveSimulationConfig_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Build logic for saving a new configuration
+            this.ViewModel.IsEditingConfig = false;
+        }
+        /// <summary>
+        /// Event handler to fire when the user clicks the discard changes button.
+        /// This will toggle edit mode and discard any changes to the configuration currently loaded
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnDiscardSimConfigChanges_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Build logic for discarding changes to a configuration
+            this.ViewModel.IsEditingConfig = false;
+        }
+
+        /// <summary>
+        /// Event handler to fire when the user tries to add a new message filter to a configuration
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnCreateMessageFilter_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Configure logic for adding filters
+        }
+        /// <summary>
+        /// Event handler to fire when the user tries to delete an existing message filter for a configuration
+        /// </summary>
+        /// <param name="Sender">Object which fired this event</param>
+        /// <param name="E">Arguments fired along with this event</param>
+        private void btnDeleteMessageFilter_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Configure logic for removing filters
         }
     }
 }

@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
     /// Session reporting ViewModel used for sending cleaned up session information out to my email
     /// Email is defined in the app settings.
     /// </summary>
-    internal class FulcrumSessionReportingViewModel : FulcrumViewModelBase
+    public class FulcrumSessionReportingViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

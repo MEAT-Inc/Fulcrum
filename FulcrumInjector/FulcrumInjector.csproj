@@ -126,23 +126,23 @@
     <Reference Include="Octokit, Version=8.0.0.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.8.0.0\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.4.4.150, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.4.4.150\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.4.4.165, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.4.4.165\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
-    <Reference Include="SharpExpressions, Version=0.5.15.387, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpExpressions.0.5.15.387\lib\net472\SharpExpressions.dll</HintPath>
+    <Reference Include="SharpExpressions, Version=0.5.15.452, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpExpressions.0.5.15.452\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
     <Reference Include="SharpLogging, Version=2.7.8.334, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpLogger.2.7.8.334\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
-    <Reference Include="SharpPipes, Version=0.2.4.46, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpPipes.0.2.4.46\lib\net472\SharpPipes.dll</HintPath>
+    <Reference Include="SharpPipes, Version=0.2.4.56, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpPipes.0.2.4.56\lib\net472\SharpPipes.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.12.9.315, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.12.9.315\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.13.1.354, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.13.1.354\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrapper, Version=6.2.1.498, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrapper.6.2.1.498\lib\net472\SharpWrapper.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=6.2.3.510, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrapper.6.2.3.510\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
@@ -200,10 +200,15 @@
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringScrambler.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDriveBroker.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumEnumCombo.xaml.cs">
+      <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
@@ -354,6 +359,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewContent\FulcrumViews\InjectorOptionViews\FulcrumSessionReportingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumEnumCombo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -546,7 +555,7 @@ cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
 cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
 cmd.exe /C mkdir "$(TargetDir)FulcrumSimulations"
-cmd.exe /C mkdir "$(TargetDir)FuclumLogs\FulcrumArchives"
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs\FulcrumArchives"
 
 copy /Y "$(ProjectDir)FulcrumViewSupport\FulcrumStyles\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
 copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"

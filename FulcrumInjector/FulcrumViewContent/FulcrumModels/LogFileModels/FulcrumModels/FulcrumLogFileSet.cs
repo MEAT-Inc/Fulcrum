@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.Fulcrum
     /// <summary>
     /// Internal class holding the values for our different types of log files supported
     /// </summary>
-    internal class FulcrumLogFileSet : LogFileSet
+    public class FulcrumLogFileSet : LogFileSet
     {
         #region Custom Events
         #endregion //Custom Events

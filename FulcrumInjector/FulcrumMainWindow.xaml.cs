@@ -58,7 +58,6 @@ namespace FulcrumInjector
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Configure DataContext and setup view controls
-            this.DataContext = this;
             FulcrumConstants.FulcrumMainWindow = this;
             
             // Set title to DEBUG if the app is inside our debug directory

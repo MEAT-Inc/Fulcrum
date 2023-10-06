@@ -30,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
+        public FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -52,7 +52,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             InitializeComponent();
 
             // Setup our data context and log information out
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

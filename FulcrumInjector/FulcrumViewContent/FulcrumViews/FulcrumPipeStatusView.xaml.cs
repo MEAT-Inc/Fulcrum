@@ -24,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumPipeStatusViewModel ViewModel { get; set; }
+        public FulcrumPipeStatusViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             InitializeComponent();
 
             // Setup a new ViewModel and setup our pipe watchdogs in a background task
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             Task.Run(() => this.ViewModel.SetupPipeStateWatchdogs());
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND WATCHDOGS OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);

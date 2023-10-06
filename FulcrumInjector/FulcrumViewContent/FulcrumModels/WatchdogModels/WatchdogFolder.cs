@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
     /// Looks at a defined directory and performs actions when files are located inside of it
     /// </summary>
     [JsonConverter(typeof(WatchdogFolderJsonConverter))]
-    internal class WatchdogFolder : IDisposable
+    public class WatchdogFolder : IDisposable
     {
         #region Custom Events
 

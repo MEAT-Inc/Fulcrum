@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
     /// <summary>
     /// Static share class object for settings entries.
     /// </summary>
-    internal sealed class FulcrumSettingsShare : Dictionary<SettingSectionTypes, FulcrumSettingsCollection>
+    public sealed class FulcrumSettingsShare : Dictionary<SettingSectionTypes, FulcrumSettingsCollection>
     {
         #region Custom Events
         #endregion //Custom Events

@@ -24,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumVehicleConnectionInfoViewModel ViewModel { get; set; }
+        public FulcrumVehicleConnectionInfoViewModel ViewModel { get; set; }
         
         #endregion // Properties
 
@@ -46,7 +46,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             InitializeComponent();
 
             // Setup a new data context for our view model instance
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

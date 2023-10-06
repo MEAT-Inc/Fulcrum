@@ -8,7 +8,8 @@
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              mc:Ignorable="d" 
              Loaded="FulcrumSettingsPaneView_OnLoaded"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ViewModel}">
 
     <!-- Style Sheets -->
     <UserControl.Resources>

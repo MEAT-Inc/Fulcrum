@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// Class used to bind our installed/active hardware objects to the view content for showing current PassThru devices.
     /// </summary>
-    internal class FulcrumInstalledHardwareViewModel : FulcrumViewModelBase
+    public class FulcrumInstalledHardwareViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

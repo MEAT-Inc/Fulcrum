@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// Base class for Model objects on the UI
     /// </summary>
-    internal class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
+    public class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
     {
         #region Custom Events
 
@@ -79,12 +79,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// <param name="Value">Value being used</param>
         public void PropertyUpdated(object Value, [CallerMemberName] string PropertyName = null)
         {
-            // Property Changed Event
-            this.OnPropertyChanged(PropertyName);
-
             // Update VM Value and Global value
             this._updateSingletonProperty(this);
             this._updateBackingField(this, PropertyName, Value);
+
+            // Property Changed Event
+            this.OnPropertyChanged(PropertyName);
         }
         /// <summary>
         /// Updates the Collection on this view model and sets a collection changed notify event
@@ -94,12 +94,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// <param name="CollectionName">The name of the collection being updated</param>
         public void CollectionUpdated(IList Value, NotifyCollectionChangedAction CollectionAction, [CallerMemberName] string CollectionName = null)
         {
-            // Collection Changed Event
-            this.OnCollectionChanged(CollectionAction, Value);
-
             // Update the VM and Global value
             this._updateSingletonProperty(this);
             this._updateBackingField(this, CollectionName, Value);
+            
+            // Collection Changed Event
+            this.OnCollectionChanged(CollectionAction, Value);
         }
 
         /// <summary>
