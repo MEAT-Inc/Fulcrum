@@ -6,7 +6,8 @@
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" 
              Loaded="FulcrumUpdaterView_OnLoaded"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ViewModel}">
  
     <!-- Command bindings for hyperlinks -->
     <FrameworkElement.CommandBindings>

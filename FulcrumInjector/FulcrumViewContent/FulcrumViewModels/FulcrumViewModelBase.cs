@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// Base class for Model objects on the UI
     /// </summary>
-    internal class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
+    public class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
     {
         #region Custom Events
 
