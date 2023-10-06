@@ -6,7 +6,8 @@
              xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             Loaded="FulcrumSessionReportingView_OnLoaded">
+             Loaded="FulcrumSessionReportingView_OnLoaded"
+             DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ViewModel}">
 
     <!-- Style Sheets -->
     <UserControl.Resources>

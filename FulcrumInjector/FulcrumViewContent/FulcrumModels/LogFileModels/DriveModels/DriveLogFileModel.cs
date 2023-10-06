@@ -13,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveMo
     /// <summary>
     /// Class which holds information about a log file path pulled in from our google drive
     /// </summary>
-    internal class DriveLogFileModel : LogFileModel
+    public class DriveLogFileModel : LogFileModel
     {
         #region Custom Events
         #endregion // Custom Events

@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
+        public FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -54,7 +54,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             InitializeComponent();
 
             // Setup our data context and log information out
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE SIMULATION PLAYBACK VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
@@ -189,7 +189,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             if (!this.ViewModel.IsSimulationRunning)
             {
                 // If the simulation configuration is not defined, open the viewer
-                if (this.ViewModel.SimulationConfiguration == null) {
+                if (this.ViewModel.LoadedConfiguration == null) {
                     this.ToggleSimulationEditor_OnClick(this.btnToggleSimEditor, null);
                     return;
                 }
@@ -230,9 +230,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         private void cboSimConfiguration_OnSelectionChanged(object Sender, SelectionChangedEventArgs E)
         {
             // Pull our selected sim configuration and store it on the view model.
-            this.ViewModel.SimulationConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
-            this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.SimulationConfiguration));
-            this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.SimulationConfiguration.ConfigurationName}!");
+            this.ViewModel.LoadedConfiguration = (PassThruSimulationConfiguration)E.AddedItems[0];
+            this.ViewModel.PropertyUpdated(E.AddedItems[0], nameof(this.ViewModel.LoadedConfiguration));
+            this._viewLogger.WriteLog($"UPDATED CURRENT SIMULATION CONFIGURATION TO {this.ViewModel.LoadedConfiguration.ConfigurationName}!");
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this._viewLogger.WriteLog("BUILDING AND STORING NEW CONFIGURATION FOR SIMULATION PLAYBACK NOW");
 
             // Build a new configuration object for the view model to bind onto. Apply config values to it as well
-            this.ViewModel.SimulationConfiguration = new PassThruSimulationConfiguration("My Configuration") {
+            this.ViewModel.CustomConfiguration = new PassThruSimulationConfiguration("My Configuration") {
                 ReaderConfigs = new PassThruStructs.SConfigList(1) {
                     ConfigList = new List<PassThruStructs.SConfig>() {
                         new() {
@@ -259,17 +259,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
                     }
                 }
             };
-
-            // Store all existing values on our edit controls so we can update them here
-            this.tbEditConfigName.Text = this.ViewModel.SimulationConfiguration.ConfigurationName;
-            this.cboEditProtocolId.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderProtocol;
-            this.cboEditBaudRate.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderBaudRate;
-            this.cboEditConnectFlags.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderChannelFlags;
-            this.tbEditReaderCount.Text = $"{this.ViewModel.SimulationConfiguration.ReaderMsgCount} Messages";
-            this.tbEditReaderTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ReaderTimeout}ms";
-            this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
-            this.tbEditResponseAttempts.Text = $"{this.ViewModel.SimulationConfiguration.ResponseAttempts} Attempts";
-            this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
         /// <summary>
         /// Event handler to fire when the user clicks the edit configuration button.
@@ -282,17 +271,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             // Toggle edit mode on our view model
             this.ViewModel.IsEditingConfig = true;
             this._viewLogger.WriteLog("TOGGLING EDIT MODE FOR CURRENT SIMULATION OBJECT");
-
-            // Store all existing values on our edit controls so we can update them here
-            this.tbEditConfigName.Text = this.ViewModel.SimulationConfiguration.ConfigurationName;
-            this.cboEditProtocolId.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderProtocol;
-            this.cboEditBaudRate.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderBaudRate;
-            this.cboEditConnectFlags.SelectedItem = this.ViewModel.SimulationConfiguration.ReaderChannelFlags;
-            this.tbEditReaderCount.Text = $"{this.ViewModel.SimulationConfiguration.ReaderMsgCount} Messages";
-            this.tbEditReaderTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ReaderTimeout}ms";
-            this.tbEditResponseTimeout.Text = $"{this.ViewModel.SimulationConfiguration.ResponseTimeout}ms";
-            this.tbEditResponseAttempts.Text = $"{this.ViewModel.SimulationConfiguration.ResponseAttempts} Attempts";
-            this._viewLogger.WriteLog("UPDATED EDIT CONTROL VALUES TO REFLECT CURRENT CONFIGURATION!", LogType.InfoLog);
         }
 
         /// <summary>

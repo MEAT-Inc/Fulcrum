@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // Public facing fields for view content configuration
-        internal FulcrumTitleViewModel ViewModel { get; set; }
+        public FulcrumTitleViewModel ViewModel { get; set; }
 
         #endregion //Properties
 
@@ -45,7 +45,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             InitializeComponent();
             
             // Setup a new ViewModel and store our context
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

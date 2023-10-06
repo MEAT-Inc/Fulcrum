@@ -7,7 +7,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Dependency property object for navigation menu types
     /// </summary>
-    internal class FulcrumNavMenuItem : HamburgerMenuGlyphItem
+    public class FulcrumNavMenuItem : HamburgerMenuGlyphItem
     {
         #region Custom Events
         #endregion //Custom Events

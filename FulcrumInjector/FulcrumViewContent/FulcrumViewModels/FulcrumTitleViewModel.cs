@@ -7,7 +7,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// ViewModel logic for our title view component
     /// </summary>
-    internal class FulcrumTitleViewModel : FulcrumViewModelBase
+    public class FulcrumTitleViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

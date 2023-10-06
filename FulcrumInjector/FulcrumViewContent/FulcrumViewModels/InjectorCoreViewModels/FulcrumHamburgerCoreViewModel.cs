@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// ViewModel for the main hamburger core object
     /// </summary>
-    internal class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
+    public class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

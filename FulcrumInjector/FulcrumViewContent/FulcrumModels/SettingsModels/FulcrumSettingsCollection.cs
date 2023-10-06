@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
     /// <summary>
     /// Wrapper holding a list of settings sets
     /// </summary>
-    internal class FulcrumSettingsCollection : IEnumerable<FulcrumSettingEntryModel>
+    public class FulcrumSettingsCollection : IEnumerable<FulcrumSettingEntryModel>
     {
         #region Custom Events
         #endregion //Custom Events

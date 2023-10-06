@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// ViewModel for the DLL output content view
     /// </summary>
-    internal class FulcrumDllOutputLogViewModel : FulcrumViewModelBase
+    public class FulcrumDllOutputLogViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

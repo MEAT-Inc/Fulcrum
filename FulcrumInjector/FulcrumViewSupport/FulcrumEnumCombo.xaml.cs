@@ -151,7 +151,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             if (SendingCheckBox.DataContext == null) return;  
 
             // Store the name of the value being added or removed
-
+            // TODO: Finish this logic maybe? Might be useful at some point
         }
         /// <summary>
         /// Event handler to fire when the user changes their selection in the single selection mode

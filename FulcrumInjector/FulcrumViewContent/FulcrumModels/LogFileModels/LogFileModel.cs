@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels
     /// Base class model object for a log file being used in the injector application
     /// This holds information about a local log file or a Google Drive log file
     /// </summary>
-    internal class LogFileModel
+    public class LogFileModel
     {
         #region Custom Events
         #endregion // Custom Events
