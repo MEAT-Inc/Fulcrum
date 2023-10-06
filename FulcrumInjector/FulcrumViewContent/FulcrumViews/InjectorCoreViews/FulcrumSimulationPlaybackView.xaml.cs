@@ -249,7 +249,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             this._viewLogger.WriteLog("BUILDING AND STORING NEW CONFIGURATION FOR SIMULATION PLAYBACK NOW");
 
             // Build a new configuration object for the view model to bind onto. Apply config values to it as well
-            this.ViewModel.LoadedConfiguration = new PassThruSimulationConfiguration("My Configuration") {
+            this.ViewModel.CustomConfiguration = new PassThruSimulationConfiguration("My Configuration") {
                 ReaderConfigs = new PassThruStructs.SConfigList(1) {
                     ConfigList = new List<PassThruStructs.SConfig>() {
                         new() {
