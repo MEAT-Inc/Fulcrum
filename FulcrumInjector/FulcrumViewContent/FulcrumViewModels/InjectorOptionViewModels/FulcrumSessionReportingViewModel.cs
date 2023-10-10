@@ -156,6 +156,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
                 string SendPassword = EmailConfigObject.ReportSenderPassword.ToString();
                 SendPassword = SendPassword.UnscrambleString();
 
+
                 // Build broker first
                 this.ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
                 BuiltSender = new FulcrumEmailBroker(SendName, SendEmail, SendPassword);

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
+using Newtonsoft.Json;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
@@ -13,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
     /// <summary>
     /// Class structure for a watched file instance inside a watched directory
     /// </summary>
-    public class WatchdogFile : IDisposable
+    internal class WatchdogFile : IDisposable
     {
         #region Custom Events
 
@@ -319,8 +321,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             if (_fileLogger == null)
             {
                 // Try and find an existing logger for the service instance first
-                string ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
-                var LocatedLogger = SharpLogBroker.FindLoggers($"{ServiceName}_FileLogger").FirstOrDefault();
+                var LocatedLogger = SharpLogBroker.FindLoggers($"{nameof(FulcrumWatchdogService)}_FileLogger").FirstOrDefault();
                 if (LocatedLogger != null)
                 {
                     // Store the found logger and write we've built it out here
@@ -330,10 +331,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 else
                 {
                     // Find our logger name and setup new targets for output
-                    var WatchdogFileTarget = FulcrumWatchdogService.LocateWatchdogFileTarget();
+                    var WatchdogFileTarget = FulcrumService.LocateServiceFileTarget<FulcrumWatchdogService>();
 
                     // Spawn our logger and register targets to it for the needed outputs
-                    _fileLogger = new SharpLogger(LoggerActions.CustomLogger, $"{ServiceName}_FolderLogger");
+                    _fileLogger = new SharpLogger(LoggerActions.CustomLogger, $"{nameof(FulcrumWatchdogService)}_FolderLogger");
                     _fileLogger.RegisterTarget(WatchdogFileTarget);
 
                     // Log we've spawned this new logger and exit out

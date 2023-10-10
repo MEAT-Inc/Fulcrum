@@ -9,6 +9,7 @@ using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using Newtonsoft.Json;
 using SharpLogging;
 
@@ -19,7 +20,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
     /// Looks at a defined directory and performs actions when files are located inside of it
     /// </summary>
     [JsonConverter(typeof(WatchdogFolderJsonConverter))]
-    public class WatchdogFolder : IDisposable
+    internal class WatchdogFolder : IDisposable
     {
         #region Custom Events
 
@@ -74,7 +75,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         // Backing fields holding information about the event/action to invoke for this folder
         private bool _isExecuting;                   // Tells us if we're running the action or not
         private Action _watchdogAction;              // The action to run when events are fired
-        private readonly int _executionGap;          // Time to wait between each execution 
+        private static int _executionGap;            // Time to wait between each execution 
         private DateTime _lastExecutionTime;         // Time the action was last invoked
 
         #endregion //Fields
@@ -203,14 +204,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
             this._directoryWatchers = new List<FileSystemWatcher>();
             this._watchedDirectory = Path.GetFullPath(WatchedDirectory);
             this._watchedFiles = new ObservableCollection<WatchdogFile>();
-            this._executionGap = ValueLoaders.GetConfigValue<int>("FulcrumWatchdog.ExecutionGap");
+            if (_executionGap == 0) 
+                _executionGap = ValueLoaders.GetConfigValue<int>("FulcrumWatchdogService.ExecutionGap");
 
             // If our logger instance is null, build it now
             if (_folderLogger == null)
             {
                 // Try and find an existing logger for the service instance first
-                string ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
-                var LocatedLogger = SharpLogBroker.FindLoggers($"{ServiceName}_FolderLogger").FirstOrDefault();
+                var LocatedLogger = SharpLogBroker.FindLoggers($"{nameof(FulcrumWatchdogService)}_FolderLogger").FirstOrDefault();
                 if (LocatedLogger != null)
                 {
                     // Store the found logger and write we've built it out here
@@ -220,10 +221,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 else
                 {
                     // Find our logger name and setup new targets for output
-                    var WatchdogFileTarget = FulcrumWatchdogService.LocateWatchdogFileTarget();
+                    var WatchdogFileTarget = FulcrumService.LocateServiceFileTarget<FulcrumWatchdogService>();
                     
                     // Spawn our logger and register targets to it for the needed outputs
-                    _folderLogger = new SharpLogger(LoggerActions.CustomLogger, $"{ServiceName}_FolderLogger");
+                    _folderLogger = new SharpLogger(LoggerActions.CustomLogger, $"{nameof(FulcrumWatchdogService)}_FolderLogger");
                     _folderLogger.RegisterTarget(WatchdogFileTarget); 
 
                     // Log we've spawned this new logger and exit out
@@ -319,11 +320,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
 
             // Check our execution time difference to see if we need to wait to run again or not
             int ElapsedSinceRun = DateTime.Now.Subtract(this._lastExecutionTime).Milliseconds;
-            if (ElapsedSinceRun > this._executionGap)
+            if (ElapsedSinceRun > _executionGap)
             {
                 // Log we're waiting for execution to be allowed and wait for it
                 _folderLogger.WriteLog("DELAYING EXECUTION FOR GAP!", LogType.WarnLog);
-                Thread.Sleep(this._executionGap - ElapsedSinceRun);
+                Thread.Sleep(_executionGap - ElapsedSinceRun);
             }
 
             // Now once we've waited long enough, invoke the action and set executing to false once done
