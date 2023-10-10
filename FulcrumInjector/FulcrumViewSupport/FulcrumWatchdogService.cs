@@ -34,6 +34,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         #region Properties
         
         // Public facing properties holding information about our folders being watched and all their files
+        public WatchdogSettings WatchdogSettings { get; private set; }
         public WatchdogFolder[] WatchedDirectories
         {
             get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
@@ -67,12 +68,14 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// CTOR routine for this watchdog service. Sets up our component object and our logger instance
         /// </summary>
-        public FulcrumWatchdogService()
+        /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
+        public FulcrumWatchdogService(WatchdogSettings ServiceSettings = null)
         {
             // Init our component object here and setup logging
             this._components = new Container();
             this._watchedDirectories = new List<WatchdogFolder>();
-            this.ServiceName = ValueLoaders.GetConfigValue<string>("FulcrumWatchdog.ServiceName");
+            this.WatchdogSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdog");
+            this.ServiceName = this.WatchdogSettings.ServiceName;
             this._watchdogLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}_Logger");
 
             // Build and register a new watchdog logging target here for a file and the console

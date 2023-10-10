@@ -1,18 +1,24 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using NLog.Targets;
@@ -40,6 +46,28 @@ namespace FulcrumInjector
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Enumeration used to configure different types of startup arguments
+        /// </summary>
+        [Flags]
+        public enum StartupArguments 
+        { 
+            // Default values are no arguments or launch injector. If launch is not provided, we exit after invoking actions
+            [Description("")] NO_ARGUMENTS                      = 0x00000000,
+            [Description("--LAUNCH_INJECTOR")] LAUNCH_INJECTOR  = 0x00000001,
+
+            // Watchdog configuration arguments. Base value is 0x00001000. Invoke is 0x00001003
+            [Description("--WATCHDOG")] WATCHDOG                = 0x00001000,
+            [Description("--WATCHDOG_INITALIZE")] INIT_WATCHDOG = WATCHDOG | 0x00000001,
+            [Description("--WATCHDOG_INVOKE")] INVOKE_WATCHDOG  = WATCHDOG | INIT_WATCHDOG | 0x00000002,
+
+            // Upload to drive configuration arguments. Base value is 0x00002000. Invoke is 0x00002003
+            [Description("--DRIVE")] DRIVE                      = 0x00002000,
+            [Description("--DRIVE_INITIALIZE")] INIT_DRIVE      = DRIVE | 0x00000001,
+            [Description("--DRIVE_INVOKE")] INVOKE_DRIVE        = DRIVE | INIT_DRIVE | 0x00000002,
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,13 +84,14 @@ namespace FulcrumInjector
             // Force the working directory. Build JSON settings objects
             JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
 
-            // Setup our logging instance information
+            // Setup logging, exception handlers, exit routines, and parse startup arguments
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
+            this._configureAppExitRoutine();
+            this._configureStartupRoutines();
 
             // Run single instance configuration
             this._configureSingleInstance();
-            this._configureAppExitRoutine();
             this._configureInjectorWatchdog();
 
             // Configure settings and app theme
@@ -159,40 +188,6 @@ namespace FulcrumInjector
             };
         }
         /// <summary>
-        /// Checks for an existing fulcrum process object and kill all but the running one.
-        /// </summary>
-        private void _configureSingleInstance()
-        {
-            // Find all the fulcrum process objects now.
-            var CurrentInjector = Process.GetCurrentProcess();
-            this._appLogger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
-            this._appLogger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
-
-            // Find the process values here.
-            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.AppInstanceName");
-            this._appLogger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
-            var InjectorsTotal = Process.GetProcesses()
-                .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
-                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName) || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
-                .ToList();
-
-            // Now kill any existing instances
-            this._appLogger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
-            if (InjectorsTotal.Count > 0)
-            {
-                // Log removing files and delete the log output
-                this._appLogger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
-                try { File.Delete(SharpLogBroker.LogFilePath); }
-                catch { this._appLogger?.WriteLog("CAN NOT DELETE NON EXISTENT FILES!", LogType.ErrorLog); }
-
-                // Exit the application
-                Environment.Exit(100);
-            }
-
-            // Return passed output.
-            this._appLogger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
-        }
-        /// <summary>
         /// Builds an event control object for methods to run when the app closes out.
         /// </summary>
         private void _configureAppExitRoutine()
@@ -240,12 +235,182 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
         /// <summary>
+        /// Looks at our command line arguments and determines what we should be doing with the injector application
+        /// If we provide an argument for booting the watchdog routines, the actions are invoked and the application exits
+        /// </summary>
+        private void _configureStartupRoutines()
+        {
+            // Check to see if we've been provided with command line arguments or not
+            string[] CommandLineArgs = Environment.GetCommandLineArgs();
+            if (CommandLineArgs.Length == 1)
+            {
+                // Log no arguments are given and exit out of this routine
+                this._appLogger.WriteLog("NO STARTUP ARGUMENTS WERE PROVIDED! INVOKING NORMAL INJECTOR ROUTINES...", LogType.WarnLog);
+                return;
+            }
+
+            // Log out the arguments provided to the CLI for the injector application here
+            string StartupArgsString = string.Join(",", CommandLineArgs);
+            this._appLogger.WriteLog("PROCESSED COMMAND LINE ARGUMENTS FOR INJECTOR APPLICATION!");
+            this._appLogger.WriteLog($"COMMAND LINE ARGS: {StartupArgsString}");
+
+            // Check our arguments and invoke actions accordingly
+            MatchCollection ArgumentMatches = Regex.Matches(StartupArgsString, @"(--\w+)");
+            if (ArgumentMatches.Count == 0)
+            {
+                // If no arguments could be found/parsed, throw an exception and exit out
+                this._appLogger.WriteLog("ERROR! NO ARGUMENTS FOR STARTUP COULD BE PARSED FROM THE INPUT STRING!", LogType.ErrorLog);
+                throw new ArgumentException($"STARTUP ARGUMENTS: {StartupArgsString} WERE INVALID!");
+            }
+
+            // Now look at the matches and find our action types
+            List<Tuple<StartupArguments, string[]>> StartupArgs = new List<Tuple<StartupArguments, string[]>>();
+            foreach (Match ArgMatch in  ArgumentMatches)
+            {
+                // Try and parse our arguments in to our list of actions here
+                try
+                {
+                    // Check if we've got a parameter for the argument or not
+                    string ArgString = ArgMatch.Value;
+                    Match ParameterArgMatch = Regex.Match(ArgString, @"(--\w+)\((\d+)\)");
+                    if (!ParameterArgMatch.Success)
+                    {
+                        // Build and store the next parameter less argument object
+                        StartupArgs.Add(new Tuple<StartupArguments, string[]>(
+                            ArgString.ToEnumValue<StartupArguments>(),
+                            Array.Empty<string>()
+                        ));
+                    }
+                    else
+                    {
+                        // If we've got a parameterized argument, store the arguments for it here
+                        StartupArguments ArgType = ParameterArgMatch.Groups[1].Value.ToEnumValue<StartupArguments>();
+                        string[] ArgumentParameters = ParameterArgMatch.Groups[2].Value.Split(',');
+
+                        // Build and store the next parameterized argument object
+                        StartupArgs.Add(new Tuple<StartupArguments, string[]>(
+                            ArgType,
+                            ArgumentParameters
+                        ));
+                    }
+
+                    // Log out the argument object parsed in here
+                    var NewestArg = StartupArgs.Last();
+                    this._appLogger.WriteLog(NewestArg.Item2.Length == 0
+                        ? $"--> PARSED ARGUMENT: {NewestArg.Item1}"
+                        : $"--> PARSED ARGUMENT: {NewestArg.Item1} | PARAMETERS: {string.Join(",", NewestArg.Item2)}");
+                }
+                catch (Exception ArgParseEx)
+                {
+                    // Log out the exception thrown during the parse routine
+                    this._appLogger.WriteLog($"ERROR! FAILED TO PARSE ARGUMENT: {ArgMatch.Value}!", LogType.ErrorLog);
+                    this._appLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", ArgParseEx);
+                }
+            }
+
+            // Invoke the actions needed for our arguments here 
+            this._appLogger.WriteLog("INVOKING ARGUMENT ACTIONS NOW...", LogType.InfoLog);
+            foreach (var StartupAction in StartupArgs)
+            {
+                // Check the type of action being invoked here and execute it
+                StartupArguments ArgType = StartupAction.Item1;
+                if (ArgType.HasFlag(StartupArguments.WATCHDOG))
+                {
+                    // If we've got a watchdog action, init the watchdog service if needed and execute it
+                    this._appLogger.WriteLog($"INVOKING WATCHDOG ACTION {StartupAction}...", LogType.WarnLog);
+
+                    // Switch based on the argument type and execute the needed action
+                    switch (ArgType)
+                    {
+                        // For watchdog init, build a new service and exit out
+                        case StartupArguments.WATCHDOG:
+                            this._configureInjectorWatchdog();
+                            this._appLogger.WriteLog("INVOKED NEW WATCHDOG INSTANCE CORRECTLY!", LogType.InfoLog);
+                            break;
+
+                        // For watchdog invoke, build the service and invoke a new 
+                        case StartupArguments.INVOKE_WATCHDOG:
+                            if (StartupAction.Item2.Length == 0) {
+                                this._appLogger.WriteLog("ERROR! NO COMMAND TYPE WAS PROVIDED FOR WATCHDOG ROUTINE!", LogType.ErrorLog);
+                                break;
+                            }
+
+                            // Invoke a new watchdog service instance and run a custom command for it
+                            if (!int.TryParse(StartupAction.Item2[0], out int WatchdogCommand)) {
+                                this._appLogger.WriteLog($"ERROR! COULD NOT PARSE WATCHDOG COMMAND TYPE {StartupAction.Item2[0]}!", LogType.ErrorLog);
+                                break;
+                            }
+
+                            // Once we've got a valid command, invoke it
+                            this._appLogger.WriteLog($"BUILDING WATCHDOG SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
+                            this._configureInjectorWatchdog();
+                            FulcrumConstants.FulcrumWatchdog.InvokeCustomCommand(WatchdogCommand);
+                            
+                            // Break out once we've invoked our command
+                            this._appLogger.WriteLog($"EXECUTED COMMAND {WatchdogCommand} CORRECTLY!");
+                            break;
+                    }
+                }
+                if (ArgType.HasFlag(StartupArguments.DRIVE))
+                {
+                    // TODO: Build logic for invoking drive routines here
+                    // If we've got a drive action, init the drive helper and invoke an upload routine
+                    this._appLogger.WriteLog($"INVOKING DRIVE ACTION {StartupAction}...", LogType.WarnLog);
+                }
+            }
+
+            // Check if we've got the launch flag for the injector or not
+            bool ShouldLaunch = StartupArgs.Any(ArgObj => ArgObj.Item1 == StartupArguments.LAUNCH_INJECTOR);
+            if (ShouldLaunch) this._appLogger.WriteLog("FOUND REQUEST TO BOOT INJECTOR AFTER STARTUP ROUTINES!", LogType.InfoLog);
+            else
+            {
+                // If we don't want to launch the injector app, exit the program here
+                this._appLogger.WriteLog("LAUNCH INJECTOR FLAG WAS NOT PROVIDED IN STARTUP ARGUMENTS! EXITING NOW...", LogType.WarnLog);
+                Environment.Exit(0);
+            }
+        }
+        /// <summary>
+        /// Checks for an existing fulcrum process object and kill all but the running one.
+        /// </summary>
+        private void _configureSingleInstance()
+        {
+            // Find all the fulcrum process objects now.
+            var CurrentInjector = Process.GetCurrentProcess();
+            this._appLogger?.WriteLog("KILLING EXISTING FULCRUM INSTANCES NOW!", LogType.WarnLog);
+            this._appLogger?.WriteLog($"CURRENT FULCRUM PROCESS IS SEEN TO HAVE A PID OF {CurrentInjector.Id}", LogType.InfoLog);
+
+            // Find the process values here.
+            string CurrentInstanceName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.AppInstanceName");
+            this._appLogger?.WriteLog($"CURRENT INJECTOR PROCESS NAME FILTERS ARE: {CurrentInstanceName} AND {CurrentInjector.ProcessName}");
+            var InjectorsTotal = Process.GetProcesses()
+                .Where(ProcObj => ProcObj.Id != CurrentInjector.Id)
+                .Where(ProcObj => ProcObj.ProcessName.Contains(CurrentInstanceName) || ProcObj.ProcessName.Contains(CurrentInjector.ProcessName))
+                .ToList();
+
+            // Now kill any existing instances
+            this._appLogger?.WriteLog($"FOUND A TOTAL OF {InjectorsTotal.Count} INJECTORS ON OUR MACHINE");
+            if (InjectorsTotal.Count > 0)
+            {
+                // Log removing files and delete the log output
+                this._appLogger?.WriteLog("SINCE AN EXISTING INJECTOR WAS FOUND, KILLING ALL BUT THE EXISTING INSTANCE!", LogType.InfoLog);
+                try { File.Delete(SharpLogBroker.LogFilePath); }
+                catch { this._appLogger?.WriteLog("CAN NOT DELETE NON EXISTENT FILES!", LogType.ErrorLog); }
+
+                // Exit the application
+                Environment.Exit(100);
+            }
+
+            // Return passed output.
+            this._appLogger?.WriteLog("NO OTHER INSTANCES FOUND! CLAIMING SINGLETON RIGHTS FOR THIS PROCESS OBJECT NOW...");
+        }
+        /// <summary>
         /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
         /// </summary>
         private void _configureInjectorWatchdog()
         {
             // Make sure we actually want to use this watchdog service 
-            if (!ValueLoaders.GetConfigValue<bool>("FulcrumWatchdog.WatchdogEnabled"))
+            WatchdogSettings WatchdogConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdog");
+            if (!WatchdogConfig.WatchdogEnabled)
             {
                 // Log that the watchdog is disabled and exit out
                 this._appLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
@@ -257,7 +422,7 @@ namespace FulcrumInjector
             // Spin up a new injector watchdog service here if needed           
             Task.Run(() =>
             {
-                FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService();
+                FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService(WatchdogConfig);
                 FulcrumConstants.FulcrumWatchdog.StartWatchdogService();
             });
 

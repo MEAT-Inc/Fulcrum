@@ -195,6 +195,7 @@
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFileSet.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\DriveModels\DriveLogFileSet.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\LogFileSet.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogSettings.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorMiscViewModels\FulcrumGoogleDriveViewModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
