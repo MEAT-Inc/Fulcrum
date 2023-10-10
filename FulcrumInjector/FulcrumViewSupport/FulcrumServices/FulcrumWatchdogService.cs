@@ -26,11 +26,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #region Properties
         
         // Public facing properties holding information about our folders being watched and all their files
-        public WatchdogSettings WatchdogSettings
-        {
-            get => this._watchdogSettings;
-            private set => this._watchdogSettings = value;
-        }
         public WatchdogFolder[] WatchedDirectories
         {
             get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
@@ -52,15 +47,21 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// CTOR routine for this watchdog service. Sets up our component object and our logger instance
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        public FulcrumWatchdogService()
+        public FulcrumWatchdogService(WatchdogSettings ServiceSettings = null)
         {
-            // Init our component object here and setup logging
-            this._watchedDirectories = new List<WatchdogFolder>();
-            this.WatchdogSettings = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
+            // Build and register a new watchdog logging target here for a file and the console
+            this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumWatchdogService>();
+            this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
 
             // Log we're building this new service and log out the name we located for it
             this._serviceLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
+
+            // Init our component object here and setup logging
+            this._watchedDirectories = new List<WatchdogFolder>();
+            this._watchdogSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
+
+            // Log that our service has been built correctly and exit out
             this._serviceLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
         }
 
@@ -69,7 +70,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <summary>
         /// Starts the service up and builds a watchdog helper process
         /// </summary>
-        /// <param name="WatchedFolders"></param>
+        /// <param name="WatchedFolders">NOT USED!</param>
         protected override void OnStart(string[] WatchedFolders)
         {
             try 
@@ -89,13 +90,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
                 }
 
                 // Now using the configuration file, load in our predefined folders to monitor
-                var WatchedConfigs = ValueLoaders.GetConfigValue<WatchdogFolder[]>("FulcrumWatchdog.WatchedFolders");
-                this._serviceLogger.WriteLog($"LOADED IN A TOTAL OF {WatchedConfigs.Length} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
+                this._watchdogSettings = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
+                this._serviceLogger.WriteLog($"LOADED IN A TOTAL OF {this._watchdogSettings.WatchedFolders.Count} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
                 this._serviceLogger.WriteLog("IMPORTED PATH CONFIGURATIONS WILL BE LOGGED BELOW", LogType.TraceLog);
 
                 // Clear out any previous configurations/folders and add our new ones now
                 this._watchedDirectories = new List<WatchdogFolder>();
-                this.AddWatchedFolders(WatchedConfigs);
+                this.AddWatchedFolders(this._watchdogSettings.WatchedFolders.ToArray());
                 
                 // Log booted service without issues here and exit out of this routine
                 this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);

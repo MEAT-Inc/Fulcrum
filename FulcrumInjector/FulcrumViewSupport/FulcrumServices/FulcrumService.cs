@@ -1,10 +1,12 @@
-﻿using NLog.Targets;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using NLog.Targets;
 using SharpLogging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +30,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #endregion // Fields
 
         #region Properties
+
+        // Public facing property holding our file target for this service
+        public FileTarget ServiceLoggingTarget { get; protected set; }
+
         #endregion // Properties
 
         #region Structs and Classes
@@ -57,12 +63,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             this._components = new Container();
 
             // Find the name of our service type and use it for logger configuration
-            this.ServiceName = this.GetType().Name.Replace("Service", string.Empty); 
+            this.ServiceName = this.GetType().Name;
             this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}_Logger");
-
-            // Build and register a new watchdog logging target here for a file and the console
-            var ServiceFileTarget = LocateServiceFileTarget();
-            this._serviceLogger.RegisterTarget(ServiceFileTarget);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -105,15 +107,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// Configures the logger for this service to output to a custom file path
         /// </summary>
         /// <returns>The configured file target to register for this service</returns>
-        private FileTarget LocateServiceFileTarget()
+        public static FileTarget LocateServiceFileTarget<TServiceType>() where TServiceType : FulcrumService
         {
             // Make sure our output location exists first
-            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, $"{this.ServiceName}Logs");
+            string ServiceName = typeof(TServiceType).Name;
+            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, $"{ServiceName.Replace("Fulcrum", string.Empty)}Logs");
             if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
 
             // Configure our new logger name and the output log file path for this logger instance 
             string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
-            string ServiceLoggerName = $"{this.ServiceName}Logging_{ServiceLoggerTime}";
+            string ServiceLoggerName = $"{ServiceName}Logging_{ServiceLoggerTime}";
             string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
             if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
 

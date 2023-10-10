@@ -54,24 +54,40 @@ namespace FulcrumInjector.FulcrumViewContent
         #region Properties
 
         // Public static properties holding the drive and watchdog services for the injector instance
-        public static FulcrumWatchdogService FulcrumWatchdogService
-        {
-            get => _fulcrumWatchdogService ??= new FulcrumWatchdogService();
-            set
-            {
-                // Check if the watchdog is null or not
-                if (_fulcrumWatchdogService == null) return;
-                _fulcrumWatchdogService = value;
-            }
-        }
         public static FulcrumDriveService FulcrumDriveService
         {
-            get => _fulcrumDriveService ??= new FulcrumDriveService();
+            get
+            {
+                // If the service exists, return it out
+                if (_fulcrumDriveService != null) return _fulcrumDriveService;
+
+                // Build a new service and store it if needed
+                _fulcrumDriveService = new FulcrumDriveService();
+                return _fulcrumDriveService;
+            }
             set
             {
                 // Check if the watchdog is null or not
                 if (_fulcrumDriveService == null) return;
                 _fulcrumDriveService = value;
+            }
+        }
+        public static FulcrumWatchdogService FulcrumWatchdogService
+        {
+            get
+            {
+                // If the service exists, return it out
+                if (_fulcrumWatchdogService != null) return _fulcrumWatchdogService;
+
+                // Build a new service and store it if needed
+                _fulcrumWatchdogService = new FulcrumWatchdogService();
+                return _fulcrumWatchdogService;
+            }
+            set
+            {
+                // Check if the watchdog is null or not
+                if (_fulcrumWatchdogService == null) return;
+                _fulcrumWatchdogService = value;
             }
         }
 

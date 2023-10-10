@@ -425,7 +425,7 @@ namespace FulcrumInjector
             Task.Run(() =>
             {
                 // Build and boot a new service instance for our watchdog
-                FulcrumConstants.FulcrumWatchdogService = new FulcrumWatchdogService();
+                FulcrumConstants.FulcrumWatchdogService = new FulcrumWatchdogService(WatchdogConfig);
                 FulcrumConstants.FulcrumWatchdogService.StartService();
             });
 
@@ -438,11 +438,21 @@ namespace FulcrumInjector
         /// </summary>
         private void _configureDriveService()
         {
+            // Make sure we actually want to use this watchdog service 
+            var DriveConfig = ValueLoaders.GetConfigValue<FulcrumDriveBroker.DriveServiceSettings>("FulcrumDriveService");
+            if (!DriveConfig.DriveEnabled)
+            {
+                // Log that the watchdog is disabled and exit out
+                this._appLogger.WriteLog("WARNING! DRIVE SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                this._appLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD DriveEnabled TO TRUE TO ENABLE OUR DRIVE SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Spin up a new injector drive service here if needed           
             Task.Run(() =>
             {
                 // Build and boot a new service instance for our watchdog
-                FulcrumConstants.FulcrumDriveService = new FulcrumDriveService();
+                FulcrumConstants.FulcrumDriveService = new FulcrumDriveService(DriveConfig);
                 FulcrumConstants.FulcrumDriveService.StartService();
             });
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using Google.Apis.Drive.v3;
 using NLog.Targets;
 using SharpLogging;
@@ -18,7 +20,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #region Fields
 
         // Private backing fields for our drive service configuration
-        private DriveService _driveService; 
+        private DriveService _driveService;                                  // Backing drive service object
+        private FulcrumDriveBroker.DriveServiceSettings _driveSettings;      // Settings configuration for our service
 
         #endregion //Fields
 
@@ -33,12 +36,20 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <summary>
         /// CTOR routine for this drive service. Sets up our component object and our logger instance
         /// </summary>
-        public FulcrumDriveService()
+        /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
+        public FulcrumDriveService(FulcrumDriveBroker.DriveServiceSettings ServiceSettings = null)
         {
+            // Build and register a new watchdog logging target here for a file and the console
+            this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumDriveService>();
+            this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
+
             // Log we're building this new service and log out the name we located for it
             this._serviceLogger.WriteLog("SPAWNING NEW DRIVE SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
-            
+
+            // Pull our settings configuration for the service here 
+            this._driveSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<FulcrumDriveBroker.DriveServiceSettings>("FulcrumDriveService");
+
             // Build a new google drive service
             if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
                 throw new InvalidOperationException("ERROR! FAILED TO BUILD GOOGLE DRIVE SERVICE!");

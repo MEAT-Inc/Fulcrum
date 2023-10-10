@@ -22,7 +22,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
         // Public facing properties for our watchdog configuration
         public int ExecutionGap { get; set; }                       // Sets the minimum time between executions of the watchdog helper
         public bool WatchdogEnabled { get; set; }                   // Sets if the watchdog is enabled for this session
-        public string ServiceName { get; set; }                     // Stores the name of the injector watchdog service
         public List<WatchdogFolder> WatchedFolders { get; set; }    // List of folders being watched for the service
 
         #endregion // Properties
