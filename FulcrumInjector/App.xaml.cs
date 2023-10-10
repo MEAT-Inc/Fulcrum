@@ -20,6 +20,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using NLog.Targets;
 using SharpLogging;
@@ -92,7 +93,8 @@ namespace FulcrumInjector
 
             // Run single instance configuration
             this._configureSingleInstance();
-            this._configureInjectorWatchdog();
+            this._configureDriveService();
+            this._configureWatchdogService();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
@@ -324,7 +326,7 @@ namespace FulcrumInjector
                     {
                         // For watchdog init, build a new service and exit out
                         case StartupArguments.WATCHDOG:
-                            this._configureInjectorWatchdog();
+                            this._configureWatchdogService();
                             this._appLogger.WriteLog("INVOKED NEW WATCHDOG INSTANCE CORRECTLY!", LogType.InfoLog);
                             break;
 
@@ -343,8 +345,8 @@ namespace FulcrumInjector
 
                             // Once we've got a valid command, invoke it
                             this._appLogger.WriteLog($"BUILDING WATCHDOG SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
-                            this._configureInjectorWatchdog();
-                            FulcrumConstants.FulcrumWatchdog.InvokeCustomCommand(WatchdogCommand);
+                            this._configureWatchdogService();
+                            FulcrumConstants.FulcrumWatchdogService.RunCommand(WatchdogCommand);
                             
                             // Break out once we've invoked our command
                             this._appLogger.WriteLog($"EXECUTED COMMAND {WatchdogCommand} CORRECTLY!");
@@ -406,10 +408,10 @@ namespace FulcrumInjector
         /// <summary>
         /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
         /// </summary>
-        private void _configureInjectorWatchdog()
+        private void _configureWatchdogService()
         {
             // Make sure we actually want to use this watchdog service 
-            WatchdogSettings WatchdogConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdog");
+            WatchdogSettings WatchdogConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
             if (!WatchdogConfig.WatchdogEnabled)
             {
                 // Log that the watchdog is disabled and exit out
@@ -422,13 +424,31 @@ namespace FulcrumInjector
             // Spin up a new injector watchdog service here if needed           
             Task.Run(() =>
             {
-                FulcrumConstants.FulcrumWatchdog = new FulcrumWatchdogService(WatchdogConfig);
-                FulcrumConstants.FulcrumWatchdog.StartWatchdogService();
+                // Build and boot a new service instance for our watchdog
+                FulcrumConstants.FulcrumWatchdogService = new FulcrumWatchdogService();
+                FulcrumConstants.FulcrumWatchdogService.StartService();
             });
 
             // Log that we've booted this new service instance correctly and exit out
             this._appLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
             this._appLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK! DIRECTORIES AND FILES WILL BE MONITORED!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Configures a new instance of a watchdog helper for the injector log files folder and starts it
+        /// </summary>
+        private void _configureDriveService()
+        {
+            // Spin up a new injector drive service here if needed           
+            Task.Run(() =>
+            {
+                // Build and boot a new service instance for our watchdog
+                FulcrumConstants.FulcrumDriveService = new FulcrumDriveService();
+                FulcrumConstants.FulcrumDriveService.StartService();
+            });
+
+            // Log that we've booted this new service instance correctly and exit out
+            this._appLogger.WriteLog("SPAWNED NEW INJECTOR DRIVE SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
+            this._appLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
         }
         /// <summary>
         /// Pulls in the resource dictionaries from the given resource path and stores them in the app

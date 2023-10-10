@@ -9,6 +9,7 @@ using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using Newtonsoft.Json;
 using SharpLogging;
 
@@ -220,7 +221,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 else
                 {
                     // Find our logger name and setup new targets for output
-                    var WatchdogFileTarget = FulcrumWatchdogService.LocateWatchdogFileTarget();
+                    var WatchdogFileTarget = FulcrumDriveService.LocateWatchdogFileTarget();
                     
                     // Spawn our logger and register targets to it for the needed outputs
                     _folderLogger = new SharpLogger(LoggerActions.CustomLogger, $"{ServiceName}_FolderLogger");

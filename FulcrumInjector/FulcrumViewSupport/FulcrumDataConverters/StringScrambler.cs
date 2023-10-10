@@ -36,7 +36,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
             // Reverse the input string
             string ReversedString = string.Join(string.Empty, InputString.Reverse());
             string DecodedString = Encoding.UTF8.GetString(Convert.FromBase64String(ReversedString));
-
+            
             // Return the decoded string 
             return DecodedString; 
         }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
@@ -330,7 +331,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels
                 else
                 {
                     // Find our logger name and setup new targets for output
-                    var WatchdogFileTarget = FulcrumWatchdogService.LocateWatchdogFileTarget();
+                    var WatchdogFileTarget = FulcrumDriveService.LocateWatchdogFileTarget();
 
                     // Spawn our logger and register targets to it for the needed outputs
                     _fileLogger = new SharpLogger(LoggerActions.CustomLogger, $"{ServiceName}_FolderLogger");

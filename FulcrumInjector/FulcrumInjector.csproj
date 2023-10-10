@@ -200,6 +200,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringEncryptor.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
@@ -212,6 +213,12 @@
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumWatchdogService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumService.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumVersionInfo.cs" />
@@ -278,7 +285,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumStyles\CustomColorShader.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogFolder.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogFile.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumWatchdogService.cs">
+    <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumDriveService.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumWin32Invokers.cs" />
