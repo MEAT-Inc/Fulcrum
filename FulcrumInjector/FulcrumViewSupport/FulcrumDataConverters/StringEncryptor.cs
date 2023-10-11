@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using FulcrumInjector.Properties;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
 {
@@ -53,12 +54,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// Simple Encryption (AES) then Authentication (HMAC) for a UTF8 Message.
         /// </summary>
         /// <param name="ContentToEncrypt">The content we want to encrypt</param>
-        /// <param name="CryptoKey">The crypt key used to encryption</param>
-        /// <param name="AuthKey">The auth key used for encryption</param>
         /// <param name="OptionalPayload">(Optional) Non-Secret Payload</param>
         /// <returns> The content provided as an encrypted Message</returns>
         /// <exception cref="ArgumentException">Thrown when the input content is not provided for encryption</exception>
-        public static string Encrypt(string ContentToEncrypt, byte[] CryptoKey, byte[] AuthKey, byte[] OptionalPayload = null)
+        public static string Encrypt(string ContentToEncrypt, byte[] OptionalPayload = null)
         {
             // Make sure the content we're encrypting exists and has length 
             if (string.IsNullOrEmpty(ContentToEncrypt))
@@ -66,7 +65,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
 
             // Convert the content into a byte array and then store the cypher content from the encryption of it
             var PlainText = Encoding.UTF8.GetBytes(ContentToEncrypt);
-            var CipherContent = Encrypt(PlainText, CryptoKey, AuthKey, OptionalPayload);
+            var CipherContent = Encrypt(PlainText, OptionalPayload);
 
             // Convert the encrypted bytes into a base 64 string and return it out
             return Convert.ToBase64String(CipherContent);
@@ -75,18 +74,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// Simple Encryption(AES) then Authentication (HMAC) for a UTF8 Message.
         /// </summary>
         /// <param name="ContentToEncrypt">The content we want to encrypt</param>
-        /// <param name="CryptoKey">The crypt key used to encryption</param>
-        /// <param name="AuthKey">The auth key used for encryption</param>
         /// <param name="OptionalPayload">(Optional) Non-Secret Payload</param>
         /// <returns>Encrypted Message</returns>
         /// <exception cref="ArgumentException">Thrown when one of the key values or the input content is null</exception>
-        public static byte[] Encrypt(byte[] ContentToEncrypt, byte[] CryptoKey, byte[] AuthKey, byte[] OptionalPayload = null)
+        public static byte[] Encrypt(byte[] ContentToEncrypt, byte[] OptionalPayload = null)
         {
             // Do basic error checking on input arguments to ensure they're populated
-            if (CryptoKey == null || CryptoKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(CryptoKey));
-            if (AuthKey == null || AuthKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(AuthKey));
+            if (EncryptionKeys.CryptographicKey == null || EncryptionKeys.CryptographicKey.Length != KeyBitSize / 8)
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(EncryptionKeys.CryptographicKey));
+            if (EncryptionKeys.AutorizationKey == null || EncryptionKeys.AutorizationKey.Length != KeyBitSize / 8)
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(EncryptionKeys.AutorizationKey));
             if (ContentToEncrypt == null || ContentToEncrypt.Length < 1)
                 throw new ArgumentException("Secret Message Required!", nameof(ContentToEncrypt));
 
@@ -102,7 +99,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
                 IVKey = AesManager.IV;
 
                 // Spawn in the encryptor object here using the IV key provided 
-                using (var AesEncryptor = AesManager.CreateEncryptor(CryptoKey, IVKey))
+                using (var AesEncryptor = AesManager.CreateEncryptor(EncryptionKeys.CryptographicKey, IVKey))
                 using (var CipherStream = new MemoryStream())
                 {
                     // Copy the content from our encryptor into a crypto stream and prepare to save it as our cipher 
@@ -119,7 +116,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
             }
 
             // Assemble encrypted message and add authentication
-            using (var HMAC256 = new HMACSHA256(AuthKey))
+            using (var HMAC256 = new HMACSHA256(EncryptionKeys.AutorizationKey))
             using (var EncryptedStream = new MemoryStream())
             {
                 using (var BinaryWriter = new BinaryWriter(EncryptedStream))
@@ -145,12 +142,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// Simple Authentication (HMAC) then Decryption (AES) for a secrets UTF8 Message.
         /// </summary>
         /// <param name="EncryptedMessage">The encrypted message to decrypt</param>
-        /// <param name="CryptoKey">The crypt key used to encryption</param>
-        /// <param name="AuthKey">The auth key used for encryption</param>
         /// <param name="OptionalPayloadLength">(Optional) Non-Secret Payload</param>
         /// <returns>The decrypted Message from our encrypted input content</returns>
         /// <exception cref="ArgumentException">Thrown when the input content is not provided for decryption or one of our keys is missing</exception>
-        public static string Decrypt(string EncryptedMessage, byte[] CryptoKey, byte[] AuthKey, int OptionalPayloadLength = 0)
+        public static string Decrypt(string EncryptedMessage, int OptionalPayloadLength = 0)
         {
             // Make sure the content we're encrypting exists and has length 
             if (string.IsNullOrEmpty(EncryptedMessage))
@@ -158,7 +153,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
 
             // Convert the content into a byte array and then store the cypher content from the decryption of it
             var CipherText = Convert.FromBase64String(EncryptedMessage);
-            var PlainText = Decrypt(CipherText, CryptoKey, AuthKey, OptionalPayloadLength);
+            var PlainText = Decrypt(CipherText, OptionalPayloadLength);
 
             // Convert the decrypted bytes into a base 64 string and return it out
             return Encoding.UTF8.GetString(PlainText);
@@ -167,23 +162,21 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         /// Simple Authentication (HMAC) then Decryption (AES) for a secrets UTF8 Message.
         /// </summary>
         /// <param name="EncryptedMessage">The encrypted message to decrypt</param>
-        /// <param name="CryptoKey">The crypt key used to encryption</param>
-        /// <param name="AuthKey">The auth key used for encryption</param>
         /// <param name="OptionalPayloadLength">(Optional) Non-Secret Payload</param>
         /// <returns>The decrypted Message from our encrypted input content</returns>
         /// <exception cref="ArgumentException">Thrown when the input content is not provided for decryption</exception>
-        public static byte[] Decrypt(byte[] EncryptedMessage, byte[] CryptoKey, byte[] AuthKey, int OptionalPayloadLength = 0)
+        public static byte[] Decrypt(byte[] EncryptedMessage, int OptionalPayloadLength = 0)
         {
             // Do basic error checking on input arguments to ensure they're populated
-            if (CryptoKey == null || CryptoKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(CryptoKey));
-            if (AuthKey == null || AuthKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(AuthKey));
+            if (EncryptionKeys.CryptographicKey == null || EncryptionKeys.CryptographicKey.Length != KeyBitSize / 8)
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(EncryptionKeys.CryptographicKey));
+            if (EncryptionKeys.AutorizationKey == null || EncryptionKeys.AutorizationKey.Length != KeyBitSize / 8)
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(EncryptionKeys.AutorizationKey));
             if (EncryptedMessage == null || EncryptedMessage.Length < 1)
                 throw new ArgumentException("Secret Message Required!", nameof(EncryptedMessage));
 
             // Build a new HMAC 256 Helper using the auth key to start decryption
-            using (var hmac = new HMACSHA256(AuthKey))
+            using (var hmac = new HMACSHA256(EncryptionKeys.AutorizationKey))
             {
                 // Calculate the checksum tag on the input content and attempt to calculate it
                 var ChecksumTag = new byte[hmac.HashSize / 8];
@@ -217,7 +210,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
                     Array.Copy(EncryptedMessage, OptionalPayloadLength, IVKey, 0, IVKey.Length);
 
                     // Spawn a new AES decrypter using the AES manager and our key values found
-                    using (var Decrypter = AesManaged.CreateDecryptor(CryptoKey, IVKey))
+                    using (var Decrypter = AesManaged.CreateDecryptor(EncryptionKeys.CryptographicKey, IVKey))
                     using (var PlainTextStream = new MemoryStream())
                     {
                         // Copy the content from the decrypted stream values into our memory stream to hold the content needed
