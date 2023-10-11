@@ -426,11 +426,9 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,csharp
 
-.DS_Store
-
-ProtechSalesInvoice_Fulcrum.xlsx
-
-ProtechSalesInvoice_FulcrumInjector_Final_02012022.pdf
-
+# Ignore for debug and release folders for injector application
 FulcrumShim/[Dd]ebug/
 FulcrumShim/[Rr]elease*/
+
+# Ignore for Encryption Key Contents
+FulcrumInjector/Properties/EncryptionKeys.cs
