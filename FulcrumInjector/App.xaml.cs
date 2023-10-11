@@ -190,6 +190,15 @@ namespace FulcrumInjector
             };
         }
         /// <summary>
+        /// Validates the encryption key configuration for the injector application. Will allow a chance to
+        /// provide keys to the application if no keys are given in the encryption file for debug runs.
+        /// </summary>
+        private void _configureCryptographicKeys()
+        {
+            // Start by checking the encryption keys
+            this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.InfoLog);
+        }
+        /// <summary>
         /// Builds an event control object for methods to run when the app closes out.
         /// </summary>
         private void _configureAppExitRoutine()
