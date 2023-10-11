@@ -16,12 +16,14 @@ using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewContent.FulcrumViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
+using FulcrumInjector.Properties;
 using NLog.Targets;
 using SharpLogging;
 
@@ -85,9 +87,15 @@ namespace FulcrumInjector
             // Force the working directory. Build JSON settings objects
             JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
 
-            // Setup logging, exception handlers, exit routines, and parse startup arguments
+            // Setup logging and configure universal exception handlers
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
+
+            // Pull in our user settings and configure cryptographic keys
+            this._configureUserSettings();
+            this._configureCryptographicKeys();
+
+            // Configure our cleanup and startup routines
             this._configureAppExitRoutine();
             this._configureStartupRoutines();
 
@@ -96,9 +104,8 @@ namespace FulcrumInjector
             this._configureDriveService();
             this._configureWatchdogService();
 
-            // Configure settings and app theme
+            // Configure the current application theme and setup singleton contents
             this._configureCurrentTheme();
-            this._configureUserSettings();
             this._configureSingletonViews();
 
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
@@ -196,7 +203,21 @@ namespace FulcrumInjector
         private void _configureCryptographicKeys()
         {
             // Start by checking the encryption keys
-            this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.InfoLog);
+            this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.WarnLog);
+            if (EncryptionKeys.IsEncryptionConfigured)
+            {
+                // Log out that our encryption keys are configured and exit out
+                this._appLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED CORRECTLY!", LogType.InfoLog);
+                return;
+            }
+
+            // Log out that we're now showing the configuration window for our encryption keys
+            this._appLogger.WriteLog("ENCRYPTION KEYS ARE NOT CONFIGURED AT THIS TIME!");
+            this._appLogger.WriteLog("SHOWING NEW CONFIGURATION WINDOW FOR ENCRYPTION KEY SETUP...");
+
+            // Build and show a new dialog window for the configuration of the keys
+            FulcrumEncryptionKeysWindow KeyConfigWindow = new FulcrumEncryptionKeysWindow();
+            KeyConfigWindow.ShowDialog();
         }
         /// <summary>
         /// Builds an event control object for methods to run when the app closes out.

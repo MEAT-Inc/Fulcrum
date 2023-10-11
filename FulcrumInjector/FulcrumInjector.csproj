@@ -197,6 +197,9 @@
     <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\LogFileSet.cs" />
     <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogSettings.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorMiscViewModels\FulcrumGoogleDriveViewModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumEncryptionKeysWindow.xaml.cs">
+      <DependentUpon>FulcrumEncryptionKeysWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
@@ -334,6 +337,10 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
+    <Page Include="FulcrumViewContent\FulcrumViews\FulcrumEncryptionKeysWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

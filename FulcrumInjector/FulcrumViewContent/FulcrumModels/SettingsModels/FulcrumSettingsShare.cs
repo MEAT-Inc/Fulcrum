@@ -51,6 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
 
         // Predefined settings collections for object values pulled in from our JSON Configuration file
         public FulcrumSettingsCollection InjectorShimDllSettings => this[SettingSectionTypes.SHIM_DLL_SETTINGS];
+        public FulcrumSettingsCollection InjectorEncryptionSettings => this[SettingSectionTypes.ENCRYPTION_SETTINGS];
         public FulcrumSettingsCollection InjectorRegexFulcrumSettings => this[SettingSectionTypes.DLL_OUTPUT_REGEX_SETTINGS];
         public FulcrumSettingsCollection DebugLogViewerFulcrumSettings => this[SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS];
         public FulcrumSettingsCollection InjectorPipeConfigFulcrumSettings => this[SettingSectionTypes.INJECTOR_PIPE_SETTINGS];
@@ -75,23 +76,26 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             this.Add(SettingSectionTypes.SHIM_DLL_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.SHIM_DLL_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
+            this.Add(SettingSectionTypes.INJECTOR_PIPE_SETTINGS, new FulcrumSettingsCollection(
+                SettingSectionTypes.INJECTOR_PIPE_SETTINGS,
+                Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.HARDWARE_CONFIGURATION_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.LOG_FILE_CONVERSION_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
-            this.Add(SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS, new FulcrumSettingsCollection(
-                SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS,
-                Array.Empty<FulcrumSettingEntryModel>()));
-            this.Add(SettingSectionTypes.INJECTOR_PIPE_SETTINGS, new FulcrumSettingsCollection(
-                SettingSectionTypes.INJECTOR_PIPE_SETTINGS,
+            this.Add(SettingSectionTypes.ENCRYPTION_SETTINGS, new FulcrumSettingsCollection(
+                SettingSectionTypes.ENCRYPTION_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.DLL_OUTPUT_REGEX_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.DLL_OUTPUT_REGEX_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.DLL_OUTPUT_SYNTAX_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.DLL_OUTPUT_SYNTAX_SETTINGS,
+                Array.Empty<FulcrumSettingEntryModel>()));
+            this.Add(SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS, new FulcrumSettingsCollection(
+                SettingSectionTypes.DEBUG_LOG_VIEWER_SETTINGS,
                 Array.Empty<FulcrumSettingEntryModel>()));
             this.Add(SettingSectionTypes.DEBUG_LOG_VIEWER_SYNTAX_SETTINGS, new FulcrumSettingsCollection(
                 SettingSectionTypes.DEBUG_LOG_VIEWER_SYNTAX_SETTINGS,
