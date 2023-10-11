@@ -45,12 +45,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         /// </summary>
         public FulcrumEncryptionKeysWindow()
         {
-            // Configure a new logger for our encryption keys window
+            // Initialize new UI Component and configure the logger instance for it
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-
-            // Initialize new UI Component and configure a window blur style
             InitializeComponent();
-            FulcrumWindowBlur.ShowBlurEffect(this);
         }
         /// <summary>
         /// On loaded, we want to populate our view content with current key values if they exist

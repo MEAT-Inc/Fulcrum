@@ -1,11 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
 
-            <!-- Insert styles for About This App here -->
+            <!-- Insert Styles for Encryption Key Configuration Here -->
 
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>

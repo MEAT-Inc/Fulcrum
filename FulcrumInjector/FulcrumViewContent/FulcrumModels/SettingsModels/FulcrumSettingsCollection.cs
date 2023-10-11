@@ -45,7 +45,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels
             [Description("Injector Pipe Settings")] INJECTOR_PIPE_SETTINGS,
             [Description("Hardware Configuration Settings")] HARDWARE_CONFIGURATION_SETTINGS,
             [Description("Log File Conversion Settings")] LOG_FILE_CONVERSION_SETTINGS,
-            [Description("Fulcrum Encryption Settings")] ENCRYPTION_SETTINGS,
             [Description("PassThru DLL Output Regex Settings")] DLL_OUTPUT_REGEX_SETTINGS,
             [Description("PassThru DLL Output Syntax Settings")] DLL_OUTPUT_SYNTAX_SETTINGS,
             [Description("Debug Log Viewer Settings")] DEBUG_LOG_VIEWER_SETTINGS,

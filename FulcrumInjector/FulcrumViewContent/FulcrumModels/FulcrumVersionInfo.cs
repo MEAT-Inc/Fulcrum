@@ -20,8 +20,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
         public readonly Version ShimVersion = new(0, 0);
         public readonly Version InjectorVersion = new(0, 0);
 
-        // Public facing fields for the compile times of the currently installed shim and injector objects
-        public readonly DateTime ShimBuildDate = DateTime.MinValue;
+        // Public facing fields for the compile time of the currently installed injector application
         public readonly DateTime InjectorBuildDate = DateTime.MinValue;
 
         #endregion //Fields
@@ -33,7 +32,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
         public string InjectorVersionString => this.InjectorVersion.ToString();
 
         // Public facing properties holding the same build date/time information as above but shown as string content
-        public string ShimBuildDateString => this.ShimBuildDate.ToString("MM/dd/yyyy - HH:mm:ss");
         public string InjectorBuildDateString => this.InjectorBuildDate.ToString("MM/dd/yyyy - HH:mm:ss");
 
         #endregion //Properties
@@ -79,8 +77,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
         public FulcrumVersionInfo()
         {
             // Build version information from current object executing
-            AssemblyName InjectorAssyName = Assembly.GetEntryAssembly()?.GetName();
-            this.InjectorVersion = InjectorAssyName?.Version;
+            Assembly InjectorAssembly = Assembly.GetExecutingAssembly();
+            this.InjectorBuildDate = this._getBuildTime(InjectorAssembly);
+            this.InjectorVersion = InjectorAssembly.GetName()?.Version;
             if (this.InjectorVersion == null)
                 throw new InvalidOperationException("FAILED TO FIND OUR CURRENT INJECTOR VERSION!");
 
@@ -101,10 +100,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumModels
             this.ShimVersion = Version.Parse(InjectorShimFileInfo.FileVersion);
             if (this.ShimVersion == null)
                 throw new InvalidOperationException("FAILED TO FIND OUR CURRENT SHIM VERSION!");
-
-            // Store the build date/time for the injector and shim DLLs here
-            this.ShimBuildDate = this._getBuildTime(Assembly.LoadFile(InjectorDllPath));
-            this.InjectorBuildDate = this._getBuildTime(Assembly.GetExecutingAssembly());
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

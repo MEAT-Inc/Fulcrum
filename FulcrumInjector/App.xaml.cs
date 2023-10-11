@@ -83,19 +83,16 @@ namespace FulcrumInjector
         {
             // Startup override
             base.OnStartup(e);
-
+            
             // Force the working directory. Build JSON settings objects
             JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
 
-            // Setup logging and configure universal exception handlers
+            // Setup logging and exception handlers
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
 
-            // Pull in our user settings and configure cryptographic keys
-            this._configureUserSettings();
+            // Validate encryption keys and add our startup/exit event handlers 
             this._configureCryptographicKeys();
-
-            // Configure our cleanup and startup routines
             this._configureAppExitRoutine();
             this._configureStartupRoutines();
 
@@ -104,8 +101,9 @@ namespace FulcrumInjector
             this._configureDriveService();
             this._configureWatchdogService();
 
-            // Configure the current application theme and setup singleton contents
+            // Configure settings and app theme
             this._configureCurrentTheme();
+            this._configureUserSettings();
             this._configureSingletonViews();
 
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
@@ -202,9 +200,9 @@ namespace FulcrumInjector
         /// </summary>
         private void _configureCryptographicKeys()
         {
-            // Start by checking the encryption keys
+            // Log out that we're configuring encryption keys here and check if they're configured
             this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.WarnLog);
-            if (EncryptionKeys.IsEncryptionConfigured)
+            if (EncryptionKeys.IsEncryptionConfigured && !Debugger.IsAttached)
             {
                 // Log out that our encryption keys are configured and exit out
                 this._appLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED CORRECTLY!", LogType.InfoLog);
