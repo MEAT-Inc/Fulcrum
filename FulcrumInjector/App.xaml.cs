@@ -202,7 +202,7 @@ namespace FulcrumInjector
         {
             // Log out that we're configuring encryption keys here and check if they're configured
             this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.WarnLog);
-            if (EncryptionKeys.IsEncryptionConfigured && !Debugger.IsAttached)
+            if (EncryptionKeys.IsEncryptionConfigured)
             {
                 // Log out that our encryption keys are configured and exit out
                 this._appLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED CORRECTLY!", LogType.InfoLog);

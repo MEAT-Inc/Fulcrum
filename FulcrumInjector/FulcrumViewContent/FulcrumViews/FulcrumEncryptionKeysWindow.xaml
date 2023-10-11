@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" mc:Ignorable="d"
-        BorderBrush="White" BorderThickness="2" ResizeMode="NoResize" 
-        ShowCloseButton="False" TitleBarHeight="0" Height="430" Width="570">
+        BorderBrush="White" BorderThickness="2" ResizeMode="NoResize"  TitleBarHeight="10"
+        ShowCloseButton="False" NonActiveWindowTitleBrush="Transparent" Height="400" Width="570">
 
     <!-- Style Sheets -->
     <Window.Resources>
@@ -32,7 +32,7 @@
         </Grid.RowDefinitions>
 
         <!-- Information Content -->
-        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5,0,5,5">
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5,-5,5,5">
             <TextBlock Text="Invalid Encryption Key Configuration!" Style="{StaticResource TitleTextStyle}" Margin="0,5"/>
             <TextBlock Style="{StaticResource ConfigInfoTextStyle}" Margin="5,5">
                 <Run Text="ACHTUNG!" FontWeight="Bold" Foreground="Yellow"/>
