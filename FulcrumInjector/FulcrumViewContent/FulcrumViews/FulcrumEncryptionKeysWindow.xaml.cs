@@ -49,18 +49,42 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             InitializeComponent();
         }
-        /// <summary>
-        /// On loaded, we want to populate our view content with current key values if they exist
-        /// </summary>
-        /// <param name="SendingWindow">Sending object</param>
-        /// <param name="EventArgs">Events attached to it.</param>
-        private void FulcrumEncryptionKeysWindow_OnLoaded(object SendingWindow, RoutedEventArgs EventArgs)
-        {
-            // Pull up our version information and configure our view content
-            this._viewLogger.WriteLog("REFRESHING BUILD CONFIGURATION INFORMATION NOW...", LogType.InfoLog);
-        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Event handler to fire when the user changes the text in either of the key value text boxes
+        /// </summary>
+        /// <param name="Sender">Textbox that sent this event</param>
+        /// <param name="E">Event args fired along with the text changed event</param>
+        private void tbKeyValue_OnChanged(object Sender, TextChangedEventArgs E)
+        {
+            // Check the state of both text boxes and enable or disable the save button
+            this.btnConfirmEncryptionSettings.IsEnabled =
+                !string.IsNullOrWhiteSpace(this.tbAuthKeyValue.Text) &&
+                !string.IsNullOrWhiteSpace(this.tbCryptoKeyValue.Text);
+        }
+
+        /// <summary>
+        /// Event handler used to process a save configuration request for our encryption settings
+        /// </summary>
+        /// <param name="Sender">The sending button that fired this event</param>
+        /// <param name="E">EventArgs fired along with the click event</param>
+        private void btnConfirmEncryptionSettings_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // TODO: Configure logic for setting injector encryption values
+        }
+        /// <summary>
+        /// Event handler used to process a close injector request when the user cancels configuration
+        /// </summary>
+        /// <param name="Sender">The sending button that fired this event</param>
+        /// <param name="E">EventArgs fired along with the click event</param>
+        private void btnCloseInjectorApplication_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Log out that we're just closing this window out and exit the application
+            this._viewLogger.WriteLog("PROCESSED AN EXIT REQUEST FROM THE ENCRYPTION CONFIGURATION WINDOW!", LogType.WarnLog);
+            this._viewLogger.WriteLog("EXITING APPLICATION WITHOUT CONFIGURING ENCRYPTION KEYS NOW...", LogType.WarnLog);
+            Environment.Exit(0);
+        }
     }
 }

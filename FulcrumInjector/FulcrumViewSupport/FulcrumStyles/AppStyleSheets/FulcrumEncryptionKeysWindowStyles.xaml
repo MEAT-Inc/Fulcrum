@@ -5,8 +5,70 @@
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
 
-            <!-- Insert Styles for Encryption Key Configuration Here -->
+            <!-- Title Text and Information Text Styles -->
+            <Style x:Key="TitleTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+            </Style>
+            <Style x:Key="ConfigInfoTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="TextAlignment" Value="Justify"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+            <Style x:Key="KeyValueTitleTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="TextAlignment" Value="Justify"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style> 
 
+            <!-- Entry Content Style -->
+            <Style x:Key="KeyValueInputBoxStyle" TargetType="TextBox">
+                <Setter Property="Margin" Value="5,5"/>
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
+            <!-- Control Button Style -->
+            <Style x:Key="KeyConfigButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="Background" Value="DarkGray"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="White" BorderThickness="2" CornerRadius="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="Gray" TargetName="Border" />
+                                    <Setter Property="BorderBrush" Value="Gray" TargetName="Border" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryColor_Darker_35}" TargetName="Border" />
+                                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_65}" TargetName="Border" />
+                                    <Setter Property="BorderThickness" Value="3" TargetName="Border" />
+                                    <Setter Property="FontWeight" Value="DemiBold"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseCaptured" Value="True">
+                                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}" TargetName="Border" />
+                                    <Setter Property="Background" Value="{StaticResource SecondaryColor_Darker_65}" TargetName="Border" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
