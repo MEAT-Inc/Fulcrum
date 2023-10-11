@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using SharpLogging;
 
 namespace FulcrumInjector.Properties
@@ -20,19 +21,31 @@ namespace FulcrumInjector.Properties
 
         #region Fields
 
-        // Private static logger object for the encryption keys class
+        // Private static logger object and encryption key objects
         private static readonly SharpLogger _encryptionKeyLogger;
+        private static readonly byte[] AuthKey = new byte[]
+        {
+            
+            // TODO: Insert the pre-defined Authorization key bytes in here!
+            // Reach out to zack.walsh@meatinc.autos for these keys if you're helping develop this application!
 
-        // Static readonly fields for byte content/encryption
-        public static readonly byte[] AuthKey = new byte[] { };
-        public static readonly byte[] CryptoKey = new byte[] { };
+        };
+        private static readonly byte[] CryptoKey = new byte[]
+        {
+
+            // TODO: Insert the pre-defined Cryptographic key bytes in here!
+            // Reach out to zack.walsh@meatinc.autos for these keys if you're helping develop this application!
+
+        };
 
         #endregion // Fields
 
         #region Properties
         
         // Public static properties with helpful configuration information 
-        public static bool EncryptionConfigured => CryptoKey.Length > 0 && AuthKey.Length > 0;
+        public static bool EncryptionConfigured => 
+            CryptoKey.Length == StringEncryptor.KeyByteSize && 
+            AuthKey.Length > StringEncryptor.KeyByteSize;
 
         #endregion // Properties
 
