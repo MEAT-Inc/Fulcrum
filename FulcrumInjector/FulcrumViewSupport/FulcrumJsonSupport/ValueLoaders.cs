@@ -101,13 +101,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
                 var PulledJObject = JsonConfigFile.ApplicationConfig[JObjectKey];
                 _valueLoadersLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {JObjectKey} OK!", LogType.TraceLog);
 
-                // Cast and return if needed
+                // Cast and return the requested object as an array if needed
                 if (PulledJObject.Type != JTokenType.Array) return JObject.FromObject(PulledJObject);
-                {
-                    // Build new object
-                    JObject OutputObject = new JObject { JObjectKey, JArray.FromObject(PulledJObject) };
-                    return OutputObject;
-                }
+                JObject OutputObject = new JObject { { JObjectKey, JArray.FromObject(PulledJObject) } };
+                return OutputObject;
             }
             catch (Exception PullEx)
             {

@@ -73,7 +73,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             string TokenUri = InputObject[this._findJsonPropName(nameof(DriveExplorerConfiguration.TokenUri))].Value<string>();
             string AuthProvider = InputObject[this._findJsonPropName(nameof(DriveExplorerConfiguration.AuthProvider))].Value<string>();
             string ClientSecret = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerConfiguration.ClientSecret))].Value<string>());
-            string[] RedirectUris = InputObject[this._findJsonPropName(nameof(DriveExplorerConfiguration.RedirectUris))].Value<string[]>();
+            string[] RedirectUris = InputObject[this._findJsonPropName(nameof(DriveExplorerConfiguration.RedirectUris))].ToObject<string[]>();
 
             // Return built output object
             return new DriveExplorerConfiguration()
