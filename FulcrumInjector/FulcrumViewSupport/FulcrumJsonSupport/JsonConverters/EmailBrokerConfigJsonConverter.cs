@@ -1,21 +1,15 @@
-﻿using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
+﻿using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using SharpExpressions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
-using static FulcrumInjector.FulcrumViewSupport.FulcrumUpdater;
+using static FulcrumInjector.FulcrumViewSupport.FulcrumEmailBroker;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
     /// <summary>
-    /// JSON Converter for the Fulcrum update configuration object/class
+    /// JSON Converter for the Fulcrum Email broker configuration object
     /// </summary>
-    internal class UpdaterConfigJsonConverter : JsonConverter
+    internal class EmailBrokerConfigJsonConverter : JsonConverter
     {
         #region Custom Events
         #endregion // Custom Events
@@ -39,7 +33,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// CTOR for this JSON converter. Allows us to specify encryption state
         /// </summary>
         /// <param name="UseEncryption">When true, output is encrypted</param>
-        public UpdaterConfigJsonConverter(bool UseEncryption = true)
+        public EmailBrokerConfigJsonConverter(bool UseEncryption = true)
         {
             // Store our encryption configuration state 
             this._useEncryption = UseEncryption;
@@ -52,7 +46,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// </summary>
         /// <param name="ObjectType">The type of object we're trying to convert</param>
         /// <returns>True if the object can be serialized, false if not</returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumUpdaterConfiguration); }
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(EmailBrokerConfiguration); }
         /// <summary>
         /// Writes JSON output for the given input object
         /// </summary>
@@ -63,17 +57,19 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            FulcrumUpdaterConfiguration UpdaterConfig = ValueObject as FulcrumUpdaterConfiguration;
+            EmailBrokerConfiguration EmailConfig = ValueObject as EmailBrokerConfiguration;
 
-            // Build a dynamic output object using the properties of our update configuration
-            // Encrypt "UpdaterUserName", "UpdaterSecretKey"
+            // Build a dynamic output object using the properties of our email configuration
+            // Encrypt "ReportSenderEmail", "ReportSenderPassword"
             var OutputObject = JObject.FromObject(new
             {
-                UpdaterConfig.ForceUpdateReady,
-                UpdaterConfig.UpdaterOrgName,
-                UpdaterConfig.UpdaterRepoName, 
-                UpdaterUserName = this._useEncryption ? StringEncryptor.Encrypt(UpdaterConfig.UpdaterUserName) : UpdaterConfig.UpdaterUserName,
-                UpdaterSecretKey = this._useEncryption ? StringEncryptor.Encrypt(UpdaterConfig.UpdaterSecretKey) : UpdaterConfig.UpdaterSecretKey,
+                EmailConfig.ReportSenderName,
+                ReportSenderEmail = this._useEncryption 
+                    ? StringEncryptor.Encrypt(EmailConfig.ReportSenderName)
+                    : EmailConfig.ReportSenderName,
+                ReportSenderPassword = this._useEncryption 
+                    ? StringEncryptor.Encrypt(EmailConfig.ReportSenderPassword)
+                    : EmailConfig.ReportSenderPassword,
             });
 
             // Now write this built object.
@@ -94,21 +90,21 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             if (InputObject.HasValues == false) { return default; }
 
             // Read in our properties for the JObject and build a configuration from them
-            bool ForceUpdateReady = InputObject[nameof(FulcrumUpdaterConfiguration.ForceUpdateReady)].Value<bool>();
-            string UpdaterOrgName = InputObject[nameof(FulcrumUpdaterConfiguration.UpdaterOrgName)].Value<string>();
-            string UpdaterRepoName = InputObject[nameof(FulcrumUpdaterConfiguration.UpdaterRepoName)].Value<string>();
-            string UpdaterUserName = InputObject[nameof(FulcrumUpdaterConfiguration.UpdaterUserName)].Value<string>();
-            string UpdaterSecretKey = InputObject[nameof(FulcrumUpdaterConfiguration.UpdaterSecretKey)].Value<string>();
+            string ReportSenderName = InputObject[nameof(EmailBrokerConfiguration.ReportSenderName)].Value<string>();
+            string ReportSenderEmail = InputObject[nameof(EmailBrokerConfiguration.ReportSenderEmail)].Value<string>();
+            string ReportSenderPassword = InputObject[nameof(EmailBrokerConfiguration.ReportSenderPassword)].Value<string>();
 
             // Return built output object
-            return new FulcrumUpdaterConfiguration()
+            return new EmailBrokerConfiguration()
             {
                 // Store the properties of our configuration here and exit out
-                ForceUpdateReady = ForceUpdateReady,
-                UpdaterOrgName = UpdaterOrgName,
-                UpdaterRepoName = UpdaterRepoName,
-                UpdaterUserName = this._useEncryption ? StringEncryptor.Decrypt(UpdaterUserName) : UpdaterUserName,
-                UpdaterSecretKey = this._useEncryption ? StringEncryptor.Decrypt(UpdaterSecretKey) : UpdaterSecretKey,
+                ReportSenderName = ReportSenderName,
+                ReportSenderEmail = this._useEncryption 
+                    ? StringEncryptor.Decrypt(ReportSenderEmail)
+                    : ReportSenderEmail,
+                ReportSenderPassword = this._useEncryption 
+                    ? StringEncryptor.Decrypt(ReportSenderPassword)
+                    : ReportSenderPassword,
             };
         }
     }

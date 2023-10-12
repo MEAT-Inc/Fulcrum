@@ -16,6 +16,36 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
     /// </summary>
     internal class DriveExplorerAuthJsonConverter : JsonConverter
     {
+        #region Custom Events
+        #endregion // Custom Events
+
+        #region Fields
+        #endregion // Fields
+
+        #region Properties
+
+        // Public facing property used to determine if we encrypt the output content of our JSON object or not
+        private readonly bool _useEncryption;
+
+        #endregion // Properties
+
+        #region Structs and Classes
+        #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// CTOR for this JSON converter. Allows us to specify encryption state
+        /// </summary>
+        /// <param name="UseEncryption">When true, output is encrypted</param>
+        public DriveExplorerAuthJsonConverter(bool UseEncryption = true)
+        {
+            // Store our encryption configuration state 
+            this._useEncryption = UseEncryption;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Sets if we can convert this object or not.
         /// </summary>
@@ -34,20 +64,32 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             if (ValueObject == null) { return; }
             DriveExplorerAuthorization ExplorerAuth = ValueObject as DriveExplorerAuthorization;
 
-            // Build a dynamic output object using the properties of our update configuration
+            // Build a dynamic output object using the properties of our authorization configuration
             // Encrypt "project_id", "private_key_id", "private_key", "client_email", "client_id", "client_x509_cert_url"
             var OutputObject = JObject.FromObject(new
             {
                 type = ExplorerAuth.Type,
-                project_id = StringEncryptor.Encrypt(ExplorerAuth.ProjectId),
-                private_key_id = StringEncryptor.Encrypt(ExplorerAuth.PrivateKeyId.Replace("\\n", string.Empty)),
-                private_key = StringEncryptor.Encrypt(ExplorerAuth.PrivateKey),
-                client_email = StringEncryptor.Encrypt(ExplorerAuth.ClientEmail),
-                client_id = StringEncryptor.Encrypt(ExplorerAuth.ClientId),
+                project_id = this._useEncryption 
+                    ? StringEncryptor.Encrypt(ExplorerAuth.ProjectId) 
+                    : ExplorerAuth.ProjectId,
+                private_key_id = this._useEncryption 
+                    ? StringEncryptor.Encrypt(ExplorerAuth.PrivateKeyId)
+                    : ExplorerAuth.PrivateKeyId,
+                private_key = this._useEncryption 
+                    ? StringEncryptor.Encrypt(ExplorerAuth.PrivateKey.Replace("\\n", "\n")).Trim()
+                    : ExplorerAuth.PrivateKey.Replace("\\n", "\n").Trim(),
+                client_email = this._useEncryption 
+                    ? StringEncryptor.Encrypt(ExplorerAuth.ClientEmail)
+                    : ExplorerAuth.ClientEmail,
+                client_id = this._useEncryption 
+                    ? StringEncryptor.Encrypt(ExplorerAuth.ClientId)
+                    : ExplorerAuth.ClientId,
                 auth_uri = ExplorerAuth.AuthUri,
                 token_uri = ExplorerAuth.TokenUri,
                 auth_provider_x509_cert_url = ExplorerAuth.AuthProviderUrl,
-                client_x509_cert_url = StringEncryptor.Encrypt(ExplorerAuth.ClientCertUrl),
+                client_x509_cert_url = this._useEncryption 
+                    ? StringEncryptor.Encrypt(ExplorerAuth.ClientCertUrl)
+                    : ExplorerAuth.ClientCertUrl,
                 universe_domain = ExplorerAuth.UniverseDomain,
             });
 
@@ -70,15 +112,15 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 
             // Read in our properties for the JObject and build a configuration from them
             string Type = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.Type))].Value<string>();
-            string ProjectId = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ProjectId))].Value<string>());
-            string PrivateKeyId = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.PrivateKeyId))].Value<string>().Replace("\\n", string.Empty));
-            string PrivateKey = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.PrivateKey))].Value<string>());
-            string ClientEmail = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ClientEmail))].Value<string>());
-            string ClientId = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ClientId))].Value<string>());
+            string ProjectId = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ProjectId))].Value<string>();
+            string PrivateKeyId = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.PrivateKeyId))].Value<string>();
+            string PrivateKey = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.PrivateKey))].Value<string>();
+            string ClientEmail = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ClientEmail))].Value<string>();
+            string ClientId = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ClientId))].Value<string>();
             string AuthUri = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.AuthUri))].Value<string>();
             string TokenUri = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.TokenUri))].Value<string>();
             string AuthProviderUrl = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.AuthProviderUrl))].Value<string>();
-            string ClientCertUrl = StringEncryptor.Decrypt(InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ClientCertUrl))].Value<string>());
+            string ClientCertUrl = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.ClientCertUrl))].Value<string>();
             string UniverseDomain = InputObject[this._findJsonPropName(nameof(DriveExplorerAuthorization.UniverseDomain))].Value<string>();
 
             // Return built output object
@@ -86,15 +128,15 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             {
                 // Store the properties of our configuration here and exit out
                 Type = Type,
-                ProjectId = ProjectId,
-                PrivateKeyId = PrivateKeyId,
-                PrivateKey = PrivateKey,
-                ClientEmail = ClientEmail,
-                ClientId = ClientId,
+                ProjectId = this._useEncryption ? StringEncryptor.Decrypt(ProjectId) : ProjectId,
+                PrivateKeyId = this._useEncryption ? StringEncryptor.Decrypt(PrivateKeyId) : PrivateKeyId,
+                PrivateKey = (this._useEncryption ? StringEncryptor.Decrypt(PrivateKey) : PrivateKey).Replace("\\n", "\n").Trim(),
+                ClientEmail = this._useEncryption ? StringEncryptor.Decrypt(ClientEmail) : ClientEmail,
+                ClientId = this._useEncryption ? StringEncryptor.Decrypt(ClientId): ClientId,
                 AuthUri = AuthUri,
                 TokenUri = TokenUri,
                 AuthProviderUrl = AuthProviderUrl,
-                ClientCertUrl = ClientCertUrl,
+                ClientCertUrl = this._useEncryption ? StringEncryptor.Decrypt(ClientCertUrl) : ClientCertUrl,
                 UniverseDomain = UniverseDomain
             };
         }
@@ -110,7 +152,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         private string _findJsonPropName(string PropName)
         {
             // Find the JSON property attribute for the given property name
-            if (typeof(DriveExplorerConfiguration).GetProperties()
+            if (typeof(DriveExplorerAuthorization).GetProperties()
                     .Where(PropObj => PropObj.Name.Contains(PropName))
                     .Select(PropObj => PropObj.GetCustomAttribute(typeof(JsonPropertyAttribute)))
                     .FirstOrDefault() is not JsonPropertyAttribute JsonPropAttribute)

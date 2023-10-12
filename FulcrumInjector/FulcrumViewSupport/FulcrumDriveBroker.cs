@@ -152,7 +152,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     // Store the API configuration and Application name for the authorization helper
                     ApplicationName = ApplicationName,
                     HttpClientInitializer = GoogleCredential.FromJson(
-                        JsonConvert.SerializeObject(_explorerAuth, new JsonConverter[] { }))
+                        JsonConvert.SerializeObject(_explorerAuth, new DriveExplorerAuthJsonConverter(false)))
                         .CreateScoped(DriveService.Scope.DriveReadonly)
                 });
 

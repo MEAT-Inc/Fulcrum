@@ -149,25 +149,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             try
             {
                 // Pull in new settings values for sender and default receivers.
+                string ConfigKeyBase = "FulcrumConstants.InjectorEmailConfiguration";
                 this.ViewModelLogger.WriteLog("PULLING IN NEW VALUES FOR BROKER OBJECT AND CONSTRUCTING IT", LogType.InfoLog);
-                string ConfigKeyBase = "FulcrumConstants.InjectorEmailConfiguration.SenderConfiguration";
-                string SendName = ValueLoaders.GetConfigValue<string>($"{ConfigKeyBase}.ReportSenderName");
-                string SendEmail = ValueLoaders.GetConfigValue<string>($"{ConfigKeyBase}.ReportSenderEmail");
-                string SendPassword = ValueLoaders.GetConfigValue<string>($"{ConfigKeyBase}.ReportSenderPassword");
+                var EmailConfig = ValueLoaders.GetConfigValue<FulcrumEmailBroker.EmailBrokerConfiguration>($"{ConfigKeyBase}.SenderConfiguration");
 
-                // Build broker first
+                // Build a new email broker using the pulled configuration information
                 this.ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
-                BuiltSender = new FulcrumEmailBroker(SendName, SendEmail, SendPassword);
+                BuiltSender = new FulcrumEmailBroker(EmailConfig);
 
                 // Now try and authorize the client for a google address.
                 this.ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
-                var SmtpConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumConstants.InjectorEmailConfiguration.SmtpServerSettings");
-                var SmtpServerPort = (int)SmtpConfigObject.ServerPort;
-                var SmtpServerName = (string)SmtpConfigObject.ServerName;
-                var SmtpServerTimeout = (int)SmtpConfigObject.ServerTimeout;
+                var SmtpConfigObject = ValueLoaders.GetConfigValue<FulcrumEmailBroker.EmailSmtpConfiguration>($"{ConfigKeyBase}.SmtpServerSettings");
 
                 // Store configuration values for client and then authorize it.
-                BuiltSender.StoreSmtpConfiguration(SmtpServerName, SmtpServerPort, SmtpServerTimeout);
+                BuiltSender.StoreSmtpConfiguration(SmtpConfigObject);
                 if (BuiltSender.AuthenticateSmtpClient()) this.ViewModelLogger.WriteLog("AUTHORIZED NEW CLIENT CORRECTLY! READY TO PROCESS AND SEND REPORTS!", LogType.InfoLog);
                 else throw new InvalidOperationException("FAILED TO AUTHORIZE SMTP CLIENT BROKER ON THE REPORT SENDING OBJECT!");
                 return true;

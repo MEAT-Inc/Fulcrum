@@ -217,6 +217,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\DriveExplorerAuthJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\DriveExplorerConfigJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\EmailBrokerConfigJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\UpdateConfigurationJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumWatchdogService.cs">
