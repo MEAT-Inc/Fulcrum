@@ -206,6 +206,7 @@ namespace FulcrumInjector
             {
                 // Log out that our encryption keys are configured and exit out
                 this._appLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED CORRECTLY!", LogType.InfoLog);
+                this._appLogger.WriteLog("MOVING ONTO REMAINDER OF INJECTOR STARTUP ROUTINES...", LogType.InfoLog);
                 return;
             }
 

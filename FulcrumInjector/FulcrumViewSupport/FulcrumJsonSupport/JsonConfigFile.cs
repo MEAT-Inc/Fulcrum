@@ -63,8 +63,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
 
         // List of encrypted sections and config field keys
         public static List<EncryptedConfigSection> EncryptedConfigs { get; private set; }
-        public static List<string> EncryptedConfigKeys => 
-            EncryptedConfigKeys == null 
+        public static List<string> EncryptedConfigKeys =>
+            EncryptedConfigs == null 
                 ? new List<string>() 
                 : EncryptedConfigs.SelectMany(ConfigObj => ConfigObj.GetConfigKeys()).ToList();
 
