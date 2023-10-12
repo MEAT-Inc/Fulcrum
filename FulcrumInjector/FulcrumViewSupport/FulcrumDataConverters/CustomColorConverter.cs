@@ -6,7 +6,7 @@ using DrawingBrush = System.Drawing.Brush;
 using MediaColor = System.Windows.Media.Color;
 using MediaBrush = System.Windows.Media.Brush;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
 {
     /// <summary>
     /// Helper methods for converting our various types of colors.

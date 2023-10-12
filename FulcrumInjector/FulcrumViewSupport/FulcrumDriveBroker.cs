@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
@@ -60,6 +61,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Class object used to define the JSON object of a google drive explorer configuration
         /// </summary>
+        [JsonConverter(typeof(DriveExplorerConfigJsonConverter))]
         public class DriveExplorerConfiguration
         {
             [JsonProperty("auth_uri")] public string AuthUri { get; set; }
@@ -73,6 +75,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Class object used to define the JSON object of our google drive authorization
         /// </summary>
+        [JsonConverter(typeof(DriveExplorerAuthJsonConverter))]
         public class DriveExplorerAuthorization
         {
             [JsonProperty("type")] public string Type { get; set; }
@@ -121,7 +124,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Pull in the drive ID and application name first
             ApplicationName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.ApplicationName");
-            GoogleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId").UnscrambleString();
+            GoogleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId");
             _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
             _driveServiceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
             _driveServiceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
@@ -129,19 +132,10 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Pull in the configuration values for the drive explorer and unscramble needed strings
             _driveServiceLogger.WriteLog("LOADING AND UNSCRAMBLING CONFIGURATION FOR DRIVE SERVICE NOW...");
             _explorerConfig = ValueLoaders.GetConfigValue<DriveExplorerConfiguration>("FulcrumConstants.InjectorDriveExplorer.ExplorerConfiguration");
-            _explorerConfig.ClientId = _explorerConfig.ClientId.UnscrambleString();
-            _explorerConfig.ProjectId = _explorerConfig.ProjectId.UnscrambleString();
-            _explorerConfig.ClientSecret = _explorerConfig.ClientSecret.UnscrambleString();
 
             // Pull in the configuration values for the drive explorer authorization and unscramble needed strings
             _driveServiceLogger.WriteLog("LOADING AND UNSCRAMBLING AUTHORIZATION FOR DRIVE SERVICE NOW...");
             _explorerAuth = ValueLoaders.GetConfigValue<DriveExplorerAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
-            _explorerAuth.ClientId = _explorerAuth.ClientId.UnscrambleString();
-            _explorerAuth.ProjectId = _explorerAuth.ProjectId.UnscrambleString();
-            _explorerAuth.ClientEmail = _explorerAuth.ClientEmail.UnscrambleString();
-            _explorerAuth.PrivateKeyId = _explorerAuth.PrivateKeyId.UnscrambleString();
-            _explorerAuth.ClientCertUrl = _explorerAuth.ClientCertUrl.UnscrambleString();
-            _explorerAuth.PrivateKey = _explorerAuth.PrivateKey.UnscrambleString().Replace("\\n", string.Empty);
 
             // Log out that our unscramble routines have been completed
             _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
@@ -158,7 +152,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     // Store the API configuration and Application name for the authorization helper
                     ApplicationName = ApplicationName,
                     HttpClientInitializer = GoogleCredential.FromJson(
-                        JsonConvert.SerializeObject(_explorerAuth))
+                        JsonConvert.SerializeObject(_explorerAuth, new JsonConverter[] { }))
                         .CreateScoped(DriveService.Scope.DriveReadonly)
                 });
 

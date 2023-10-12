@@ -22,8 +22,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters
         private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
 
         // Preconfigured Encryption Parameters
-        public static readonly int KeyBitSize = 512;
-        public static readonly int BlockBitSize = 256;
+        public static readonly int KeyBitSize = 256;
+        public static readonly int BlockBitSize = 128;
         public static readonly int KeyByteSize = KeyBitSize / 8;
 
         #endregion //Fields

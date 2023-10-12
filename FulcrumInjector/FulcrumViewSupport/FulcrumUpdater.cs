@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using Newtonsoft.Json;
 using Octokit;
 using SharpLogging;
 
@@ -33,7 +35,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         // Private backing fields for the Git helper, timer, and updater configuration
         private readonly Stopwatch _downloadTimer;
         private readonly GitHubClient _gitUpdaterClient;
-        private readonly UpdateConfiguration _updaterConfiguration;
+        private readonly FulcrumUpdaterConfiguration _updaterConfiguration;
 
         // Private backing fields to hold version information helpers
         private string _latestInjectorVersion;
@@ -79,7 +81,8 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Private class instance used to hold our injector configuration values for updates
         /// </summary>
-        private class UpdateConfiguration
+        [JsonConverter(typeof(UpdaterConfigJsonConverter))]
+        public class FulcrumUpdaterConfiguration
         {
             public bool ForceUpdateReady { get; set; }
             public string UpdaterOrgName { get; set; }
@@ -100,8 +103,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         {
             // Construct a new logger instance and build a new configuration for the updater
             this._injectorUpdateLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this._updaterConfiguration = ValueLoaders.GetConfigValue<UpdateConfiguration>("FulcrumConstants.InjectorUpdates");
-            this._updaterConfiguration.UpdaterSecretKey = this._updaterConfiguration.UpdaterSecretKey.UnscrambleString();
+            this._updaterConfiguration = ValueLoaders.GetConfigValue<FulcrumUpdaterConfiguration>("FulcrumConstants.InjectorUpdates");
             this._injectorUpdateLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
 
             // Configure updater here

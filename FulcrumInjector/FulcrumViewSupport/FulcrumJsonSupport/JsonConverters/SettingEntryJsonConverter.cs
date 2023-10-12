@@ -14,15 +14,15 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <summary>
         /// Sets if we can convert this object or not.
         /// </summary>
-        /// <param name="ObjectType"></param>
-        /// <returns></returns>
+        /// <param name="ObjectType">The type of object we're trying to convert</param>
+        /// <returns>True if the object can be serialized, false if not</returns>
         public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumSettingEntryModel); }
         /// <summary>
-        /// Writes JSON output
+        /// Writes JSON output for the given input object
         /// </summary>
-        /// <param name="JWriter"></param>
-        /// <param name="ValueObject"></param>
-        /// <param name="JSerializer"></param>
+        /// <param name="JWriter">The JWriter building output content for the input value</param>
+        /// <param name="ValueObject">The object being written out to a JSON string</param>
+        /// <param name="JSerializer">Serializer settings for the writer output</param>
         public override void WriteJson(JsonWriter JWriter, object? ValueObject, JsonSerializer JSerializer)
         {
             // Check if object is null. Build output
@@ -45,11 +45,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <summary>
         /// Reads the JSON object input from a string
         /// </summary>
-        /// <param name="JReader"></param>
-        /// <param name="ObjectType"></param>
-        /// <param name="ExistingValue"></param>
-        /// <param name="JSerializer"></param>
-        /// <returns></returns>
+        /// <param name="JReader">The JReader being used to read our input JSON content</param>
+        /// <param name="ObjectType">The type of object we're trying to build form the input JSON</param>
+        /// <param name="ExistingValue">An existing object to update values for based on our new object</param>
+        /// <param name="JSerializer">Serializer settings for the reader input</param>
+        /// <returns>The object built from the input JSON content</returns>
         public override object? ReadJson(JsonReader JReader, Type ObjectType, object? ExistingValue, JsonSerializer JSerializer)
         {
             // Check if input is null. Build object from it.
@@ -57,11 +57,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             if (InputObject.HasValues == false) { return default; }
 
             // Select the array of paths here.
-            string SettingName = InputObject["SettingName"]?.Value<string>();
-            object SettingValue = InputObject["SettingValue"]?.Value<object>();
-            string SettingDescription = InputObject["SettingDescription"]?.Value<string>();
-            Enum.TryParse(InputObject["SettingSection"]?.Value<string>(), out FulcrumSettingsCollection.SettingSectionTypes SettingSection);
-            Enum.TryParse(InputObject["SettingControlType"]?.Value<string>(), out FulcrumSettingEntryModel.ControlTypes SettingControlType);
+            string SettingName = InputObject[nameof(FulcrumSettingEntryModel.SettingName)]?.Value<string>();
+            object SettingValue = InputObject[nameof(FulcrumSettingEntryModel.SettingValue)]?.Value<object>();
+            string SettingDescription = InputObject[nameof(FulcrumSettingEntryModel.SettingDescription)]?.Value<string>();
+            Enum.TryParse(InputObject[nameof(FulcrumSettingEntryModel.SettingSection)]?.Value<string>(), out FulcrumSettingsCollection.SettingSectionTypes SettingSection);
+            Enum.TryParse(InputObject[nameof(FulcrumSettingEntryModel.SettingControlType)]?.Value<string>(), out FulcrumSettingEntryModel.ControlTypes SettingControlType);
 
             // Double check that this is NOT a PassThruRegex value. If it is, then we apply a new Regex based on loaded values
             if (SettingName.Contains("Regex") && string.IsNullOrEmpty(SettingValue?.ToString()))

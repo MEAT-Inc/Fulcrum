@@ -150,12 +150,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             {
                 // Pull in new settings values for sender and default receivers.
                 this.ViewModelLogger.WriteLog("PULLING IN NEW VALUES FOR BROKER OBJECT AND CONSTRUCTING IT", LogType.InfoLog);
-                var EmailConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumConstants.InjectorEmailConfiguration.SenderConfiguration");
-                string SendName = EmailConfigObject.ReportSenderName;
-                string SendEmail = EmailConfigObject.ReportSenderEmail;
-                string SendPassword = EmailConfigObject.ReportSenderPassword.ToString();
-                SendPassword = SendPassword.UnscrambleString();
-
+                string ConfigKeyBase = "FulcrumConstants.InjectorEmailConfiguration.SenderConfiguration";
+                string SendName = ValueLoaders.GetConfigValue<string>($"{ConfigKeyBase}.ReportSenderName");
+                string SendEmail = ValueLoaders.GetConfigValue<string>($"{ConfigKeyBase}.ReportSenderEmail");
+                string SendPassword = ValueLoaders.GetConfigValue<string>($"{ConfigKeyBase}.ReportSenderPassword");
 
                 // Build broker first
                 this.ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);

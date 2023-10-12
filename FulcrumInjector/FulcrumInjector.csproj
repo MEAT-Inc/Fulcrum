@@ -208,13 +208,15 @@
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringScrambler.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDriveBroker.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumEnumCombo.xaml.cs">
       <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\DriveExplorerAuthJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\DriveExplorerConfigJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\UpdateConfigurationJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumWatchdogService.cs">
       <SubType>Component</SubType>
@@ -294,9 +296,8 @@
     <Compile Include="FulcrumViewSupport\FulcrumWin32Invokers.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumWindowBlur.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleConfiguration.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\CustomColorConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\CustomColorConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\CustomColorValueJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\CustomFilePathJsonConverters.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleColorSet.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleModel.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\ValueLoaders.cs" />

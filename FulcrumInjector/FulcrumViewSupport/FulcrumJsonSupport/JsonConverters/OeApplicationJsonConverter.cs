@@ -5,8 +5,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
-// Static using call for our OE application model objects
+using static FulcrumInjector.FulcrumViewContent.FulcrumViewModels.FulcrumInstalledOeAppsViewModel;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
@@ -16,22 +15,22 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
     internal class FulcrumOeApplicationJsonConverter : JsonConverter
     {
         /// <summary>
-        /// Sets if the object can be converted or not.
+        /// Sets if we can convert this object or not.
         /// </summary>
-        /// <param name="ObjectType"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumInstalledOeAppsViewModel.FulcrumOeApplication); }
+        /// <param name="ObjectType">The type of object we're trying to convert</param>
+        /// <returns>True if the object can be serialized, false if not</returns>
+        public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(FulcrumOeApplication); }
         /// <summary>
-        /// Writes JSON output
+        /// Writes JSON output for the given input object
         /// </summary>
-        /// <param name="JWriter"></param>
-        /// <param name="ValueObject"></param>
-        /// <param name="JSerializer"></param>
+        /// <param name="JWriter">The JWriter building output content for the input value</param>
+        /// <param name="ValueObject">The object being written out to a JSON string</param>
+        /// <param name="JSerializer">Serializer settings for the writer output</param>
         public override void WriteJson(JsonWriter JWriter, object? ValueObject, JsonSerializer JSerializer)
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            FulcrumInstalledOeAppsViewModel.FulcrumOeApplication CastApp = ValueObject as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
+            FulcrumOeApplication CastApp = ValueObject as FulcrumOeApplication;
 
             // Build a dynamic output object
             var OutputObject = JObject.FromObject(new
@@ -48,11 +47,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <summary>
         /// Reads the JSON object input from a string
         /// </summary>
-        /// <param name="JReader"></param>
-        /// <param name="ObjectType"></param>
-        /// <param name="ExistingValue"></param>
-        /// <param name="JSerializer"></param>
-        /// <returns></returns>
+        /// <param name="JReader">The JReader being used to read our input JSON content</param>
+        /// <param name="ObjectType">The type of object we're trying to build form the input JSON</param>
+        /// <param name="ExistingValue">An existing object to update values for based on our new object</param>
+        /// <param name="JSerializer">Serializer settings for the reader input</param>
+        /// <returns>The object built from the input JSON content</returns>
         public override object? ReadJson(JsonReader JReader, Type ObjectType, object? ExistingValue, JsonSerializer JSerializer)
         {
             // Check if input is null. Build object from it.
@@ -60,10 +59,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             if (InputObject.HasValues == false) { return null; }
 
             // Select the array of paths here.
-            string AppName = InputObject["OEAppName"].Value<string>();
-            string AppVersion = InputObject["OEAppVersion"].Value<string>();
-            string AppCommand = InputObject["OEAppCommand"].Value<string>();
-            string[] PathSet = JArray.FromObject(InputObject["OEAppPath"]).ToObject<string[]>();
+            string AppName = InputObject[nameof(FulcrumOeApplication.OEAppName)].Value<string>();
+            string AppVersion = InputObject[nameof(FulcrumOeApplication.OEAppVersion)].Value<string>();
+            string AppCommand = InputObject[nameof(FulcrumOeApplication.OEAppCommand)].Value<string>();
+            string[] PathSet = JArray.FromObject(InputObject[nameof(FulcrumOeApplication.OEAppPath)]).ToObject<string[]>();
 
             // Find existing path value.
             string FinalAppPath = PathSet.Any(PathValue => File.Exists(PathValue)) ?
@@ -76,7 +75,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                 !AppCommand.Contains("$OEAppPath$") ? AppCommand : AppCommand.Replace("$OEAppPath$", FinalAppPath);
 
             // Generate new output app model object.
-            FulcrumInstalledOeAppsViewModel.FulcrumOeApplication OutputApp = new FulcrumInstalledOeAppsViewModel.FulcrumOeApplication(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
+            FulcrumOeApplication OutputApp = new FulcrumOeApplication(AppName, FinalAppPath, AppVersion, AppCommand, PathSet);
             return OutputApp;
         }
     }
