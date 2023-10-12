@@ -203,6 +203,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewSupport\FulcrumCommandLine.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringEncryptor.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
