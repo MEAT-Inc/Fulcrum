@@ -37,6 +37,14 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// CTOR for this JSON converter. Defaults encryption to on for reading and writing JSON values
+        /// </summary>
+        public DriveExplorerConfigJsonConverter()
+        {
+            // Store our encryption configuration state 
+            this._useEncryption = true;
+        }
+        /// <summary>
         /// CTOR for this JSON converter. Allows us to specify encryption state
         /// </summary>
         /// <param name="UseEncryption">When true, output is encrypted</param>
