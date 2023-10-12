@@ -89,10 +89,10 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// CTOR for a new fulcrum command line argument parser
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
         public FulcrumCommandLine()
         {
-            // Spawn a new logger instance and store our input arguments 
+            // Spawn a new logger, configure backing properties, and store input arguments
+            this.StartupActions = new List<FulcrumStartupAction>();
             this._commandLineLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ParsedArguments = string.Join(",", Environment.GetCommandLineArgs());
 
@@ -116,11 +116,10 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // If no arguments could be found/parsed, throw an exception and exit out
                 this._commandLineLogger.WriteLog("ERROR! NO ARGUMENTS FOR STARTUP COULD BE PARSED FROM THE INPUT STRING!", LogType.ErrorLog);
-                throw new ArgumentException($"STARTUP ARGUMENTS: {this.ParsedArguments} WERE INVALID!");
+                return this.StartupActions;
             }
 
             // Now look at the matches and find our action types
-            this.StartupActions = new List<FulcrumStartupAction>();
             foreach (Match ArgMatch in ArgumentMatches)
             {
                 // Try and parse our arguments in to our list of actions here
