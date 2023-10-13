@@ -21,31 +21,31 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels
         #region Fields
 
         // Main Color Values
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color PrimaryColor;       // Primary Color       
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color SecondaryColor;     // Accent/Showcase Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color TextColorBase;      // Main Text Color
 
         // Shades For Primary
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color PrimaryColor_Darker_35;      // 35% Darker Primary Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color PrimaryColor_Darker_65;      // 65% Darker Primary Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color PrimaryColor_Lighter_35;     // 35% Lighter Primary Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color PrimaryColor_Lighter_65;     // 65% Lighter Primary Color
 
         // Shades for Secondary
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color SecondaryColor_Darker_35;     // 35% Darker Secondary Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color SecondaryColor_Darker_65;     // 65% Darker Secondary Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color SecondaryColor_Lighter_35;    // 35% Lighter Secondary Color
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         private Color SecondaryColor_Lighter_65;    // 65% Lighter Secondary Color
 
         #endregion //Fields

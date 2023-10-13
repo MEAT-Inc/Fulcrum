@@ -154,10 +154,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <exception cref="InvalidDataException">Thrown when a member of the object is invalid</exception>
         protected TObjectType _updateEncryptionMembers(UpdateTypes UpdateType, TObjectType ValueObject)
         {
-            // Serialize and deserialize our input object to clone it before modifying values
-            string SerializedInputObject = JsonConvert.SerializeObject(ValueObject);
-            TObjectType ClonedValueObject = JsonConvert.DeserializeObject<TObjectType>(SerializedInputObject);
-
             // Find all of our property objects and encrypt their values as needed
             List<MemberInfo> MembersToUpdate = new List<MemberInfo>();
             MembersToUpdate.AddRange((FieldInfo[])typeof(TObjectType)
@@ -181,13 +177,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                     case PropertyInfo InputProperty:
                     {
                         // Encrypt or decrypt the value and set the property value for our input object
-                        string InputValue = InputProperty.GetValue(ClonedValueObject).ToString();
+                        string InputValue = InputProperty.GetValue(ValueObject).ToString();
                         string UpdatedValue = UpdateType == UpdateTypes.ENCRYPT 
                             ? FulcrumEncryptor.Encrypt(InputValue)
                             : FulcrumEncryptor.Decrypt(InputValue);
 
                         // Update the value on our input object here
-                        InputProperty.SetValue(ClonedValueObject, UpdatedValue);
+                        InputProperty.SetValue(ValueObject, UpdatedValue);
                         break;
                     }
 
@@ -195,20 +191,20 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                     case FieldInfo InputField:
                     {
                         // Encrypt or decrypt the value and set the property value for our input object
-                        string InputValue = InputField.GetValue(ClonedValueObject).ToString();
+                        string InputValue = InputField.GetValue(ValueObject).ToString();
                         string UpdatedValue = UpdateType == UpdateTypes.ENCRYPT
                             ? FulcrumEncryptor.Encrypt(InputValue)
                             : FulcrumEncryptor.Decrypt(InputValue);
 
                         // Update the value on our input object here
-                        InputField.SetValue(ClonedValueObject, UpdatedValue);
+                        InputField.SetValue(ValueObject, UpdatedValue);
                         break;
                     }
                 }
             }
 
-            // Return the updated cloned copy of our input object here
-            return ClonedValueObject;
+            // Return the updated copy of our input object here
+            return ValueObject;
         }
     }
 }

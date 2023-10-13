@@ -47,11 +47,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <param name="JWriter">The JWriter building output content for the input value</param>
         /// <param name="ValueObject">The object being written out to a JSON string</param>
         /// <param name="JSerializer">Serializer settings for the writer output</param>
-        public new void WriteJson(JsonWriter JWriter, object? ValueObject, JsonSerializer JSerializer)
+        public override void WriteJson(JsonWriter JWriter, EmailBrokerConfiguration ValueObject, JsonSerializer JSerializer)
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            EmailBrokerConfiguration EmailConfig = ValueObject as EmailBrokerConfiguration;
 
             // Pull our serializer settings and check for encryption if needed
             bool OriginalEncryptionState = this._useEncryption;
@@ -63,13 +62,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             // Encrypt "ReportSenderEmail", "ReportSenderPassword"
             var OutputObject = JObject.FromObject(new
             {
-                EmailConfig.ReportSenderName,
+                ValueObject.ReportSenderName,
                 ReportSenderEmail = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(EmailConfig.ReportSenderName)
-                    : EmailConfig.ReportSenderName,
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ReportSenderName)
+                    : ValueObject.ReportSenderName,
                 ReportSenderPassword = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(EmailConfig.ReportSenderPassword)
-                    : EmailConfig.ReportSenderPassword,
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ReportSenderPassword)
+                    : ValueObject.ReportSenderPassword,
             });
 
             // Now write this built object and reset our encryption state if needed
@@ -84,7 +83,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <param name="ExistingValue">An existing object to update values for based on our new object</param>
         /// <param name="JSerializer">Serializer settings for the reader input</param>
         /// <returns>The object built from the input JSON content</returns>
-        public new object? ReadJson(JsonReader JReader, Type ObjectType, object? ExistingValue, JsonSerializer JSerializer)
+        public override EmailBrokerConfiguration ReadJson(JsonReader JReader, Type ObjectType, EmailBrokerConfiguration ExistingValue, bool HasExistingValue, JsonSerializer JSerializer)
         {
             // Check if input is null. Build object from it.
             JObject InputObject = JObject.Load(JReader);
@@ -106,10 +105,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             {
                 // Store the properties of our configuration here and exit out
                 ReportSenderName = ReportSenderName,
-                ReportSenderEmail = this._useEncryption 
+                ReportSenderEmail = this._useEncryption
                     ? FulcrumEncryptor.Decrypt(ReportSenderEmail)
                     : ReportSenderEmail,
-                ReportSenderPassword = this._useEncryption 
+                ReportSenderPassword = this._useEncryption
                     ? FulcrumEncryptor.Decrypt(ReportSenderPassword)
                     : ReportSenderPassword,
             };

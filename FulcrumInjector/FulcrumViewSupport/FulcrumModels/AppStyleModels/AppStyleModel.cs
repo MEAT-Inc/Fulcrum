@@ -31,13 +31,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels
         public string ThemeName { get; set; }
         
         // Color objects.
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         public Color PrimaryColor
         {
             get => StyleColors.GetDrawingColor(ColorTypes.PRIMARY_COLOR_BASE);
             set => StyleColors.SetDrawingColor(ColorTypes.PRIMARY_COLOR_BASE, value);
         }
-        [JsonConverter(typeof(CustomColorValueJsonConverter))]
+        [JsonConverter(typeof(ColorValueJsonConverter))]
         public Color SecondaryColor
         {
             get => StyleColors.GetDrawingColor(ColorTypes.SECONDARY_COLOR_BASE);

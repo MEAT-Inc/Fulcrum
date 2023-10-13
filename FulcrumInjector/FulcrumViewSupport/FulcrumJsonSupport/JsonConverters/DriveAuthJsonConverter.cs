@@ -50,11 +50,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <param name="JWriter">The JWriter building output content for the input value</param>
         /// <param name="ValueObject">The object being written out to a JSON string</param>
         /// <param name="JSerializer">Serializer settings for the writer output</param>
-        public new void WriteJson(JsonWriter JWriter, object? ValueObject, JsonSerializer JSerializer)
+        public override void WriteJson(JsonWriter JWriter, DriveAuthorization ValueObject, JsonSerializer JSerializer)
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            DriveAuthorization Auth = ValueObject as DriveAuthorization;
 
             // Pull our serializer settings and check for encryption if needed
             bool OriginalEncryptionState = this._useEncryption;
@@ -66,29 +65,29 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             // Encrypt "project_id", "private_key_id", "private_key", "client_email", "client_id", "client_x509_cert_url"
             var OutputObject = JObject.FromObject(new
             {
-                type = Auth.Type,
-                project_id = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Auth.ProjectId) 
-                    : Auth.ProjectId,
-                private_key_id = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Auth.PrivateKeyId)
-                    : Auth.PrivateKeyId,
-                private_key = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Auth.PrivateKey.Replace("\\n", "\n")).Trim()
-                    : Auth.PrivateKey.Replace("\\n", "\n").Trim(),
-                client_email = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Auth.ClientEmail)
-                    : Auth.ClientEmail,
+                type = ValueObject.Type,
+                project_id = this._useEncryption
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ProjectId)
+                    : ValueObject.ProjectId,
+                private_key_id = this._useEncryption
+                    ? FulcrumEncryptor.Encrypt(ValueObject.PrivateKeyId)
+                    : ValueObject.PrivateKeyId,
+                private_key = this._useEncryption
+                    ? FulcrumEncryptor.Encrypt(ValueObject.PrivateKey.Replace("\\n", "\n")).Trim()
+                    : ValueObject.PrivateKey.Replace("\\n", "\n").Trim(),
+                client_email = this._useEncryption
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ClientEmail)
+                    : ValueObject.ClientEmail,
                 client_id = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Auth.ClientId)
-                    : Auth.ClientId,
-                auth_uri = Auth.AuthUri,
-                token_uri = Auth.TokenUri,
-                auth_provider_x509_cert_url = Auth.AuthProviderUrl,
-                client_x509_cert_url = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Auth.ClientCertUrl)
-                    : Auth.ClientCertUrl,
-                universe_domain = Auth.UniverseDomain,
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ClientId)
+                    : ValueObject.ClientId,
+                auth_uri = ValueObject.AuthUri,
+                token_uri = ValueObject.TokenUri,
+                auth_provider_x509_cert_url = ValueObject.AuthProviderUrl,
+                client_x509_cert_url = this._useEncryption
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ClientCertUrl)
+                    : ValueObject.ClientCertUrl,
+                universe_domain = ValueObject.UniverseDomain,
             });
 
             // Now write this built object and reset our encryption state if needed
@@ -103,7 +102,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <param name="ExistingValue">An existing object to update values for based on our new object</param>
         /// <param name="JSerializer">Serializer settings for the reader input</param>
         /// <returns>The object built from the input JSON content</returns>
-        public new object? ReadJson(JsonReader JReader, Type ObjectType, object? ExistingValue, JsonSerializer JSerializer)
+        public override DriveAuthorization ReadJson(JsonReader JReader, Type ObjectType, DriveAuthorization ExistingValue, bool HasExistingValue, JsonSerializer JSerializer)
         {
             // Check if input is null. Build object from it.
             JObject InputObject = JObject.Load(JReader);
@@ -137,7 +136,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
                 PrivateKeyId = this._useEncryption ? FulcrumEncryptor.Decrypt(PrivateKeyId) : PrivateKeyId,
                 PrivateKey = (this._useEncryption ? FulcrumEncryptor.Decrypt(PrivateKey) : PrivateKey).Replace("\\n", "\n").Trim(),
                 ClientEmail = this._useEncryption ? FulcrumEncryptor.Decrypt(ClientEmail) : ClientEmail,
-                ClientId = this._useEncryption ? FulcrumEncryptor.Decrypt(ClientId): ClientId,
+                ClientId = this._useEncryption ? FulcrumEncryptor.Decrypt(ClientId) : ClientId,
                 AuthUri = AuthUri,
                 TokenUri = TokenUri,
                 AuthProviderUrl = AuthProviderUrl,

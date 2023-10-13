@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
     /// <summary>
     /// Custom JSON Converter used to log out the theme style color values for the injector app
     /// </summary>
-    internal class CustomColorValueJsonConverter : JsonConverter
+    internal class ColorValueJsonConverter : JsonConverter
     {
         /// <summary>
         /// Sets if we can convert this object or not.

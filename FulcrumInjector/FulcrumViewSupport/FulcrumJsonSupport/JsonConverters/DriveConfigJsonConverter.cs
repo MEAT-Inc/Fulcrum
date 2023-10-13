@@ -50,11 +50,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <param name="JWriter">The JWriter building output content for the input value</param>
         /// <param name="ValueObject">The object being written out to a JSON string</param>
         /// <param name="JSerializer">Serializer settings for the writer output</param>
-        public new void WriteJson(JsonWriter JWriter, object? ValueObject, JsonSerializer JSerializer)
+        public override void WriteJson(JsonWriter JWriter, DriveConfiguration ValueObject, JsonSerializer JSerializer)
         {
             // Check if object is null. Build output
             if (ValueObject == null) { return; }
-            DriveConfiguration Config = ValueObject as DriveConfiguration;
 
             // Pull our serializer settings and check for encryption if needed
             bool OriginalEncryptionState = this._useEncryption;
@@ -67,18 +66,18 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             var OutputObject = JObject.FromObject(new
             {
                 client_id = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Config.ClientId)
-                    : Config.ClientId,
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ClientId)
+                    : ValueObject.ClientId,
                 project_id = this._useEncryption 
-                    ? FulcrumEncryptor.Encrypt(Config.ProjectId) 
-                    : Config.ProjectId,
-                auth_uri = Config.AuthUri,
-                token_uri = Config.TokenUri,
-                auth_provider_x509_cert_url = Config.AuthProvider,
+                    ? FulcrumEncryptor.Encrypt(ValueObject.ProjectId) 
+                    : ValueObject.ProjectId,
+                auth_uri = ValueObject.AuthUri,
+                token_uri = ValueObject.TokenUri,
+                auth_provider_x509_cert_url = ValueObject.AuthProvider,
                 client_secret = this._useEncryption 
-                    ? FulcrumEncryptor.Decrypt(Config.ClientSecret)
-                    : Config.ClientSecret,
-                redirect_uris = Config.RedirectUris,
+                    ? FulcrumEncryptor.Decrypt(ValueObject.ClientSecret)
+                    : ValueObject.ClientSecret,
+                redirect_uris = ValueObject.RedirectUris,
             });
 
             // Now write this built object and reset our encryption state if needed
@@ -92,8 +91,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <param name="ObjectType">The type of object we're trying to build form the input JSON</param>
         /// <param name="ExistingValue">An existing object to update values for based on our new object</param>
         /// <param name="JSerializer">Serializer settings for the reader input</param>
-        /// <returns>The object built from the input JSON content</returns>
-        public new object? ReadJson(JsonReader JReader, Type ObjectType, object? ExistingValue, JsonSerializer JSerializer)
+        /// <returns>The object built from the input JSON content</returns>}
+        public override DriveConfiguration ReadJson(JsonReader JReader, Type ObjectType, DriveConfiguration ExistingValue, bool HasExistingValue, JsonSerializer JSerializer)
         {
             // Check if input is null. Build object from it.
             JObject InputObject = JObject.Load(JReader);
@@ -115,13 +114,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
             string[] RedirectUris = InputObject[this._findJsonPropName(nameof(DriveConfiguration.RedirectUris))].ToObject<string[]>();
 
             // Build a new output object using our pulled properties
-            var OutputObject =  new DriveConfiguration()
+            var OutputObject = new DriveConfiguration()
             {
                 // Store the properties of our configuration here and exit out
                 ClientId = this._useEncryption ? FulcrumEncryptor.Decrypt(ClientId) : ClientId,
                 ProjectId = this._useEncryption ? FulcrumEncryptor.Decrypt(ProjectId) : ProjectId,
                 AuthUri = AuthUri,
-                TokenUri = TokenUri, 
+                TokenUri = TokenUri,
                 AuthProvider = AuthProvider,
                 ClientSecret = this._useEncryption ? FulcrumEncryptor.Decrypt(ClientSecret) : ClientSecret,
                 RedirectUris = RedirectUris
