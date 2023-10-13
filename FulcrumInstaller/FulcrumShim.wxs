@@ -89,7 +89,8 @@
                                 <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
                                     <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml" />
                                     <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumControlStyles.xaml" />
-                                    <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
+									<File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
+									<File Id="FULCRUMENCRYPTIONKEYSWINDOWSTYLES.XAML" Name="FulcrumEncryptionKeysWindowStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumEncryptionKeysWindowStyles.xaml" />
                                     <File Id="FULCRUMVEHICLECONNECTIONINFOSTYLES.XAML" Name="FulcrumVehicleConnectionInfoStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml" />
                                     <File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml" />
                                     <File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml" />

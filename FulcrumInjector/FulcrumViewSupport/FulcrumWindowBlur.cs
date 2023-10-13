@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Applies a blur to a window
     /// </summary>
-    internal static class FulcrumWindowBlur
+    public static class FulcrumWindowBlur
     {
         #region Custom Events
         #endregion //Custom Events

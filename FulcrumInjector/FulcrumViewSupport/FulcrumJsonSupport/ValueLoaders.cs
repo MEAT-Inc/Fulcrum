@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Windows.Documents;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
 
@@ -17,6 +21,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
 
         // Backing logger object used to avoid configuration issues
         private static SharpLogger _backingLogger;
+        private static List<string> _encryptedFields;
 
         #endregion //Fields
 
@@ -60,7 +65,22 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
             TValueType ConvertedValue = ValueObject.ToObject<TValueType>();
             _valueLoadersLogger?.WriteLog($"PROPERTY: {JsonPath} WAS READ AND STORED AS TYPE {typeof(TValueType).Name} CORRECTLY!", LogType.TraceLog);
 
+            // Check if the path given is an encrypted field or not. If it's not, then just return the value out
+            if (!JsonConfigFile.EncryptedConfigKeys.Contains(JsonPath) || typeof(TValueType) != typeof(string))
+                return ConvertedValue;
+
+            // If we've got an encrypted field value and a string value, convert/decrypt it here 
+            _valueLoadersLogger?.WriteLog("DECRYPTING VALUE FOR FIELD NOW...", LogType.TraceLog);
+            string DecryptedValue = FulcrumEncryptor.Decrypt(ConvertedValue.ToString());
+            if (DecryptedValue is TValueType CastDecryption)
+            {
+                // Return the decrypted field value
+                _valueLoadersLogger?.WriteLog($"DECRYPTION PASSED FOR FIELD {JsonPath}!", LogType.TraceLog);
+                return CastDecryption;
+            }
+
             // Return the built converted value here
+            _valueLoadersLogger?.WriteLog($"DECRYPTION FAILED TO EXECUTE FOR FIELD {JsonPath}!", LogType.TraceLog);
             return ConvertedValue;
         }
         /// <summary>
@@ -82,14 +102,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
                 var PulledJObject = JsonConfigFile.ApplicationConfig[JObjectKey];
                 _valueLoadersLogger?.WriteLog($"PULLED CONFIG OBJECT FOR VALUE: {JObjectKey} OK!", LogType.TraceLog);
 
-                // Cast and return if needed
+                // Cast and return the requested object as an array if needed
                 if (PulledJObject.Type != JTokenType.Array) return JObject.FromObject(PulledJObject);
-                {
-                    // Build new object
-                    JObject OutputObject = new JObject();
-                    OutputObject.Add(JObjectKey, JArray.FromObject(PulledJObject));
-                    return OutputObject;
-                }
+                JObject OutputObject = new JObject { { JObjectKey, JArray.FromObject(PulledJObject) } };
+                return OutputObject;
             }
             catch (Exception PullEx)
             {
