@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
     /// <summary>
     /// The actual service base component used for the injector watchdog helper
     /// </summary>
-    internal class FulcrumWatchdogService : FulcrumService
+    public class FulcrumWatchdogService : FulcrumService
     {
         #region Custom Events
         #endregion //Custom Events
@@ -70,8 +70,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <summary>
         /// Starts the service up and builds a watchdog helper process
         /// </summary>
-        /// <param name="WatchedFolders">NOT USED!</param>
-        protected override void OnStart(string[] WatchedFolders)
+        /// <param name="StartupArgs">NOT USED!</param>
+        protected override void OnStart(string[] StartupArgs)
         {
             try 
             {

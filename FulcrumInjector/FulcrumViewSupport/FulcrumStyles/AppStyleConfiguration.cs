@@ -5,9 +5,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using ControlzEx.Theming;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
@@ -15,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
     /// <summary>
     /// Class reserved to configuring theme object values on the application
     /// </summary>
-    internal class AppThemeConfiguration
+    public class AppThemeConfiguration
     {
         #region Custom Events
         #endregion //Custom Events

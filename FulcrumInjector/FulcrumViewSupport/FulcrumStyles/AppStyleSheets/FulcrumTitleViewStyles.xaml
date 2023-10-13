@@ -3,6 +3,7 @@
                     xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
             <!-- Converter for Styles -->
             <fulcrumDataConverters:BoolToVisibilityConverter x:Key="VisibilityConverter"/>

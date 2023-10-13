@@ -25,6 +25,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
 
         // ViewModel object to bind onto
         public FulcrumDllInjectionTestViewModel ViewModel { get; set; }
+
         #endregion // Properties
 
         #region Structs and Classes

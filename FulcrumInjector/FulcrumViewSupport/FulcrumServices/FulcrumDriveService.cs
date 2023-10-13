@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
 using Google.Apis.Drive.v3;
 using NLog.Targets;
 using SharpLogging;
@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
     /// <summary>
     /// The actual service base component used for the injector drive service helper
     /// </summary>
-    internal class FulcrumDriveService : FulcrumService
+    public class FulcrumDriveService : FulcrumService
     {
         #region Custom Events
         #endregion //Custom Events
@@ -20,8 +20,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #region Fields
 
         // Private backing fields for our drive service configuration
-        private DriveService _driveService;                                  // Backing drive service object
-        private FulcrumDriveBroker.DriveServiceSettings _driveSettings;      // Settings configuration for our service
+        private DriveService _driveService;               // Backing drive service object
+        private DriveServiceSettings _driveSettings;      // Settings configuration for our service
 
         #endregion //Fields
 
@@ -37,7 +37,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// CTOR routine for this drive service. Sets up our component object and our logger instance
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        public FulcrumDriveService(FulcrumDriveBroker.DriveServiceSettings ServiceSettings = null)
+        public FulcrumDriveService(DriveServiceSettings ServiceSettings = null)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumDriveService>();
@@ -48,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Pull our settings configuration for the service here 
-            this._driveSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<FulcrumDriveBroker.DriveServiceSettings>("FulcrumDriveService");
+            this._driveSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumDriveService");
 
             // Build a new google drive service
             if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
@@ -63,8 +63,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <summary>
         /// Starts the service up and builds a watchdog helper process
         /// </summary>
-        /// <param name="WatchedFolders"></param>
-        protected override void OnStart(string[] WatchedFolders)
+        /// <param name="StartupArgs">NOT USED!</param>
+        protected override void OnStart(string[] StartupArgs)
         {
             // Ensure the drive service exists first
             this._serviceLogger.WriteLog("BOOTING NEW DRIVE SERVICE NOW...", LogType.WarnLog);

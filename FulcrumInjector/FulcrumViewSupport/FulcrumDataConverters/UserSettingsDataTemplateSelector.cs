@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using Newtonsoft.Json;
 using SharpLogging;
 

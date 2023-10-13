@@ -5,6 +5,7 @@ using System.Windows.Navigation;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using MahApps.Metro.Controls;
 using SharpLogging;
 

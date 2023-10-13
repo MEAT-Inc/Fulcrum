@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.EmailBrokerModels;
 using SharpLogging;
 using SharpPipes;
 
@@ -33,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         // Public properties for the view to bind onto  
         public bool CanModifyMessage { get => _canModifyMessage; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public FulcrumEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        internal FulcrumEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -149,27 +150,20 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             try
             {
                 // Pull in new settings values for sender and default receivers.
+                string ConfigKeyBase = "FulcrumConstants.InjectorEmailConfiguration";
                 this.ViewModelLogger.WriteLog("PULLING IN NEW VALUES FOR BROKER OBJECT AND CONSTRUCTING IT", LogType.InfoLog);
-                var EmailConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumConstants.InjectorEmailConfiguration.SenderConfiguration");
-                string SendName = EmailConfigObject.ReportSenderName;
-                string SendEmail = EmailConfigObject.ReportSenderEmail;
-                string SendPassword = EmailConfigObject.ReportSenderPassword.ToString();
-                SendPassword = SendPassword.UnscrambleString();
+                var EmailConfig = ValueLoaders.GetConfigValue<EmailBrokerConfiguration>($"{ConfigKeyBase}.SenderConfiguration");
 
-
-                // Build broker first
+                // Build a new email broker using the pulled configuration information
                 this.ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
-                BuiltSender = new FulcrumEmailBroker(SendName, SendEmail, SendPassword);
+                BuiltSender = new FulcrumEmailBroker(EmailConfig);
 
                 // Now try and authorize the client for a google address.
                 this.ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
-                var SmtpConfigObject = ValueLoaders.GetConfigValue<dynamic>("FulcrumConstants.InjectorEmailConfiguration.SmtpServerSettings");
-                var SmtpServerPort = (int)SmtpConfigObject.ServerPort;
-                var SmtpServerName = (string)SmtpConfigObject.ServerName;
-                var SmtpServerTimeout = (int)SmtpConfigObject.ServerTimeout;
+                var SmtpConfigObject = ValueLoaders.GetConfigValue<EmailSmtpConfiguration>($"{ConfigKeyBase}.SmtpServerSettings");
 
                 // Store configuration values for client and then authorize it.
-                BuiltSender.StoreSmtpConfiguration(SmtpServerName, SmtpServerPort, SmtpServerTimeout);
+                BuiltSender.StoreSmtpConfiguration(SmtpConfigObject);
                 if (BuiltSender.AuthenticateSmtpClient()) this.ViewModelLogger.WriteLog("AUTHORIZED NEW CLIENT CORRECTLY! READY TO PROCESS AND SEND REPORTS!", LogType.InfoLog);
                 else throw new InvalidOperationException("FAILED TO AUTHORIZE SMTP CLIENT BROKER ON THE REPORT SENDING OBJECT!");
                 return true;

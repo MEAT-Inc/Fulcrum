@@ -3,6 +3,7 @@
                     xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
                     xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
             
             <!-- Inverse Bool Converter-->

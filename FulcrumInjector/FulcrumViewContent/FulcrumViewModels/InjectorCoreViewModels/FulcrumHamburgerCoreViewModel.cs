@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using SharpLogging;
 using Svg;
 

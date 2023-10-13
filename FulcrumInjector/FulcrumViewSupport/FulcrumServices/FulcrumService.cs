@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
     /// <summary>
     /// Base class definition for a fulcrum service instance
     /// </summary>
-    internal class FulcrumService : ServiceBase
+    public class FulcrumService : ServiceBase
     {
         #region Custom Events
         #endregion // Custom Events
