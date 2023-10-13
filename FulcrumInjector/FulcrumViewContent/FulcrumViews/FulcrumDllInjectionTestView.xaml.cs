@@ -24,7 +24,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumDllInjectionTestViewModel ViewModel { get; set; }
+        public FulcrumDllInjectionTestViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

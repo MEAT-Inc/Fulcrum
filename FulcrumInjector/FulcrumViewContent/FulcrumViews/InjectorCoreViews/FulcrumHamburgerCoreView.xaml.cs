@@ -30,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumHamburgerCoreViewModel ViewModel { get; set; }   
+        public FulcrumHamburgerCoreViewModel ViewModel { get; set; }   
 
         #endregion // Properties
 

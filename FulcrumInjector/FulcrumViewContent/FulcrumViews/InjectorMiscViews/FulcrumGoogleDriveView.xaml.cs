@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumGoogleDriveViewModel ViewModel { get; set; }
+        public FulcrumGoogleDriveViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

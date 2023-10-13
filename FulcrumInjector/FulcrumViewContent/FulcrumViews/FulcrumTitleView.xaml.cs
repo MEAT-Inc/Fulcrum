@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // Public facing fields for view content configuration
-        internal FulcrumTitleViewModel ViewModel { get; set; }
+        public FulcrumTitleViewModel ViewModel { get; set; }
 
         #endregion //Properties
 
