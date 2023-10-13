@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using FulcrumInjector.Properties;
 using MahApps.Metro.Controls;
 using SharpLogging;
@@ -10,9 +11,9 @@ using SharpLogging;
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
 {
     /// <summary>
-    /// Interaction logic for FulcrumEncryptionKeysWindow.xaml
+    /// Interaction logic for FulcrumEncryptionConfigWindow.xaml
     /// </summary>
-    public partial class FulcrumEncryptionKeysWindow : MetroWindow
+    public partial class FulcrumEncryptionConfigWindow : MetroWindow
     {
         #region Custom Events
         #endregion // Custom Events
@@ -35,7 +36,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
         /// <summary>
         /// Builds a new view object instance for our encryption key configuration routines
         /// </summary>
-        public FulcrumEncryptionKeysWindow()
+        public FulcrumEncryptionConfigWindow()
         {
             // Initialize new UI Component and configure the logger instance for it
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);

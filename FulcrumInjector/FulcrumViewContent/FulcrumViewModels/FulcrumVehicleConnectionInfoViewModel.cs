@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// View model object for our connected vehicle information helper
     /// </summary>
-    public class FulcrumVehicleConnectionInfoViewModel : FulcrumViewModelBase
+    internal class FulcrumVehicleConnectionInfoViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

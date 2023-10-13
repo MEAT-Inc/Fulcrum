@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
     /// <summary>
     /// View model for the Google Drive viewing content used throughout the Injector application
     /// </summary>
-    public class FulcrumGoogleDriveViewModel : FulcrumViewModelBase
+    internal class FulcrumGoogleDriveViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

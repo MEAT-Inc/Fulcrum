@@ -2,12 +2,12 @@
 using System.Windows;
 using MahApps.Metro.Controls;
 
-namespace FulcrumInjector.FulcrumViewSupport
+namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
 {
     /// <summary>
     /// Dependency property object for navigation menu types
     /// </summary>
-    public class FulcrumNavMenuItem : HamburgerMenuGlyphItem
+    internal class FulcrumNavMenuItem : HamburgerMenuGlyphItem
     {
         #region Custom Events
         #endregion //Custom Events

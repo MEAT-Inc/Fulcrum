@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// View model for playback during the injector simulation processing
     /// </summary>
-    public class FulcrumSimulationPlaybackViewModel : FulcrumViewModelBase
+    internal class FulcrumSimulationPlaybackViewModel : FulcrumViewModelBase
     {
         #region Custom Events
 

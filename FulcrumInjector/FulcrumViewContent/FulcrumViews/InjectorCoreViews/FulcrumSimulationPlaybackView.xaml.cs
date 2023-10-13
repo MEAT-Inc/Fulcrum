@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
+        internal FulcrumSimulationPlaybackViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

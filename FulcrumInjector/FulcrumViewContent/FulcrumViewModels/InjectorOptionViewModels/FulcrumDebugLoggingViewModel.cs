@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
     /// <summary>
     /// View model used to help render and register logging redirects
     /// </summary>
-    public class FulcrumDebugLoggingViewModel : FulcrumViewModelBase
+    internal class FulcrumDebugLoggingViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

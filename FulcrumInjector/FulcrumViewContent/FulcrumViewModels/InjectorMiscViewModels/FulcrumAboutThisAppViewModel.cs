@@ -6,7 +6,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
     /// <summary>
     /// View model content for the About view on the injector application
     /// </summary>
-    public class FulcrumAboutThisAppViewModel : FulcrumViewModelBase
+    internal class FulcrumAboutThisAppViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

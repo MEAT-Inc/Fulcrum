@@ -6,6 +6,7 @@ using System.Linq;
 using SharpExpressions;
 using SharpLogging;
 using SharpSimulator;
+
 // Static using for the LogFileTypes enumeration
 using LogFileTypes = FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.LogFileModel.LogFileTypes;
 
@@ -14,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.Fulcrum
     /// <summary>
     /// Internal class holding the values for our different types of log files supported
     /// </summary>
-    public class FulcrumLogFileSet : LogFileSet
+    internal class FulcrumLogFileSet : LogFileSet
     {
         #region Custom Events
         #endregion //Custom Events

@@ -7,7 +7,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.Fulcrum
     /// <summary>
     /// Class which holds information about a log file path from the local machine
     /// </summary>
-    public class FulcrumLogFileModel : LogFileModel
+    internal class FulcrumLogFileModel : LogFileModel
     {
         #region Custom Events
         #endregion //Custom Events

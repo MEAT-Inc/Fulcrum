@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.EmailBrokerModels;
 using SharpLogging;
 using SharpPipes;
 
@@ -14,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
     /// Session reporting ViewModel used for sending cleaned up session information out to my email
     /// Email is defined in the app settings.
     /// </summary>
-    public class FulcrumSessionReportingViewModel : FulcrumViewModelBase
+    internal class FulcrumSessionReportingViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events
@@ -33,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         // Public properties for the view to bind onto  
         public bool CanModifyMessage { get => _canModifyMessage; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        public FulcrumEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        internal FulcrumEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -151,7 +152,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
                 // Pull in new settings values for sender and default receivers.
                 string ConfigKeyBase = "FulcrumConstants.InjectorEmailConfiguration";
                 this.ViewModelLogger.WriteLog("PULLING IN NEW VALUES FOR BROKER OBJECT AND CONSTRUCTING IT", LogType.InfoLog);
-                var EmailConfig = ValueLoaders.GetConfigValue<FulcrumEmailBroker.EmailBrokerConfiguration>($"{ConfigKeyBase}.SenderConfiguration");
+                var EmailConfig = ValueLoaders.GetConfigValue<EmailBrokerConfiguration>($"{ConfigKeyBase}.SenderConfiguration");
 
                 // Build a new email broker using the pulled configuration information
                 this.ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
@@ -159,7 +160,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
 
                 // Now try and authorize the client for a google address.
                 this.ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
-                var SmtpConfigObject = ValueLoaders.GetConfigValue<FulcrumEmailBroker.EmailSmtpConfiguration>($"{ConfigKeyBase}.SmtpServerSettings");
+                var SmtpConfigObject = ValueLoaders.GetConfigValue<EmailSmtpConfiguration>($"{ConfigKeyBase}.SmtpServerSettings");
 
                 // Store configuration values for client and then authorize it.
                 BuiltSender.StoreSmtpConfiguration(SmtpConfigObject);

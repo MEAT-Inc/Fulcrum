@@ -13,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
     /// Private class instance used to hold our injector configuration values for updates
     /// </summary>
     [JsonConverter(typeof(UpdaterConfigJsonConverter))]
-    public class FulcrumUpdaterConfiguration
+    internal class FulcrumUpdaterConfiguration
     {
         // Public properties which do not require encryption or decryption
         public bool ForceUpdateReady { get; set; }

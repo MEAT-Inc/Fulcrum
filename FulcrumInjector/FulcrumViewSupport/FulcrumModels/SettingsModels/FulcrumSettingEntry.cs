@@ -10,7 +10,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels
     /// Model object for our settings entries
     /// </summary>
     [JsonConverter(typeof(SettingEntryJsonConverter))]
-    public class FulcrumSettingEntryModel
+    internal class FulcrumSettingEntryModel
     {
         #region Custom Events
         #endregion //Custom Events

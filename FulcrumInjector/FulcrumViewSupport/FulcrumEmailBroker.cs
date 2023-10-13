@@ -18,7 +18,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Class used for sending emails out to our client applications and users
     /// </summary>
-    public class FulcrumEmailBroker
+    internal class FulcrumEmailBroker
     {
         #region Custom Events
         #endregion //Custom Events

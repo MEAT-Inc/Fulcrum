@@ -205,8 +205,8 @@
     <Compile Include="FulcrumViewSupport\FulcrumModels\DriveBrokerModels\DriveServiceSettings.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\WatchdogModels\WatchdogSettings.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorMiscViewModels\FulcrumGoogleDriveViewModel.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionKeysWindow.xaml.cs">
-      <DependentUpon>FulcrumEncryptionKeysWindow.xaml</DependentUpon>
+    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionConfigWindow.xaml.cs">
+      <DependentUpon>FulcrumEncryptionConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
@@ -240,7 +240,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumUpdater.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumEmailBroker.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumNavMenuItem.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\SettingsModels\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
@@ -350,7 +350,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
-    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionKeysWindow.xaml">
+    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionConfigWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

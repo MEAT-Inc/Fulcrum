@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumSessionReportingViewModel ViewModel { get; set; }
+        internal FulcrumSessionReportingViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

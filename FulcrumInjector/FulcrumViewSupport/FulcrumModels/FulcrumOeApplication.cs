@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
     /// Model object of our OE Applications installed on the system.
     /// </summary>
     [JsonConverter(typeof(FulcrumOeApplicationJsonConverter))]
-    public class FulcrumOeApplication
+    internal class FulcrumOeApplication
     {
         #region Custom Events
         #endregion //Custom Events

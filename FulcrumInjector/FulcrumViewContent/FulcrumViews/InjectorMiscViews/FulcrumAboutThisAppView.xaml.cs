@@ -23,7 +23,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumAboutThisAppViewModel ViewModel { get; set; }
+        internal FulcrumAboutThisAppViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

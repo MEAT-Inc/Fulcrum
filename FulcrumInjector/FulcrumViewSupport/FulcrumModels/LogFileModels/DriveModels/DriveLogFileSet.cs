@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
     /// <summary>
     /// Internal class holding the values for our different types of log files supported on a google drive location
     /// </summary>
-    public class DriveLogFileSet : LogFileSet
+    internal class DriveLogFileSet : LogFileSet
     {
         #region Custom Events
 

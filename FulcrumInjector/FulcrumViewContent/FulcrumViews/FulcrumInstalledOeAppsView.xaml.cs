@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
@@ -29,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
+        internal FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -144,7 +145,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         {
             // Pull the newly selected OE App model object 
             if (Sender is not ListView SendingListView) return;
-            var SelectedApp = SendingListView.SelectedItem as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
+            var SelectedApp = SendingListView.SelectedItem as FulcrumOeApplication;
 
             // Log out what application is being controlled here
             this._viewLogger.WriteLog(SelectedApp != null

@@ -70,8 +70,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <summary>
         /// Starts the service up and builds a watchdog helper process
         /// </summary>
-        /// <param name="WatchedFolders">NOT USED!</param>
-        protected override void OnStart(string[] WatchedFolders)
+        /// <param name="StartupArgs">NOT USED!</param>
+        protected override void OnStart(string[] StartupArgs)
         {
             try 
             {

@@ -34,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumDllOutputLogViewModel ViewModel { get; set; }
+        internal FulcrumDllOutputLogViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
     /// <summary>
     /// View model content for the Updater view on the injector application
     /// </summary>
-    public class FulcrumUpdaterViewModel : FulcrumViewModelBase
+    internal class FulcrumUpdaterViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

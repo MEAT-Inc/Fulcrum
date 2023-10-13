@@ -21,6 +21,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
@@ -195,8 +196,8 @@ namespace FulcrumInjector
             this._appLogger.WriteLog("SHOWING NEW CONFIGURATION WINDOW FOR ENCRYPTION KEY SETUP...");
 
             // Build and show a new dialog window for the configuration of the keys
-            FulcrumEncryptionKeysWindow KeyConfigWindow = new FulcrumEncryptionKeysWindow();
-            KeyConfigWindow.ShowDialog();
+            FulcrumEncryptionConfigWindow ConfigConfigWindow = new FulcrumEncryptionConfigWindow();
+            ConfigConfigWindow.ShowDialog();
         }
         /// <summary>
         /// Builds an event control object for methods to run when the app closes out.
@@ -400,7 +401,7 @@ namespace FulcrumInjector
         private void _configureDriveService()
         {
             // Make sure we actually want to use this watchdog service 
-            var DriveConfig = ValueLoaders.GetConfigValue<FulcrumDriveBroker.DriveServiceSettings>("FulcrumDriveService");
+            var DriveConfig = ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumDriveService");
             if (!DriveConfig.DriveEnabled)
             {
                 // Log that the watchdog is disabled and exit out

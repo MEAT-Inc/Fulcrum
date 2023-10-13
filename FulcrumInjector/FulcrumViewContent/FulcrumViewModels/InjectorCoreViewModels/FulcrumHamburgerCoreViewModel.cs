@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using SharpLogging;
 using Svg;
 
@@ -17,7 +18,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// ViewModel for the main hamburger core object
     /// </summary>
-    public class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
+    internal class FulcrumHamburgerCoreViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

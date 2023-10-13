@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Class which houses the logic for pulling in a new Fulcrum Injector MSI File.
     /// </summary>
-    public class FulcrumUpdater
+    internal class FulcrumUpdater
     {
         #region Custom Events
 

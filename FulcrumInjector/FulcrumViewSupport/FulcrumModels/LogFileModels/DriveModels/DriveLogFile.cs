@@ -3,6 +3,7 @@ using System.IO;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Google.Apis.Drive.v3;
 using SharpLogging;
+
 // Static using for google drive file type
 using GoogleDriveFile = Google.Apis.Drive.v3.Data.File;
 
@@ -11,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
     /// <summary>
     /// Class which holds information about a log file path pulled in from our google drive
     /// </summary>
-    public class DriveLogFileModel : LogFileModel
+    internal class DriveLogFileModel : LogFileModel
     {
         #region Custom Events
         #endregion // Custom Events

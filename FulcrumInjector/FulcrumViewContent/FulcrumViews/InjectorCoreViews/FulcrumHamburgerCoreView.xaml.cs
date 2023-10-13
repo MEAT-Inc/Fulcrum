@@ -5,6 +5,7 @@ using System.Windows.Navigation;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using MahApps.Metro.Controls;
 using SharpLogging;
 
@@ -29,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumHamburgerCoreViewModel ViewModel { get; set; }   
+        internal FulcrumHamburgerCoreViewModel ViewModel { get; set; }   
 
         #endregion // Properties
 
