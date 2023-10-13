@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
@@ -30,9 +32,9 @@ namespace FulcrumInjector.FulcrumViewSupport
         private static readonly SharpLogger _driveServiceLogger = new(LoggerActions.UniversalLogger);
 
         // Private backing fields for drive service objects
-        private static DriveService _driveService;                  // Static service object for our google drive service
-        private static DriveExplorerAuthorization _explorerAuth;    // The authorization configuration for the drive service
-        private static DriveExplorerConfiguration _explorerConfig;  // The initialization configuration for the drive service
+        private static DriveService _driveService;          // Static service object for our google drive service
+        private static DriveAuthorization _driveAuth;       // The authorization configuration for the drive service
+        private static DriveConfiguration _driveConfig;     // The initialization configuration for the drive service
 
         #endregion // Fields
 
@@ -48,48 +50,6 @@ namespace FulcrumInjector.FulcrumViewSupport
         #endregion // Properties
 
         #region Structs and Classes
-
-        /// <summary>
-        /// Class object holding our configuration for a drive service instance
-        /// </summary>
-        public class DriveServiceSettings
-        {
-            // Public facing properties for our drive service configuration
-            public bool DriveEnabled { get; set; }      // Tells us if the service is enabled or not 
-            public string ServiceName { get; set; }     // Stores the name of the google drive service
-        }
-        /// <summary>
-        /// Class object used to define the JSON object of a google drive explorer configuration
-        /// </summary>
-        [JsonConverter(typeof(DriveExplorerConfigJsonConverter))]
-        public class DriveExplorerConfiguration
-        {
-            [JsonProperty("auth_uri")] public string AuthUri { get; set; }
-            [JsonProperty("token_uri")] public string TokenUri { get; set; }
-            [JsonProperty("client_id")] public string ClientId { get; set; }
-            [JsonProperty("project_id")] public string ProjectId { get; set; }
-            [JsonProperty("client_secret")] public string ClientSecret { get; set; }
-            [JsonProperty("redirect_uris")] public string[] RedirectUris { get; set; }
-            [JsonProperty("auth_provider_x509_cert_url")] public string AuthProvider { get; set; }
-        }
-        /// <summary>
-        /// Class object used to define the JSON object of our google drive authorization
-        /// </summary>
-        [JsonConverter(typeof(DriveExplorerAuthJsonConverter))]
-        public class DriveExplorerAuthorization
-        {
-            [JsonProperty("type")] public string Type { get; set; }
-            [JsonProperty("auth_uri")] public string AuthUri { get; set; }
-            [JsonProperty("token_uri")] public string TokenUri { get; set; }
-            [JsonProperty("client_id")] public string ClientId { get; set; }
-            [JsonProperty("project_id")] public string ProjectId { get; set; }
-            [JsonProperty("private_key")] public string PrivateKey { get; set; }
-            [JsonProperty("client_email")] public string ClientEmail { get; set; }
-            [JsonProperty("private_key_id")] public string PrivateKeyId { get; set; }
-            [JsonProperty("universe_domain")] public string UniverseDomain { get; set; }
-            [JsonProperty("client_x509_cert_url")] public string ClientCertUrl { get; set; }
-            [JsonProperty("auth_provider_x509_cert_url")] public string AuthProviderUrl { get; set; }
-        }
 
         /// <summary>
         /// Enumeration used to help filter the resulting object types from a query to the drive/folder
@@ -131,28 +91,29 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Pull in the configuration values for the drive explorer and unscramble needed strings
             _driveServiceLogger.WriteLog("LOADING AND UNSCRAMBLING CONFIGURATION FOR DRIVE SERVICE NOW...");
-            _explorerConfig = ValueLoaders.GetConfigValue<DriveExplorerConfiguration>("FulcrumConstants.InjectorDriveExplorer.ExplorerConfiguration");
+            _driveConfig = ValueLoaders.GetConfigValue<DriveConfiguration>("FulcrumConstants.InjectorDriveExplorer.ExplorerConfiguration");
 
             // Pull in the configuration values for the drive explorer authorization and unscramble needed strings
             _driveServiceLogger.WriteLog("LOADING AND UNSCRAMBLING AUTHORIZATION FOR DRIVE SERVICE NOW...");
-            _explorerAuth = ValueLoaders.GetConfigValue<DriveExplorerAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
+            _driveAuth = ValueLoaders.GetConfigValue<DriveAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
 
             // Log out that our unscramble routines have been completed
             _driveServiceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
-            _driveServiceLogger.WriteLog($"DRIVE CLIENT ID: {_explorerConfig.ClientId}");
-            _driveServiceLogger.WriteLog($"DRIVE PROJECT ID: {_explorerConfig.ProjectId}");
-            _driveServiceLogger.WriteLog($"DRIVE SERVICE EMAIL: {_explorerAuth.ClientEmail}");
+            _driveServiceLogger.WriteLog($"DRIVE CLIENT ID: {_driveConfig.ClientId}");
+            _driveServiceLogger.WriteLog($"DRIVE PROJECT ID: {_driveConfig.ProjectId}");
+            _driveServiceLogger.WriteLog($"DRIVE SERVICE EMAIL: {_driveAuth.ClientEmail}");
 
             try
             {
                 // Configure the google drive service here
                 _driveServiceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
+                string AuthServiceJson = JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false));
                 _driveService = new DriveService(new BaseClientService.Initializer()
                 {
                     // Store the API configuration and Application name for the authorization helper
                     ApplicationName = ApplicationName,
-                    HttpClientInitializer = GoogleCredential.FromJson(
-                        JsonConvert.SerializeObject(_explorerAuth, new DriveExplorerAuthJsonConverter(false)))
+                    HttpClientInitializer = GoogleCredential
+                        .FromJson(AuthServiceJson)
                         .CreateScoped(DriveService.Scope.DriveReadonly)
                 });
 

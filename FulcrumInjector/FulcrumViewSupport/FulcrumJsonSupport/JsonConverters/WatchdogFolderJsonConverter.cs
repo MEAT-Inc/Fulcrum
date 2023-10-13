@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static FulcrumInjector.FulcrumViewContent.FulcrumViewModels.FulcrumInstalledOeAppsViewModel;

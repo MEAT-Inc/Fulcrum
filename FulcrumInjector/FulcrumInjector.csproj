@@ -39,7 +39,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\Debug\FulcrumInjector.xml</DocumentationFile>
   </PropertyGroup>
@@ -52,7 +52,7 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28Installed%29|AnyCPU'">
     <OutputPath>bin\Release %28Installed%29\</OutputPath>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
@@ -189,35 +189,45 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\DriveModels\DriveLogFileModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFileModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\LogFileModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFileSet.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\DriveModels\DriveLogFileSet.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\LogFileModels\LogFileSet.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogSettings.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\DriveBrokerModels\DriveAuthorization.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\DriveBrokerModels\DriveConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\EmailBrokerModels\EmailBrokerConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\EmailBrokerModels\EmailSmtpConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumOeApplication.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumStartupAction.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumUpdaterConfiguration.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\DriveModels\DriveLogFile.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFile.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\LogFile.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFileSet.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\DriveModels\DriveLogFileSet.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\LogFileSet.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\DriveBrokerModels\DriveServiceSettings.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\WatchdogModels\WatchdogSettings.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorMiscViewModels\FulcrumGoogleDriveViewModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumEncryptionKeysWindow.xaml.cs">
+    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionKeysWindow.xaml.cs">
       <DependentUpon>FulcrumEncryptionKeysWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumCommandLine.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumDataConverters\StringEncryptor.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumEncryption\FulcrumEncryptor.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\EnumLibExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDriveBroker.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumEnumCombo.xaml.cs">
+    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml.cs">
       <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumEncryption\EncryptedValueAttribute.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\DriveExplorerAuthJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\DriveExplorerConfigJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\EmailBrokerConfigJsonConverter.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\EncryptedJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\UpdateConfigurationJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumWatchdogService.cs">
@@ -226,12 +236,12 @@
     <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleEnums.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\AppStyleModels\AppStyleEnums.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumUpdater.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\FulcrumVersionInfo.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumEmailBroker.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumNavMenuItem.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingsShare.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\SettingsModels\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumInstalledHardwareViewModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumLogReviewViewModel.cs" />
@@ -290,8 +300,8 @@
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\BoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\HamburgerNavService.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumStyles\CustomColorShader.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogFolder.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\WatchdogModels\WatchdogFile.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\WatchdogModels\WatchdogFolder.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\WatchdogModels\WatchdogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumServices\FulcrumDriveService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -300,15 +310,15 @@
     <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\CustomColorConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConverters\CustomColorValueJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleColorSet.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumStyles\AppStyleModels\AppStyleModel.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\AppStyleModels\AppStyleColorSet.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\AppStyleModels\AppStyleModel.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\ValueLoaders.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\ValueSetters.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\JsonConfigFile.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumLogFormatters\DebugLogFormatters\DebugLoggingRedirectTarget.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingEntryModel.cs" />
-    <Compile Include="FulcrumViewContent\FulcrumModels\SettingsModels\FulcrumSettingsCollection.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\SettingsModels\FulcrumSettingEntry.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\SettingsModels\FulcrumSettingsCollection.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\PropertyWatchdog.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorOptionViewModels\FulcrumDebugLoggingViewModel.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumDllOutputLogViewModel.cs" />
@@ -340,7 +350,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorCoreViews\FulcrumDllOutputLogView.xaml.cs">
       <DependentUpon>FulcrumDllOutputLogView.xaml</DependentUpon>
     </Compile>
-    <Page Include="FulcrumViewContent\FulcrumViews\FulcrumEncryptionKeysWindow.xaml">
+    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionKeysWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -380,7 +390,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FulcrumViewSupport\FulcrumEnumCombo.xaml">
+    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -507,7 +517,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
-    <Compile Include="Properties\EncryptionKeys.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumEncryption\EncryptionKeys.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -6,8 +6,10 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using Newtonsoft.Json;
 using Octokit;
 using SharpLogging;
@@ -77,21 +79,6 @@ namespace FulcrumInjector.FulcrumViewSupport
         #endregion //Properties
 
         #region Structs and Classes
-
-        /// <summary>
-        /// Private class instance used to hold our injector configuration values for updates
-        /// </summary>
-        [JsonConverter(typeof(UpdaterConfigJsonConverter))]
-        public class FulcrumUpdaterConfiguration
-        {
-            public bool ForceUpdateReady { get; set; }
-            public string UpdaterOrgName { get; set; }
-            public string UpdaterRepoName { get; set; }
-            public string UpdaterUserName { get; set; }
-            public string UpdaterSecretKey { get; set; }
-        }
-
-
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

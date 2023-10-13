@@ -1,5 +1,5 @@
 ﻿using System;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpExpressions;

@@ -8,7 +8,7 @@ using ControlzEx.Theming;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumStyles.AppStyleModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles

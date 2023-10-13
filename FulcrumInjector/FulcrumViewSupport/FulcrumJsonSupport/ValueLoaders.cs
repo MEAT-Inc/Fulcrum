@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Documents;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
 
@@ -70,7 +71,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
 
             // If we've got an encrypted field value and a string value, convert/decrypt it here 
             _valueLoadersLogger?.WriteLog("DECRYPTING VALUE FOR FIELD NOW...", LogType.TraceLog);
-            string DecryptedValue = StringEncryptor.Decrypt(ConvertedValue.ToString());
+            string DecryptedValue = FulcrumEncryptor.Decrypt(ConvertedValue.ToString());
             if (DecryptedValue is TValueType CastDecryption)
             {
                 // Return the decrypted field value

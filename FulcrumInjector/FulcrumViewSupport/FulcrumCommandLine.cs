@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 
 namespace FulcrumInjector.FulcrumViewSupport
 {
@@ -40,8 +41,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Enumeration used to configure different types of startup arguments
         /// </summary>
-        [Flags]
-        public enum StartupArguments
+        [Flags] public enum StartupArguments
         {
             // Default values are no arguments or launch injector. If launch is not provided, we exit after invoking actions
             [Description("")] NO_ARGUMENTS = 0x00000000,
@@ -56,30 +56,6 @@ namespace FulcrumInjector.FulcrumViewSupport
             [Description("--DRIVE")] DRIVE = 0x00002000,
             [Description("--DRIVE_INITIALIZE")] INIT_DRIVE = DRIVE | 0x00000001,
             [Description("--DRIVE_INVOKE")] INVOKE_DRIVE = DRIVE | INIT_DRIVE | 0x00000002,
-        }
-
-        /// <summary>
-        /// Class object holding information about a parsed argument object
-        /// </summary>
-        public class FulcrumStartupAction
-        {
-            // Public properties holding information about the requested action
-            public StartupArguments ArgumentType { get; set; }
-            public string[] ArgumentParameters { get; set; }
-
-            // ------------------------------------------------------------------------------------------------------------------------------------------
-
-            /// <summary>
-            /// Builds a new instance of a FulcrumStartupAction
-            /// </summary>
-            /// <param name="ArgType">The type of action being invoked</param>
-            /// <param name="ArgParameters">Parameters passed along with the command</param>
-            public FulcrumStartupAction(StartupArguments ArgType, params string[] ArgParameters)
-            {
-                // Store object properties and exit out 
-                this.ArgumentType = ArgType;
-                this.ArgumentParameters = ArgParameters;
-            }
         }
 
         #endregion // Structs and Classes
