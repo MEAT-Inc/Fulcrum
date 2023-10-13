@@ -6,7 +6,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Internal static helper class which contains all the routines needed to PInvoke a DLL object
     /// </summary>
-    internal class FulcrumWin32Invokers
+    public class FulcrumWin32Invokers
     {
         // Loads a DLL into the memory.
         [DllImport("kernel32.dll", EntryPoint = "LoadLibrary", SetLastError = true)]

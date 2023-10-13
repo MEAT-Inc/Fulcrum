@@ -17,7 +17,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
     /// <summary>
     /// ViewModel for settings pane binding values
     /// </summary>
-    internal class FulcrumSettingsPaneViewModel : FulcrumViewModelBase
+    public class FulcrumSettingsPaneViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

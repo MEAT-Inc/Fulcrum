@@ -3,6 +3,7 @@ using System.IO;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.FulcrumModels;
 using SharpLogging;
+
 // Static using call for a google drive log file model
 using GoogleDriveFile = Google.Apis.Drive.v3.Data.File;
 
@@ -12,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
     /// Base class model object for a log file being used in the injector application
     /// This holds information about a local log file or a Google Drive log file
     /// </summary>
-    internal class LogFileModel
+    public class LogFile
     {
         #region Custom Events
         #endregion // Custom Events
@@ -95,7 +96,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
         /// Spawns a new log file object instance and configures fields/properties of it
         /// </summary>
         /// <param name="InputLogPath">The path to the input log file object</param>
-        protected LogFileModel(string InputLogPath)
+        protected LogFile(string InputLogPath)
         {
             // Configure a new file logger if needed
             _logFileLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
@@ -119,7 +120,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
         /// Spawns a new log file object instance and configures fields/properties of it
         /// </summary>
         /// <param name="InputDriveFile">The google drive file object built for our log file</param>
-        protected LogFileModel(GoogleDriveFile InputDriveFile)
+        protected LogFile(GoogleDriveFile InputDriveFile)
         {
             // Configure a new file logger if needed
             _logFileLogger ??= new SharpLogger(LoggerActions.UniversalLogger);

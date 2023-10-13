@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Class instance used to help us configure command line argument routines
     /// </summary>
-    internal class FulcrumCommandLine
+    public class FulcrumCommandLine
     {
         #region Custom Events
         #endregion // Custom Events

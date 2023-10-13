@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// Viewmodel object for viewing output log instances from old log files.
     /// </summary>
-    internal class FulcrumLogReviewViewModel : FulcrumViewModelBase
+    public class FulcrumLogReviewViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

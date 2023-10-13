@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
     /// <summary>
     /// Class object holding information about a parsed argument object
     /// </summary>
-    internal class FulcrumStartupAction
+    public class FulcrumStartupAction
     {
         // Public properties holding information about the requested action
         public string[] ArgumentParameters { get; set; }

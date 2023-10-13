@@ -30,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
+        public FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
 
         #endregion // Properties
 

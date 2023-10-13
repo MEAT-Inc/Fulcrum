@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
     /// <summary>
     /// Internal class holding the values for our different types of log files supported on a google drive location
     /// </summary>
-    internal class DriveLogFileSet : LogFileSet
+    public class DriveLogFileSet : LogFileSet
     {
         #region Custom Events
 
@@ -134,10 +134,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._sourceDriveFolder.Id}!");
 
             // Clear out the existing log file models if needed
-            this[LogFileModel.LogFileTypes.PASSTHRU_FILE].Clear();
-            this[LogFileModel.LogFileTypes.EXPRESSIONS_FILE].Clear();
-            this[LogFileModel.LogFileTypes.SIMULATIONS_FILE].Clear(); 
-            this[LogFileModel.LogFileTypes.UNKNOWN_FILE].Clear();
+            this[LogFile.LogFileTypes.PASSTHRU_FILE].Clear();
+            this[LogFile.LogFileTypes.EXPRESSIONS_FILE].Clear();
+            this[LogFile.LogFileTypes.SIMULATIONS_FILE].Clear(); 
+            this[LogFile.LogFileTypes.UNKNOWN_FILE].Clear();
 
             // Iterate all the located files and store them for this set object one by one
             foreach (var LocatedFile in LocatedFiles)

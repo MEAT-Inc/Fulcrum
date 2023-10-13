@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.EmailBrokerModels
     /// Class object holding the definition for the email broker configuration
     /// </summary>
     [JsonConverter(typeof(EmailBrokerConfigJsonConverter))]
-    internal class EmailBrokerConfiguration
+    public class EmailBrokerConfiguration
     {
         #region Custom Events
         #endregion // Custom Events

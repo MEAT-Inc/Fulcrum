@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels
     /// <summary>
     /// Class structure for a watched file instance inside a watched directory
     /// </summary>
-    internal class WatchdogFile : IDisposable
+    public class WatchdogFile : IDisposable
     {
         #region Custom Events
 

@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
     /// <summary>
     /// The actual service base component used for the injector drive service helper
     /// </summary>
-    internal class FulcrumDriveService : FulcrumService
+    public class FulcrumDriveService : FulcrumService
     {
         #region Custom Events
         #endregion //Custom Events

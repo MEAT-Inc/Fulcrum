@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
     /// <summary>
     /// Class object containing information about the current version of this application
     /// </summary>
-    internal class FulcrumVersionInfo : IComparable
+    public class FulcrumVersionInfo : IComparable
     {
         #region Custom Events
         #endregion //Custom Events

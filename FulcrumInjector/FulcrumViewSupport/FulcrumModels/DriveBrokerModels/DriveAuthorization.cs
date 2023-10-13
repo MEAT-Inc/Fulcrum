@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels
     /// Class object used to define the JSON object of our google drive authorization
     /// </summary>
     [JsonConverter(typeof(DriveAuthJsonConverter))]
-    internal class DriveAuthorization
+    public class DriveAuthorization
     {
         // Public properties which do not require encryption or decryption
         [JsonProperty("type")] public string Type { get; set; }

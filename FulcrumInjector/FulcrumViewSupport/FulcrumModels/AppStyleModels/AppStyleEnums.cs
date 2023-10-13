@@ -5,7 +5,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels
     /// <summary>
     /// Type of theme used.
     /// </summary>
-    internal enum ThemeTypes
+    public enum ThemeTypes
     {
         DARK_COLORS = 0,
         LIGHT_COLORS = 1,
@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels
     /// Type of color options
     /// </summary>
     [Flags]
-    internal enum ColorTypes : uint
+    public enum ColorTypes : uint
     {
         // Color Type Bases
         PRIMARY_COLOR = 0x001000,

@@ -21,7 +21,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Static helper class used to configure and consume google drive service
     /// </summary>
-    internal static class FulcrumDriveBroker
+    public static class FulcrumDriveBroker
     {
         #region Custom Events
         #endregion // Custom Events
@@ -107,13 +107,12 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // Configure the google drive service here
                 _driveServiceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
-                string AuthServiceJson = JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false));
                 _driveService = new DriveService(new BaseClientService.Initializer()
                 {
                     // Store the API configuration and Application name for the authorization helper
                     ApplicationName = ApplicationName,
                     HttpClientInitializer = GoogleCredential
-                        .FromJson(AuthServiceJson)
+                        .FromJson(JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false)))
                         .CreateScoped(DriveService.Scope.DriveReadonly)
                 });
 

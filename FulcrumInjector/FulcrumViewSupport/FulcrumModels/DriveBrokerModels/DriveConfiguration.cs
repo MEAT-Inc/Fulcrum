@@ -8,7 +8,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels
     /// Class object used to define the JSON object of a google drive explorer configuration
     /// </summary>
     [JsonConverter(typeof(DriveConfigJsonConverter))]
-    internal class DriveConfiguration
+    public class DriveConfiguration
     {
         // Public properties which do not require encryption or decryption
         [JsonProperty("auth_uri")] public string AuthUri { get; set; }

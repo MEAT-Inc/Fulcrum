@@ -5,7 +5,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
     /// <summary>
     /// Supporting class used to help find shades of colors based on input color values
     /// </summary>
-    internal static class CustomColorShader
+    public static class CustomColorShader
     {
         /// <summary>
         /// Color shader.

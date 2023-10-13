@@ -5,7 +5,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels
     /// <summary>
     /// Model object for our watchdog service settings configuration
     /// </summary>
-    internal class WatchdogSettings
+    public class WatchdogSettings
     {
         #region Custom Events
         #endregion // Custom Events

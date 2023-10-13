@@ -13,7 +13,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels
     /// Color Set for an app theme.
     /// </summary>
     [JsonObject(MemberSerialization.Fields)]
-    internal class AppStyleColorSet
+    public class AppStyleColorSet
     {
         #region Custom Events
         #endregion //Custom Events

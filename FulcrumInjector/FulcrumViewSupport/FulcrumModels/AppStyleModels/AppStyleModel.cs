@@ -11,7 +11,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.AppStyleModels
     /// <summary>
     /// Color Theme for this application
     /// </summary>
-    internal class AppStyleModel
+    public class AppStyleModel
     {
         #region Custom Events
         #endregion //Custom Events

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SharpLogging;
-using static FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.LogFileModel;
+using static FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.LogFile;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
 {
@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
     /// Base class model object for a log file set used in the injector application
     /// This holds information about a set of local log files or a Google Drive log file set
     /// </summary>
-    internal class LogFileSet : Dictionary<LogFileTypes, List<LogFileModel>>
+    public class LogFileSet : Dictionary<LogFileTypes, List<LogFile>>
     {
         #region Custom Events
         #endregion // Custom Events
@@ -20,16 +20,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
         protected static SharpLogger _logSetLogger;         
 
         // Primary/default/combined log file objects
-        private LogFileModel _passThruLogFile;              // Primary PassThru log file when more than one exists
-        private LogFileModel _expressionsFile;              // Primary expressions file when more than one exists
-        private LogFileModel _simulationsFile;              // Primary simulations file when more than one exists
+        private LogFile _passThruLogFile;              // Primary PassThru log file when more than one exists
+        private LogFile _expressionsFile;              // Primary expressions file when more than one exists
+        private LogFile _simulationsFile;              // Primary simulations file when more than one exists
 
         #endregion // Fields
 
         #region Properties
 
         // Public facing properties holding the path values for all of our file types
-        public LogFileModel PassThruLogFile
+        public LogFile PassThruLogFile
         {
             get => this._passThruLogFile;
             protected set
@@ -42,7 +42,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
                 this._passThruLogFile = value; 
             }
         }                    
-        public LogFileModel ExpressionsFile
+        public LogFile ExpressionsFile
         {
             get => this._expressionsFile;
             protected set
@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
                 this._expressionsFile = value;
             }
         }                    
-        public LogFileModel SimulationsFile
+        public LogFile SimulationsFile
         {
             get => this._simulationsFile;
             protected set
@@ -76,12 +76,12 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
         public int TotalLogCount => this.Sum(KeyObj => KeyObj.Value.Count);
 
         // Collection of all log files stored on the log file set
-        public List<LogFileModel> LogSetFiles
+        public List<LogFile> LogSetFiles
         {
             get
             {
                 // Build a combined list of all log files
-                List<LogFileModel> OutputFiles = new List<LogFileModel>();
+                List<LogFile> OutputFiles = new List<LogFile>();
                 OutputFiles.AddRange(this[LogFileTypes.PASSTHRU_FILE]);
                 OutputFiles.AddRange(this[LogFileTypes.EXPRESSIONS_FILE]);
                 OutputFiles.AddRange(this[LogFileTypes.SIMULATIONS_FILE]);
@@ -108,10 +108,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels
             _logSetLogger ??= new SharpLogger(LoggerActions.UniversalLogger);
 
             // Configure our dictionary of log types and exit out
-            this.Add(LogFileTypes.PASSTHRU_FILE, new List<LogFileModel>());
-            this.Add(LogFileTypes.EXPRESSIONS_FILE, new List<LogFileModel>());
-            this.Add(LogFileTypes.SIMULATIONS_FILE, new List<LogFileModel>());
-            this.Add(LogFileTypes.UNKNOWN_FILE, new List<LogFileModel>());
+            this.Add(LogFileTypes.PASSTHRU_FILE, new List<LogFile>());
+            this.Add(LogFileTypes.EXPRESSIONS_FILE, new List<LogFile>());
+            this.Add(LogFileTypes.SIMULATIONS_FILE, new List<LogFile>());
+            this.Add(LogFileTypes.UNKNOWN_FILE, new List<LogFile>());
         }
     }
 }

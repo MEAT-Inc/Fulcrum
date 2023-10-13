@@ -3,7 +3,7 @@
     /// <summary>
     /// Class object holding the definition for the email broker SMTP Configuration
     /// </summary>
-    internal class EmailSmtpConfiguration
+    public class EmailSmtpConfiguration
     {
         #region Custom Events
         #endregion // Custom Events

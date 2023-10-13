@@ -16,7 +16,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumStyles
     /// <summary>
     /// Class reserved to configuring theme object values on the application
     /// </summary>
-    internal class AppThemeConfiguration
+    public class AppThemeConfiguration
     {
         #region Custom Events
         #endregion //Custom Events
