@@ -10,14 +10,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.FulcrumModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using SharpExpressions;
 using SharpLogging;
 using SharpSimulator;
@@ -27,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// Viewmodel object for viewing output log instances from old log files.
     /// </summary>
-    internal class FulcrumLogReviewViewModel : FulcrumViewModelBase
+    public class FulcrumLogReviewViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events
@@ -35,8 +34,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Fields
 
         // Fields holding our generator and log formatting objects 
-        public LogOutputFilteringHelper LogFilteringHelper;         // Format helper for the loaded log files
-        public InjectorOutputSyntaxHelper InjectorSyntaxHelper;     // Format helper for the PassThru log files
+        internal LogOutputFilteringHelper LogFilteringHelper;       // Format helper for the loaded log files
+        internal InjectorOutputSyntaxHelper InjectorSyntaxHelper;   // Format helper for the PassThru log files
         
         // Private backing fields holding information about our viewer
         private bool _isLogLoaded = false;                          // Tells us if a log file is loaded or not

@@ -10,9 +10,9 @@
              xmlns:fulcrumViewSupport="clr-namespace:FulcrumInjector.FulcrumViewSupport"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              xmlns:passThruTypes="clr-namespace:SharpWrapper.PassThruTypes;assembly=SharpWrapper"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             Loaded="FulcrumSimulationPlaybackView_OnLoaded">
+             xmlns:fulcrumControls="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumControls"
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" Loaded="FulcrumSimulationPlaybackView_OnLoaded"
+             DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ViewModel}">
 
     <!-- Style Sheets and Resources -->
     <UserControl.Resources>
@@ -496,7 +496,8 @@
                                                 </ComboBox.ItemTemplate>
                                             </ComboBox>
                                             <TextBox Tag="Enter A Name" x:Name="tbEditConfigName"
-                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>                                        
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"
+                                                     Text="{Binding Path=CustomConfiguration.ConfigurationName}"/>                                        
                                         </Grid>
 
                                         <!-- Protocol ID Configuration -->
@@ -504,14 +505,14 @@
                                         <Grid Grid.Row="1" Grid.Column="1">
                                             <TextBox x:Name="tbChannelProtocol"
                                                      Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderProtocol}" 
+                                                     Text="{Binding LoadedConfiguration.ReaderProtocol}" 
                                                      Visibility="{Binding ElementName=cboEditProtocolId, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                            <fulcrumViewSupport:FulcrumEnumComboBox 
+                                            <fulcrumControls:FulcrumEnumComboBox 
                                                 x:Name="cboEditProtocolId"
                                                 DefaultValue="Protocol ID"
                                                 Style="{StaticResource EditConfigComboBoxStyle}"
                                                 EnumerationType="{x:Type passThruTypes:ProtocolId}"
-                                                SelectedItem="{Binding ElementName=tbChannelProtocol, Path=Text, Mode=OneWay}"/>
+                                                SelectedItem="{Binding Path=CustomConfiguration.ReaderProtocol}"/>
                                         </Grid>
 
                                         <!-- BaudRate Configuration -->
@@ -519,14 +520,14 @@
                                         <Grid Grid.Row="2" Grid.Column="1">
                                             <TextBox x:Name="tbChannelBaudRate"
                                                      Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderBaudRate}" 
+                                                     Text="{Binding LoadedConfiguration.ReaderBaudRate}" 
                                                      Visibility="{Binding ElementName=cboEditBaudRate, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                            <fulcrumViewSupport:FulcrumEnumComboBox 
+                                            <fulcrumControls:FulcrumEnumComboBox 
                                                   x:Name="cboEditBaudRate"
                                                   DefaultValue="BaudRate"
                                                   EnumerationType="{x:Type passThruTypes:BaudRate}"
                                                   Style="{StaticResource EditConfigComboBoxStyle}"
-                                                  SelectedItem="{Binding ElementName=tbChannelBaudRate, Path=Text, Mode=OneWay}"/>
+                                                  SelectedItem="{Binding Path=CustomConfiguration.ReaderBaudRate}"/>
                                         </Grid>                                        
                                         
                                         <!-- Connect Flags Configuration -->
@@ -534,50 +535,54 @@
                                         <Grid Grid.Row="3" Grid.Column="1">
                                             <TextBox x:Name="tbChannelFlags"
                                                      Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderChannelFlags}" 
+                                                     Text="{Binding LoadedConfiguration.ReaderChannelFlags}" 
                                                      Visibility="{Binding ElementName=cboEditConnectFlags, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                            <fulcrumViewSupport:FulcrumEnumComboBox 
+                                            <fulcrumControls:FulcrumEnumComboBox 
                                                 x:Name="cboEditConnectFlags"
                                                 DefaultValue="Connect Flags"
                                                 Style="{StaticResource EditConfigComboBoxStyle}"
                                                 EnumerationType="{x:Type passThruTypes:PassThroughConnect}"
-                                                SelectedItem="{Binding ElementName=tbChannelFlags, Path=Text, Mode=OneWay}"/>
+                                                SelectedItem="{Binding Path=CustomConfiguration.ReaderChannelFlags}"/>
                                         </Grid>
 
                                         <!-- Read Message Count Configuration -->
                                         <TextBlock Text="Message Count:" Grid.Row="4" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="4" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
+                                                     Text="{Binding LoadedConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
                                             <TextBox Tag="Read Count" x:Name="tbEditReaderCount"
-                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"
+                                                     Text="{Binding CustomConfiguration.ReaderMsgCount, StringFormat={}{0} Messages}"/>
                                         </Grid>
 
                                         <!-- Reader Timeout Configuration -->
                                         <TextBlock Text="Reader Timeout:" Grid.Row="5" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="5" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
+                                                     Text="{Binding LoadedConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditReaderTimeout"
-                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"
+                                                     Text="{Binding CustomConfiguration.ReaderTimeout, StringFormat={}{0}ms}"/>
                                         </Grid>
 
                                         <!-- Response Timeout Configuration -->
                                         <TextBlock Text="Response Timeout:" Grid.Row="6" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="6" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
+                                                     Text="{Binding LoadedConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditResponseTimeout"
-                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"
+                                                     Text="{Binding CustomConfiguration.ResponseTimeout, StringFormat={}{0}ms}"/>
                                         </Grid>
 
                                         <!-- Response Attempts Configuration -->
                                         <TextBlock Text="Response Attempts:" Grid.Row="7" Grid.Column="0" Style="{StaticResource ConfigInfoTextBlockStyle}"/>
                                         <Grid Grid.Row="7" Grid.Column="1">
                                             <TextBox Style="{StaticResource ReadonlyTextBoxStyle}"
-                                                     Text="{Binding SimulationConfiguration.ResponseAttempts, StringFormat={}{0} Attempts}"/>
+                                                     Text="{Binding LoadedConfiguration.ResponseAttempts, StringFormat={}{0} Attempts}"/>
                                             <TextBox Tag="Milliseconds" x:Name="tbEditResponseAttempts"
-                                                     Style="{StaticResource EditConfigTextBoxStyle}"/>
+                                                     Style="{StaticResource EditConfigTextBoxStyle}"
+                                                     Text="{Binding CustomConfiguration.ResponseAttempts, StringFormat={}{0} Attempts}"/>
                                         </Grid>
 
                                         <!-- Buttons to build and save simulation configurations. Not yet supported -->
@@ -628,7 +633,7 @@
 
                                         <!-- Filters ListBox -->
                                         <ListBox Grid.Row="0" x:Name="lbConfigurationFilters"
-                                                 ItemsSource="{Binding SimulationConfiguration.ReaderFilters}"
+                                                 ItemsSource="{Binding LoadedConfiguration.ReaderFilters}"
                                                  BorderBrush="{StaticResource TextColorBase}" BorderThickness="1">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type ptObjects:J2534Filter}">
@@ -698,7 +703,7 @@
                                                                          Style="{StaticResource ReadonlyTextBoxStyle}"
                                                                          Tag="No Flags" Text="{Binding FilterFlags}"
                                                                          Visibility="{Binding ElementName=cboEditFilterFlags, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                                                <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                                <fulcrumControls:FulcrumEnumComboBox 
                                                                     DefaultValue="Tx Flags"
                                                                     x:Name="cboEditFilterFlags"
                                                                     Margin="5,5,5,0"
@@ -715,7 +720,7 @@
                                                                          Style="{StaticResource ReadonlyTextBoxStyle}"
                                                                          Tag="Filter Type" Text="{Binding FilterType}"
                                                                          Visibility="{Binding ElementName=cboEditFilterType, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                                                <fulcrumViewSupport:FulcrumEnumComboBox 
+                                                                <fulcrumControls:FulcrumEnumComboBox 
                                                                     DefaultValue="Filter Type"
                                                                     x:Name="cboEditFilterType"
                                                                     Margin="5,5,5,0"

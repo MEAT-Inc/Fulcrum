@@ -3,6 +3,7 @@
                     xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
 
             <!--Main Title Text-->

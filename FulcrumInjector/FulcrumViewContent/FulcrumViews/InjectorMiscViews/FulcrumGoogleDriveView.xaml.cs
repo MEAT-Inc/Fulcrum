@@ -3,10 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
@@ -29,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumGoogleDriveViewModel ViewModel { get; set; }
+        public FulcrumGoogleDriveViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             InitializeComponent();
 
             // Setup our data context and log information out
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE GOOGLE DRIVE VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

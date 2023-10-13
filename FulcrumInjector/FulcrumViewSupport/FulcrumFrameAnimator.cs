@@ -9,7 +9,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// Animates frame objects
     /// This is used in the nav helper service to control events that are fired when we change tabs in the hamburger core
     /// </summary>
-    internal class FulcrumFrameAnimator
+    public class FulcrumFrameAnimator
     {
         #region Custom Events
         #endregion //Custom Events

@@ -14,7 +14,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// Base class for Model objects on the UI
     /// </summary>
-    internal class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
+    public class FulcrumViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
     {
         #region Custom Events
 
@@ -64,7 +64,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// Constructs a new instance of a ViewModelControl base object
         /// </summary>
         /// <param name="ViewContent">The view which this VMC Base object will be consuming</param>
-        public FulcrumViewModelBase(UserControl ViewContent)
+        protected FulcrumViewModelBase(UserControl ViewContent)
         {
             // Store the base view content on this instance and exit out
             this.BaseViewControl = ViewContent;

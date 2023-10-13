@@ -7,6 +7,10 @@ using System.Net.Mail;
 using System.Security;
 using System.Text.RegularExpressions;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.EmailBrokerModels;
+using Newtonsoft.Json;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport
@@ -14,7 +18,7 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Class used for sending emails out to our client applications and users
     /// </summary>
-    internal class FulcrumEmailBroker
+    public class FulcrumEmailBroker
     {
         #region Custom Events
         #endregion //Custom Events
@@ -23,12 +27,6 @@ namespace FulcrumInjector.FulcrumViewSupport
         
         // Private logger instance for our email broker
         private readonly SharpLogger _emailLogger;
-
-        // Public fields holding our sender object information and address
-        public readonly string EmailSenderName;
-        public readonly MailAddress EmailSenderAddress;
-        public readonly SecureString EmailSenderPassword;
-        public readonly MailAddress DefaultRecipientAddress;
 
         // Private backing fields for configuring our email sending routines
         private bool _smtpSetupConfigured = false;
@@ -39,9 +37,6 @@ namespace FulcrumInjector.FulcrumViewSupport
         #region Properties
 
         // Public facing collection of email address properties used to configure sending outgoing messages
-        public int SmtpServerPort { get; private set; }
-        public int SmtpServerTimeout { get; private set; }
-        public string SmtpServerName { get; private set; }
         public SmtpClient SendingClient { get; private set; }
         public MailAddress[] EmailRecipientAddresses
         {
@@ -70,6 +65,21 @@ namespace FulcrumInjector.FulcrumViewSupport
         }
         public FileInfo[] MessageAttachmentFiles { get; private set; }
 
+        // Public facing configuration properties for our broker
+        public EmailBrokerConfiguration EmailConfiguration { get; private set; }
+        public EmailSmtpConfiguration EmailStmpConfiguration { get; private set; }
+
+        // Computed properties based on CTOR arguments
+        public string EmailSenderName => this.EmailConfiguration.ReportSenderName;
+        public string EmailSenderPassword => this.EmailConfiguration.ReportSenderPassword;
+        public MailAddress EmailSenderAddress => new(this.EmailConfiguration.ReportSenderEmail);
+        public MailAddress DefaultRecipientAddress => new(this.EmailConfiguration.DefaultReportRecipient);
+
+        // Computed properties based on the SMTP configuration
+        public int SmtpServerPort => this.EmailStmpConfiguration.ServerPort;
+        public int SmtpServerTimeout => this.EmailStmpConfiguration.ServerTimeout;
+        public string SmtpServerName => this.EmailStmpConfiguration.ServerName;
+
         #endregion //Properties
 
         #region Structs and Classes
@@ -78,31 +88,44 @@ namespace FulcrumInjector.FulcrumViewSupport
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Builds a new Email broker based on the provided configuration 
+        /// </summary>
+        /// <param name="EmailConfiguration">The configuration being used for the email broker</param>
+        public FulcrumEmailBroker(EmailBrokerConfiguration EmailConfiguration)
+        {
+            // Spawn a new email logger and store the configuration
+            this._emailLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            EmailConfiguration.DefaultReportRecipient ??= "zack.walsh@meatinc.autos";
+            this.EmailConfiguration = EmailConfiguration;
+
+            // Log information about passed output here.
+            this._emailLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this.EmailSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog); 
+            this._emailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
+        }
+        /// <summary>
         /// Builds a new email report broker object with the given sender information.
         /// </summary>
         /// <param name="SenderName">Name of sender</param>
         /// <param name="SenderEmail">Sender email</param>
         /// <param name="SenderPassword">Sender password</param>
         /// <param name="DefaultRecipient">Default recipient for emails</param>
-        public FulcrumEmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient = null)
+        public FulcrumEmailBroker(string SenderName, string SenderEmail, string SenderPassword, string DefaultRecipient)
         {
             // Spawn a new email logger first
             this._emailLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Now build default settings values and log information
-            this.EmailSenderName = SenderName;
-            this.EmailSenderAddress = new MailAddress(SenderEmail);
-            if (DefaultRecipient == null) this._emailLogger.WriteLog("NOT INCLUDING A DEFAULT RECIPIENT ON THESE EMAILS!", LogType.WarnLog);
-            else { this.DefaultRecipientAddress = new MailAddress(DefaultRecipient); }
-
-            // Configure password entry and the SMTP Client here
-            this.EmailSenderPassword = new SecureString();
-            Array.ForEach(SenderPassword.ToArray(), this.EmailSenderPassword.AppendChar);
+            this.EmailConfiguration = new EmailBrokerConfiguration()
+            {
+                ReportSenderName = SenderName,
+                ReportSenderEmail = SenderEmail,
+                ReportSenderPassword = SenderPassword,
+                DefaultReportRecipient = DefaultRecipient
+            };
 
             // Log information about passed output here.
             this._emailLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this.EmailSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
-            this._emailLogger.WriteLog($"PULLED IN A NEW PASSWORD VALUE OF {SenderPassword} TO USE FOR SENDING OPERATIONS", LogType.InfoLog);
-            if (this.DefaultRecipientAddress != null) this._emailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
+            this._emailLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -110,15 +133,32 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Configures new SMTP configuration information if needed.
         /// </summary>
-        /// <param name="SMTPHost"></param>
-        /// <param name="SMTPPort"></param>
-        /// <param name="SMTPTimeout"></param>
+        /// <param name="SmtpConfig">The configuration for our SMTP client</param>
+        public void StoreSmtpConfiguration(EmailSmtpConfiguration SmtpConfig)
+        {
+            // Log information and store new values.
+            this.EmailStmpConfiguration = SmtpConfig; 
+
+            // Log information about the newly
+            this._smtpSetupConfigured = true;
+            this._emailLogger.WriteLog("CONFIGURED NEW SMTP CLIENT LOGIN AND CONFIG VALUES!");
+            this._emailLogger.WriteLog($"HOST: {this.EmailSenderName} | PORT: {this.SmtpServerPort} | TIMEOUT: {this.SmtpServerTimeout}", LogType.TraceLog);
+        }
+        /// <summary>
+        /// Configures new SMTP configuration information if needed.
+        /// </summary>
+        /// <param name="SMTPHost">The hostname to connect to</param>
+        /// <param name="SMTPPort">The port to connect to</param>
+        /// <param name="SMTPTimeout">The timeout for the connection</param>
         public void StoreSmtpConfiguration(string SMTPHost, int SMTPPort, int SMTPTimeout = 20000)
         {
             // Log information and store new values.
-            this.SmtpServerName = SMTPHost;
-            this.SmtpServerPort = SMTPPort;
-            this.SmtpServerTimeout = SMTPTimeout;
+            this.EmailStmpConfiguration = new EmailSmtpConfiguration()
+            {
+                ServerName = SMTPHost,
+                ServerPort = SMTPPort,
+                ServerTimeout = SMTPTimeout
+            };
 
             // Log information about the newly
             this._smtpSetupConfigured = true;
@@ -128,7 +168,6 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// Authorizes the sender email passed into the CTOR and ensures we can use it.
         /// </summary>
-        /// <param name="OutputClient">Built SMTP client object if this passed</param>
         /// <returns>True if authorized. False if not.</returns>
         public bool AuthenticateSmtpClient()
         {

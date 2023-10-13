@@ -15,7 +15,8 @@
         ResizeMode="CanResize"
         MinWidth="1000" MinHeight="800"
         Loaded="InjectorMainWindow_OnLoaded"
-        Closed="InjectorMainWindow_OnClosed">
+        Closed="InjectorMainWindow_OnClosed"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     
     <!-- Dark Semi Transparent Background -->
     <Window.Background>

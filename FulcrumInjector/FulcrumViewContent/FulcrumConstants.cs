@@ -1,6 +1,4 @@
 ﻿using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
@@ -11,6 +9,9 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using SharpLogging;
 using SharpWrapper;
 
@@ -36,7 +37,8 @@ namespace FulcrumInjector.FulcrumViewContent
 
         // Private static backing field for the injector main window and watchdog
         private static FulcrumMainWindow _fulcrumMainWindow;                    // Main window of the injector application
-        private static FulcrumWatchdogService _fulcrumWatchdog;                 // Watchdog service for the injector app
+        private static FulcrumDriveService _fulcrumDriveService;                // Watchdog service for the injector app
+        private static FulcrumWatchdogService _fulcrumWatchdogService;          // Drive service for the injector app
 
         // Private static Singleton Injector DLL Core Output View Contents. These get set to control view contents on the Main window
         private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumInstalledHardwareSingleton;
@@ -51,15 +53,41 @@ namespace FulcrumInjector.FulcrumViewContent
 
         #region Properties
 
-        // Public static property holding the watchdog for the injector instance
-        public static FulcrumWatchdogService FulcrumWatchdog
+        // Public static properties holding the drive and watchdog services for the injector instance
+        public static FulcrumDriveService FulcrumDriveService
         {
-            get => _fulcrumWatchdog ??= new FulcrumWatchdogService();
+            get
+            {
+                // If the service exists, return it out
+                if (_fulcrumDriveService != null) return _fulcrumDriveService;
+
+                // Build a new service and store it if needed
+                _fulcrumDriveService = new FulcrumDriveService();
+                return _fulcrumDriveService;
+            }
             set
             {
                 // Check if the watchdog is null or not
-                if (_fulcrumWatchdog == null) return;
-                _fulcrumWatchdog = value;
+                if (_fulcrumDriveService == null) return;
+                _fulcrumDriveService = value;
+            }
+        }
+        public static FulcrumWatchdogService FulcrumWatchdogService
+        {
+            get
+            {
+                // If the service exists, return it out
+                if (_fulcrumWatchdogService != null) return _fulcrumWatchdogService;
+
+                // Build a new service and store it if needed
+                _fulcrumWatchdogService = new FulcrumWatchdogService();
+                return _fulcrumWatchdogService;
+            }
+            set
+            {
+                // Check if the watchdog is null or not
+                if (_fulcrumWatchdogService == null) return;
+                _fulcrumWatchdogService = value;
             }
         }
 

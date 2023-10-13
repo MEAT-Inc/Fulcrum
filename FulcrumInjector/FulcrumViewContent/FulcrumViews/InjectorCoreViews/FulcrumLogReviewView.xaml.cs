@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.FulcrumModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
@@ -34,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumLogReviewViewModel ViewModel { get; set; }
+        public FulcrumLogReviewViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -56,7 +56,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
             InitializeComponent();
 
             // Setup our data context and log information out
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE LOG REVIEW VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

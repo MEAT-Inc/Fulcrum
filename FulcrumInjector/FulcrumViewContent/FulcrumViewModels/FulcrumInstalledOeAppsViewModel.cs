@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using Newtonsoft.Json;
 using SharpLogging;
 
@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
     /// <summary>
     /// Viewmodel for installed OE Applications
     /// </summary>
-    internal class FulcrumInstalledOeAppsViewModel : FulcrumViewModelBase
+    public class FulcrumInstalledOeAppsViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion //Custom Events
@@ -44,58 +44,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         #endregion //Properties
 
         #region Structs and Classes
-
-        /// <summary>
-        /// Model object of our OE Applications installed on the system.
-        /// </summary>
-        [JsonConverter(typeof(FulcrumOeApplicationJsonConverter))]
-        public class FulcrumOeApplication
-        {
-            #region Custom Events
-            #endregion //Custom Events
-
-            #region Fields
-            #endregion //Fields
-
-            #region Properties
-
-            // Properties about an OE Application
-            public string OEAppName { get; private set; }
-            public string OEAppPath { get; private set; }
-            public string OEAppVersion { get; private set; }
-            public string OEAppCommand { get; private set; }
-            public string[] OEAppPathList { get; private set; }
-            public bool IsAppUsable => File.Exists(OEAppPath);
-
-            #endregion //Properties
-
-            #region Structs and Classes
-            #endregion //Structs and Classes
-
-            // ------------------------------------------------------------------------------------------------------------------------------------------
-
-            /// <summary>
-            /// Returns hyphenated string object for this app instance
-            /// </summary>
-            /// <returns></returns>
-            public override string ToString() { return $"{OEAppName} - {OEAppPath} - {OEAppVersion} - {OEAppCommand}"; }
-
-            // ------------------------------------------------------------------------------------------------------------------------------------------
-
-            /// <summary>
-            /// Builds a new OE application object from a given set of values.
-            /// </summary>
-            public FulcrumOeApplication(string Name, string Path, string Version = "N/A", string BatLaunchCommand = null, string[] PathSet = null)
-            {
-                // Store values. Append into our list of models.
-                this.OEAppName = Name;
-                this.OEAppPath = Path;
-                this.OEAppVersion = Version;
-                this.OEAppPathList = PathSet ?? new[] { this.OEAppPath };
-                this.OEAppCommand = BatLaunchCommand ?? $"cmd.exe /C \"{OEAppPath}\"";
-            }
-        }
-
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

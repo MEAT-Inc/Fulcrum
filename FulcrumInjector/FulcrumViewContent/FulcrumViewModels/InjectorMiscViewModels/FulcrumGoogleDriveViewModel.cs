@@ -16,11 +16,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Forms.VisualStyles;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.LogFileModels.DriveModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveModels;
 using Google.Apis.Services;
 using Newtonsoft.Json;
 using Octokit.Internal;
@@ -30,7 +29,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
     /// <summary>
     /// View model for the Google Drive viewing content used throughout the Injector application
     /// </summary>
-    internal class FulcrumGoogleDriveViewModel : FulcrumViewModelBase
+    public class FulcrumGoogleDriveViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events

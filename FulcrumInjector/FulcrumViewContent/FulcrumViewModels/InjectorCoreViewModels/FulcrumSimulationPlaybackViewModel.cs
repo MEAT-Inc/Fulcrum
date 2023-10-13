@@ -15,7 +15,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
     /// <summary>
     /// View model for playback during the injector simulation processing
     /// </summary>
-    internal class FulcrumSimulationPlaybackViewModel : FulcrumViewModelBase
+    public class FulcrumSimulationPlaybackViewModel : FulcrumViewModelBase
     {
         #region Custom Events
 
@@ -59,7 +59,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         private EventArgs[] _simEventsProcessed;                                    // Events fired during the simulation
         private PassThruSimulationPlayer _simulationPlayer;                         // The player running the simulation
         private List<PassThruSimulationChannel> _simulationChannels;                // The channels being simulated
-        private PassThruSimulationConfiguration _simulationConfiguration;           // Configuration being used for the simulation
+        private PassThruSimulationConfiguration _loadedConfiguration;               // Configuration currently loaded for playback
+        private PassThruSimulationConfiguration _customConfiguration;               // Configuration for user defined routines
         private List<PassThruSimulationConfiguration> _simulationConfigurations;    // All supported simulation configurations
 
         #endregion // Fields
@@ -67,10 +68,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         #region Properties
 
         // Public properties for the view to bind onto  
+        public bool IsEditingConfig
+        {
+            get => this._isEditingConfig;
+            set
+            {
+                // Update the backing property and store the current configuration as our custom one
+                this.PropertyUpdated(value);
+                if (value) this.CustomConfiguration = LoadedConfiguration;
+            }
+        }
         public bool IsNewConfig { get => this._isNewConfig; set => PropertyUpdated(value); }
         public bool IsSimLoaded { get => this._isSimLoaded; set => PropertyUpdated(value); }
         public bool IsSimStarting { get => this._isSimStarting; set => PropertyUpdated(value); }
-        public bool IsEditingConfig { get => this._isEditingConfig; set => PropertyUpdated(value); }
         public bool CanDeleteConfig { get => this._canDeleteConfig; set => PropertyUpdated(value); }
         public bool IsHardwareSetup { get => this._isHardwareSetup; set => PropertyUpdated(value); }
         public bool IsSimulationRunning { get => this._isSimulationRunning; set => PropertyUpdated(value); }
@@ -84,9 +94,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
         public PassThruSimulationChannel[] SimulationChannels { get => this._simulationChannels.ToArray(); set => PropertyUpdated(value.ToList()); }
 
         // Currently applied simulation configuration and configurations we're able to load in
-        public PassThruSimulationConfiguration SimulationConfiguration
+        public PassThruSimulationConfiguration LoadedConfiguration
         {
-            get => this._simulationConfiguration;
+            get => this._loadedConfiguration;
             set
             {
                 // Update our backing field and configure some other values for editing
@@ -96,6 +106,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
                 this.IsNewConfig = string.IsNullOrWhiteSpace(value.ConfigurationName);
                 this.CanDeleteConfig = !PassThruSimulationConfiguration.SupportedConfigurations.ToList().Contains(value);
             }
+        }
+        public PassThruSimulationConfiguration CustomConfiguration
+        {
+            get => this._customConfiguration;
+            set => this.PropertyUpdated(value);
         }
         public List<PassThruSimulationConfiguration> SimulationConfigurations { get => this._simulationConfigurations; set => PropertyUpdated(value); }
 
@@ -172,7 +187,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Log that we've saved the content requested and exit out
             this.ViewModelLogger.WriteLog("STORED UPDATED CONFIGURATION VALUES ON SETTINGS FILE CORRECTLY!", LogType.InfoLog);
-            this.SimulationConfiguration = UpdatedConfiguration;
+            this.LoadedConfiguration = UpdatedConfiguration;
             return true;
         }
         /// <summary>
@@ -271,7 +286,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
             this.ViewModelLogger.WriteLog("SETTING UP NEW SIMULATION PLAYER FOR THE CURRENTLY BUILT LOADER OBJECT...", LogType.WarnLog);
 
             // Pull in a base configuration and build a new reader. If no configuration is given, return out
-            if (this._simulationConfiguration == null) return false;
+            if (this._loadedConfiguration == null) return false;
             this._simulationPlayer = FulcrumConstants.SharpSessionAlpha == null
                 ? new PassThruSimulationPlayer(this.SimulationChannels, Version, DllName, DeviceName)
                 : new PassThruSimulationPlayer(this.SimulationChannels, FulcrumConstants.SharpSessionAlpha);
@@ -287,7 +302,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewM
 
             // Configure our simulation player here
             this._simulationPlayer.SetResponsesEnabled(true);
-            this._simulationPlayer.SetPlaybackConfiguration(this._simulationConfiguration);
+            this._simulationPlayer.SetPlaybackConfiguration(this._loadedConfiguration);
             this.ViewModelLogger.WriteLog("CONFIGURED ALL NEEDED SETUP VALUES FOR OUR SIMULATION PLAYER OK! STARTING INIT ROUTINE NOW...", LogType.InfoLog);
 
             // Run the init routine and start reading output here

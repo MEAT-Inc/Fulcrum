@@ -6,8 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
@@ -30,7 +30,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
+        public FulcrumInstalledOeAppsViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -52,7 +52,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             InitializeComponent();
 
             // Setup our data context and log information out
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
@@ -145,7 +145,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         {
             // Pull the newly selected OE App model object 
             if (Sender is not ListView SendingListView) return;
-            var SelectedApp = SendingListView.SelectedItem as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
+            var SelectedApp = SendingListView.SelectedItem as FulcrumOeApplication;
 
             // Log out what application is being controlled here
             this._viewLogger.WriteLog(SelectedApp != null

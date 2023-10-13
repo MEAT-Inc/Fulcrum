@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FulcrumInjector.FulcrumViewContent.FulcrumModels.WatchdogModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
@@ -15,17 +15,17 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
     internal class WatchdogFolderJsonConverter : JsonConverter
     {
         /// <summary>
-        /// Sets if the object can be converted or not.
+        /// Sets if we can convert this object or not.
         /// </summary>
-        /// <param name="ObjectType"></param>
-        /// <returns></returns>
+        /// <param name="ObjectType">The type of object we're trying to convert</param>
+        /// <returns>True if the object can be serialized, false if not</returns>
         public override bool CanConvert(Type ObjectType) { return ObjectType == typeof(WatchdogFolder); }
         /// <summary>
-        /// Writes JSON output
+        /// Writes JSON output for the given input object
         /// </summary>
-        /// <param name="JWriter"></param>
-        /// <param name="ValueObject"></param>
-        /// <param name="JSerializer"></param>
+        /// <param name="JWriter">The JWriter building output content for the input value</param>
+        /// <param name="ValueObject">The object being written out to a JSON string</param>
+        /// <param name="JSerializer">Serializer settings for the writer output</param>
         public override void WriteJson(JsonWriter JWriter, object? ValueObject, JsonSerializer JSerializer)
         {
             // Check if object is null. Build output
@@ -45,11 +45,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         /// <summary>
         /// Reads the JSON object input from a string
         /// </summary>
-        /// <param name="JReader"></param>
-        /// <param name="ObjectType"></param>
-        /// <param name="ExistingValue"></param>
-        /// <param name="JSerializer"></param>
-        /// <returns></returns>
+        /// <param name="JReader">The JReader being used to read our input JSON content</param>
+        /// <param name="ObjectType">The type of object we're trying to build form the input JSON</param>
+        /// <param name="ExistingValue">An existing object to update values for based on our new object</param>
+        /// <param name="JSerializer">Serializer settings for the reader input</param>
+        /// <returns>The object built from the input JSON content</returns>
         public override object? ReadJson(JsonReader JReader, Type ObjectType, object? ExistingValue, JsonSerializer JSerializer)
         {
             // Check if input is null. Build object from it.

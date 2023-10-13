@@ -33,7 +33,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         #region Properties
 
         // ViewModel object to bind onto
-        internal FulcrumUpdaterViewModel ViewModel { get; set; }
+        public FulcrumUpdaterViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -55,7 +55,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
             InitializeComponent();
 
             // Setup our data context and log our information
-            this.DataContext = this.ViewModel;
+            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE UPDATER VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
