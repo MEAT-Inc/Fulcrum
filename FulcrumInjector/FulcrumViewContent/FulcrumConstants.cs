@@ -62,7 +62,7 @@ namespace FulcrumInjector.FulcrumViewContent
                 if (_fulcrumDriveService != null) return _fulcrumDriveService;
 
                 // Build a new service and store it if needed
-                _fulcrumDriveService = new FulcrumDriveService();
+                FulcrumDriveService.InitializeDriveService(true);
                 return _fulcrumDriveService;
             }
             set
@@ -80,7 +80,7 @@ namespace FulcrumInjector.FulcrumViewContent
                 if (_fulcrumWatchdogService != null) return _fulcrumWatchdogService;
 
                 // Build a new service and store it if needed
-                _fulcrumWatchdogService = new FulcrumWatchdogService();
+                FulcrumWatchdogService.InitializeWatchdogService(true);
                 return _fulcrumWatchdogService;
             }
             set

@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FulcrumInjector.FulcrumViewContent;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
+using Google.Apis.Services;
+using Newtonsoft.Json;
 using NLog.Targets;
 using SharpLogging;
+using File = Google.Apis.Drive.v3.Data.File;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
 {
@@ -22,16 +31,34 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
 
         #region Fields
 
-        // Private backing fields for our drive service configuration
-        private DriveService _driveService;               // Backing drive service object
-        private DriveServiceSettings _driveSettings;      // Settings configuration for our service
+        // Private backing fields for drive service objects
+        private DriveAuthorization _driveAuth;              // The authorization configuration for the drive service
+        private DriveConfiguration _driveConfig;            // The initialization configuration for the drive service
+        private DriveServiceSettings _driveSettings;        // Settings configuration for our service
 
         #endregion //Fields
 
         #region Properties
+
+        // Public readonly properties holding information about the drive configuration
+        public string GoogleDriveId { get; private set; }
+        public string ApplicationName { get; private set; }
+        public static DriveService DriveService { get; private set; }
+
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Enumeration used to help filter the resulting object types from a query to the drive/folder
+        /// </summary>
+        public enum ResultTypes
+        {
+            [Description("")] ALL_RESULTS,                                      // Pulls in all results from the search 
+            [Description("application/vnd.google-apps.file")] FILES_ONLY,       // Pulls only files in from the search
+            [Description("application/vnd.google-apps.folder")] FOLDERS_ONLY    // Pulls only folders in from the search
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,7 +67,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// CTOR routine for this drive service. Sets up our component object and our logger instance
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        public FulcrumDriveService(DriveServiceSettings ServiceSettings = null)
+        private FulcrumDriveService(DriveServiceSettings ServiceSettings = null)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumDriveService>();
@@ -52,13 +79,42 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
 
             // Pull our settings configuration for the service here 
             this._driveSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumDriveService");
-
-            // Build a new google drive service
-            if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
-                throw new InvalidOperationException("ERROR! FAILED TO BUILD GOOGLE DRIVE SERVICE!");
-
-            // Log that our service has been built correctly and exit out
             this._serviceLogger.WriteLog("FULCRUM INJECTOR DRIVE SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
+
+            // Pull in the drive ID and application name first
+            this.ApplicationName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.ApplicationName");
+            this.GoogleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId");
+            this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
+            this._serviceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
+
+            // Pull in the configuration values for the drive explorer and unscramble needed strings
+            this._serviceLogger.WriteLog("LOADING AND UNSCRAMBLING CONFIGURATION FOR DRIVE SERVICE NOW...");
+            this._driveConfig = ValueLoaders.GetConfigValue<DriveConfiguration>("FulcrumConstants.InjectorDriveExplorer.ExplorerConfiguration");
+
+            // Pull in the configuration values for the drive explorer authorization and unscramble needed strings
+            this._serviceLogger.WriteLog("LOADING AND UNSCRAMBLING AUTHORIZATION FOR DRIVE SERVICE NOW...");
+            this._driveAuth = ValueLoaders.GetConfigValue<DriveAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
+
+            // Log out that our unscramble routines have been completed
+            this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {_driveConfig.ClientId}");
+            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {_driveConfig.ProjectId}");
+            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {_driveAuth.ClientEmail}");
+
+            // Configure the google drive service here
+            this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
+            DriveService = new DriveService(new BaseClientService.Initializer()
+            {
+                // Store the API configuration and Application name for the authorization helper
+                ApplicationName = ApplicationName,
+                HttpClientInitializer = GoogleCredential
+                    .FromJson(JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false)))
+                    .CreateScoped(DriveService.Scope.DriveReadonly)
+            });
+
+            // Return the new drive service object 
+            this._serviceLogger.WriteLog("BUILT NEW GOOGLE DRIVE EXPLORER SERVICE WITHOUT ISSUES!", LogType.InfoLog);
         }
         /// <summary>
         /// Static CTOR for the drive service which builds and configures a new drive service
@@ -110,12 +166,22 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         {
             // Ensure the drive service exists first
             this._serviceLogger.WriteLog("BOOTING NEW DRIVE SERVICE NOW...", LogType.WarnLog);
-            if (this._driveService != null) this._serviceLogger.WriteLog("DRIVE SERVICE EXISTS! STARTING SERVICE INSTANCE NOW...", LogType.InfoLog); 
+            if (DriveService != null) this._serviceLogger.WriteLog("DRIVE SERVICE EXISTS! STARTING SERVICE INSTANCE NOW...", LogType.InfoLog); 
             else 
-            { 
-                // Build a new google drive service
-                if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
-                    throw new InvalidOperationException("ERROR! FAILED TO BUILD GOOGLE DRIVE SERVICE!");
+            {
+                // Configure the google drive service here
+                this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
+                DriveService = new DriveService(new BaseClientService.Initializer()
+                {
+                    // Store the API configuration and Application name for the authorization helper
+                    ApplicationName = ApplicationName,
+                    HttpClientInitializer = GoogleCredential
+                        .FromJson(JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false)))
+                        .CreateScoped(DriveService.Scope.DriveReadonly)
+                });
+
+                // Return the new drive service object 
+                this._serviceLogger.WriteLog("BUILT NEW GOOGLE DRIVE EXPLORER SERVICE WITHOUT ISSUES!", LogType.InfoLog);
             }
 
             // Log that our service has been configured correctly
@@ -177,12 +243,98 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Uploads requested files to the google drive location dedicated to this machine
+        /// Helper method used to query a given location on a google drive and return all files found for it
         /// </summary>
-        /// <param name="FileNames">Files we're looking to upload to our google drive</param>
-        public void UploadFiles(params string[] FileNames)
+        /// <param name="LocatedObjects">The files/folders found in the location</param>
+        /// <returns>True if one or more files/folders are found</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
+        public bool ListDriveContents(out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
-            // TODO: Build the logic needed for updating files here
+            // Validate our drive service first
+            if (DriveService == null)
+                throw new InvalidOperationException("Error! Drive Service is not configured!");
+
+            // Build a new list request for pulling all files in from the drive location
+            var ListRequest = DriveService.Files.List();
+            ListRequest.PageSize = 1000;
+            ListRequest.Corpora = "drive";
+            ListRequest.DriveId = GoogleDriveId;
+            ListRequest.SupportsTeamDrives = true;
+            ListRequest.IncludeTeamDriveItems = true;
+            ListRequest.IncludeItemsFromAllDrives = true;
+
+            // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
+            LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
+                (_, TokenObj) => ListRequest.PageToken = TokenObj,
+                RespObj => RespObj.NextPageToken,
+                RespObj => RespObj.Files)
+                .Fetch(ListRequest)
+                .ToList();
+
+            // Filter our results based on the result type provided if needed
+            switch (ResultFilter)
+            {
+                // Filter for files only (Excludes folder mimeTypes)
+                case ResultTypes.FILES_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType != ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+
+                // Filter for folders only (Includes only folder mimeTypes)
+                case ResultTypes.FOLDERS_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+            }
+
+            // Return out based on the number of logs found 
+            return LocatedObjects.Count > 0;
+        }
+        /// <summary>
+        /// Helper method used to query a given location on a google drive and return all files found for it
+        /// </summary>
+        /// <param name="FolderId">The ID of the location to search</param>
+        /// <param name="LocatedObjects">The files/folders found in the location</param>
+        /// <returns>True if one or more files/folders are found</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
+        public bool ListFolderContents(string FolderId, out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
+        {
+            // Validate our drive service first
+            if (DriveService == null)
+                throw new InvalidOperationException("Error! Drive Service is not configured!");
+
+            // Build a new list request for pulling all files in from the drive location
+            var ListRequest = DriveService.Files.List();
+            ListRequest.PageSize = 1000;
+            ListRequest.Corpora = "drive";
+            ListRequest.DriveId = GoogleDriveId;
+            ListRequest.SupportsTeamDrives = true;
+            ListRequest.IncludeTeamDriveItems = true;
+            ListRequest.IncludeItemsFromAllDrives = true;
+            ListRequest.Q = $"'{FolderId}' in parents";
+
+            // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
+            LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
+                    (_, TokenObj) => ListRequest.PageToken = TokenObj,
+                    RespObj => RespObj.NextPageToken,
+                    RespObj => RespObj.Files)
+                .Fetch(ListRequest)
+                .ToList();
+
+            // Filter our results based on the result type provided if needed
+            switch (ResultFilter)
+            {
+                // Filter for files only (Excludes folder mimeTypes)
+                case ResultTypes.FILES_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType != ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+
+                // Filter for folders only (Includes only folder mimeTypes)
+                case ResultTypes.FOLDERS_ONLY:
+                    LocatedObjects = LocatedObjects.Where(DriveObj => DriveObj.MimeType == ResultTypes.FOLDERS_ONLY.ToDescriptionString()).ToList();
+                    break;
+            }
+
+            // Return out based on the number of logs found 
+            return LocatedObjects.Count > 0;
         }
     }
 }

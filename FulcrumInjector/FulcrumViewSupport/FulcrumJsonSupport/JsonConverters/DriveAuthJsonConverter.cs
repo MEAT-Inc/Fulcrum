@@ -9,7 +9,6 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using static FulcrumInjector.FulcrumViewSupport.FulcrumDriveBroker;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {

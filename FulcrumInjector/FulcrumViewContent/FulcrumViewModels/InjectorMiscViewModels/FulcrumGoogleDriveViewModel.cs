@@ -1,4 +1,4 @@
-﻿using SharpLogging;
+using SharpLogging;
 using SharpSimulator;
 using System;
 using System.Collections.Generic;
@@ -20,6 +20,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using Google.Apis.Services;
 using Newtonsoft.Json;
 using Octokit.Internal;
@@ -35,9 +36,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         #endregion // Custom Events
 
         #region Fields
-
-        // Private backing fields for google drive explorer
-        private DriveService _driveService;                                 // The service used to navigate our google drive
 
         // Private backing field for refresh timer and progress
         private string _driveOperationText;                                 // Status text for drive operation             
@@ -121,9 +119,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.FilteredLogFolders ??= new ObservableCollection<DriveLogFileSet>();
             this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
 
-            // Try and build our drive service here
-            if (!FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
-                throw new InvalidComObjectException("Error! Failed to build new Drive Explorer Service!");
+            // Check if the drive service is null or not
+            if (FulcrumConstants.FulcrumDriveService == null)
+            {
+                // Try and build our drive service here if it's not yet configured
+                FulcrumDriveService.InitializeDriveService(true);
+                if (FulcrumDriveService.DriveService == null)
+                    throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
+            }
 
             // Log completed building view model instance and exit out
             this.ViewModelLogger.WriteLog("CONFIGURED GOOGLE DRIVE SERVICE AND DEFAULT FILTERING DICTIONARY CORRECTLY!", LogType.InfoLog);
@@ -148,8 +151,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Validate our Drive Explorer service is built and ready for use
             this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
-            if (this._driveService == null && !FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
-                throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
+            if (FulcrumDriveService.DriveService == null)
+            {
+                // Build a new service and check if it's valid 
+                FulcrumDriveService.InitializeDriveService(true);
+                if (FulcrumDriveService.DriveService == null)
+                    throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
+            }
 
             // Control our items sources in the dispatcher
             this.BaseViewControl.Dispatcher.Invoke(() =>
@@ -162,8 +170,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Build a new request to list all the files in the drive
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
-            if (!FulcrumDriveBroker.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveBroker.ResultTypes.FOLDERS_ONLY))
-                throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumDriveBroker.GoogleDriveId})!");
+            if (!FulcrumConstants.FulcrumDriveService.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveService.ResultTypes.FOLDERS_ONLY))
+                throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumConstants.FulcrumDriveService.GoogleDriveId})!");
 
             // Iterate the contents and build a new list of files to filter 
             int FoldersIterated = 0;
@@ -213,8 +221,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Validate our Drive Explorer service is built and ready for use
             this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
-            if (this._driveService == null && !FulcrumDriveBroker.ConfigureDriveService(out this._driveService))
-                throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
+            if (FulcrumDriveService.DriveService == null)
+            {
+                // Build a new service and check if it's valid 
+                FulcrumDriveService.InitializeDriveService(true);
+                if (FulcrumDriveService.DriveService == null)
+                    throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
+            }
 
             // Configure an event handler for the log context object
             LogSet.OnDownloadProgress = null;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using Google.Apis.Drive.v3;
 using SharpLogging;
 
@@ -32,16 +33,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
             get
             {
                 // If the service exists, don't reconfigure it
-                if (FulcrumDriveBroker.DriveService != null)
-                    return FulcrumDriveBroker.DriveService;
+                if (FulcrumDriveService.DriveService != null)
+                    return FulcrumDriveService.DriveService;
 
                 // If the drive service is not built, configure it now if possible
-                if (!FulcrumDriveBroker.ConfigureDriveService(out var DriveService))
+                FulcrumDriveService.InitializeDriveService();
+                if (FulcrumDriveService.DriveService == null)
                     throw new InvalidOperationException("Error! Failed to configure Google Drive Service!");
 
                 // Return the built drive service
-                return DriveService;
-
+                return FulcrumDriveService.DriveService;
             }
         }
 

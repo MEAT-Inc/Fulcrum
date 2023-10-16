@@ -18,9 +18,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #endregion //Custom Events
 
         #region Fields
-
-        // Private static logger instance for a watchdog service
-
+        
         // Private backing fields for our watchdog service configuration
         private WatchdogSettings _watchdogSettings;            // Settings configuration for the service
         private List<WatchdogFolder> _watchedDirectories;      // Watched folders for the service
@@ -51,7 +49,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// CTOR routine for this watchdog service. Sets up our component object and our logger instance
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        public FulcrumWatchdogService(WatchdogSettings ServiceSettings = null)
+        private FulcrumWatchdogService(WatchdogSettings ServiceSettings = null)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumWatchdogService>();
