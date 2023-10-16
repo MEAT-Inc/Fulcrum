@@ -62,7 +62,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
             // Encryption configuration arguments. Base value is 0x00003000.
             [Description("--ENCRYPTION")] ENCRYPTION = 0x00004000,
-            [Description("--ENCRYPTION")] ENCRYPTION_INITIALIZE = ENCRYPTION | 0x00000001,
+            [Description("--ENCRYPTION")] INIT_ENCRYPTION = ENCRYPTION | 0x00000001,
             [Description("--ENCRYPT_STRING")] ENCRYPT_STRING = ENCRYPTION | 0x00000002,
             [Description("--DECRYPT_STRING")] DECRYPT_STRING = ENCRYPTION | 0x00000003,
         }
@@ -187,6 +187,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // For watchdog init, build a new service and exit out
                 case StartupArguments.WATCHDOG:
+                case StartupArguments.INIT_WATCHDOG:
                     FulcrumWatchdogService.InitializeWatchdogService(true);
                     this._commandLineLogger.WriteLog("INVOKED NEW WATCHDOG INSTANCE CORRECTLY!", LogType.InfoLog);
                     return true;
@@ -233,6 +234,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // For drive service init, build a new service and exit out
                 case StartupArguments.DRIVE:
+                case StartupArguments.INIT_DRIVE:
                     FulcrumDriveService.InitializeDriveService(true);
                     this._commandLineLogger.WriteLog("INVOKED NEW DRIVE SERVICE INSTANCE CORRECTLY!", LogType.InfoLog);
                     return true;
@@ -279,6 +281,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             {
                 // For encryption init, build a new service and exit out
                 case StartupArguments.ENCRYPTION:
+                case StartupArguments.INIT_ENCRYPTION:
 
                     // Ensure our encryption keys are configured before trying to invoke an action
                     if (FulcrumEncryptionWindow.ConfigureEncryptionKeys()) this._commandLineLogger.WriteLog("ENCRYPTION CONFIGURATION IS OK!", LogType.InfoLog);
