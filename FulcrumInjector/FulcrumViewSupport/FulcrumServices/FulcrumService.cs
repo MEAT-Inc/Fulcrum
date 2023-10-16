@@ -24,9 +24,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #region Fields
 
         // Private/protected fields for service instances
-        protected readonly IContainer _components;                 // Component objects used by this service instance
-        protected readonly SharpLogger _serviceLogger;             // Logger instance for our service
-        
+        protected readonly IContainer _components;             // Component objects used by this service instance
+        protected readonly SharpLogger _serviceLogger;         // Logger instance for our service
+
         #endregion // Fields
 
         #region Properties

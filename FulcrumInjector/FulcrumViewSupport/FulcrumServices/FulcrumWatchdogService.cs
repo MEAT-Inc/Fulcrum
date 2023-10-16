@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
 using SharpLogging;
@@ -16,6 +18,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #endregion //Custom Events
 
         #region Fields
+
+        // Private static logger instance for a watchdog service
 
         // Private backing fields for our watchdog service configuration
         private WatchdogSettings _watchdogSettings;            // Settings configuration for the service
@@ -63,6 +67,47 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
 
             // Log that our service has been built correctly and exit out
             this._serviceLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Static CTOR for the watchdog service which builds and configures a new watchdog service
+        /// </summary>
+        /// <param name="ForceInit">When true, we force rebuild the requested service instance</param>
+        /// <returns>The built and configured watchdog helper service</returns>
+        public static FulcrumWatchdogService InitializeWatchdogService(bool ForceInit = false)
+        {
+            // Build a static init logger for the service here
+            SharpLogger ServiceInitLogger =
+                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
+                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
+
+            // Make sure we actually want to use this watchdog service 
+            WatchdogSettings WatchdogConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
+            if (!WatchdogConfig.WatchdogEnabled)
+            {
+                // Log that the watchdog is disabled and exit out
+                ServiceInitLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                ServiceInitLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD WatchdogEnabled TO TRUE TO ENABLE OUR WATCHDOG!", LogType.WarnLog);
+                return null;
+            }
+
+            // BUG: Starting new watchdog instances for many log files is broken
+            // Spin up a new injector watchdog service here if needed           
+            Task.Run(() =>
+            {
+                // Check if we need to force rebuilt this service or not
+                if (FulcrumConstants.FulcrumWatchdogService != null && !ForceInit) return;
+
+                // Build and boot a new service instance for our watchdog
+                FulcrumConstants.FulcrumWatchdogService = new FulcrumWatchdogService(WatchdogConfig);
+                FulcrumConstants.FulcrumWatchdogService.StartService();
+            });
+
+            // Log that we've booted this new service instance correctly and exit out
+            ServiceInitLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
+            ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK! DIRECTORIES AND FILES WILL BE MONITORED!", LogType.InfoLog);
+
+            // Return the built service instance 
+            return FulcrumConstants.FulcrumWatchdogService;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
