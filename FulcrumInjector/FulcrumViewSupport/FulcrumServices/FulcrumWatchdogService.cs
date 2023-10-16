@@ -38,7 +38,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
             private set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
         }
-        
+
         #endregion //Properties
 
         #region Structs and Classes
