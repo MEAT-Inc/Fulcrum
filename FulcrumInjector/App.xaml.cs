@@ -99,7 +99,7 @@ namespace FulcrumInjector
         /// Imports the Injector logging and archiving configuration objects from our settings file and sets up logging for this instance
         /// </summary>
         private void _configureInjectorLogging()
-        {
+        { 
             // Load in and apply the log archive and log broker configurations for this instance
             var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
             var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");

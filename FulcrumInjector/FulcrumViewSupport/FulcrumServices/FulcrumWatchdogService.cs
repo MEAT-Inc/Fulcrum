@@ -18,28 +18,27 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #endregion //Custom Events
 
         #region Fields
-
-        // Private static logger instance for a watchdog service
-
+        
         // Private backing fields for our watchdog service configuration
-        private WatchdogSettings _watchdogSettings;            // Settings configuration for the service
-        private List<WatchdogFolder> _watchedDirectories;      // Watched folders for the service
+        private WatchdogSettings _watchdogSettings;              // Settings configuration for the service
+        private List<WatchdogFolder> _watchedDirectories;        // Watched folders for the service
+        private static FulcrumWatchdogService _serviceInstance;  // Static service instance object
 
         #endregion //Fields
 
         #region Properties
-        
+
         // Public facing properties holding information about our folders being watched and all their files
+        public WatchdogFile[] WatchedFiles => this.WatchedDirectories
+            .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
+            .OrderBy(WatchedFile => WatchedFile.FullFilePath)
+            .ToArray();
         public WatchdogFolder[] WatchedDirectories
         {
             get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
             private set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
         }
-        public WatchdogFile[] WatchedFiles => this.WatchedDirectories
-            .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
-            .OrderBy(WatchedFile => WatchedFile.FullFilePath)
-            .ToArray();
-
+        
         #endregion //Properties
 
         #region Structs and Classes
@@ -51,7 +50,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// CTOR routine for this watchdog service. Sets up our component object and our logger instance
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        public FulcrumWatchdogService(WatchdogSettings ServiceSettings = null)
+        private FulcrumWatchdogService(WatchdogSettings ServiceSettings = null)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumWatchdogService>();
@@ -64,8 +63,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             // Init our component object here and setup logging
             this._watchedDirectories = new List<WatchdogFolder>();
             this._watchdogSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
-
-            // Log that our service has been built correctly and exit out
             this._serviceLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
         }
         /// <summary>
@@ -95,11 +92,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             Task.Run(() =>
             {
                 // Check if we need to force rebuilt this service or not
-                if (FulcrumConstants.FulcrumWatchdogService != null && !ForceInit) return;
+                if (_serviceInstance != null && !ForceInit) return;
 
                 // Build and boot a new service instance for our watchdog
-                FulcrumConstants.FulcrumWatchdogService = new FulcrumWatchdogService(WatchdogConfig);
-                FulcrumConstants.FulcrumWatchdogService.StartService();
+                _serviceInstance = new FulcrumWatchdogService(WatchdogConfig);
+                _serviceInstance.StartService();
             });
 
             // Log that we've booted this new service instance correctly and exit out
@@ -107,7 +104,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK! DIRECTORIES AND FILES WILL BE MONITORED!", LogType.InfoLog);
 
             // Return the built service instance 
-            return FulcrumConstants.FulcrumWatchdogService;
+            return _serviceInstance;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

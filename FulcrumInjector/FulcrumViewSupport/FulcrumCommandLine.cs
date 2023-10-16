@@ -63,8 +63,8 @@ namespace FulcrumInjector.FulcrumViewSupport
             // Encryption configuration arguments. Base value is 0x00003000.
             [Description("--ENCRYPTION")] ENCRYPTION = 0x00004000,
             [Description("--ENCRYPTION")] INIT_ENCRYPTION = ENCRYPTION | 0x00000001,
-            [Description("--ENCRYPT_STRING")] ENCRYPT_STRING = ENCRYPTION | 0x00000002,
-            [Description("--DECRYPT_STRING")] DECRYPT_STRING = ENCRYPTION | 0x00000003,
+            [Description("--ENCRYPT_STRING")] ENCRYPT_STRING = ENCRYPTION | INIT_ENCRYPTION | 0x00000002,
+            [Description("--DECRYPT_STRING")] DECRYPT_STRING = ENCRYPTION | INIT_ENCRYPTION | 0x00000004,
         }
 
         #endregion // Structs and Classes
@@ -208,8 +208,8 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Once we've got a valid command, invoke it
                     this._commandLineLogger.WriteLog($"BUILDING WATCHDOG SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
-                    FulcrumWatchdogService.InitializeWatchdogService();
-                    FulcrumConstants.FulcrumWatchdogService.RunCommand(WatchdogCommand);
+                    var WatchdogService = FulcrumWatchdogService.InitializeWatchdogService();
+                    WatchdogService.RunCommand(WatchdogCommand);
 
                     // Break out once we've invoked our command
                     this._commandLineLogger.WriteLog($"EXECUTED COMMAND {WatchdogCommand} CORRECTLY!");
@@ -239,7 +239,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                     this._commandLineLogger.WriteLog("INVOKED NEW DRIVE SERVICE INSTANCE CORRECTLY!", LogType.InfoLog);
                     return true;
 
-                // For watchdog invoke, build the service and invoke a new 
+                // For watchdog invoke, build the service and invoke a new command
                 case StartupArguments.INVOKE_DRIVE:
                     if (DriveAction.ArgumentParameters.Length == 0) {
                         this._commandLineLogger.WriteLog("ERROR! NO COMMAND TYPE WAS PROVIDED FOR DRIVE ROUTINE!", LogType.ErrorLog);
@@ -255,8 +255,8 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Once we've got a valid command, invoke it
                     this._commandLineLogger.WriteLog($"BUILDING DRIVE SERVICE AND INVOKING COMMAND {DriveCommand}...", LogType.InfoLog);
-                    FulcrumDriveService.InitializeDriveService();
-                    FulcrumConstants.FulcrumDriveService.RunCommand(DriveCommand);
+                    var DriveService = FulcrumDriveService.InitializeDriveService();
+                    DriveService.RunCommand(DriveCommand);
 
                     // Break out once we've invoked our command
                     this._commandLineLogger.WriteLog($"EXECUTED COMMAND {DriveCommand} CORRECTLY!");
