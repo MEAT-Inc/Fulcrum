@@ -32,18 +32,29 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         #region Fields
 
         // Private backing fields for drive service objects
-        private DriveAuthorization _driveAuth;              // The authorization configuration for the drive service
-        private DriveConfiguration _driveConfig;            // The initialization configuration for the drive service
-        private DriveServiceSettings _driveSettings;        // Settings configuration for our service
+        private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
+        private DriveConfiguration _driveConfig;                  // The initialization configuration for the drive service
+        private static DriveService _driveService;                // Private static instance for our drive service object
+        private DriveServiceSettings _driveSettings;              // Settings configuration for our service
+        private static FulcrumDriveService _serviceInstance;      // Static service instance object
 
         #endregion //Fields
 
         #region Properties
 
         // Public readonly properties holding information about the drive configuration
+        public static DriveService DriveService
+        {
+            get
+            {
+                // If our drive service is null, build it and return it out
+                if (_driveService == null) InitializeDriveService();
+                return _driveService;
+            }
+            private set => _driveService = value;
+        }
         public string GoogleDriveId { get; private set; }
         public string ApplicationName { get; private set; }
-        public static DriveService DriveService { get; private set; }
 
         #endregion //Properties
 
@@ -141,11 +152,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             Task.Run(() =>
             {
                 // Check if we need to force rebuilt this service or not
-                if (FulcrumConstants.FulcrumDriveService != null && !ForceInit) return;
+                if (_serviceInstance != null && !ForceInit) return;
 
                 // Build and boot a new service instance for our watchdog
-                FulcrumConstants.FulcrumDriveService = new FulcrumDriveService(DriveConfig);
-                FulcrumConstants.FulcrumDriveService.StartService();
+                _serviceInstance = new FulcrumDriveService(DriveConfig);
+                _serviceInstance.StartService();
             });
 
             // Log that we've booted this new service instance correctly and exit out
@@ -153,7 +164,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
 
             // Return the built service instance 
-            return FulcrumConstants.FulcrumDriveService;
+            return _serviceInstance;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

@@ -24,6 +24,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
 
         #region Fields
 
+        // Private static service instance for file operations
+        private static FulcrumDriveService _driveService;
+
         // Private backing fields for folder configuration
         private readonly File _sourceDriveFolder;           // Folder object used to build this log model set
         private readonly Regex _nameParseRegex = new(       // The regex used to filter names of file sets
@@ -102,7 +105,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
             if (SourceDriveFolder.MimeType != FulcrumDriveService.ResultTypes.FOLDERS_ONLY.ToDescriptionString())
                 throw new ArgumentException("Error! Input drive object is not a folder!");
 
-            // Store the input log folder and find the files in it
+            // Store the input log folder and find the files in it using the drive service
+            _driveService ??= FulcrumDriveService.InitializeDriveService();
             this._sourceDriveFolder = SourceDriveFolder;
 
             // Configure properties of the log folder
@@ -132,7 +136,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
         public bool RefreshFolderFiles()
         {
             // Build a request to list all the files in the folder 
-            if (!FulcrumConstants.FulcrumDriveService.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles, FulcrumDriveService.ResultTypes.FILES_ONLY))
+            if (!_driveService.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles, FulcrumDriveService.ResultTypes.FILES_ONLY))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._sourceDriveFolder.Id}!");
 
             // Clear out the existing log file models if needed

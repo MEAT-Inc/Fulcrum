@@ -41,6 +41,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         private string _driveOperationText;                                 // Status text for drive operation             
         private double _driveOperationProgress;                             // Progress for drive routines
         private Stopwatch _driveOperationTimer;                             // Timer used to track duration of drive routines
+        private FulcrumDriveService _driveService;                          // Private service instance used for drive operations
 
         // Private backing field for the collection of loaded logs 
         private ObservableCollection<DriveLogFileSet> _locatedLogFolders;   // Collection of all loaded log folders found
@@ -120,13 +121,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
 
             // Check if the drive service is null or not
-            if (FulcrumConstants.FulcrumDriveService == null)
-            {
-                // Try and build our drive service here if it's not yet configured
-                FulcrumDriveService.InitializeDriveService(true);
-                if (FulcrumDriveService.DriveService == null)
-                    throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
-            }
+            this._driveService = FulcrumDriveService.InitializeDriveService();
+            if (this._driveService == null) 
+                throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
 
             // Log completed building view model instance and exit out
             this.ViewModelLogger.WriteLog("CONFIGURED GOOGLE DRIVE SERVICE AND DEFAULT FILTERING DICTIONARY CORRECTLY!", LogType.InfoLog);
@@ -170,8 +167,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Build a new request to list all the files in the drive
             this.ViewModelLogger.WriteLog("BUILDING REQUEST TO QUERY DRIVE CONTENTS NOW...");
-            if (!FulcrumConstants.FulcrumDriveService.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveService.ResultTypes.FOLDERS_ONLY))
-                throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {FulcrumConstants.FulcrumDriveService.GoogleDriveId})!");
+            if (!this._driveService.ListDriveContents(out var LocatedDriveFolders, FulcrumDriveService.ResultTypes.FOLDERS_ONLY))
+                throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for Scan Sessions! (ID: {this._driveService.GoogleDriveId})!");
 
             // Iterate the contents and build a new list of files to filter 
             int FoldersIterated = 0;

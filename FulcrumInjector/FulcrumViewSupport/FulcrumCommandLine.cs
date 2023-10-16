@@ -208,8 +208,8 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Once we've got a valid command, invoke it
                     this._commandLineLogger.WriteLog($"BUILDING WATCHDOG SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
-                    FulcrumWatchdogService.InitializeWatchdogService();
-                    FulcrumConstants.FulcrumWatchdogService.RunCommand(WatchdogCommand);
+                    var WatchdogService = FulcrumWatchdogService.InitializeWatchdogService();
+                    WatchdogService.RunCommand(WatchdogCommand);
 
                     // Break out once we've invoked our command
                     this._commandLineLogger.WriteLog($"EXECUTED COMMAND {WatchdogCommand} CORRECTLY!");
@@ -255,8 +255,8 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Once we've got a valid command, invoke it
                     this._commandLineLogger.WriteLog($"BUILDING DRIVE SERVICE AND INVOKING COMMAND {DriveCommand}...", LogType.InfoLog);
-                    FulcrumDriveService.InitializeDriveService();
-                    FulcrumConstants.FulcrumDriveService.RunCommand(DriveCommand);
+                    var DriveService = FulcrumDriveService.InitializeDriveService();
+                    DriveService.RunCommand(DriveCommand);
 
                     // Break out once we've invoked our command
                     this._commandLineLogger.WriteLog($"EXECUTED COMMAND {DriveCommand} CORRECTLY!");
