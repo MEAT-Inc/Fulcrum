@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
 using Google.Apis.Drive.v3;
 using NLog.Targets;
 using SharpLogging;
@@ -56,6 +59,45 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
 
             // Log that our service has been built correctly and exit out
             this._serviceLogger.WriteLog("FULCRUM INJECTOR DRIVE SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Static CTOR for the drive service which builds and configures a new drive service
+        /// </summary>
+        /// <returns>The built and configured drive helper service</returns>
+        public static FulcrumDriveService InitializeDriveService(bool ForceInit = false)
+        {
+            // Build a static init logger for the service here
+            SharpLogger ServiceInitLogger =
+                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
+                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
+
+            // Make sure we actually want to use this watchdog service 
+            var DriveConfig = ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumDriveService");
+            if (!DriveConfig.DriveEnabled)
+            {
+                // Log that the watchdog is disabled and exit out
+                ServiceInitLogger.WriteLog("WARNING! DRIVE SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                ServiceInitLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD DriveEnabled TO TRUE TO ENABLE OUR DRIVE SERVICE!", LogType.WarnLog);
+                return null;
+            }
+
+            // Spin up a new injector drive service here if needed           
+            Task.Run(() =>
+            {
+                // Check if we need to force rebuilt this service or not
+                if (FulcrumConstants.FulcrumDriveService != null && !ForceInit) return;
+
+                // Build and boot a new service instance for our watchdog
+                FulcrumConstants.FulcrumDriveService = new FulcrumDriveService(DriveConfig);
+                FulcrumConstants.FulcrumDriveService.StartService();
+            });
+
+            // Log that we've booted this new service instance correctly and exit out
+            ServiceInitLogger.WriteLog("SPAWNED NEW INJECTOR DRIVE SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
+            ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
+
+            // Return the built service instance 
+            return FulcrumConstants.FulcrumDriveService;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

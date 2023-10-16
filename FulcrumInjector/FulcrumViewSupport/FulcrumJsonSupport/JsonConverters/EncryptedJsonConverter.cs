@@ -5,10 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
 {
@@ -54,6 +56,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         {
             // Store our encryption configuration state
             this._useEncryption = true;
+
+            // Validate encryption is configured here before trying to decrypt values
+            if (FulcrumEncryptionWindow.ConfigureEncryptionKeys()) return;
+            throw new Exception("Error! Encryption must be configured to use an encrypted JSON converter!");
         }
         /// <summary>
         /// CTOR for this JSON converter. Allows us to specify encryption state
@@ -63,6 +69,10 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters
         {
             // Store our encryption configuration state
             this._useEncryption = UseEncryption;
+
+            // Validate encryption is configured here before trying to decrypt values
+            if (FulcrumEncryptionWindow.ConfigureEncryptionKeys()) return;
+            throw new Exception("Error! Encryption must be configured to use an encrypted JSON converter!");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

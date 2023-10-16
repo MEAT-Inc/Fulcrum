@@ -11,9 +11,9 @@ using SharpLogging;
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
 {
     /// <summary>
-    /// Interaction logic for FulcrumEncryptionConfigWindow.xaml
+    /// Interaction logic for FulcrumEncryptionWindow.xaml
     /// </summary>
-    public partial class FulcrumEncryptionConfigWindow : MetroWindow
+    public partial class FulcrumEncryptionWindow : MetroWindow
     {
         #region Custom Events
         #endregion // Custom Events
@@ -36,11 +36,37 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
         /// <summary>
         /// Builds a new view object instance for our encryption key configuration routines
         /// </summary>
-        public FulcrumEncryptionConfigWindow()
+        private FulcrumEncryptionWindow()
         {
             // Initialize new UI Component and configure the logger instance for it
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             InitializeComponent();
+        }
+        /// <summary>
+        /// Static helper method used to invoke a new configuration window and request user setup for keys
+        /// </summary>
+        /// <returns>True if keys are configured. False if they are not</returns>
+        public static bool ConfigureEncryptionKeys()
+        {
+            // Check if encryption is configured or not
+            if (EncryptionKeys.IsEncryptionConfigured) return true;
+
+            // If it's not configured, build a new window and show it
+            FulcrumEncryptionWindow EncryptionWin = new FulcrumEncryptionWindow();
+            EncryptionWin._viewLogger.WriteLog("ENCRYPTION KEYS ARE NOT CONFIGURED!", LogType.WarnLog);
+            EncryptionWin._viewLogger.WriteLog("REQUESTING USER CONFIGURATION NOW...", LogType.WarnLog);
+
+            // Show a new dialog window for the configuration of the keys and check the status again
+            EncryptionWin.ShowDialog();
+            if (EncryptionKeys.IsEncryptionConfigured) {
+                EncryptionWin._viewLogger.WriteLog("ENCRYPTION KEYS HAVE BEEN CONFIGURED CORRECTLY!", LogType.InfoLog);
+                return false;
+            }
+
+            // Log out encryption was not configured and exit false
+            EncryptionWin._viewLogger.WriteLog("ENCRYPTION KEY CONFIGURATION WAS NOT COMPLETED!", LogType.WarnLog);
+            EncryptionWin._viewLogger.WriteLog("EXITING INJECTOR APP NOW...", LogType.WarnLog);
+            return false;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,10 +128,16 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
         /// <param name="E">EventArgs fired along with the click event</param>
         private void btnCloseInjectorApplication_OnClick(object Sender, RoutedEventArgs E)
         {
-            // Log out that we're just closing this window out and exit the application
-            this._viewLogger.WriteLog("PROCESSED AN EXIT REQUEST FROM THE ENCRYPTION CONFIGURATION WINDOW!", LogType.WarnLog);
-            this._viewLogger.WriteLog("EXITING APPLICATION WITHOUT CONFIGURING ENCRYPTION KEYS NOW...", LogType.WarnLog);
-            Environment.Exit(0);
+            // If encryption keys are configured just exit this routine and close this window
+            if (EncryptionKeys.IsEncryptionConfigured) {
+                this._viewLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED! INJECTOR APPLICATION MAY PROCEED!", LogType.InfoLog);
+                this.Close(); 
+            }
+
+            // If keys are not configured, close the window and log out this result 
+            this._viewLogger.WriteLog("ENCRYPTION KEYS ARE NOT CONFIGURED! THIS IS AN ISSUE!", LogType.ErrorLog);
+            this._viewLogger.WriteLog("INJECTOR APP CAN NOT PROCEED WITHOUT VALID ENCRYPTION KEY CONFIGURATION!", LogType.ErrorLog);
+            this.Close();
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
