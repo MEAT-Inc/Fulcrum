@@ -218,7 +218,6 @@
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\SizeFormatExtensions.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\TextTableGenerator.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumDriveBroker.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml.cs">
       <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
     </Compile>
