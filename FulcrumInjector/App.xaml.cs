@@ -72,13 +72,13 @@ namespace FulcrumInjector
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
 
-            // Configure a single instance and setup startup/exit routines
+            // Configure a single instance and setup encryption along with an exit routine
             this._configureSingleInstance();
             this._configureAppExitRoutine();
-            this._configureStartupRoutines();
+            this._configureCryptographicKeys();
 
-            // Invoke configuration for our drive service and watchdog services here
-            FulcrumEncryptionWindow.ConfigureEncryptionKeys();
+            // Configure startup actions if needed. Then build the drive/watchdog services here
+            this._configureStartupActions();
             FulcrumDriveService.InitializeDriveService();
             FulcrumWatchdogService.InitializeWatchdogService();
 
@@ -203,7 +203,7 @@ namespace FulcrumInjector
                 catch { this._appLogger?.WriteLog("CAN NOT DELETE NON EXISTENT FILES!", LogType.ErrorLog); }
 
                 // Exit the application
-                Environment.Exit(100);
+                Environment.Exit(0);
             }
 
             // Return passed output.
@@ -257,10 +257,35 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
         /// <summary>
+        /// Validates the encryption key configuration for the injector application. Will allow a chance to
+        /// provide keys to the application if no keys are given in the encryption file for debug runs.
+        /// </summary>
+        private void _configureCryptographicKeys()
+        {
+            // Log out that we're configuring encryption keys here and check if they're configured
+            this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.WarnLog);
+            if (EncryptionKeys.IsEncryptionConfigured)
+            {
+                // Log out that our encryption keys are configured and exit out
+                this._appLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED CORRECTLY!", LogType.InfoLog);
+                this._appLogger.WriteLog("MOVING ONTO REMAINDER OF INJECTOR STARTUP ROUTINES...", LogType.InfoLog);
+                return;
+            }
+
+            // Invoke our configure encryption routine and check the result of it here
+            this._appLogger.WriteLog("INVOKING NEW ENCRYPTION KEY CONFIGURATION ROUTINE NOW...", LogType.WarnLog);
+            if (FulcrumEncryptionWindow.ConfigureEncryptionKeys()) return;
+
+            // If the configuration is not determined still, exit out of this application
+            this._appLogger.WriteLog("ERROR! ENCRYPTION IS STILL NOT CONFIGURED CORRECTLY!", LogType.ErrorLog);
+            this._appLogger.WriteLog("EXITING THE INJECTOR APP NOW...", LogType.ErrorLog);
+            Environment.Exit(0);
+        }
+        /// <summary>
         /// Looks at our command line arguments and determines what we should be doing with the injector application
         /// If we provide an argument for booting the watchdog routines, the actions are invoked and the application exits
         /// </summary>
-        private void _configureStartupRoutines()
+        private void _configureStartupActions()
         {
             // Check to see if we've been provided with command line arguments or not
             FulcrumCommandLine CommandLineHelper = new FulcrumCommandLine(); 
