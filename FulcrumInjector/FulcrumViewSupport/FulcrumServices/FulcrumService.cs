@@ -10,6 +10,7 @@ using System.ServiceModel;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Win32.TaskScheduler;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
@@ -111,7 +112,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <returns>True if the service task is scheduled. False if it is not</returns>
         public static bool ScheduleServiceAction(FulcrumServiceAction ServiceAction)
         {
-
+            // TODO: Build logic for adding new scheduled actions
+            return false;
         }
         /// <summary>
         /// Helper method used to cancel/stop an action for the current service based on the name of it
@@ -120,7 +122,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <returns>True if the action is stopped. False if not</returns>
         public static bool CancelServiceAction(string ActionName)
         {
-
+            // TODO: Build logic for removing existing actions by name
+            return false;
         }
         /// <summary>
         /// Helper method used to cancel/stop an action for the current service based on the GUID of it
@@ -129,7 +132,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
         /// <returns>True if the action is stopped. False if not</returns>
         public static bool CancelServiceAction(Guid ActionGuid)
         {
-
+            // TODO: Build logic for removing existing actions by GUID
+            return false;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

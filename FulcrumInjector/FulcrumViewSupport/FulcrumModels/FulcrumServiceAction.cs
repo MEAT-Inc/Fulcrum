@@ -91,7 +91,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
                     $"# Script GUID:    {this.ActionGuid.ToString("D").ToUpper()}",
                     $"# Script Timing:  {this.ActionTiming.ToDescriptionString()}",
                     $"# Execution Time: {this.ActionTime:HH:mm:ss}",
-                    SplittingString
+                    SplittingString,
+                    "",
                 };
 
                 // Store the commands into the script information and return out
@@ -125,6 +126,23 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
         /// Spawns a new FulcrumServiceAction object used to help us invoke service actions
         /// </summary>
         /// <param name="ActionName">Name of the action being invoked</param>
+        /// <param name="ActionTime">The time for the action to be invoked</param>
+        public FulcrumServiceAction(string ActionName, TimeSpan ActionTime, params string[] ActionCommands)
+        {
+            // Store the name, time to execute, and configure a GUID value along with the timing type
+            this.ActionName = ActionName;
+            this._actionTime = ActionTime;
+            this.ActionGuid = Guid.NewGuid();
+            this.ActionTiming = ActionTimings.MANUAL;
+
+            // Setup the name of the script file for this action 
+            this.ActionCommands = ActionCommands;
+            this.ActionScriptFile = $"{this.ActionName}_{this.ActionGuid.ToString("D").ToUpper()}";
+        }
+        /// <summary>
+        /// Spawns a new FulcrumServiceAction object used to help us invoke service actions
+        /// </summary>
+        /// <param name="ActionName">Name of the action being invoked</param>
         /// <param name="Timing">The timing type for the action being invoked</param>
         public FulcrumServiceAction(string ActionName, ActionTimings Timing, params string[] ActionCommands)
         {
@@ -145,7 +163,8 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
         /// </summary>
         /// <param name="ActionName">Name of the action being invoked</param>
         /// <param name="ActionTime">The time for the action to be invoked</param>
-        public FulcrumServiceAction(string ActionName, TimeSpan ActionTime, params string[] ActionCommands)
+        /// <param name="StartupAction">The startup action being used to invoke a routine on the injector</param>
+        public FulcrumServiceAction(string ActionName, TimeSpan ActionTime, FulcrumStartupAction StartupAction)
         {
             // Store the name, time to execute, and configure a GUID value along with the timing type
             this.ActionName = ActionName;
@@ -154,8 +173,28 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
             this.ActionTiming = ActionTimings.MANUAL;
 
             // Setup the name of the script file for this action 
-            this.ActionCommands = ActionCommands;
+            this.ActionCommands = new string[] { StartupAction.ToString() };
             this.ActionScriptFile = $"{this.ActionName}_{this.ActionGuid.ToString("D").ToUpper()}";
+        }
+        /// <summary>
+        /// Spawns a new FulcrumServiceAction object used to help us invoke service actions
+        /// </summary>
+        /// <param name="ActionName">Name of the action being invoked</param>
+        /// <param name="Timing">The timing type for the action being invoked</param>
+        /// <param name="StartupAction">The startup action being used to invoke a routine on the injector</param>
+        public FulcrumServiceAction(string ActionName, ActionTimings Timing, FulcrumStartupAction StartupAction)
+        {
+            // Store the action name and timing value. Configure a new GUID value for it as well 
+            this.ActionTiming = Timing;
+            this.ActionName = ActionName;
+            this.ActionGuid = Guid.NewGuid();
+
+            // Setup the name of the script file for this action 
+            this.ActionCommands = new string[] { StartupAction.ToString() };
+            this.ActionScriptFile = $"{this.ActionName}_{this.ActionGuid.ToString("D").ToUpper()}";
+
+            // Store a default DateTime value for the timing since no value was given
+            this._actionTime = new TimeSpan(12, 0, 0);
         }
     }
 }

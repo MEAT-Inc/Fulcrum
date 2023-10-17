@@ -12,7 +12,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
     /// <summary>
     /// The actual service base component used for the injector watchdog helper
     /// </summary>
-    public class FulcrumWatchdogService : FulcrumService
+    public sealed class FulcrumWatchdogService : FulcrumService
     {
         #region Custom Events
         #endregion //Custom Events

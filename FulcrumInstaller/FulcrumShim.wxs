@@ -26,7 +26,7 @@
                 <Directory Id="MeatIncProgramFiles" Name="MEAT Inc">
                     <Directory Id="DriverComponent" Name="FulcrumShim">
 	                    <!-- Injector App Files -->
-                        <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
+                        <Directory Id="FULCRUMINJECTORFILES" Name="FulcrumInjector" >
 							<!-- Supporting DLLs and Logic -->
 	                        <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
 	                            <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
@@ -60,13 +60,14 @@
                                 <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
                                 <File Id="SYSTEM.NUMERICS.VECTORS.DLL" Name="System.Numerics.Vectors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.dll" />
 								<File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.DLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
-								<!--<File Id="SYSTEM.SERVICEPROCESS.DLL" Name="System.ServiceProcess.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.ServiceProcess.dll" />-->
                                 <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
                                 <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
                                 <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
                                 <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
                                 <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />
-                                <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
+								<File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
+								<File Id="MICROSOFT.WIN32.TASKSCHEDULER.DLL" Name="Microsoft.Win32.TaskScheduler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Win32.TaskScheduler.dll" />
+	                            <File Id="MICROSOFT.WIN32.TASKSCHEDULER.XML" Name="Microsoft.Win32.TaskScheduler.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Win32.TaskScheduler.xml" />
                                 <File Id="OCTOKIT.XML" Name="Octokit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.xml" />
                                 <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
                                 <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
