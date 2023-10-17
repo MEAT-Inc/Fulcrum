@@ -57,9 +57,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Build our new Email broker instance
-            this.ShowEmailInfoText = true;
-            if (_generateEmailBroker(out var NewSender)) this.SessionReportSender = NewSender;
-            else throw new InvalidOperationException("FAILED TO CONFIGURE NEW EMAIL HELPER OBJECT!");
+            try { FulcrumEmailBroker.InitializeEmailBroker(); }
+            catch (Exception InitBrokerEx)
+            {
+                // Catch and log the broker creation exception and exit out
+                this.ViewModelLogger.WriteLog("FAILED TO CONFIGURE A NEW EMAIL BROKER OBJECT!", LogType.ErrorLog);
+                this.ViewModelLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW.", InitBrokerEx);
+                throw InitBrokerEx;
+            }
 
             // Log passed. Build in main log file and session logs if any.
             this.ViewModelLogger.WriteLog("EMAIL REPORT BROKER HAS BEEN BUILT OK AND BOUND TO OUR VIEW CONTENT!");
@@ -138,42 +143,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             // Try and attach it to our output report helper.
             if (this.SessionReportSender.AddMessageAttachment(NextSessionLog)) this.ViewModelLogger.WriteLog("ATTACHED REPORT FILE OK!", LogType.InfoLog);
             else this.ViewModelLogger.WriteLog("FAILED TO ATTACH REPORT INTO OUR OUTPUT CONTENT!", LogType.ErrorLog);
-        }
-
-        /// <summary>
-        /// Builds a new email reporting broker for the given settings values.
-        /// </summary>
-        /// <param name="BuiltSender">Sender object built</param>
-        /// <returns>True if built ok. False if not.</returns>
-        private bool _generateEmailBroker(out FulcrumEmailBroker BuiltSender)
-        {
-            try
-            {
-                // Pull in new settings values for sender and default receivers.
-                string ConfigKeyBase = "FulcrumConstants.InjectorEmailConfiguration";
-                this.ViewModelLogger.WriteLog("PULLING IN NEW VALUES FOR BROKER OBJECT AND CONSTRUCTING IT", LogType.InfoLog);
-                var EmailConfig = ValueLoaders.GetConfigValue<EmailBrokerConfiguration>($"{ConfigKeyBase}.SenderConfiguration");
-
-                // Build a new email broker using the pulled configuration information
-                this.ViewModelLogger.WriteLog("PULLED IN NEW INFORMATION VALUES FOR OUR RECIPIENT AND SENDERS CORRECTLY! BUILDING BROKER NOW...", LogType.InfoLog);
-                BuiltSender = new FulcrumEmailBroker(EmailConfig);
-
-                // Now try and authorize the client for a google address.
-                this.ViewModelLogger.WriteLog("PULLING IN SMTP CONFIG VALUES AND AUTHORIZING CLIENT FOR USE NOW...", LogType.WarnLog);
-                var SmtpConfigObject = ValueLoaders.GetConfigValue<EmailSmtpConfiguration>($"{ConfigKeyBase}.SmtpServerSettings");
-
-                // Store configuration values for client and then authorize it.
-                BuiltSender.StoreSmtpConfiguration(SmtpConfigObject);
-                if (BuiltSender.AuthenticateSmtpClient()) this.ViewModelLogger.WriteLog("AUTHORIZED NEW CLIENT CORRECTLY! READY TO PROCESS AND SEND REPORTS!", LogType.InfoLog);
-                else throw new InvalidOperationException("FAILED TO AUTHORIZE SMTP CLIENT BROKER ON THE REPORT SENDING OBJECT!");
-                return true;
-            }
-            catch (Exception BuildBrokerEx)
-            {
-                this.ViewModelLogger.WriteLog("FAILED TO CONSTRUCT A NEW BROKER FOR EMAIL CONTENTS! THIS IS STRANGE!", LogType.WarnLog);
-                this.ViewModelLogger.WriteException("EXCEPTION THROWN IS BEING LOGGED BELOW.", BuildBrokerEx);
-                BuiltSender = null; return false;
-            }
         }
     }
 }

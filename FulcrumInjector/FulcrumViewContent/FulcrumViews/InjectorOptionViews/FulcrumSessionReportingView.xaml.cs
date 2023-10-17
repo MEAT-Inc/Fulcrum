@@ -144,7 +144,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
                 // Rend out the message request here.
                 var SendTime = new Stopwatch(); SendTime.Start();
-                bool SendResult = this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
+                bool SendResult = this.ViewModel.SessionReportSender.SendMessage(SendingSubject, BodyContents);
                 this._viewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
                 this._viewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
 

@@ -18,12 +18,16 @@ namespace FulcrumInjector.FulcrumViewSupport
     /// <summary>
     /// Class instance used to help us configure command line argument routines
     /// </summary>
-    public class FulcrumCommandLine
+    public sealed class FulcrumCommandLine
     {
         #region Custom Events
         #endregion // Custom Events
 
         #region Fields
+
+        // Private static configuration for Singleton pattern
+        private static FulcrumCommandLine _commandLineHelper = null;
+        private static readonly object _instanceLock = new object();
 
         // Private logger instance for our command line helper class 
         private readonly SharpLogger _commandLineLogger;
@@ -32,9 +36,20 @@ namespace FulcrumInjector.FulcrumViewSupport
 
         #region Properties
 
+        // Public static singleton instance for our email broker object
+        public static FulcrumCommandLine CommandLineHelper
+        {
+            get
+            {
+                // Lock onto our instance lock for threading and pull our broker instance out
+                lock (_instanceLock)
+                    return _commandLineHelper ??= new FulcrumCommandLine();
+            }
+        }
+
         // Public facing properties holding our input command line arguments and the built startup actions
-        public string ParsedArguments { get; private set; }
         public List<FulcrumStartupAction> StartupActions { get; private set; }
+        public string ParsedArguments => string.Join(",", Environment.GetCommandLineArgs());
         public bool ShouldLaunchInjector => this.StartupActions.Any(ActionObj => ActionObj.ArgumentType == StartupArguments.LAUNCH_INJECTOR);
 
         #endregion // Properties
@@ -74,16 +89,24 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// <summary>
         /// CTOR for a new fulcrum command line argument parser
         /// </summary>
-        public FulcrumCommandLine()
+        private FulcrumCommandLine()
         {
             // Spawn a new logger, configure backing properties, and store input arguments
             this.StartupActions = new List<FulcrumStartupAction>();
             this._commandLineLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ParsedArguments = string.Join(",", Environment.GetCommandLineArgs());
-
+            
             // Log out the arguments provided to the CLI for the injector application here
             this._commandLineLogger.WriteLog("PROCESSED COMMAND LINE ARGUMENTS FOR INJECTOR APPLICATION!");
             this._commandLineLogger.WriteLog($"COMMAND LINE ARGS: {this.ParsedArguments}");
+        }
+        /// <summary>
+        /// Static CTOR for a command line helper instance. Simply pulls out the new singleton instance for our command line helper
+        /// </summary>
+        /// <returns>The instance for our CLI helper singleton</returns>
+        public static FulcrumCommandLine InitializeCommandLineHelper()
+        {
+            // Build a new singleton instance for our CLI helper or return the current instance 
+            return CommandLineHelper;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

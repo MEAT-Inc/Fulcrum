@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
 {
@@ -14,6 +15,24 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
         // Public properties holding information about the requested action
         public string[] ArgumentParameters { get; set; }
         public FulcrumCommandLine.StartupArguments ArgumentType { get; set; }
+        
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Override for the ToString call which will return out the startup action as a string object
+        /// </summary>
+        /// <returns>A string holding our startup argument as a string</returns>
+        public override string ToString()
+        {
+            // Build an argument string and return it out
+            if (this.ArgumentParameters == null || this.ArgumentParameters.Length == 0)
+                return $"{ArgumentType.ToDescriptionString()}";
+
+            // Join the arguments together and return them wrapped in parens
+            string OutputString = $"{ArgumentType.ToDescriptionString()}";
+            OutputString += $"({string.Join(", ", this.ArgumentParameters.Select(ArgValue => $"\"{ArgValue}\""))}";
+            return OutputString;
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

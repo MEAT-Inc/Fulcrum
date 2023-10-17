@@ -194,6 +194,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumModels\EmailBrokerModels\EmailBrokerConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\EmailBrokerModels\EmailSmtpConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumOeApplication.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumServiceAction.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumStartupAction.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumUpdaterConfiguration.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\DriveModels\DriveLogFile.cs" />
@@ -579,6 +580,7 @@ py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
     <PostBuildEvent>cmd.exe /C rmdir /s /q "$(TargetDir)de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
+cmd.exe /C mkdir "$(TargetDir)FulcrumTasks"
 cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"

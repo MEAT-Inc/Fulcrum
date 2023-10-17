@@ -10,6 +10,7 @@ using System.ServiceModel;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
 {
@@ -99,6 +100,36 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumServices
             // Stop the service instance here if possible. This should only be done when it's running
             this._serviceLogger.WriteLog($"INVOKING AN OnStop METHOD FOR OUR {this.ServiceName} SERVICE...", LogType.WarnLog);
             this.OnStop();
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Helper method used to assign an action for the current service to run at the given time with provided configuration
+        /// </summary>
+        /// <param name="ServiceAction">The action we're looking to schedule for this service</param>
+        /// <returns>True if the service task is scheduled. False if it is not</returns>
+        public static bool ScheduleServiceAction(FulcrumServiceAction ServiceAction)
+        {
+
+        }
+        /// <summary>
+        /// Helper method used to cancel/stop an action for the current service based on the name of it
+        /// </summary>
+        /// <param name="ActionName">Name of the action we're killing</param>
+        /// <returns>True if the action is stopped. False if not</returns>
+        public static bool CancelServiceAction(string ActionName)
+        {
+
+        }
+        /// <summary>
+        /// Helper method used to cancel/stop an action for the current service based on the GUID of it
+        /// </summary>
+        /// <param name="ActionGuid">GUID of the action we're killing</param>
+        /// <returns>True if the action is stopped. False if not</returns>
+        public static bool CancelServiceAction(Guid ActionGuid)
+        {
+
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

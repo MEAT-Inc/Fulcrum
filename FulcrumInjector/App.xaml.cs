@@ -288,7 +288,7 @@ namespace FulcrumInjector
         private void _configureStartupActions()
         {
             // Check to see if we've been provided with command line arguments or not
-            FulcrumCommandLine CommandLineHelper = new FulcrumCommandLine(); 
+            var CommandLineHelper = FulcrumCommandLine.InitializeCommandLineHelper();
             var StartupActions = CommandLineHelper.ParseCommandLineArgs();
             if (StartupActions.Count == 0) 
             {
