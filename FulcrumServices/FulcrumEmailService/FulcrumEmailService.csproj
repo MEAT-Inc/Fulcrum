@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmailServiceModels\EmailBrokerConfiguration.cs" />
+    <Compile Include="EmailServiceModels\EmailServiceSettings.cs" />
     <Compile Include="EmailServiceModels\EmailSmtpConfiguration.cs" />
     <Compile Include="JsonConverters\EmailBrokerConfigJsonConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -99,4 +100,7 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

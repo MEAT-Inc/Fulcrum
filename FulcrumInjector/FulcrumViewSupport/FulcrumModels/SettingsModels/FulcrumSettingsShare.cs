@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumJson;
 using FulcrumSupport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

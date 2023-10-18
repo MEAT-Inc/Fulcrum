@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using FulcrumService;
 
 namespace FulcrumWatchdogService.WatchdogServiceModels
 {
     /// <summary>
     /// Model object for our watchdog service settings configuration
     /// </summary>
-    public class WatchdogSettings
+    public class WatchdogSettings : FulcrumServiceSettings
     {
         #region Custom Events
         #endregion // Custom Events

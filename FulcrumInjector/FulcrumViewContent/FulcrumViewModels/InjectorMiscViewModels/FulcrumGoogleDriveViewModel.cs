@@ -120,7 +120,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog("CONFIGURED EMPTY RESULT AND FILTERING LISTS CORRECTLY!", LogType.InfoLog);
 
             // Check if the drive service is null or not
-            this._driveService = FulcrumDrive.InitializeDriveService();
+            this._driveService = FulcrumDrive.InitializeDriveService().Result;
             if (this._driveService == null) 
                 throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
 

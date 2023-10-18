@@ -214,11 +214,6 @@
       <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\DriveAuthJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\DriveConfigJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\EmailBrokerConfigJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\EncryptedJsonConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumJsonSupport\WatchdogFolderJsonConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\AppStyleModels\AppStyleEnums.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumNavMenuItem.cs" />
@@ -554,6 +549,10 @@
       <Project>{9ed477f5-f3dc-4643-b7cb-e2fc3f33d652}</Project>
       <Name>FulcrumService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FulcrumServices\FulcrumUpdaterService\FulcrumUpdaterService.csproj">
+      <Project>{5577927F-40B8-4ECB-B168-1CC06BD7B8F8}</Project>
+      <Name>FulcrumUpdaterService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FulcrumServices\FulcrumWatchdogService\FulcrumWatchdogService.csproj">
       <Project>{73615040-9704-4497-9ABA-C5EF17F1D639}</Project>
       <Name>FulcrumWatchdogService</Name>
@@ -582,7 +581,6 @@ py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
     <PostBuildEvent>cmd.exe /C rmdir /s /q "$(TargetDir)de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
-cmd.exe /C mkdir "$(TargetDir)FulcrumTasks"
 cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"

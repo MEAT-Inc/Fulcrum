@@ -42,11 +42,11 @@ namespace FulcrumUpdaterService
         // Private backing fields for the Git helper, timer, and updater configuration
         private readonly Stopwatch _downloadTimer;                       // Download timer for pulling in versions
         private readonly GitHubClient _gitUpdaterClient;                 // The updater client for pulling in versions
-        private readonly UpdaterConfiguration _updaterConfiguration;     // Updater configuration values
+        private readonly UpdaterServiceSettings _serviceConfig;          // Updater configuration values
 
         // Private backing fields to hold version information helpers
-        private string _latestInjectorVersion;
-        private string[] _injectorVersionsFound;
+        private string _latestInjectorVersion;                           // Private backing field holding the latest injector version
+        private string[] _injectorVersionsFound;                         // Private backing field holding all injector versions
 
         #endregion //Fields
 
@@ -92,20 +92,33 @@ namespace FulcrumUpdaterService
         /// Builds a new injector update helper object which pulls our GitHub release information
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        internal FulcrumUpdater(UpdaterConfiguration ServiceSettings = null)
+        internal FulcrumUpdater(UpdaterServiceSettings ServiceSettings = null)
         {
-            // Construct a new logger instance and build a new configuration for the updater
+            // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumUpdater>();
             this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
 
-            // Store the configuration for our update helper object here
-            this._updaterConfiguration = ServiceSettings ?? ValueLoaders.GetConfigValue<UpdaterConfiguration>("FulcrumConstants.InjectorUpdates");
-            this._serviceLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
+            // Log we're building this new service and log out the name we located for it
+            this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
-            // Configure updater here
+            // Store the configuration for our update helper object here
+            this._serviceConfig = ServiceSettings ?? ValueLoaders.GetConfigValue<UpdaterServiceSettings>("FulcrumServices.FulcrumUpdaterService");
+            this._serviceLogger.WriteLog("PULLED BASE SERVICE CONFIGURATION VALUES CORRECTLY!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"SERVICE NAME: {this._serviceConfig.ServiceName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"SERVICE ENABLED: {this._serviceConfig.ServiceEnabled}", LogType.TraceLog);
+
+            // Log out information about the updater configuration here
+            this._serviceLogger.WriteLog("PULLED IN OUR CONFIGURATIONS FOR INJECTOR UPDATER API CALLS OK!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"USERNAME: {this._serviceConfig.UpdaterUserName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"FORCE UPDATES: {this._serviceConfig.ForceUpdateReady}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"REPOSITORY NAME:  {this._serviceConfig.UpdaterRepoName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"ORGANIZATION NAME: {this._serviceConfig.UpdaterOrgName}", LogType.TraceLog);
+
+            // Spawn a new timer for tracking download time and authorize a new GitHub helper
             this._downloadTimer = new Stopwatch();
-            Credentials LoginCredentials = new Credentials(this._updaterConfiguration.UpdaterSecretKey);
-            this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._updaterConfiguration.UpdaterUserName)) { Credentials = LoginCredentials };
+            Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
+            this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
             this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATING NOW USING MEAT INC BOT TOKEN ACCESS...", LogType.InfoLog);
         }
         /// <summary>
@@ -113,30 +126,39 @@ namespace FulcrumUpdaterService
         /// </summary>
         /// <param name="ForceInit">When true, we force rebuild the requested service instance</param>
         /// <returns>The instance for our service singleton</returns>
-        public static FulcrumUpdater InitializeEmailBroker(bool ForceInit = false)
+        public static Task<FulcrumUpdater> InitializeUpdaterService(bool ForceInit = false)
         {
             // Build a static init logger for the service here
             SharpLogger ServiceInitLogger =
                 SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
                 ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
 
-            // Spin up a new injector drive service here if needed           
-            Task.Run(() =>
+            // Make sure we actually want to use this watchdog service 
+            var ServiceConfig = ValueLoaders.GetConfigValue<UpdaterServiceSettings>("FulcrumServices.FulcrumUpdaterService");
+            if (!ServiceConfig.ServiceEnabled) {
+                ServiceInitLogger.WriteLog("WARNING! UPDATER SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                return null;
+            }
+
+            // Spin up a new injector email service here if needed           
+            ServiceInitLogger.WriteLog($"SPAWNING A NEW UPDATER SERVICE INSTANCE NOW...", LogType.WarnLog);
+            return Task.Run(() =>
             {
                 // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) return;
+                if (_serviceInstance != null && !ForceInit)
+                {
+                    ServiceInitLogger.WriteLog("FOUND EXISTING UPDATER SERVICE INSTANCE! RETURNING IT NOW...");
+                    return _serviceInstance;
+                }
 
                 // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumUpdater();
+                _serviceInstance = new FulcrumUpdater(ServiceConfig);
                 _serviceInstance.OnStart(null);
+                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
+
+                // Return the service instance here
+                return _serviceInstance;
             });
-
-            // Log that we've booted this new service instance correctly and exit out
-            ServiceInitLogger.WriteLog("SPAWNED NEW INJECTOR UPDATER SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
-            ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
-
-            // Return the built service instance 
-            return _serviceInstance;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -285,7 +307,7 @@ namespace FulcrumUpdaterService
         {
             // Pull in the releases and return them out
             this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._updaterConfiguration.UpdaterOrgName, this._updaterConfiguration.UpdaterRepoName).Result.ToArray();
+            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
             this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
 
             // Store our latest release object on this class

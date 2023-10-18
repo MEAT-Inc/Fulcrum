@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FulcrumDriveService;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using FulcrumSupport;
 using SharpLogging;
 using File = Google.Apis.Drive.v3.Data.File;
@@ -26,7 +26,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
         #region Fields
 
         // Private static service instance for file operations
-        private static FulcrumDriveService _driveService;
+        private static FulcrumDrive _driveService;
 
         // Private backing fields for folder configuration
         private readonly File _sourceDriveFolder;           // Folder object used to build this log model set
@@ -103,11 +103,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
             // Make sure the input file object is a type of folder
             if (SourceDriveFolder == null)
                 throw new NullReferenceException("Error! Input log folder was null!");
-            if (SourceDriveFolder.MimeType != FulcrumDriveService.ResultTypes.FOLDERS_ONLY.ToDescriptionString())
+            if (SourceDriveFolder.MimeType != FulcrumDrive.ResultTypes.FOLDERS_ONLY.ToDescriptionString())
                 throw new ArgumentException("Error! Input drive object is not a folder!");
 
             // Store the input log folder and find the files in it using the drive service
-            _driveService ??= FulcrumDriveService.InitializeDriveService();
+            _driveService ??= FulcrumDrive.InitializeDriveService().Result;
             this._sourceDriveFolder = SourceDriveFolder;
 
             // Configure properties of the log folder
@@ -137,7 +137,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
         public bool RefreshFolderFiles()
         {
             // Build a request to list all the files in the folder 
-            if (!_driveService.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles, FulcrumDriveService.ResultTypes.FILES_ONLY))
+            if (!_driveService.ListFolderContents(this._sourceDriveFolder.Id, out var LocatedFiles, FulcrumDrive.ResultTypes.FILES_ONLY))
                 throw new InvalidOperationException($"Error! Failed to refresh Drive Contents for location {this._sourceDriveFolder.Id}!");
 
             // Clear out the existing log file models if needed

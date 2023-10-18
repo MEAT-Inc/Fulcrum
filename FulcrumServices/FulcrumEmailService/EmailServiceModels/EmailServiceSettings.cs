@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using FulcrumEncryption;
 using FulcrumService;
 
-namespace FulcrumDriveService.DriveServiceModels
+namespace FulcrumEmailService.EmailServiceModels
 {
     /// <summary>
-    /// Class object holding our configuration for the settings section to control a drive service instance
+    /// Class object holding our configuration for the settings section to control an email service instance
     /// </summary>
-    public class DriveServiceSettings : FulcrumServiceSettings
+    public class EmailServiceSettings : FulcrumServiceSettings
     {
         #region Custom Events
         #endregion // Custom Events
@@ -21,13 +21,9 @@ namespace FulcrumDriveService.DriveServiceModels
 
         #region Properties
 
-        // Public facing properties holding configuration for our drive service
-        public string ApplicationName { get; set; } 
-        [EncryptedValue] public string GoogleDriveId { get; set; }
-
         // Public facing properties holding configuration for drive authorization
-        public DriveConfiguration ExplorerConfiguration { get; set; }
-        public DriveAuthorization ExplorerAuthorization { get; set; }
+        public EmailSmtpConfiguration SmtpServerSettings { get; set; }
+        public EmailBrokerConfiguration SenderConfiguration { get; set; }
 
         #endregion // Properties
 

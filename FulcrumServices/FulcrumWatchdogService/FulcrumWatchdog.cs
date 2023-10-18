@@ -20,9 +20,9 @@ namespace FulcrumWatchdogService
         #region Fields
 
         // Private backing fields for our watchdog service configuration
-        private WatchdogSettings _watchdogSettings;              // Settings configuration for the service
-        private static FulcrumWatchdog _serviceInstance;         // Static service instance object
-        private List<WatchdogFolder> _watchedDirectories;        // Watched folders for the service
+        private WatchdogSettings _serviceConfig;             // Settings configuration for the service
+        private static FulcrumWatchdog _serviceInstance;     // Static service instance object
+        private List<WatchdogFolder> _watchedDirectories;    // Watched folders for the service
 
         #endregion //Fields
 
@@ -57,12 +57,21 @@ namespace FulcrumWatchdogService
             this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
 
             // Log we're building this new service and log out the name we located for it
-            this._serviceLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
+            this._serviceLogger.WriteLog("SPAWNING NEW DRIVE SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Init our component object here and setup logging
-            this._watchedDirectories = new List<WatchdogFolder>();
-            this._watchdogSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
+            this._serviceConfig = ServiceSettings ?? ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumServices.FulcrumWatchdogService");
+            this._serviceLogger.WriteLog("PULLED BASE SERVICE CONFIGURATION VALUES CORRECTLY!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"SERVICE NAME: {this._serviceConfig.ServiceName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"SERVICE ENABLED: {this._serviceConfig.ServiceEnabled}", LogType.TraceLog);
+
+            // Log out information about our configuration values here 
+            this._serviceLogger.WriteLog("PULLED WATCHDOG CONFIGURATION VALUES CORRECTLY!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"FOLDER COUNT: {this._serviceConfig.WatchedFolders.Count}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"EXECUTION GAP: {this._serviceConfig.ExecutionGap}", LogType.TraceLog);
+
+            // Log that we've stored the basic configuration for our watchdog service here and exit out
             this._serviceLogger.WriteLog("FULCRUM INJECTOR WATCHDOG SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
         }
         /// <summary>
@@ -70,7 +79,7 @@ namespace FulcrumWatchdogService
         /// </summary>
         /// <param name="ForceInit">When true, we force rebuild the requested service instance</param>
         /// <returns>The built and configured watchdog helper service</returns>
-        public static FulcrumWatchdog InitializeWatchdogService(bool ForceInit = false)
+        public static Task<FulcrumWatchdog> InitializeWatchdogService(bool ForceInit = false)
         {
             // Build a static init logger for the service here
             SharpLogger ServiceInitLogger =
@@ -78,33 +87,30 @@ namespace FulcrumWatchdogService
                 ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
 
             // Make sure we actually want to use this watchdog service 
-            WatchdogSettings WatchdogConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
-            if (!WatchdogConfig.WatchdogEnabled)
-            {
-                // Log that the watchdog is disabled and exit out
+            WatchdogSettings ServiceConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumServices.FulcrumWatchdogService");
+            if (!ServiceConfig.WatchdogEnabled) {
                 ServiceInitLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
-                ServiceInitLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD WatchdogEnabled TO TRUE TO ENABLE OUR WATCHDOG!", LogType.WarnLog);
                 return null;
             }
 
-            // BUG: Starting new watchdog instances for many log files is broken
-            // Spin up a new injector watchdog service here if needed           
-            Task.Run(() =>
+            // Spin up a new injector drive service here if needed           
+            ServiceInitLogger.WriteLog($"SPAWNING A NEW WATCHDOG SERVICE INSTANCE NOW...", LogType.WarnLog);
+            return Task.Run(() =>
             {
                 // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) return;
+                if (_serviceInstance != null && !ForceInit) {
+                    ServiceInitLogger.WriteLog("FOUND EXISTING WATCHDOG SERVICE INSTANCE! RETURNING IT NOW...");
+                    return _serviceInstance;
+                }
 
                 // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumWatchdog(WatchdogConfig);
+                _serviceInstance = new FulcrumWatchdog(ServiceConfig);
                 _serviceInstance.OnStart(null);
+                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK!", LogType.InfoLog);
+
+                // Return the service instance here
+                return _serviceInstance;
             });
-
-            // Log that we've booted this new service instance correctly and exit out
-            ServiceInitLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
-            ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK! DIRECTORIES AND FILES WILL BE MONITORED!", LogType.InfoLog);
-
-            // Return the built service instance 
-            return _serviceInstance;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -122,6 +128,7 @@ namespace FulcrumWatchdogService
                 this._serviceLogger.WriteLog($"CONFIGURING NEW FOLDER WATCHDOG OBJECTS FOR INJECTOR SERVICE...", LogType.InfoLog);
 
                 // Loop all of our folder instances and store them on our service instance
+                this._watchedDirectories ??= new List<WatchdogFolder>();
                 for (int WatchdogIndex = 0; WatchdogIndex < this._watchedDirectories.Count; WatchdogIndex++)
                 {
                     // Make sure this instance is not null before trying to use it
@@ -133,13 +140,12 @@ namespace FulcrumWatchdogService
                 }
 
                 // Now using the configuration file, load in our predefined folders to monitor
-                this._watchdogSettings = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumWatchdogService");
-                this._serviceLogger.WriteLog($"LOADED IN A TOTAL OF {this._watchdogSettings.WatchedFolders.Count} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
+                this._serviceLogger.WriteLog($"LOADED IN A TOTAL OF {this._serviceConfig.WatchedFolders.Count} WATCHED PATH VALUES! IMPORTING PATH VALUES NOW...");
                 this._serviceLogger.WriteLog("IMPORTED PATH CONFIGURATIONS WILL BE LOGGED BELOW", LogType.TraceLog);
 
                 // Clear out any previous configurations/folders and add our new ones now
                 this._watchedDirectories = new List<WatchdogFolder>();
-                this.AddWatchedFolders(this._watchdogSettings.WatchedFolders.ToArray());
+                this.AddWatchedFolders(this._serviceConfig.WatchedFolders.ToArray());
 
                 // Log booted service without issues here and exit out of this routine
                 this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);

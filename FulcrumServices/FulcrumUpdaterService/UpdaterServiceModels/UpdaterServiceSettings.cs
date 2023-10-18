@@ -1,4 +1,5 @@
 ﻿using FulcrumEncryption;
+using FulcrumService;
 using FulcrumUpdaterService.JsonConverters;
 using Newtonsoft.Json;
 
@@ -7,8 +8,8 @@ namespace FulcrumUpdaterService.UpdaterServiceModels
     /// <summary>
     /// Private class instance used to hold our injector configuration values for updates
     /// </summary>
-    [JsonConverter(typeof(UpdaterConfigJsonConverter))]
-    public class UpdaterConfiguration
+    [JsonConverter(typeof(UpdaterServiceSettingsJsonConverter))]
+    public class UpdaterServiceSettings : FulcrumServiceSettings
     {
         // Public properties which do not require encryption or decryption
         public bool ForceUpdateReady { get; set; }
@@ -19,5 +20,4 @@ namespace FulcrumUpdaterService.UpdaterServiceModels
         [EncryptedValue] public string UpdaterUserName { get; set; }
         [EncryptedValue] public string UpdaterSecretKey { get; set; }
     }
-
 }

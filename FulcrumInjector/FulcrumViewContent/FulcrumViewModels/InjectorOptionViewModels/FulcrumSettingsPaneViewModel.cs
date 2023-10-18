@@ -7,6 +7,7 @@ using System.Windows.Documents;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
+using FulcrumJson;
 using ICSharpCode.AvalonEdit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

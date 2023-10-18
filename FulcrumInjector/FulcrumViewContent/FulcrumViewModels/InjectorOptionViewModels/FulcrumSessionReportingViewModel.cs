@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+using FulcrumEmailService;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumModels.EmailBrokerModels;
 using SharpLogging;
 using SharpPipes;
 
@@ -23,9 +23,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         #region Fields
 
         // Private backing fields for our public properties
-        private bool _canModifyMessage = true;
-        private bool _showEmailInfoText = true;
-        private FulcrumEmailBroker _sessionReportSender;
+        private bool _canModifyMessage = true;          // Sets if we're able to modify the text of our email or not 
+        private bool _showEmailInfoText = true;         // Sets if we're showing the help information or not 
+        private FulcrumEmail _sessionReportSender;      // The sending service helper for sending emails
 
         #endregion // Fields
 
@@ -34,7 +34,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         // Public properties for the view to bind onto  
         public bool CanModifyMessage { get => _canModifyMessage; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
-        internal FulcrumEmailBroker SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        internal FulcrumEmail SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -57,7 +57,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
             // Build our new Email broker instance
-            try { FulcrumEmailBroker.InitializeEmailBroker(); }
+            try { this._sessionReportSender = FulcrumEmail.InitializeEmailService().Result; }
             catch (Exception InitBrokerEx)
             {
                 // Catch and log the broker creation exception and exit out

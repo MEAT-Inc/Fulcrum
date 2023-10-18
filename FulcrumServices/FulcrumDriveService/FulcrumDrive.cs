@@ -32,7 +32,7 @@ namespace FulcrumDriveService
         private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
         private DriveConfiguration _driveConfig;                  // The initialization configuration for the drive service
         private static DriveService _driveService;                // Private static instance for our drive service object
-        private DriveServiceSettings _driveSettings;              // Settings configuration for our service
+        private DriveServiceSettings _serviceConfig;              // Settings configuration for our service
         private static FulcrumDrive _serviceInstance;             // Static service instance object
 
         #endregion //Fields
@@ -86,29 +86,27 @@ namespace FulcrumDriveService
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Pull our settings configuration for the service here 
-            this._driveSettings = ServiceSettings ?? ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumDriveService");
-            this._serviceLogger.WriteLog("FULCRUM INJECTOR DRIVE SERVICE HAS BEEN BUILT AND IS READY TO RUN!", LogType.InfoLog);
+            this._serviceConfig = ServiceSettings ?? ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumServices.FulcrumDriveService");
+            this._serviceLogger.WriteLog("PULLED BASE SERVICE CONFIGURATION VALUES CORRECTLY!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"SERVICE NAME: {this._serviceConfig.ServiceName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"SERVICE ENABLED: {this._serviceConfig.ServiceEnabled}", LogType.TraceLog);
 
             // Pull in the drive ID and application name first
-            this.ApplicationName = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.ApplicationName");
-            this.GoogleDriveId = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDriveExplorer.GoogleDriveId");
+            this.GoogleDriveId = this._serviceConfig.GoogleDriveId; 
+            this.ApplicationName = this._serviceConfig.ApplicationName; 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
             this._serviceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
 
-            // Pull in the configuration values for the drive explorer and unscramble needed strings
-            this._serviceLogger.WriteLog("LOADING AND UNSCRAMBLING CONFIGURATION FOR DRIVE SERVICE NOW...");
-            this._driveConfig = ValueLoaders.GetConfigValue<DriveConfiguration>("FulcrumConstants.InjectorDriveExplorer.ExplorerConfiguration");
+            // Pull in new authorization and configuration objects here
+            this._driveAuth = this._serviceConfig.ExplorerAuthorization;
+            this._driveConfig = this._serviceConfig.ExplorerConfiguration;
 
-            // Pull in the configuration values for the drive explorer authorization and unscramble needed strings
-            this._serviceLogger.WriteLog("LOADING AND UNSCRAMBLING AUTHORIZATION FOR DRIVE SERVICE NOW...");
-            this._driveAuth = ValueLoaders.GetConfigValue<DriveAuthorization>("FulcrumConstants.InjectorDriveExplorer.ExplorerAuthorization");
-
-            // Log out that our unscramble routines have been completed
+            // Log out information about our configuration values here 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {_driveConfig.ClientId}");
-            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {_driveConfig.ProjectId}");
-            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {_driveAuth.ClientEmail}");
+            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}");
+            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}");
+            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}");
 
             // Configure the google drive service here
             this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
@@ -117,7 +115,7 @@ namespace FulcrumDriveService
                 // Store the API configuration and Application name for the authorization helper
                 ApplicationName = ApplicationName,
                 HttpClientInitializer = GoogleCredential
-                    .FromJson(JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false)))
+                    .FromJson(JsonConvert.SerializeObject(this._driveAuth, new DriveAuthJsonConverter(false)))
                     .CreateScoped(DriveService.Scope.DriveReadonly)
             });
 
@@ -129,7 +127,7 @@ namespace FulcrumDriveService
         /// </summary>
         /// <param name="ForceInit">When true, we force rebuild the requested service instance</param>
         /// <returns>The built and configured drive helper service</returns>
-        public static FulcrumDrive InitializeDriveService(bool ForceInit = false)
+        public static Task<FulcrumDrive> InitializeDriveService(bool ForceInit = false)
         {
             // Build a static init logger for the service here
             SharpLogger ServiceInitLogger =
@@ -137,32 +135,30 @@ namespace FulcrumDriveService
                 ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
 
             // Make sure we actually want to use this watchdog service 
-            var DriveConfig = ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumDriveService");
-            if (!DriveConfig.DriveEnabled)
-            {
-                // Log that the watchdog is disabled and exit out
+            var ServiceConfig = ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumServices.FulcrumDriveService");
+            if (!ServiceConfig.ServiceEnabled) {
                 ServiceInitLogger.WriteLog("WARNING! DRIVE SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
-                ServiceInitLogger.WriteLog("CHANGE THE VALUE OF JSON FIELD DriveEnabled TO TRUE TO ENABLE OUR DRIVE SERVICE!", LogType.WarnLog);
                 return null;
             }
 
             // Spin up a new injector drive service here if needed           
-            Task.Run(() =>
+            ServiceInitLogger.WriteLog($"SPAWNING A NEW DRIVE SERVICE INSTANCE NOW...", LogType.WarnLog);
+            return Task.Run(() =>
             {
                 // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) return;
+                if (_serviceInstance != null && !ForceInit) {
+                    ServiceInitLogger.WriteLog("FOUND EXISTING DRIVE SERVICE INSTANCE! RETURNING IT NOW...");
+                    return _serviceInstance;
+                }
 
                 // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumDrive(DriveConfig);
+                _serviceInstance = new FulcrumDrive(ServiceConfig);
                 _serviceInstance.OnStart(null);
+                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
+
+                // Return the service instance here
+                return _serviceInstance;
             });
-
-            // Log that we've booted this new service instance correctly and exit out
-            ServiceInitLogger.WriteLog("SPAWNED NEW INJECTOR DRIVE SERVICE OK! BOOTING IT NOW...", LogType.WarnLog);
-            ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
-
-            // Return the built service instance 
-            return _serviceInstance;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
