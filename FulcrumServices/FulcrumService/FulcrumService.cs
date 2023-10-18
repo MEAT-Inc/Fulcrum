@@ -157,7 +157,7 @@ namespace FulcrumService
         {
             // Make sure our output location exists first
             string ServiceName = typeof(TServiceType).Name;
-            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, $"{ServiceName.Replace("Fulcrum", string.Empty)}Logs");
+            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, $"{ServiceName.Replace("Fulcrum", string.Empty)}ServiceLogs");
             if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
 
             // Configure our new logger name and the output log file path for this logger instance 
