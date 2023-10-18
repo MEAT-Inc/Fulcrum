@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
+using FulcrumJson;
 using Newtonsoft.Json;
 using SharpLogging;
 

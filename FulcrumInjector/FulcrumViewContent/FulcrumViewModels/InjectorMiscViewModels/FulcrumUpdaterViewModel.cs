@@ -4,6 +4,8 @@ using System.Net;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumJson;
+using FulcrumUpdaterService;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels
@@ -64,7 +66,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.DownloadTimeRemaining = "N/A";
 
             // Build new update helper
-            this.GitHubUpdateHelper = new FulcrumUpdater();
+            this.GitHubUpdateHelper = FulcrumUpdater.InitializeUpdaterService().Result;
             GitHubUpdateHelper.RefreshInjectorVersions();
             this.ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 

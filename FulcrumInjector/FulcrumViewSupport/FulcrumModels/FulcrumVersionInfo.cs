@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
 {
