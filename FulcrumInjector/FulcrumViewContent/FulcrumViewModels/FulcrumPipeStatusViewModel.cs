@@ -14,9 +14,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 
         // Private property watchdogs to update our UI based on other events 
         // TODO: FUCKING REMOVE THIS? WHY NOT USE PROP CHANGED EVENTS?
-        private readonly PropertyWatchdog _readerPipeStateWatchdog;
-        private readonly PropertyWatchdog _writerPipeStateWatchdog;
-        private readonly PropertyWatchdog _testInjectionButtonWatchdog;
+        private readonly FulcrumPropertyWatchdog _readerPipeStateWatchdog;
+        private readonly FulcrumPropertyWatchdog _writerPipeStateWatchdog;
+        private readonly FulcrumPropertyWatchdog _testInjectionButtonWatchdog;
         
         #endregion //Custom Events
 
@@ -61,9 +61,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this._writerPipe = PassThruPipeWriter.AllocatePipe();
 
             // Build new pipe model object and watchdogs.
-            this._readerPipeStateWatchdog = new PropertyWatchdog(250);
-            this._writerPipeStateWatchdog = new PropertyWatchdog(250);
-            this._testInjectionButtonWatchdog = new PropertyWatchdog(250);
+            this._readerPipeStateWatchdog = new FulcrumPropertyWatchdog(250);
+            this._writerPipeStateWatchdog = new FulcrumPropertyWatchdog(250);
+            this._testInjectionButtonWatchdog = new FulcrumPropertyWatchdog(250);
             this.ViewModelLogger.WriteLog("BUILT NEW MODEL OBJECT AND WATCHDOG OBJECTS FOR PIPE INSTANCES OK!");
             this.ViewModelLogger.WriteLog("SETUP NEW PIPE STATUS MONITOR VALUES OK!");
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);

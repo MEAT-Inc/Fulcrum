@@ -8,10 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FulcrumDriveService;
+using FulcrumEmailService;
+using FulcrumEncryption;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
-using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
-using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
+using FulcrumSupport;
+using FulcrumWatchdogService;
 
 namespace FulcrumInjector.FulcrumViewSupport
 {
@@ -65,18 +68,23 @@ namespace FulcrumInjector.FulcrumViewSupport
             [Description("")] NO_ARGUMENTS = 0x00000000,
             [Description("--LAUNCH_INJECTOR")] LAUNCH_INJECTOR = 0x00000001,
 
-            // Watchdog configuration arguments. Base value is 0x00001000. Invoke is 0x00001003
+            // Watchdog configuration arguments. Base value is 0x00001000. Invoke is 0x00001002
             [Description("--WATCHDOG")] WATCHDOG = 0x00001000,
             [Description("--WATCHDOG_INITALIZE")] INIT_WATCHDOG = WATCHDOG | 0x00000001,
             [Description("--WATCHDOG_INVOKE")] INVOKE_WATCHDOG = WATCHDOG | INIT_WATCHDOG | 0x00000002,
 
-            // Upload to drive configuration arguments. Base value is 0x00002000. Invoke is 0x00002003
+            // Upload to drive configuration arguments. Base value is 0x00002000. Invoke is 0x00002001
             [Description("--DRIVE")] DRIVE = 0x00002000,
             [Description("--DRIVE_INITIALIZE")] INIT_DRIVE = DRIVE | 0x00000001,
             [Description("--DRIVE_INVOKE")] INVOKE_DRIVE = DRIVE | INIT_DRIVE | 0x00000002,
 
-            // Encryption configuration arguments. Base value is 0x00003000.
-            [Description("--ENCRYPTION")] ENCRYPTION = 0x00004000,
+            // Encryption configuration arguments. Base value is 0x00008000. Invoke is 0x00008002
+            [Description("--EMAIL")] EMAIL = 0x00008000,
+            [Description("--EMAIL_INITIALIZE")] INIT_EMAIL = EMAIL | 0x00000001,
+            [Description("--DRIVE_INVOKE")] INVOKE_EMAIL = EMAIL | INIT_EMAIL | 0x00000002,
+
+            // Encryption configuration arguments. Base value is 0x00008000. Invoke is 0x00008001
+            [Description("--ENCRYPTION")] ENCRYPTION = 0x00008000,
             [Description("--ENCRYPTION")] INIT_ENCRYPTION = ENCRYPTION | 0x00000001,
             [Description("--ENCRYPT_STRING")] ENCRYPT_STRING = ENCRYPTION | INIT_ENCRYPTION | 0x00000002,
             [Description("--DECRYPT_STRING")] DECRYPT_STRING = ENCRYPTION | INIT_ENCRYPTION | 0x00000004,
@@ -190,6 +198,7 @@ namespace FulcrumInjector.FulcrumViewSupport
             // For all other action types, return the result of the invoked routine
             if (ArgType.HasFlag(StartupArguments.WATCHDOG)) return this._invokeWatchdogAction(StartupAction);
             if (ArgType.HasFlag(StartupArguments.DRIVE)) return this._invokeDriveAction(StartupAction);
+            if (ArgType.HasFlag(StartupArguments.EMAIL)) return this._invokeEmailAction(StartupAction);
             if (ArgType.HasFlag(StartupArguments.ENCRYPTION)) return this._invokeEncryptionAction(StartupAction);
 
             // If no argument types are found to be valid, log this issue and exit out 
@@ -211,7 +220,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 // For watchdog init, build a new service and exit out
                 case StartupArguments.WATCHDOG:
                 case StartupArguments.INIT_WATCHDOG:
-                    FulcrumWatchdogService.InitializeWatchdogService(true);
+                    FulcrumWatchdog.InitializeWatchdogService(true);
                     this._commandLineLogger.WriteLog("INVOKED NEW WATCHDOG INSTANCE CORRECTLY!", LogType.InfoLog);
                     return true;
 
@@ -231,7 +240,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Once we've got a valid command, invoke it
                     this._commandLineLogger.WriteLog($"BUILDING WATCHDOG SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
-                    var WatchdogService = FulcrumWatchdogService.InitializeWatchdogService();
+                    var WatchdogService = FulcrumWatchdog.InitializeWatchdogService();
                     WatchdogService.RunCommand(WatchdogCommand);
 
                     // Break out once we've invoked our command
@@ -258,7 +267,7 @@ namespace FulcrumInjector.FulcrumViewSupport
                 // For drive service init, build a new service and exit out
                 case StartupArguments.DRIVE:
                 case StartupArguments.INIT_DRIVE:
-                    FulcrumDriveService.InitializeDriveService(true);
+                    FulcrumDrive.InitializeDriveService(true);
                     this._commandLineLogger.WriteLog("INVOKED NEW DRIVE SERVICE INSTANCE CORRECTLY!", LogType.InfoLog);
                     return true;
 
@@ -278,7 +287,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Once we've got a valid command, invoke it
                     this._commandLineLogger.WriteLog($"BUILDING DRIVE SERVICE AND INVOKING COMMAND {DriveCommand}...", LogType.InfoLog);
-                    var DriveService = FulcrumDriveService.InitializeDriveService();
+                    var DriveService = FulcrumDrive.InitializeDriveService();
                     DriveService.RunCommand(DriveCommand);
 
                     // Break out once we've invoked our command
@@ -292,7 +301,53 @@ namespace FulcrumInjector.FulcrumViewSupport
             }
         }
         /// <summary>
-        /// Private helper method used to invoke a encryption action
+        /// Private helper method used to invoke an email action
+        /// </summary>
+        /// <param name="EmailAction">The email action being invoked</param>
+        /// <returns>True if the action is invoked. False if not</returns>
+        private bool _invokeEmailAction(FulcrumStartupAction EmailAction)
+        {
+            // Switch based on the argument type and execute the needed action
+            StartupArguments ArgType = EmailAction.ArgumentType;
+            switch (ArgType)
+            {
+                // For encryption init, build a new service and exit out
+                case StartupArguments.EMAIL:
+                case StartupArguments.INIT_EMAIL:
+                    FulcrumEmail.InitializeEmailService(true);
+                    this._commandLineLogger.WriteLog("INVOKED NEW DRIVE SERVICE INSTANCE CORRECTLY!", LogType.InfoLog);
+                    return true;
+
+                case StartupArguments.INVOKE_EMAIL:
+                    if (EmailAction.ArgumentParameters.Length == 0) {
+                        this._commandLineLogger.WriteLog("ERROR! NO COMMAND TYPE WAS PROVIDED FOR EMAIL ROUTINE!", LogType.ErrorLog);
+                        return false;
+                    }
+
+                    // Invoke a new watchdog service instance and run a custom command for it
+                    string CommandNumberString = EmailAction.ArgumentParameters[0];
+                    if (!int.TryParse(CommandNumberString, out int WatchdogCommand)) {
+                        this._commandLineLogger.WriteLog($"ERROR! COULD NOT PARSE EMAIL COMMAND TYPE {CommandNumberString}!", LogType.ErrorLog);
+                        return false;
+                    }
+
+                    // Once we've got a valid command, invoke it
+                    this._commandLineLogger.WriteLog($"BUILDING EMAIL SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
+                    var WatchdogService = FulcrumEmail.InitializeEmailService();
+                    WatchdogService.RunCommand(WatchdogCommand);
+
+                    // Break out once we've invoked our command
+                    this._commandLineLogger.WriteLog($"EXECUTED COMMAND {WatchdogCommand} CORRECTLY!");
+                    return true;
+
+                // For all other cases, exit out failed
+                default:
+                    this._commandLineLogger.WriteLog($"ERROR! FAILED TO INVOKE EMAIL ACTION {ArgType}!", LogType.ErrorLog);
+                    return false;
+            }
+        }
+        /// <summary>
+        /// Private helper method used to invoke an encryption action
         /// </summary>
         /// <param name="EncryptionAction">The encryption action being invoked</param>
         /// <returns>True if the action is invoked. False if not</returns>
@@ -335,7 +390,8 @@ namespace FulcrumInjector.FulcrumViewSupport
                     }
 
                     // Check our argument count for the encryption routine here
-                    if (EncryptionAction.ArgumentParameters.Length == 0) {
+                    if (EncryptionAction.ArgumentParameters.Length == 0)
+                    {
                         this._commandLineLogger.WriteLog("ERROR! COULD NOT FIND STRING VALUE TO ENCRYPT OR DECRYPT!", LogType.ErrorLog);
                         return false;
                     }
@@ -343,10 +399,10 @@ namespace FulcrumInjector.FulcrumViewSupport
                     // Store if we're encrypting or decrypting here and convert our input value
                     bool IsEncrypting = ArgType == StartupArguments.ENCRYPT_STRING;
                     string InputValue = EncryptionAction.ArgumentParameters[0];
-                    string ConvertedString = IsEncrypting 
+                    string ConvertedString = IsEncrypting
                         ? FulcrumEncryptor.Encrypt(InputValue)
                         : FulcrumEncryptor.Decrypt(InputValue);
-                    
+
                     // Log out the action has passed correctly and write the new value out to our log file
                     this._commandLineLogger.WriteLog($"{(IsEncrypting ? "ENCRYPTED" : "DECRYPTED")} STRING CORRECTLY!", LogType.InfoLog);
                     this._commandLineLogger.WriteLog($"INPUT STRING VALUE: {InputValue}", LogType.InfoLog);

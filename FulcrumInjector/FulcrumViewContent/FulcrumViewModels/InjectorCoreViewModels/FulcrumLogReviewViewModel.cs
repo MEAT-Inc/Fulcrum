@@ -17,6 +17,8 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.FilteringFormatter
 using FulcrumInjector.FulcrumViewSupport.FulcrumLogFormatters.InjectorSyntaxFormatters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.FulcrumModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
+using FulcrumJson;
+using FulcrumSupport;
 using SharpExpressions;
 using SharpLogging;
 using SharpSimulator;
