@@ -19,6 +19,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using FulcrumJson;
+using FulcrumUpdaterService;
 using FulcrumWatchdogService;
 using SharpLogging;
 
@@ -64,15 +65,16 @@ namespace FulcrumInjector
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
 
-            // Configure a single instance and setup encryption along with an exit routine
+            // Configure a single instance and setup encryption. Configure exit routine and parse CLI arguments
             this._configureSingleInstance();
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
-
-            // Configure startup actions if needed. Then build the drive/watchdog services here
             this._configureStartupActions();
+
+            // Initialize instances of our service objects if needed here
             FulcrumDrive.InitializeDriveService();
             FulcrumEmail.InitializeEmailService();
+            FulcrumUpdater.InitializeUpdaterService();
             FulcrumWatchdog.InitializeWatchdogService();
 
             // Configure settings and app theme

@@ -62,6 +62,7 @@ namespace FulcrumEmailService.JsonConverters
             var OutputObject = JObject.FromObject(new
             {
                 ValueObject.ReportSenderName,
+                ValueObject.DefaultReportRecipient,
                 ReportSenderEmail = this._useEncryption 
                     ? FulcrumEncryptor.Encrypt(ValueObject.ReportSenderName)
                     : ValueObject.ReportSenderName,
@@ -98,12 +99,14 @@ namespace FulcrumEmailService.JsonConverters
             string ReportSenderName = InputObject[nameof(EmailBrokerConfiguration.ReportSenderName)].Value<string>();
             string ReportSenderEmail = InputObject[nameof(EmailBrokerConfiguration.ReportSenderEmail)].Value<string>();
             string ReportSenderPassword = InputObject[nameof(EmailBrokerConfiguration.ReportSenderPassword)].Value<string>();
+            string DefaultReportRecipient = InputObject[nameof(EmailBrokerConfiguration.DefaultReportRecipient)].Value<string>();
 
             // Build a new output object using our pulled properties
             var OutputObject = new EmailBrokerConfiguration()
             {
                 // Store the properties of our configuration here and exit out
                 ReportSenderName = ReportSenderName,
+                DefaultReportRecipient = DefaultReportRecipient,
                 ReportSenderEmail = this._useEncryption
                     ? FulcrumEncryptor.Decrypt(ReportSenderEmail)
                     : ReportSenderEmail,

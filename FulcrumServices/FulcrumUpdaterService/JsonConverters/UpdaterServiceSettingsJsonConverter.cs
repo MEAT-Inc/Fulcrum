@@ -61,6 +61,8 @@ namespace FulcrumUpdaterService.JsonConverters
             // Encrypt "UpdaterUserName", "UpdaterSecretKey"
             var OutputObject = JObject.FromObject(new
             {
+                ValueObject.ServiceName,
+                ValueObject.ServiceEnabled,
                 ValueObject.ForceUpdateReady,
                 ValueObject.UpdaterOrgName,
                 ValueObject.UpdaterRepoName, 
@@ -93,6 +95,8 @@ namespace FulcrumUpdaterService.JsonConverters
             if (ConfigConverter is UpdaterServiceSettingsJsonConverter CastConverter) this._useEncryption = CastConverter._useEncryption;
 
             // Read in our properties for the JObject and build a configuration from them
+            string ServiceName = InputObject[nameof(UpdaterServiceSettings.ServiceName)].Value<string>();
+            bool ServiceEnabled = InputObject[nameof(UpdaterServiceSettings.ServiceEnabled)].Value<bool>();
             bool ForceUpdateReady = InputObject[nameof(UpdaterServiceSettings.ForceUpdateReady)].Value<bool>();
             string UpdaterOrgName = InputObject[nameof(UpdaterServiceSettings.UpdaterOrgName)].Value<string>();
             string UpdaterRepoName = InputObject[nameof(UpdaterServiceSettings.UpdaterRepoName)].Value<string>();
@@ -103,9 +107,11 @@ namespace FulcrumUpdaterService.JsonConverters
             var OutputObject = new UpdaterServiceSettings()
             {
                 // Store the properties of our configuration here and exit out
-                ForceUpdateReady = ForceUpdateReady,
+                ServiceName = ServiceName,
+                ServiceEnabled = ServiceEnabled,
                 UpdaterOrgName = UpdaterOrgName,
                 UpdaterRepoName = UpdaterRepoName,
+                ForceUpdateReady = ForceUpdateReady,
                 UpdaterUserName = this._useEncryption ? FulcrumEncryptor.Decrypt(UpdaterUserName) : UpdaterUserName,
                 UpdaterSecretKey = this._useEncryption ? FulcrumEncryptor.Decrypt(UpdaterSecretKey) : UpdaterSecretKey,
             };

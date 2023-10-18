@@ -145,8 +145,7 @@ namespace FulcrumUpdaterService
             return Task.Run(() =>
             {
                 // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit)
-                {
+                if (_serviceInstance != null && !ForceInit) {
                     ServiceInitLogger.WriteLog("FOUND EXISTING UPDATER SERVICE INSTANCE! RETURNING IT NOW...");
                     return _serviceInstance;
                 }

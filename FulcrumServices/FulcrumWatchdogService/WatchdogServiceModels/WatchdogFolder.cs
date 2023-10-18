@@ -204,7 +204,7 @@ namespace FulcrumWatchdogService.WatchdogServiceModels
             this._watchedDirectory = Path.GetFullPath(WatchedDirectory);
             this._watchedFiles = new ObservableCollection<WatchdogFile>();
             if (_executionGap == 0) 
-                _executionGap = ValueLoaders.GetConfigValue<int>("FulcrumWatchdogService.ExecutionGap");
+                _executionGap = ValueLoaders.GetConfigValue<int>("FulcrumServices.FulcrumWatchdogService.ExecutionGap");
 
             // If our logger instance is null, build it now
             if (_folderLogger == null)
