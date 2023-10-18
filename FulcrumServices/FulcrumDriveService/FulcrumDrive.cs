@@ -28,12 +28,15 @@ namespace FulcrumDriveService
 
         #region Fields
 
+        // Private backing fields for our drive service instance
+        private static FulcrumDrive _serviceInstance;           // Instance of our service object
+        private static readonly object _serviceLock = new();    // Lock object for building service instances
+
         // Private backing fields for drive service objects
         private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
         private DriveConfiguration _driveConfig;                  // The initialization configuration for the drive service
         private static DriveService _driveService;                // Private static instance for our drive service object
         private DriveServiceSettings _serviceConfig;              // Settings configuration for our service
-        private static FulcrumDrive _serviceInstance;             // Static service instance object
 
         #endregion //Fields
 
@@ -145,19 +148,23 @@ namespace FulcrumDriveService
             ServiceInitLogger.WriteLog($"SPAWNING A NEW DRIVE SERVICE INSTANCE NOW...", LogType.WarnLog);
             return Task.Run(() =>
             {
-                // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) {
-                    ServiceInitLogger.WriteLog("FOUND EXISTING DRIVE SERVICE INSTANCE! RETURNING IT NOW...");
+                // Lock our service object for thread safe operations
+                lock (_serviceLock)
+                {
+                    // Check if we need to force rebuilt this service or not
+                    if (_serviceInstance != null && !ForceInit) {
+                        ServiceInitLogger.WriteLog("FOUND EXISTING DRIVE SERVICE INSTANCE! RETURNING IT NOW...");
+                        return _serviceInstance;
+                    }
+
+                    // Build and boot a new service instance for our watchdog
+                    _serviceInstance = new FulcrumDrive(ServiceConfig);
+                    _serviceInstance.OnStart(null);
+                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
+
+                    // Return the service instance here
                     return _serviceInstance;
                 }
-
-                // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumDrive(ServiceConfig);
-                _serviceInstance.OnStart(null);
-                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
-
-                // Return the service instance here
-                return _serviceInstance;
             });
         }
 

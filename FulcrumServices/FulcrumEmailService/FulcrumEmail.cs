@@ -31,12 +31,13 @@ namespace FulcrumEmailService
 
         #region Fields
 
-        // Private logger instance and backing fields for our email recipients
-        private static FulcrumEmail _serviceInstance;             // Static service instance object
-        private MailAddress[] _emailRecipientAddresses;           // Backing field for email service configuration
+        // Private backing fields for our email service instance
+        private static FulcrumEmail _serviceInstance;         // Instance of our service object
+        private static readonly object _serviceLock = new();    // Lock object for building service instances
 
         // Private configuration objects for service setup
         private EmailServiceSettings _serviceConfig;              // Settings configuration for our service
+        private MailAddress[] _emailRecipientAddresses;           // Backing field for email service configuration
         private EmailSmtpConfiguration _stmpConfiguration;        // Configuration for SMTP Server connections
         private EmailBrokerConfiguration _emailConfiguration;     // Configuration for the broker instance itself
 
@@ -178,19 +179,23 @@ namespace FulcrumEmailService
             ServiceInitLogger.WriteLog($"SPAWNING A NEW EMAIL SERVICE INSTANCE NOW...", LogType.WarnLog); 
             return Task.Run(() =>
             {
-                // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) {
-                    ServiceInitLogger.WriteLog("FOUND EXISTING EMAIL SERVICE INSTANCE! RETURNING IT NOW...");
+                // Lock our service object for thread safe operations
+                lock (_serviceLock)
+                {
+                    // Check if we need to force rebuilt this service or not
+                    if (_serviceInstance != null && !ForceInit) {
+                        ServiceInitLogger.WriteLog("FOUND EXISTING EMAIL SERVICE INSTANCE! RETURNING IT NOW...");
+                        return _serviceInstance;
+                    }
+
+                    // Build and boot a new service instance for our watchdog
+                    _serviceInstance = new FulcrumEmail(ServiceConfig);
+                    _serviceInstance.OnStart(null);
+                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR EMAIL SERVICE OK!", LogType.InfoLog);
+
+                    // Return the service instance here
                     return _serviceInstance;
                 }
-
-                // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumEmail(ServiceConfig);
-                _serviceInstance.OnStart(null);
-                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR EMAIL SERVICE OK!", LogType.InfoLog);
-
-                // Return the service instance here
-                return _serviceInstance;
             });
         }
 

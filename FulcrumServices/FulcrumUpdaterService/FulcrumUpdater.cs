@@ -36,8 +36,9 @@ namespace FulcrumUpdaterService
 
         #region Fields
 
-        // Private backing fields for our watchdog service configuration
-        private static FulcrumUpdater _serviceInstance;        
+        // Private backing fields for our updater service instance
+        private static FulcrumUpdater _serviceInstance;         // Instance of our service object
+        private static readonly object _serviceLock = new();    // Lock object for building service instances
 
         // Private backing fields for the Git helper, timer, and updater configuration
         private readonly Stopwatch _downloadTimer;                       // Download timer for pulling in versions
@@ -144,19 +145,23 @@ namespace FulcrumUpdaterService
             ServiceInitLogger.WriteLog($"SPAWNING A NEW UPDATER SERVICE INSTANCE NOW...", LogType.WarnLog);
             return Task.Run(() =>
             {
-                // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) {
-                    ServiceInitLogger.WriteLog("FOUND EXISTING UPDATER SERVICE INSTANCE! RETURNING IT NOW...");
+                // Lock our service object for thread safe operations
+                lock (_serviceLock)
+                {
+                    // Check if we need to force rebuilt this service or not
+                    if (_serviceInstance != null && !ForceInit) {
+                        ServiceInitLogger.WriteLog("FOUND EXISTING UPDATER SERVICE INSTANCE! RETURNING IT NOW...");
+                        return _serviceInstance;
+                    }
+
+                    // Build and boot a new service instance for our watchdog
+                    _serviceInstance = new FulcrumUpdater(ServiceConfig);
+                    _serviceInstance.OnStart(null);
+                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
+
+                    // Return the service instance here
                     return _serviceInstance;
                 }
-
-                // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumUpdater(ServiceConfig);
-                _serviceInstance.OnStart(null);
-                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
-
-                // Return the service instance here
-                return _serviceInstance;
             });
         }
 

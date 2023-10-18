@@ -19,9 +19,12 @@ namespace FulcrumWatchdogService
 
         #region Fields
 
+        // Private backing fields for our updater service instance
+        private static FulcrumWatchdog _serviceInstance;        // Instance of our service object
+        private static readonly object _serviceLock = new();    // Lock object for building service instances
+
         // Private backing fields for our watchdog service configuration
         private WatchdogSettings _serviceConfig;             // Settings configuration for the service
-        private static FulcrumWatchdog _serviceInstance;     // Static service instance object
         private List<WatchdogFolder> _watchedDirectories;    // Watched folders for the service
 
         #endregion //Fields
@@ -97,19 +100,23 @@ namespace FulcrumWatchdogService
             ServiceInitLogger.WriteLog($"SPAWNING A NEW WATCHDOG SERVICE INSTANCE NOW...", LogType.WarnLog);
             return Task.Run(() =>
             {
-                // Check if we need to force rebuilt this service or not
-                if (_serviceInstance != null && !ForceInit) {
-                    ServiceInitLogger.WriteLog("FOUND EXISTING WATCHDOG SERVICE INSTANCE! RETURNING IT NOW...");
+                // Lock our service object for thread safe operations
+                lock (_serviceLock)
+                {
+                    // Check if we need to force rebuilt this service or not
+                    if (_serviceInstance != null && !ForceInit) {
+                        ServiceInitLogger.WriteLog("FOUND EXISTING WATCHDOG SERVICE INSTANCE! RETURNING IT NOW...");
+                        return _serviceInstance;
+                    }
+
+                    // Build and boot a new service instance for our watchdog
+                    _serviceInstance = new FulcrumWatchdog(ServiceConfig);
+                    _serviceInstance.OnStart(null);
+                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK!", LogType.InfoLog);
+
+                    // Return the service instance here
                     return _serviceInstance;
                 }
-
-                // Build and boot a new service instance for our watchdog
-                _serviceInstance = new FulcrumWatchdog(ServiceConfig);
-                _serviceInstance.OnStart(null);
-                ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK!", LogType.InfoLog);
-
-                // Return the service instance here
-                return _serviceInstance;
             });
         }
 
