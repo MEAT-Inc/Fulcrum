@@ -3,8 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
-using FulcrumInjector.Properties;
+using FulcrumEncryption;
 using MahApps.Metro.Controls;
 using SharpLogging;
 
@@ -49,7 +48,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
         public static bool ConfigureEncryptionKeys()
         {
             // Check if encryption is configured or not
-            if (EncryptionKeys.IsEncryptionConfigured) return true;
+            if (FulcrumEncryptionKeys.IsEncryptionConfigured) return true;
 
             // If it's not configured, build a new window and show it
             FulcrumEncryptionWindow EncryptionWin = new FulcrumEncryptionWindow();
@@ -58,7 +57,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
 
             // Show a new dialog window for the configuration of the keys and check the status again
             EncryptionWin.ShowDialog();
-            if (EncryptionKeys.IsEncryptionConfigured) {
+            if (FulcrumEncryptionKeys.IsEncryptionConfigured) {
                 EncryptionWin._viewLogger.WriteLog("ENCRYPTION KEYS HAVE BEEN CONFIGURED CORRECTLY!", LogType.InfoLog);
                 return false;
             }
@@ -99,9 +98,9 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
                 this._viewLogger.WriteLog("CONVERTED AND PARSED BOTH AUTH KEY AND CRYPTO KEY VALUES CORRECTLY!", LogType.InfoLog);
 
                 // Now store the byte values on the encryption store and exit out
-                if (!EncryptionKeys.SetAuthorizationKey(AuthBytes))
+                if (!FulcrumEncryptionKeys.SetAuthorizationKey(AuthBytes))
                     throw new InvalidOperationException("Error! Failed to set a new Authorization Key despite a valid parse!");
-                if (!EncryptionKeys.SetCryptographicKey(CryptoBytes))
+                if (!FulcrumEncryptionKeys.SetCryptographicKey(CryptoBytes))
                     throw new InvalidOperationException("Error! Failed to set a new Cryptographic Key despite a valid parse!");
 
                 // Once we've set our key values, we can exit out of this window
@@ -129,7 +128,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
         private void btnCloseInjectorApplication_OnClick(object Sender, RoutedEventArgs E)
         {
             // If encryption keys are configured just exit this routine and close this window
-            if (EncryptionKeys.IsEncryptionConfigured) {
+            if (FulcrumEncryptionKeys.IsEncryptionConfigured) {
                 this._viewLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED! INJECTOR APPLICATION MAY PROCEED!", LogType.InfoLog);
                 this.Close(); 
             }

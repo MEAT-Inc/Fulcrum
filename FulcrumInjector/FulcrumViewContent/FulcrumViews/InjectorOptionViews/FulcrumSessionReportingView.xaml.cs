@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumJson;
 using SharpLogging;
 using SharpPipes;
 
@@ -75,8 +76,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         private void FulcrumSessionReportingView_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Force show help menu and build email temp text
-            if (this.EmailBodyTextContent.Text.Length == 0)
-            {
+            if (this.EmailBodyTextContent.Text.Length == 0) {
                 this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
                 this._viewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
             }
@@ -144,7 +144,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
                 // Rend out the message request here.
                 var SendTime = new Stopwatch(); SendTime.Start();
-                bool SendResult = this.ViewModel.SessionReportSender.SendReportMessage(SendingSubject, BodyContents);
+                bool SendResult = this.ViewModel.SessionReportSender.SendMessage(SendingSubject, BodyContents);
                 this._viewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
                 this._viewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
 

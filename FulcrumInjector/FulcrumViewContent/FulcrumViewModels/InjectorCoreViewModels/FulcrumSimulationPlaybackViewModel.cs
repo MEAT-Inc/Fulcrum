@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpLogging;

@@ -1,33 +1,26 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using ControlzEx.Theming;
+using FulcrumDriveService;
+using FulcrumEmailService;
+using FulcrumEncryption;
 using FulcrumInjector.FulcrumViewContent;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
-using FulcrumInjector.FulcrumViewContent.FulcrumViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
-using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumEncryption;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumModels.DriveBrokerModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
-using FulcrumInjector.FulcrumViewSupport.FulcrumModels.WatchdogModels;
-using FulcrumInjector.FulcrumViewSupport.FulcrumServices;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
-using FulcrumInjector.Properties;
-using NLog.Targets;
+using FulcrumJson;
+using FulcrumUpdaterService;
+using FulcrumWatchdogService;
 using SharpLogging;
 
 namespace FulcrumInjector
@@ -72,15 +65,17 @@ namespace FulcrumInjector
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
 
-            // Configure a single instance and setup encryption along with an exit routine
+            // Configure a single instance and setup encryption. Configure exit routine and parse CLI arguments
             this._configureSingleInstance();
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
-
-            // Configure startup actions if needed. Then build the drive/watchdog services here
             this._configureStartupActions();
-            FulcrumDriveService.InitializeDriveService();
-            FulcrumWatchdogService.InitializeWatchdogService();
+
+            // Initialize instances of our service objects if needed here
+            FulcrumDrive.InitializeDriveService();
+            FulcrumEmail.InitializeEmailService();
+            FulcrumUpdater.InitializeUpdaterService();
+            FulcrumWatchdog.InitializeWatchdogService();
 
             // Configure settings and app theme
             this._configureCurrentTheme();
@@ -264,7 +259,7 @@ namespace FulcrumInjector
         {
             // Log out that we're configuring encryption keys here and check if they're configured
             this._appLogger.WriteLog("VALIDATING ENCRYPTION KEY CONFIGURATION NOW...", LogType.WarnLog);
-            if (EncryptionKeys.IsEncryptionConfigured)
+            if (FulcrumEncryptionKeys.IsEncryptionConfigured)
             {
                 // Log out that our encryption keys are configured and exit out
                 this._appLogger.WriteLog("ENCRYPTION KEYS ARE CONFIGURED CORRECTLY!", LogType.InfoLog);
@@ -288,7 +283,7 @@ namespace FulcrumInjector
         private void _configureStartupActions()
         {
             // Check to see if we've been provided with command line arguments or not
-            FulcrumCommandLine CommandLineHelper = new FulcrumCommandLine(); 
+            var CommandLineHelper = FulcrumCommandLine.InitializeCommandLineHelper();
             var StartupActions = CommandLineHelper.ParseCommandLineArgs();
             if (StartupActions.Count == 0) 
             {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport.JsonConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using ICSharpCode.AvalonEdit;
 using NLog.Targets;

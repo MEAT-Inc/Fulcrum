@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews"
+        xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumControls"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" mc:Ignorable="d"
         BorderBrush="White" BorderThickness="2" ResizeMode="NoResize"  TitleBarHeight="10"
         ShowCloseButton="False" NonActiveWindowTitleBrush="Transparent" Height="425" Width="570">
