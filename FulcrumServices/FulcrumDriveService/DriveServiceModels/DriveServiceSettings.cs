@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumDriveService.JsonConverters;
 using FulcrumEncryption;
 using FulcrumService;
+using Newtonsoft.Json;
 
 namespace FulcrumDriveService.DriveServiceModels
 {
     /// <summary>
     /// Class object holding our configuration for the settings section to control a drive service instance
     /// </summary>
+    [JsonConverter(typeof(DriveServiceSettingsJsonConverter))]
     public class DriveServiceSettings : FulcrumServiceSettings
     {
         #region Custom Events

@@ -51,6 +51,7 @@
     <Compile Include="DriveServiceModels\DriveServiceSettings.cs" />
     <Compile Include="JsonConverters\DriveAuthJsonConverter.cs" />
     <Compile Include="JsonConverters\DriveConfigJsonConverter.cs" />
+    <Compile Include="JsonConverters\DriveServiceSettingsJsonConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
       <AutoGen>True</AutoGen>
