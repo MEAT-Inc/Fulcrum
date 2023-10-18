@@ -98,8 +98,8 @@ namespace FulcrumDriveService
             this.GoogleDriveId = this._serviceConfig.GoogleDriveId; 
             this.ApplicationName = this._serviceConfig.ApplicationName; 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
-            this._serviceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
+            this._serviceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}", LogType.TraceLog);
 
             // Pull in new authorization and configuration objects here
             this._driveAuth = this._serviceConfig.ExplorerAuthorization;
@@ -107,9 +107,9 @@ namespace FulcrumDriveService
 
             // Log out information about our configuration values here 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}");
-            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}");
-            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}");
+            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}", LogType.TraceLog);
 
             // Configure the google drive service here
             this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
