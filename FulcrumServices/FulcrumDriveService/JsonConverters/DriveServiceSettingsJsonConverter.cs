@@ -100,8 +100,8 @@ namespace FulcrumDriveService.JsonConverters
             bool ServiceEnabled = InputObject[nameof(DriveServiceSettings.ServiceEnabled)].Value<bool>();
             string GoogleDriveId = InputObject[nameof(DriveServiceSettings.GoogleDriveId)].Value<string>();
             string ApplicationName = InputObject[nameof(DriveServiceSettings.ApplicationName)].Value<string>();
-            DriveAuthorization DriveAuth = InputObject[nameof(DriveServiceSettings.ExplorerAuthorization)].Value<DriveAuthorization>();
-            DriveConfiguration DriveConfig = InputObject[nameof(DriveServiceSettings.ExplorerConfiguration)].Value<DriveConfiguration>();
+            DriveAuthorization DriveAuth = InputObject[nameof(DriveServiceSettings.ExplorerAuthorization)].ToObject<DriveAuthorization>();
+            DriveConfiguration DriveConfig = InputObject[nameof(DriveServiceSettings.ExplorerConfiguration)].ToObject<DriveConfiguration>();
 
             // Build a new output object using our pulled properties
             var OutputObject = new DriveServiceSettings()
