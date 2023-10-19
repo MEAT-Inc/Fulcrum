@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels
 {

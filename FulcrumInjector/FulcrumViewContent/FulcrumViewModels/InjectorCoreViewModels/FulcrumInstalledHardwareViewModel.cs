@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumJson;
 using SharpLogging;
 using SharpWrapper.J2534Objects;
 using SharpWrapper.PassThruImport;

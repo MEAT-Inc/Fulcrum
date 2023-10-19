@@ -2,7 +2,13 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
     <?define ProductVersion="!(bind.fileVersion.FULCRUMINJECTOR.EXE)"?>
-    <!-- Product Definitions -->
+
+    <!-- Registry Key Name Variables -->
+    <?define InstallPathKeyName="InstallPath"?>
+	<?define InstallVersionKeyName="InstallVersion"?>
+	<?define InstallExecutableKeyName="InstallExecutable"?>
+
+	<!-- Product Definitions -->
     <Product Id="*" Name="FulcrumInjector" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
         <!-- Package Metadata Configuration -->
         <Package InstallerVersion="200" Compressed="yes" />
@@ -24,144 +30,190 @@
             <Directory Id="ProgramMenuFolder" />
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="MeatIncProgramFiles" Name="MEAT Inc">
-                    <Directory Id="DriverComponent" Name="FulcrumShim">
-                        <!-- Injector App Files -->
-                        <Directory Name="FulcrumInjector" Id="FULCRUMINJECTORFILES">
-							<!-- Supporting DLLs and Logic -->
-	                        <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
-	                            <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
-	                            <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
-								<File Id="GOOGLE.APIS.AUTH.DLL" Name="Google.Apis.Auth.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
-								<File Id="GOOGLE.APIS.AUTH.PLATFORMSERVICES.DLL" Name="Google.Apis.Auth.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.PlatformServices.dll" />
-								<File Id="GOOGLE.APIS.AUTH.XML" Name="Google.Apis.Auth.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.xml" />
-								<File Id="GOOGLE.APIS.CORE.DLL" Name="Google.Apis.Core.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.dll" />
-								<File Id="GOOGLE.APIS.CORE.XML" Name="Google.Apis.Core.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.xml" />
-								<File Id="GOOGLE.APIS.DLL" Name="Google.Apis.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.dll" />
-								<File Id="GOOGLE.APIS.DRIVE.V3.DLL" Name="Google.Apis.Drive.v3.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.dll" />
-								<File Id="GOOGLE.APIS.DRIVE.V3.XML" Name="Google.Apis.Drive.v3.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.xml" />
-								<File Id="GOOGLE.APIS.PLATFORMSERVICES.DLL" Name="Google.Apis.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.PlatformServices.dll" />
-								<File Id="GOOGLE.APIS.XML" Name="Google.Apis.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.xml" />
-								<File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
-                                <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.dll" />
-                                <File Id="MARKDIG.DLL" Name="Markdig.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.dll" />
-                                <File Id="MARKDIG.WPF.DLL" Name="Markdig.Wpf.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.Wpf.dll" />
-                                <File Id="MICROSOFT.XAML.BEHAVIORS.DLL" Name="Microsoft.Xaml.Behaviors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.dll" />
-                                <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
-                                <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
-                                <File Id="OCTOKIT.DLL" Name="Octokit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.dll" />
-                                <File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
-								<File Id="SHARPEXPRESSIONS.DLL" Name="SharpExpressions.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpExpressions.dll" />
-								<File Id="SHARPPIPES.DLL" Name="SharpPipes.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpPipes.dll" />
-                                <File Id="SHARPLOGGING.DLL" Name="SharpLogging.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogging.dll" />
-                                <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
-                                <File Id="SHARPWRAPPER.DLL" Name="SharpWrapper.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrapper.dll" />
-                                <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
-                                <File Id="SYSTEM.BUFFERS.DLL" Name="System.Buffers.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.dll" />
-                                <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
-                                <File Id="SYSTEM.NUMERICS.VECTORS.DLL" Name="System.Numerics.Vectors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.dll" />
-								<File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.DLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
-								<!--<File Id="SYSTEM.SERVICEPROCESS.DLL" Name="System.ServiceProcess.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.ServiceProcess.dll" />-->
-                                <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
-                                <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
-                                <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
-                                <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
-                                <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />
-                                <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
-                                <File Id="OCTOKIT.XML" Name="Octokit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.xml" />
-                                <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
-                                <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
-                                <File Id="SYSTEM.MEMORY.XML" Name="System.Memory.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.xml" />
-                                <File Id="SYSTEM.NUMERICS.VECTORS.XML" Name="System.Numerics.Vectors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.xml" />
-                                <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.XML" Name="System.Runtime.CompilerServices.Unsafe.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.xml" />
-	                            <!-- Injector EXE and Shortcuts -->
-	                            <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
-		                            <!-- Start Menu Shortcut -->
-		                            <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
-			                            <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-		                            </Shortcut>
-		                            <!-- Desktop Shortcut -->
-		                            <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
-			                            <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-		                            </Shortcut>
-	                            </File>                            
-	                        </Component>
-                            <Directory Id="FULCRUMXAML" Name="FulcrumXAML">
-                                <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
-                                    <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml" />
-                                    <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumControlStyles.xaml" />
-									<File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
-									<File Id="FULCRUMENCRYPTIONKEYSWINDOWSTYLES.XAML" Name="FulcrumEncryptionKeysWindowStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumEncryptionKeysWindowStyles.xaml" />
-                                    <File Id="FULCRUMVEHICLECONNECTIONINFOSTYLES.XAML" Name="FulcrumVehicleConnectionInfoStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml" />
-                                    <File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml" />
-                                    <File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml" />
-									<File Id="FULCRUMHAMBURGERCOREVIEWSTYLES.XAML" Name="FulcrumHamburgerCoreViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml" />
-                                    <File Id="FULCRUMINSTALLEDHARDWAREVIEWSTYLES.XAML" Name="FulcrumInstalledHardwareViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml" />
-                                    <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
-                                    <File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
-                                    <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
-                                    <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
-                                    <File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />
-                                    <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumTitleViewStyles.xaml" />
-                                    <File Id="FULCRUMSIMULATIONPLAYBACKSTYLES.XAML" Name="FulcrumSimulationPlaybackStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
-                                    <File Id="FULCRUMABOUTTHISAPPSTYLES.XAML" Name="FulcrumAboutThisAppStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
-									<File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml" />
-									<File Id="FULCRUMGOOGLEDRIVESTYLES.XAML" Name="FulcrumGoogleDriveStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumGoogleDriveStyles.xaml" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
-                                <Component Id="CreateFulcrumIconsFolder" Guid="471E54A8-8BEC-47B0-BC6B-7B7E3A7426BB">
+	                <Component Id="MeatIncRegistryKey" Guid="2EFF94B1-6D86-408D-B758-41C48F1B64BF">
+		                <RegistryKey Root="HKLM" Id="MeatIncKey" Key="SOFTWARE\MEAT Inc" Action="createAndRemoveOnUninstall">
+			                <RegistryValue Id="MeatIncFiles" Name="InstallPath" Action="write" Type="string" Value="[MeatIncProgramFiles]" />
+		                </RegistryKey>
+	                </Component>
+	                <Directory Id="FulcrumInjectorFiles" Name="FulcrumInjector">
+	                    <Component Id="FulcrumInjectorRegistryKey" Guid="7A1F175A-1CEC-431D-BFE0-EABE1A5F2AD5">
+		                    <RegistryKey Root="HKLM" Id="FulcrumInjectorKey" Key="SOFTWARE\MEAT Inc\FulcrumInjector" Action="createAndRemoveOnUninstall">
+			                    <RegistryValue Id="FulcrumInjectorVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="$(var.ProductVersion)" />
+			                    <RegistryValue Id="FulcrumInjectorInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]" />
+			                    <RegistryValue Id="FulcrumInjectorExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]FulcrumInjector.exe" />
+		                    </RegistryKey>
+	                    </Component>
+                        <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
+	                        <File Id="FULCRUMDRIVESERVICE.EXE_1" Name="FulcrumDriveService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumDriveService.exe" />
+                            <File Id="FULCRUMEMAILSERVICE.EXE_1" Name="FulcrumEmailService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumEmailService.exe" />
+                            <File Id="FULCRUMUPDATERSERVICE.EXE_1" Name="FulcrumUpdaterService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumUpdaterService.exe" />
+                            <File Id="FULCRUMWATCHDOGSERVICE.EXE_1" Name="FulcrumWatchdogService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumWatchdogService.exe" />
+                            <File Id="CONTROLZEX.DLL" Name="ControlzEx.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.dll" />
+                            <File Id="FIZZLER.DLL" Name="Fizzler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Fizzler.dll" />
+                            <File Id="FULCRUMENCRYPTION.DLL_4" Name="FulcrumEncryption.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                            <File Id="FULCRUMJSON.DLL_4" Name="FulcrumJson.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumJson.dll" />
+                            <File Id="FULCRUMSERVICE.DLL_4" Name="FulcrumService.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumService.dll" />
+                            <File Id="FULCRUMSUPPORT.DLL_4" Name="FulcrumSupport.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumSupport.dll" />
+                            <File Id="GOOGLE.APIS.AUTH.DLL" Name="Google.Apis.Auth.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
+                            <File Id="GOOGLE.APIS.AUTH.PLATFORMSERVICES.DLL" Name="Google.Apis.Auth.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.PlatformServices.dll" />
+                            <File Id="GOOGLE.APIS.CORE.DLL" Name="Google.Apis.Core.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.dll" />
+                            <File Id="GOOGLE.APIS.DLL" Name="Google.Apis.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.dll" />
+                            <File Id="GOOGLE.APIS.DRIVE.V3.DLL" Name="Google.Apis.Drive.v3.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.dll" />
+                            <File Id="GOOGLE.APIS.PLATFORMSERVICES.DLL" Name="Google.Apis.PlatformServices.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.PlatformServices.dll" />
+                            <File Id="ICSHARPCODE.AVALONEDIT.DLL" Name="ICSharpCode.AvalonEdit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll" />
+                            <File Id="MAHAPPS.METRO.DLL" Name="MahApps.Metro.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.dll" />
+                            <File Id="MARKDIG.DLL" Name="Markdig.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.dll" />
+                            <File Id="MARKDIG.WPF.DLL" Name="Markdig.Wpf.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.Wpf.dll" />
+                            <File Id="MICROSOFT.WIN32.TASKSCHEDULER.DLL" Name="Microsoft.Win32.TaskScheduler.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Win32.TaskScheduler.dll" />
+                            <File Id="MICROSOFT.XAML.BEHAVIORS.DLL" Name="Microsoft.Xaml.Behaviors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.dll" />
+                            <File Id="NEWTONSOFT.JSON.DLL" Name="Newtonsoft.Json.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+                            <File Id="NLOG.DLL" Name="NLog.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.dll" />
+                            <File Id="OCTOKIT.DLL" Name="Octokit.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.dll" />
+                            <File Id="SHARPAUTOID.DLL" Name="SharpAutoId.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpAutoId.dll" />
+                            <File Id="SHARPEXPRESSIONS.DLL" Name="SharpExpressions.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpExpressions.dll" />
+                            <File Id="SHARPLOGGING.DLL" Name="SharpLogging.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpLogging.dll" />
+                            <File Id="SHARPPIPES.DLL" Name="SharpPipes.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpPipes.dll" />
+                            <File Id="SHARPSIMULATOR.DLL" Name="SharpSimulator.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpSimulator.dll" />
+                            <File Id="SHARPWRAPPER.DLL" Name="SharpWrapper.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\SharpWrapper.dll" />
+                            <File Id="SVG.DLL" Name="Svg.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.dll" />
+                            <File Id="SYSTEM.BUFFERS.DLL" Name="System.Buffers.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.dll" />
+                            <File Id="SYSTEM.MEMORY.DLL" Name="System.Memory.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.dll" />
+                            <File Id="SYSTEM.NUMERICS.VECTORS.DLL" Name="System.Numerics.Vectors.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.dll" />
+                            <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.DLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
+                            <File Id="FULCRUMDRIVESERVICE.EXE.CONFIG_1" Name="FulcrumDriveService.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumDriveService.exe.config" />
+                            <File Id="FULCRUMEMAILSERVICE.EXE.CONFIG_1" Name="FulcrumEmailService.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumEmailService.exe.config" />
+                            <File Id="FULCRUMINJECTOR.EXE.CONFIG" Name="FulcrumInjector.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe.config" />
+                            <File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG_1" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
+                            <File Id="FULCRUMWATCHDOGSERVICE.EXE.CONFIG_1" Name="FulcrumWatchdogService.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumWatchdogService.exe.config" />
+                            <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
+                            <File Id="FULCRUMINJECTOR.XML" Name="FulcrumInjector.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.xml" />
+                            <File Id="GOOGLE.APIS.AUTH.XML" Name="Google.Apis.Auth.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.xml" />
+                            <File Id="GOOGLE.APIS.CORE.XML" Name="Google.Apis.Core.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.xml" />
+                            <File Id="GOOGLE.APIS.DRIVE.V3.XML" Name="Google.Apis.Drive.v3.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.xml" />
+                            <File Id="GOOGLE.APIS.XML" Name="Google.Apis.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.xml" />
+                            <File Id="ICSHARPCODE.AVALONEDIT.XML" Name="ICSharpCode.AvalonEdit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml" />
+                            <File Id="MAHAPPS.METRO.XML" Name="MahApps.Metro.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\MahApps.Metro.xml" />
+                            <File Id="MARKDIG.XML" Name="Markdig.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Markdig.xml" />
+                            <File Id="MICROSOFT.WIN32.TASKSCHEDULER.XML" Name="Microsoft.Win32.TaskScheduler.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Win32.TaskScheduler.xml" />
+                            <File Id="MICROSOFT.XAML.BEHAVIORS.XML" Name="Microsoft.Xaml.Behaviors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.xml" />
+                            <File Id="NEWTONSOFT.JSON.XML" Name="Newtonsoft.Json.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Newtonsoft.Json.xml" />
+                            <File Id="NLOG.XML" Name="NLog.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\NLog.xml" />
+                            <File Id="OCTOKIT.XML" Name="Octokit.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Octokit.xml" />
+                            <File Id="SVG.XML" Name="Svg.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Svg.xml" />
+                            <File Id="SYSTEM.BUFFERS.XML" Name="System.Buffers.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Buffers.xml" />
+                            <File Id="SYSTEM.MEMORY.XML" Name="System.Memory.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.xml" />
+                            <File Id="SYSTEM.NUMERICS.VECTORS.XML" Name="System.Numerics.Vectors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.xml" />
+                            <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.XML" Name="System.Runtime.CompilerServices.Unsafe.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.xml" />
+	                        <!-- Injector EXE and Shortcuts -->
+	                        <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
+		                        <!-- Start Menu Shortcut -->
+		                        <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+			                        <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+		                        </Shortcut>
+		                        <!-- Desktop Shortcut -->
+		                        <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+			                        <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+		                        </Shortcut>
+	                        </File>
+                        </Component>
+                        <Directory Id="FULCRUMXAML" Name="FulcrumXAML">
+                            <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
+                                <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml" />
+                                <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumControlStyles.xaml" />
+                                <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
+                                <File Id="FULCRUMENCRYPTIONKEYSWINDOWSTYLES.XAML" Name="FulcrumEncryptionKeysWindowStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumEncryptionKeysWindowStyles.xaml" />
+                                <File Id="FULCRUMVEHICLECONNECTIONINFOSTYLES.XAML" Name="FulcrumVehicleConnectionInfoStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumVehicleConnectionInfoStyles.xaml" />
+                                <File Id="FULCRUMDLLINJECTIONTESTVIEWSTYLES.XAML" Name="FulcrumDllInjectionTestViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml" />
+                                <File Id="FULCRUMDLLOUTPUTLOGVIEWSTYLES.XAML" Name="FulcrumDllOutputLogViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllOutputLogViewStyles.xaml" />
+                                <File Id="FULCRUMHAMBURGERCOREVIEWSTYLES.XAML" Name="FulcrumHamburgerCoreViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumHamburgerCoreViewStyles.xaml" />
+                                <File Id="FULCRUMINSTALLEDHARDWAREVIEWSTYLES.XAML" Name="FulcrumInstalledHardwareViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledHardwareViewStyles.xaml" />
+                                <File Id="FULCRUMINSTALLEDOEAPPSVIEWSTYLES.XAML" Name="FulcrumInstalledOeAppsViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumInstalledOeAppsViewStyles.xaml" />
+                                <File Id="FULCRUMLOGREVIEWVIEWSTYLES.XAML" Name="FulcrumLogReviewViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumLogReviewViewStyles.xaml" />
+                                <File Id="FULCRUMPIPESTATUSVIEWSTYLES.XAML" Name="FulcrumPipeStatusViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumPipeStatusViewStyles.xaml" />
+                                <File Id="FULCRUMSETTINGSPANEVIEWSTYLES.XAML" Name="FulcrumSessionReportingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSettingsPaneViewStyles.xaml" />
+                                <File Id="FULCRUMSESSIONREPORTINGVIEWSTYLES.XAML" Name="FulcrumSettingsPaneViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSessionReportingViewStyles.xaml" />
+                                <File Id="FULCRUMTITLEVIEWSTYLES.XAML" Name="FulcrumTitleViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumTitleViewStyles.xaml" />
+                                <File Id="FULCRUMSIMULATIONPLAYBACKSTYLES.XAML" Name="FulcrumSimulationPlaybackStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
+                                <File Id="FULCRUMABOUTTHISAPPSTYLES.XAML" Name="FulcrumAboutThisAppStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
+                                <File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml" />
+                                <File Id="FULCRUMGOOGLEDRIVESTYLES.XAML" Name="FulcrumGoogleDriveStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumGoogleDriveStyles.xaml" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
+                            <Component Id="CreateFulcrumIconsFolder" Guid="471E54A8-8BEC-47B0-BC6B-7B7E3A7426BB">
+                                <CreateFolder />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMRESOURCES" Name="FulcrumResources">
+                            <Component Id="FulcrumResourceFiles" Guid="D02E8312-F036-4A73-A0A4-8D848B4F1426">
+                                <File Id="MEATINCTURBOLOGO.JPG" Name="MeatIncTurboLogo.jpg" Source="..\FulcrumInjector\FulcrumResources\MeatIncTurboLogo.jpg" />
+                                <File Id="SHIMICONPROJECT.ICO" Name="ShimIconProject.ico" Source="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+                                <File Id="SHIMICONPROJECT.XCF" Name="ShimIconProject.xcf" Source="..\FulcrumInjector\FulcrumResources\ShimIconProject.xcf" />
+                                <File Id="UNICORNSOFTWARELIST.TXT" Name="UnicornSoftwareList.txt" Source="..\FulcrumInjector\FulcrumResources\UnicornSoftwareList.txt" />
+                                <File Id="FULCRUMSHIMDLLCONFIG.TXT" Name="FulcrumShimDLLConfig.txt" Source="..\FulcrumInjector\FulcrumResources\FulcrumShimDLLConfig.txt" />
+                                <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMEXPRESSIONS" Name="FulcrumExpressions">
+                            <Component Id="CreateFulcrumExpressionsFolder" Guid="6367FEEB-615C-4D19-B68F-984BF71C7321">
+                                <CreateFolder />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMSIMULATIONS" Name="FulcrumSimulations">
+                            <Component Id="CreateFulcrumSimulationsFolder" Guid="8776595B-41EE-47C8-844A-F0596C67F90B">
+                                <CreateFolder />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMCONVERSIONS" Name="FulcrumConversions">
+                            <Component Id="CreateFulcrumConversionsFolder" Guid="A88D5BF2-516C-4838-B79F-BFDE9ACF6BD5">
+                                <CreateFolder />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMDEFAULTIMPORTS" Name="FulcrumImports">
+                            <Component Id="CreateFulcrumImportsFolder" Guid="77D91A92-6EF7-4E05-984E-9DA575EABEFD">
+                                <CreateFolder />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
+                            <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
+                                <CreateFolder />
+                            </Component>
+                            <Directory Id="FULCRUMARCHIVESFOLDER" Name="FulcrumArchives">
+                                <Component Id="CreateFulcrumArchivesFolder" Guid="CD71C6E7-D573-4A21-8DBF-628557CC1DA1">
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-                            <Directory Id="FULCRUMRESOURCES" Name="FulcrumResources">
-                                <Component Id="FulcrumResourceFiles" Guid="D02E8312-F036-4A73-A0A4-8D848B4F1426">
-                                    <File Id="MEATINCTURBOLOGO.JPG" Name="MeatIncTurboLogo.jpg" Source="..\FulcrumInjector\FulcrumResources\MeatIncTurboLogo.jpg" />
-                                    <File Id="SHIMICONPROJECT.ICO" Name="ShimIconProject.ico" Source="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-                                    <File Id="SHIMICONPROJECT.XCF" Name="ShimIconProject.xcf" Source="..\FulcrumInjector\FulcrumResources\ShimIconProject.xcf" />
-                                    <File Id="UNICORNSOFTWARELIST.TXT" Name="UnicornSoftwareList.txt" Source="..\FulcrumInjector\FulcrumResources\UnicornSoftwareList.txt" />
-                                    <File Id="FULCRUMSHIMDLLCONFIG.TXT" Name="FulcrumShimDLLConfig.txt" Source="..\FulcrumInjector\FulcrumResources\FulcrumShimDLLConfig.txt" />
-                                    <File Id="FULCRUMINJECTORSETTINGS.JSON" Name="FulcrumInjectorSettings.json" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumResources\FulcrumInjectorSettings.json" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="FULCRUMEXPRESSIONS" Name="FulcrumExpressions">
-                                <Component Id="CreateFulcrumExpressionsFolder" Guid="6367FEEB-615C-4D19-B68F-984BF71C7321">
+                            <Directory Id="FULCRUMWATCHDOGLOGSFOLDER" Name="WatchdogServiceLogs">
+                                <Component Id="CreateWatchdogServiceLogsFolder" Guid="753D8563-B5EC-4D68-BF12-AE6B43C83207">
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-                            <Directory Id="FULCRUMSIMULATIONS" Name="FulcrumSimulations">
-                                <Component Id="CreateFulcrumSimulationsFolder" Guid="8776595B-41EE-47C8-844A-F0596C67F90B">
+                            <Directory Id="DRIVESERVICELOGS" Name="DriveServiceLogs">
+                                <Component Id="CreateDriveServiceLogsFolder" Guid="7DD75A6D-5721-44E8-819E-4DC8FFA304A7">
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-                            <Directory Id="FULCRUMCONVERSIONS" Name="FulcrumConversions">
-                                <Component Id="CreateFulcrumConversionsFolder" Guid="A88D5BF2-516C-4838-B79F-BFDE9ACF6BD5">
+                            <Directory Id="EMAILSERVICELOGS" Name="EmailServiceLogs">
+                                <Component Id="CreateEmailServiceLogsFolder" Guid="B8309159-DA7E-405B-A8F3-88DD3AF651EB">
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-                            <Directory Id="FULCRUMDEFAULTIMPORTS" Name="FulcrumImports">
-                                <Component Id="CreateFulcrumImportsFolder" Guid="77D91A92-6EF7-4E05-984E-9DA575EABEFD">
+                            <Directory Id="UPDATERSERVICELOGS" Name="UpdaterServiceLogs">
+                                <Component Id="CreateUpdaterServiceLogsFolder" Guid="BF7C14A9-28C3-4EB1-B7F6-5662FA874970">
                                     <CreateFolder />
                                 </Component>
                             </Directory>
-							<Directory Name="FulcrumLogs" Id="FULCRUMLOGS">
-								<Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
-									<CreateFolder />
-								</Component>
-								<Directory Name="FulcrumArchives" Id="FULCRUMARCHIVESFOLDER">
-									<Component Id="CreateFulcrumArchivesFolder" Guid="CD71C6E7-D573-4A21-8DBF-628557CC1DA1">
-										<CreateFolder />
-									</Component>
-								</Directory>
-								<Directory Name="WatchdogLogs" Id="FULCRUMWATCHDOGLOGSFOLDER">
-									<Component Id="CreateFulcrumWatchdogLogsFolder" Guid="753D8563-B5EC-4D68-BF12-AE6B43C83207">
-										<CreateFolder />
-									</Component>
-								</Directory>
-							</Directory>
-
-						</Directory>
-                        <!-- DLL Files for the Fulcrum -->
-                        <Component Id="FulcrumShimFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
+                        </Directory>
+                    </Directory>
+                    <Directory Id="FulcrumShimFiles" Name="FulcrumShim">
+	                    <Component Id="FulcrumShimRegistryKey" Guid="0D33DD10-646A-4409-A869-C09D092BF638">
+		                    <RegistryKey Id="FulcrumShimKey" Root="HKLM" Key="SOFTWARE\MEAT Inc\FulcrumShim" Action="createAndRemoveOnUninstall">
+								<RegistryValue Id="ShimInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]" />
+								<RegistryValue Id="ShimVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSHIM.DLL)" />
+                                <RegistryValue Id="ShimDllPath" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]FulcrumShim.dll" />
+							</RegistryKey>
+	                    </Component>
+                        <Component Id="FulcrumShimProgramFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
                             <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\$(var.Configuration)\FulcrumShim.dll" />
                             <File Id="CONCRT140.DLL" Name="concrt140.dll" Source="..\FulcrumShim\$(var.Configuration)\concrt140.dll" />
                             <File Id="MFC140.DLL" Name="mfc140.dll" Source="..\FulcrumShim\$(var.Configuration)\mfc140.dll" />
@@ -188,15 +240,12 @@
                             <File Id="VCOMP140.DLL" Name="vcomp140.dll" Source="..\FulcrumShim\$(var.Configuration)\vcomp140.dll" />
                             <File Id="VCRUNTIME140.DLL" Name="vcruntime140.dll" Source="..\FulcrumShim\$(var.Configuration)\vcruntime140.dll" />
                         </Component>
-                        <!-- Version 0404 Key -->
-                        <Component Id="V0404RegKey" Guid="EF5C10AB-C995-429F-A491-7EC723A8D924">
+                        <Component Id="FulcrumShimV0404RegistryKey" Guid="EF5C10AB-C995-429F-A491-7EC723A8D924">
                             <RegistryKey Id="RegOmegaKey_0404" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc - FulcrumShim (v04.04)" Action="createAndRemoveOnUninstall">
-                                <!-- Add registry strings for the product -->
                                 <RegistryValue Id="V0404_RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
                                 <RegistryValue Id="V0404_RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
-                                <RegistryValue Id="V0404_RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\FulcrumInjector\FulcrumInjector.exe" />
-                                <RegistryValue Id="V0404_RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
-                                <!-- Add registry dword flags for each network protocol -->
+                                <RegistryValue Id="V0404_RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[MeatIncProgramFiles]\FulcrumInjector\FulcrumInjector.exe" />
+                                <RegistryValue Id="V0404_RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[MeatIncProgramFiles]FulcrumShim.dll" />
                                 <RegistryValue Id="V0404_RegFlagCAN" Name="CAN" Action="write" Type="integer" Value="1" />
                                 <RegistryValue Id="V0404_RegFlagISO15765" Name="ISO15765" Action="write" Type="integer" Value="1" />
                                 <RegistryValue Id="V0404_RegFlagJ1850PWM" Name="J1850PWM" Action="write" Type="integer" Value="1" />
@@ -209,15 +258,12 @@
                                 <RegistryValue Id="V0404_RegFlagSCIBTRANS" Name="SCI_B_TRANS" Action="write" Type="integer" Value="1" />
                             </RegistryKey>
                         </Component>
-                        <!-- Version 0500 Key -->
-                        <Component Id="V0500RegKey" Guid="0E480A35-76F2-404D-8997-277C99EF4150">
+                        <Component Id="FulcrumShimV0500RegistryKey" Guid="0E480A35-76F2-404D-8997-277C99EF4150">
                             <RegistryKey Id="RegOmegaKey_0500" Root="HKLM" Key="SOFTWARE\PassThruSupport.05.00\MEAT Inc - FulcrumShim (v05.00)" Action="createAndRemoveOnUninstall">
-                                <!-- Add registry strings for the product -->
                                 <RegistryValue Id="V0500_RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
                                 <RegistryValue Id="V0500_RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
-                                <RegistryValue Id="V0500_RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[DriverComponent]\FulcrumInjector\FulcrumInjector.exe" />
-                                <RegistryValue Id="V0500_RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[DriverComponent]FulcrumShim.dll" />
-                                <!-- Add registry dword flags for each network protocol -->
+                                <RegistryValue Id="V0500_RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[MeatIncProgramFiles]\FulcrumInjector\FulcrumInjector.exe" />
+                                <RegistryValue Id="V0500_RegFunctionLibrary" Name="FunctionLibrary" Action="write" Type="string" KeyPath="yes" Value="[MeatIncProgramFiles]FulcrumShim.dll" />
                                 <RegistryValue Id="V0500_RegFlagCAN" Name="CAN" Action="write" Type="integer" Value="1" />
                                 <RegistryValue Id="V0500_RegFlagISO15765" Name="ISO15765" Action="write" Type="integer" Value="1" />
                                 <RegistryValue Id="V0500_RegFlagJ1850PWM" Name="J1850PWM" Action="write" Type="integer" Value="1" />
@@ -231,26 +277,150 @@
                             </RegistryKey>
                         </Component>
                     </Directory>
+                    <Directory Id="FulcrumServices" Name="FulcrumServices">
+						<Component Id="FulcrumServicesRegistryKey" Guid="12557D48-30E2-4035-A576-E587D6A9B547">
+							<RegistryKey Root="HKLM" Id="FulcrumServicesKey" Key="SOFTWARE\MEAT Inc\FulcrumServices" Action="createAndRemoveOnUninstall">
+								<RegistryValue Id="ServicesInstallFolder" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumServices]" />
+								<RegistryValue Id="ServiceBaseVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSERVICE.DLL_4)" />
+							</RegistryKey>
+						</Component>
+	                    <Directory Id="FulcrumWatchdogService" Name="FulcrumWatchdogService">
+	                        <Component Id="WatchdogServiceRegistryKey" Guid="1AF8BA36-D9D4-4CF4-A9D6-9EA9D3BD0758">
+		                        <RegistryKey Root="HKLM" Id="WatchdogServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumWatchdog" Action="createAndRemoveOnUninstall">
+			                        <RegistryValue Id="WatchdogServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]" />
+			                        <RegistryValue Id="WatchdogServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMWATCHDOGSERVICE.EXE)" />
+			                        <RegistryValue Id="WatchdogServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]FulcrumWatchdog.exe" />
+		                        </RegistryKey>
+	                        </Component>
+	                        <Component Id="WatchdogServiceProgramFiles" Guid="A53BA067-BCEE-4802-8407-E6948F1AAB4F">
+                                <File Id="FULCRUMWATCHDOGSERVICE.EXE" Name="FulcrumWatchdogService.exe" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe" />
+                                <File Id="FULCRUMENCRYPTION.DLL_3" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                                <File Id="FULCRUMJSON.DLL_3" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumJson.dll" />
+                                <File Id="FULCRUMSERVICE.DLL_3" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumService.dll" />
+                                <File Id="FULCRUMSUPPORT.DLL_3" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumSupport.dll" />
+                                <File Id="NEWTONSOFT.JSON.DLL_4" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+                                <File Id="NLOG.DLL_4" Name="NLog.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\NLog.dll" />
+                                <File Id="SHARPLOGGING.DLL_4" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\SharpLogging.dll" />
+                                <File Id="FULCRUMWATCHDOGSERVICE.EXE.CONFIG" Name="FulcrumWatchdogService.exe.config" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe.config" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FulcrumDriveService" Name="FulcrumDriveService">
+	                        <Component Id="DriveServiceRegistryKey" Guid="65E3149A-C942-44AC-9B7C-FDD00B345954">
+		                        <RegistryKey Root="HKLM" Id="DriveServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumDrive" Action="createAndRemoveOnUninstall">
+			                        <RegistryValue Id="DriveServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]" />
+			                        <RegistryValue Id="DriveServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMDRIVESERVICE.EXE)" />
+			                        <RegistryValue Id="DriveServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]FulcrumEmailService.exe" />
+		                        </RegistryKey>
+	                        </Component>
+	                        <Component Id="DriveServiceProgramFiles" Guid="420C72D7-A383-4E5A-9DA5-4AA8A5876EE5">
+                                <File Id="FULCRUMDRIVESERVICE.EXE" Name="FulcrumDriveService.exe" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe" />
+                                <File Id="FULCRUMENCRYPTION.DLL" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                                <File Id="FULCRUMJSON.DLL" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumJson.dll" />
+                                <File Id="FULCRUMSERVICE.DLL" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumService.dll" />
+                                <File Id="FULCRUMSUPPORT.DLL" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumSupport.dll" />
+                                <File Id="GOOGLE.APIS.AUTH.DLL_1" Name="Google.Apis.Auth.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Google.Apis.Auth.dll" />
+                                <File Id="GOOGLE.APIS.AUTH.PLATFORMSERVICES.DLL_1" Name="Google.Apis.Auth.PlatformServices.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Google.Apis.Auth.PlatformServices.dll" />
+                                <File Id="GOOGLE.APIS.CORE.DLL_1" Name="Google.Apis.Core.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Google.Apis.Core.dll" />
+                                <File Id="GOOGLE.APIS.DLL_1" Name="Google.Apis.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Google.Apis.dll" />
+                                <File Id="GOOGLE.APIS.DRIVE.V3.DLL_1" Name="Google.Apis.Drive.v3.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Google.Apis.Drive.v3.dll" />
+                                <File Id="GOOGLE.APIS.PLATFORMSERVICES.DLL_1" Name="Google.Apis.PlatformServices.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Google.Apis.PlatformServices.dll" />
+                                <File Id="NEWTONSOFT.JSON.DLL_1" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+                                <File Id="NLOG.DLL_1" Name="NLog.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\NLog.dll" />
+                                <File Id="SHARPLOGGING.DLL_1" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\SharpLogging.dll" />
+                                <File Id="FULCRUMDRIVESERVICE.EXE.CONFIG" Name="FulcrumDriveService.exe.config" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe.config" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="FulcrumUpdaterService" Name="FulcrumUpdaterService">
+	                        <Component Id="UpdaterServiceRegistryKey" Guid="D372EBB4-C61A-428A-AF2F-B1115A0A0FCF">
+		                        <RegistryKey Root="HKLM" Id="UpdaterServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumUpdater" Action="createAndRemoveOnUninstall">
+			                        <RegistryValue Id="UpdaterServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]" />
+			                        <RegistryValue Id="UpdaterServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMUPDATERSERVICE.EXE)" />
+			                        <RegistryValue Id="UpdaterServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]FulcrumUpdater.exe" />
+		                        </RegistryKey>
+	                        </Component>
+	                        <Component Id="UpdaterServiceProgramFiles" Guid="5D0D1D69-02A7-4BE3-A76B-CA11F9266819">
+                                <File Id="FULCRUMUPDATERSERVICE.EXE" Name="FulcrumUpdaterService.exe" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe" />
+                                <File Id="FULCRUMENCRYPTION.DLL_2" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                                <File Id="FULCRUMJSON.DLL_2" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumJson.dll" />
+                                <File Id="FULCRUMSERVICE.DLL_2" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumService.dll" />
+                                <File Id="FULCRUMSUPPORT.DLL_2" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumSupport.dll" />
+                                <File Id="NEWTONSOFT.JSON.DLL_3" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+                                <File Id="NLOG.DLL_3" Name="NLog.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\NLog.dll" />
+                                <File Id="OCTOKIT.DLL_1" Name="Octokit.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\Octokit.dll" />
+                                <File Id="SHARPLOGGING.DLL_3" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\SharpLogging.dll" />
+                                <File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
+                            </Component>
+                        </Directory>
+	                    <Directory Id="FulcrumEmailService" Name="FulcrumEmailService">
+	                        <Component Id="EmailServiceRegistryKey" Guid="6C0A5D95-DD66-4995-83F7-92748ADE9429">
+		                        <RegistryKey Root="HKLM" Id="EmailServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumEmail" Action="createAndRemoveOnUninstall">
+			                        <RegistryValue Id="EmailServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]" />
+			                        <RegistryValue Id="EmailServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMEMAILSERVICE.EXE)" />
+			                        <RegistryValue Id="EmailServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]FulcrumEmailService.exe" />
+		                        </RegistryKey>
+	                        </Component>
+	                        <Component Id="EmailServiceProgramFiles" Guid="A71ED1B5-55EE-4B01-AEC5-A3C8DE2AF5C9">
+                                <File Id="FULCRUMEMAILSERVICE.EXE" Name="FulcrumEmailService.exe" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe" />
+                                <File Id="FULCRUMENCRYPTION.DLL_1" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                                <File Id="FULCRUMJSON.DLL_1" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumJson.dll" />
+                                <File Id="FULCRUMSERVICE.DLL_1" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumService.dll" />
+                                <File Id="FULCRUMSUPPORT.DLL_1" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumSupport.dll" />
+                                <File Id="NEWTONSOFT.JSON.DLL_2" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+                                <File Id="NLOG.DLL_2" Name="NLog.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\NLog.dll" />
+                                <File Id="SHARPLOGGING.DLL_2" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\SharpLogging.dll" />
+                                <File Id="FULCRUMEMAILSERVICE.EXE.CONFIG" Name="FulcrumEmailService.exe.config" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe.config" />
+                            </Component>
+                        </Directory>
+                    </Directory>
                 </Directory>
             </Directory>
         </Directory>
         <!-- Features -->
         <Feature Id="ProductFeature" Title="installer" Level="1">
-            <ComponentRef Id="V0404RegKey" />
-            <ComponentRef Id="V0500RegKey" />
+
+            <!-- Base Registry Keys -->
+            <ComponentRef Id="MeatIncRegistryKey" />
+            <ComponentRef Id="FulcrumShimRegistryKey" />
+            <ComponentRef Id="FulcrumServicesRegistryKey" />
+            <ComponentRef Id="FulcrumInjectorRegistryKey" />
+
+            <!-- Service Registry Keys -->
+            <ComponentRef Id="WatchdogServiceRegistryKey" />
+            <ComponentRef Id="DriveServiceRegistryKey" />
+            <ComponentRef Id="UpdaterServiceRegistryKey" />
+            <ComponentRef Id="EmailServiceRegistryKey" />
+
+			<!-- PassThru Support Keys -->
+            <ComponentRef Id="FulcrumShimV0404RegistryKey" />
+            <ComponentRef Id="FulcrumShimV0500RegistryKey" />
+
+            <!-- Injector Program Files -->
             <ComponentRef Id="FulcrumXamlFiles" />
-            <ComponentRef Id="FulcrumShimFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
-			<ComponentRef Id="CreateFulcrumIconsFolder" />
-			<ComponentRef Id="CreateFulcrumLoggingFolder" />
-			<ComponentRef Id="CreateFulcrumArchivesFolder" />
-            <ComponentRef Id="CreateFulcrumImportsFolder" />
+            <ComponentRef Id="CreateFulcrumIconsFolder" />
+			<ComponentRef Id="CreateFulcrumImportsFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
-			<ComponentRef Id="CreateFulcrumWatchdogLogsFolder" />
-            <ComponentRef Id="CreateFulcrumExpressionsFolder" />
+			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
             <ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
-		</Feature>
+
+            <!-- Shim Program Files-->
+            <ComponentRef Id="FulcrumShimProgramFiles" />
+            
+            <!-- Service Files and Registry Keys -->
+            <ComponentRef Id="WatchdogServiceProgramFiles" />
+            <ComponentRef Id="DriveServiceProgramFiles" />
+            <ComponentRef Id="UpdaterServiceProgramFiles" />
+            <ComponentRef Id="EmailServiceProgramFiles" />
+
+            <!-- Logging Folders  -->
+            <ComponentRef Id="CreateFulcrumLoggingFolder" />
+            <ComponentRef Id="CreateFulcrumArchivesFolder" />
+            <ComponentRef Id="CreateWatchdogServiceLogsFolder" />
+            <ComponentRef Id="CreateDriveServiceLogsFolder" />
+            <ComponentRef Id="CreateEmailServiceLogsFolder" />
+            <ComponentRef Id="CreateUpdaterServiceLogsFolder" />
+        </Feature>
         <!-- In Control Panel > Add or Remove Programs, applications can have various 
          entries like phone number and Internet contact information under the Click 
          here for support information entry -->

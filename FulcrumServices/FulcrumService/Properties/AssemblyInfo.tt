@@ -1,0 +1,49 @@
+﻿﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#
+    string output = File.ReadAllText(this.Host.ResolvePath("AssemblyInfo.cs"));
+    Regex pattern = new Regex("AssemblyVersion\\(\"(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<revision>\\d+)\\.(?<build>\\d+)\"\\)");
+    MatchCollection matches = pattern.Matches(output);
+    if( matches.Count == 1 )
+    {
+        major = Convert.ToInt32(matches[0].Groups["major"].Value);
+        minor = Convert.ToInt32(matches[0].Groups["minor"].Value);
+        build = Convert.ToInt32(matches[0].Groups["build"].Value) + 1;
+        revision = Convert.ToInt32(matches[0].Groups["revision"].Value);
+        if( this.Host.ResolveParameterValue("-","-","BuildConfiguration") == "Release" )
+            revision++;
+    }
+#>
+// Using calls for Assembly Info updating
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Resources;
+
+// General Information
+[assembly: AssemblyTitle("FulcrumService")]
+[assembly: AssemblyDescription("Supporting logic for any of the FulcrumInjector service objects")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("MEAT Inc")]
+[assembly: AssemblyProduct("FulcrumService")]
+[assembly: AssemblyCopyright("Copyright ©MEAT Inc 2023")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// Internal Visibility for testing
+[assembly: ComVisible(false)]
+[assembly: Guid("9ed477f5-f3dc-4643-b7cb-e2fc3f33d652")]
+
+// Version information
+[assembly: AssemblyVersion("<#= this.major #>.<#= this.minor #>.<#= this.revision #>.<#= this.build #>")]
+[assembly: AssemblyFileVersion("<#= this.major #>.<#= this.minor #>.<#= this.revision #>.<#= this.build #>")]
+[assembly: NeutralResourcesLanguageAttribute( "en-US" )]
+
+<#+
+    int major = 1;
+    int minor = 0;
+    int revision = 0;
+    int build = 0;
+#>

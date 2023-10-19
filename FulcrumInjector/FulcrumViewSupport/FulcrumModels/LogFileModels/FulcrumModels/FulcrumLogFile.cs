@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumSupport;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.FulcrumModels
 {
