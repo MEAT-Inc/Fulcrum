@@ -81,8 +81,8 @@ namespace FulcrumEncryption
             // Do basic error checking on input arguments to ensure they're populated
             if (FulcrumEncryptionKeys.CryptographicKey == null || FulcrumEncryptionKeys.CryptographicKey.Length != KeyBitSize / 8)
                 throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(FulcrumEncryptionKeys.CryptographicKey));
-            if (FulcrumEncryptionKeys.AutorizationKey == null || FulcrumEncryptionKeys.AutorizationKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(FulcrumEncryptionKeys.AutorizationKey));
+            if (FulcrumEncryptionKeys.AuthorizationKey == null || FulcrumEncryptionKeys.AuthorizationKey.Length != KeyBitSize / 8)
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(FulcrumEncryptionKeys.AuthorizationKey));
             if (ContentToEncrypt == null || ContentToEncrypt.Length < 1)
                 throw new ArgumentException("Secret Message Required!", nameof(ContentToEncrypt));
 
@@ -115,7 +115,7 @@ namespace FulcrumEncryption
             }
 
             // Assemble encrypted message and add authentication
-            using (var HMAC256 = new HMACSHA256(FulcrumEncryptionKeys.AutorizationKey))
+            using (var HMAC256 = new HMACSHA256(FulcrumEncryptionKeys.AuthorizationKey))
             using (var EncryptedStream = new MemoryStream())
             {
                 using (var BinaryWriter = new BinaryWriter(EncryptedStream))
@@ -169,13 +169,13 @@ namespace FulcrumEncryption
             // Do basic error checking on input arguments to ensure they're populated
             if (FulcrumEncryptionKeys.CryptographicKey == null || FulcrumEncryptionKeys.CryptographicKey.Length != KeyBitSize / 8)
                 throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(FulcrumEncryptionKeys.CryptographicKey));
-            if (FulcrumEncryptionKeys.AutorizationKey == null || FulcrumEncryptionKeys.AutorizationKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(FulcrumEncryptionKeys.AutorizationKey));
+            if (FulcrumEncryptionKeys.AuthorizationKey == null || FulcrumEncryptionKeys.AuthorizationKey.Length != KeyBitSize / 8)
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), nameof(FulcrumEncryptionKeys.AuthorizationKey));
             if (EncryptedMessage == null || EncryptedMessage.Length < 1)
                 throw new ArgumentException("Secret Message Required!", nameof(EncryptedMessage));
 
             // Build a new HMAC 256 Helper using the auth key to start decryption
-            using (var hmac = new HMACSHA256(FulcrumEncryptionKeys.AutorizationKey))
+            using (var hmac = new HMACSHA256(FulcrumEncryptionKeys.AuthorizationKey))
             {
                 // Calculate the checksum tag on the input content and attempt to calculate it
                 var ChecksumTag = new byte[hmac.HashSize / 8];
