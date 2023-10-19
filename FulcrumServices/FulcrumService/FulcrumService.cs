@@ -76,10 +76,14 @@ namespace FulcrumService
         {
             // Build a static logger for service initialization routines here
             _serviceInitLogger =
-                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
-                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
+                SharpLogBroker.FindLoggers($"{nameof(FulcrumServiceBase)}Logger").FirstOrDefault()
+                ?? new SharpLogger(LoggerActions.UniversalLogger, $"{nameof(FulcrumServiceBase)}Logger");
 
             // Configure our AppSettings file if needed as well
+            if (JsonConfigFile.IsConfigured) return;
+            _serviceInitLogger.WriteLog("WARNING! INJECTOR SETTINGS FILE WAS NOT CONFIGURED! CONFIGURING IT NOW...", LogType.WarnLog);
+
+
             JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
         }
         /// <summary>
