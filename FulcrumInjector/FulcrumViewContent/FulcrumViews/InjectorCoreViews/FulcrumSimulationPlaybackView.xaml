@@ -10,7 +10,7 @@
              xmlns:fulcrumViewSupport="clr-namespace:FulcrumInjector.FulcrumViewSupport"
              xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters"
              xmlns:passThruTypes="clr-namespace:SharpWrapper.PassThruTypes;assembly=SharpWrapper"
-             xmlns:fulcrumControls="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumControls"
+             xmlns:fulcrumViewContent="clr-namespace:FulcrumInjector.FulcrumViewContent"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" Loaded="FulcrumSimulationPlaybackView_OnLoaded"
              DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ViewModel}">
 
@@ -507,7 +507,7 @@
                                                      Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding LoadedConfiguration.ReaderProtocol}" 
                                                      Visibility="{Binding ElementName=cboEditProtocolId, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                            <fulcrumControls:FulcrumEnumComboBox 
+                                            <fulcrumViewContent:FulcrumEnumComboBox 
                                                 x:Name="cboEditProtocolId"
                                                 DefaultValue="Protocol ID"
                                                 Style="{StaticResource EditConfigComboBoxStyle}"
@@ -522,7 +522,7 @@
                                                      Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding LoadedConfiguration.ReaderBaudRate}" 
                                                      Visibility="{Binding ElementName=cboEditBaudRate, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                            <fulcrumControls:FulcrumEnumComboBox 
+                                            <fulcrumViewContent:FulcrumEnumComboBox 
                                                   x:Name="cboEditBaudRate"
                                                   DefaultValue="BaudRate"
                                                   EnumerationType="{x:Type passThruTypes:BaudRate}"
@@ -537,7 +537,7 @@
                                                      Style="{StaticResource ReadonlyTextBoxStyle}"
                                                      Text="{Binding LoadedConfiguration.ReaderChannelFlags}" 
                                                      Visibility="{Binding ElementName=cboEditConnectFlags, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                            <fulcrumControls:FulcrumEnumComboBox 
+                                            <fulcrumViewContent:FulcrumEnumComboBox 
                                                 x:Name="cboEditConnectFlags"
                                                 DefaultValue="Connect Flags"
                                                 Style="{StaticResource EditConfigComboBoxStyle}"
@@ -703,7 +703,7 @@
                                                                          Style="{StaticResource ReadonlyTextBoxStyle}"
                                                                          Tag="No Flags" Text="{Binding FilterFlags}"
                                                                          Visibility="{Binding ElementName=cboEditFilterFlags, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                                                <fulcrumControls:FulcrumEnumComboBox 
+                                                                <fulcrumViewContent:FulcrumEnumComboBox 
                                                                     DefaultValue="Tx Flags"
                                                                     x:Name="cboEditFilterFlags"
                                                                     Margin="5,5,5,0"
@@ -720,7 +720,7 @@
                                                                          Style="{StaticResource ReadonlyTextBoxStyle}"
                                                                          Tag="Filter Type" Text="{Binding FilterType}"
                                                                          Visibility="{Binding ElementName=cboEditFilterType, Path=Visibility, Converter={StaticResource InverseVisibilityConverter}}"/>
-                                                                <fulcrumControls:FulcrumEnumComboBox 
+                                                                <fulcrumViewContent:FulcrumEnumComboBox 
                                                                     DefaultValue="Filter Type"
                                                                     x:Name="cboEditFilterType"
                                                                     Margin="5,5,5,0"

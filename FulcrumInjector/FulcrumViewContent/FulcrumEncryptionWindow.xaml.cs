@@ -7,7 +7,7 @@ using FulcrumEncryption;
 using MahApps.Metro.Controls;
 using SharpLogging;
 
-namespace FulcrumInjector.FulcrumViewContent.FulcrumControls
+namespace FulcrumInjector.FulcrumViewContent
 {
     /// <summary>
     /// Interaction logic for FulcrumEncryptionWindow.xaml
