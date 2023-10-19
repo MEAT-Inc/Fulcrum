@@ -93,7 +93,7 @@ namespace FulcrumEmailService
         /// Private CTOR for building a new singleton of our email broker client
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        internal FulcrumEmail(EmailServiceSettings ServiceSettings = null)
+        internal FulcrumEmail(EmailServiceSettings ServiceSettings = null) : base(ServiceTypes.EMAIL_SERVICE)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumEmail>();
@@ -163,20 +163,15 @@ namespace FulcrumEmailService
         /// <returns>The instance for our broker singleton</returns>
         public static Task<FulcrumEmail> InitializeEmailService(bool ForceInit = false)
         {
-            // Build a static init logger for the service here
-            SharpLogger ServiceInitLogger =
-                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
-                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
-
             // Make sure we actually want to use this watchdog service 
             var ServiceConfig = ValueLoaders.GetConfigValue<EmailServiceSettings>("FulcrumServices.FulcrumEmailService");
             if (!ServiceConfig.ServiceEnabled) {
-                ServiceInitLogger.WriteLog("WARNING! EMAIL SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("WARNING! EMAIL SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
                 return null;
             }
 
             // Spin up a new injector email service here if needed           
-            ServiceInitLogger.WriteLog($"SPAWNING A NEW EMAIL SERVICE INSTANCE NOW...", LogType.WarnLog); 
+            _serviceInitLogger.WriteLog($"SPAWNING A NEW EMAIL SERVICE INSTANCE NOW...", LogType.WarnLog); 
             return Task.Run(() =>
             {
                 // Lock our service object for thread safe operations
@@ -184,14 +179,14 @@ namespace FulcrumEmailService
                 {
                     // Check if we need to force rebuilt this service or not
                     if (_serviceInstance != null && !ForceInit) {
-                        ServiceInitLogger.WriteLog("FOUND EXISTING EMAIL SERVICE INSTANCE! RETURNING IT NOW...");
+                        _serviceInitLogger.WriteLog("FOUND EXISTING EMAIL SERVICE INSTANCE! RETURNING IT NOW...");
                         return _serviceInstance;
                     }
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumEmail(ServiceConfig);
                     _serviceInstance.OnStart(null);
-                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR EMAIL SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR EMAIL SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;

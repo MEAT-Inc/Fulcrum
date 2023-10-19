@@ -29,8 +29,8 @@ namespace FulcrumDriveService
         #region Fields
 
         // Private backing fields for our drive service instance
-        private static FulcrumDrive _serviceInstance;           // Instance of our service object
-        private static readonly object _serviceLock = new();    // Lock object for building service instances
+        private static FulcrumDrive _serviceInstance;             // Instance of our service object
+        private static readonly object _serviceLock = new();      // Lock object for building service instances
 
         // Private backing fields for drive service objects
         private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
@@ -78,7 +78,7 @@ namespace FulcrumDriveService
         /// CTOR routine for this drive service. Sets up our component object and our logger instance
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        internal FulcrumDrive(DriveServiceSettings ServiceSettings = null)
+        internal FulcrumDrive(DriveServiceSettings ServiceSettings = null) : base(ServiceTypes.DRIVE_SERVICE)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumDrive>();
@@ -98,8 +98,8 @@ namespace FulcrumDriveService
             this.GoogleDriveId = this._serviceConfig.GoogleDriveId; 
             this.ApplicationName = this._serviceConfig.ApplicationName; 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE ID AND APPLICATION NAME CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}");
-            this._serviceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}");
+            this._serviceLogger.WriteLog($"DRIVE ID: {GoogleDriveId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"APPLICATION NAME: {ApplicationName}", LogType.TraceLog);
 
             // Pull in new authorization and configuration objects here
             this._driveAuth = this._serviceConfig.ExplorerAuthorization;
@@ -107,9 +107,9 @@ namespace FulcrumDriveService
 
             // Log out information about our configuration values here 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}");
-            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}");
-            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}");
+            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}", LogType.TraceLog);
 
             // Configure the google drive service here
             this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
@@ -132,20 +132,15 @@ namespace FulcrumDriveService
         /// <returns>The built and configured drive helper service</returns>
         public static Task<FulcrumDrive> InitializeDriveService(bool ForceInit = false)
         {
-            // Build a static init logger for the service here
-            SharpLogger ServiceInitLogger =
-                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
-                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
-
             // Make sure we actually want to use this watchdog service 
             var ServiceConfig = ValueLoaders.GetConfigValue<DriveServiceSettings>("FulcrumServices.FulcrumDriveService");
             if (!ServiceConfig.ServiceEnabled) {
-                ServiceInitLogger.WriteLog("WARNING! DRIVE SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("WARNING! DRIVE SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
                 return null;
             }
 
             // Spin up a new injector drive service here if needed           
-            ServiceInitLogger.WriteLog($"SPAWNING A NEW DRIVE SERVICE INSTANCE NOW...", LogType.WarnLog);
+            _serviceInitLogger.WriteLog($"SPAWNING A NEW DRIVE SERVICE INSTANCE NOW...", LogType.WarnLog);
             return Task.Run(() =>
             {
                 // Lock our service object for thread safe operations
@@ -153,14 +148,14 @@ namespace FulcrumDriveService
                 {
                     // Check if we need to force rebuilt this service or not
                     if (_serviceInstance != null && !ForceInit) {
-                        ServiceInitLogger.WriteLog("FOUND EXISTING DRIVE SERVICE INSTANCE! RETURNING IT NOW...");
+                        _serviceInitLogger.WriteLog("FOUND EXISTING DRIVE SERVICE INSTANCE! RETURNING IT NOW...");
                         return _serviceInstance;
                     }
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumDrive(ServiceConfig);
                     _serviceInstance.OnStart(null);
-                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;
