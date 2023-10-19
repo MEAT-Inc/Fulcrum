@@ -7,14 +7,11 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews;
-using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
-using SharpLogging;
 using SharpWrapper;
 
-namespace FulcrumInjector.FulcrumViewContent
+namespace FulcrumInjector.FulcrumViewSupport
 {
     /// <summary>
     /// Static class which holds all the View constants for our application.

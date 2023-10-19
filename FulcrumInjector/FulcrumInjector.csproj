@@ -311,7 +311,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\FulcrumConstants.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumConstants.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumDllInjectionTestView.xaml.cs">
       <DependentUpon>FulcrumDllInjectionTestView.xaml</DependentUpon>
     </Compile>

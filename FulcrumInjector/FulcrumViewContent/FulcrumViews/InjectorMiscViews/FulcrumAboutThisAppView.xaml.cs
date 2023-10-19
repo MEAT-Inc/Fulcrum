@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews

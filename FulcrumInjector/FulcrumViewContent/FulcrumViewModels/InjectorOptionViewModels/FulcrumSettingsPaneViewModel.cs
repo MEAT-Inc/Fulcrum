@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;

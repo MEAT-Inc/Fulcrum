@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumJson;
 using SharpLogging;
