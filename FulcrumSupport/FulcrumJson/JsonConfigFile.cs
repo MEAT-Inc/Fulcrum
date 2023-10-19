@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FulcrumSupport;
+using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using SharpLogging;
 
@@ -121,12 +123,12 @@ namespace FulcrumJson
             _jsonConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
             FulcrumInjectorExe = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #else
-            var FulcrumKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\PassThruSupport.04.04\\MEAT Inc - FulcrumShim (v04.04)");
-            if (FulcrumKey != null) { FulcrumInjectorExe = Path.GetDirectoryName(FulcrumKey.GetValue("ConfigApplication").ToString()); } 
-            else 
+            // Pull the injector EXE location and store our directory for it
+            FulcrumInjectorExe = RegistryControl.InjectorExecutable;
+            if (FulcrumInjectorExe == null )
             {
                 _jsonConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
-                FulcrumInjectorExe = @"C:\Program Files (x86)\MEAT Inc\FulcrumShim\FulcrumInjector";
+                FulcrumInjectorExe = @"C:\Program Files (x86)\MEAT Inc\FulcrumInjector";
             }
 #endif
             // List all the files in the directory we've located now and then find our settings file by name
