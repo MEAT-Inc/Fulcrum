@@ -93,7 +93,7 @@ namespace FulcrumUpdaterService
         /// Builds a new injector update helper object which pulls our GitHub release information
         /// </summary>
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
-        internal FulcrumUpdater(UpdaterServiceSettings ServiceSettings = null)
+        internal FulcrumUpdater(UpdaterServiceSettings ServiceSettings = null) : base(ServiceTypes.UPDATER_SERVICE)
         {
             // Build and register a new watchdog logging target here for a file and the console
             this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumUpdater>();
@@ -129,20 +129,15 @@ namespace FulcrumUpdaterService
         /// <returns>The instance for our service singleton</returns>
         public static Task<FulcrumUpdater> InitializeUpdaterService(bool ForceInit = false)
         {
-            // Build a static init logger for the service here
-            SharpLogger ServiceInitLogger =
-                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
-                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
-
             // Make sure we actually want to use this watchdog service 
             var ServiceConfig = ValueLoaders.GetConfigValue<UpdaterServiceSettings>("FulcrumServices.FulcrumUpdaterService");
             if (!ServiceConfig.ServiceEnabled) {
-                ServiceInitLogger.WriteLog("WARNING! UPDATER SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("WARNING! UPDATER SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
                 return null;
             }
 
             // Spin up a new injector email service here if needed           
-            ServiceInitLogger.WriteLog($"SPAWNING A NEW UPDATER SERVICE INSTANCE NOW...", LogType.WarnLog);
+            _serviceInitLogger.WriteLog($"SPAWNING A NEW UPDATER SERVICE INSTANCE NOW...", LogType.WarnLog);
             return Task.Run(() =>
             {
                 // Lock our service object for thread safe operations
@@ -150,14 +145,14 @@ namespace FulcrumUpdaterService
                 {
                     // Check if we need to force rebuilt this service or not
                     if (_serviceInstance != null && !ForceInit) {
-                        ServiceInitLogger.WriteLog("FOUND EXISTING UPDATER SERVICE INSTANCE! RETURNING IT NOW...");
+                        _serviceInitLogger.WriteLog("FOUND EXISTING UPDATER SERVICE INSTANCE! RETURNING IT NOW...");
                         return _serviceInstance;
                     }
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumUpdater(ServiceConfig);
                     _serviceInstance.OnStart(null);
-                    ServiceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;

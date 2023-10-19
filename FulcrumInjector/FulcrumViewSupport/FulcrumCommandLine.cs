@@ -177,7 +177,7 @@ namespace FulcrumInjector.FulcrumViewSupport
         /// </summary>
         /// <param name="StartupAction">The startup action we're invoking</param>
         /// <returns>True if the action is invoked. False if it is not</returns>
-        public bool InvokeStartupAction(FulcrumStartupAction StartupAction)
+        public bool InvokeCommandLineAction(FulcrumStartupAction StartupAction)
         {
             // Log out the action being invoked here and store the argument type
             StartupArguments ArgType = StartupAction.ArgumentType;

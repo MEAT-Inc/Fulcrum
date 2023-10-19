@@ -297,7 +297,7 @@ namespace FulcrumInjector
             foreach (var StartupAction in StartupActions)
             {
                 // If the action fails to invoke, log the failure out and throw an exception here 
-                bool ExecutionResult = CommandLineHelper.InvokeStartupAction(StartupAction); 
+                bool ExecutionResult = CommandLineHelper.InvokeCommandLineAction(StartupAction); 
                 if (ExecutionResult) this._appLogger.WriteLog($"INVOKED ACTION {StartupAction.ArgumentType} OK!", LogType.InfoLog);
                 else
                 {

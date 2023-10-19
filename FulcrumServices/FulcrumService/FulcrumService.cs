@@ -8,6 +8,8 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using FulcrumSupport;
+using FulcrumJson;
 
 namespace FulcrumService
 {
@@ -23,18 +25,33 @@ namespace FulcrumService
 
         // Private/protected fields for service instances
         protected readonly IContainer _components;             // Component objects used by this service instance
+        protected readonly ServiceTypes _serviceType;          // The type of service this class represents
         protected readonly SharpLogger _serviceLogger;         // Logger instance for our service
+        protected static SharpLogger _serviceInitLogger;       // Logger used to configure service initialization routines
 
         #endregion // Fields
 
         #region Properties
 
         // Public facing property holding our file target for this service
-        public FileTarget ServiceLoggingTarget { get; protected set; }
+        protected FileTarget ServiceLoggingTarget { get; set; }
 
         #endregion // Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Enumeration holding different service types for our services
+        /// </summary>
+        protected enum ServiceTypes
+        {
+            [Description("FulcrumServiceBase")]  BASE_SERVICE,       // Default value. Base service type
+            [Description("FulcrumWatchdog")]     WATCHDOG_SERVICE,   // Watchdog Service Type
+            [Description("FulcrumDrive")]        DRIVE_SERVICE,      // Drive Service type
+            [Description("FulcrumEmail")]        EMAIL_SERVICE,      // Email Service Type
+            [Description("FulcrumUpdater")]      UPDATER_SERVICE     // Updater Service Type
+        }
+
         #endregion // Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,16 +70,31 @@ namespace FulcrumService
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Protected CTOR for a new FulcrumService instance. Builds our service container and sets up logging
+        /// Static CTOR for a FulcrumService object. Defines the static service initialization logger
         /// </summary>
-        protected FulcrumServiceBase()
+        static FulcrumServiceBase()
+        {
+            // Build a static logger for service initialization routines here
+            _serviceInitLogger =
+                SharpLogBroker.FindLoggers("ServiceInitLogger").FirstOrDefault()
+                ?? new SharpLogger(LoggerActions.UniversalLogger, "ServiceInitLogger");
+
+            // Configure our AppSettings file if needed as well
+            JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
+        }
+        /// <summary>
+        /// Protected CTOR for a new FulcrumService instance. Builds our service container and sets up logging
+        /// <param name="ServiceType">The type of service being constructed</param>
+        /// </summary>
+        protected FulcrumServiceBase(ServiceTypes ServiceType)
         {
             // Build a new component container for the service
             this._components = new Container();
 
             // Find the name of our service type and use it for logger configuration
-            this.ServiceName = this.GetType().Name;
-            this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}_Logger");
+            this._serviceType = ServiceType;
+            this.ServiceName = this._serviceType.ToDescriptionString();
+            this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}Service_Logger");
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,6 +126,42 @@ namespace FulcrumService
 
             // Log that our service has been configured correctly
             this._serviceLogger.WriteLog($"{this.GetType().Name} SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
+        }
+        /// <summary>
+        /// Executes a custom command on the given service object as requested.
+        /// This method is NOT supported on the base service type!
+        /// </summary>
+        /// <param name="ServiceCommand">The number of the command being executed for our service</param>
+        /// <exception cref="NotImplementedException">Thrown when this method is called since base services are not supported</exception>
+        protected override void OnCustomCommand(int ServiceCommand)
+        {
+            try
+            {
+                // Check what type of command is being executed and perform actions accordingly.
+                switch (ServiceCommand)
+                {
+                    // For any other command value or something that is not recognized
+                    case 128:
+
+                        // Log out the command help information for the user to read in the log file.
+                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
+                        this._serviceLogger.WriteLog($"                                    FulcrumInjector Service Command Help", LogType.InfoLog);
+                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
+                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
+                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
+                        this._serviceLogger.WriteLog("", LogType.InfoLog);
+                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
+                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
+                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
+                        return;
+                }
+            }
+            catch (Exception SendCustomCommandEx)
+            {
+                // Log out the failure and exit this method
+                this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING SERVICE INSTANCE!", LogType.ErrorLog);
+                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
+            }
         }
         /// <summary>
         /// Stops the service and runs cleanup routines
