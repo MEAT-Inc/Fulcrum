@@ -48,13 +48,12 @@ namespace FulcrumSupport
         // Public facing properties holding computed values for the Injector App registry key
         public static string InjectorInstallPath => _getRegistryValue(_injectorRegistryKey, _installPathKey);
         public static string InjectorExecutable => _getRegistryValue(_injectorRegistryKey, _installExecutableKey);
-        public static string InjectorSettingsFile => _getRegistryValue(_injectorRegistryKey, _injectorSettingsKey);
         public static Version InjectorVersion => _getRegistryVersion(_injectorRegistryKey, _installVersionKey);
 
         // Public facing properties holding computed values for the Shim DLL registry key
-        public static string ShimDllPath => _getRegistryValue(_shimRegistryKey, _installExecutableKey);
         public static string ShimInstallPath => _getRegistryValue(_shimRegistryKey, _installPathKey);
-        public static Version ShimInstallVersion => _getRegistryVersion(_shimRegistryKey, _installVersionKey);
+        public static string ShimDllExecutable => _getRegistryValue(_shimRegistryKey, _installExecutableKey);
+        public static Version ShimDllVersion => _getRegistryVersion(_shimRegistryKey, _installVersionKey);
 
         // Public facing properties holding computed values for the base Injector Service Key
         public static string InjectorServiceInstallPath => _getRegistryValue(_serviceRegistryKey, _serviceRegistryKey);

@@ -82,8 +82,6 @@ namespace FulcrumService
             // Configure our AppSettings file if needed as well
             if (JsonConfigFile.IsConfigured) return;
             _serviceInitLogger.WriteLog("WARNING! INJECTOR SETTINGS FILE WAS NOT CONFIGURED! CONFIGURING IT NOW...", LogType.WarnLog);
-
-
             JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
         }
         /// <summary>
