@@ -293,7 +293,6 @@
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="WatchdogServiceProgramFiles" Guid="A53BA067-BCEE-4802-8407-E6948F1AAB4F">
-                                <File Id="FULCRUMWATCHDOGSERVICE.EXE" Name="FulcrumWatchdogService.exe" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe" />
                                 <File Id="FULCRUMENCRYPTION.DLL_3" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
                                 <File Id="FULCRUMJSON.DLL_3" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL_3" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumService.dll" />
@@ -302,7 +301,21 @@
                                 <File Id="NLOG.DLL_4" Name="NLog.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGING.DLL_4" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\SharpLogging.dll" />
                                 <File Id="FULCRUMWATCHDOGSERVICE.EXE.CONFIG" Name="FulcrumWatchdogService.exe.config" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe.config" />
-                            </Component>
+								<File Id="FULCRUMWATCHDOGSERVICE.EXE" Name="FulcrumWatchdogService.exe" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe">
+                                    <ServiceInstall
+	                                    Id="ServiceInstaller"
+	                                    Type="ownProcess"
+	                                    Name="FulcrumWatchdog"
+	                                    DisplayName="Fulcrum Watchdog"
+	                                    Description="Service controlled by the FulcrumInjector application which allows us to monitor any desired folders/files and perform scheduled actions"
+	                                    Start="auto"
+	                                    Account="[SERVICEACCOUNT]"
+	                                    Password="[SERVICEPASSWORD]"
+	                                    ErrorControl="normal"
+	                                    Arguments=" /start"/>
+                                    <ServiceControl Id="StartWatchdogService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumWatchdog" Wait="yes" />
+								</File>
+	                        </Component>
                         </Directory>
                         <Directory Id="FulcrumDriveService" Name="FulcrumDriveService">
 	                        <Component Id="DriveServiceRegistryKey" Guid="65E3149A-C942-44AC-9B7C-FDD00B345954">
@@ -313,8 +326,7 @@
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="DriveServiceProgramFiles" Guid="420C72D7-A383-4E5A-9DA5-4AA8A5876EE5">
-                                <File Id="FULCRUMDRIVESERVICE.EXE" Name="FulcrumDriveService.exe" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe" />
-                                <File Id="FULCRUMENCRYPTION.DLL" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+								<File Id="FULCRUMENCRYPTION.DLL" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
                                 <File Id="FULCRUMJSON.DLL" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumService.dll" />
                                 <File Id="FULCRUMSUPPORT.DLL" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumSupport.dll" />
@@ -328,6 +340,20 @@
                                 <File Id="NLOG.DLL_1" Name="NLog.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGING.DLL_1" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\SharpLogging.dll" />
                                 <File Id="FULCRUMDRIVESERVICE.EXE.CONFIG" Name="FulcrumDriveService.exe.config" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe.config" />
+								<File Id="FULCRUMDRIVESERVICE.EXE" Name="FulcrumDriveService.exe" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe">
+									<ServiceInstall
+										Id="ServiceInstaller"
+										Type="ownProcess"
+										Name="FulcrumDrive"
+										DisplayName="Fulcrum Drive"
+										Description="Service controlled by the FulcrumInjector application which allows us to browse contents from a Google Drive location"
+										Start="auto"
+										Account="[SERVICEACCOUNT]"
+										Password="[SERVICEPASSWORD]"
+										ErrorControl="normal"
+										Arguments=" /start"/>
+									<ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumDrive" Wait="yes" />
+								</File>
                             </Component>
                         </Directory>
                         <Directory Id="FulcrumUpdaterService" Name="FulcrumUpdaterService">
@@ -339,8 +365,7 @@
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="UpdaterServiceProgramFiles" Guid="5D0D1D69-02A7-4BE3-A76B-CA11F9266819">
-                                <File Id="FULCRUMUPDATERSERVICE.EXE" Name="FulcrumUpdaterService.exe" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe" />
-                                <File Id="FULCRUMENCRYPTION.DLL_2" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+		                        <File Id="FULCRUMENCRYPTION.DLL_2" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
                                 <File Id="FULCRUMJSON.DLL_2" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL_2" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumService.dll" />
                                 <File Id="FULCRUMSUPPORT.DLL_2" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumSupport.dll" />
@@ -348,8 +373,22 @@
                                 <File Id="NLOG.DLL_3" Name="NLog.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="OCTOKIT.DLL_1" Name="Octokit.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\Octokit.dll" />
                                 <File Id="SHARPLOGGING.DLL_3" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\SharpLogging.dll" />
-                                <File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
-                            </Component>
+								<File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
+								<File Id="FULCRUMUPDATERSERVICE.EXE" Name="FulcrumUpdaterService.exe" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe">
+									<ServiceInstall
+										Id="ServiceInstaller"
+										Type="ownProcess"
+										Name="FulcrumUpdater"
+										DisplayName="Fulcrum Updater"
+										Description="Service controlled by the FulcrumInjector application which allows us to check and install new versions of the application"
+										Start="auto"
+										Account="[SERVICEACCOUNT]"
+										Password="[SERVICEPASSWORD]"
+										ErrorControl="normal"
+										Arguments=" /start"/>
+									<ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumUpdater" Wait="yes" />
+								</File>
+							</Component>
                         </Directory>
 	                    <Directory Id="FulcrumEmailService" Name="FulcrumEmailService">
 	                        <Component Id="EmailServiceRegistryKey" Guid="6C0A5D95-DD66-4995-83F7-92748ADE9429">
@@ -360,7 +399,6 @@
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="EmailServiceProgramFiles" Guid="A71ED1B5-55EE-4B01-AEC5-A3C8DE2AF5C9">
-                                <File Id="FULCRUMEMAILSERVICE.EXE" Name="FulcrumEmailService.exe" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe" />
                                 <File Id="FULCRUMENCRYPTION.DLL_1" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
                                 <File Id="FULCRUMJSON.DLL_1" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL_1" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumService.dll" />
@@ -369,6 +407,20 @@
                                 <File Id="NLOG.DLL_2" Name="NLog.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGING.DLL_2" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\SharpLogging.dll" />
                                 <File Id="FULCRUMEMAILSERVICE.EXE.CONFIG" Name="FulcrumEmailService.exe.config" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe.config" />
+								<File Id="FULCRUMEMAILSERVICE.EXE" Name="FulcrumEmailService.exe" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe">
+									<ServiceInstall
+										Id="ServiceInstaller"
+										Type="ownProcess"
+										Name="FulcrumEmail"
+										DisplayName="Fulcrum Email"
+										Description="Service controlled by the FulcrumInjector application which allows us to send automated emails to any desired recipients"
+										Start="auto"
+										Account="[SERVICEACCOUNT]"
+										Password="[SERVICEPASSWORD]"
+										ErrorControl="normal"
+										Arguments=" /start"/>
+									<ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumEmail" Wait="yes" />
+								</File>
                             </Component>
                         </Directory>
                     </Directory>
