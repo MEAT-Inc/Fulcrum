@@ -28,7 +28,7 @@ namespace FulcrumEncryption
         #region Properties
 
         // Public static key objects for our encryption routines
-        public static byte[] AutorizationKey { get; private set; } =
+        public static byte[] AuthorizationKey { get; private set; } =
         {
             // TODO: Insert the pre-defined Authorization key bytes in here!
             // Reach out to zack.walsh@meatinc.autos for these keys if you're helping develop this application!
@@ -41,7 +41,7 @@ namespace FulcrumEncryption
 
         // Public static properties with helpful configuration information 
         public static bool IsEncryptionConfigured => 
-            AutorizationKey.Length == FulcrumEncryptor.KeyByteSize && 
+            AuthorizationKey.Length == FulcrumEncryptor.KeyByteSize && 
             CryptographicKey.Length == FulcrumEncryptor.KeyByteSize;
 
         #endregion // Properties
