@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
+using FulcrumSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
@@ -61,15 +63,21 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this.ViewModelLogger.WriteLog("SETTING UP INJECTOR TEST VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
+            // Store a local flag for if we're using a debug build or not
+            bool IsDebugBuild = false;
+#if DEBUG
+            // Toggle our debug build flag value to true if needed
+            IsDebugBuild = true;
+#endif
             // Store title and version string values now.
             this.InjectorTestResult = "Not Yet Tested";
-            this.InjectorDllPath =
-#if DEBUG
-               Path.GetFullPath("..\\..\\..\\FulcrumShim\\Debug\\FulcrumShim.dll");
-#else
-                ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorDllInformation.FulcrumDLL");  
-#endif
-
+            if (!Debugger.IsAttached) this.InjectorDllPath = RegistryControl.ShimDllExecutable;
+            else
+            {
+                // Build a path for the Shim DLL based on build configuration
+                string ShimDllPath = Path.GetFullPath("..\\..\\.\\FulcrumShim\\");
+                this.InjectorDllPath = ShimDllPath + (IsDebugBuild ? "Debug" : "Release") + "\\FulcrumShim.dll";
+            }
             // Log information about the DLL Path values
             this.ViewModelLogger.WriteLog("LOCATED NEW DLL PATH VALUE OK!");
             this.ViewModelLogger.WriteLog($"DLL PATH VALUE PULLED: {this.InjectorDllPath}");

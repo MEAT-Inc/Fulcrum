@@ -14,12 +14,8 @@ namespace FulcrumWatchdogService
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
-            {
-                new FulcrumWatchdog()
-            };
-            ServiceBase.Run(ServicesToRun);
+            // Build and run a new service instance
+            ServiceBase.Run(new FulcrumWatchdog());
         }
     }
 }

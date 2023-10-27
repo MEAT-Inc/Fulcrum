@@ -15,12 +15,8 @@ namespace FulcrumDriveService
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
-            {
-                new FulcrumDrive()
-            };
-            ServiceBase.Run(ServicesToRun);
+            // Build and run a new service instance
+            ServiceBase.Run(new FulcrumDrive());
         }
     }
 }
