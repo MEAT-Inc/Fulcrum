@@ -14,12 +14,8 @@ namespace FulcrumEmailService
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
-            {
-                new FulcrumEmail()
-            };
-            ServiceBase.Run(ServicesToRun);
+            // Build and run a new service instance
+            ServiceBase.Run(new FulcrumEmail());
         }
     }
 }

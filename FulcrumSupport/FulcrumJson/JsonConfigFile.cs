@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -117,24 +118,38 @@ namespace FulcrumJson
         public static void SetInjectorConfigFile(string NewConfigFileName, string ForcedDirectory = null)
         {
             // Pull location of the configuration application. If debugging is on, then try and set it using the working dir. 
-            string FulcrumInjectorExe = ForcedDirectory ?? string.Empty;
+            string FulcrumInjectorDir = ForcedDirectory ?? string.Empty;
             _jsonConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
+
+            // Store a local flag for if we're using a debug build or not
+            bool IsDebugBuild = false;
 #if DEBUG
-            _jsonConfigLogger?.WriteLog("DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
-            FulcrumInjectorExe = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-#else
-            // Pull the injector EXE location and store our directory for it
-            FulcrumInjectorExe = RegistryControl.InjectorExecutable;
-            if (FulcrumInjectorExe == null )
-            {
-                _jsonConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
-                FulcrumInjectorExe = @"C:\Program Files (x86)\MEAT Inc\FulcrumInjector";
-            }
+            // Toggle our debug build flag value to true if needed
+            IsDebugBuild = true;
 #endif
+            // Check if we've got a debugger hooked up or not first
+            if (Debugger.IsAttached) 
+            {
+                // If we've got a debugger hooked on, use the forced directory or use the current assembly location
+                _jsonConfigLogger?.WriteLog("DEBUGGER OR DEBUG BUILD FOUND! USING DEBUG CONFIGURATION FILE FROM CURRENT WORKING DIR", LogType.InfoLog);
+                FulcrumInjectorDir = ForcedDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            }
+            else
+            {
+                // Pull the injector EXE location from the registry and store our directory for it
+                FulcrumInjectorDir = RegistryControl.InjectorInstallPath;
+                if (FulcrumInjectorDir == null)
+                {
+                    // If the injector registry control object fails to find a key value, use a default path
+                    _jsonConfigLogger?.WriteLog("INJECTOR REGISTRY KEY WAS NULL! FALLING BACK NOW...", LogType.WarnLog);
+                    FulcrumInjectorDir = @"C:\Program Files (x86)\MEAT Inc\FulcrumInjector";
+                }
+            }
+
             // List all the files in the directory we've located now and then find our settings file by name
-            Directory.SetCurrentDirectory(FulcrumInjectorExe);
-            _jsonConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorExe}", LogType.InfoLog);
-            string[] LocatedFilesInDirectory = Directory.GetFiles(FulcrumInjectorExe, "*.json", SearchOption.AllDirectories);
+            Directory.SetCurrentDirectory(FulcrumInjectorDir);
+            _jsonConfigLogger?.WriteLog($"INJECTOR DIR PULLED: {FulcrumInjectorDir}", LogType.InfoLog);
+            string[] LocatedFilesInDirectory = Directory.GetFiles(FulcrumInjectorDir, "*.json", SearchOption.AllDirectories);
             _jsonConfigLogger?.WriteLog($"LOCATED A TOTAL OF {LocatedFilesInDirectory.Length} FILES IN OUR APP FOLDER WITH A JSON EXTENSION");
             string MatchedConfigFile = LocatedFilesInDirectory
                 .OrderBy(FileObj => FileObj.Length)

@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using SharpLogging;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumControls
+namespace FulcrumInjector.FulcrumViewContent
 {
     /// <summary>
     /// Custom ComboBox object which populates it's values based on a specified enumeration type

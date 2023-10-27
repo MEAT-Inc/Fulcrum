@@ -3,8 +3,10 @@ using SharpLogging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,15 +76,84 @@ namespace FulcrumService
         /// </summary>
         static FulcrumServiceBase()
         {
+            // Configure our AppSettings file if needed as well
+            if (!JsonConfigFile.IsConfigured)
+            {
+                // Store a local flag for if we're using a debug build or not
+                bool IsDebugBuild = false;
+#if DEBUG
+                // Toggle our debug build flag value to true if needed
+                IsDebugBuild = true;
+#endif
+                // If a debugger is attached to our service object, assume we're working in the debug folders
+                string InjectorDirectory;
+                if (!Debugger.IsAttached) InjectorDirectory = RegistryControl.InjectorInstallPath;
+                else
+                {
+                    // Find our current working directory and map up to our injector debug folder
+                    string WorkingDirectory = Assembly.GetExecutingAssembly().Location;
+                    string[] WorkingDirSplit = WorkingDirectory.Split(Path.DirectorySeparatorChar)
+                        .TakeWhile(PathPart => !PathPart.Contains("FulcrumShim"))
+                        .Append("FulcrumShim\\FulcrumInjector\\bin")
+                        .Append(Debugger.IsAttached ? "Debug" : "Release")
+                        .ToArray();
+
+                    // Combine the current working directory with our configuration type to build the desired location
+                    InjectorDirectory = string.Join(Path.DirectorySeparatorChar.ToString(), WorkingDirSplit);
+                    JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json", InjectorDirectory);
+                }
+
+                // Using the built injector directory location, set our configuration file location and name
+                JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json", InjectorDirectory);
+            }
+            
+            // Check if we need to configure logging or archiving before building our logger instance
+            if (!SharpLogBroker.LogBrokerInitialized)
+            {
+                // Load in and apply the log broker configuration for this instance. Reformat output paths to log ONLY into the injector install location
+                var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration"); 
+                BrokerConfig.LogFilePath = Path.GetFullPath(BrokerConfig.LogFilePath);
+                SharpLogBroker.InitializeLogging(BrokerConfig);
+            }
+            if (!SharpLogArchiver.LogArchiverInitialized)
+            {
+                // Load in and apply the log archiver configuration for this instance. Reformat output paths to log ONLY into the injector install location
+                var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");
+                ArchiverConfig.ArchivePath = Path.GetFullPath(ArchiverConfig.ArchivePath);
+                ArchiverConfig.SearchPath = Path.GetFullPath(ArchiverConfig.SearchPath);
+                SharpLogArchiver.InitializeArchiving(ArchiverConfig);
+            }
+
             // Build a static logger for service initialization routines here
             _serviceInitLogger =
                 SharpLogBroker.FindLoggers($"{nameof(FulcrumServiceBase)}Logger").FirstOrDefault()
                 ?? new SharpLogger(LoggerActions.UniversalLogger, $"{nameof(FulcrumServiceBase)}Logger");
 
-            // Configure our AppSettings file if needed as well
-            if (JsonConfigFile.IsConfigured) return;
-            _serviceInitLogger.WriteLog("WARNING! INJECTOR SETTINGS FILE WAS NOT CONFIGURED! CONFIGURING IT NOW...", LogType.WarnLog);
-            JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json");
+            // Finally invoke an archive routine and child folder cleanup routine if needed
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                _serviceInitLogger.WriteLog("LOGGING ARCHIVE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("PROGRESS FOR ARCHIVAL ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Start with booting the archive routine
+                SharpLogArchiver.ArchiveLogFiles();
+                _serviceInitLogger.WriteLog("ARCHIVE ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+
+                // Then finally invoke the archive cleanup routines
+                SharpLogArchiver.CleanupArchiveHistory();
+                _serviceInitLogger.WriteLog("ARCHIVE CLEANUP ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+            });
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                _serviceInitLogger.WriteLog("LOGGING SUBFOLDER PURGE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("PROGRESS FOR SUBFOLDER PURGE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Call the cleanup method to purge our subdirectories if needed
+                SharpLogArchiver.CleanupSubdirectories();
+                _serviceInitLogger.WriteLog("CLEANED UP ALL CHILD LOGGING FOLDERS!", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Protected CTOR for a new FulcrumService instance. Builds our service container and sets up logging

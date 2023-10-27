@@ -192,7 +192,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionWindow.xaml.cs">
+    <Compile Include="FulcrumViewContent\FulcrumEncryptionWindow.xaml.cs">
       <DependentUpon>FulcrumEncryptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumOeApplication.cs" />
@@ -210,7 +210,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumCommandLine.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml.cs">
+    <Compile Include="FulcrumViewContent\FulcrumEnumCombo.xaml.cs">
       <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
@@ -311,7 +311,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\FulcrumConstants.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumConstants.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumDllInjectionTestView.xaml.cs">
       <DependentUpon>FulcrumDllInjectionTestView.xaml</DependentUpon>
     </Compile>
@@ -354,11 +354,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionWindow.xaml">
+    <Page Include="FulcrumViewContent\FulcrumEncryptionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml">
+    <Page Include="FulcrumViewContent\FulcrumEnumCombo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

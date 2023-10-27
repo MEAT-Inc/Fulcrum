@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogging;
 using SharpWrapper.J2534Objects;
 

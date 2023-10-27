@@ -12,7 +12,6 @@ using FulcrumDriveService;
 using FulcrumEmailService;
 using FulcrumEncryption;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
-using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
 using FulcrumSupport;
 using FulcrumWatchdogService;
 
@@ -78,14 +77,14 @@ namespace FulcrumInjector.FulcrumViewSupport
             [Description("--DRIVE_INITIALIZE")] INIT_DRIVE = DRIVE | 0x00000001,
             [Description("--DRIVE_INVOKE")] INVOKE_DRIVE = DRIVE | INIT_DRIVE | 0x00000002,
 
-            // Encryption configuration arguments. Base value is 0x00008000. Invoke is 0x00008002
-            [Description("--EMAIL")] EMAIL = 0x00008000,
+            // Encryption configuration arguments. Base value is 0x00004000. Invoke is 0x00008002
+            [Description("--EMAIL")] EMAIL = 0x00004000,
             [Description("--EMAIL_INITIALIZE")] INIT_EMAIL = EMAIL | 0x00000001,
             [Description("--DRIVE_INVOKE")] INVOKE_EMAIL = EMAIL | INIT_EMAIL | 0x00000002,
 
             // Encryption configuration arguments. Base value is 0x00008000. Invoke is 0x00008001
             [Description("--ENCRYPTION")] ENCRYPTION = 0x00008000,
-            [Description("--ENCRYPTION")] INIT_ENCRYPTION = ENCRYPTION | 0x00000001,
+            [Description("--ENCRYPTION_INITIALIZE")] INIT_ENCRYPTION = ENCRYPTION | 0x00000001,
             [Description("--ENCRYPT_STRING")] ENCRYPT_STRING = ENCRYPTION | INIT_ENCRYPTION | 0x00000002,
             [Description("--DECRYPT_STRING")] DECRYPT_STRING = ENCRYPTION | INIT_ENCRYPTION | 0x00000004,
         }
@@ -326,18 +325,18 @@ namespace FulcrumInjector.FulcrumViewSupport
 
                     // Invoke a new watchdog service instance and run a custom command for it
                     string CommandNumberString = EmailAction.ArgumentParameters[0];
-                    if (!int.TryParse(CommandNumberString, out int WatchdogCommand)) {
+                    if (!int.TryParse(CommandNumberString, out int EmailCommand)) {
                         this._commandLineLogger.WriteLog($"ERROR! COULD NOT PARSE EMAIL COMMAND TYPE {CommandNumberString}!", LogType.ErrorLog);
                         return false;
                     }
 
                     // Once we've got a valid command, invoke it
-                    this._commandLineLogger.WriteLog($"BUILDING EMAIL SERVICE AND INVOKING COMMAND {WatchdogCommand}...", LogType.InfoLog);
-                    var WatchdogService = FulcrumEmail.InitializeEmailService().Result;
-                    WatchdogService.RunCommand(WatchdogCommand);
+                    this._commandLineLogger.WriteLog($"BUILDING EMAIL SERVICE AND INVOKING COMMAND {EmailCommand}...", LogType.InfoLog);
+                    var EmailService = FulcrumEmail.InitializeEmailService().Result;
+                    EmailService.RunCommand(EmailCommand);
 
                     // Break out once we've invoked our command
-                    this._commandLineLogger.WriteLog($"EXECUTED COMMAND {WatchdogCommand} CORRECTLY!");
+                    this._commandLineLogger.WriteLog($"EXECUTED COMMAND {EmailCommand} CORRECTLY!");
                     return true;
 
                 // For all other cases, exit out failed
