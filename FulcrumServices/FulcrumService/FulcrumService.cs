@@ -26,17 +26,24 @@ namespace FulcrumService
         #region Fields
 
         // Private/protected fields for service instances
-        protected readonly IContainer _components;             // Component objects used by this service instance
-        protected readonly ServiceTypes _serviceType;          // The type of service this class represents
-        protected readonly SharpLogger _serviceLogger;         // Logger instance for our service
-        protected static SharpLogger _serviceInitLogger;       // Logger used to configure service initialization routines
+        private readonly IContainer _components;                      // Component objects used by this service instance
+        protected readonly ServiceTypes _serviceType;                 // The type of service this class represents
+        protected readonly SharpLogger _serviceLogger;                // Logger instance for our service
+        protected static readonly SharpLogger _serviceInitLogger;     // Logger used to configure service initialization routines
 
         #endregion // Fields
 
         #region Properties
 
-        // Public facing property holding our file target for this service
+        // Protected property holding our file target for this service
         protected FileTarget ServiceLoggingTarget { get; set; }
+
+        // Properties holding information about the installed windows service object
+        protected ServiceController ServiceInstance { get; set; }
+        public bool IsServiceInstance => this.ServiceInstance == null;
+
+        // Properties holding information about JSON output data location for custom commands
+        protected string ServiceJsonLocation { get; set; }
 
         #endregion // Properties
 
@@ -95,7 +102,7 @@ namespace FulcrumService
                     string[] WorkingDirSplit = WorkingDirectory.Split(Path.DirectorySeparatorChar)
                         .TakeWhile(PathPart => !PathPart.Contains("FulcrumShim"))
                         .Append("FulcrumShim\\FulcrumInjector\\bin")
-                        .Append(Debugger.IsAttached ? "Debug" : "Release")
+                        .Append(IsDebugBuild ? "Debug" : "Release")
                         .ToArray();
 
                     // Combine the current working directory with our configuration type to build the desired location
@@ -168,6 +175,47 @@ namespace FulcrumService
             this._serviceType = ServiceType;
             this.ServiceName = this._serviceType.ToDescriptionString();
             this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}Service_Logger");
+
+            // See if this assembly is a direct instance of a service object or not first
+            Assembly EntryAssembly = Assembly.GetEntryAssembly();
+            if (EntryAssembly == null) throw new InvalidOperationException("Error! Could not find entry assembly for service instance!");
+            if (EntryAssembly.FullName.Contains($"{this.ServiceName}Service"))
+            {
+                // Log out that we've got an actual service instance and return out
+                this._serviceLogger.WriteLog("WARNING! SERVICE BEING BOOTED IS AN ACTUAL SERVICE INSTANCE!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL SERVICE CALLS/COMMANDS EXECUTED WILL BE DONE SO USING JSON ROUTINES FOR PASSING DATA!", LogType.WarnLog);
+                return;
+            }
+
+            // Try and consume an existing service instance here if possible
+            try { this.ServiceInstance = new ServiceController(this.ServiceName); }
+            catch (Exception ConsumeServiceEx)
+            {
+                // Catch the exception and log it out. Try and boot our service instance here
+                this._serviceLogger.WriteLog($"ERROR! FAILED TO CONSUME SERVICE INSTANCE NAMED \"{this.ServiceName}\"!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("SERVICE CONSUMPTION EXCEPTION IS BEING LOGGED BELOW", ConsumeServiceEx);
+                throw ConsumeServiceEx;
+            }
+
+            // Make sure our service instance is running here before moving on
+            if (this.ServiceInstance.Status != ServiceControllerStatus.Running) {
+                this._serviceLogger.WriteLog($"BOOTING SERVICE INSTANCE FOR SERVICE {this.ServiceName}...", LogType.WarnLog);
+                this.ServiceInstance.Start();
+            }
+
+            try
+            {
+                // Wait for a running state for our service here. Max time to wait is 120 seconds.
+                this.ServiceInstance.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(120));
+                this._serviceLogger.WriteLog($"SERVICE {this.ServiceName} HAS BEEN BOOTED AND SEEN TO BE RUNNING!", LogType.InfoLog);
+            }
+            catch (Exception ServiceStateEx)
+            {
+                // Catch the exception and log it out. Try and boot our service instance here
+                this._serviceLogger.WriteLog($"ERROR! FAILED TO CONSUME SERVICE INSTANCE NAMED \"{this.ServiceName}\"!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("SERVICE STATUS EXCEPTION IS BEING LOGGED BELOW", ServiceStateEx);
+                throw ServiceStateEx;
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -179,27 +227,18 @@ namespace FulcrumService
         /// <param name="ServiceCommand">The int value of the command we're trying to run (128 is the help command)</param>
         public void RunCommand(int ServiceCommand)
         {
-            // Invoke the service command and exit out
-            this._serviceLogger.WriteLog($"INVOKING AN OnCustomCommand METHOD FOR OUR {this.ServiceName} SERVICE...", LogType.WarnLog);
-            this.OnCustomCommand(ServiceCommand);
+            // Check if we've got a service instance or if we're consuming our service here
+            if (this.IsServiceInstance) this.ServiceInstance.ExecuteCommand(ServiceCommand); 
+            else
+            {
+                // Invoke the service command and exit out
+                this._serviceLogger.WriteLog($"INVOKING AN OnCustomCommand METHOD FOR OUR {this.ServiceName} SERVICE...", LogType.WarnLog);
+                this.OnCustomCommand(ServiceCommand);
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// Starts the service up and builds a helper process
-        /// </summary>
-        /// <param name="StartupArgs">NOT USED!</param>
-        protected override void OnStart(string[] StartupArgs)
-        {
-            // Ensure the drive service exists first
-            this._serviceLogger.WriteLog($"BOOTING NEW {this.GetType().Name} SERVICE NOW...", LogType.WarnLog);
-
-            // TODO: Perform any needed startup configuration in this service here
-
-            // Log that our service has been configured correctly
-            this._serviceLogger.WriteLog($"{this.GetType().Name} SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
-        }
         /// <summary>
         /// Executes a custom command on the given service object as requested.
         /// This method is NOT supported on the base service type!
@@ -234,24 +273,6 @@ namespace FulcrumService
                 // Log out the failure and exit this method
                 this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING SERVICE INSTANCE!", LogType.ErrorLog);
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
-            }
-        }
-        /// <summary>
-        /// Stops the service and runs cleanup routines
-        /// </summary>
-        protected override void OnStop()
-        {
-            try
-            {
-                // Log that we're killing this service and exit out
-                this._serviceLogger.WriteLog($"{this.GetType().Name} IS SHUTTING DOWN NOW...", LogType.InfoLog);
-                this._serviceLogger.WriteLog($"{this.GetType().Name} HAS BEEN SHUT DOWN WITHOUT ISSUES!", LogType.InfoLog);
-            }
-            catch (Exception StopDriveServiceEx)
-            {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog($"ERROR! FAILED TO SHUTDOWN EXISTING {this.GetType().Name} INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE STOP ROUTINE IS LOGGED BELOW", StopDriveServiceEx);
             }
         }
 
