@@ -3,6 +3,7 @@ using SharpLogging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -120,15 +121,17 @@ namespace FulcrumService
                 // Load in and apply the log broker configuration for this instance. Reformat output paths to log ONLY into the injector install location
                 var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration"); 
                 BrokerConfig.LogFilePath = Path.GetFullPath(BrokerConfig.LogFilePath);
-                SharpLogBroker.InitializeLogging(BrokerConfig);
+                if (!SharpLogBroker.InitializeLogging(BrokerConfig))
+                    throw new InvalidOperationException("Error! Failed to configure log broker instance for a FulcrumService!");
             }
             if (!SharpLogArchiver.LogArchiverInitialized)
             {
                 // Load in and apply the log archiver configuration for this instance. Reformat output paths to log ONLY into the injector install location
                 var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");
                 ArchiverConfig.ArchivePath = Path.GetFullPath(ArchiverConfig.ArchivePath);
-                ArchiverConfig.SearchPath = Path.GetFullPath(ArchiverConfig.SearchPath);
-                SharpLogArchiver.InitializeArchiving(ArchiverConfig);
+                ArchiverConfig.SearchPath = Path.GetFullPath(ArchiverConfig.SearchPath); 
+                if (!SharpLogArchiver.InitializeArchiving(ArchiverConfig))
+                    throw new InvalidOperationException("Error! Failed to configure log archiver instance for a FulcrumService!");
             }
 
             // Build a static logger for service initialization routines here
@@ -207,7 +210,7 @@ namespace FulcrumService
             {
                 // Wait for a running state for our service here. Max time to wait is 120 seconds.
                 this.ServiceInstance.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(120));
-                this._serviceLogger.WriteLog($"SERVICE {this.ServiceName} HAS BEEN BOOTED AND SEEN TO BE RUNNING!", LogType.InfoLog);
+                this._serviceLogger.WriteLog($"SERVICE {this.ServiceName} WAS FOUND AND APPEARS TO BE RUNNING!", LogType.InfoLog);
             }
             catch (Exception ServiceStateEx)
             {
@@ -228,11 +231,17 @@ namespace FulcrumService
         public void RunCommand(int ServiceCommand)
         {
             // Check if we've got a service instance or if we're consuming our service here
-            if (this.IsServiceInstance) this.ServiceInstance.ExecuteCommand(ServiceCommand); 
+            this._serviceLogger.WriteLog($"INVOKING AN OnCustomCommand METHOD FOR OUR {this.ServiceName} SERVICE");
+            if (this.IsServiceInstance) 
+            {
+                // If we've got a hooked instance, execute this routine here
+                this._serviceLogger.WriteLog("INVOKING COMMAND ON SERVICE CONTROLLER INSTANCE!", LogType.WarnLog);
+                this.ServiceInstance.ExecuteCommand(ServiceCommand);
+            } 
             else
             {
-                // Invoke the service command and exit out
-                this._serviceLogger.WriteLog($"INVOKING AN OnCustomCommand METHOD FOR OUR {this.ServiceName} SERVICE...", LogType.WarnLog);
+                // If this is the service instance itself, run the command locally
+                this._serviceLogger.WriteLog("SERVICE INSTANCE IS BEING INVOKED DIRECTLY!", LogType.WarnLog);
                 this.OnCustomCommand(ServiceCommand);
             }
         }

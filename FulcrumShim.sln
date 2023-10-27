@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FulcrumShim", "FulcrumShim\FulcrumShim.vcxproj", "{25DE901C-9939-4B98-A2A0-58090B7375FD}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "FulcrumInstaller", "FulcrumInstaller\FulcrumInstaller.wixproj", "{46915009-6E9B-410C-B2BF-0C5E92D556B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7} = {7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FulcrumInjector", "FulcrumInjector\FulcrumInjector.csproj", "{7B268CC3-BB60-4ED8-8564-9FE49D43E8E7}"
 EndProject

@@ -25,8 +25,7 @@ namespace FulcrumInjector.FulcrumViewSupport
 
         // Static fields for our injector application information
         public static FulcrumSettingsShare FulcrumSettings;                     // Collection of all our settings objects loaded in
-        public static readonly FulcrumVersionInfo FulcrumVersions = new();      // Current version information for this application
-
+        
         // Public static fields for our injector sharp sessions
         public static Sharp2534Session SharpSessionAlpha;                       // Sharp Session used for configuring hardware
         public static Sharp2534Session SharpSessionBravo;                       // Sharp Session for setting up simulations

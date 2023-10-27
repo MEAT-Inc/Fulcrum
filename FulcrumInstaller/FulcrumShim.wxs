@@ -116,8 +116,8 @@
 		                        </Shortcut>
 	                        </File>
                         </Component>
-                        <Directory Id="FULCRUMXAML" Name="FulcrumXAML">
-                            <Component Id="FulcrumXamlFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
+                        <Directory Id="FULCRUMSTYLES" Name="FulcrumStyles">
+                            <Component Id="FulcrumStyleFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
                                 <File Id="APPCOLORTHEME.XAML" Name="AppColorTheme.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\AppColorTheme.xaml" />
                                 <File Id="FULCRUMCONTROLSTYLES.XAML" Name="FulcrumControlStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumControlStyles.xaml" />
                                 <File Id="FULCRUMDEBUGLOGGINGVIEWSTYLES.XAML" Name="FulcrumDebugLoggingViewStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDebugLoggingViewStyles.xaml" />
@@ -174,6 +174,11 @@
                                 <CreateFolder />
                             </Component>
                         </Directory>
+		                <Directory Id="FULCRUMSERVICEJSON" Name="FulcrumServices">
+			                <Component Id="CreateFulcrumServicesJsonFolder" Guid="DEB91DE9-6F9C-49D7-93D5-3CDA43AE402A">
+				                <CreateFolder />
+			                </Component>
+		                </Directory>
                         <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
                             <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
                                 <CreateFolder />
@@ -443,13 +448,14 @@
             <ComponentRef Id="FulcrumShimV0500RegistryKey" />
 
             <!-- Injector Program Files -->
-            <ComponentRef Id="FulcrumXamlFiles" />
+            <ComponentRef Id="FulcrumStyleFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
             <ComponentRef Id="CreateFulcrumIconsFolder" />
 			<ComponentRef Id="CreateFulcrumImportsFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
 			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
-            <ComponentRef Id="CreateFulcrumSimulationsFolder" />
+			<ComponentRef Id="CreateFulcrumServicesJsonFolder" />
+			<ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
 
             <!-- Shim Program Files-->

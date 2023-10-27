@@ -121,12 +121,6 @@ namespace FulcrumJson
             string FulcrumInjectorDir = ForcedDirectory ?? string.Empty;
             _jsonConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
 
-            // Store a local flag for if we're using a debug build or not
-            bool IsDebugBuild = false;
-#if DEBUG
-            // Toggle our debug build flag value to true if needed
-            IsDebugBuild = true;
-#endif
             // Check if we've got a debugger hooked up or not first
             if (Debugger.IsAttached) 
             {
