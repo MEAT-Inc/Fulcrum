@@ -127,7 +127,7 @@ namespace FulcrumEncryption
             {
                 // For Authorization Keys
                 case KeyTypes.AUTHORIZATION_KEY:
-                    AutorizationKey = EncryptionKey;
+                    AuthorizationKey = EncryptionKey;
                     break;
 
                 // For Cryptographic Keys
