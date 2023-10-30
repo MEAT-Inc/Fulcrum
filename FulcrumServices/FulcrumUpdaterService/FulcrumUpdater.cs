@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Runtime.Remoting.Lifetime;
+using System.Security.Authentication;
 using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,23 +38,26 @@ namespace FulcrumUpdaterService
         #region Fields
 
         // Private backing fields for our updater service instance
-        private static FulcrumUpdater _serviceInstance;         // Instance of our service object
-        private static readonly object _serviceLock = new();    // Lock object for building service instances
+        private static FulcrumUpdater _serviceInstance;           // Instance of our service object
+        private static readonly object _serviceLock = new();      // Lock object for building service instances
 
         // Private backing fields for the Git helper, timer, and updater configuration
-        private readonly Stopwatch _downloadTimer;                       // Download timer for pulling in versions
-        private readonly GitHubClient _gitUpdaterClient;                 // The updater client for pulling in versions
-        private readonly UpdaterServiceSettings _serviceConfig;          // Updater configuration values
+        private GitHubClient _gitUpdaterClient;                   // The updater client for pulling in versions
+        private readonly Stopwatch _downloadTimer = new();        // Download timer for pulling in versions
+        private readonly UpdaterServiceSettings _serviceConfig;   // Updater configuration values
 
         // Private backing fields to hold version information helpers
-        private string _latestInjectorVersion;                           // Private backing field holding the latest injector version
-        private string[] _injectorVersionsFound;                         // Private backing field holding all injector versions
+        private string _latestInjectorVersion;                    // Private backing field holding the latest injector version
+        private string[] _injectorVersionsFound;                  // Private backing field holding all injector versions
 
         #endregion //Fields
 
         #region Properties
 
-        // Public facing fields holding information about our latest version information
+        // Public facing property holding our authorization state for the updater 
+        public bool IsGitClientAuthorized { get; private set; }
+
+        // Public facing properties holding information about our latest version information
         public string LatestInjectorVersion
         {
             get => _latestInjectorVersion ?? this.RefreshInjectorVersions().FirstOrDefault();
@@ -100,6 +104,7 @@ namespace FulcrumUpdaterService
             this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
 
             // Log we're building this new service and log out the name we located for it
+            this._downloadTimer = new Stopwatch();
             this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
@@ -115,12 +120,6 @@ namespace FulcrumUpdaterService
             this._serviceLogger.WriteLog($"FORCE UPDATES: {this._serviceConfig.ForceUpdateReady}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"REPOSITORY NAME:  {this._serviceConfig.UpdaterRepoName}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"ORGANIZATION NAME: {this._serviceConfig.UpdaterOrgName}", LogType.TraceLog);
-
-            // Spawn a new timer for tracking download time and authorize a new GitHub helper
-            this._downloadTimer = new Stopwatch();
-            Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
-            this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
-            this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATING NOW USING MEAT INC BOT TOKEN ACCESS...", LogType.InfoLog);
         }
         /// <summary>
         /// Static CTOR for an update broker instance. Simply pulls out the new singleton instance for our update broker
@@ -151,8 +150,7 @@ namespace FulcrumUpdaterService
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumUpdater(ServiceConfig);
-                    _serviceInstance.OnStart(null);
-                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("SPAWNED NEW INJECTOR UPDATER SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;
@@ -162,6 +160,32 @@ namespace FulcrumUpdaterService
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Starts the service up and builds an update helper process
+        /// </summary>
+        /// <param name="StartupArgs">NOT USED!</param>
+        protected override void OnStart(string[] StartupArgs)
+        {
+            try
+            {
+                // Log out what type of service is being configured currently
+                this._serviceLogger.WriteLog($"BOOTING NEW {this.GetType().Name} SERVICE NOW...", LogType.WarnLog);
+                this._serviceLogger.WriteLog($"CONFIGURING NEW GITHUB CONNECTION HELPER FOR INJECTOR SERVICE...", LogType.InfoLog);
+
+                // Authorize our git client here if needed
+                if (!this._authorizeGitClient())
+                    throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
+
+                // Log out that our service has been booted without issues
+                this._serviceLogger.WriteLog("UPDATER SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
+            }
+            catch (Exception StartWatchdogEx)
+            {
+                // Log out the failure and exit this method
+                this._serviceLogger.WriteLog("ERROR! FAILED TO BOOT NEW UPDATER SERVICE INSTANCE!", LogType.ErrorLog);
+                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
+            }
+        }
         /// <summary>
         /// Invokes a custom command routine for our service based on the int code provided to it.
         /// </summary>
@@ -204,8 +228,21 @@ namespace FulcrumUpdaterService
         /// </summary>
         public string[] RefreshInjectorVersions()
         {
+            // Make sure we're authorized on the GitHub client first 
+            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
+            if (!this._authorizeGitClient())
+                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
+
+            // Pull in the releases and return them out
+            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
+            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+
+            // Store our latest release object on this class
+            if (ReleasesFound?.Length != 0) 
+                this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
+
             // Parse out the version information and return them out
-            var ReleaseTagsFound = this._acquireInjectorReleaseObjects().Select(ReleaseObj => ReleaseObj.TagName).ToArray();
+            var ReleaseTagsFound = ReleasesFound.Select(ReleaseObj => ReleaseObj.TagName).ToArray();
             this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
             this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", ReleaseTagsFound)}", LogType.TraceLog);
 
@@ -255,9 +292,21 @@ namespace FulcrumUpdaterService
         /// <returns>The path of our output msi file for the injector application</returns>
         public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
         {
+            // Make sure we're authorized on the GitHub client first 
+            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
+            if (!this._authorizeGitClient())
+                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
+
+            // Pull in the releases and return them out
+            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
+            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+
+            // Store our latest release object on this class
+            if (ReleasesFound?.Length != 0) 
+                this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
+
             // First find our version to use using our version/release lookup tool
-            var ReleaseToUse = this._acquireInjectorReleaseObjects()
-                .FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
+            var ReleaseToUse = ReleasesFound.FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
             this._serviceLogger.WriteLog("PULLED IN A NEW RELEASE OBJECT TO UPDATE WITH!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
 
@@ -299,19 +348,36 @@ namespace FulcrumUpdaterService
         }
 
         /// <summary>
-        /// Pulls in all release objects from the injector repo
+        /// Private helper method used to authorize our GitHub client on the MEAT Inc organization
         /// </summary>
-        /// <returns>A readonly list of objects used to index releases</returns>
-        private Release[] _acquireInjectorReleaseObjects()
+        /// <returns>True if the client is authorized. False if not</returns>
+        private bool _authorizeGitClient()
         {
-            // Pull in the releases and return them out
-            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
-            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+            try
+            {
+                // Check if we're configured or not already 
+                if (this.IsGitClientAuthorized) {
+                    this._serviceLogger.WriteLog("GIT CLIENT WAS ALREADY AUTHORIZED! NOT RE-AUTHENTICATING", LogType.WarnLog);
+                    return true;
+                }
 
-            // Store our latest release object on this class
-            if (ReleasesFound?.Length != 0) this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
-            return ReleasesFound;
+                // Build a new git client here for authorization
+                this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING GIT CLIENT NOW...", LogType.InfoLog);
+                Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
+                this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
+                this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATION WITH BOT LOGIN ACCESS PASSED!", LogType.InfoLog);
+
+                // Return true once completed and mark our client authorized
+                this.IsGitClientAuthorized = true;
+                return true;
+            }
+            catch (Exception AuthEx)
+            {
+                // Log our exception and return false 
+                this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW GIT CLIENT!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
+                return false;
+            }
         }
     }
 }

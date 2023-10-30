@@ -145,16 +145,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.DriveOperationTimer.Restart();
             this.DriveOperationProgress = 0;
 
-            // Validate our Drive Explorer service is built and ready for use
-            this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
-            if (FulcrumDrive.DriveService == null)
-            {
-                // Build a new service and check if it's valid 
-                FulcrumDrive.InitializeDriveService(true);
-                if (FulcrumDrive.DriveService == null)
-                    throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
-            }
-
             // Control our items sources in the dispatcher
             this.BaseViewControl.Dispatcher.Invoke(() =>
             {
@@ -214,16 +204,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.DriveOperationText = "Downloading Injector Log Files...";
             this.DriveOperationTimer.Restart();
             this.DriveOperationProgress = 0;
-
-            // Validate our Drive Explorer service is built and ready for use
-            this.ViewModelLogger.WriteLog("VALIDATING INJECTOR DRIVE SERVICE...");
-            if (FulcrumDrive.DriveService == null)
-            {
-                // Build a new service and check if it's valid 
-                FulcrumDrive.InitializeDriveService(true);
-                if (FulcrumDrive.DriveService == null)
-                    throw new InvalidOperationException("Error! Google Drive explorer service has not been configured!");
-            }
 
             // Configure an event handler for the log context object
             LogSet.OnDownloadProgress = null;

@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulcrumSupport", "FulcrumSu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FulcrumJson", "FulcrumSupport\FulcrumJson\FulcrumJson.csproj", "{2A636E5D-7E7E-416D-97C7-0663F438122F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulcrumInjector", "FulcrumInjector", "{B0A9C001-28B9-4662-AD56-F444583CBA7E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fulcrum", "Fulcrum", "{B0A9C001-28B9-4662-AD56-F444583CBA7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FulcrumEncryption", "FulcrumSupport\FulcrumEncryption\FulcrumEncryption.csproj", "{39338B62-FA58-497F-B5CA-D078487B2363}"
 EndProject

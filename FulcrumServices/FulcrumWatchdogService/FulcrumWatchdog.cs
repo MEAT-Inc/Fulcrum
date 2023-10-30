@@ -106,8 +106,7 @@ namespace FulcrumWatchdogService
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumWatchdog(ServiceConfig);
-                    _serviceInstance.OnStart(null);
-                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR WATCHDOG SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("SPAWNED NEW INJECTOR WATCHDOG SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;
@@ -125,7 +124,7 @@ namespace FulcrumWatchdogService
         {
             try
             {
-                // Check our folder arguments and store them on our instance now. If no content is found, use our default values
+                // Log out what type of service is being configured currently
                 this._serviceLogger.WriteLog($"BOOTING NEW {this.GetType().Name} SERVICE NOW...", LogType.WarnLog);
                 this._serviceLogger.WriteLog($"CONFIGURING NEW FOLDER WATCHDOG OBJECTS FOR INJECTOR SERVICE...", LogType.InfoLog);
 

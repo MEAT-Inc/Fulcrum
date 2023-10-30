@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -70,7 +71,7 @@ namespace FulcrumInjector
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
             this._configureStartupActions();
-
+            
             // Initialize instances of our service objects if needed here
             FulcrumDrive.InitializeDriveService();
             FulcrumEmail.InitializeEmailService();
@@ -95,21 +96,15 @@ namespace FulcrumInjector
         /// </summary>
         private void _configureInjectorLogging()
         {
-            // Load in and apply the log archive and log broker configurations for this instance
-            if (!SharpLogBroker.LogBrokerInitialized) 
-            {
-                // Load and configure our log broker instance here if needed
-                var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
-                if (!SharpLogBroker.InitializeLogging(BrokerConfig))
-                    throw new InvalidOperationException("Error! Failed to configure log broker instance for the FulcrumInjector!");
-            }
-            if (!SharpLogArchiver.LogArchiverInitialized)
-            {
-                // Load and configure our log archiver instance here if needed
-                var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration"); 
-                if (!SharpLogArchiver.InitializeArchiving(ArchiverConfig))
-                    throw new InvalidOperationException("Error! Failed to configure log archiver instance for the FulcrumInjector!");
-            }
+            // Load and configure our log broker instance here if needed
+            var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
+            if (!SharpLogBroker.InitializeLogging(BrokerConfig))
+                throw new InvalidOperationException("Error! Failed to configure log broker instance for the FulcrumInjector!");
+
+            // Load and configure our log archiver instance here if needed
+            var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration"); 
+            if (!SharpLogArchiver.InitializeArchiving(ArchiverConfig))
+                throw new InvalidOperationException("Error! Failed to configure log archiver instance for the FulcrumInjector!");
 
             // Build a new logger for this app instance and log our some basic information
             this._appLogger = new SharpLogger(LoggerActions.UniversalLogger);
