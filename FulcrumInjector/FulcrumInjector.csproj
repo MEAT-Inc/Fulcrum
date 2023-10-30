@@ -135,8 +135,8 @@
     <Reference Include="SharpExpressions, Version=0.5.15.453, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpExpressions.0.5.15.453\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.7.8.334, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.7.8.334\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.8.2.353, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.8.2.353\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
     <Reference Include="SharpPipes, Version=0.2.4.57, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpPipes.0.2.4.57\lib\net472\SharpPipes.dll</HintPath>
@@ -192,7 +192,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionWindow.xaml.cs">
+    <Compile Include="FulcrumViewContent\FulcrumEncryptionWindow.xaml.cs">
       <DependentUpon>FulcrumEncryptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumOeApplication.cs" />
@@ -210,7 +210,7 @@
     <Compile Include="FulcrumViewSupport\FulcrumCommandLine.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml.cs">
+    <Compile Include="FulcrumViewContent\FulcrumEnumCombo.xaml.cs">
       <DependentUpon>FulcrumEnumCombo.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
@@ -311,7 +311,7 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\FulcrumConstants.cs" />
+    <Compile Include="FulcrumViewSupport\FulcrumConstants.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumDllInjectionTestView.xaml.cs">
       <DependentUpon>FulcrumDllInjectionTestView.xaml</DependentUpon>
     </Compile>
@@ -354,11 +354,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEncryptionWindow.xaml">
+    <Page Include="FulcrumViewContent\FulcrumEncryptionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="FulcrumViewSupport\FulcrumControls\FulcrumEnumCombo.xaml">
+    <Page Include="FulcrumViewContent\FulcrumEnumCombo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -581,22 +581,23 @@ py "$(SolutionDir)FulcrumShim\FulcrumVersionTick.py" "$(SolutionDir)FulcrumShim"
     <PostBuildEvent>cmd.exe /C rmdir /s /q "$(TargetDir)de"
 cmd.exe /C del "$(ProjectDir)bin\Release\*.pdb"
 
-cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
 cmd.exe /C mkdir "$(TargetDir)FulcrumStyles"
 cmd.exe /C mkdir "$(TargetDir)FulcrumIcons"
-cmd.exe /C mkdir "$(TargetDir)FulcrumImages"
-cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
 cmd.exe /C mkdir "$(TargetDir)FulcrumResources"
 cmd.exe /C mkdir "$(TargetDir)FulcrumExpressions"
 cmd.exe /C mkdir "$(TargetDir)FulcrumSimulations"
+cmd.exe /C mkdir "$(TargetDir)FulcrumConversions"
+cmd.exe /C mkdir "$(TargetDir)FulcrumImports"
+cmd.exe /C mkdir "$(TargetDir)FulcrumServices"
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs"
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs\DriveServiceLogs"
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs\EmailServiceLogs"
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs\UpdaterServiceLogs"
+cmd.exe /C mkdir "$(TargetDir)FulcrumLogs\WatchdogServiceLogs"
 cmd.exe /C mkdir "$(TargetDir)FulcrumLogs\FulcrumArchives"
 
-copy /Y "$(ProjectDir)FulcrumViewSupport\FulcrumStyles\AppStyleSheets\*" $(TargetDir)FulcrumStyles"
-copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.ico" $(TargetDir)FulcrumImages"
-copy /Y "$(ProjectDir)FulcrumResources\ShimIconProject.xcf" $(TargetDir)FulcrumImages"
-copy /Y "$(ProjectDir)FulcrumResources\MeatIncTurboLogo.jpg" $(TargetDir)FulcrumImages"
-copy /Y "$(ProjectDir)FulcrumResources\UnicornSoftwareList.txt" $(TargetDir)FulcrumResources"
-copy /Y "$(ProjectDir)FulcrumResources\FulcrumShimDLLConfig.txt" $(TargetDir)FulcrumResources"
-copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)FulcrumResources\$(ProjectName)Settings.json"</PostBuildEvent>
+copy /Y "$(ProjectDir)FulcrumResources\*" $(TargetDir)FulcrumResources"
+copy /Y "$(ProjectDir)AppSettings.json" "$(TargetDir)FulcrumResources\$(ProjectName)Settings.json"
+copy /Y "$(ProjectDir)FulcrumViewSupport\FulcrumStyles\AppStyleSheets\*" $(TargetDir)FulcrumStyles"</PostBuildEvent>
   </PropertyGroup>
 </Project>

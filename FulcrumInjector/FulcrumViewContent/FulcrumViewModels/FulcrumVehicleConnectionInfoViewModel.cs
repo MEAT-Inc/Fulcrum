@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpAutoId;
 using SharpLogging;
 using SharpWrapper;

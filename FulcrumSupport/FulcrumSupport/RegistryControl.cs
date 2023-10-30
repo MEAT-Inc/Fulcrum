@@ -36,10 +36,10 @@ namespace FulcrumSupport
         
         // Private static fields holding our Injector Service configuration registry keys
         private static readonly string _serviceRegistryKey = "SOFTWARE\\MEAT Inc\\FulcrumServices";
-        private static readonly string _driveServiceKey = $"{_serviceRegistryKey}FulcrumDrive";
-        private static readonly string _emailServiceKey = $"{_serviceRegistryKey}FulcrumEmail";
-        private static readonly string _updaterServiceKey = $"{_serviceRegistryKey}FulcrumUpdater";
-        private static readonly string _watchdogServiceKey = $"{_serviceRegistryKey}FulcrumWatchdog";
+        private static readonly string _driveServiceKey = $"{_serviceRegistryKey}\\FulcrumDrive";
+        private static readonly string _emailServiceKey = $"{_serviceRegistryKey}\\FulcrumEmail";
+        private static readonly string _updaterServiceKey = $"{_serviceRegistryKey}\\FulcrumUpdater";
+        private static readonly string _watchdogServiceKey = $"{_serviceRegistryKey}\\FulcrumWatchdog";
 
         #endregion // Fields
 

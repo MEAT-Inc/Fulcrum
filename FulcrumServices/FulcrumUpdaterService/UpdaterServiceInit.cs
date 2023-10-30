@@ -14,12 +14,8 @@ namespace FulcrumUpdaterService
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
-            {
-                new FulcrumUpdater()
-            };
-            ServiceBase.Run(ServicesToRun);
+            // Build and run a new service instance
+            ServiceBase.Run(new FulcrumUpdater());
         }
     }
 }

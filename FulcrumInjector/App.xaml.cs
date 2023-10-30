@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,7 +16,7 @@ using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorCoreViewModels;
 using FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews;
 using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumControls;
+using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using FulcrumJson;
@@ -70,13 +71,7 @@ namespace FulcrumInjector
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
             this._configureStartupActions();
-
-            // Initialize instances of our service objects if needed here
-            FulcrumDrive.InitializeDriveService();
-            FulcrumEmail.InitializeEmailService();
-            FulcrumUpdater.InitializeUpdaterService();
-            FulcrumWatchdog.InitializeWatchdogService();
-
+            
             // Configure settings and app theme
             this._configureCurrentTheme();
             this._configureUserSettings();
@@ -94,23 +89,25 @@ namespace FulcrumInjector
         /// Imports the Injector logging and archiving configuration objects from our settings file and sets up logging for this instance
         /// </summary>
         private void _configureInjectorLogging()
-        { 
-            // Load in and apply the log archive and log broker configurations for this instance
+        {
+            // Load and configure our log broker instance here if needed
             var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
-            var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");
+            if (!SharpLogBroker.InitializeLogging(BrokerConfig))
+                throw new InvalidOperationException("Error! Failed to configure log broker instance for the FulcrumInjector!");
 
-            // Make logger and build global logger object.
-            SharpLogBroker.InitializeLogging(BrokerConfig);
-            SharpLogArchiver.InitializeArchiving(ArchiverConfig);
+            // Load and configure our log archiver instance here if needed
+            var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration"); 
+            if (!SharpLogArchiver.InitializeArchiving(ArchiverConfig))
+                throw new InvalidOperationException("Error! Failed to configure log archiver instance for the FulcrumInjector!");
 
             // Build a new logger for this app instance and log our some basic information
             this._appLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            string CurrentShimVersion = FulcrumConstants.FulcrumVersions.ShimVersionString;
-            string CurrentAppVersion = FulcrumConstants.FulcrumVersions.InjectorVersionString;
+            string CurrentShimVersion = FulcrumVersionInfo.ShimVersionString;
+            string CurrentAppVersion = FulcrumVersionInfo.InjectorVersionString;
 
             // Log out this application has been booted correctly
-            this._appLogger.WriteLog($"LOGGING FOR {BrokerConfig.LogBrokerName} HAS BEEN STARTED OK!", LogType.WarnLog);
-            this._appLogger.WriteLog($"{BrokerConfig.LogBrokerName} APPLICATION IS NOW LIVE!", LogType.WarnLog);
+            this._appLogger.WriteLog($"LOGGING FOR {SharpLogBroker.LogBrokerName} HAS BEEN STARTED OK!", LogType.WarnLog);
+            this._appLogger.WriteLog($"{SharpLogBroker.LogBrokerName} APPLICATION IS NOW LIVE!", LogType.WarnLog);
             this._appLogger.WriteLog($"--> INJECTOR VERSION: {CurrentAppVersion}", LogType.WarnLog);
             this._appLogger.WriteLog($"--> SHIM DLL VERSION: {CurrentShimVersion}", LogType.WarnLog);
 

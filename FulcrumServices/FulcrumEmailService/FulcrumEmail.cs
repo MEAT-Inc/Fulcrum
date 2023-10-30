@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Net;
+using System.Security.Authentication;
 using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -44,6 +45,9 @@ namespace FulcrumEmailService
         #endregion //Fields
 
         #region Properties
+
+        // Public facing property holding our authorization state for the email client 
+        public bool IsEmailClientAuthorized { get; private set; }
 
         // Public facing collection of email address properties used to configure sending outgoing messages
         public SmtpClient SendingClient { get; private set; }
@@ -123,35 +127,6 @@ namespace FulcrumEmailService
             this._serviceLogger.WriteLog($"SMTP SERVER: {this._stmpConfiguration.ServerName}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"SMTP TIMEOUT: {this._stmpConfiguration.ServerTimeout}", LogType.TraceLog);
 
-            try
-            {
-                // First build a new SMTP Client.
-                this._serviceLogger.WriteLog("ATTEMPTING TO CONNECT TO OUR SMTP SERVER NOW...", LogType.WarnLog);
-                this.SendingClient = new SmtpClient
-                {
-                    // Setup name and port values and timeout value.
-                    Host = this._stmpConfiguration.ServerName,
-                    Port = this._stmpConfiguration.ServerPort,
-                    Timeout = this._stmpConfiguration.ServerPort,
-
-                    // SSL Configuration
-                    EnableSsl = true,
-                    Credentials = new NetworkCredential(EmailSenderAddress.Address, this._emailConfiguration.ReportSenderPassword),
-
-                    // BUG: This is causing some type of auth issues. Removing for testing.
-                    // DeliveryMethod = SmtpDeliveryMethod.Network
-                };
-
-                // Return passed and the built client.
-                this._serviceLogger.WriteLog("BUILT NEW SMTP CLIENT OBJECT OK! RETURNING IT NOW", LogType.InfoLog);
-            }
-            catch (Exception SetupEx)
-            {
-                // Log the failure output
-                this._serviceLogger.WriteLog("FAILED TO CONFIGURE OUR NEW SMTP CLIENT! THIS IS A SERIOUS ISSUE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", SetupEx);
-            }
-
             // Log information about passed output here.
             this._serviceLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this._emailConfiguration.ReportSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
             this._serviceLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
@@ -185,8 +160,7 @@ namespace FulcrumEmailService
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumEmail(ServiceConfig);
-                    _serviceInstance.OnStart(null);
-                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR EMAIL SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("SPAWNED NEW INJECTOR EMAIL SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;
@@ -196,6 +170,32 @@ namespace FulcrumEmailService
 
         // --------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Starts the service up and builds an email helper process
+        /// </summary>
+        /// <param name="StartupArgs">NOT USED!</param>
+        protected override void OnStart(string[] StartupArgs)
+        {
+            try
+            {
+                // Log out what type of service is being configured currently
+                this._serviceLogger.WriteLog($"BOOTING NEW {this.GetType().Name} SERVICE NOW...", LogType.WarnLog);
+                this._serviceLogger.WriteLog($"CONFIGURING NEW EMAIL/SMTP CONNECTION FOR INJECTOR SERVICE...", LogType.InfoLog);
+
+                // Authorize our git client here if needed
+                if (!this._authorizeEmailClient())
+                    throw new AuthenticationException("Error! Failed to authorize SMTP client for the MEAT Inc Organization!");
+
+                // Log out that our service has been booted without issues
+                this._serviceLogger.WriteLog("EMAIL SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
+            }
+            catch (Exception StartWatchdogEx)
+            {
+                // Log out the failure and exit this method
+                this._serviceLogger.WriteLog("ERROR! FAILED TO BOOT NEW EMAIL SERVICE INSTANCE!", LogType.ErrorLog);
+                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
+            }
+        }
         /// <summary>
         /// Invokes a custom command routine for our service based on the int code provided to it.
         /// </summary>
@@ -297,7 +297,6 @@ namespace FulcrumEmailService
             this._serviceLogger.WriteLog($"REMOVED ADDRESS NAME {RecipientAddress} CORRECTLY! STORING NEW ADDRESS SET NOW...", LogType.InfoLog);
             return true;
         }
-
         /// <summary>
         /// Puts a new file path into our list of attachment objects. 
         /// </summary>
@@ -366,7 +365,6 @@ namespace FulcrumEmailService
             this.MessageAttachmentFiles = this.MessageAttachmentFiles.Where(FileObj => !FilesToRemove.Contains(FileObj)).ToArray();
             return true;
         }
-
         /// <summary>
         /// Sends out the resulting report email object when this is called.
         /// </summary>
@@ -440,7 +438,8 @@ namespace FulcrumEmailService
 
                     // Now fire it off using our SMTP Server instance.
                     this._serviceLogger.WriteLog($"SENDING OUTPUT MESSAGE TO RECIPIENT {RecipientAddress.Address} NOW...", LogType.WarnLog);
-                    this.SendingClient.Send(OutputMessage);
+                    if (this._authorizeEmailClient()) this.SendingClient.Send(OutputMessage);
+                    else throw new AuthenticationException("Error! Failed to authenticate an email client!");
                     this._serviceLogger.WriteLog($"SENDING ROUTINE PASSED FOR MESSAGE OUTPUT TO CLIENT {RecipientAddress.Address}!", LogType.InfoLog);
 
                     // Clear out existing attachments from the message here
@@ -457,6 +456,48 @@ namespace FulcrumEmailService
 
             // Return passed sending
             return OverallStatus;
+        }
+
+        /// <summary>
+        /// Private helper method used to configure a new SMTP client for sending emails out 
+        /// </summary>
+        /// <returns>True if the client is authorized. False if it is not</returns>
+        private bool _authorizeEmailClient()
+        {
+            try
+            {
+                // Check if we're configured or not already 
+                if (this.IsEmailClientAuthorized) return true;
+
+                // First build a new SMTP Client.
+                this._serviceLogger.WriteLog("ATTEMPTING TO CONNECT TO OUR SMTP SERVER NOW...", LogType.WarnLog);
+                this.SendingClient = new SmtpClient
+                {
+                    // Setup name and port values and timeout value.
+                    Host = this._stmpConfiguration.ServerName,
+                    Port = this._stmpConfiguration.ServerPort,
+                    Timeout = this._stmpConfiguration.ServerPort,
+
+                    // SSL Configuration
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(EmailSenderAddress.Address, this._emailConfiguration.ReportSenderPassword),
+
+                    // BUG: This is causing some type of auth issues. Removing for testing.
+                    // DeliveryMethod = SmtpDeliveryMethod.Network
+                };
+
+                // Return passed and the built client.
+                this._serviceLogger.WriteLog("BUILT NEW SMTP CLIENT OBJECT OK! EMAIL CONFIGURATION HAS BEEN COMPLETED!", LogType.InfoLog);
+                this.IsEmailClientAuthorized = true;
+                return true;
+            }
+            catch (Exception SetupEx)
+            {
+                // Log the failure output
+                this._serviceLogger.WriteLog("FAILED TO CONFIGURE OUR NEW SMTP CLIENT! THIS IS A SERIOUS ISSUE!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW", SetupEx);
+                return false;   
+            }
         }
     }
 }

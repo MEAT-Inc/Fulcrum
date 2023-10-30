@@ -86,9 +86,8 @@ namespace FulcrumJson
                 // TODO: Test this without this weird ass replacement BS that doesn't seem to be doing anything?
                 // Remove and re-add the configuration object once we've updated it
                 JsonConfigFile.ApplicationConfig.Remove(TypeOfConfig);
-                JsonConfigFile.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated);
-                // if (TypeOfConfig != "FulcrumUserSettings") JsonConfigFile.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated); 
-                // else { JsonConfigFile.ApplicationConfig["FulcrumUserSettings"] = JArray.FromObject(ConfigObjectLocated["FulcrumUserSettings"]); }
+                if (TypeOfConfig != "FulcrumUserSettings") JsonConfigFile.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated); 
+                else { JsonConfigFile.ApplicationConfig["FulcrumUserSettings"] = JArray.FromObject(ConfigObjectLocated["FulcrumUserSettings"]); }
 
                 // Write out our JSON values here
                 File.WriteAllText(OutputPath, JsonConfigFile.ApplicationConfig.ToString(Formatting.Indented));
