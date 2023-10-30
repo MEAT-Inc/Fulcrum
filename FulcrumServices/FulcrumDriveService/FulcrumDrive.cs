@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using FulcrumDriveService.DriveServiceModels;
 using FulcrumDriveService.JsonConverters;
@@ -55,6 +56,7 @@ namespace FulcrumDriveService
         }
         public string GoogleDriveId { get; private set; }
         public string ApplicationName { get; private set; }
+        public bool IsDriveServiceAuthorized { get; private set; }
 
         #endregion //Properties
 
@@ -110,20 +112,6 @@ namespace FulcrumDriveService
             this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}", LogType.TraceLog);
-
-            // Configure the google drive service here
-            this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
-            DriveService = new DriveService(new BaseClientService.Initializer()
-            {
-                // Store the API configuration and Application name for the authorization helper
-                ApplicationName = ApplicationName,
-                HttpClientInitializer = GoogleCredential
-                    .FromJson(JsonConvert.SerializeObject(this._driveAuth, new DriveAuthJsonConverter(false)))
-                    .CreateScoped(DriveService.Scope.DriveReadonly)
-            });
-
-            // Return the new drive service object 
-            this._serviceLogger.WriteLog("BUILT NEW GOOGLE DRIVE EXPLORER SERVICE WITHOUT ISSUES!", LogType.InfoLog);
         }
         /// <summary>
         /// Static CTOR for the drive service which builds and configures a new drive service
@@ -154,8 +142,7 @@ namespace FulcrumDriveService
 
                     // Build and boot a new service instance for our watchdog
                     _serviceInstance = new FulcrumDrive(ServiceConfig);
-                    _serviceInstance.OnStart(null);
-                    _serviceInitLogger.WriteLog("BOOTED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
+                    _serviceInitLogger.WriteLog("SPAWNED NEW INJECTOR DRIVE SERVICE OK!", LogType.InfoLog);
 
                     // Return the service instance here
                     return _serviceInstance;
@@ -171,25 +158,13 @@ namespace FulcrumDriveService
         /// <param name="StartupArgs">NOT USED!</param>
         protected override void OnStart(string[] StartupArgs)
         {
-            // Ensure the drive service exists first
-            this._serviceLogger.WriteLog("BOOTING NEW DRIVE SERVICE NOW...", LogType.WarnLog);
-            if (DriveService != null) this._serviceLogger.WriteLog("DRIVE SERVICE EXISTS! STARTING SERVICE INSTANCE NOW...", LogType.InfoLog);
-            else
-            {
-                // Configure the google drive service here
-                this._serviceLogger.WriteLog("BUILDING NEW GOOGLE DRIVE SERVICE NOW...", LogType.WarnLog);
-                DriveService = new DriveService(new BaseClientService.Initializer()
-                {
-                    // Store the API configuration and Application name for the authorization helper
-                    ApplicationName = ApplicationName,
-                    HttpClientInitializer = GoogleCredential
-                        .FromJson(JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false)))
-                        .CreateScoped(DriveService.Scope.DriveReadonly)
-                });
+            // Log out what type of service is being configured currently
+            this._serviceLogger.WriteLog($"BOOTING NEW {this.GetType().Name} SERVICE NOW...", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"CONFIGURING NEW GITHUB CONNECTION HELPER FOR INJECTOR SERVICE...", LogType.InfoLog);
 
-                // Return the new drive service object 
-                this._serviceLogger.WriteLog("BUILT NEW GOOGLE DRIVE EXPLORER SERVICE WITHOUT ISSUES!", LogType.InfoLog);
-            }
+            // Make sure our drive service is built and authenticated before moving on
+            if (!this._authorizeDriveService())
+                throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
 
             // Log that our service has been configured correctly
             this._serviceLogger.WriteLog("DRIVE SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
@@ -240,8 +215,8 @@ namespace FulcrumDriveService
         public bool ListDriveContents(out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
             // Validate our drive service first
-            if (DriveService == null)
-                throw new InvalidOperationException("Error! Drive Service is not configured!");
+            if (!this._authorizeDriveService())
+                throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
 
             // Build a new list request for pulling all files in from the drive location
             var ListRequest = DriveService.Files.List();
@@ -287,8 +262,8 @@ namespace FulcrumDriveService
         public bool ListFolderContents(string FolderId, out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
             // Validate our drive service first
-            if (DriveService == null)
-                throw new InvalidOperationException("Error! Drive Service is not configured!");
+            if (!this._authorizeDriveService())
+                throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
 
             // Build a new list request for pulling all files in from the drive location
             var ListRequest = DriveService.Files.List();
@@ -324,6 +299,42 @@ namespace FulcrumDriveService
 
             // Return out based on the number of logs found 
             return LocatedObjects.Count > 0;
+        }
+
+        /// <summary>
+        /// Private helper method used to authorize our Google Drive client on the MEAT Inc organization
+        /// </summary>
+        /// <returns>True if the client is authorized. False if not</returns>
+        private bool _authorizeDriveService()
+        {
+            try
+            {
+                // Check if we're configured or not already 
+                if (this.IsDriveServiceAuthorized) return true; 
+
+                // Configure the google drive service here
+                this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING NEW GOOGLE DRIVE CLIENT NOW...", LogType.WarnLog);
+                DriveService = new DriveService(new BaseClientService.Initializer()
+                {
+                    // Store the API configuration and Application name for the authorization helper
+                    ApplicationName = ApplicationName,
+                    HttpClientInitializer = GoogleCredential
+                        .FromJson(JsonConvert.SerializeObject(_driveAuth, new DriveAuthJsonConverter(false)))
+                        .CreateScoped(DriveService.Scope.DriveReadonly)
+                });
+
+                // Log out we authorized correctly, update our authorization flag and return true 
+                this._serviceLogger.WriteLog("AUTHORIZED NEW GOOGLE DRIVE CLIENT CORRECTLY!", LogType.InfoLog);
+                this.IsDriveServiceAuthorized = true;
+                return true;
+            }
+            catch (Exception AuthEx)
+            {
+                // Log our exception and return false 
+                this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW DRIVE SERVICE CLIENT!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
+                return false;
+            }
         }
     }
 }

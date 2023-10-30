@@ -27,10 +27,10 @@ namespace FulcrumService
         #region Fields
 
         // Private/protected fields for service instances
-        private readonly IContainer _components;                      // Component objects used by this service instance
-        protected readonly ServiceTypes _serviceType;                 // The type of service this class represents
-        protected readonly SharpLogger _serviceLogger;                // Logger instance for our service
-        protected static readonly SharpLogger _serviceInitLogger;     // Logger used to configure service initialization routines
+        private readonly IContainer _components;             // Component objects used by this service instance
+        protected readonly ServiceTypes _serviceType;        // The type of service this class represents
+        protected readonly SharpLogger _serviceLogger;       // Logger instance for our service
+        protected static SharpLogger _serviceInitLogger;     // Logger used to configure service initialization routines
 
         #endregion // Fields
 
@@ -84,9 +84,10 @@ namespace FulcrumService
         /// </summary>
         static FulcrumServiceBase()
         {
-            // Configure our AppSettings file if needed as well
+            // If the settings file is configured, exit out
             if (!JsonConfigFile.IsConfigured)
             {
+
                 // Store a local flag for if we're using a debug build or not
                 bool IsDebugBuild = false;
 #if DEBUG
@@ -108,28 +109,25 @@ namespace FulcrumService
 
                     // Combine the current working directory with our configuration type to build the desired location
                     InjectorDirectory = string.Join(Path.DirectorySeparatorChar.ToString(), WorkingDirSplit);
-                    JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json", InjectorDirectory);
                 }
 
                 // Using the built injector directory location, set our configuration file location and name
                 JsonConfigFile.SetInjectorConfigFile("FulcrumInjectorSettings.json", InjectorDirectory);
             }
-            
-            // Check if we need to configure logging or archiving before building our logger instance
-            if (!SharpLogBroker.LogBrokerInitialized)
+
+            // If the executing assembly name is the fulcrum application, don't reconfigure logging
+            if (!Assembly.GetEntryAssembly().FullName.Contains("FulcrumInjector"))
             {
-                // Load in and apply the log broker configuration for this instance. Reformat output paths to log ONLY into the injector install location
-                var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration"); 
+                // Check if we need to configure logging or archiving before building our logger instance
+                var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
                 BrokerConfig.LogFilePath = Path.GetFullPath(BrokerConfig.LogFilePath);
                 if (!SharpLogBroker.InitializeLogging(BrokerConfig))
                     throw new InvalidOperationException("Error! Failed to configure log broker instance for a FulcrumService!");
-            }
-            if (!SharpLogArchiver.LogArchiverInitialized)
-            {
+
                 // Load in and apply the log archiver configuration for this instance. Reformat output paths to log ONLY into the injector install location
                 var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");
                 ArchiverConfig.ArchivePath = Path.GetFullPath(ArchiverConfig.ArchivePath);
-                ArchiverConfig.SearchPath = Path.GetFullPath(ArchiverConfig.SearchPath); 
+                ArchiverConfig.SearchPath = Path.GetFullPath(ArchiverConfig.SearchPath);
                 if (!SharpLogArchiver.InitializeArchiving(ArchiverConfig))
                     throw new InvalidOperationException("Error! Failed to configure log archiver instance for a FulcrumService!");
             }
@@ -138,6 +136,9 @@ namespace FulcrumService
             _serviceInitLogger =
                 SharpLogBroker.FindLoggers($"{nameof(FulcrumServiceBase)}Logger").FirstOrDefault()
                 ?? new SharpLogger(LoggerActions.UniversalLogger, $"{nameof(FulcrumServiceBase)}Logger");
+
+            // If the executing assembly name is the fulcrum application, don't re-archive contents
+            if (Assembly.GetEntryAssembly().FullName.Contains("FulcrumInjector")) return;
 
             // Finally invoke an archive routine and child folder cleanup routine if needed
             Task.Run(() =>
@@ -201,7 +202,8 @@ namespace FulcrumService
             }
 
             // Make sure our service instance is running here before moving on
-            if (this.ServiceInstance.Status != ServiceControllerStatus.Running) {
+            if (this.ServiceInstance.Status != ServiceControllerStatus.Running)
+            {
                 this._serviceLogger.WriteLog($"BOOTING SERVICE INSTANCE FOR SERVICE {this.ServiceName}...", LogType.WarnLog);
                 this.ServiceInstance.Start();
             }
@@ -245,9 +247,6 @@ namespace FulcrumService
                 this.OnCustomCommand(ServiceCommand);
             }
         }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
         /// <summary>
         /// Executes a custom command on the given service object as requested.
         /// This method is NOT supported on the base service type!

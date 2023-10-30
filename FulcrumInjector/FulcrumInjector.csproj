@@ -135,8 +135,8 @@
     <Reference Include="SharpExpressions, Version=0.5.15.453, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpExpressions.0.5.15.453\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.7.8.334, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.7.8.334\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.8.2.353, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.8.2.353\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
     <Reference Include="SharpPipes, Version=0.2.4.57, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpPipes.0.2.4.57\lib\net472\SharpPipes.dll</HintPath>

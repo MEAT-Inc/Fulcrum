@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -50,6 +51,19 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Private enumeration used to pull versions for different services in this class
+        /// </summary>
+        private enum ServiceTypes
+        {
+            [Description("FulcrumService.dll")]         BASE_SERVICE,       // Default value. Base service type
+            [Description("FulcrumDriveService.exe")]    DRIVE_SERVICE,      // Watchdog Service Type
+            [Description("FulcrumEmailService.exe")]    EMAIL_SERVICE,      // Drive Service type
+            [Description("FulcrumUpdaterService.exe")]  UPDATER_SERVICE,    // Email Service Type
+            [Description("FulcrumWatchdogService.exe")] WATCHDOG_SERVICE    // Updater Service Type
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -62,11 +76,11 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
             // Populate our version information objects here
             _shimVersion = _getShimVersion();
             _injectorVersion = _getInjectorVersion();
-            _serviceBaseVersion = _getServiceBaseVersion();
-            _driveServiceVersion = _getDriveServiceVersion();
-            _emailServiceVersion = _getEmailServiceVersion();
-            _updaterServiceVersion = _getUpdaterServiceVersion();
-            _watchdogServiceVersion = _getWatchdogServiceVersion();
+            _serviceBaseVersion = _getServiceVersion(ServiceTypes.BASE_SERVICE);
+            _driveServiceVersion = _getServiceVersion(ServiceTypes.DRIVE_SERVICE);
+            _emailServiceVersion = _getServiceVersion(ServiceTypes.EMAIL_SERVICE);
+            _updaterServiceVersion = _getServiceVersion(ServiceTypes.UPDATER_SERVICE);
+            _watchdogServiceVersion = _getServiceVersion(ServiceTypes.WATCHDOG_SERVICE);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -100,72 +114,25 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
             return InjectorAssembly.GetName()?.Version;
         }
         /// <summary>
-        /// Private helper routine used to pull the version of the injector service base type
+        /// Private helper method used to pull the version of a service installed on this machine
         /// </summary>
-        /// <returns>The version of the injector service base type</returns>
-        private static Version _getServiceBaseVersion()
+        /// <param name="ServiceType">The type of service to pull the version for</param>
+        /// <returns>The version of the requested service</returns>
+        private static Version _getServiceVersion(ServiceTypes ServiceType)
         {
-            // If no debugger is found, pull our value from the registry
-            if (!Debugger.IsAttached) return RegistryControl.InjectorServiceVersion;
+            // If a debugger is found, just find the version information from our file
+            if (!Debugger.IsAttached) return ServiceType switch
+            {
+                ServiceTypes.BASE_SERVICE => RegistryControl.InjectorServiceVersion,
+                ServiceTypes.DRIVE_SERVICE => RegistryControl.DriveServiceVersion,
+                ServiceTypes.EMAIL_SERVICE => RegistryControl.EmailServiceVersion,
+                ServiceTypes.WATCHDOG_SERVICE => RegistryControl.WatchdogServiceVersion,
+                ServiceTypes.UPDATER_SERVICE => RegistryControl.UpdaterServiceVersion,
+                _ => throw new ArgumentException($"Error! Service type {ServiceType.ToDescriptionString()} could not be found!")
+            };
 
             // Build version information from current directory contents
-            string AssemblyPath = Path.GetFullPath("FulcrumService.dll");
-            FileVersionInfo AssemblyVersionInfo = FileVersionInfo.GetVersionInfo(AssemblyPath);
-            return Version.Parse(AssemblyVersionInfo.FileVersion);
-        }
-        /// <summary>
-        /// Private helper routine used to pull the version of the injector drive service
-        /// </summary>
-        /// <returns>The version of the injector drive service</returns>
-        private static Version _getDriveServiceVersion()
-        {
-            // If no debugger is found, pull our value from the registry
-            if (!Debugger.IsAttached) return RegistryControl.DriveServiceVersion;
-
-            // Build version information from current directory contents
-            string AssemblyPath = Path.GetFullPath("FulcrumDriveService.exe");
-            FileVersionInfo AssemblyVersionInfo = FileVersionInfo.GetVersionInfo(AssemblyPath);
-            return Version.Parse(AssemblyVersionInfo.FileVersion);
-        }
-        /// <summary>
-        /// Private helper routine used to pull the version of the injector email service
-        /// </summary>
-        /// <returns>The version of the injector email service</returns>
-        private static Version _getEmailServiceVersion()
-        {
-            // If no debugger is found, pull our value from the registry
-            if (!Debugger.IsAttached) return RegistryControl.EmailServiceVersion;
-
-            // Build version information from current directory contents
-            string AssemblyPath = Path.GetFullPath("FulcrumEmailService.exe");
-            FileVersionInfo AssemblyVersionInfo = FileVersionInfo.GetVersionInfo(AssemblyPath);
-            return Version.Parse(AssemblyVersionInfo.FileVersion);
-        }
-        /// <summary>
-        /// Private helper routine used to pull the version of the injector updater service
-        /// </summary>
-        /// <returns>The version of the injector updater service</returns>
-        private static Version _getUpdaterServiceVersion()
-        {
-            // If no debugger is found, pull our value from the registry
-            if (!Debugger.IsAttached) return RegistryControl.UpdaterServiceVersion;
-
-            // Build version information from current directory contents
-            string AssemblyPath = Path.GetFullPath("FulcrumUpdaterService.exe");
-            FileVersionInfo AssemblyVersionInfo = FileVersionInfo.GetVersionInfo(AssemblyPath);
-            return Version.Parse(AssemblyVersionInfo.FileVersion);
-        }
-        /// <summary>
-        /// Private helper routine used to pull the version of the injector watchdog service
-        /// </summary>
-        /// <returns>The version of the injector watchdog service</returns>
-        private static Version _getWatchdogServiceVersion()
-        {
-            // If no debugger is found, pull our value from the registry
-            if (!Debugger.IsAttached) return RegistryControl.WatchdogServiceVersion;
-
-            // Build version information from current directory contents
-            string AssemblyPath = Path.GetFullPath("FulcrumWatchdogService.exe");
+            string AssemblyPath = Path.GetFullPath(ServiceType.ToDescriptionString());
             FileVersionInfo AssemblyVersionInfo = FileVersionInfo.GetVersionInfo(AssemblyPath);
             return Version.Parse(AssemblyVersionInfo.FileVersion);
         }

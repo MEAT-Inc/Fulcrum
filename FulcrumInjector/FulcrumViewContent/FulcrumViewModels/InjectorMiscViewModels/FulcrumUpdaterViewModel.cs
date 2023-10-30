@@ -68,15 +68,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Build new update helper
             this.GitHubUpdateHelper = FulcrumUpdater.InitializeUpdaterService().Result;
-            GitHubUpdateHelper.RefreshInjectorVersions();
             this.ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 
             // Check for force update toggle
-            bool ForceUpdate = ValueLoaders.GetConfigValue<bool>("FulcrumConstants.InjectorUpdates.ForceUpdateReady");
+            bool ForceUpdate = ValueLoaders.GetConfigValue<bool>("FulcrumServices.FulcrumUpdaterService.ForceUpdateReady");
             if (ForceUpdate) this.ViewModelLogger.WriteLog("WARNING! FORCING UPDATES IS ON! ENSURING SHOW UPDATE BUTTON IS VISIBLE!", LogType.WarnLog);
 
             // Check for our updates now.
-            if (!GitHubUpdateHelper.CheckAgainstVersion(FulcrumVersionInfo.InjectorVersionString) && !ForceUpdate) {
+            this.GitHubUpdateHelper.RefreshInjectorVersions();
+            if (!this.GitHubUpdateHelper.CheckAgainstVersion(FulcrumVersionInfo.InjectorVersionString) && !ForceUpdate) {
                 this.ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
                 this.ViewModelLogger.WriteLog("NOT CONFIGURING UPDATE EVENT ROUTINES FOR OUR UPDATER OBJECT!", LogType.WarnLog);
                 this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);

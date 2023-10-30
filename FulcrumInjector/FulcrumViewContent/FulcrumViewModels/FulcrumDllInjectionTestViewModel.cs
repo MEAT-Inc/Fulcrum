@@ -71,13 +71,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
 #endif
             // Store title and version string values now.
             this.InjectorTestResult = "Not Yet Tested";
-            if (!Debugger.IsAttached) this.InjectorDllPath = RegistryControl.ShimDllExecutable;
-            else
-            {
-                // Build a path for the Shim DLL based on build configuration
-                string ShimDllPath = Path.GetFullPath("..\\..\\.\\FulcrumShim\\");
-                this.InjectorDllPath = ShimDllPath + (IsDebugBuild ? "Debug" : "Release") + "\\FulcrumShim.dll";
-            }
+            this.InjectorDllPath = RegistryControl.ShimDllExecutable;
+            // if (!Debugger.IsAttached) this.InjectorDllPath = RegistryControl.ShimDllExecutable;
+            // else
+            // {
+            //     // Build a path for the Shim DLL based on build configuration
+            //     string ShimDllPath = Path.GetFullPath("..\\..\\.\\FulcrumShim\\");
+            //     this.InjectorDllPath = ShimDllPath + (IsDebugBuild ? "Debug" : "Release") + "\\FulcrumShim.dll";
+            // }
+
             // Log information about the DLL Path values
             this.ViewModelLogger.WriteLog("LOCATED NEW DLL PATH VALUE OK!");
             this.ViewModelLogger.WriteLog($"DLL PATH VALUE PULLED: {this.InjectorDllPath}");

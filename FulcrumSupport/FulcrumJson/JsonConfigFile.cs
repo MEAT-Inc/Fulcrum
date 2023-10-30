@@ -118,7 +118,7 @@ namespace FulcrumJson
         public static void SetInjectorConfigFile(string NewConfigFileName, string ForcedDirectory = null)
         {
             // Pull location of the configuration application. If debugging is on, then try and set it using the working dir. 
-            string FulcrumInjectorDir = ForcedDirectory ?? string.Empty;
+            string FulcrumInjectorDir;
             _jsonConfigLogger?.WriteLog($"PULLING IN NEW APP CONFIG FILE NAMED {NewConfigFileName} FROM PROGRAM FILES OR WORKING DIRECTORY NOW");
 
             // Check if we've got a debugger hooked up or not first
@@ -131,7 +131,7 @@ namespace FulcrumJson
             else
             {
                 // Pull the injector EXE location from the registry and store our directory for it
-                FulcrumInjectorDir = RegistryControl.InjectorInstallPath;
+                FulcrumInjectorDir = ForcedDirectory ?? RegistryControl.InjectorInstallPath;
                 if (FulcrumInjectorDir == null)
                 {
                     // If the injector registry control object fails to find a key value, use a default path

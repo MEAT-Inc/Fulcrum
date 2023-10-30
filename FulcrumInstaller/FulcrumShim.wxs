@@ -86,7 +86,6 @@
                             <File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG_1" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
                             <File Id="FULCRUMWATCHDOGSERVICE.EXE.CONFIG_1" Name="FulcrumWatchdogService.exe.config" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumWatchdogService.exe.config" />
                             <File Id="CONTROLZEX.XML" Name="ControlzEx.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\ControlzEx.xml" />
-                            <File Id="FULCRUMINJECTOR.XML" Name="FulcrumInjector.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.xml" />
                             <File Id="GOOGLE.APIS.AUTH.XML" Name="Google.Apis.Auth.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Auth.xml" />
                             <File Id="GOOGLE.APIS.CORE.XML" Name="Google.Apis.Core.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Core.xml" />
                             <File Id="GOOGLE.APIS.DRIVE.V3.XML" Name="Google.Apis.Drive.v3.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\Google.Apis.Drive.v3.xml" />
