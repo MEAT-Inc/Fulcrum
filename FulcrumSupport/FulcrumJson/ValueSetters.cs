@@ -84,6 +84,8 @@ namespace FulcrumJson
                 ConfigObjectLocated[SplitContentPath.FirstOrDefault() ?? PropertyKey] = JToken.FromObject(ValueObject);
 
                 // TODO: Test this without this weird ass replacement BS that doesn't seem to be doing anything?
+                // Remove and re-add the configuration object once we've updated it
+                JsonConfigFile.ApplicationConfig.Remove(TypeOfConfig);
                 if (TypeOfConfig != "FulcrumUserSettings") JsonConfigFile.ApplicationConfig.Add(TypeOfConfig, ConfigObjectLocated); 
                 else { JsonConfigFile.ApplicationConfig["FulcrumUserSettings"] = JArray.FromObject(ConfigObjectLocated["FulcrumUserSettings"]); }
 
