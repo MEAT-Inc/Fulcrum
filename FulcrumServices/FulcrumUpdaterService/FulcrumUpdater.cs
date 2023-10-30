@@ -153,9 +153,9 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteLog($"CONFIGURING NEW GITHUB CONNECTION HELPER FOR INJECTOR SERVICE...", LogType.InfoLog);
 
                 // Authorize our git client here if needed
-                if (!this.RefreshInjectorVersions())
-                    throw new InvalidOperationException("Error! Failed to find any injector releases!");
-                
+                if (!this._authorizeGitClient())
+                    throw new AuthenticationException("Error! Failed to authorize Git Client for the MEAT Inc Organization!");
+
                 // Log out that our service has been booted without issues
                 this._serviceLogger.WriteLog("UPDATER SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
             }

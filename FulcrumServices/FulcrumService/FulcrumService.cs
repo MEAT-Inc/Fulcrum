@@ -136,6 +136,35 @@ namespace FulcrumService
             _serviceInitLogger =
                 SharpLogBroker.FindLoggers($"{nameof(FulcrumServiceBase)}Logger").FirstOrDefault()
                 ?? new SharpLogger(LoggerActions.UniversalLogger, $"{nameof(FulcrumServiceBase)}Logger");
+
+            // If the executing assembly name is the fulcrum application, don't re-archive contents
+            if (Assembly.GetEntryAssembly().FullName.Contains("FulcrumInjector")) return;
+
+            // Finally invoke an archive routine and child folder cleanup routine if needed
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                _serviceInitLogger.WriteLog("LOGGING ARCHIVE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("PROGRESS FOR ARCHIVAL ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Start with booting the archive routine
+                SharpLogArchiver.ArchiveLogFiles();
+                _serviceInitLogger.WriteLog("ARCHIVE ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+
+                // Then finally invoke the archive cleanup routines
+                SharpLogArchiver.CleanupArchiveHistory();
+                _serviceInitLogger.WriteLog("ARCHIVE CLEANUP ROUTINES HAVE BEEN COMPLETED!", LogType.InfoLog);
+            });
+            Task.Run(() =>
+            {
+                // Log archive routines have been queued
+                _serviceInitLogger.WriteLog("LOGGING SUBFOLDER PURGE ROUTINES HAVE BEEN KICKED OFF IN THE BACKGROUND!", LogType.WarnLog);
+                _serviceInitLogger.WriteLog("PROGRESS FOR SUBFOLDER PURGE ROUTINES WILL APPEAR IN THE CONSOLE/FILE TARGET OUTPUTS!");
+
+                // Call the cleanup method to purge our subdirectories if needed
+                SharpLogArchiver.CleanupSubdirectories();
+                _serviceInitLogger.WriteLog("CLEANED UP ALL CHILD LOGGING FOLDERS!", LogType.InfoLog);
+            });
         }
         /// <summary>
         /// Protected CTOR for a new FulcrumService instance. Builds our service container and sets up logging
