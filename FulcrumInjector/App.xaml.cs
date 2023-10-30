@@ -73,10 +73,10 @@ namespace FulcrumInjector
             this._configureStartupActions();
             
             // Initialize instances of our service objects if needed here
-            FulcrumDrive.InitializeDriveService();
-            FulcrumEmail.InitializeEmailService();
-            FulcrumUpdater.InitializeUpdaterService();
-            FulcrumWatchdog.InitializeWatchdogService();
+            // FulcrumDrive.InitializeDriveService();
+            // FulcrumEmail.InitializeEmailService();
+            // FulcrumUpdater.InitializeUpdaterService(); 
+            // FulcrumWatchdog.InitializeWatchdogService();
 
             // Configure settings and app theme
             this._configureCurrentTheme();

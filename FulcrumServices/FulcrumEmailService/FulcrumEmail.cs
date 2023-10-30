@@ -467,10 +467,7 @@ namespace FulcrumEmailService
             try
             {
                 // Check if we're configured or not already 
-                if (this.IsEmailClientAuthorized) {
-                    this._serviceLogger.WriteLog("EMAIL CLIENT WAS ALREADY AUTHORIZED! NOT RE-AUTHENTICATING", LogType.WarnLog);
-                    return true;
-                }
+                if (this.IsEmailClientAuthorized) return true;
 
                 // First build a new SMTP Client.
                 this._serviceLogger.WriteLog("ATTEMPTING TO CONNECT TO OUR SMTP SERVER NOW...", LogType.WarnLog);

@@ -310,10 +310,7 @@ namespace FulcrumDriveService
             try
             {
                 // Check if we're configured or not already 
-                if (this.IsDriveServiceAuthorized) {
-                    this._serviceLogger.WriteLog("DRIVE CLIENT WAS ALREADY AUTHORIZED! NOT RE-AUTHENTICATING", LogType.WarnLog);
-                    return true;
-                }
+                if (this.IsDriveServiceAuthorized) return true; 
 
                 // Configure the google drive service here
                 this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING NEW GOOGLE DRIVE CLIENT NOW...", LogType.WarnLog);

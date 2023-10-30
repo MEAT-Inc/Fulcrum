@@ -46,10 +46,6 @@ namespace FulcrumUpdaterService
         private readonly Stopwatch _downloadTimer = new();        // Download timer for pulling in versions
         private readonly UpdaterServiceSettings _serviceConfig;   // Updater configuration values
 
-        // Private backing fields to hold version information helpers
-        private string _latestInjectorVersion;                    // Private backing field holding the latest injector version
-        private string[] _injectorVersionsFound;                  // Private backing field holding all injector versions
-
         #endregion //Fields
 
         #region Properties
@@ -58,29 +54,13 @@ namespace FulcrumUpdaterService
         public bool IsGitClientAuthorized { get; private set; }
 
         // Public facing properties holding information about our latest version information
-        public string LatestInjectorVersion
-        {
-            get => _latestInjectorVersion ?? this.RefreshInjectorVersions().FirstOrDefault();
-            private set => _latestInjectorVersion = value;
-        }
-        public Release LatestInjectorRelease { get; private set; }
+        public Release[] InjectorReleases { get; private set; }
+        public string LatestInjectorVersion => this.InjectorVersions[0];
+        public Release LatestInjectorRelease => this.InjectorReleases[0];
         public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
-
-        // Public facing properties holding all versions found on the server
-        public string[] InjectorVersionsFound
-        {
-            get
-            {
-                // Check if a value is setup or not. If not find new ones and pull in result.
-                if (this._injectorVersionsFound != null) return this._injectorVersionsFound;
-                this._injectorVersionsFound = this.RefreshInjectorVersions();
-                this._latestInjectorVersion = this._injectorVersionsFound.FirstOrDefault();
-
-                // Return versions 
-                return _injectorVersionsFound;
-            }
-            private set => _injectorVersionsFound = value;
-        }
+        public string[] InjectorVersions => this.InjectorReleases
+            .Select(ReleaseTag => Regex.Match(ReleaseTag.TagName, @"(\d+(?>\.|))+").Value)
+            .ToArray();
 
         // Time download elapsed and approximate time remaining
         public string DownloadTimeRemaining { get; private set; }
@@ -173,9 +153,9 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteLog($"CONFIGURING NEW GITHUB CONNECTION HELPER FOR INJECTOR SERVICE...", LogType.InfoLog);
 
                 // Authorize our git client here if needed
-                if (!this._authorizeGitClient())
-                    throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
-
+                if (!this.RefreshInjectorVersions())
+                    throw new InvalidOperationException("Error! Failed to find any injector releases!");
+                
                 // Log out that our service has been booted without issues
                 this._serviceLogger.WriteLog("UPDATER SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
             }
@@ -226,7 +206,7 @@ namespace FulcrumUpdaterService
         /// <summary>
         /// Updates the injector version information on the class instance.
         /// </summary>
-        public string[] RefreshInjectorVersions()
+        public bool RefreshInjectorVersions()
         {
             // Make sure we're authorized on the GitHub client first 
             this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
@@ -234,29 +214,14 @@ namespace FulcrumUpdaterService
                 throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
 
             // Pull in the releases and return them out
-            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
-            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
-
-            // Store our latest release object on this class
-            if (ReleasesFound?.Length != 0) 
-                this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
+            this.InjectorReleases = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
+            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {this.InjectorReleases.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
 
             // Parse out the version information and return them out
-            var ReleaseTagsFound = ReleasesFound.Select(ReleaseObj => ReleaseObj.TagName).ToArray();
             this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
-            this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", ReleaseTagsFound)}", LogType.TraceLog);
-
-            // Clean up tag names here to only contain version information
-            this._serviceLogger.WriteLog("CLEANING UP RELEASE TAG VALUES NOW...", LogType.WarnLog);
-            ReleaseTagsFound = ReleaseTagsFound
-                .Select(ReleaseTag => Regex.Match(ReleaseTag, @"(\d+(?>\.|))+").Value)
-                .ToArray();
-
-            // Return the version tags here
-            this.InjectorVersionsFound = ReleaseTagsFound;
-            this.LatestInjectorVersion = ReleaseTagsFound[0];
-            this._serviceLogger.WriteLog("RETURNING NEWEST INJECTOR VERSION INFORMATION NOW...", LogType.InfoLog);
-            return ReleaseTagsFound;
+            this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", this.InjectorVersions)}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"FOUND LATEST INJECTOR VERSION TO BE {this.LatestInjectorVersion}", LogType.InfoLog);
+            return this.InjectorReleases.Length != 0;
         }
         /// <summary>
         /// Checks if a version is ready to be updated or not.
@@ -266,7 +231,7 @@ namespace FulcrumUpdaterService
         public bool CheckAgainstVersion(string InputVersion)
         {
             // Validate that the versions exist to compare
-            if (this.InjectorVersionsFound == null || this.LatestInjectorVersion == null)
+            if (this.InjectorVersions == null) 
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
@@ -292,21 +257,16 @@ namespace FulcrumUpdaterService
         /// <returns>The path of our output msi file for the injector application</returns>
         public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
         {
-            // Make sure we're authorized on the GitHub client first 
-            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            if (!this._authorizeGitClient())
-                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
-
-            // Pull in the releases and return them out
-            var ReleasesFound = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
-            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {ReleasesFound.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
-
-            // Store our latest release object on this class
-            if (ReleasesFound?.Length != 0) 
-                this.LatestInjectorRelease = ReleasesFound.FirstOrDefault();
+            // Validate that the versions exist to compare
+            if (this.InjectorVersions == null)
+            {
+                // IF no versions are found, then refresh them all now
+                this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
+                this.RefreshInjectorVersions();
+            }
 
             // First find our version to use using our version/release lookup tool
-            var ReleaseToUse = ReleasesFound.FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
+            var ReleaseToUse = this.InjectorReleases.FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
             this._serviceLogger.WriteLog("PULLED IN A NEW RELEASE OBJECT TO UPDATE WITH!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
 
@@ -356,10 +316,7 @@ namespace FulcrumUpdaterService
             try
             {
                 // Check if we're configured or not already 
-                if (this.IsGitClientAuthorized) {
-                    this._serviceLogger.WriteLog("GIT CLIENT WAS ALREADY AUTHORIZED! NOT RE-AUTHENTICATING", LogType.WarnLog);
-                    return true;
-                }
+                if (this.IsGitClientAuthorized) return true;
 
                 // Build a new git client here for authorization
                 this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING GIT CLIENT NOW...", LogType.InfoLog);
