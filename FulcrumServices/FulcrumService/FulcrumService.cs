@@ -35,13 +35,10 @@ namespace FulcrumService
         #endregion // Fields
 
         #region Properties
-
-        // Protected property holding our file target for this service
-        protected FileTarget ServiceLoggingTarget { get; set; }
-
+        
         // Properties holding information about the installed windows service object
         protected ServiceController ServiceInstance { get; set; }
-        public bool IsServiceInstance => this.ServiceInstance == null;
+        public bool IsServiceInstance => this.ServiceInstance != null;
 
         // Properties holding information about JSON output data location for custom commands
         protected string ServiceJsonLocation { get; set; }
@@ -87,7 +84,6 @@ namespace FulcrumService
             // If the settings file is configured, exit out
             if (!JsonConfigFile.IsConfigured)
             {
-
                 // Store a local flag for if we're using a debug build or not
                 bool IsDebugBuild = false;
 #if DEBUG
@@ -116,18 +112,23 @@ namespace FulcrumService
             }
 
             // If the executing assembly name is the fulcrum application, don't reconfigure logging
-            if (!Assembly.GetEntryAssembly().FullName.Contains("FulcrumInjector"))
+            string EntryAssemblyName = Assembly.GetEntryAssembly().GetName().Name;
+            string ServiceLoggingFolder = EntryAssemblyName.Replace("Fulcrum", "") + "Logs";
+            if (!EntryAssemblyName.Contains("FulcrumInjector"))
             {
                 // Check if we need to configure logging or archiving before building our logger instance
                 var BrokerConfig = ValueLoaders.GetConfigValue<SharpLogBroker.BrokerConfiguration>("FulcrumLogging.LogBrokerConfiguration");
-                BrokerConfig.LogFilePath = Path.GetFullPath(BrokerConfig.LogFilePath);
+                BrokerConfig.LogFilePath = Path.Combine(Path.GetFullPath(BrokerConfig.LogFilePath), ServiceLoggingFolder);
+                BrokerConfig.LogFileName = $"{EntryAssemblyName}_Logging_$LOGGER_TIME.log";
+                BrokerConfig.LogBrokerName = $"{EntryAssemblyName}";
                 if (!SharpLogBroker.InitializeLogging(BrokerConfig))
                     throw new InvalidOperationException("Error! Failed to configure log broker instance for a FulcrumService!");
 
                 // Load in and apply the log archiver configuration for this instance. Reformat output paths to log ONLY into the injector install location
                 var ArchiverConfig = ValueLoaders.GetConfigValue<SharpLogArchiver.ArchiveConfiguration>("FulcrumLogging.LogArchiveConfiguration");
+                ArchiverConfig.SearchPath = Path.Combine(Path.GetFullPath(ArchiverConfig.SearchPath), ServiceLoggingFolder);
                 ArchiverConfig.ArchivePath = Path.GetFullPath(ArchiverConfig.ArchivePath);
-                ArchiverConfig.SearchPath = Path.GetFullPath(ArchiverConfig.SearchPath);
+                ArchiverConfig.ArchiveFileFilter = $"{EntryAssemblyName}*.*";
                 if (!SharpLogArchiver.InitializeArchiving(ArchiverConfig))
                     throw new InvalidOperationException("Error! Failed to configure log archiver instance for a FulcrumService!");
             }
@@ -138,7 +139,7 @@ namespace FulcrumService
                 ?? new SharpLogger(LoggerActions.UniversalLogger, $"{nameof(FulcrumServiceBase)}Logger");
 
             // If the executing assembly name is the fulcrum application, don't re-archive contents
-            if (Assembly.GetEntryAssembly().FullName.Contains("FulcrumInjector")) return;
+            if (EntryAssemblyName.Contains("FulcrumInjector")) return;
 
             // Finally invoke an archive routine and child folder cleanup routine if needed
             Task.Run(() =>
@@ -190,7 +191,7 @@ namespace FulcrumService
                 this._serviceLogger.WriteLog("ALL SERVICE CALLS/COMMANDS EXECUTED WILL BE DONE SO USING JSON ROUTINES FOR PASSING DATA!", LogType.WarnLog);
                 return;
             }
-
+            
             // Try and consume an existing service instance here if possible
             try { this.ServiceInstance = new ServiceController(this.ServiceName); }
             catch (Exception ConsumeServiceEx)
@@ -226,6 +227,28 @@ namespace FulcrumService
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Instance/debug startup method for the service.
+        /// This method will simply call the OnStart method for our service with given arguments
+        /// <param name="ServiceArgs">Arguments for the service startup routine</param>
+        /// </summary>
+        public void StartService(params string[] ServiceArgs)
+        {
+            // Check if we've got a service instance or if we're consuming our service here
+            this._serviceLogger.WriteLog($"INVOKING AN OnStart METHOD FOR OUR {this.ServiceName} SERVICE");
+            if (this.IsServiceInstance)
+            {
+                // If we've got a hooked instance, execute this routine here
+                this._serviceLogger.WriteLog("INVOKING ROUTINE ON SERVICE CONTROLLER INSTANCE!", LogType.WarnLog);
+                this.ServiceInstance.Start(ServiceArgs);
+            }
+            else
+            {
+                // If this is the service instance itself, run the command locally
+                this._serviceLogger.WriteLog("SERVICE INSTANCE IS BEING INVOKED DIRECTLY!", LogType.WarnLog);
+                this.OnStart(ServiceArgs);
+            }
+        }
+        /// <summary>
         /// Instance/debug custom command method for the service.
         /// This allows us to run custom actions on the service in real time if we've defined them here
         /// </summary>
@@ -237,7 +260,7 @@ namespace FulcrumService
             if (this.IsServiceInstance) 
             {
                 // If we've got a hooked instance, execute this routine here
-                this._serviceLogger.WriteLog("INVOKING COMMAND ON SERVICE CONTROLLER INSTANCE!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("INVOKING ON SERVICE CONTROLLER INSTANCE!", LogType.WarnLog);
                 this.ServiceInstance.ExecuteCommand(ServiceCommand);
             } 
             else
@@ -248,39 +271,24 @@ namespace FulcrumService
             }
         }
         /// <summary>
-        /// Executes a custom command on the given service object as requested.
-        /// This method is NOT supported on the base service type!
+        /// Instance/debug stop command for the service
+        /// This will simply call the OnStop method for our service instance
         /// </summary>
-        /// <param name="ServiceCommand">The number of the command being executed for our service</param>
-        /// <exception cref="NotImplementedException">Thrown when this method is called since base services are not supported</exception>
-        protected override void OnCustomCommand(int ServiceCommand)
+        public void StopService()
         {
-            try
+            // Check if we've got a service instance or if we're consuming our service here
+            this._serviceLogger.WriteLog($"INVOKING AN OnStop METHOD FOR OUR {this.ServiceName} SERVICE");
+            if (this.IsServiceInstance)
             {
-                // Check what type of command is being executed and perform actions accordingly.
-                switch (ServiceCommand)
-                {
-                    // For any other command value or something that is not recognized
-                    case 128:
-
-                        // Log out the command help information for the user to read in the log file.
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"                                    FulcrumInjector Service Command Help", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        return;
-                }
+                // If we've got a hooked instance, execute this routine here
+                this._serviceLogger.WriteLog("INVOKING ROUTINE ON SERVICE CONTROLLER INSTANCE!", LogType.WarnLog);
+                this.ServiceInstance.Stop();
             }
-            catch (Exception SendCustomCommandEx)
+            else
             {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING SERVICE INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
+                // If this is the service instance itself, run the command locally
+                this._serviceLogger.WriteLog("SERVICE INSTANCE IS BEING INVOKED DIRECTLY!", LogType.WarnLog);
+                this.Stop();
             }
         }
 
@@ -315,44 +323,6 @@ namespace FulcrumService
         {
             // TODO: Build logic for removing existing actions by GUID
             return false;
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Configures the logger for this service to output to a custom file path
-        /// </summary>
-        /// <returns>The configured file target to register for this service</returns>
-        public static FileTarget LocateServiceFileTarget<TServiceType>() where TServiceType : FulcrumServiceBase
-        {
-            // Make sure our output location exists first
-            string ServiceName = typeof(TServiceType).Name;
-            string OutputFolder = Path.Combine(SharpLogBroker.LogFileFolder, $"{ServiceName.Replace("Fulcrum", string.Empty)}ServiceLogs");
-            if (!Directory.Exists(OutputFolder)) Directory.CreateDirectory(OutputFolder);
-
-            // Configure our new logger name and the output log file path for this logger instance 
-            string ServiceLoggerTime = SharpLogBroker.LogFileName.Split('_').Last().Split('.')[0];
-            string ServiceLoggerName = $"{ServiceName}Logging_{ServiceLoggerTime}";
-            string OutputFileName = Path.Combine(OutputFolder, $"{ServiceLoggerName}.log");
-            if (File.Exists(OutputFileName)) File.Delete(OutputFileName);
-
-            // Spawn the new generation logger and attach in a new file target for it
-            var ExistingTarget = SharpLogBroker.LoggingTargets.FirstOrDefault(LoggerTarget => LoggerTarget.Name == ServiceLoggerName);
-            if (ExistingTarget is FileTarget LocatedFileTarget) return LocatedFileTarget;
-
-            // Spawn the new generation logger and attach in a new file target for it
-            string LayoutString = SharpLogBroker.DefaultFileFormat.LoggerFormatString;
-            FileTarget ServiceFileTarget = new FileTarget(ServiceLoggerName)
-            {
-                KeepFileOpen = false,           // Allows multiple programs to access this file
-                Layout = LayoutString,          // The output log line layout for the logger
-                ConcurrentWrites = true,        // Allows multiple writes at one time or not
-                FileName = OutputFileName,      // The name/full log file being written out
-                Name = ServiceLoggerName,       // The name of the logger target being registered
-            };
-
-            // Return the output logger object built
-            return ServiceFileTarget;
         }
     }
 }

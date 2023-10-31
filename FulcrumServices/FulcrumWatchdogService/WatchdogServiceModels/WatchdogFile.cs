@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FulcrumSupport;
 using SharpLogging;
 using FulcrumService;
+using NLog.Targets;
 
 namespace FulcrumWatchdogService.WatchdogServiceModels
 {
@@ -323,18 +324,12 @@ namespace FulcrumWatchdogService.WatchdogServiceModels
                 {
                     // Store the found logger and write we've built it out here
                     _fileLogger = LocatedLogger;
-                    _fileLogger.WriteLog("STORED NEW STATIC FILE LOGGER INSTANCE FOR OUR WATCHDOGS OK!", LogType.InfoLog);
+                    _fileLogger.WriteLog("STORED STATIC FILE LOGGER INSTANCE FOR OUR WATCHDOGS OK!", LogType.InfoLog);
                 }
                 else
                 {
-                    // Find our logger name and setup new targets for output
-                    var WatchdogFileTarget = FulcrumServiceBase.LocateServiceFileTarget<FulcrumWatchdog>();
-
                     // Spawn our logger and register targets to it for the needed outputs
-                    _fileLogger = new SharpLogger(LoggerActions.CustomLogger, $"{nameof(FulcrumWatchdog)}_FolderLogger");
-                    _fileLogger.RegisterTarget(WatchdogFileTarget);
-
-                    // Log we've spawned this new logger and exit out
+                    _fileLogger = new SharpLogger(LoggerActions.FileLogger, $"{nameof(FulcrumWatchdog)}_FolderLogger");
                     _fileLogger.WriteLog("REGISTERED AND BUILT NEW LOGGER FOR WATCHDOG FILE OPERATIONS OK!", LogType.InfoLog);
                 }
             }

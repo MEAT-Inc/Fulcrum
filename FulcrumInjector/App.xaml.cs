@@ -70,8 +70,7 @@ namespace FulcrumInjector
             this._configureSingleInstance();
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
-            this._configureStartupActions();
-            
+
             // Configure settings and app theme
             this._configureCurrentTheme();
             this._configureUserSettings();
@@ -272,47 +271,6 @@ namespace FulcrumInjector
             this._appLogger.WriteLog("ERROR! ENCRYPTION IS STILL NOT CONFIGURED CORRECTLY!", LogType.ErrorLog);
             this._appLogger.WriteLog("EXITING THE INJECTOR APP NOW...", LogType.ErrorLog);
             Environment.Exit(0);
-        }
-        /// <summary>
-        /// Looks at our command line arguments and determines what we should be doing with the injector application
-        /// If we provide an argument for booting the watchdog routines, the actions are invoked and the application exits
-        /// </summary>
-        private void _configureStartupActions()
-        {
-            // Check to see if we've been provided with command line arguments or not
-            var CommandLineHelper = FulcrumCommandLine.InitializeCommandLineHelper();
-            var StartupActions = CommandLineHelper.ParseCommandLineArgs();
-            if (StartupActions.Count == 0) 
-            {
-                // Log no arguments are given and exit out of this routine
-                this._appLogger.WriteLog("NO STARTUP ARGUMENTS WERE PROVIDED! INVOKING NORMAL INJECTOR ROUTINES...", LogType.WarnLog);
-                return;
-            }
-
-            // Invoke the actions needed for our arguments here 
-            this._appLogger.WriteLog("INVOKING ARGUMENT ACTIONS NOW...", LogType.InfoLog);
-            foreach (var StartupAction in StartupActions)
-            {
-                // If the action fails to invoke, log the failure out and throw an exception here 
-                bool ExecutionResult = CommandLineHelper.InvokeCommandLineAction(StartupAction); 
-                if (ExecutionResult) this._appLogger.WriteLog($"INVOKED ACTION {StartupAction.ArgumentType} OK!", LogType.InfoLog);
-                else
-                {
-                    // Log out that an action failed to invoke and throw a new exception out
-                    this._appLogger.WriteLog("ERROR! FAILED TO INVOKE STARTUP ACTION!", LogType.ErrorLog);
-                    this._appLogger.WriteLog($"ACTION {StartupAction.ArgumentType} COULD NOT BE INVOKED!", LogType.ErrorLog);
-                    throw new InvalidOperationException($"Failed to invoke action {StartupAction.ArgumentType}!");
-                }
-            }
-
-            // Check if we've got the launch flag for the injector or not
-            if (CommandLineHelper.ShouldLaunchInjector) this._appLogger.WriteLog("FOUND REQUEST TO BOOT INJECTOR AFTER STARTUP ROUTINES!", LogType.InfoLog);
-            else
-            {
-                // If we don't want to launch the injector app, exit the program here
-                this._appLogger.WriteLog("LAUNCH INJECTOR FLAG WAS NOT PROVIDED IN STARTUP ARGUMENTS! EXITING NOW...", LogType.WarnLog);
-                Environment.Exit(0);
-            }
         }
         /// <summary>
         /// Configure new theme setup for instance objects.

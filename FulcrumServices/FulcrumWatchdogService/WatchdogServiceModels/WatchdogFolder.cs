@@ -215,18 +215,12 @@ namespace FulcrumWatchdogService.WatchdogServiceModels
                 {
                     // Store the found logger and write we've built it out here
                     _folderLogger = LocatedLogger;
-                    _folderLogger.WriteLog("STORED NEW STATIC FILE LOGGER INSTANCE FOR OUR WATCHDOGS OK!", LogType.InfoLog);
+                    _folderLogger.WriteLog("STORED STATIC FOLDER LOGGER INSTANCE FOR OUR WATCHDOGS OK!", LogType.InfoLog);
                 }
                 else
                 {
-                    // Find our logger name and setup new targets for output
-                    var WatchdogFileTarget = FulcrumServiceBase.LocateServiceFileTarget<FulcrumWatchdog>();
-                    
                     // Spawn our logger and register targets to it for the needed outputs
                     _folderLogger = new SharpLogger(LoggerActions.CustomLogger, $"{nameof(FulcrumWatchdog)}_FolderLogger");
-                    _folderLogger.RegisterTarget(WatchdogFileTarget); 
-
-                    // Log we've spawned this new logger and exit out
                     _folderLogger.WriteLog("REGISTERED AND BUILT NEW LOGGER FOR WATCHDOG FOLDER OPERATIONS OK!", LogType.InfoLog);
                 }
             }
