@@ -71,6 +71,12 @@ namespace FulcrumInjector
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
 
+            // Boot our service instances here 
+            FulcrumEmail.InitializeEmailService();
+            FulcrumDrive.InitializeDriveService();
+            FulcrumUpdater.InitializeUpdaterService();
+            FulcrumWatchdog.InitializeWatchdogService();
+
             // Configure settings and app theme
             this._configureCurrentTheme();
             this._configureUserSettings();

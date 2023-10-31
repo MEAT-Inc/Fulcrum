@@ -149,7 +149,7 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteLog($"CONFIGURING NEW GITHUB CONNECTION HELPER FOR INJECTOR SERVICE...", LogType.InfoLog);
 
                 // Authorize our git client here if needed
-                if (!this._authorizeGitClient())
+                if (!this._authorizeGitClient()) 
                     throw new AuthenticationException("Error! Failed to authorize Git Client for the MEAT Inc Organization!");
 
                 // Log out that our service has been booted without issues
@@ -202,7 +202,7 @@ namespace FulcrumUpdaterService
         /// <summary>
         /// Updates the injector version information on the class instance.
         /// </summary>
-        public bool RefreshInjectorVersions()
+        public bool RefreshInjectorReleases()
         {
             // Make sure we're authorized on the GitHub client first 
             this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
@@ -227,11 +227,11 @@ namespace FulcrumUpdaterService
         public bool CheckAgainstVersion(string InputVersion)
         {
             // Validate that the versions exist to compare
-            if (this.InjectorVersions == null) 
+            if (this.InjectorReleases == null) 
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                this.RefreshInjectorVersions();
+                this.RefreshInjectorReleases();
             }
 
             // Now compare the versions
@@ -254,11 +254,11 @@ namespace FulcrumUpdaterService
         public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
         {
             // Validate that the versions exist to compare
-            if (this.InjectorVersions == null)
+            if (this.InjectorReleases == null)
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                this.RefreshInjectorVersions();
+                this.RefreshInjectorReleases();
             }
 
             // First find our version to use using our version/release lookup tool
