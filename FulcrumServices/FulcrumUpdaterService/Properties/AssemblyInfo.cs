@@ -19,7 +19,7 @@ using System.Resources;
 [assembly: Guid("5577927f-40b8-4ecb-b168-1cc06bd7b8f8")]
 
 // Version information
-[assembly: AssemblyVersion("0.2.2.103")]
-[assembly: AssemblyFileVersion("0.2.2.103")]
+[assembly: AssemblyVersion("0.2.4.112")]
+[assembly: AssemblyFileVersion("0.2.4.112")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
