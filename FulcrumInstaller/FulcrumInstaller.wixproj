@@ -92,7 +92,7 @@
     <GetAssemblyIdentity AssemblyFiles="..\FulcrumInjector\bin\$(Configuration)\FulcrumInjector.exe">
       <Output TaskParameter="Assemblies" ItemName="AsmInfo" />
     </GetAssemblyIdentity>
-    <CreateProperty Value="$(SolutionName)_%(AsmInfo.Version)">
+    <CreateProperty Value="FulcrumInstaller_%(AsmInfo.Version)">
       <Output TaskParameter="Value" PropertyName="TargetName" />
     </CreateProperty>
   </Target>

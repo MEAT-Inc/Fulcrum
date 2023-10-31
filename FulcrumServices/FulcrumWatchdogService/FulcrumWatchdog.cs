@@ -55,10 +55,6 @@ namespace FulcrumWatchdogService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumWatchdog(WatchdogSettings ServiceSettings = null) : base(ServiceTypes.WATCHDOG_SERVICE)
         {
-            // Build and register a new watchdog logging target here for a file and the console
-            this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumWatchdog>();
-            this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
-
             // Log we're building this new service and log out the name we located for it
             this._serviceLogger.WriteLog("SPAWNING NEW DRIVE SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
@@ -86,7 +82,7 @@ namespace FulcrumWatchdogService
         {
             // Make sure we actually want to use this watchdog service 
             WatchdogSettings ServiceConfig = ValueLoaders.GetConfigValue<WatchdogSettings>("FulcrumServices.FulcrumWatchdogService");
-            if (!ServiceConfig.WatchdogEnabled) {
+            if (!ServiceConfig.ServiceEnabled) {
                 _serviceInitLogger.WriteLog("WARNING! WATCHDOG SERVICE IS TURNED OFF IN OUR CONFIGURATION FILE! NOT BOOTING IT", LogType.WarnLog);
                 return null;
             }

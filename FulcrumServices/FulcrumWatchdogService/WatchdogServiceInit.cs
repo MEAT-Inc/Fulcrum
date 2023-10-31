@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -14,8 +15,12 @@ namespace FulcrumWatchdogService
         /// </summary>
         static void Main()
         {
-            // Build and run a new service instance
-            ServiceBase.Run(new FulcrumWatchdog());
+            // Build and store a new service instance
+            FulcrumWatchdog ServiceInstance = new FulcrumWatchdog();
+
+            // Either fire the start service routine or run the service instance here
+            if (Debugger.IsAttached) ServiceInstance.StartService();
+            else ServiceBase.Run(ServiceInstance);
         }
     }
 }

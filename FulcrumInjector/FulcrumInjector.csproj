@@ -196,7 +196,6 @@
       <DependentUpon>FulcrumEncryptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumOeApplication.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumStartupAction.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\DriveModels\DriveLogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\LogFile.cs" />
@@ -207,7 +206,6 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml.cs">
       <DependentUpon>FulcrumGoogleDriveView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewSupport\FulcrumCommandLine.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumDataConverters\InverseVisibilityConverter.cs" />
     <Compile Include="FulcrumViewContent\FulcrumEnumCombo.xaml.cs">

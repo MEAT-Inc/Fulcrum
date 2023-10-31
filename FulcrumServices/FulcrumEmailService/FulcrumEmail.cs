@@ -99,10 +99,6 @@ namespace FulcrumEmailService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumEmail(EmailServiceSettings ServiceSettings = null) : base(ServiceTypes.EMAIL_SERVICE)
         {
-            // Build and register a new watchdog logging target here for a file and the console
-            this.ServiceLoggingTarget = LocateServiceFileTarget<FulcrumEmail>();
-            this._serviceLogger.RegisterTarget(this.ServiceLoggingTarget);
-
             // Log we're building this new service and log out the name we located for it
             this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
