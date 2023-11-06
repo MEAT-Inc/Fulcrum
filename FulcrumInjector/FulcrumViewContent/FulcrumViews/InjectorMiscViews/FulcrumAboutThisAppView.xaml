@@ -19,20 +19,25 @@
     </UserControl.Resources>
 
     <!-- Content View -->
-    <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
+    <Grid Margin="0,10,0,10" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <!-- Title -->
+        <TextBlock Grid.Row="0" Text="About The FulcrumInjector" Style="{StaticResource VersionInfoTitleText}"/>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".625*"/>
+                <ColumnDefinition Width=".70*"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <!-- About this App and Logo -->
-            <Grid Grid.Row="0" Grid.Column="0" Margin="5,0">
+            <Grid Grid.Row="0" Grid.Column="0" Margin="-10,0,15,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
@@ -40,7 +45,7 @@
 
                 <!-- Logo -->
                 <Border Grid.Row="0" Style="{StaticResource LogoBorderStyle}" x:Name="bdLogo">
-                    <Image Width="{Binding ElementName=bdLogo, Path=Width}" Height="{Binding ElementName=bdLogo, Path=Height}">
+                    <Image Width="{Binding ElementName=bdLogo, Path=Width}" Height="{Binding ElementName=bdLogo, Path=Height}" Margin="-1">
                         <Image.Source>
                             <BitmapImage UriSource="../../../FulcrumResources/MeatIncTurboLogo.jpg" />
                         </Image.Source>
@@ -51,6 +56,7 @@
                 <TextBlock Grid.Row="1" Style="{StaticResource AboutThisAppText}">
                     <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
                     <LineBreak/>
+                    <LineBreak/>
                     <Run Text="Any questions, comments, or concerns with this application can be directed to either zack.walsh@meatinc.autos or by submitting a bug or issue report on the repository for this application."/>
                     <LineBreak/>
                     <LineBreak/>
@@ -60,25 +66,81 @@
             </Grid>
 
             <!-- Splitting Border -->
-            <Border Grid.Column="1" BorderThickness="2,0,0,0" BorderBrush="{StaticResource PrimaryColor}"/>
+            <Border Grid.Column="1" BorderThickness="2,0,0,0" Margin="0,0,0,15" BorderBrush="{StaticResource PrimaryColor}"/>
 
             <!-- Version Information -->
-            <Grid Grid.Row="0" Grid.Column="1" Margin="5">
+            <Grid Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Version Information" Style="{StaticResource VersionInfoTitleText}"/>
-            </Grid>
 
+                <!-- Version Information -->
+                <Grid Grid.Row="0" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="135"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Version Values -->
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Injector App"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding InjectorAppVersion}"
+                             Style="{StaticResource VersionValueText}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="Shim DLL"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ShimDllVersion}"
+                                 Style="{StaticResource VersionValueText}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Service Base"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ServiceBaseVersion}"
+                                 Style="{StaticResource VersionValueText}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="3" Text="Drive Service"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding DriveServiceVersion}"
+                                 Style="{StaticResource VersionValueText}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="4" Text="Email Service"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding EmailServiceVersion}"
+                                 Style="{StaticResource VersionValueText}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="5" Text="Updater Service"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding UpdaterServiceVersion}"
+                                 Style="{StaticResource VersionValueText}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="6" Text="Watchdog Service"
+                                   Style="{StaticResource VersionNameText}"/>
+                    <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding WatchdogServiceVersion}"
+                                 Style="{StaticResource VersionValueText}"/>
+                </Grid>
+
+                <!-- Version Info Information -->
+                <TextBlock Grid.Row="1" Margin="0,0,0,0"
+                               Style="{StaticResource AboutThisAppText}" 
+                               Text="The version information above is either pulled from the registry locations for the FulcrumInjector application (HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\MEAT Inc), or pulled locally from the currently running executable. If you're confused as to why version information is reflecting a specific value, ensure you're running the latest version of the Injector Application and double check you don't see SOURCE_BINARY or DEBUG_BUILD in the title bar of this window."/>
+            </Grid>
         </Grid>
 
         <!-- Close out button -->
         <Button 
-            Grid.Row="1" 
+            Grid.Row="2" 
             Grid.Column="0" FontSize="18" VerticalAlignment="Center"
             Click="ToggleAboutThisApplicationFlyout_OnClick"
             Style="{StaticResource ActionButtonStyle}"
-            Content="Close Information" Width="250" Height="35" />
+            Content="Close Information" Width="250" Height="30" />
     </Grid>
 </UserControl>
