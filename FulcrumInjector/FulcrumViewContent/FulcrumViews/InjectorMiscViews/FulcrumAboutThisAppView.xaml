@@ -21,35 +21,64 @@
     <!-- Content View -->
     <Grid Margin="15,30,15,15" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="210"/>
-            <RowDefinition/>
-            <RowDefinition Height=".30*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
-        <!-- Meat INC turbo logo goes here -->
-        <Image Grid.Row="0">
-            <Image.Source>
-                <BitmapImage UriSource="../../../FulcrumResources/MeatIncTurboLogo.jpg" />
-            </Image.Source>
-        </Image>
-        <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryColor}" BorderThickness="5" Width="220" CornerRadius="3"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width=".625*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Information about this app goes here -->
-        <TextBlock Grid.Row="1" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center" TextWrapping="Wrap" Width="500" FontSize="15">
-                        <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
-                        <LineBreak/>
-                        <Run Text="Any questions, comments, or concerns with this application can be directed to either zack.walsh@meatinc.autos or by submitting a bug or issue report on the repository for this application."/>
-                        <LineBreak/>
-                        <LineBreak/>
-                        <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software."/>
-        </TextBlock>
+            <!-- About this App and Logo -->
+            <Grid Grid.Row="0" Grid.Column="0" Margin="5,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <!-- Logo -->
+                <Border Grid.Row="0" Style="{StaticResource LogoBorderStyle}" x:Name="bdLogo">
+                    <Image Width="{Binding ElementName=bdLogo, Path=Width}" Height="{Binding ElementName=bdLogo, Path=Height}">
+                        <Image.Source>
+                            <BitmapImage UriSource="../../../FulcrumResources/MeatIncTurboLogo.jpg" />
+                        </Image.Source>
+                    </Image>
+                </Border>
+
+                <!-- About this App -->
+                <TextBlock Grid.Row="1" Style="{StaticResource AboutThisAppText}">
+                    <Run Text="The FulcrumInjector is a product of MEAT Inc (Copyright 2021). All software is provided as is and comes without any warranty."/>
+                    <LineBreak/>
+                    <Run Text="Any questions, comments, or concerns with this application can be directed to either zack.walsh@meatinc.autos or by submitting a bug or issue report on the repository for this application."/>
+                    <LineBreak/>
+                    <LineBreak/>
+                    <Run Foreground="{StaticResource PrimaryColor}" FontWeight="DemiBold" 
+                         Text="Thanks, and enjoy the Fulcrum. Don't get too carried away with the power of this app. Or get carried away. Fuck closed source software."/>
+                </TextBlock>
+            </Grid>
+
+            <!-- Splitting Border -->
+            <Border Grid.Column="1" BorderThickness="2,0,0,0" BorderBrush="{StaticResource PrimaryColor}"/>
+
+            <!-- Version Information -->
+            <Grid Grid.Row="0" Grid.Column="1" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Version Information" Style="{StaticResource VersionInfoTitleText}"/>
+            </Grid>
+
+        </Grid>
 
         <!-- Close out button -->
-        <Button Grid.Row="2" 
-                FontSize="18"
-                VerticalAlignment="Top"
-                Click="ToggleAboutThisApplicationFlyout_OnClick"
-                Style="{StaticResource ActionButtonStyle}"
-                Content="Close Information" Width="250" Height="35" />
+        <Button 
+            Grid.Row="1" 
+            Grid.Column="0" FontSize="18" VerticalAlignment="Center"
+            Click="ToggleAboutThisApplicationFlyout_OnClick"
+            Style="{StaticResource ActionButtonStyle}"
+            Content="Close Information" Width="250" Height="35" />
     </Grid>
 </UserControl>
