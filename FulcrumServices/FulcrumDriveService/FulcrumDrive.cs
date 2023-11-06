@@ -35,7 +35,6 @@ namespace FulcrumDriveService
 
         // Private backing fields for drive service objects
         private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
-        private DriveConfiguration _driveConfig;                  // The initialization configuration for the drive service
         private static DriveService _driveService;                // Private static instance for our drive service object
         private DriveServiceSettings _serviceConfig;              // Settings configuration for our service
 
@@ -101,12 +100,11 @@ namespace FulcrumDriveService
 
             // Pull in new authorization and configuration objects here
             this._driveAuth = this._serviceConfig.ExplorerAuthorization;
-            this._driveConfig = this._serviceConfig.ExplorerConfiguration;
 
             // Log out information about our configuration values here 
             this._serviceLogger.WriteLog("PULLED GOOGLE DRIVE EXPLORER AUTHORIZATION AND CONFIGURATION INFORMATION CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveConfig.ClientId}", LogType.TraceLog);
-            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveConfig.ProjectId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveAuth.ClientId}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveAuth.ProjectId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}", LogType.TraceLog);
         }
         /// <summary>
