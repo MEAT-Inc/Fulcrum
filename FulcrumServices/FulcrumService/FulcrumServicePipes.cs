@@ -142,7 +142,7 @@ namespace FulcrumService
             // Build a new set of stream readers and writers for our pipe object along with a command queue
             if (!this._spawnServicePipes())
                 throw new InvalidOperationException($"Error! Failed to configure pipe objects for pipe {this.ServicePipeName}!");
-            if (!this._initializeServicePipe())
+            if (this.ServicePipeType == ServicePipeTypes.HOST_PIPE && !this._initializeServicePipe())
                 throw new InvalidOperationException($"Error! Failed to start pipe service task for pipe {this.ServicePipeName}!");
         }
 
@@ -292,9 +292,6 @@ namespace FulcrumService
             {
                 // Check if we've got a host or client pipe setup here first
                 this._servicePipeLogger.WriteLog($"STARTING {this.ServicePipeName} SERVICE TASK NOW...", LogType.WarnLog);
-                if (this.ServicePipeType != ServicePipeTypes.HOST_PIPE) return;
-
-                // For host pipes, we boot a new reader to pull our lines in and build pipe commands for them
                 while (!this._servicePipeTaskCancellationToken.IsCancellationRequested)
                 {
                     // Read content in from the server pipe and store the result
