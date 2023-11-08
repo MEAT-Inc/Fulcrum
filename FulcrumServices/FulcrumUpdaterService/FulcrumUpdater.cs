@@ -162,41 +162,7 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
             }
         }
-        /// <summary>
-        /// Invokes a custom command routine for our service based on the int code provided to it.
-        /// </summary>
-        /// <param name="ServiceCommand">The command to execute on our service instance (128-255)</param>
-        protected override void OnCustomCommand(int ServiceCommand)
-        {
-            try
-            {
-                // Check what type of command is being executed and perform actions accordingly.
-                switch (ServiceCommand)
-                {
-                    // For any other command value or something that is not recognized
-                    case 128:
 
-                        // Log out the command help information for the user to read in the log file.
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"                                FulcrumInjector Updater Service Command Help", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        return;
-                }
-            }
-            catch (Exception SendCustomCommandEx)
-            {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING {this.GetType().Name} INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
-            }
-        }
-       
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>

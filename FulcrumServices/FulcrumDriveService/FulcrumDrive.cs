@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SharpLogging;
 using File = Google.Apis.Drive.v3.Data.File;
 
@@ -60,7 +62,7 @@ namespace FulcrumDriveService
         #endregion //Properties
 
         #region Structs and Classes
-
+        
         /// <summary>
         /// Enumeration used to help filter the resulting object types from a query to the drive/folder
         /// </summary>
@@ -106,6 +108,16 @@ namespace FulcrumDriveService
             this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveAuth.ClientId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveAuth.ProjectId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}", LogType.TraceLog);
+
+            // Configure our event handlers for service action routines
+            this.ServicePipe.PipeActionCompleted += (SendingAction, ActionArgs) =>
+            {
+                // Find our action name and arguments here to invoke it as needed
+                if (SendingAction is not FulcrumServicePipe.ServicePipeAction PipeAction) return;
+
+                // TODO: Find method name information and execute our action accordingly
+                // TODO: Store results of method execution on our pipe action object
+            };
         }
         /// <summary>
         /// Static CTOR for the drive service which builds and configures a new drive service
@@ -163,40 +175,6 @@ namespace FulcrumDriveService
             // Log that our service has been configured correctly
             this._serviceLogger.WriteLog("DRIVE SERVICE HAS BEEN CONFIGURED AND BOOTED CORRECTLY!", LogType.InfoLog);
         }
-        /// <summary>
-        /// Invokes a custom command routine for our service based on the int code provided to it.
-        /// </summary>
-        /// <param name="ServiceCommand">The command to execute on our service instance (128-255)</param>
-        protected override void OnCustomCommand(int ServiceCommand)
-        {
-            try
-            {
-                // Check what type of command is being executed and perform actions accordingly.
-                switch (ServiceCommand)
-                {
-                    // For any other command value or something that is not recognized
-                    case 128:
-
-                        // Log out the command help information for the user to read in the log file.
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"                                FulcrumInjector Drive Service Command Help", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        return;
-                }
-            }
-            catch (Exception SendCustomCommandEx)
-            {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING DRIVE SERVICE INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
-            }
-        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -208,6 +186,18 @@ namespace FulcrumDriveService
         /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
         public bool ListDriveContents(out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeRoutine(nameof(ListDriveContents), new List<File>(), ResultFilter);
+
+                // Store our output value for results and cast out file list.
+                bool ExecutionPassed = (bool)PipeAction.PipeCommandResult;
+                LocatedObjects = ExecutionPassed ? PipeAction.PipeMethodArguments[0] as List<File> : new List<File>();
+                return ExecutionPassed;
+            }
+
             // Validate our drive service first
             if (!this._authorizeDriveService())
                 throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
@@ -255,6 +245,18 @@ namespace FulcrumDriveService
         /// <exception cref="InvalidOperationException">Thrown when the google drive service could not be built</exception>
         public bool ListFolderContents(string FolderId, out List<File> LocatedObjects, ResultTypes ResultFilter = ResultTypes.ALL_RESULTS)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeRoutine(nameof(ListFolderContents), FolderId, new List<File>(), ResultFilter);
+
+                // Store our output value for results and cast out file list.
+                bool ExecutionPassed = (bool)PipeAction.PipeCommandResult;
+                LocatedObjects = ExecutionPassed ? PipeAction.PipeMethodArguments[1] as List<File> : new List<File>();
+                return ExecutionPassed;
+            }
+
             // Validate our drive service first
             if (!this._authorizeDriveService())
                 throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
