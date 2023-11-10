@@ -9,6 +9,7 @@ using FulcrumDriveService.DriveServiceModels;
 using FulcrumDriveService.JsonConverters;
 using FulcrumJson;
 using FulcrumService;
+using FulcrumService.FulcrumServiceModels;
 using FulcrumSupport;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
@@ -108,16 +109,6 @@ namespace FulcrumDriveService
             this._serviceLogger.WriteLog($"DRIVE CLIENT ID: {this._driveAuth.ClientId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE PROJECT ID: {this._driveAuth.ProjectId}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DRIVE SERVICE EMAIL: {this._driveAuth.ClientEmail}", LogType.TraceLog);
-
-            // Configure our event handlers for service action routines
-            this.ServicePipe.PipeActionCompleted += (SendingAction, ActionArgs) =>
-            {
-                // Find our action name and arguments here to invoke it as needed
-                if (SendingAction is not FulcrumServicePipe.ServicePipeAction PipeAction) return;
-
-                // TODO: Find method name information and execute our action accordingly
-                // TODO: Store results of method execution on our pipe action object
-            };
         }
         /// <summary>
         /// Static CTOR for the drive service which builds and configures a new drive service

@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FulcrumService.FulcrumServiceModels;
 using FulcrumSupport;
 using Newtonsoft.Json;
 using SharpLogging;
@@ -20,13 +21,13 @@ namespace FulcrumService
     /// <summary>
     /// Class object holding our definition and logic for a service pipe
     /// </summary>
-    public class FulcrumServicePipe
+    public class FulcrumServicePipe : IDisposable
     {
         #region Custom Events
 
         // Public facing events for pipe action routines
-        public EventHandler<ServicePipeAction> PipeActionInvoked;               // Fired when an action execution is started
-        public EventHandler<ServicePipeAction> PipeActionCompleted;             // Fired when an action is executed on our pipe object
+        public EventHandler<FulcrumServicePipeAction> PipeActionInvoked;               // Fired when an action execution is started
+        public EventHandler<FulcrumServicePipeAction> PipeActionCompleted;             // Fired when an action is executed on our pipe object
 
         #endregion // Custom Events
 
@@ -68,57 +69,29 @@ namespace FulcrumService
             [Description("CLIENT")] CLIENT_PIPE,     // Client pipe (Consumers)
         }
 
-        /// <summary>
-        /// Class object holding a routine to execute on our service pipes.
-        /// This should ONLY be used when we're using a client service to control the host
-        /// </summary>
-        public class ServicePipeAction
-        {
-            #region Custom Events
-            #endregion // Custom Events
-
-            #region Fields
-
-            // Public facing readonly fields for our pipe actions
-            public readonly Guid PipeActionGuid;
-            public readonly string PipeMethodName;
-            public readonly object[] PipeMethodArguments;
-            public readonly FulcrumServiceBase.ServiceTypes PipeServiceType;
-
-            #endregion // Fields
-
-            #region Properties
-
-            // Public facing properties holding information about our command execution results
-            public bool IsExecuted { get; internal set; }
-            public object PipeCommandResult { get; internal set; }
-
-            #endregion // Properties
-
-            #region Structs and Classes
-            #endregion // Structs and Classes
-
-            // ------------------------------------------------------------------------------------------------------------------------------------------
-
-            /// <summary>
-            /// Spawns a new pipe action routine to be invoked to our service host
-            /// </summary>
-            /// <param name="ServiceType">The type of service we're invoking this method on</param>
-            /// <param name="PipeCommand">Text of the command being issued for our pipe instance</param>
-            /// <param name="CommandArguments">The arguments passed into our pipe command object</param>
-            public ServicePipeAction(FulcrumServiceBase.ServiceTypes ServiceType, string PipeCommand, params object[] CommandArguments)
-            {
-                // Store our new pipe GUID value here 
-                this.PipeActionGuid = Guid.NewGuid();
-
-                // Store our pipe command name and arguments
-                this.PipeMethodName = PipeCommand;
-                this.PipeServiceType = ServiceType;
-                this.PipeMethodArguments = CommandArguments;
-            }
-        }
-
         #endregion // Structs and Classes
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Disposes a pipe object once it's not longer being used
+        /// </summary>
+        public void Dispose()
+        {
+            // Log out we're disposing the pipe object here and cancel our reader task
+            this._servicePipeLogger?.WriteLog($"DISPOSING {this.ServicePipeType.ToDescriptionString()} PIPE {this.ServicePipeName}...", LogType.WarnLog);
+            this._servicePipeTaskTokenSource?.Cancel();
+            
+            // Dispose our pipe objects and exit out
+            _servicePipeLogger?.Dispose();
+            _serviceInstance?.Dispose();
+            _servicePipeWriter?.Dispose();
+            _servicePipeReader?.Dispose();
+            _clientPipe?.Dispose();
+            _servicePipe?.Dispose();
+            _servicePipeTask?.Dispose();
+            _servicePipeTaskTokenSource?.Dispose();
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +103,7 @@ namespace FulcrumService
         {
             // Spawn our pipe logger and build the pipe name here
             this._serviceInstance = ServiceInstance;
-            this.ServicePipeName = $"{this._serviceInstance.ServiceName.ToDescriptionString()}Pipe";
+            this.ServicePipeName = $"{this._serviceInstance.ServiceType.ToDescriptionString()}Pipe";
             this._servicePipeLogger = new SharpLogger(LoggerActions.UniversalLogger, $"{this.ServicePipeName}Logger");
             this._servicePipeLogger.WriteLog($"SPAWNING NEW SERVICE PIPE NAMED {this.ServicePipeName}...", LogType.WarnLog);
 
@@ -144,6 +117,9 @@ namespace FulcrumService
                 throw new InvalidOperationException($"Error! Failed to configure pipe objects for pipe {this.ServicePipeName}!");
             if (this.ServicePipeType == ServicePipeTypes.HOST_PIPE && !this._initializeServicePipe())
                 throw new InvalidOperationException($"Error! Failed to start pipe service task for pipe {this.ServicePipeName}!");
+
+            // Log out that our pipe has been created and setup correctly 
+            this._servicePipeLogger.WriteLog($"{this.ServicePipeType.ToDescriptionString()} PIPE {this.ServicePipeName} HAS BEEN CONFIGURED CORRECTLY!", LogType.InfoLog); 
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,7 +130,7 @@ namespace FulcrumService
         /// <param name="PipeAction">The action to invoke on our pipe host</param>
         /// <returns>True if the pipe action is queued. False if not</returns>
         /// <exception cref="InvalidOperationException">Thrown when we try to queue a pipe action for our host pipe</exception>
-        public bool QueuePipeAction(ServicePipeAction PipeAction)
+        public bool QueuePipeAction(FulcrumServicePipeAction PipeAction)
         {
             // Make sure we've got a client pipe object first
             if (this.ServicePipeType != ServicePipeTypes.CLIENT_PIPE)
@@ -192,7 +168,7 @@ namespace FulcrumService
         /// <param name="TimeoutTime">The time to wait for our action to complete</param>
         /// <param name="PipeAction">The action queued and responded to</param>
         /// <returns>True if an action response is found. False if not</returns>
-        public bool WaitForAction(Guid ActionGuid, out ServicePipeAction PipeAction, int TimeoutTime = 5000)
+        public bool WaitForAction(Guid ActionGuid, out FulcrumServicePipeAction PipeAction, int TimeoutTime = 5000)
         {
             // Wait for a new event to fie for our pipe reader
             Stopwatch TimeoutTimer = new Stopwatch();
@@ -203,7 +179,7 @@ namespace FulcrumService
             {
                 // Pull in the JSON content of our action object returned
                 string NextActionString = this._servicePipeReader.ReadLine();
-                PipeAction = JsonConvert.DeserializeObject<ServicePipeAction>(NextActionString);
+                PipeAction = JsonConvert.DeserializeObject<FulcrumServicePipeAction>(NextActionString);
                 if (PipeAction.PipeActionGuid != ActionGuid) continue;
 
                 // Invoke an action completed event to pull in our new pipe action object
@@ -236,7 +212,7 @@ namespace FulcrumService
             try
             {
                 // Try and build our pipe instance and setup new readers/writers for it
-                if (this._serviceInstance.IsServiceClient)
+                if (this.ServicePipeType == ServicePipeTypes.CLIENT_PIPE)
                 {
                     // Spawn a client pipe instance for client connections
                     this._clientPipe = new NamedPipeClientStream(this.ServicePipeName);
@@ -252,14 +228,6 @@ namespace FulcrumService
                     this._servicePipe = new NamedPipeServerStream(this.ServicePipeName);
                     this._servicePipeReader = new StreamReader(this._servicePipe);
                     this._servicePipeWriter = new StreamWriter(this._servicePipe);
-
-                    // Initialize our host pipe and exit out
-                    Task.Run(() =>
-                    {
-                        // Wait for a new connection to our host pipe and log once found
-                        this._servicePipe.WaitForConnection();
-                        this._servicePipeLogger.WriteLog($"FOUND NEW CLIENT CONNECTION FOR PIPE {this.ServicePipeName}!", LogType.InfoLog);
-                    });
                 }
 
                 // Log out our pipe type and state then return passed
@@ -294,25 +262,49 @@ namespace FulcrumService
                 this._servicePipeLogger.WriteLog($"STARTING {this.ServicePipeName} SERVICE TASK NOW...", LogType.WarnLog);
                 while (!this._servicePipeTaskCancellationToken.IsCancellationRequested)
                 {
-                    // Read content in from the server pipe and store the result
-                    string NextActionString = this._servicePipeReader.ReadLine();
-                    ServicePipeAction PipeAction = JsonConvert.DeserializeObject<ServicePipeAction>(NextActionString);
+                    try
+                    {
+                        // If the pipe is not connected, wait for a new connection to be processed
+                        if (!this._servicePipe.IsConnected) this._servicePipe.WaitForConnection(); 
 
-                    // Execute the pipe action and fire event handlers as needed
-                    bool ActionInvoked = this._executePipeAction(PipeAction);
-                    this.PipeActionInvoked?.Invoke(this, PipeAction);
+                        // Read content in from the server pipe and store the result
+                        string NextActionString = this._servicePipeReader.ReadLine();
+                        if (string.IsNullOrWhiteSpace(NextActionString)) continue;
+                        if (NextActionString.StartsWith("\"") && NextActionString.EndsWith("\""))
+                            NextActionString = NextActionString.Substring(1, NextActionString.Length - 2);
 
-                    // If the invoke routine passed, serialize and return out our pipe action content here
-                    if (!ActionInvoked) this._servicePipeLogger.WriteLog("WARNING! PIPE ACTION FAILED TO EXECUTE!", LogType.WarnLog);
-                    this._servicePipeLogger.WriteLog("RESPONDING TO PIPE ACTION REQUEST WITH UPDATED PIPE OBJECT VALUES NOW...", LogType.InfoLog);
-                    string PipeActionResult = JsonConvert.SerializeObject(PipeAction);
-                    this._servicePipeWriter.WriteLine(PipeActionResult);
-                    this._servicePipeWriter.Flush();
+                        // Use our sanitized JSON content to build our Pipe Action here
+                        FulcrumServicePipeAction PipeAction = JsonConvert.DeserializeObject<FulcrumServicePipeAction>(NextActionString);
+
+                        // Execute the pipe action and fire event handlers as needed
+                        bool ActionInvoked = this._executePipeAction(PipeAction);
+                        this.PipeActionInvoked?.Invoke(this, PipeAction);
+
+                        // If the invoke routine passed, serialize and return out our pipe action content here
+                        if (!ActionInvoked) this._servicePipeLogger.WriteLog("WARNING! PIPE ACTION FAILED TO EXECUTE!", LogType.WarnLog);
+                        this._servicePipeLogger.WriteLog("RESPONDING TO PIPE ACTION REQUEST WITH UPDATED PIPE OBJECT VALUES NOW...", LogType.InfoLog);
+
+                        // Serialize our pipe action object and write it out to our client object
+                        string PipeActionResult = JsonConvert.SerializeObject(PipeAction);
+                        this._servicePipeWriter.WriteLine(PipeActionResult);
+                        this._servicePipeWriter.Flush();
+                        this._servicePipe.Disconnect();
+                    }
+                    catch (Exception ReadPipeDataEx)
+                    {
+                        // Log out the failure to read from the pipe and continue on
+                        this._servicePipeLogger.WriteLog($"ERROR! FAILED TO READ OR RESPOND TO DATA FROM PIPE {this.ServicePipeName}!", LogType.ErrorLog);
+                        this._servicePipeLogger.WriteException("EXCEPTION DURING ACTION EXECUTION ROUTINE IS BEING LOGGED BELOW", ReadPipeDataEx);
+
+                        // Flush our pipe to keep reading
+                        this._servicePipe.Disconnect();
+                    }
                 }
             }, this._servicePipeTaskCancellationToken);
 
             // Boot the pipe task and return the result
             this._servicePipeTask.Start();
+            Thread.Sleep(250);
             bool IsRunning = this._servicePipeTask.Status == TaskStatus.Running;
             if (!IsRunning) this._servicePipeLogger.WriteLog($"ERROR! FAILED TO BOOT PIPE TASK FOR PIPE {this.ServicePipeName}!", LogType.ErrorLog);
             else this._servicePipeLogger.WriteLog($"PIPE SERVICE {this.ServicePipeName} HAS BEEN BOOTED AND IS RUNNING CORRECTLY!", LogType.InfoLog);
@@ -324,7 +316,7 @@ namespace FulcrumService
         /// Helper method which is used to find and invoke methods on our service instance
         /// </summary>
         /// <param name="PipeAction"></param>
-        private bool _executePipeAction(ServicePipeAction PipeAction)
+        private bool _executePipeAction(FulcrumServicePipeAction PipeAction)
         {
             // Log out that we're invoking a new pipe action here and find our method to invoke
             this._servicePipeLogger.WriteLog($"INVOKING PIPE ACTION {PipeAction.PipeMethodName} NOW...", LogType.InfoLog);

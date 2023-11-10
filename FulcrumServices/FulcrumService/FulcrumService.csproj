@@ -47,8 +47,10 @@
     <Compile Include="FulcrumServiceBase.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="FulcrumServiceModels\FulcrumServicePipeAction.cs" />
     <Compile Include="FulcrumServicePipes.cs" />
     <Compile Include="FulcrumServiceSettings.cs" />
+    <Compile Include="JsonConverters\FulcrumServicePipeActionJsonConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
       <AutoGen>True</AutoGen>

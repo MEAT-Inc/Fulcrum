@@ -19,8 +19,13 @@ namespace FulcrumUpdaterService
             FulcrumUpdater ServiceInstance = new FulcrumUpdater();
 
             // Either fire the start service routine or run the service instance here
-            if (Debugger.IsAttached) ServiceInstance.StartService();
-            else ServiceBase.Run(ServiceInstance);
+            if (!Debugger.IsAttached) ServiceBase.Run(ServiceInstance);
+            else
+            {
+                // Boot our service and wait forever
+                ServiceInstance.StartService();
+                while (true) continue;
+            }
         }
     }
 }

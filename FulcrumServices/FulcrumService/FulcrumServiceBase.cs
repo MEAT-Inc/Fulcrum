@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FulcrumSupport;
 using FulcrumJson;
+using FulcrumService.FulcrumServiceModels;
 
 namespace FulcrumService
 {
@@ -302,11 +303,11 @@ namespace FulcrumService
         /// <param name="MethodArgs">Arguments of the method being invoked</param>
         /// <returns>The pipe action invoked for this routine if passed</returns>
         /// <exception cref="InvalidOperationException">Thrown when the pipe action fails to execute</exception>
-        protected FulcrumServicePipe.ServicePipeAction ExecutePipeRoutine(string MethodName, params object[] MethodArgs)
+        protected FulcrumServicePipeAction ExecutePipeRoutine(string MethodName, params object[] MethodArgs)
         {
             // Log out that we're using the service instance object and pull our results back
             this._serviceLogger.WriteLog("WARNING! CONSUMING SERVICE FOR EXECUTION INSTEAD OF CALLING LOCAL METHOD!", LogType.WarnLog);
-            var PipeAction = new FulcrumServicePipe.ServicePipeAction(this.ServiceType, MethodName, MethodArgs);
+            var PipeAction = new FulcrumServicePipeAction(this.ServiceType, MethodName, MethodArgs);
 
             // Queue our pipe action to the host service instance and execute it
             if (!this.ServicePipe.QueuePipeAction(PipeAction))
