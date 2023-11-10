@@ -236,17 +236,6 @@ namespace FulcrumService
             this._serviceLogger.WriteLog("SPAWNED SERVICE COMPONENTS AND PIPES CORRECTLY!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"SERVICE {this.ServiceName} IS READY FOR INTERNAL OR EXTERNAL CONTROL!", LogType.InfoLog);
         }
-        /// <summary>
-        /// Static protected CTOR for a service instance which allows us to consume other service instances
-        /// from inside this service instance
-        /// </summary>
-        /// <param name="ServiceType">The type of service being consumed</param>
-        /// <returns>The service instance built</returns>
-        protected static FulcrumServiceBase AllocateService(ServiceTypes ServiceType)
-        {
-            // Build and return a new service instance here
-            return new FulcrumServiceBase(ServiceType);
-        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 

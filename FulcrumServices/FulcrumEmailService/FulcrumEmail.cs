@@ -420,6 +420,8 @@ namespace FulcrumEmailService
             return OverallStatus;
         }
 
+        // --------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Private helper method used to configure a new SMTP client for sending emails out 
         /// </summary>

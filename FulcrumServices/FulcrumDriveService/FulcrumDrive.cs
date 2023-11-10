@@ -37,8 +37,8 @@ namespace FulcrumDriveService
         private static readonly object _serviceLock = new();      // Lock object for building service instances
 
         // Private backing fields for drive service objects
+        private DriveService _driveService;                       // Private static instance for our drive service object
         private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
-        private static DriveService _driveService;                // Private static instance for our drive service object
         private DriveServiceSettings _serviceConfig;              // Settings configuration for our service
 
         #endregion //Fields
@@ -46,16 +46,6 @@ namespace FulcrumDriveService
         #region Properties
 
         // Public readonly properties holding information about the drive configuration
-        public static DriveService DriveService
-        {
-            get
-            {
-                // If our drive service is null, build it and return it out
-                if (_driveService == null) InitializeDriveService();
-                return _driveService;
-            }
-            private set => _driveService = value;
-        }
         public string GoogleDriveId { get; private set; }
         public string ApplicationName { get; private set; }
         public bool IsDriveServiceAuthorized { get; private set; }
@@ -84,6 +74,15 @@ namespace FulcrumDriveService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumDrive(DriveServiceSettings ServiceSettings = null) : base(ServiceTypes.DRIVE_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! DRIVE SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
             this._serviceLogger.WriteLog("SPAWNING NEW DRIVE SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
@@ -194,7 +193,7 @@ namespace FulcrumDriveService
                 throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
 
             // Build a new list request for pulling all files in from the drive location
-            var ListRequest = DriveService.Files.List();
+            var ListRequest = _driveService.Files.List();
             ListRequest.PageSize = 1000;
             ListRequest.Corpora = "drive";
             ListRequest.DriveId = GoogleDriveId;
@@ -253,7 +252,7 @@ namespace FulcrumDriveService
                 throw new AuthenticationException("Error! Failed to authorize Drive Service for the MEAT Inc Organization!");
 
             // Build a new list request for pulling all files in from the drive location
-            var ListRequest = DriveService.Files.List();
+            var ListRequest = _driveService.Files.List();
             ListRequest.PageSize = 1000;
             ListRequest.Corpora = "drive";
             ListRequest.DriveId = GoogleDriveId;
@@ -289,6 +288,98 @@ namespace FulcrumDriveService
         }
 
         /// <summary>
+        /// Helper method used to download a file from our Google Drive using the given file ID
+        /// </summary>
+        /// <param name="FileId">ID of the file to pull in</param>
+        /// <param name="OutputFile">Path to store the downloaded file into</param>
+        /// <returns>True if the file is downloaded and exists, false if not</returns>
+        public bool DownloadDriveFile(string FileId, string OutputFile)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method and return out based on the result of the action
+                var PipeAction = this.ExecutePipeRoutine(nameof(DownloadDriveFile), FileId, OutputFile);
+                return (bool)PipeAction.PipeCommandResult;
+            }
+
+            // Build a new request to locate and download our file based on an ID value
+            FilesResource.GetRequest FileRequest = _driveService.Files.Get(FileId);
+            string DriveFileName = FileRequest.Execute().Name;
+
+            // Log out where our file is being downloaded to and the ID of the file being pulled
+            this._serviceLogger.WriteLog($"ATTEMPTING TO DOWNLOAD FILE {DriveFileName} (ID: {FileId})...", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"OUTPUT FILE NAME: {OutputFile}", LogType.InfoLog);
+
+            // Invoke our file download routine here
+            FileRequest.Download(new FileStream(OutputFile, FileMode.OpenOrCreate));
+
+            // Return out based on if our file exists or not
+            bool DownloadPassed = System.IO.File.Exists(OutputFile); 
+            if (DownloadPassed) this._serviceLogger.WriteLog($"DOWNLOADED FILE {FileId} TO OUTPUT FILE {OutputFile} WITHOUT ISSUES!", LogType.InfoLog);
+            else this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD {FileId} TO OUTPUT FILE {OutputFile}!", LogType.ErrorLog);
+
+            // Return the result of our file state here
+            return DownloadPassed;
+        }
+        /// <summary>
+        /// Helper method which is used to download multiple files from the Google Drive into a requested folder
+        /// </summary>
+        /// <param name="FileIds">IDs of the files to download</param>
+        /// <param name="OutputFolder">The folder to store our downloaded files into</param>
+        /// <returns>True if all files are downloaded. False if not</returns>
+        public bool DownloadDriveFiles(IEnumerable<string> FileIds, string OutputFolder)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method and return out based on the result of the action
+                var PipeAction = this.ExecutePipeRoutine(nameof(DownloadDriveFiles), FileIds, OutputFolder);
+                return (bool)PipeAction.PipeCommandResult;
+            }
+
+            // Log out where our files are being downloaded to and download them all in parallel here
+            this._serviceLogger.WriteLog($"ATTEMPTING TO DOWNLOAD FILES INTO FOLDER {OutputFolder}...", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"TOTAL OF {FileIds.Count()} FILES ARE BEING DOWNLOADED", LogType.InfoLog);
+
+            // Make sure our output folder exists first
+            if (!Directory.Exists(OutputFolder))
+            {
+                // Build a directory for our output files here 
+                this._serviceLogger.WriteLog($"WARNING! FOLDER {OutputFolder} DID NOT EXIST!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("BUILDING OUTPUT FOLDER FOR DOWNLOADED FILES NOW...", LogType.WarnLog);
+                Directory.CreateDirectory(OutputFolder);
+            }
+
+            // Build a new request to locate and download our file based on an ID value
+            bool DownloadsPassed = true;
+            Parallel.ForEach(FileIds, FileId =>
+            {
+                // Check if we're able to keep downloading or not
+                if (!DownloadsPassed) return; 
+
+                // Build a new request for each file object
+                FilesResource.GetRequest FileRequest = _driveService.Files.Get(FileId);
+                string DriveFileName = FileRequest.Execute().Name;
+                string OutputFile = Path.Combine(OutputFolder, DriveFileName);
+
+                // Log out what file is being downloaded and save it
+                this._serviceLogger.WriteLog($"--> DOWNLOADING FILE {DriveFileName} (ID: {FileId}) TO FILE {OutputFile}...", LogType.InfoLog);
+                FileRequest.Download(new FileStream(OutputFile, FileMode.OpenOrCreate));
+
+                // Make sure the file exists before moving on
+                DownloadsPassed = System.IO.File.Exists(OutputFile);
+                if (!DownloadsPassed) this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD FILE {DriveFileName} (ID: {FileId}) TO OUTPUT FILE {OutputFile}!", LogType.ErrorLog);
+            });
+
+            // Return the result of our file state here
+            this._serviceLogger.WriteLog("DOWNLOAD ROUTINE FOR PROVIDED FILE IDS COMPLETE! RETURNING RESULTS NOW...");
+            return DownloadsPassed;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
         /// Private helper method used to authorize our Google Drive client on the MEAT Inc organization
         /// </summary>
         /// <returns>True if the client is authorized. False if not</returns>
@@ -301,7 +392,7 @@ namespace FulcrumDriveService
 
                 // Configure the google drive service here
                 this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING NEW GOOGLE DRIVE CLIENT NOW...", LogType.WarnLog);
-                DriveService = new DriveService(new BaseClientService.Initializer()
+                _driveService = new DriveService(new BaseClientService.Initializer()
                 {
                     // Store the API configuration and Application name for the authorization helper
                     ApplicationName = ApplicationName,
