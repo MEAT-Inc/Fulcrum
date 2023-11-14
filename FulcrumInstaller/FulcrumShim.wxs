@@ -448,7 +448,6 @@
 			<ComponentRef Id="CreateFulcrumImportsFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
 			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
-			<ComponentRef Id="CreateFulcrumServicesJsonFolder" />
 			<ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
 

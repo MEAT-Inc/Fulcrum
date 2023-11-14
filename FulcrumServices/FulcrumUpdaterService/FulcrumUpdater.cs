@@ -172,6 +172,14 @@ namespace FulcrumUpdaterService
         /// <returns>True if updates ready. False if not.</returns>
         public bool CheckAgainstVersion(string InputVersion)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeRoutine(nameof(CheckAgainstVersion), InputVersion);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Validate that the versions exist to compare
             if (this.InjectorReleases == null) 
             {
@@ -199,6 +207,15 @@ namespace FulcrumUpdaterService
         /// <returns>The path of our output msi file for the injector application</returns>
         public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeRoutine(nameof(DownloadInjectorRelease), VersionTag, string.Empty);
+                InjectorAssetUrl = PipeAction.PipeMethodArguments[1].ToString();
+                return PipeAction.PipeCommandResult.ToString();
+            }
+
             // Validate that the versions exist to compare
             if (this.InjectorReleases == null)
             {

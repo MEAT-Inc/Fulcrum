@@ -142,7 +142,7 @@ namespace FulcrumWatchdogService
 
                 // Clear out any previous configurations/folders and add our new ones now
                 this._watchedDirectories = new List<WatchdogFolder>();
-                this.AddWatchedFolders(this._serviceConfig.WatchedFolders.ToArray());
+                this.AddWatchedFolders(this._serviceConfig.WatchedFolders);
 
                 // Log booted service without issues here and exit out of this routine
                 this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);
@@ -193,8 +193,16 @@ namespace FulcrumWatchdogService
         /// Attempts to add in a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToWatch">The folder objects we wish to watch</param>
-        public void AddWatchedFolders(params WatchdogFolder[] FoldersToWatch)
+        public bool AddWatchedFolders(List<WatchdogFolder> FoldersToWatch)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeRoutine(nameof(AddWatchedFolders), FoldersToWatch);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Loop all the passed folder objects and add/update them one by one
             this._serviceLogger.WriteLog("ATTEMPTING TO REGISTER NEW FOLDERS ON A WATCHDOG SERVICE!", LogType.WarnLog);
             foreach (var FolderToAdd in FoldersToWatch)
@@ -224,13 +232,22 @@ namespace FulcrumWatchdogService
 
             // Log that we've looped all our values correctly and exit out
             this._serviceLogger.WriteLog("UPDATED AND STORED ALL NEEDED FOLDER CONFIGURATIONS WITHOUT ISSUES!", LogType.InfoLog);
+            return true; 
         }
         /// <summary>
         /// Attempts to remove a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToRemove">The folder objects we wish to stop watching</param>
-        public void RemoveWatchedFolders(params WatchdogFolder[] FoldersToRemove)
+        public bool RemoveWatchedFolders(List<WatchdogFolder> FoldersToRemove)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeRoutine(nameof(RemoveWatchedFolders), FoldersToRemove);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Loop all the passed folder objects and remove them one by one
             this._serviceLogger.WriteLog("ATTEMPTING TO REMOVE EXISTING FOLDERS FROM A WATCHDOG SERVICE!", LogType.WarnLog);
             foreach (var FolderToRemove in FoldersToRemove)
@@ -263,6 +280,7 @@ namespace FulcrumWatchdogService
 
             // Log that we've looped all our values correctly and exit out
             this._serviceLogger.WriteLog("UPDATED AND REMOVED ALL NEEDED FOLDER CONFIGURATIONS WITHOUT ISSUES!", LogType.InfoLog);
+            return true;
         }
     }
 }

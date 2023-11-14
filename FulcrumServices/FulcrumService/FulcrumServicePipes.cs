@@ -153,7 +153,7 @@ namespace FulcrumService
             this._servicePipeLogger.WriteLog($"QUEUEING AND SENDING ACTION {PipeActionGuid} TO PIPE HOST NOW...");
 
             // Write our pipe action as a JSON string to our host pipe here
-            string PipeActionJson = JsonConvert.SerializeObject(PipeActionGuid);
+            string PipeActionJson = JsonConvert.SerializeObject(PipeAction);
             this._servicePipeWriter.WriteLine(PipeActionJson);
             this._servicePipeWriter.Flush();
 
@@ -179,6 +179,9 @@ namespace FulcrumService
             {
                 // Pull in the JSON content of our action object returned
                 string NextActionString = this._servicePipeReader.ReadLine();
+                if (string.IsNullOrWhiteSpace(NextActionString)) continue; 
+
+                // Once we've got a valid JSON entry for our pipe content, process it and check the GUID
                 PipeAction = JsonConvert.DeserializeObject<FulcrumServicePipeAction>(NextActionString);
                 if (PipeAction.PipeActionGuid != ActionGuid) continue;
 

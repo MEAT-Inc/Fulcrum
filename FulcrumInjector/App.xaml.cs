@@ -76,7 +76,7 @@ namespace FulcrumInjector
             FulcrumDrive.InitializeDriveService();
             FulcrumUpdater.InitializeUpdaterService();
             FulcrumWatchdog.InitializeWatchdogService();
-
+ 
             // Configure settings and app theme
             this._configureCurrentTheme();
             this._configureUserSettings();

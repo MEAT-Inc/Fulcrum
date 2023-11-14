@@ -53,7 +53,7 @@ namespace FulcrumService.JsonConverters
             });
 
             // Now write this built object and reset our encryption state if needed
-            JWriter.WriteRaw(JsonConvert.SerializeObject(OutputObject, Formatting.Indented));
+            JWriter.WriteRaw(JsonConvert.SerializeObject(OutputObject, Formatting.None));
         }
         /// <summary>
         /// Reads the JSON object input from a string
@@ -73,7 +73,7 @@ namespace FulcrumService.JsonConverters
             // Read in our properties for the JObject and build a pipe action from them
             bool IsExecuted = InputObject[nameof(FulcrumServicePipeAction.IsExecuted)].Value<bool>();
             string PipeMethodName = InputObject[nameof(FulcrumServicePipeAction.PipeMethodName)].Value<string>();
-            object PipeCommandResult = InputObject[nameof(FulcrumServicePipeAction.PipeCommandResult)].Value<object[]>();
+            object PipeCommandResult = InputObject[nameof(FulcrumServicePipeAction.PipeCommandResult)].Value<object>();
             Guid PipeActionGuid = Guid.Parse(InputObject[nameof(FulcrumServicePipeAction.PipeActionGuid)].Value<string>());
             var PipeServiceType = (InputObject[nameof(FulcrumServicePipeAction.PipeServiceType)].Value<string>()).ToEnumValue<FulcrumServiceBase.ServiceTypes>();
 

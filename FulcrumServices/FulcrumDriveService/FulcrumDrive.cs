@@ -182,8 +182,8 @@ namespace FulcrumDriveService
                 // Invoke our pipe routine for this method if needed and store output results
                 var PipeAction = this.ExecutePipeRoutine(nameof(ListDriveContents), new List<File>(), ResultFilter);
 
-                // Store our output value for results and cast out file list.
-                bool ExecutionPassed = (bool)PipeAction.PipeCommandResult;
+                // Store our output value for results and exit out
+                bool ExecutionPassed = bool.Parse(PipeAction.PipeCommandResult.ToString());
                 LocatedObjects = ExecutionPassed ? PipeAction.PipeMethodArguments[0] as List<File> : new List<File>();
                 return ExecutionPassed;
             }
@@ -241,8 +241,8 @@ namespace FulcrumDriveService
                 // Invoke our pipe routine for this method if needed and store output results
                 var PipeAction = this.ExecutePipeRoutine(nameof(ListFolderContents), FolderId, new List<File>(), ResultFilter);
 
-                // Store our output value for results and cast out file list.
-                bool ExecutionPassed = (bool)PipeAction.PipeCommandResult;
+                // Store our output value for results and exit out
+                bool ExecutionPassed = bool.Parse(PipeAction.PipeCommandResult.ToString());
                 LocatedObjects = ExecutionPassed ? PipeAction.PipeMethodArguments[1] as List<File> : new List<File>();
                 return ExecutionPassed;
             }
@@ -300,7 +300,7 @@ namespace FulcrumDriveService
             {
                 // Invoke our pipe routine for this method and return out based on the result of the action
                 var PipeAction = this.ExecutePipeRoutine(nameof(DownloadDriveFile), FileId, OutputFile);
-                return (bool)PipeAction.PipeCommandResult;
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
             // Build a new request to locate and download our file based on an ID value
@@ -335,7 +335,7 @@ namespace FulcrumDriveService
             {
                 // Invoke our pipe routine for this method and return out based on the result of the action
                 var PipeAction = this.ExecutePipeRoutine(nameof(DownloadDriveFiles), FileIds, OutputFolder);
-                return (bool)PipeAction.PipeCommandResult;
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
             // Log out where our files are being downloaded to and download them all in parallel here
