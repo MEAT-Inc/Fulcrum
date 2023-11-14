@@ -79,8 +79,7 @@ namespace FulcrumInjector
  
             // Configure settings and app theme
             this._configureCurrentTheme();
-            this._configureUserSettings();
-            this._configureSingletonViews();
+            this._configureUserSettings(); 
 
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
             this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
@@ -301,53 +300,6 @@ namespace FulcrumInjector
             FulcrumConstants.FulcrumSettings = FulcrumSettingsShare.GenerateSettingsShare();
             this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
             this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
-        }
-        /// <summary>
-        /// Pulls in the resource dictionaries from the given resource path and stores them in the app
-        /// </summary>
-        private void _configureSingletonViews()
-        {
-            // Log information. Pull files in and store them all. This tuple create call pulls types for views then types for view models
-            this._appLogger?.WriteLog("GENERATING STATIC VIEW CONTENTS FOR HAMBURGER CORE CONTENTS NOW...", LogType.WarnLog);
-            var LoopResultCast = Assembly.GetExecutingAssembly().GetTypes().Where(TypePulled =>
-                    TypePulled.Namespace != null && !TypePulled.Name.Contains("HamburgerCore") && 
-                    (TypePulled.Namespace.Contains("InjectorCoreView") ||
-                     TypePulled.Namespace.Contains("InjectorOptionView") || 
-                    TypePulled.Namespace.Contains("InjectorMiscView")))
-                .ToLookup(TypePulled => TypePulled.Name.EndsWith("View") || TypePulled.Name.EndsWith("ViewModel"));
-
-            // Now build singleton instances for the types required.
-            var ViewTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("View")).ToArray();
-            var ViewModelTypes = LoopResultCast[true].Where(TypeValue => TypeValue.Name.EndsWith("ViewModel")).ToArray();
-            if (ViewTypes.Length != ViewModelTypes.Length) this._appLogger?.WriteLog("WARNING! TYPE OUTPUT LISTS ARE NOT EQUAL SIZES!", LogType.ErrorLog);
-
-            // Configure a new Viewmodel base for the hamburger now
-            this._appLogger.WriteLog("SPAWNING NEW HAMBURGER CORE VIEW AND VIEW MODEL...", LogType.InfoLog);
-            FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(
-                typeof(FulcrumHamburgerCoreView),
-                typeof(FulcrumHamburgerCoreViewModel));
-
-            // Loop operation here
-            int MaxLoopIndex = Math.Min(ViewTypes.Length, ViewModelTypes.Length);
-            this._appLogger?.WriteLog($"BUILDING TYPE INSTANCES NOW...", LogType.InfoLog);
-            this._appLogger?.WriteLog($"A TOTAL OF {MaxLoopIndex} BASE ASSEMBLY TYPES ARE BEING SPLIT AND PROCESSED...", LogType.InfoLog);
-            for (int IndexValue = 0; IndexValue < MaxLoopIndex; IndexValue += 1)
-            {
-                // Pull type values here
-                Type ViewType = ViewTypes[IndexValue]; Type ViewModelType = ViewModelTypes[IndexValue];
-                this._appLogger?.WriteLog("PULLED IN NEW TYPES FOR ENTRY OBJECT OK!", LogType.InfoLog);
-                this._appLogger?.WriteLog($"VIEW TYPE:       {ViewType.Name}", LogType.InfoLog);
-                this._appLogger?.WriteLog($"VIEW MODEL TYPE: {ViewModelType.Name}", LogType.InfoLog);
-
-                // Generate our singleton object here.
-                var BuiltSingleton = FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.CreateSingletonInstance(ViewType, ViewModelType);
-                this._appLogger?.WriteLog("NEW SINGLETON INSTANCE BUILT FOR VIEW AND VIEWMODEL TYPES CORRECTLY!", LogType.InfoLog);
-                this._appLogger?.WriteLog($"SINGLETON TYPE: {BuiltSingleton.GetType().FullName} WAS BUILT OK!", LogType.TraceLog);
-            }
-
-            // Log completed building and exit routine
-            this._appLogger?.WriteLog("BUILT OUTPUT TYPE CONTENTS OK! THESE VALUES ARE NOW STORED ON OUR MAIN WINDOW INSTANCE!", LogType.WarnLog);
-            this._appLogger?.WriteLog("THE TYPE OUTPUT BUILT IS BEING PROJECTED ONTO THE FULCRUM INJECTOR CONSTANTS STORE OBJECT!", LogType.WarnLog);
         }
     }
 }

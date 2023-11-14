@@ -49,8 +49,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         public FulcrumUpdaterView()
         {
             // Spawn a new logger and setup our view model
-            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = new FulcrumUpdaterViewModel(this);
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Initialize new UI Component
             InitializeComponent();

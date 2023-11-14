@@ -45,8 +45,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         public FulcrumHamburgerCoreView()
         {
             // Spawn a new logger and setup our view model
-            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = new FulcrumHamburgerCoreViewModel(this);
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Initialize new UI Component
             InitializeComponent();

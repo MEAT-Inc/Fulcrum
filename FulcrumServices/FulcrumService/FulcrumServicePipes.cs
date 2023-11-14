@@ -150,7 +150,7 @@ namespace FulcrumService
 
             // Queue the command for our pipe and store it if it's a new unique action
             string PipeActionGuid = PipeAction.PipeActionGuid.ToString("D").ToUpper();
-            this._servicePipeLogger.WriteLog($"QUEUEING AND SENDING ACTION {PipeActionGuid} TO PIPE HOST NOW...");
+            this._servicePipeLogger.WriteLog($"QUEUEING AND SENDING ACTION {PipeAction.PipeMethodName} (GUID: {PipeActionGuid}) TO PIPE HOST NOW...");
 
             // Write our pipe action as a JSON string to our host pipe here
             string PipeActionJson = JsonConvert.SerializeObject(PipeAction);

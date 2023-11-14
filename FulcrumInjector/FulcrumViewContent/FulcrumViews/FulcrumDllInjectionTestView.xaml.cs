@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
@@ -39,14 +40,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         public FulcrumDllInjectionTestView()
         {
             // Spawn a new logger and setup our view model
+            FulcrumConstants.FulcrumDllInjectionTestView = this;
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = new FulcrumDllInjectionTestViewModel(this);
+            this.ViewModel = FulcrumConstants.FulcrumDllInjectionTestViewModel ??= new FulcrumDllInjectionTestViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
 
             // Setup our data context and log information out
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE INJECTION TEST VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

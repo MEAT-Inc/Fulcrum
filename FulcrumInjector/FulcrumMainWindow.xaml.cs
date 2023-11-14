@@ -39,9 +39,12 @@ namespace FulcrumInjector
         {
             // Init main component and blur background of the main window.
             InitializeComponent();
-
-            // Setup a blur effect for our window background and configure the logger for this window
+            
+            // Store our main window singleton on our Constants and build blue effect
+            FulcrumConstants.FulcrumMainWindow = this;
             FulcrumWindowBlur.ShowBlurEffect(this);
+
+            // Configure a new logger for our main window and log out our state has been configured
             this._injectorMainLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this._injectorMainLogger.WriteLog("STORED INJECTOR INSTANCE ON OUR CONSTANTS CLASS OK!", LogType.InfoLog);
             this._injectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE CORRECTLY!", LogType.InfoLog);
@@ -57,9 +60,6 @@ namespace FulcrumInjector
         /// <param name="e"></param>
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Configure DataContext and setup view controls
-            FulcrumConstants.FulcrumMainWindow = this;
-            
             // Set title to DEBUG if the app is inside our debug directory
             if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
 #if DEBUG

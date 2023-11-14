@@ -43,8 +43,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         public FulcrumDebugLoggingView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumDebugLoggingViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();

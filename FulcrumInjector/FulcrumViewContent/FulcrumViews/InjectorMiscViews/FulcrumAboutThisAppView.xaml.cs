@@ -39,14 +39,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         public FulcrumAboutThisAppView()
         {
             // Spawn a new logger and setup our view model
-            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = new FulcrumAboutThisAppViewModel(this);
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Initialize new UI component instance
             InitializeComponent();
 
             // Setup our data context and log information out
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP ABOUT THIS APP VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

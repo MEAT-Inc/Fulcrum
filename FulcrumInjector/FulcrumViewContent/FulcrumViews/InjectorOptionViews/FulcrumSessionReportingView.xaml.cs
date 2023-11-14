@@ -49,8 +49,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         public FulcrumSessionReportingView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumSessionReportingViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumSessionReportingViewModel ?? new FulcrumSessionReportingViewModel(this);
 
             // Append new session log files.
             this.ViewModel.AppendSessionLogFiles();
