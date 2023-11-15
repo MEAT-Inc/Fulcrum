@@ -99,8 +99,17 @@ namespace FulcrumEmailService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumEmail(EmailServiceSettings ServiceSettings = null) : base(ServiceTypes.EMAIL_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! EMAIL SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
-            this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
+            this._serviceLogger.WriteLog("SPAWNING NEW EMAIL SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Pull our settings configuration for the service here 

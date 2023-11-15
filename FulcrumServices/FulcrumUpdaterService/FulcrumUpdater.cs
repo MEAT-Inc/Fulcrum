@@ -67,7 +67,14 @@ namespace FulcrumUpdaterService
             private set
             {
                 // Check if we're using a service client or not and set the value accordingly
-                if (!this.IsServiceClient) this._injectorReleases = value;
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._injectorReleases = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
                 if (!this.SetPipeMemberValue(nameof(InjectorReleases), value))
                     throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(InjectorReleases)}!");
             }

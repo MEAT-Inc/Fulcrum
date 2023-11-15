@@ -31,15 +31,28 @@ namespace FulcrumWatchdogService
 
         #region Properties
 
-        // Private properties holding information about our folders being watched and all their files
-        private WatchdogFile[] WatchedFiles => this.WatchedDirectories
-            .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
-            .OrderBy(WatchedFile => WatchedFile.FullFilePath)
-            .ToArray();
-        private WatchdogFolder[] WatchedDirectories
+        // Public property holding all of our watched folders
+        public List<WatchdogFolder> WatchedDirectories
         {
-            get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
-            set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._watchedDirectories
+                : this.GetPipeMemberValue(nameof(WatchedDirectories)) as List<WatchdogFolder>;
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._watchedDirectories = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
+                if (!this.SetPipeMemberValue(nameof(WatchedDirectories), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(WatchedDirectories)}!");
+            }
         }
 
         #endregion //Properties
@@ -154,7 +167,7 @@ namespace FulcrumWatchdogService
                 this.AddWatchedFolders(this._serviceConfig.WatchedFolders);
 
                 // Log booted service without issues here and exit out of this routine
-                this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);
+                this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Count} DIRECTORY OBJECTS OK!", LogType.InfoLog);
             }
             catch (Exception StartWatchdogEx)
             {

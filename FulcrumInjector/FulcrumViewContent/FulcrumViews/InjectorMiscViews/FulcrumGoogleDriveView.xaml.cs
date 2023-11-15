@@ -62,10 +62,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumGoogleDriveView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Hook in a new event for the button click on the check for updates title button
-            FulcrumConstants.FulcrumTitleView.btnGoogleDrive.Click += this.ToggleGoogleDriveFlyout_OnClick;
-            this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE ABOUT THIS APP BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
-
             // Invoke a background refresh for pulling in all log files for our explorer
             this.RefreshGoogleDrive_OnClick(this.btnRefreshInjectorFiles, null);
         }
@@ -77,7 +73,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="E"></param>
-        private void ToggleGoogleDriveFlyout_OnClick(object Sender, RoutedEventArgs E)
+        internal void ToggleGoogleDriveFlyout_OnClick(object Sender, RoutedEventArgs E)
         {
             // Log processed and show if we have to.
             this._viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR THE GOOGLE DRIVE ICON CORRECTLY!", LogType.WarnLog);

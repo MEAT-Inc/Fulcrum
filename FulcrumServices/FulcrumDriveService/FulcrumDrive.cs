@@ -62,7 +62,14 @@ namespace FulcrumDriveService
             private set
             {
                 // Check if we're using a service client or not and set the value accordingly
-                if (!this.IsServiceClient) this._googleDriveId = value; 
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._googleDriveId = value; 
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
                 if (!this.SetPipeMemberValue(nameof(GoogleDriveId), value))
                     throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(GoogleDriveId)}!");
             }
@@ -77,7 +84,14 @@ namespace FulcrumDriveService
             private set
             {
                 // Check if we're using a service client or not and set the value accordingly
-                if (!this.IsServiceClient) this._applicationName = value;
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._applicationName = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
                 if (!this.SetPipeMemberValue(nameof(ApplicationName), value))
                     throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(ApplicationName)}!");
             }
@@ -92,7 +106,14 @@ namespace FulcrumDriveService
             private set
             {
                 // Check if we're using a service client or not and set the value accordingly
-                if (!this.IsServiceClient) this._isDriveServiceAuthorized = value;
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._isDriveServiceAuthorized = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
                 if (!this.SetPipeMemberValue(nameof(IsDriveServiceAuthorized), value))
                     throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(IsDriveServiceAuthorized)}!");
             }

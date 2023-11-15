@@ -301,6 +301,9 @@ namespace FulcrumService
                         // Log out the failure to read from the pipe and continue on
                         this._servicePipeLogger.WriteLog($"ERROR! FAILED TO READ OR RESPOND TO DATA FROM PIPE {this.ServicePipeName}!", LogType.ErrorLog);
                         this._servicePipeLogger.WriteException("EXCEPTION DURING ACTION EXECUTION ROUTINE IS BEING LOGGED BELOW", ReadPipeDataEx);
+
+                        // Disconnect our pipe server here
+                        this._servicePipe.Disconnect();
                     }
                 }
             }, this._servicePipeTaskCancellationToken);
@@ -343,6 +346,7 @@ namespace FulcrumService
                             // Invoke our method object for the pipe action and store the result
                             object ActionResult = PipeActionMethod.Invoke(this._serviceInstance, PipeAction.PipeMethodArguments);
                             PipeAction.PipeCommandResult = ActionResult;
+                            PipeAction.IsExecuted = true;
 
                             // Log out that we've invoked our pipe action correctly and exit out
                             return true;
@@ -401,14 +405,13 @@ namespace FulcrumService
                                             PipeProperty.SetValue(this, PipeAction.PipeMethodArguments[0]);
 
                                         // Break out once we've pulled or set our value
-                                        PipeAction.IsExecuted = true;
                                         break;
                                     }
                             }
 
                             // Break out once we've set or pulled our member value
+                            PipeAction.IsExecuted = true;
                             return true;
-
                         }
                         catch (Exception InvokeActionEx)
                         {

@@ -47,7 +47,7 @@ namespace FulcrumService.JsonConverters
                 PipeServiceType = ValueObject.PipeServiceType.ToDescriptionString(), 
                 ReflectionType = ValueObject.ReflectionType.ToDescriptionString(),
                 ValueObject.IsExecuted,
-                PipeMethodName = ValueObject.PipeActionName,
+                ValueObject.PipeActionName,
                 ValueObject.PipeMethodArguments,
                 PipeArgumentTypes = ValueObject.PipeArgumentTypes.Select(ArgType => ArgType.AssemblyQualifiedName),
                 ValueObject.PipeCommandResult

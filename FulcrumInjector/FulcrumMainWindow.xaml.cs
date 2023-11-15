@@ -61,6 +61,13 @@ namespace FulcrumInjector
         {
             // Store our main window singleton on our Constants and build blue effect
             FulcrumConstants.FulcrumMainWindow = this;
+            this._injectorMainLogger.WriteLog("STORED MAIN WINDOW INSTANCE ON FULCRUM CONSTANTS CORRECTLY!", LogType.InfoLog);
+
+            // Hook our button event handlers as needed here
+            FulcrumConstants.FulcrumTitleView.btnGoogleDrive.Click += FulcrumConstants.FulcrumGoogleDriveView.ToggleGoogleDriveFlyout_OnClick;
+            FulcrumConstants.FulcrumTitleView.btnCheckForUpdates.Click += FulcrumConstants.FulcrumUpdaterView.ToggleApplicationUpdateInformation_OnClick;
+            FulcrumConstants.FulcrumTitleView.btnAboutTheInjetor.Click += FulcrumConstants.FulcrumAboutThisAppView.ToggleAboutThisApplicationFlyout_OnClick;
+            this._injectorMainLogger.WriteLog("STORED AND CONFIGURED EVENT HANDLERS FOR TITLE VIEW BUTTONS CORRECTLY!", LogType.InfoLog);
 
             // Set title to DEBUG if the app is inside our debug directory
             if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
