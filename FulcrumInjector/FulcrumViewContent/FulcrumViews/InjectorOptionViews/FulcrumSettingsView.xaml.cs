@@ -15,9 +15,9 @@ using SharpLogging;
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 {
     /// <summary>
-    /// Interaction logic for FulcrumSettingsPaneView.xaml
+    /// Interaction logic for FulcrumSettingsView.xaml
     /// </summary>
-    public partial class FulcrumSettingsPaneView : UserControl
+    public partial class FulcrumSettingsView : UserControl
     {
         #region Custom Events
         #endregion // Custom Events
@@ -32,7 +32,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         #region Properties
 
         // ViewModel object to bind onto
-        public FulcrumSettingsPaneViewModel ViewModel { get; set; }
+        public FulcrumSettingsViewModel ViewModel { get; set; }
 
         #endregion // Properties
 
@@ -44,17 +44,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         /// <summary>
         /// Builds a new pipe status view object
         /// </summary>
-        public FulcrumSettingsPaneView()
+        public FulcrumSettingsView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumSettingsViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumSettingsPaneViewModel ?? new FulcrumSettingsPaneViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
 
             // Setup our data context and log information out
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES AND LOGGING TARGETS OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

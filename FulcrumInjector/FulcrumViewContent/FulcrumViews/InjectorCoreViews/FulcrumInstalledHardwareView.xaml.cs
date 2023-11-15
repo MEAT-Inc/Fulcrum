@@ -41,8 +41,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         public FulcrumInstalledHardwareView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumInstalledHardwareViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumInstalledHardwareViewModel ?? new FulcrumInstalledHardwareViewModel(this);
 
             // Initialize new UI component instance
             InitializeComponent();

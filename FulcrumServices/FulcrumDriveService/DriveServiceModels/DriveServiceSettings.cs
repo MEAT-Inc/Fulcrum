@@ -29,7 +29,6 @@ namespace FulcrumDriveService.DriveServiceModels
         [EncryptedValue] public string GoogleDriveId { get; set; }
 
         // Public facing properties holding configuration for drive authorization
-        public DriveConfiguration ExplorerConfiguration { get; set; }
         public DriveAuthorization ExplorerAuthorization { get; set; }
 
         #endregion // Properties

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
@@ -38,14 +39,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         public FulcrumTitleView()
         {
             // Spawn a new logger and setup our view model
-            this.ViewModel = new FulcrumTitleViewModel(this);
+            FulcrumConstants.FulcrumTitleView = this;
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
+            this.ViewModel = FulcrumConstants.FulcrumTitleViewModel ??= new FulcrumTitleViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
             
             // Setup a new ViewModel and store our context
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("SETUP TITLE VIEW CONTROL COMPONENT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

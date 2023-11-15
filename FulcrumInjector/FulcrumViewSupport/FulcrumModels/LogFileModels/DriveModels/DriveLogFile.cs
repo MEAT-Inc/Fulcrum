@@ -28,25 +28,6 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
 
         #region Properties
 
-        // Private property holding our drive service object
-        private DriveService _driveService
-        {
-            get
-            {
-                // If the service exists, don't reconfigure it
-                if (FulcrumDrive.DriveService != null)
-                    return FulcrumDrive.DriveService;
-
-                // If the drive service is not built, configure it now if possible
-                FulcrumDrive.InitializeDriveService();
-                if (FulcrumDrive.DriveService == null)
-                    throw new InvalidOperationException("Error! Failed to configure Google Drive Service!");
-
-                // Return the built drive service
-                return FulcrumDrive.DriveService;
-            }
-        }
-
         // Public facing properties holding information about the log file instance
         public new bool LogFileExists => (bool)!this._sourceDriveFile?.Trashed;
         public new string LogFileSize => this.LogFileExists ? this._sourceDriveFile?.Size.Value.ToFileSize() : "N/A";
@@ -87,9 +68,13 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels.LogFileModels.DriveMo
         {
             try
             {
+                // Log out we're downloading our file instance here 
+                _logFileLogger.WriteLog($"DOWNLOADING LOG FILE {this.LogFileName} TO {DownloadPath} NOW...", LogType.InfoLog);
+
                 // Download the file using the ID of it and our drive service
-                FilesResource.GetRequest LocatedResource = _driveService.Files.Get(this._sourceDriveFile.Id);
-                LocatedResource.Download(new FileStream(DownloadPath, FileMode.OpenOrCreate));
+                FulcrumDrive DriveService = FulcrumDrive.InitializeDriveService().Result;
+                if (!DriveService.DownloadDriveFile(this._sourceDriveFile.Id, DownloadPath))
+                    throw new InvalidOperationException("Error! Failed to download log file using FulcrumDriveService!");
 
                 // Return out based on if the file exists or not
                 return File.Exists(DownloadPath);

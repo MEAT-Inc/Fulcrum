@@ -47,10 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DriveServiceModels\DriveAuthorization.cs" />
-    <Compile Include="DriveServiceModels\DriveConfiguration.cs" />
     <Compile Include="DriveServiceModels\DriveServiceSettings.cs" />
     <Compile Include="JsonConverters\DriveAuthJsonConverter.cs" />
-    <Compile Include="JsonConverters\DriveConfigJsonConverter.cs" />
     <Compile Include="JsonConverters\DriveServiceSettingsJsonConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>

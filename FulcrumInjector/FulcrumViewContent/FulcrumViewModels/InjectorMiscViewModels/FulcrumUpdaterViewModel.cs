@@ -75,7 +75,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             if (ForceUpdate) this.ViewModelLogger.WriteLog("WARNING! FORCING UPDATES IS ON! ENSURING SHOW UPDATE BUTTON IS VISIBLE!", LogType.WarnLog);
 
             // Check for our updates now.
-            if (!this.GitHubUpdateHelper.CheckAgainstVersion(FulcrumVersionInfo.InjectorVersionString) && !ForceUpdate) {
+            if (!this.GitHubUpdateHelper.CheckAgainstVersion(FulcrumVersionInfo.InjectorVersionString) && !ForceUpdate)
+            {
+                // Log out that no update is ready and that we've constructed a view model correctly
                 this.ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
                 this.ViewModelLogger.WriteLog("NOT CONFIGURING UPDATE EVENT ROUTINES FOR OUR UPDATER OBJECT!", LogType.WarnLog);
                 this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);

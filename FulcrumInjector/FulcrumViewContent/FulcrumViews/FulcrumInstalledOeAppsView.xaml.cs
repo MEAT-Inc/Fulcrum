@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using SharpLogging;
 
@@ -45,14 +46,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         public FulcrumInstalledOeAppsView()
         {
             // Spawn a new logger and setup our view model
+            FulcrumConstants.FulcrumInstalledOeAppsView = this;
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = new FulcrumInstalledOeAppsViewModel(this);
+            this.ViewModel = FulcrumConstants.FulcrumInstalledOeAppsViewModel ??= new FulcrumInstalledOeAppsViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
 
             // Setup our data context and log information out
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR CURRENTLY INSTALLED OE APPLICATION INFORMATION OUTPUT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

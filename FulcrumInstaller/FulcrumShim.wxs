@@ -173,12 +173,7 @@
                                 <CreateFolder />
                             </Component>
                         </Directory>
-		                <Directory Id="FULCRUMSERVICEJSON" Name="FulcrumServices">
-			                <Component Id="CreateFulcrumServicesJsonFolder" Guid="DEB91DE9-6F9C-49D7-93D5-3CDA43AE402A">
-				                <CreateFolder />
-			                </Component>
-		                </Directory>
-                        <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
+		                <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
                             <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
                                 <CreateFolder />
                             </Component>
@@ -453,7 +448,6 @@
 			<ComponentRef Id="CreateFulcrumImportsFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
 			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
-			<ComponentRef Id="CreateFulcrumServicesJsonFolder" />
 			<ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
 

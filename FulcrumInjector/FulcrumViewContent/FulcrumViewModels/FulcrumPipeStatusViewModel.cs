@@ -57,6 +57,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
             this.ViewModelLogger.WriteLog("SETTING UP PIPE STATUS VIEW BOUND VALUES NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
 
+            // Store default pipe states here 
+            this.ReaderPipeState = "Loading...";
+            this.WriterPipeState = "Loading...";
+
             // Configure new pipe instances for our class
             this._readerPipe = PassThruPipeReader.AllocatePipe();
             this._writerPipe = PassThruPipeWriter.AllocatePipe();

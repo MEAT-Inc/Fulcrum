@@ -5,7 +5,48 @@
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
 
-            <!-- Insert styles for About This App here -->
+            <!-- Title Text Style -->
+            <Style x:Key="VersionInfoTitleText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+            </Style>
+
+            <!-- Logo Border Style -->
+            <Style x:Key="LogoBorderStyle" TargetType="Border">
+                <Setter Property="Width" Value="120"/>
+                <Setter Property="Height" Value="120"/>
+                <Setter Property="Margin" Value="5,0"/>
+                <Setter Property="CornerRadius" Value="3"/>
+                <Setter Property="BorderThickness" Value="5"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+            </Style>
+
+            <!-- About This App Text Style -->
+            <Style x:Key="AboutThisAppText" TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Justify"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="FontSize" Value="13"/>
+            </Style>
+
+            <!-- Version Name Text Style -->
+            <Style x:Key="VersionNameText" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <!-- Version Value Text Box Style -->
+            <Style x:Key="VersionValueText" TargetType="TextBox" BasedOn="{StaticResource StaticReadonlyTextBoxStyle}">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="Foreground" Value="Yellow"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
 
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>

@@ -40,8 +40,10 @@ namespace FulcrumInjector
             // Init main component and blur background of the main window.
             InitializeComponent();
 
-            // Setup a blur effect for our window background and configure the logger for this window
+            // Configure our blur background effect here
             FulcrumWindowBlur.ShowBlurEffect(this);
+
+            // Configure a new logger for our main window and log out our state has been configured
             this._injectorMainLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this._injectorMainLogger.WriteLog("STORED INJECTOR INSTANCE ON OUR CONSTANTS CLASS OK!", LogType.InfoLog);
             this._injectorMainLogger.WriteLog("SETUP NEW BLUR EFFECT ON MAIN WINDOW INSTANCE CORRECTLY!", LogType.InfoLog);
@@ -57,9 +59,16 @@ namespace FulcrumInjector
         /// <param name="e"></param>
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Configure DataContext and setup view controls
+            // Store our main window singleton on our Constants and build blue effect
             FulcrumConstants.FulcrumMainWindow = this;
-            
+            this._injectorMainLogger.WriteLog("STORED MAIN WINDOW INSTANCE ON FULCRUM CONSTANTS CORRECTLY!", LogType.InfoLog);
+
+            // Hook our button event handlers as needed here
+            FulcrumConstants.FulcrumTitleView.btnGoogleDrive.Click += FulcrumConstants.FulcrumGoogleDriveView.ToggleGoogleDriveFlyout_OnClick;
+            FulcrumConstants.FulcrumTitleView.btnCheckForUpdates.Click += FulcrumConstants.FulcrumUpdaterView.ToggleApplicationUpdateInformation_OnClick;
+            FulcrumConstants.FulcrumTitleView.btnAboutTheInjetor.Click += FulcrumConstants.FulcrumAboutThisAppView.ToggleAboutThisApplicationFlyout_OnClick;
+            this._injectorMainLogger.WriteLog("STORED AND CONFIGURED EVENT HANDLERS FOR TITLE VIEW BUTTONS CORRECTLY!", LogType.InfoLog);
+
             // Set title to DEBUG if the app is inside our debug directory
             if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
 #if DEBUG

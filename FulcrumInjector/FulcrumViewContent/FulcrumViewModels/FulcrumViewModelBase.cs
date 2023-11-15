@@ -67,8 +67,9 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         /// <param name="ViewContent">The view which this VMC Base object will be consuming</param>
         protected FulcrumViewModelBase(UserControl ViewContent)
         {
-            // Store the base view content on this instance and exit out
+            // Store the base view content on this instance, register our singleton type and exit out
             this.BaseViewControl = ViewContent;
+            FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.RegisterAsSingleton(ViewContent, this);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

@@ -18,8 +18,14 @@ using System.Resources;
 [assembly: ComVisible(false)]
 [assembly: Guid("9ed477f5-f3dc-4643-b7cb-e2fc3f33d652")]
 
+// TODO: Uncomment this out to enable access to internal members for child services
+// [assembly: InternalsVisibleTo("FulcrumDriveService")]
+// [assembly: InternalsVisibleTo("FulcrumEmailService")]
+// [assembly: InternalsVisibleTo("FulcrumUpdaterService")]
+// [assembly: InternalsVisibleTo("FulcrumWatchdogService")]
+
 // Version information
-[assembly: AssemblyVersion("0.3.4.99")]
-[assembly: AssemblyFileVersion("0.3.4.99")]
+[assembly: AssemblyVersion("0.5.3.154")]
+[assembly: AssemblyFileVersion("0.5.3.154")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
