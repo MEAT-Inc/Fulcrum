@@ -46,6 +46,9 @@ namespace FulcrumUpdaterService
         private readonly Stopwatch _downloadTimer = new();        // Download timer for pulling in versions
         private readonly UpdaterServiceSettings _serviceConfig;   // Updater configuration values
 
+        // Private backing fields for our public facing properties
+        private Release[] _injectorReleases;                      // Collection of all releases found for the injector app
+
         #endregion //Fields
 
         #region Properties
@@ -54,7 +57,28 @@ namespace FulcrumUpdaterService
         public bool IsGitClientAuthorized { get; private set; }
 
         // Public facing properties holding information about our latest version information
-        public Release[] InjectorReleases { get; private set; }
+        public Release[] InjectorReleases
+        {
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._injectorReleases
+                : this.GetPipeMemberValue(nameof(InjectorReleases)) as Release[];
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._injectorReleases = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
+                if (!this.SetPipeMemberValue(nameof(InjectorReleases), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(InjectorReleases)}!");
+            }
+        }
         public string LatestInjectorVersion => this.InjectorVersions[0];
         public Release LatestInjectorRelease => this.InjectorReleases[0];
         public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
@@ -62,6 +86,7 @@ namespace FulcrumUpdaterService
             .Select(ReleaseTag => Regex.Match(ReleaseTag.TagName, @"(\d+(?>\.|))+").Value)
             .ToArray();
 
+        // TODO: Configure these properties to fire over pipe operations
         // Time download elapsed and approximate time remaining
         public string DownloadTimeRemaining { get; private set; }
         public string DownloadTimeElapsed => this._downloadTimer == null ? "00:00" : this._downloadTimer.Elapsed.ToString().Split('.')[0];
@@ -79,6 +104,15 @@ namespace FulcrumUpdaterService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumUpdater(UpdaterServiceSettings ServiceSettings = null) : base(ServiceTypes.UPDATER_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! UPDATER SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
             this._downloadTimer = new Stopwatch();
             this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
@@ -162,63 +196,9 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
             }
         }
-        /// <summary>
-        /// Invokes a custom command routine for our service based on the int code provided to it.
-        /// </summary>
-        /// <param name="ServiceCommand">The command to execute on our service instance (128-255)</param>
-        protected override void OnCustomCommand(int ServiceCommand)
-        {
-            try
-            {
-                // Check what type of command is being executed and perform actions accordingly.
-                switch (ServiceCommand)
-                {
-                    // For any other command value or something that is not recognized
-                    case 128:
 
-                        // Log out the command help information for the user to read in the log file.
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"                                FulcrumInjector Updater Service Command Help", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        return;
-                }
-            }
-            catch (Exception SendCustomCommandEx)
-            {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING {this.GetType().Name} INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
-            }
-        }
-       
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// Updates the injector version information on the class instance.
-        /// </summary>
-        public bool RefreshInjectorReleases()
-        {
-            // Make sure we're authorized on the GitHub client first 
-            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            if (!this._authorizeGitClient())
-                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
-
-            // Pull in the releases and return them out
-            this.InjectorReleases = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
-            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {this.InjectorReleases.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
-
-            // Parse out the version information and return them out
-            this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
-            this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", this.InjectorVersions)}", LogType.TraceLog);
-            this._serviceLogger.WriteLog($"FOUND LATEST INJECTOR VERSION TO BE {this.LatestInjectorVersion}", LogType.InfoLog);
-            return this.InjectorReleases.Length != 0;
-        }
         /// <summary>
         /// Checks if a version is ready to be updated or not.
         /// </summary>
@@ -226,12 +206,20 @@ namespace FulcrumUpdaterService
         /// <returns>True if updates ready. False if not.</returns>
         public bool CheckAgainstVersion(string InputVersion)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(CheckAgainstVersion), InputVersion);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Validate that the versions exist to compare
             if (this.InjectorReleases == null) 
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                this.RefreshInjectorReleases();
+                this._refreshInjectorReleases();
             }
 
             // Now compare the versions
@@ -253,12 +241,21 @@ namespace FulcrumUpdaterService
         /// <returns>The path of our output msi file for the injector application</returns>
         public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(DownloadInjectorRelease), VersionTag, string.Empty);
+                InjectorAssetUrl = PipeAction.PipeMethodArguments[1].ToString();
+                return PipeAction.PipeCommandResult.ToString();
+            }
+
             // Validate that the versions exist to compare
             if (this.InjectorReleases == null)
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                this.RefreshInjectorReleases();
+                this._refreshInjectorReleases();
             }
 
             // First find our version to use using our version/release lookup tool
@@ -303,6 +300,8 @@ namespace FulcrumUpdaterService
             return InjectorAssetPath;
         }
 
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Private helper method used to authorize our GitHub client on the MEAT Inc organization
         /// </summary>
@@ -331,6 +330,26 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
                 return false;
             }
+        }
+        /// <summary>
+        /// Updates the injector version information on the class instance.
+        /// </summary>
+        private bool _refreshInjectorReleases()
+        {
+            // Make sure we're authorized on the GitHub client first 
+            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
+            if (!this._authorizeGitClient())
+                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
+
+            // Pull in the releases and return them out
+            this.InjectorReleases = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
+            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {this.InjectorReleases.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+
+            // Parse out the version information and return them out
+            this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", this.InjectorVersions)}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"FOUND LATEST INJECTOR VERSION TO BE {this.LatestInjectorVersion}", LogType.InfoLog);
+            return this.InjectorReleases.Length != 0;
         }
     }
 }

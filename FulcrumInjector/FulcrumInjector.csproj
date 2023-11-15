@@ -303,8 +303,8 @@
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumPipeStatusView.xaml.cs">
       <DependentUpon>FulcrumPipeStatusView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewContent\FulcrumViews\InjectorOptionViews\FulcrumSettingsPaneView.xaml.cs">
-      <DependentUpon>FulcrumSettingsPaneView.xaml</DependentUpon>
+    <Compile Include="FulcrumViewContent\FulcrumViews\InjectorOptionViews\FulcrumSettingsView.xaml.cs">
+      <DependentUpon>FulcrumSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FulcrumViewContent\FulcrumViews\FulcrumTitleView.xaml.cs">
       <DependentUpon>FulcrumTitleView.xaml</DependentUpon>
@@ -460,7 +460,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FulcrumViewContent\FulcrumViews\InjectorOptionViews\FulcrumSettingsPaneView.xaml">
+    <Page Include="FulcrumViewContent\FulcrumViews\InjectorOptionViews\FulcrumSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

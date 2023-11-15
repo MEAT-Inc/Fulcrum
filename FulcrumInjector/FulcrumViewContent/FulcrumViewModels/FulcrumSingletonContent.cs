@@ -213,12 +213,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
                 // IF this failed, try using view objects before failing out.
                 var UserControlFallbackValue = LocateSingletonViewInstance(ViewModelTypeToLocate);
                 if (UserControlFallbackValue != null) return UserControlFallbackValue;
-                throw new InvalidCastException($"FAILED TO LOCATE A USER CONTROL OR VIEW MODEL MATCHING TYPE: {ViewModelTypeToLocate.Name}!");
+                throw new InvalidCastException($"CAN NOT USE A NON VIEW MODEL BASE TYPE FOR SINGLETON LOOKUPS!");
             }
 
             // Find first object with the type matching the given viewmodel type
             var PulledSingleton = FulcrumSingletons.FirstOrDefault(ViewObj => ViewObj.SingletonViewModel.GetType() == ViewModelTypeToLocate);
-            if (PulledSingleton == null) _singletonLogger.WriteLog("FAILED TO LOCATE VALID SINGLETON INSTANCE!", LogType.ErrorLog);
+            if (PulledSingleton == null) _singletonLogger.WriteLog($"NO MATCHING SINGLETON INSTANCE WAS FOUND FOR TYPE {ViewModelTypeToLocate.Name}!", LogType.ErrorLog);
             return PulledSingleton;
         }
     }

@@ -43,8 +43,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         public FulcrumDebugLoggingView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumDebugLoggingViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumDebugLoggingViewModel ?? new FulcrumDebugLoggingViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
@@ -54,7 +54,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger.WriteLog("BUILT NEW LOG CONTENT FORMATTER OK!", LogType.InfoLog);
 
             // Store our View model as the current context and log out some information
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE DEBUG LOGGING REVIEW VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

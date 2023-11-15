@@ -49,14 +49,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         public FulcrumUpdaterView()
         {
             // Spawn a new logger and setup our view model
-            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
             this.ViewModel = new FulcrumUpdaterViewModel(this);
+            this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Initialize new UI Component
             InitializeComponent();
 
             // Setup our data context and log our information
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE UPDATER VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }
@@ -86,14 +85,28 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
 
             // Open or close the flyout for updates based on what the view model found
             FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = this.ViewModel.UpdateReady;
-
-            // Hook in a new event for the button click on the check for updates title button
-            FulcrumConstants.FulcrumTitleView.btnCheckForUpdates.Click += this.ToggleApplicationUpdateInformation_OnClick;
-            this._viewLogger.WriteLog("HOOKED IN A NEW EVENT FOR THE CHECK FOR UPDATES BUTTON ON OUR TITLE VIEW!", LogType.InfoLog);
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Button click event for the updates view
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        internal void ToggleApplicationUpdateInformation_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Log processed and show if we have to.
+            this._viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
+            if (FulcrumConstants.FulcrumMainWindow?.AppUpdatesFlyout == null) { this._viewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
+            else
+            {
+                // Toggle the information pane
+                bool IsOpen = FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen;
+                FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = !IsOpen;
+                this._viewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
+            }
+        }
         /// <summary>
         /// Button click command to execute a new update install request
         /// </summary>
@@ -116,24 +129,5 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenHyperlink(object sender, ExecutedRoutedEventArgs e) => Process.Start(e.Parameter.ToString());
-        
-        /// <summary>
-        /// Button click event for the updates view
-        /// </summary>
-        /// <param name="Sender"></param>
-        /// <param name="E"></param>
-        private void ToggleApplicationUpdateInformation_OnClick(object Sender, RoutedEventArgs E)
-        {
-            // Log processed and show if we have to.
-            this._viewLogger.WriteLog("PROCESSED BUTTON CLICK FOR APP UPDATES VIEW", LogType.WarnLog);
-            if (FulcrumConstants.FulcrumMainWindow?.AppUpdatesFlyout == null) { this._viewLogger.WriteLog("ERROR! UPDATES FLYOUT IS NULL!", LogType.ErrorLog); }
-            else
-            {
-                // Toggle the information pane
-                bool IsOpen = FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen;
-                FulcrumConstants.FulcrumMainWindow.AppUpdatesFlyout.IsOpen = !IsOpen;
-                this._viewLogger.WriteLog("PROCESSED VIEW TOGGLE REQUEST FOR APP UPDATES OK!", LogType.InfoLog);
-            }
-        }
     }
 }

@@ -50,14 +50,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         public FulcrumLogReviewView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumLogReviewViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumLogReviewViewModel ?? new FulcrumLogReviewViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
 
             // Setup our data context and log information out
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR THE LOG REVIEW VIEW OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

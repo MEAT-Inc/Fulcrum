@@ -31,15 +31,28 @@ namespace FulcrumWatchdogService
 
         #region Properties
 
-        // Public facing properties holding information about our folders being watched and all their files
-        public WatchdogFile[] WatchedFiles => this.WatchedDirectories
-            .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
-            .OrderBy(WatchedFile => WatchedFile.FullFilePath)
-            .ToArray();
-        public WatchdogFolder[] WatchedDirectories
+        // Public property holding all of our watched folders
+        public List<WatchdogFolder> WatchedDirectories
         {
-            get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
-            private set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._watchedDirectories
+                : this.GetPipeMemberValue(nameof(WatchedDirectories)) as List<WatchdogFolder>;
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._watchedDirectories = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
+                if (!this.SetPipeMemberValue(nameof(WatchedDirectories), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(WatchedDirectories)}!");
+            }
         }
 
         #endregion //Properties
@@ -55,8 +68,17 @@ namespace FulcrumWatchdogService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumWatchdog(WatchdogSettings ServiceSettings = null) : base(ServiceTypes.WATCHDOG_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! WATCHDOG SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
-            this._serviceLogger.WriteLog("SPAWNING NEW DRIVE SERVICE!", LogType.InfoLog);
+            this._serviceLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Init our component object here and setup logging
@@ -142,172 +164,16 @@ namespace FulcrumWatchdogService
 
                 // Clear out any previous configurations/folders and add our new ones now
                 this._watchedDirectories = new List<WatchdogFolder>();
-                this.AddWatchedFolders(this._serviceConfig.WatchedFolders.ToArray());
+                this.AddWatchedFolders(this._serviceConfig.WatchedFolders);
 
                 // Log booted service without issues here and exit out of this routine
-                this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Length} DIRECTORY OBJECTS OK!", LogType.InfoLog);
+                this._serviceLogger.WriteLog($"BOOTED A NEW FILE WATCHDOG SERVICE FOR {this.WatchedDirectories.Count} DIRECTORY OBJECTS OK!", LogType.InfoLog);
             }
             catch (Exception StartWatchdogEx)
             {
                 // Log out the failure and exit this method
                 this._serviceLogger.WriteLog("ERROR! FAILED TO BOOT NEW WATCHDOG SERVICE INSTANCE!", LogType.ErrorLog);
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
-            }
-        }
-        /// <summary>
-        /// Invokes a custom command routine for our service based on the int code provided to it.
-        /// </summary>
-        /// <param name="ServiceCommand">The command to execute on our service instance (128-255)</param>
-        protected override void OnCustomCommand(int ServiceCommand)
-        {
-            try
-            {
-                // Check what type of command is being executed and perform actions accordingly.
-                switch (ServiceCommand)
-                {
-                    // For any other command value or something that is not recognized
-                    case 128:
-
-                        // Log out the command help information for the user to read in the log file.
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"                                     FulcrumInjector Watchdog Command Help", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Variable Actions", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 131:  Reloads the configuration file on our service and imports all folders again", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 132:  (Not Built Yet) Adding a new directory instance to our service host", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 133:  (Not Built Yet) Removing an existing directory instance from our service host", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Information Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 140:  Prints out the names of each path being watched", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 141:  Prints out the information about all folders being watched", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 142:  Prints out the names of every file being watched in every folder as a list", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Execution Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 150:  Force executes the watchdog refresh action on all currently built folders", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        return;
-
-                    // For importing the configuration file again
-                    case 131:
-                        // Log reimporting contents now
-                        this._serviceLogger.WriteLog("RELOADING CONFIGURATION FILE AND IMPORTING DIRECTORY ENTRIES NOW...", LogType.InfoLog);
-
-                        // Loop all of our folder instances and store them on our service instance
-                        for (int WatchdogIndex = 0; WatchdogIndex < this._watchedDirectories.Count; WatchdogIndex++)
-                        {
-                            // Make sure this instance is not null before trying to use it
-                            if (this._watchedDirectories[WatchdogIndex] == null) continue;
-
-                            // Dispose the file instance and null it out
-                            this._watchedDirectories[WatchdogIndex].Dispose();
-                            this._watchedDirectories[WatchdogIndex] = null;
-                        }
-
-                        // Now reimport our configuration file and start this process over again
-                        this._serviceLogger.WriteLog("DISPOSED AND CLEARED OUT OLD LISTED DIRECTORIES ON THIS SERVICE!", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("RESTARTING SERVICE INSTANCE NOW...", LogType.InfoLog);
-                        this.OnStart(null);
-                        return;
-
-                    // For printing out the names of our folders
-                    case 140:
-                        // Log printing out names now
-                        this._serviceLogger.WriteLog("GETTING AND DISPLAYING FULCRUM INJECTOR WATCHDOG DIRECTORY NAMES NOW...", LogType.InfoLog);
-
-                        // Loop the paths and log them all out now.
-                        for (int DirIndex = 0; DirIndex < this._watchedDirectories.Count; DirIndex++)
-                        {
-                            // Build a string value to print out from the content of each folder
-                            string WatchedPath = this._watchedDirectories[DirIndex].WatchedDirectoryPath;
-                            this._serviceLogger.WriteLog($"\t--> [FORCED] ::: DIRECTORY (INDEX {DirIndex}) -- {WatchedPath}", LogType.InfoLog);
-                        }
-
-                        // Log done refreshing all folders and exit out
-                        this._serviceLogger.WriteLog($"COMPLETED LISTING OF ALL WATCHED DIRECTORY NAMES. TOTAL OF {this._watchedDirectories.Count} DIRECTORIES WERE FOUND", LogType.InfoLog);
-                        return;
-
-                    // For the print folders command
-                    case 141:
-                        // Log printing out tables now.
-                        this._serviceLogger.WriteLog("GETTING AND DISPLAYING FULCRUM INJECTOR WATCHDOG DIRECTORIES AS TABLES NOW...", LogType.InfoLog);
-
-                        // Loop all the folders and one by one refresh them.
-                        foreach (WatchdogFolder WatchedDirectory in this._watchedDirectories)
-                        {
-                            // Format the output string to be tabbed in one level
-                            string[] SplitFolderStrings = WatchedDirectory
-                                .ToString().Split('\n')
-                                .Select(StringPart => $"\t{StringPart.Trim()}").ToArray();
-
-                            // Now write the formatted string content out
-                            this._serviceLogger.WriteLog(string.Join("\n", SplitFolderStrings) + "\n");
-                        }
-
-                        // Once all entries are printed, log done and exit out
-                        this._serviceLogger.WriteLog($"PRINTED OUT ALL INFORMATION FOR REQUESTED DIRECTORIES OK!", LogType.InfoLog);
-                        return;
-
-                    // For printing out every file name directly without the table formatting
-                    case 142:
-                        // Log printing out tables now.
-                        this._serviceLogger.WriteLog("GETTING AND DISPLAYING FULCRUM INJECTOR WATCHDOG FILES AS A LIST NOW...", LogType.InfoLog);
-
-                        // Get all the file instances we need now.
-                        Tuple<string, string>[] FilesBeingWatched = this._watchedDirectories.Select(DirObj =>
-                        {
-                            // Store the name of the folder and the name of the file in question
-                            string FolderName = DirObj.WatchedDirectoryName;
-                            string[] FileNames = DirObj.WatchedFiles
-                                .Select(FileObj => FileObj.FullFilePath)
-                                .ToArray();
-
-                            // Build a list of tuples to return out
-                            Tuple<string, string>[] FilesForDir = FileNames
-                                .Select(FilePath => new Tuple<string, string>(FolderName, FilePath))
-                                .ToArray();
-
-                            // Return the tuple sets here
-                            return FilesForDir;
-                        }).SelectMany(TupleSet => TupleSet).ToArray();
-
-                        // Now loop each file and print it out to the console.
-                        foreach (Tuple<string, string> FileAndDirPair in FilesBeingWatched)
-                            this._serviceLogger.WriteLog($"\t--> DIRECTORY: {FileAndDirPair.Item1} | FILE: {FileAndDirPair.Item2}", LogType.InfoLog);
-
-                        // Once all entries are printed, log done and exit out
-                        this._serviceLogger.WriteLog($"PRINTED OUT ALL INFORMATION FOR ALL REQUESTED FILE ENTRIES OK!", LogType.InfoLog);
-                        return;
-
-
-                    // To force execute a new refresh routine on the service
-                    case 150:
-                        // Log starting to perform refresh operations
-                        this._serviceLogger.WriteLog("FORCE INVOKING A REFRESH ROUTINE ON ALL DIRECTORIES NOW...", LogType.InfoLog);
-
-                        // Loop all the folders and one by one refresh them.
-                        foreach (WatchdogFolder WatchedDirectory in this._watchedDirectories)
-                        {
-                            // Log done once the refresh action has completed
-                            WatchedDirectory.ExecuteWatchdogAction();
-                            this._serviceLogger.WriteLog($"\t--> [FORCED] ::: DIRECTORY {WatchedDirectory.WatchedDirectoryName} ROUTINE EXECUTED!", LogType.InfoLog);
-                        }
-
-                        // Log done refreshing all folders and exit out
-                        this._serviceLogger.WriteLog($"COMPLETED ALL REFRESH ROUTINES NEEDED FOR ALL REQUESTED DIRECTORIES!", LogType.InfoLog);
-                        return;
-                }
-            }
-            catch (Exception SendCustomCommandEx)
-            {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING WATCHDOG SERVICE INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
             }
         }
         /// <summary>
@@ -349,8 +215,16 @@ namespace FulcrumWatchdogService
         /// Attempts to add in a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToWatch">The folder objects we wish to watch</param>
-        public void AddWatchedFolders(params WatchdogFolder[] FoldersToWatch)
+        public bool AddWatchedFolders(List<WatchdogFolder> FoldersToWatch)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(AddWatchedFolders), FoldersToWatch);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Loop all the passed folder objects and add/update them one by one
             this._serviceLogger.WriteLog("ATTEMPTING TO REGISTER NEW FOLDERS ON A WATCHDOG SERVICE!", LogType.WarnLog);
             foreach (var FolderToAdd in FoldersToWatch)
@@ -380,13 +254,22 @@ namespace FulcrumWatchdogService
 
             // Log that we've looped all our values correctly and exit out
             this._serviceLogger.WriteLog("UPDATED AND STORED ALL NEEDED FOLDER CONFIGURATIONS WITHOUT ISSUES!", LogType.InfoLog);
+            return true; 
         }
         /// <summary>
         /// Attempts to remove a set of new folder values for the given service
         /// </summary>
         /// <param name="FoldersToRemove">The folder objects we wish to stop watching</param>
-        public void RemoveWatchedFolders(params WatchdogFolder[] FoldersToRemove)
+        public bool RemoveWatchedFolders(List<WatchdogFolder> FoldersToRemove)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(RemoveWatchedFolders), FoldersToRemove);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Loop all the passed folder objects and remove them one by one
             this._serviceLogger.WriteLog("ATTEMPTING TO REMOVE EXISTING FOLDERS FROM A WATCHDOG SERVICE!", LogType.WarnLog);
             foreach (var FolderToRemove in FoldersToRemove)
@@ -419,6 +302,7 @@ namespace FulcrumWatchdogService
 
             // Log that we've looped all our values correctly and exit out
             this._serviceLogger.WriteLog("UPDATED AND REMOVED ALL NEEDED FOLDER CONFIGURATIONS WITHOUT ISSUES!", LogType.InfoLog);
+            return true;
         }
     }
 }
