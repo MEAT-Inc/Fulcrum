@@ -99,8 +99,17 @@ namespace FulcrumEmailService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumEmail(EmailServiceSettings ServiceSettings = null) : base(ServiceTypes.EMAIL_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! EMAIL SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
-            this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
+            this._serviceLogger.WriteLog("SPAWNING NEW EMAIL SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Pull our settings configuration for the service here 
@@ -190,40 +199,6 @@ namespace FulcrumEmailService
                 // Log out the failure and exit this method
                 this._serviceLogger.WriteLog("ERROR! FAILED TO BOOT NEW EMAIL SERVICE INSTANCE!", LogType.ErrorLog);
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
-            }
-        }
-        /// <summary>
-        /// Invokes a custom command routine for our service based on the int code provided to it.
-        /// </summary>
-        /// <param name="ServiceCommand">The command to execute on our service instance (128-255)</param>
-        protected override void OnCustomCommand(int ServiceCommand)
-        {
-            try
-            {
-                // Check what type of command is being executed and perform actions accordingly.
-                switch (ServiceCommand)
-                {
-                    // For any other command value or something that is not recognized
-                    case 128:
-
-                        // Log out the command help information for the user to read in the log file.
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"                                FulcrumInjector Email Service Command Help", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- The provided command value of {ServiceCommand} is reserved to show this help message.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Enter any command number above 128 to execute an action on our service instance.", LogType.InfoLog);
-                        this._serviceLogger.WriteLog($"- Execute this command again with the service command ID 128 to get a list of all possible commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("Help Commands", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("   Command 128:  Displays this help message", LogType.InfoLog);
-                        this._serviceLogger.WriteLog("----------------------------------------------------------------------------------------------------------------", LogType.InfoLog);
-                        return;
-                }
-            }
-            catch (Exception SendCustomCommandEx)
-            {
-                // Log out the failure and exit this method
-                this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A CUSTOM COMMAND ON AN EXISTING EMAIL SERVICE INSTANCE!", LogType.ErrorLog);
-                this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE CUSTOM COMMAND ROUTINE IS LOGGED BELOW", SendCustomCommandEx);
             }
         }
 
@@ -453,6 +428,8 @@ namespace FulcrumEmailService
             // Return passed sending
             return OverallStatus;
         }
+
+        // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Private helper method used to configure a new SMTP client for sending emails out 

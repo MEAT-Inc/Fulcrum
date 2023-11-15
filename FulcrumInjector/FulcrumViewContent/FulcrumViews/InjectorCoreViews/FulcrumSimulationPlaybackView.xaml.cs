@@ -49,8 +49,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorCoreViews
         public FulcrumSimulationPlaybackView()
         {
             // Spawn a new logger and setup our view model
+            this.ViewModel = new FulcrumSimulationPlaybackViewModel(this);
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = FulcrumConstants.FulcrumSimulationPlaybackViewModel ?? new FulcrumSimulationPlaybackViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();

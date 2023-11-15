@@ -67,7 +67,6 @@ namespace FulcrumDriveService.JsonConverters
                 GoogleDriveId = this._useEncryption
                     ? FulcrumEncryptor.Encrypt(ValueObject.GoogleDriveId)
                     : ValueObject.GoogleDriveId,
-                ValueObject.ExplorerConfiguration,
                 ValueObject.ExplorerAuthorization
             });
 
@@ -101,7 +100,6 @@ namespace FulcrumDriveService.JsonConverters
             string GoogleDriveId = InputObject[nameof(DriveServiceSettings.GoogleDriveId)].Value<string>();
             string ApplicationName = InputObject[nameof(DriveServiceSettings.ApplicationName)].Value<string>();
             DriveAuthorization DriveAuth = InputObject[nameof(DriveServiceSettings.ExplorerAuthorization)].ToObject<DriveAuthorization>();
-            DriveConfiguration DriveConfig = InputObject[nameof(DriveServiceSettings.ExplorerConfiguration)].ToObject<DriveConfiguration>();
 
             // Build a new output object using our pulled properties
             var OutputObject = new DriveServiceSettings()
@@ -109,9 +107,8 @@ namespace FulcrumDriveService.JsonConverters
                 ServiceName = ServiceName,
                 ServiceEnabled = ServiceEnabled,
                 ApplicationName = ApplicationName,
-                GoogleDriveId = this._useEncryption ? FulcrumEncryptor.Decrypt(GoogleDriveId) : GoogleDriveId,
                 ExplorerAuthorization = DriveAuth,
-                ExplorerConfiguration = DriveConfig
+                GoogleDriveId = this._useEncryption ? FulcrumEncryptor.Decrypt(GoogleDriveId) : GoogleDriveId,
             };
 
             // Reset our encryption state and return the built object

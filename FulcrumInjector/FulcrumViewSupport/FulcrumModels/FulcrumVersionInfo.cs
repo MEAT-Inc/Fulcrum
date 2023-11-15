@@ -136,5 +136,37 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
             FileVersionInfo AssemblyVersionInfo = FileVersionInfo.GetVersionInfo(AssemblyPath);
             return Version.Parse(AssemblyVersionInfo.FileVersion);
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Static method which is used to convert our version information into a set of string values
+        /// </summary>
+        /// <returns>A text table holding our version information values here</returns>
+        public static string ToVersionTable()
+        {
+            // Build a new set of values for our text table here
+            Tuple<string, string>[] VersionStrings = new Tuple<string, string>[]
+            {
+                new(nameof(InjectorVersionString).Replace("String", string.Empty), InjectorVersionString),
+                new(nameof(ShimVersionString).Replace("String", string.Empty), ShimVersionString),
+                new(nameof(ServiceBaseVersionString).Replace("String", string.Empty), ServiceBaseVersionString),
+                new(nameof(DriveVersionString).Replace("String", string.Empty), DriveVersionString),
+                new(nameof(EmailVersionString).Replace("String", string.Empty), EmailVersionString),
+                new(nameof(UpdaterVersionString).Replace("String", string.Empty), UpdaterVersionString),
+                new(nameof(WatchdogVersionString).Replace("String", string.Empty), WatchdogVersionString),
+            };
+
+            // Convert these values into a text table and return it out
+            string VersionInfoString =
+                "Injector App Versions\n" +
+                VersionStrings.ToStringTable(
+                    new[] { "Component Name", "Component Version" },
+                    VersionObj => VersionObj.Item1,
+                    VersionObj => VersionObj.Item2);
+
+            // Return the built version string values 
+            return VersionInfoString;
+        }
     }
 }

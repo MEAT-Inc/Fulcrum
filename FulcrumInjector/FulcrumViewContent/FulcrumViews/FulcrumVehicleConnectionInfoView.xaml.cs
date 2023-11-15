@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels;
+using FulcrumInjector.FulcrumViewSupport;
 using SharpLogging;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
@@ -39,14 +40,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         public FulcrumVehicleConnectionInfoView()
         {
             // Spawn a new logger and setup our view model
+            FulcrumConstants.FulcrumVehicleConnectionInfoView = this;
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModel = new FulcrumVehicleConnectionInfoViewModel(this);
+            this.ViewModel = FulcrumConstants.FulcrumVehicleConnectionInfoViewModel ??= new FulcrumVehicleConnectionInfoViewModel(this);
 
             // Initialize new UI Component
             InitializeComponent();
 
             // Setup a new data context for our view model instance
-            // this.DataContext = this.ViewModel;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR VEHICLE CONNECTION INFORMATION OUTPUT OK!", LogType.InfoLog);
             this._viewLogger.WriteLog($"BUILT NEW INSTANCE FOR VIEW TYPE {this.GetType().Name} OK!", LogType.InfoLog);
         }

@@ -19,7 +19,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
     /// <summary>
     /// ViewModel for settings pane binding values
     /// </summary>
-    public class FulcrumSettingsPaneViewModel : FulcrumViewModelBase
+    public class FulcrumSettingsViewModel : FulcrumViewModelBase
     {
         #region Custom Events
         #endregion // Custom Events
@@ -51,7 +51,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         /// Builds a new VM and generates a new logger object for it.
         /// </summary>
         /// <param name="SettingsViewUserControl">UserControl which holds the content for our settings view</param>
-        public FulcrumSettingsPaneViewModel(UserControl SettingsViewUserControl) : base(SettingsViewUserControl)
+        public FulcrumSettingsViewModel(UserControl SettingsViewUserControl) : base(SettingsViewUserControl)
         {
             // Spawn a new logger for this view model instance and log some information
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
