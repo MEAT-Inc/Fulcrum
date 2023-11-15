@@ -46,6 +46,9 @@ namespace FulcrumUpdaterService
         private readonly Stopwatch _downloadTimer = new();        // Download timer for pulling in versions
         private readonly UpdaterServiceSettings _serviceConfig;   // Updater configuration values
 
+        // Private backing fields for our public facing properties
+        private Release[] _injectorReleases;                      // Collection of all releases found for the injector app
+
         #endregion //Fields
 
         #region Properties
@@ -54,7 +57,21 @@ namespace FulcrumUpdaterService
         public bool IsGitClientAuthorized { get; private set; }
 
         // Public facing properties holding information about our latest version information
-        public Release[] InjectorReleases { get; private set; }
+        public Release[] InjectorReleases
+        {
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._injectorReleases
+                : this.GetPipeMemberValue(nameof(InjectorReleases)) as Release[];
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient) this._injectorReleases = value;
+                if (!this.SetPipeMemberValue(nameof(InjectorReleases), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(InjectorReleases)}!");
+            }
+        }
         public string LatestInjectorVersion => this.InjectorVersions[0];
         public Release LatestInjectorRelease => this.InjectorReleases[0];
         public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
@@ -62,6 +79,7 @@ namespace FulcrumUpdaterService
             .Select(ReleaseTag => Regex.Match(ReleaseTag.TagName, @"(\d+(?>\.|))+").Value)
             .ToArray();
 
+        // TODO: Configure these properties to fire over pipe operations
         // Time download elapsed and approximate time remaining
         public string DownloadTimeRemaining { get; private set; }
         public string DownloadTimeElapsed => this._downloadTimer == null ? "00:00" : this._downloadTimer.Elapsed.ToString().Split('.')[0];
@@ -79,6 +97,15 @@ namespace FulcrumUpdaterService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumUpdater(UpdaterServiceSettings ServiceSettings = null) : base(ServiceTypes.UPDATER_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! UPDATER SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
             this._downloadTimer = new Stopwatch();
             this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
@@ -176,7 +203,7 @@ namespace FulcrumUpdaterService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeRoutine(nameof(CheckAgainstVersion), InputVersion);
+                var PipeAction = this.ExecutePipeMethod(nameof(CheckAgainstVersion), InputVersion);
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
@@ -211,7 +238,7 @@ namespace FulcrumUpdaterService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeRoutine(nameof(DownloadInjectorRelease), VersionTag, string.Empty);
+                var PipeAction = this.ExecutePipeMethod(nameof(DownloadInjectorRelease), VersionTag, string.Empty);
                 InjectorAssetUrl = PipeAction.PipeMethodArguments[1].ToString();
                 return PipeAction.PipeCommandResult.ToString();
             }

@@ -31,15 +31,15 @@ namespace FulcrumWatchdogService
 
         #region Properties
 
-        // Public facing properties holding information about our folders being watched and all their files
-        public WatchdogFile[] WatchedFiles => this.WatchedDirectories
+        // Private properties holding information about our folders being watched and all their files
+        private WatchdogFile[] WatchedFiles => this.WatchedDirectories
             .SelectMany(WatchedDir => WatchedDir.WatchedFiles)
             .OrderBy(WatchedFile => WatchedFile.FullFilePath)
             .ToArray();
-        public WatchdogFolder[] WatchedDirectories
+        private WatchdogFolder[] WatchedDirectories
         {
             get => this._watchedDirectories.Where(WatchedDir => WatchedDir != null).ToArray();
-            private set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
+            set => this._watchedDirectories = value.Where(WatchedDir => WatchedDir != null).ToList();
         }
 
         #endregion //Properties
@@ -55,8 +55,17 @@ namespace FulcrumWatchdogService
         /// <param name="ServiceSettings">Optional settings object for our service configuration</param>
         internal FulcrumWatchdog(WatchdogSettings ServiceSettings = null) : base(ServiceTypes.WATCHDOG_SERVICE)
         {
+            // Check if we're consuming this service instance or not
+            if (this.IsServiceClient)
+            {
+                // If we're a client, just log out that we're piping commands across to our service and exit out
+                this._serviceLogger.WriteLog("WARNING! WATCHDOG SERVICE IS BEING BOOTED IN CLIENT CONFIGURATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("ALL COMMANDS/ROUTINES EXECUTED ON THE DRIVE SERVICE WILL BE INVOKED USING THE HOST SERVICE!", LogType.WarnLog);
+                return;
+            }
+
             // Log we're building this new service and log out the name we located for it
-            this._serviceLogger.WriteLog("SPAWNING NEW DRIVE SERVICE!", LogType.InfoLog);
+            this._serviceLogger.WriteLog("SPAWNING NEW WATCHDOG SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
             // Init our component object here and setup logging
@@ -199,7 +208,7 @@ namespace FulcrumWatchdogService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeRoutine(nameof(AddWatchedFolders), FoldersToWatch);
+                var PipeAction = this.ExecutePipeMethod(nameof(AddWatchedFolders), FoldersToWatch);
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
@@ -244,7 +253,7 @@ namespace FulcrumWatchdogService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeRoutine(nameof(RemoveWatchedFolders), FoldersToRemove);
+                var PipeAction = this.ExecutePipeMethod(nameof(RemoveWatchedFolders), FoldersToRemove);
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 

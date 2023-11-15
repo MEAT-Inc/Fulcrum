@@ -71,16 +71,16 @@ namespace FulcrumInjector
             this._configureAppExitRoutine();
             this._configureCryptographicKeys();
 
+            // Configure settings and app theme
+            this._configureCurrentTheme();
+            this._configureUserSettings();
+
             // Boot our service instances here 
             FulcrumEmail.InitializeEmailService();
             FulcrumDrive.InitializeDriveService();
             FulcrumUpdater.InitializeUpdaterService();
             FulcrumWatchdog.InitializeWatchdogService();
- 
-            // Configure settings and app theme
-            this._configureCurrentTheme();
-            this._configureUserSettings(); 
-
+            
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
             this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
             this._appLogger.WriteLog("ALL REQUIRED FULCRUM INJECTOR STARTUP ROUTINES ARE DONE! MAIN WINDOW OPENING UP NOW...", LogType.InfoLog);

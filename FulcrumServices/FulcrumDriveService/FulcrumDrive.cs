@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using FulcrumDriveService.DriveServiceModels;
@@ -41,19 +42,66 @@ namespace FulcrumDriveService
         private DriveAuthorization _driveAuth;                    // The authorization configuration for the drive service
         private DriveServiceSettings _serviceConfig;              // Settings configuration for our service
 
+        // Private backing fields for our public facing properties
+        private string _googleDriveId;                           // The ID of the google drive we're hooked into
+        private string _applicationName;                         // The name of the application connected to our drive
+        private bool _isDriveServiceAuthorized;                  // Holds the state of our drive service
+
         #endregion //Fields
 
         #region Properties
 
         // Public readonly properties holding information about the drive configuration
-        public string GoogleDriveId { get; private set; }
-        public string ApplicationName { get; private set; }
-        public bool IsDriveServiceAuthorized { get; private set; }
+        public string GoogleDriveId
+        {
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._googleDriveId
+                : this.GetPipeMemberValue(nameof(GoogleDriveId)).ToString();
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient) this._googleDriveId = value; 
+                if (!this.SetPipeMemberValue(nameof(GoogleDriveId), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(GoogleDriveId)}!");
+            }
+        }
+        public string ApplicationName
+        {
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._applicationName
+                : this.GetPipeMemberValue(nameof(ApplicationName)).ToString();
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient) this._applicationName = value;
+                if (!this.SetPipeMemberValue(nameof(ApplicationName), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(ApplicationName)}!");
+            }
+        }
+        public bool IsDriveServiceAuthorized
+        {
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient 
+                ? this._isDriveServiceAuthorized
+                : bool.Parse(this.GetPipeMemberValue(nameof(IsDriveServiceAuthorized)).ToString());
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient) this._isDriveServiceAuthorized = value;
+                if (!this.SetPipeMemberValue(nameof(IsDriveServiceAuthorized), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(IsDriveServiceAuthorized)}!");
+            }
+        }
 
         #endregion //Properties
 
         #region Structs and Classes
-        
+
         /// <summary>
         /// Enumeration used to help filter the resulting object types from a query to the drive/folder
         /// </summary>
@@ -180,7 +228,7 @@ namespace FulcrumDriveService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeRoutine(nameof(ListDriveContents), new List<File>(), ResultFilter);
+                var PipeAction = this.ExecutePipeMethod(nameof(ListDriveContents), new List<File>(), ResultFilter);
 
                 // Store our output value for results and exit out
                 bool ExecutionPassed = bool.Parse(PipeAction.PipeCommandResult.ToString());
@@ -239,7 +287,7 @@ namespace FulcrumDriveService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeRoutine(nameof(ListFolderContents), FolderId, new List<File>(), ResultFilter);
+                var PipeAction = this.ExecutePipeMethod(nameof(ListFolderContents), FolderId, new List<File>(), ResultFilter);
 
                 // Store our output value for results and exit out
                 bool ExecutionPassed = bool.Parse(PipeAction.PipeCommandResult.ToString());
@@ -299,7 +347,7 @@ namespace FulcrumDriveService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method and return out based on the result of the action
-                var PipeAction = this.ExecutePipeRoutine(nameof(DownloadDriveFile), FileId, OutputFile);
+                var PipeAction = this.ExecutePipeMethod(nameof(DownloadDriveFile), FileId, OutputFile);
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
@@ -334,7 +382,7 @@ namespace FulcrumDriveService
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method and return out based on the result of the action
-                var PipeAction = this.ExecutePipeRoutine(nameof(DownloadDriveFiles), FileIds, OutputFolder);
+                var PipeAction = this.ExecutePipeMethod(nameof(DownloadDriveFiles), FileIds, OutputFolder);
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 

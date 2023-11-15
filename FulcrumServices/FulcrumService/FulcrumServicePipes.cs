@@ -150,7 +150,10 @@ namespace FulcrumService
 
             // Queue the command for our pipe and store it if it's a new unique action
             string PipeActionGuid = PipeAction.PipeActionGuid.ToString("D").ToUpper();
-            this._servicePipeLogger.WriteLog($"QUEUEING AND SENDING ACTION {PipeAction.PipeMethodName} (GUID: {PipeActionGuid}) TO PIPE HOST NOW...");
+            this._servicePipeLogger.WriteLog($"QUEUEING AND SENDING NEW PIPE ACTION NOW...", LogType.InfoLog);
+            this._servicePipeLogger.WriteLog($"PIPE ACTION GUID:  {PipeActionGuid}");
+            this._servicePipeLogger.WriteLog($"PIPE ACTION NAME: {PipeAction.PipeActionName}");
+            this._servicePipeLogger.WriteLog($"PIPE ACTION TYPE: {PipeAction.ReflectionType.ToDescriptionString()}");
 
             // Write our pipe action as a JSON string to our host pipe here
             string PipeActionJson = JsonConvert.SerializeObject(PipeAction);
@@ -298,9 +301,6 @@ namespace FulcrumService
                         // Log out the failure to read from the pipe and continue on
                         this._servicePipeLogger.WriteLog($"ERROR! FAILED TO READ OR RESPOND TO DATA FROM PIPE {this.ServicePipeName}!", LogType.ErrorLog);
                         this._servicePipeLogger.WriteException("EXCEPTION DURING ACTION EXECUTION ROUTINE IS BEING LOGGED BELOW", ReadPipeDataEx);
-
-                        // Flush our pipe to keep reading
-                        this._servicePipe.Disconnect();
                     }
                 }
             }, this._servicePipeTaskCancellationToken);
@@ -321,34 +321,109 @@ namespace FulcrumService
         /// <param name="PipeAction"></param>
         private bool _executePipeAction(FulcrumServicePipeAction PipeAction)
         {
-            // Log out that we're invoking a new pipe action here and find our method to invoke
-            this._servicePipeLogger.WriteLog($"INVOKING PIPE ACTION {PipeAction.PipeMethodName} NOW...", LogType.InfoLog);
-            MethodInfo PipeActionMethod = this._serviceInstance
-                .GetType().GetMethods()
-                .Where(MethodObj => MethodObj.Name == PipeAction.PipeMethodName)
-                .FirstOrDefault(MethodObj => MethodObj.GetParameters().Length == PipeAction.PipeMethodArguments.Length);
-
-            // Make sure our pipe action is not null here 
-            if (PipeActionMethod == null)
-                throw new MissingMethodException($"Error! Could not find method {PipeAction.PipeMethodName} for service type {this._serviceInstance.ServiceType}!");
-
-            try
+            // Find our execution type here and determine what routine needs to be done.
+            this._servicePipeLogger.WriteLog($"INVOKING PIPE ACTION {PipeAction.PipeActionName} NOW...", LogType.InfoLog);
+            switch (PipeAction.ReflectionType)
             {
-                // Invoke our method object for the pipe action and store the result
-                object ActionResult = PipeActionMethod.Invoke(this._serviceInstance, PipeAction.PipeMethodArguments);
-                PipeAction.IsExecuted = true;
-                PipeAction.PipeCommandResult = ActionResult;
+                // For method invocation types
+                case FulcrumServicePipeAction.ReflectionTypes.METHOD_TYPE:
+                    {
+                        // For method types, find and invoke our method object here
+                        MethodInfo PipeActionMethod = this._serviceInstance
+                            .GetType().GetMethods()
+                            .Where(MethodObj => MethodObj.Name == PipeAction.PipeActionName)
+                            .FirstOrDefault(MethodObj => MethodObj.GetParameters().Length == PipeAction.PipeMethodArguments.Length);
 
-                // Log out that we've invoked our pipe action correctly and exit out
-                this._servicePipeLogger.WriteLog($"INVOKED PIPE ACTION {PipeAction.PipeMethodName} CORRECTLY!", LogType.InfoLog);
-                return true;
-            }
-            catch (Exception InvokeActionEx)
-            {
-                // Log out that we failed to invoke our method action and return false
-                this._servicePipeLogger.WriteLog($"ERROR! FAILED TO INVOKE PIPE ACTION {PipeAction.PipeMethodName}!", LogType.ErrorLog);
-                this._servicePipeLogger.WriteException("EXCEPTION THROWN FROM INVOKE ROUTINE IS LOGGING BELOW", InvokeActionEx);
-                return false;
+                        // Make sure our pipe action is not null here 
+                        if (PipeActionMethod == null)
+                            throw new MissingMethodException($"Error! Could not find method {PipeAction.PipeActionName} for service type {this._serviceInstance.ServiceType}!");
+
+                        try
+                        {
+                            // Invoke our method object for the pipe action and store the result
+                            object ActionResult = PipeActionMethod.Invoke(this._serviceInstance, PipeAction.PipeMethodArguments);
+                            PipeAction.PipeCommandResult = ActionResult;
+
+                            // Log out that we've invoked our pipe action correctly and exit out
+                            return true;
+                        }
+                        catch (Exception InvokeActionEx)
+                        {
+                            // Log out that we failed to invoke our method action and return false
+                            this._servicePipeLogger.WriteLog($"ERROR! FAILED TO INVOKE PIPE ACTION {PipeAction.PipeActionName}!", LogType.ErrorLog);
+                            this._servicePipeLogger.WriteException("EXCEPTION THROWN FROM INVOKE ROUTINE IS LOGGING BELOW", InvokeActionEx);
+                            return false;
+                        }
+                    }
+
+                // For getting or setting member objects
+                case FulcrumServicePipeAction.ReflectionTypes.GET_MEMBER:
+                case FulcrumServicePipeAction.ReflectionTypes.SET_MEMBER:
+                    {
+                        // For getting members find and invoke our member information object here 
+                        MemberInfo PipeActionMember = this._serviceInstance
+                            .GetType().GetMembers()
+                            .FirstOrDefault(MemberObj => MemberObj.Name == PipeAction.PipeActionName);
+
+                        // If no member information can be found, throw a new missing member exception
+                        if (PipeActionMember == null)
+                            throw new MissingMemberException($"Error! Could not find member {PipeAction.PipeActionName} for service type {this._serviceInstance.ServiceType}!");
+
+                        try
+                        {
+                            // Now switch based on if we're using a field or property object here
+                            switch (PipeActionMember)
+                            {
+                                // For fields, set them here using the field setter
+                                case FieldInfo PipeField:
+                                    {
+                                        // For getting members, pull our value
+                                        if (PipeAction.ReflectionType == FulcrumServicePipeAction.ReflectionTypes.GET_MEMBER)
+                                            PipeAction.PipeCommandResult = PipeField.GetValue(this);
+
+                                        // For setting members, set our value
+                                        if (PipeAction.ReflectionType == FulcrumServicePipeAction.ReflectionTypes.SET_MEMBER)
+                                            PipeField.SetValue(this, PipeAction.PipeMethodArguments[0]);
+
+                                        // Break out once we've pulled or set our value
+                                        break;
+                                    }
+
+                                // For properties, set them here using the property setter
+                                case PropertyInfo PipeProperty:
+                                    {
+                                        // For getting members, pull our value
+                                        if (PipeAction.ReflectionType == FulcrumServicePipeAction.ReflectionTypes.GET_MEMBER)
+                                            PipeAction.PipeCommandResult = PipeProperty.GetValue(this);
+
+                                        // For setting members, set our value
+                                        if (PipeAction.ReflectionType == FulcrumServicePipeAction.ReflectionTypes.SET_MEMBER)
+                                            PipeProperty.SetValue(this, PipeAction.PipeMethodArguments[0]);
+
+                                        // Break out once we've pulled or set our value
+                                        PipeAction.IsExecuted = true;
+                                        break;
+                                    }
+                            }
+
+                            // Break out once we've set or pulled our member value
+                            return true;
+
+                        }
+                        catch (Exception InvokeActionEx)
+                        {
+                            // Log out that we failed to invoke our method action and return false
+                            this._servicePipeLogger.WriteLog($"ERROR! FAILED TO INVOKE PIPE ACTION {PipeAction.PipeActionName}!", LogType.ErrorLog);
+                            this._servicePipeLogger.WriteException("EXCEPTION THROWN FROM INVOKE ROUTINE IS LOGGING BELOW", InvokeActionEx);
+                            return false;
+                        }
+                    }
+
+                // If no reflection type is specified, throw a new exception out
+                default:
+                    this._servicePipeLogger.WriteLog($"ERROR! NO REFLECTION TYPE WAS PROVIDED FOR PIPE ACTION {PipeAction.PipeActionName}!", LogType.ErrorLog);
+                    this._servicePipeLogger.WriteLog("ENSURE PIPE ACTION TYPES ARE SPECIFIED BEFORE SENDING THEM TO HOST SERVICES!", LogType.ErrorLog);
+                    throw new InvalidOperationException($"Error! No reflection type set for pipe method {PipeAction.PipeActionName}!");
             }
         }
     }

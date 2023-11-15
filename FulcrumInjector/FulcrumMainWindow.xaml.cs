@@ -39,9 +39,8 @@ namespace FulcrumInjector
         {
             // Init main component and blur background of the main window.
             InitializeComponent();
-            
-            // Store our main window singleton on our Constants and build blue effect
-            FulcrumConstants.FulcrumMainWindow = this;
+
+            // Configure our blur background effect here
             FulcrumWindowBlur.ShowBlurEffect(this);
 
             // Configure a new logger for our main window and log out our state has been configured
@@ -60,6 +59,9 @@ namespace FulcrumInjector
         /// <param name="e"></param>
         private void InjectorMainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // Store our main window singleton on our Constants and build blue effect
+            FulcrumConstants.FulcrumMainWindow = this;
+
             // Set title to DEBUG if the app is inside our debug directory
             if (Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Contains("bin")) this.Title += " (SOURCE_BINARY";
 #if DEBUG

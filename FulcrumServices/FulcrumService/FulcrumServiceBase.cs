@@ -286,37 +286,96 @@ namespace FulcrumService
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Protected instance method used to invoke a routine on a host service instance
+        /// Protected instance method used to invoke a get member routine on our host service
         /// </summary>
-        /// <param name="MethodName">Name of the method being invoked</param>
-        /// <param name="MethodArgs">Arguments of the method being invoked</param>
+        /// <param name="MemberName">Name of the member being pulled</param>
         /// <returns>The pipe action invoked for this routine if passed</returns>
         /// <exception cref="InvalidOperationException">Thrown when the pipe action fails to execute</exception>
-        protected FulcrumServicePipeAction ExecutePipeRoutine(string MethodName, params object[] MethodArgs)
+        protected object GetPipeMemberValue(string MemberName)
         {
-            // Log out that we're using the service instance object and pull our results back
-            this._serviceLogger.WriteLog("WARNING! CONSUMING SERVICE FOR EXECUTION INSTEAD OF CALLING LOCAL METHOD!", LogType.WarnLog);
-            var PipeAction = new FulcrumServicePipeAction(this.ServiceType, MethodName, MethodArgs);
+            // Configure our pipe action routine based on our input arguments and invoke it 
+            var PipeAction = new FulcrumServicePipeAction(this.ServiceType, MemberName);
+            if (!this._invokePipeAction(ref PipeAction))
+                throw new InvalidOperationException("Error! Failed to get a member value from a service pipe!");
 
-            // Queue our pipe action to the host service instance and execute it
-            if (!this.ServicePipe.QueuePipeAction(PipeAction))
-            {
-                // Log that we failed to queue this action and exit out
-                this._serviceLogger.WriteLog("ERROR! FAILED TO QUEUE NEW PIPE ACTION!", LogType.ErrorLog);
-                throw new InvalidOperationException("Error! Failed to invoke a new pipe action!");
-            }
+            // Return our value pulled from the service pipe
+            return PipeAction.PipeCommandResult;
+        }
+        /// <summary>
+        /// Protected instance method used to invoke a set member routine on our host service
+        /// </summary>
+        /// <param name="MemberName">Name of the member being set</param>
+        /// <param name="MemberValue">Value of the member member being set</param>
+        /// <returns>The pipe action invoked for this routine if passed</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the pipe action fails to execute</exception>
+        protected bool SetPipeMemberValue(string MemberName, object MemberValue)
+        {
+            // Configure our pipe action routine based on our input arguments and invoke it 
+            var PipeAction = new FulcrumServicePipeAction(this.ServiceType, MemberName, MemberValue);
+            if (!this._invokePipeAction(ref PipeAction))
+                throw new InvalidOperationException("Error! Failed to set a member value with a service pipe!");
 
-            // Wait for our pipe action to come back and store the values of it as our return information
-            if (!this.ServicePipe.WaitForAction(PipeAction.PipeActionGuid, out PipeAction))
-            {
-                // Log that we failed to find our pipe response and fail out of this method 
-                this._serviceLogger.WriteLog("ERROR! FAILED TO FIND PIPE ACTION RESPONSE!", LogType.ErrorLog);
-                throw new InvalidOperationException("Error! Failed to find pipe action response!");
-            }
+            // Return passed once we've gotten to this point 
+            return true; 
+        }
+        /// <summary>
+        /// Protected instance method used to invoke a routine on a host service instance
+        /// </summary>
+        /// <param name="ActionName">Name of the method/member being invoked</param>
+        /// <param name="MethodArgs">Arguments of the member routine/method being invoked</param>
+        /// <returns>The pipe action invoked for this routine if passed</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the pipe action fails to execute</exception>
+        protected FulcrumServicePipeAction ExecutePipeMethod(string ActionName, params object[] MethodArgs)
+        {
+            // Configure our pipe action routine based on our input arguments and invoke it 
+            var PipeAction = new FulcrumServicePipeAction(this.ServiceType, ActionName, MethodArgs?.ToArray());
+            if (!this._invokePipeAction(ref PipeAction))
+                throw new InvalidOperationException("Error! Failed to execute a method over a service pipe!");
 
-            // Store our pipe response values as our output values and exit this method
-            this._serviceLogger.WriteLog("PIPE ROUTINE EXECUTION COMPLETED CORRECTLY! RETURNING CONTENT NOW...", LogType.InfoLog);
+            // Return our built pipe action values
             return PipeAction;
+        }
+
+        /// <summary>
+        /// Private helper method used to invoke a new pipe action routine onto one of our services
+        /// </summary>
+        /// <param name="PipeAction">The action being invoked</param>
+        /// <returns>The updated action after invocation of it has been called</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the pipe action fails to execute</exception>
+        private bool _invokePipeAction(ref FulcrumServicePipeAction PipeAction)
+        {
+            try
+            {
+                // Queue our pipe action to the host service instance and execute it
+                if (!this.ServicePipe.QueuePipeAction(PipeAction))
+                {
+                    // Log that we failed to queue this action and exit out
+                    this._serviceLogger.WriteLog("ERROR! FAILED TO QUEUE NEW PIPE ACTION!", LogType.ErrorLog);
+                    throw new InvalidOperationException("Error! Failed to invoke a new pipe action!");
+                }
+
+                // Wait for our pipe action to come back and store the values of it as our return information
+                if (!this.ServicePipe.WaitForAction(PipeAction.PipeActionGuid, out PipeAction))
+                {
+                    // Log that we failed to find our pipe response and fail out of this method 
+                    this._serviceLogger.WriteLog("ERROR! FAILED TO FIND PIPE ACTION RESPONSE!", LogType.ErrorLog);
+                    throw new InvalidOperationException("Error! Failed to find pipe action response!");
+                }
+
+                // Return out true once we've invoked our pipe routine 
+                return true;
+            }
+            catch (Exception InvokePipeActionEx)
+            {
+                // Log out our pipe action exception and return false
+                this._serviceLogger.WriteLog("ERROR! FAILED TO INVOKE A NEW PIPE ACTION!", LogType.ErrorLog);
+                this._serviceLogger.WriteLog($"PIPE ACTION NAME: {PipeAction.PipeActionName}", LogType.ErrorLog);
+                this._serviceLogger.WriteLog($"PIPE ACTION GUID: {PipeAction.PipeActionGuid.ToString("D").ToUpper()}", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION THROWN DURING INVOCATION IS BEING LOGGED BELOW", InvokePipeActionEx);
+
+                // Return out failed at this point 
+                return false;
+            }
         }
     }
 }

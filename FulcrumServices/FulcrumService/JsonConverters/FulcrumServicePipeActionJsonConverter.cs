@@ -44,9 +44,10 @@ namespace FulcrumService.JsonConverters
             var OutputObject = JObject.FromObject(new
             {
                 PipeActionGuid = ValueObject.PipeActionGuid.ToString("D").ToUpper(),
-                PipeServiceType = ValueObject.PipeServiceType.ToDescriptionString(),
+                PipeServiceType = ValueObject.PipeServiceType.ToDescriptionString(), 
+                ReflectionType = ValueObject.ReflectionType.ToDescriptionString(),
                 ValueObject.IsExecuted,
-                ValueObject.PipeMethodName,
+                PipeMethodName = ValueObject.PipeActionName,
                 ValueObject.PipeMethodArguments,
                 PipeArgumentTypes = ValueObject.PipeArgumentTypes.Select(ArgType => ArgType.AssemblyQualifiedName),
                 ValueObject.PipeCommandResult
@@ -72,10 +73,11 @@ namespace FulcrumService.JsonConverters
 
             // Read in our properties for the JObject and build a pipe action from them
             bool IsExecuted = InputObject[nameof(FulcrumServicePipeAction.IsExecuted)].Value<bool>();
-            string PipeMethodName = InputObject[nameof(FulcrumServicePipeAction.PipeMethodName)].Value<string>();
+            string PipeMethodName = InputObject[nameof(FulcrumServicePipeAction.PipeActionName)].Value<string>();
             object PipeCommandResult = InputObject[nameof(FulcrumServicePipeAction.PipeCommandResult)].Value<object>();
             Guid PipeActionGuid = Guid.Parse(InputObject[nameof(FulcrumServicePipeAction.PipeActionGuid)].Value<string>());
             var PipeServiceType = (InputObject[nameof(FulcrumServicePipeAction.PipeServiceType)].Value<string>()).ToEnumValue<FulcrumServiceBase.ServiceTypes>();
+            var ReflectionType = (InputObject[nameof(FulcrumServicePipeAction.ReflectionType)].Value<string>()).ToEnumValue<FulcrumServicePipeAction.ReflectionTypes>();
 
             // Build our list of argument type values here
             JArray TypesJArray = JArray.FromObject(InputObject[nameof(FulcrumServicePipeAction.PipeArgumentTypes)]);
@@ -106,7 +108,8 @@ namespace FulcrumService.JsonConverters
             {
                 IsExecuted = IsExecuted,
                 PipeActionGuid = PipeActionGuid,
-                PipeMethodName = PipeMethodName,
+                PipeActionName = PipeMethodName,
+                ReflectionType = ReflectionType,
                 PipeServiceType = PipeServiceType,
                 PipeCommandResult = PipeCommandResult,
                 PipeArgumentTypes = ArgumentTypes.ToArray(),
