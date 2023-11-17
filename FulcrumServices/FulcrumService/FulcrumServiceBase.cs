@@ -251,8 +251,7 @@ namespace FulcrumService
                 }
 
                 // Make sure our service instance is running here before moving on
-                if (this.ServiceInstance.Status != ServiceControllerStatus.Running)
-                {
+                if (this.ServiceInstance.Status != ServiceControllerStatus.Running) {
                     this._serviceLogger.WriteLog($"BOOTING SERVICE INSTANCE FOR SERVICE {this.ServiceName}...", LogType.WarnLog);
                     this.ServiceInstance.Start();
                 }

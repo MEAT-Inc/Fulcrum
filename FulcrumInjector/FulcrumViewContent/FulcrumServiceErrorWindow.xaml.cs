@@ -131,15 +131,8 @@ namespace FulcrumInjector.FulcrumViewContent
 
             // Configure a new collection to store our service states on here
             this.ServiceInformation = new ObservableCollection<FulcrumServiceBase.FulcrumServiceInfo>();
-            this._viewLogger.WriteLog("BUILT NEW COLLECTION FOR SERVICE STATE INFORMATION! POPULATING NOW...", LogType.InfoLog);
-
-            // Iterate all of our service information objects here and store them
-            foreach (var ServiceState in ServiceStates)
-            {
-                // Add our service state and log it out here 
-                this.ServiceInformation.Add(ServiceState);
-                this._viewLogger.WriteLog($"ADDED SERVICE STATE INFORMATION FOR SERVICE {ServiceState.ServiceName}!", LogType.InfoLog);
-            }
+            foreach (var ServiceState in ServiceStates) this.ServiceInformation.Add(ServiceState);
+            this._viewLogger.WriteLog("BUILT AMD POPULATED A NEW COLLECTION FOR SERVICE STATE INFORMATION!", LogType.InfoLog);
 
             // Log out that we've built service install information and continue on
             this._viewLogger.WriteLog("BUILT INSTALL INFORMATION FOR ALL SERVICE INSTANCES CORRECTLY!", LogType.InfoLog);

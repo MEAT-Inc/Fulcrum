@@ -304,73 +304,28 @@ namespace FulcrumInjector
         private void _configureInjectorServices()
         {
             // Begin by checking service installation state values here 
+            this._appLogger?.WriteLog("VALIDATING INJECTOR SERVICE INSTALL LOCATIONS...", LogType.WarnLog);
             if (!FulcrumServiceErrorWindow.ValidateServiceConfiguration())
             {
                 // Log out that we're missing one or more services and 
-                this._appLogger.WriteLog("ERROR! COULD NOT FIND ALL INJECTOR SERVICES!", LogType.ErrorLog);
-                this._appLogger.WriteLog("EXITING INJECTOR APPLICATION SINCE IS A FATAL ERROR!", LogType.ErrorLog);
+                this._appLogger?.WriteLog("ERROR! COULD NOT FIND ALL INJECTOR SERVICES!", LogType.ErrorLog);
+                this._appLogger?.WriteLog("EXITING INJECTOR APPLICATION SINCE IS A FATAL ERROR!", LogType.ErrorLog);
                 Environment.Exit(0);
             }
 
-            // Log out that we're booting our services and create them here
-            if (!Debugger.IsAttached)
-            {
-                // Log out that we're building these service instances in a release mode for use
-                this._appLogger.WriteLog("BOOTING INJECTOR SERVICE INSTANCES NOW...", LogType.WarnLog);
-                this._appLogger.WriteLog("INITIALIZING SERVICE INSTANCES FOR A NON DEBUG INSTANCE OF THE INJECTOR APP...", LogType.WarnLog);
+            // Log out that we're building these service instances in a release mode for use
+            this._appLogger?.WriteLog("INJECTOR SERVICE CONFIGURATION IS NORMAL!", LogType.InfoLog);
+            this._appLogger?.WriteLog("BOOTING INJECTOR SERVICE INSTANCES NOW...", LogType.WarnLog);
 
-                // If no debugger is found, just spawn service instances and wait for creation
-                FulcrumEmail.InitializeEmailService();
-                FulcrumDrive.InitializeDriveService();
-                FulcrumUpdater.InitializeUpdaterService();
-                FulcrumWatchdog.InitializeWatchdogService();
-                this._appLogger.WriteLog("BOOTED ALL SERVICE TASKS CORRECTLY!", LogType.InfoLog);
+            // If no debugger is found, just spawn service instances and wait for creation
+            FulcrumEmail.InitializeEmailService();
+            FulcrumDrive.InitializeDriveService();
+            FulcrumUpdater.InitializeUpdaterService();
+            FulcrumWatchdog.InitializeWatchdogService();
 
-                // Return out once all services are booted
-                return;
-            }
-
-            // If a debugger is found, stop service instances on the host machine and invoke new ones here
-            this._appLogger.WriteLog("DEBUGGER FOUND! KILLING SERVICE INSTANCES AND SPAWNING NEW DEBUG VERSIONS NOW...", LogType.WarnLog);
-            var ServicesFound = ServiceController.GetServices()
-                .Where(ServiceObj => ServiceObj.ServiceName.Contains("Fulcrum"))
-                .ToArray();
-
-            // Log out how many services we've found and make sure there's a valid number of them
-            this._appLogger.WriteLog($"FOUND A TOTAL OF {ServicesFound.Length} SERVICES FOR THE INJECTOR APPLICATION! KILLING THEM NOW...", LogType.InfoLog);
-            this._appLogger.WriteLog($"SERVICES FOUND: {string.Join(" | ", ServicesFound.Select(ServiceObj => ServiceObj.ServiceName))}", LogType.InfoLog);
-
-            // Store a path value to our built service configuration object
-            string ServicesDirectory = Path.GetFullPath("..\\..\\..\\FulcrumServices");
-            this._appLogger.WriteLog($"PROCESSED SERVICE BUILD BASE DIRECTORY OF {ServicesDirectory}", LogType.InfoLog);
-
-            // Kill each service instance and boot a new one here
-            this._appLogger.WriteLog("KILLING AND REBOOTING INJECTOR SERVICES NOW...", LogType.InfoLog);
-            foreach (var InjectorService in ServicesFound)
-            {
-                // Store the service name here
-                string ServiceName = InjectorService.ServiceName;
-                this._appLogger.WriteLog($"REBOOTING SERVICE {ServiceName}...", LogType.WarnLog);
-
-                try
-                {
-                    // Kill our service and wait 2 seconds for a stopped status here 
-                    InjectorService.Stop();
-                    this._appLogger.WriteLog($"WAITING 2 SECONDS FOR STOPPED SIGNAL FROM SERVICE {ServiceName}...");
-                    InjectorService.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
-                }
-                catch (Exception StopServiceEx)
-                {
-                    // Catch the exception and log it out then rethrow it
-                    this._appLogger.WriteLog($"ERROR! FAILED TO PROCESS A SERVICE STOPPED SIGNAL FOR SERVICE {ServiceName}!", LogType.ErrorLog);
-                    this._appLogger.WriteException("EXCEPTION THROWN DURING STOP ROUTINE IS BEING LOGGED BELOW", StopServiceEx);
-                    throw;
-                }
-
-                // Copy our service files into their install locations and reboot services here
-                string[] ServiceFolders = Directory.GetDirectories(ServicesDirectory).Where(DirName => DirName != "FulcrumService").ToArray();
-                this._appLogger.WriteLog($"FOUND {ServiceFolders.Length} SERVICE FOLDERS TO UPDATE INSTALL FILES WITH!", LogType.InfoLog);
-            }
+            // Log out that we've booted all of our service instances here
+            this._appLogger?.WriteLog("BOOTED ALL SERVICE TASKS CORRECTLY!", LogType.InfoLog);
+            this._appLogger?.WriteLog("IF SERVICE ROUTINES FAIL TO EXECUTE, PLEASE ENSURE SERVICE INSTANCES ARE ACTIVE ON THIS MACHINE!", LogType.InfoLog);
         }
     }
 }
