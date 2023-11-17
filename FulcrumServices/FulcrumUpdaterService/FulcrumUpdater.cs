@@ -74,20 +74,12 @@ namespace FulcrumUpdaterService
 
         // Public facing properties holding information about our latest version information
         public Release[] InjectorReleases
-        {
+        { 
             // Pull the value from our service host or the local instance based on client configuration
-            get
-            {
-                // If we are a service client, invoke a member value request routine and return them out
-                if (this.IsServiceClient) return this.GetPipeMemberValue(nameof(InjectorReleases)) as Release[];
+            get => !this.IsServiceClient
+                ? this._injectorReleases
+                : this.GetPipeMemberValue(nameof(InjectorReleases)) as Release[];
 
-                // If we're not a service client, refresh the releases and store them here
-                if (this._injectorReleases == null && this._refreshInjectorReleases())
-                    throw new InvalidOperationException("Error! Failed to refresh injector releases!");
-
-                // Return the newly built list of releases
-                return this._injectorReleases;
-            }
             private set
             {
                 // Check if we're using a service client or not and set the value accordingly
