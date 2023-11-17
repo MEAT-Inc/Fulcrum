@@ -34,13 +34,13 @@ namespace FulcrumSupport
         private static readonly string _installExecutableKey = "InstallExecutable";
 
         // Private static fields holding our Injector App configuration registry keys
-        private static readonly string _injectorRegistryKey = "SOFTWARE\\MEAT Inc\\FulcrumInjector";
+        private static readonly string _injectorRegistryKey = $"{_meatIncRegistryKey}\\FulcrumInjector";
 
         // Private static fields holding our Shim DLL configuration registry keys
-        private static readonly string _shimRegistryKey = "SOFTWARE\\MEAT Inc\\FulcrumShim";
+        private static readonly string _shimRegistryKey = $"{_meatIncRegistryKey}\\FulcrumShim";
         
         // Private static fields holding our Injector Service configuration registry keys
-        private static readonly string _serviceRegistryKey = "SOFTWARE\\MEAT Inc\\FulcrumServices";
+        private static readonly string _serviceRegistryKey = $"{_meatIncRegistryKey}\\FulcrumServices";
         private static readonly string _driveServiceKey = $"{_serviceRegistryKey}\\FulcrumDrive";
         private static readonly string _emailServiceKey = $"{_serviceRegistryKey}\\FulcrumEmail";
         private static readonly string _updaterServiceKey = $"{_serviceRegistryKey}\\FulcrumUpdater";

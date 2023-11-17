@@ -61,7 +61,6 @@ namespace FulcrumService
             [Description("FulcrumEmail")] EMAIL_SERVICE,         // Email Service Type
             [Description("FulcrumUpdater")] UPDATER_SERVICE      // Updater Service Type
         }
-
         /// <summary>
         /// Class object holding the definition for a service instance on the host machine
         /// </summary>
@@ -103,9 +102,9 @@ namespace FulcrumService
             {
                 // Store the path, name, and fallback values here
                 this.ServiceName = ServiceName;
+                this.ServiceInstalled = ServiceInstalled;
                 this.ServicePath = ServicePath ?? "Service Missing!";
                 this.ServiceVersion = ServiceVersion ?? "Service Missing!";
-                this.ServiceInstalled = ServiceInstalled && (ServicePath != null && ServiceVersion != null);
             }
         }
 
@@ -376,7 +375,7 @@ namespace FulcrumService
                 };
 
                 // Make sure this path exists before moving on
-                if (!File.Exists(InstallPath))
+                if (!File.Exists(InstallPath) && !Directory.Exists(InstallPath))
                 {
                     // Set installed state to false and log out this issue
                     _serviceInitLogger.WriteLog($"ERROR! FAILED TO FIND A VALID EXECUTABLE FOR SERVICE {ServiceType.ToDescriptionString()}!");
@@ -407,7 +406,7 @@ namespace FulcrumService
                 };
 
                 // Make sure our version value is not 0.0.0.0
-                if (InstallVersion == "0.0.0.0") 
+                if (InstallVersion == new Version().ToString()) 
                 {
                     // Set installed state to false and log out this issue
                     _serviceInitLogger.WriteLog($"ERROR! FAILED TO FIND A VALID VERSION VALUE FOR SERVICE {ServiceType.ToDescriptionString()}!");

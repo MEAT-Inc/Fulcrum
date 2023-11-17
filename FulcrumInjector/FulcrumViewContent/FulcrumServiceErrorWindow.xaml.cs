@@ -102,7 +102,7 @@ namespace FulcrumInjector.FulcrumViewContent
             get => this._serviceInformation;
             set => this.SetField(ref this._serviceInformation, value);
         }
-        public bool ServicesConfigured => this.ServiceInformation.Any(ServiceInfo => ServiceInfo.ServiceInstalled);
+        public bool ServicesConfigured => this.ServiceInformation.All(ServiceInfo => ServiceInfo.ServiceInstalled);
 
         #endregion // Properties
 

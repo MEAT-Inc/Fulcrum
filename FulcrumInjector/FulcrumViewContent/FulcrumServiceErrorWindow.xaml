@@ -64,11 +64,11 @@
                                 <ColumnDefinition Width="300"/>
                             </Grid.ColumnDefinitions>
                             <Border Grid.Column="0" BorderBrush="White" BorderThickness="0,0,1,0" Margin="0,-5,7,-5">
-                                <CheckBox IsEnabled="False" IsChecked="{Binding ServiceInstalled}" Width="25" Height="25"
+                                <CheckBox IsEnabled="False" IsChecked="{Binding ServiceInstalled, Mode=OneWay}" Width="25" Height="25"
                                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                             </Border>
                             <Border Grid.Column="1" BorderBrush="White" BorderThickness="0,0,1,0" Margin="0,-5,7,-5">
-                                <TextBlock Text="{Binding ServiceName}" FontWeight="DemiBold" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding ServiceName, Mode=OneWay}" FontWeight="DemiBold" VerticalAlignment="Center">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -85,9 +85,9 @@
                                 </TextBlock>
                             </Border>
                             <Border Grid.Column="2" BorderBrush="White" BorderThickness="0,0,1,0" Margin="0,-5,7,-5">
-                                <TextBlock Margin="-1,0,0,0" Text="{Binding ServiceVersion}" Foreground="White" VerticalAlignment="Center"/>
+                                <TextBlock Margin="-1,0,0,0" Text="{Binding ServiceVersion, Mode=OneWay}" Foreground="White" VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock Grid.Column="3" Text="{Binding ServicePath}" VerticalAlignment="Center"
+                            <TextBlock Grid.Column="3" Text="{Binding ServicePath, Mode=OneWay}" VerticalAlignment="Center"
                                        FontSize="11" FontFamily="Consolas" TextWrapping="Wrap" Foreground="White"/>
                         </Grid>
                     </Border>
