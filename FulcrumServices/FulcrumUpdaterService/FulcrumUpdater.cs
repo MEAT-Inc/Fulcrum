@@ -210,6 +210,39 @@ namespace FulcrumUpdaterService
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Updates the injector version information on the class instance.
+        /// </summary>
+        /// <exception cref="AuthenticationException">Thrown when our gir client fails to authorize</exception>
+        public bool RefreshInjectorReleases()
+        {
+            // Make sure we're authorized on the GitHub client first 
+            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
+            if (!this._authorizeGitClient())
+                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
+
+            try
+            {
+                // Pull in the releases and return them out
+                this._injectorReleases = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
+                this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {this._injectorReleases.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+
+                // Parse out the version information and return them out
+                this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
+                this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", this.InjectorVersions)}", LogType.TraceLog);
+                this._serviceLogger.WriteLog($"FOUND LATEST INJECTOR VERSION TO BE {this.LatestInjectorVersion}", LogType.InfoLog);
+
+                // Return out based on how many releases are found
+                return this._injectorReleases.Length != 0;
+            }
+            catch (Exception RefreshVersionsEx)
+            {
+                // Log out our exception and exit out false
+                this._serviceLogger.WriteLog("ERROR! FAILED TO REFRESH INJECTOR VERSIONS!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION THROWN DURING REFRESH ROUTINE IS BEING LOGGED BELOW", RefreshVersionsEx);
+                return false;
+            }
+        }
+        /// <summary>
         /// Checks if a version is ready to be updated or not.
         /// </summary>
         /// <param name="InputVersion">Current Version</param>
@@ -230,7 +263,7 @@ namespace FulcrumUpdaterService
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog); 
-                if (!this._refreshInjectorReleases())
+                if (!this.RefreshInjectorReleases())
                     throw new InvalidOperationException("Error! Failed to refresh Injector Versions!");
             }
 
@@ -266,7 +299,7 @@ namespace FulcrumUpdaterService
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                if (!this._refreshInjectorReleases())
+                if (!this.RefreshInjectorReleases())
                     throw new InvalidOperationException("Error! Failed to refresh Injector Versions!");
             }
 
@@ -304,7 +337,7 @@ namespace FulcrumUpdaterService
             {
                 // IF no versions are found, then refresh them all now
                 this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                if (!this._refreshInjectorReleases())
+                if (!this.RefreshInjectorReleases())
                     throw new InvalidOperationException("Error! Failed to refresh Injector Versions!");
             }
 
@@ -385,39 +418,6 @@ namespace FulcrumUpdaterService
                 // Log our exception and return false 
                 this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW GIT CLIENT!", LogType.ErrorLog);
                 this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
-                return false;
-            }
-        }
-        /// <summary>
-        /// Updates the injector version information on the class instance.
-        /// </summary>
-        /// <exception cref="AuthenticationException">Thrown when our gir client fails to authorize</exception>
-        private bool _refreshInjectorReleases()
-        {
-            // Make sure we're authorized on the GitHub client first 
-            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
-            if (!this._authorizeGitClient())
-                throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
-
-            try
-            {
-                // Pull in the releases and return them out
-                this._injectorReleases = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
-                this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {this._injectorReleases.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
-
-                // Parse out the version information and return them out
-                this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
-                this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", this.InjectorVersions)}", LogType.TraceLog);
-                this._serviceLogger.WriteLog($"FOUND LATEST INJECTOR VERSION TO BE {this.LatestInjectorVersion}", LogType.InfoLog);
-
-                // Return out based on how many releases are found
-                return this._injectorReleases.Length != 0;
-            }
-            catch (Exception RefreshVersionsEx)
-            {
-                // Log out our exception and exit out false
-                this._serviceLogger.WriteLog("ERROR! FAILED TO REFRESH INJECTOR VERSIONS!", LogType.ErrorLog);
-                this._serviceLogger.WriteException("EXCEPTION THROWN DURING REFRESH ROUTINE IS BEING LOGGED BELOW", RefreshVersionsEx);
                 return false;
             }
         }

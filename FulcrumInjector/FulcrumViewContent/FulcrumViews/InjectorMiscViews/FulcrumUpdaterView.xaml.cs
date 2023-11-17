@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -66,6 +67,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
         /// <param name="e">Events attached to it.</param>
         private void FulcrumUpdaterView_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // Refresh our releases here
+            if (!this.ViewModel.GitHubUpdateHelper.RefreshInjectorReleases())
+                throw new InvalidOperationException("Error! Failed to refresh injector releases!");
+
             // Build in the release notes contents here
             var XamlReleaseNotes = Markdown.ToXaml(
                 this.ViewModel.GitHubUpdateHelper.LatestInjectorReleaseNotes,
