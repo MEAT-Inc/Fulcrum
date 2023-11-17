@@ -148,20 +148,12 @@ namespace FulcrumService
                 throw new InvalidOperationException("Error! Pipe action type and service type do not match!");
             }
 
-            // Queue the command for our pipe and store it if it's a new unique action
-            string PipeActionGuid = PipeAction.PipeActionGuid.ToString("D").ToUpper();
-            this._servicePipeLogger.WriteLog($"QUEUEING AND SENDING NEW PIPE ACTION NOW...", LogType.InfoLog);
-            this._servicePipeLogger.WriteLog($"PIPE ACTION GUID:  {PipeActionGuid}");
-            this._servicePipeLogger.WriteLog($"PIPE ACTION NAME: {PipeAction.PipeActionName}");
-            this._servicePipeLogger.WriteLog($"PIPE ACTION TYPE: {PipeAction.ReflectionType.ToDescriptionString()}");
-
             // Write our pipe action as a JSON string to our host pipe here
             string PipeActionJson = JsonConvert.SerializeObject(PipeAction);
             this._servicePipeWriter.WriteLine(PipeActionJson);
             this._servicePipeWriter.Flush();
 
-            // Log out that we've sent this action out to be invoked and fire an event for it
-            this._servicePipeLogger.WriteLog($"QUEUED PIPE ACTION {PipeActionGuid} CORRECTLY! EXECUTING WHEN READY!", LogType.InfoLog);
+            // Return passed once we've invoked our pipe routine
             return true;
         }
         /// <summary>
@@ -186,12 +178,11 @@ namespace FulcrumService
 
                 // Once we've got a valid JSON entry for our pipe content, process it and check the GUID
                 PipeAction = JsonConvert.DeserializeObject<FulcrumServicePipeAction>(NextActionString);
-                if (PipeAction.PipeActionGuid != ActionGuid) continue;
+                if (PipeAction?.PipeActionGuid != ActionGuid) continue;
 
                 // Invoke an action completed event to pull in our new pipe action object
                 PipeAction.IsExecuted = true;
                 this.PipeActionCompleted?.Invoke(this, PipeAction);
-                this._servicePipeLogger.WriteLog($"PROCESSED PIPE ACTION {ActionGuid.ToString("D").ToUpper()} RESPONSE CORRECTLY!", LogType.InfoLog);
                 return true; 
             }
             
