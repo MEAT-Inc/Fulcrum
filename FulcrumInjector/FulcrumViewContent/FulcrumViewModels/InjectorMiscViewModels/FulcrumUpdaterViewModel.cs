@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Windows.Controls;
@@ -17,11 +18,51 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
     public class FulcrumUpdaterViewModel : FulcrumViewModelBase
     {
         #region Custom Events
+
+        // Event for download progress
+        private EventHandler<DownloadDataCompletedEventArgs> OnUpdaterComplete;
+        private EventHandler<DownloadProgressChangedEventArgs> OnUpdaterProgress;
+
+        /// <summary>
+        /// Event handler routine for when download progress is updated
+        /// </summary>
+        /// <param name="SendingUpdater">Updater who sent this event</param>
+        /// <param name="UpdateArgs">Arguments fired with this event</param>
+        private void _updateDownloadProgressEvent(object SendingUpdater, DownloadProgressChangedEventArgs UpdateArgs)
+        {
+            // Start by getting the current progress update value and set is downloading to true
+            this.IsDownloading = true;
+            this.DownloadProgress = UpdateArgs.ProgressPercentage;
+            this.DownloadTimeElapsed = this.DownloadTimeElapsed;
+            this.DownloadTimeRemaining = this.DownloadTimeRemaining;
+
+            // Log the current byte count output
+            string CurrentSize = UpdateArgs.BytesReceived.ToString();
+            string TotalSize = UpdateArgs.TotalBytesToReceive.ToString();
+        }
+        /// <summary>
+        /// Event handler routine for when download progress is completed
+        /// </summary>
+        /// <param name="SendingUpdater">Updater who sent this event</param>
+        /// <param name="UpdateArgs">Arguments fired with this event</param>
+        private void _updateDownloadCompleteProgressEvent(object SendingUpdater, DownloadDataCompletedEventArgs UpdateArgs)
+        {
+            // Update current progress to 100% and set is downloading state to false.
+            this.IsDownloading = false;
+            this.DownloadProgress = 100;
+            this.DownloadTimeElapsed = this.DownloadTimeElapsed;
+            this.DownloadTimeRemaining = "Download Done!";
+
+            // Log done downloading and update values for the view model
+            this.ViewModelLogger.WriteLog("DOWNLOADING COMPLETED WITHOUT ISSUES!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"TOTAL DOWNLOAD TIME ELAPSED: {this.DownloadTimeElapsed}");
+        }
+
         #endregion // Custom Events
 
         #region Fields
 
-        // GitHub Updater Client
+        // GitHub Updater Client service
         public readonly FulcrumUpdater GitHubUpdateHelper;
 
         // Private backing fields for our public properties
@@ -70,6 +111,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.GitHubUpdateHelper = FulcrumUpdater.InitializeUpdaterService().Result;
             this.ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 
+            // Build action for downloading in progress
+            this.OnUpdaterProgress += _updateDownloadProgressEvent;
+            this.OnUpdaterComplete += _updateDownloadCompleteProgressEvent;
+            this.ViewModelLogger.WriteLog("HOOKED NEW EVENTS FOR DOWNLOAD PROGRESS ON UPDATE HELPER CORRECTLY!", LogType.InfoLog);
+
             // Check for force update toggle
             bool ForceUpdate = ValueLoaders.GetConfigValue<bool>("FulcrumServices.FulcrumUpdaterService.ForceUpdateReady");
             if (ForceUpdate) this.ViewModelLogger.WriteLog("WARNING! FORCING UPDATES IS ON! ENSURING SHOW UPDATE BUTTON IS VISIBLE!", LogType.WarnLog);
@@ -87,11 +133,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             }
 
             // Now setup view content for update ready.
-            this.UpdateReady = true;
-            this._initializeUpdaterClientEvents();
-
-            // Log completed building view model instance and exit out
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
+            this.UpdateReady = true;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -104,13 +147,38 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             // Start by invoking a new download of the newest version
             this.IsDownloading = true;
             string LatestTag = this.GitHubUpdateHelper.LatestInjectorVersion;
+            string AssetDownloadUrl = this.GitHubUpdateHelper.GetInjectorAssetUrl(LatestTag);
+            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{LatestTag}.msi");
             this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
-            string OutputAssetPath = this.GitHubUpdateHelper.DownloadInjectorRelease(LatestTag, out string AssetUrl);
+            this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+
+            // Return the URL of the path to download here
+            Stopwatch DownloadTimer = new Stopwatch();
+            WebClient AssetDownloadHelper = new WebClient();
+            AssetDownloadHelper.DownloadDataCompleted += (Sender, Args) => this.OnUpdaterComplete.Invoke(this, Args);
+            AssetDownloadHelper.DownloadProgressChanged += (Sender, Args) =>
+            {
+                // Invoke the event for progress changed if it's not null
+                this.OnUpdaterProgress?.Invoke(this, Args);
+
+                // Find our approximate time left
+                var ApproximateMillisLeft = DownloadTimer.ElapsedMilliseconds * Args.TotalBytesToReceive / Args.BytesReceived;
+                TimeSpan ApproximateToSpan = TimeSpan.FromMilliseconds(ApproximateMillisLeft);
+                this.DownloadTimeElapsed = DownloadTimer.Elapsed.ToString("mm:ss");
+                this.DownloadTimeRemaining = ApproximateToSpan.ToString("mm:ss");
+            };
+
+            // Log done building setup and download the version output here
+            DownloadTimer.Start();
+            this.ViewModelLogger.WriteLog("BUILT NEW WEB CLIENT FOR DOWNLOADING ASSETS OK! STARTING DOWNLOAD NOW...", LogType.InfoLog);
+            AssetDownloadHelper.DownloadFile(AssetDownloadUrl, DownloadFilePath); DownloadTimer.Stop();
+            this.ViewModelLogger.WriteLog($"TOTAL DOWNLOAD TIME TAKEN: {this.DownloadTimeElapsed}");
 
             // Log done downloading and return the path
-            this.ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {OutputAssetPath} OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {DownloadFilePath} OK!", LogType.InfoLog);
             this.IsDownloading = false;
-            return OutputAssetPath;
+            return DownloadFilePath;
         }
         /// <summary>
         /// Installs a new version of the Injector application from the given MSI path
@@ -145,55 +213,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             InstallNewReleaseProcess.Start();
             InstallNewReleaseProcess.CloseMainWindow();
             return true;
-        }
-
-        /// <summary>
-        /// Configures updater event objects for when downloads are in the works
-        /// </summary>
-        private void _initializeUpdaterClientEvents()
-        {
-            // Build action for downloading in progress
-            this.GitHubUpdateHelper.OnUpdaterProgress += _updateDownloadProgressEvent;
-            this.GitHubUpdateHelper.OnUpdaterComplete += _updateDownloadCompleteProgressEvent;
-
-            // Log done and exit routine
-            this.ViewModelLogger.WriteLog("BUILT EVENTS FOR PROGRESS MONITORING CORRECTLY!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog("DOWNLOAD PROGRESS WILL BE TRACKED AND UPDATED AS FILES ARE PULLED IN", LogType.InfoLog);
-        }
-        /// <summary>
-        /// Event handler routine for when download progress is updated
-        /// </summary>
-        /// <param name="SendingUpdater">Updater who sent this event</param>
-        /// <param name="UpdateArgs">Arguments fired with this event</param>
-        private void _updateDownloadProgressEvent(object SendingUpdater, DownloadProgressChangedEventArgs UpdateArgs)
-        {
-            // Start by getting the current progress update value and set is downloading to true
-            this.IsDownloading = true;
-            this.DownloadProgress = UpdateArgs.ProgressPercentage;
-            this.DownloadTimeElapsed = GitHubUpdateHelper.DownloadTimeElapsed;
-            this.DownloadTimeRemaining = GitHubUpdateHelper.DownloadTimeRemaining;
-
-            // Log the current byte count output
-            string CurrentSize = UpdateArgs.BytesReceived.ToString();
-            string TotalSize = UpdateArgs.TotalBytesToReceive.ToString();
-            this.ViewModelLogger.WriteLog($"CURRENT DOWNLOAD PROGRESS: {CurrentSize} OF {TotalSize}");
-        }
-        /// <summary>
-        /// Event handler routine for when download progress is completed
-        /// </summary>
-        /// <param name="SendingUpdater">Updater who sent this event</param>
-        /// <param name="UpdateArgs">Arguments fired with this event</param>
-        private void _updateDownloadCompleteProgressEvent(object SendingUpdater, DownloadDataCompletedEventArgs UpdateArgs)
-        {
-            // Update current progress to 100% and set is downloading state to false.
-            this.IsDownloading = false;
-            this.DownloadProgress = 100;
-            this.DownloadTimeElapsed = GitHubUpdateHelper.DownloadTimeElapsed;
-            this.DownloadTimeRemaining = "Download Done!";
-
-            // Log done downloading and update values for the view model
-            this.ViewModelLogger.WriteLog("DOWNLOADING COMPLETED WITHOUT ISSUES!", LogType.InfoLog);
-            this.ViewModelLogger.WriteLog($"TOTAL DOWNLOAD TIME ELAPSED: {GitHubUpdateHelper.DownloadTimeElapsed}");
         }
     }
 }

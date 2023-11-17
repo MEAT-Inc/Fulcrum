@@ -25,7 +25,7 @@ using System.Resources;
 // [assembly: InternalsVisibleTo("FulcrumWatchdogService")]
 
 // Version information
-[assembly: AssemblyVersion("0.5.5.171")]
-[assembly: AssemblyFileVersion("0.5.5.171")]
+[assembly: AssemblyVersion("0.5.5.172")]
+[assembly: AssemblyFileVersion("0.5.5.172")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
