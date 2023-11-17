@@ -62,6 +62,53 @@ namespace FulcrumService
             [Description("FulcrumUpdater")] UPDATER_SERVICE      // Updater Service Type
         }
 
+        /// <summary>
+        /// Class object holding the definition for a service instance on the host machine
+        /// </summary>
+        public class FulcrumServiceInfo
+        {
+            #region Custom Events
+            #endregion // Custom Events
+
+            #region Fields
+            #endregion // Fields
+
+            #region Properties
+
+            // Public facing properties for our service installed state
+            public string ServiceName { get; internal set; }
+            public string ServicePath { get; internal set; }
+            public string ServiceVersion { get; internal set; }
+            public bool ServiceInstalled { get; internal set; }
+
+            #endregion // Properties
+
+            #region Structs and Classes
+            #endregion // Structs and Classes
+
+            // --------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Default CTOR for a service information object
+            /// </summary>
+            public FulcrumServiceInfo() { }
+            /// <summary>
+            /// Spawns a new service information object with the given configuration
+            /// </summary>
+            /// <param name="ServiceName">Name of the service object being checked</param>
+            /// <param name="ServicePath">Path to the service object being checked</param>
+            /// <param name="ServiceVersion">Version of the service object being checked</param>
+            /// <param name="ServiceInstalled">Tells us if the given service is installed or not</param>
+            public FulcrumServiceInfo(string ServiceName, string ServicePath = null, string ServiceVersion = null, bool ServiceInstalled = false)
+            {
+                // Store the path, name, and fallback values here
+                this.ServiceName = ServiceName;
+                this.ServicePath = ServicePath ?? "Service Missing!";
+                this.ServiceVersion = ServiceVersion ?? "Service Missing!";
+                this.ServiceInstalled = ServiceInstalled && (ServicePath != null && ServiceVersion != null);
+            }
+        }
+
         #endregion // Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -281,6 +328,111 @@ namespace FulcrumService
                 this._serviceLogger.WriteLog("SERVICE INSTANCE IS BEING INVOKED DIRECTLY!", LogType.WarnLog);
                 this.Stop();
             }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Builds a new collection of service information objects for all service types
+        /// </summary>
+        /// <returns>A collection of service status objects</returns>
+        public static FulcrumServiceInfo[] GetServiceStates()
+        {
+            // Find all of our enum values and pull each one here for the service type given
+            _serviceInitLogger.WriteLog("GENERATING SERVICE INFORMATION FOR ALL SERVICES NOW...", LogType.WarnLog);
+            var ServiceInstanceTypes = Enum.GetValues(typeof(ServiceTypes))
+                .Cast<ServiceTypes>()
+                .ToArray();
+
+            // Iterate all the service types and return new values for them here 
+            return ServiceInstanceTypes.Select(GetServiceState).ToArray();
+        }
+        /// <summary>
+        /// Builds a new service information object for the given service type
+        /// </summary>
+        /// <param name="ServiceType">The type of service we're building a configuration for</param>
+        /// <returns>The status object for this service instance</returns>
+        public static FulcrumServiceInfo GetServiceState(ServiceTypes ServiceType)
+        {
+            // Store temp variables for service state values 
+            bool ServiceInstalled = true;
+            string InstallPath = "Service Missing!";
+            string InstallVersion = "Service Missing!";
+
+            // Log out what service we're building information for
+            _serviceInitLogger.WriteLog($"GENERATING SERVICE INFORMATION FOR SERVICE TYPE {ServiceType.ToDescriptionString()}...");
+
+            try
+            {
+                // Find our install path using the registry helper object here
+                InstallPath = ServiceType switch
+                {
+                    ServiceTypes.DRIVE_SERVICE => RegistryControl.DriveServiceExecutable,
+                    ServiceTypes.EMAIL_SERVICE => RegistryControl.EmailServiceExecutable,
+                    ServiceTypes.BASE_SERVICE => RegistryControl.InjectorServiceInstallPath,
+                    ServiceTypes.UPDATER_SERVICE => RegistryControl.UpdaterServiceExecutable,
+                    ServiceTypes.WATCHDOG_SERVICE => RegistryControl.WatchdogServiceExecutable,
+                    _ => throw new Exception($"Error! Service type {ServiceType.ToDescriptionString()} does not have an install path!")
+                };
+
+                // Make sure this path exists before moving on
+                if (!File.Exists(InstallPath))
+                {
+                    // Set installed state to false and log out this issue
+                    _serviceInitLogger.WriteLog($"ERROR! FAILED TO FIND A VALID EXECUTABLE FOR SERVICE {ServiceType.ToDescriptionString()}!");
+                    ServiceInstalled = false;
+                }
+            }
+            catch (Exception FindServicePathEx)
+            {
+                // Log out that we failed to find a path for the requested service
+                _serviceInitLogger.WriteLog($"ERROR! FAILED TO FIND INSTALL PATH FOR SERVICE TYPE {ServiceType.ToDescriptionString()}!", LogType.ErrorLog);
+                _serviceInitLogger.WriteException("EXCEPTION DURING LOOKUP ROUTINE IS BEING LOGGED BELOW", FindServicePathEx);
+
+                // Set our installed state to false 
+                ServiceInstalled = false;
+            }
+
+            try
+            {
+                // Find our install version using the registry helper object here
+                InstallVersion = ServiceType switch
+                {
+                    ServiceTypes.DRIVE_SERVICE => RegistryControl.DriveServiceVersion.ToString(),
+                    ServiceTypes.EMAIL_SERVICE => RegistryControl.EmailServiceVersion.ToString(),
+                    ServiceTypes.BASE_SERVICE => RegistryControl.InjectorServiceVersion.ToString(),
+                    ServiceTypes.UPDATER_SERVICE => RegistryControl.UpdaterServiceVersion.ToString(),
+                    ServiceTypes.WATCHDOG_SERVICE => RegistryControl.WatchdogServiceVersion.ToString(),
+                    _ => throw new Exception($"Error! Service type {ServiceType.ToDescriptionString()} does not have an install version!")
+                };
+
+                // Make sure our version value is not 0.0.0.0
+                if (InstallVersion == "0.0.0.0") 
+                {
+                    // Set installed state to false and log out this issue
+                    _serviceInitLogger.WriteLog($"ERROR! FAILED TO FIND A VALID VERSION VALUE FOR SERVICE {ServiceType.ToDescriptionString()}!");
+                    ServiceInstalled = false;
+                }
+            }
+            catch (Exception FindServiceVersionEx)
+            {
+                // Log out that we failed to find a path for the requested service
+                _serviceInitLogger.WriteLog($"ERROR! FAILED TO FIND INSTALL VERSION FOR SERVICE TYPE {ServiceType.ToDescriptionString()}!", LogType.ErrorLog);
+                _serviceInitLogger.WriteException("EXCEPTION DURING LOOKUP ROUTINE IS BEING LOGGED BELOW", FindServiceVersionEx);
+
+                // Set our installed state to false 
+                ServiceInstalled = false;
+            }
+
+            // Build a new service state object here and add it to our collection of services
+            _serviceInitLogger.WriteLog($"GENERATED NEW SERVICE INFORMATION FOR SERVICE {ServiceType.ToDescriptionString()}!", LogType.InfoLog);
+            return new FulcrumServiceInfo()
+            {
+                ServicePath = InstallPath,
+                ServiceVersion = InstallVersion,
+                ServiceInstalled = ServiceInstalled,
+                ServiceName = ServiceType.ToDescriptionString(),
+            };
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

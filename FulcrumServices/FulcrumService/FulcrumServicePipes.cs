@@ -294,7 +294,6 @@ namespace FulcrumService
                         string PipeActionResult = JsonConvert.SerializeObject(PipeAction);
                         this._servicePipeWriter.WriteLine(PipeActionResult);
                         this._servicePipeWriter.Flush();
-                        this._servicePipe.Disconnect();
                     }
                     catch (Exception ReadPipeDataEx)
                     {

@@ -19,23 +19,20 @@
                 <Setter Property="TextAlignment" Value="Justify"/>
                 <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
             </Style>
-            <Style x:Key="KeyValueTitleTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="DemiBold"/>
-                <Setter Property="TextWrapping" Value="Wrap"/>
-                <Setter Property="TextAlignment" Value="Justify"/>
-                <Setter Property="Foreground" Value="Yellow"/>
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style> 
 
-            <!-- Entry Content Style -->
-            <Style x:Key="KeyValueInputBoxStyle" TargetType="TextBox">
-                <Setter Property="Margin" Value="5,5"/>
+            <!-- Service State ListBox Style -->
+            <Style x:Key="ServiceStateListBoxStyle" TargetType="ListBox">
+                <Setter Property="Margin" Value="10"/>
                 <Setter Property="Background" Value="Black"/>
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+                <Setter Property="BorderBrush" Value="White"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+            <Style x:Key="ServiceStateListBoxItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True" >
+                        <Setter Property="FontWeight" Value="DemiBold" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
         </ResourceDictionary>

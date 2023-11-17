@@ -288,7 +288,7 @@
 		                        <RegistryKey Root="HKLM" Id="WatchdogServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumWatchdog" Action="createAndRemoveOnUninstall">
 			                        <RegistryValue Id="WatchdogServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]" />
 			                        <RegistryValue Id="WatchdogServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMWATCHDOGSERVICE.EXE)" />
-			                        <RegistryValue Id="WatchdogServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]FulcrumWatchdog.exe" />
+			                        <RegistryValue Id="WatchdogServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]FulcrumWatchdogService.exe" />
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="WatchdogServiceProgramFiles" Guid="A53BA067-BCEE-4802-8407-E6948F1AAB4F">
@@ -320,7 +320,7 @@
 		                        <RegistryKey Root="HKLM" Id="DriveServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumDrive" Action="createAndRemoveOnUninstall">
 			                        <RegistryValue Id="DriveServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]" />
 			                        <RegistryValue Id="DriveServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMDRIVESERVICE.EXE)" />
-			                        <RegistryValue Id="DriveServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]FulcrumEmailService.exe" />
+			                        <RegistryValue Id="DriveServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]FulcrumDriveService.exe" />
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="DriveServiceProgramFiles" Guid="420C72D7-A383-4E5A-9DA5-4AA8A5876EE5">
@@ -358,7 +358,7 @@
 		                        <RegistryKey Root="HKLM" Id="UpdaterServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumUpdater" Action="createAndRemoveOnUninstall">
 			                        <RegistryValue Id="UpdaterServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]" />
 			                        <RegistryValue Id="UpdaterServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMUPDATERSERVICE.EXE)" />
-			                        <RegistryValue Id="UpdaterServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]FulcrumUpdater.exe" />
+			                        <RegistryValue Id="UpdaterServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]FulcrumUpdaterService.exe" />
 		                        </RegistryKey>
 	                        </Component>
 	                        <Component Id="UpdaterServiceProgramFiles" Guid="5D0D1D69-02A7-4BE3-A76B-CA11F9266819">
