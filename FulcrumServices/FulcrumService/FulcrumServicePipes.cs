@@ -279,8 +279,7 @@ namespace FulcrumService
 
                         // If the invoke routine passed, serialize and return out our pipe action content here
                         if (!ActionInvoked) this._servicePipeLogger.WriteLog("WARNING! PIPE ACTION FAILED TO EXECUTE!", LogType.WarnLog);
-                        this._servicePipeLogger.WriteLog("RESPONDING TO PIPE ACTION REQUEST WITH UPDATED PIPE OBJECT VALUES NOW...", LogType.InfoLog);
-
+                        
                         // Serialize our pipe action object and write it out to our client object
                         string PipeActionResult = JsonConvert.SerializeObject(PipeAction);
                         this._servicePipeWriter.WriteLine(PipeActionResult);
