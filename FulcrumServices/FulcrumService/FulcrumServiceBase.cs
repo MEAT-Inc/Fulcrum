@@ -230,6 +230,16 @@ namespace FulcrumService
             this.ServiceName = this.ServiceType.ToDescriptionString();
             this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}Service_Logger");
 
+            // Build an exception handler to catch all exceptions on our service instance to avoid crashes
+            AppDomain CurrentDomain = AppDomain.CurrentDomain;
+            CurrentDomain.UnhandledException += (_, ExceptionArgs) =>
+            {
+                // Now log the exception thrown and process the exception to a handled state
+                if (ExceptionArgs.ExceptionObject is not Exception CastException) return;
+                string ExInfo = $"UNHANDLED APP LEVEL {CastException.GetType().Name} EXCEPTION PROCESSED AT {DateTime.Now:g}!";
+                this._serviceLogger.WriteException(ExInfo, (Exception)ExceptionArgs.ExceptionObject, LogType.ErrorLog);
+            };
+
             // See if this assembly is a direct instance of a service object or not first
             Assembly EntryAssembly = Assembly.GetEntryAssembly();
             if (EntryAssembly.FullName.Contains($"{this.ServiceName}Service"))

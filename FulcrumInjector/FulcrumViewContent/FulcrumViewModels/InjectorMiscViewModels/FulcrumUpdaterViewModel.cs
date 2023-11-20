@@ -2,13 +2,22 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Xaml;
 using FulcrumInjector.FulcrumViewSupport;
+using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using FulcrumJson;
 using FulcrumUpdaterService;
 using SharpLogging;
+
+// Using calls for MarkDig conversion routines
+using Markdig;
+using Markdown = Markdig.Wpf.Markdown;
+using XamlReader = System.Windows.Markup.XamlReader;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels
 {
@@ -35,10 +44,6 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.DownloadProgress = UpdateArgs.ProgressPercentage;
             this.DownloadTimeElapsed = this.DownloadTimeElapsed;
             this.DownloadTimeRemaining = this.DownloadTimeRemaining;
-
-            // Log the current byte count output
-            string CurrentSize = UpdateArgs.BytesReceived.ToString();
-            string TotalSize = UpdateArgs.TotalBytesToReceive.ToString();
         }
         /// <summary>
         /// Event handler routine for when download progress is completed
@@ -71,6 +76,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         private double _downloadProgress;         // Progress for when downloads are in the works
         private string _downloadTimeElapsed;      // Time downloading spent so far
         private string _downloadTimeRemaining;    // Approximate time left on the download
+        private string _latestInjectorVersion;    // The latest version of the injector application ready
 
         #endregion // Fields
 
@@ -82,6 +88,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         public double DownloadProgress { get => _downloadProgress; set => PropertyUpdated(value); }
         public string DownloadTimeElapsed { get => _downloadTimeElapsed; set => PropertyUpdated(value); }
         public string DownloadTimeRemaining { get => _downloadTimeRemaining; set => PropertyUpdated(value); }
+        public string LatestInjectorVersion { get => _latestInjectorVersion; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -107,14 +114,14 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.DownloadTimeElapsed = "00:00";
             this.DownloadTimeRemaining = "N/A";
 
-            // Build new update helper
-            this.GitHubUpdateHelper = FulcrumUpdater.InitializeUpdaterService().Result;
-            this.ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
-
             // Build action for downloading in progress
             this.OnUpdaterProgress += _updateDownloadProgressEvent;
             this.OnUpdaterComplete += _updateDownloadCompleteProgressEvent;
             this.ViewModelLogger.WriteLog("HOOKED NEW EVENTS FOR DOWNLOAD PROGRESS ON UPDATE HELPER CORRECTLY!", LogType.InfoLog);
+
+            // Build new update helper
+            this.GitHubUpdateHelper = FulcrumUpdater.InitializeUpdaterService().Result;
+            this.ViewModelLogger.WriteLog("BUILT NEW UPDATE HELPER OK! UPDATE CHECK HAS PASSED! READY TO INVOKE NEW UPDATE IF NEEDED", LogType.InfoLog);
 
             // Check for force update toggle
             bool ForceUpdate = ValueLoaders.GetConfigValue<bool>("FulcrumServices.FulcrumUpdaterService.ForceUpdateReady");
@@ -122,7 +129,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Check for our updates now.
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
-            if (!this.GitHubUpdateHelper.CheckAgainstVersion(FulcrumVersionInfo.InjectorVersionString) && !ForceUpdate)
+            if (!this.GitHubUpdateHelper.CheckForUpdate(FulcrumVersionInfo.InjectorVersionString, out this._latestInjectorVersion) && !ForceUpdate)
             {
                 // Log out that no update is ready and that we've constructed a view model correctly
                 this.ViewModelLogger.WriteLog("NO UPDATE FOUND! MOVING ON TO MAIN EXECUTION ROUTINE", LogType.WarnLog);
@@ -140,14 +147,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         /// <summary>
         /// Invokes a new download on the git hub helper to pull in the newest release of the injector
         /// </summary>
+        /// <returns>The path to the downloaded injector installer</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the version requested can not be found</exception>
         public string InvokeInjectorDownload()
         {
-            // Start by invoking a new download of the newest version
+            // Start by finding the version of the injector we wish to update to
             this.IsDownloading = true;
-            string LatestTag = this.GitHubUpdateHelper.LatestInjectorVersion;
-            string AssetDownloadUrl = this.GitHubUpdateHelper.GetInjectorAssetUrl(LatestTag);
-            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{LatestTag}.msi");
-            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {LatestTag} NOW...", LogType.InfoLog);
+            string AssetDownloadUrl = this.GitHubUpdateHelper.GetInjectorInstallerUrl(this.LatestInjectorVersion);
+            if (string.IsNullOrWhiteSpace(AssetDownloadUrl))
+                throw new InvalidOperationException($"Error! Failed to find injector version {this.LatestInjectorVersion}!");
+
+            // Build our download path for the pulled asset/installer version
+            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{this.LatestInjectorVersion}.msi");
+            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion} NOW...", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
 
@@ -174,43 +186,32 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog($"TOTAL DOWNLOAD TIME TAKEN: {this.DownloadTimeElapsed}");
 
             // Log done downloading and return the path
-            this.ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {LatestTag} TO PATH {DownloadFilePath} OK!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog($"DOWNLOADED RELEASE {this.LatestInjectorVersion} TO PATH {DownloadFilePath} OK!", LogType.InfoLog);
             this.IsDownloading = false;
             return DownloadFilePath;
         }
         /// <summary>
-        /// Installs a new version of the Injector application from the given MSI path
+        /// Pulls in the release notes for the latest injector version and builds a flow document to show on the UI for the updater
         /// </summary>
-        /// <param name="PathToInstaller">Path to the installer to run</param>
-        /// <returns>True if started, false if not.</returns>
-        public bool InstallInjectorRelease(string PathToInstaller)
+        /// <returns>A flow document holding release notes for the injector version requested</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the conversion to a flow document fails</exception>
+        public FlowDocument BuildInjectorReleaseNotes()
         {
-            // Setup our string for the command to run.
-            string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {PathToInstaller}";
-            if (!File.Exists(PathToInstaller)) {
-                this.ViewModelLogger.WriteLog($"PATH {PathToInstaller} DOES NOT EXIST ON THE SYSTEM! UNABLE TO INSTALL A NEW VERSION!", LogType.ErrorLog);
-                return false; 
-            }
+            // Pull the release notes for our latest release version and build a new XML document for them
+            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE NOTES FOR VERSION {this.LatestInjectorVersion} NOW...", LogType.InfoLog); 
+            string ReleaseNotes = this.GitHubUpdateHelper.GetInjectorReleaseNotes(this.LatestInjectorVersion);
+            var XamlReleaseNotes = Markdown.ToXaml(ReleaseNotes, new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
 
-            // Build a process object and setup a CMD line call to install our new version
-            Process InstallNewReleaseProcess = new Process();
-            InstallNewReleaseProcess.StartInfo = new ProcessStartInfo()
-            {
-                Verb = "runas",                   // Set this to run as admin
-                FileName = "cmd.exe",             // Boot a CMD window
-                CreateNoWindow = true,            // Create no window on output
-                UseShellExecute = false,          // Shell execution
-                Arguments = InvokeUpdateString,   // Args to invoke.
-            };
+            // Now append the contents of the markdown into our output viewer
+            using var MemStream = new MemoryStream(Encoding.UTF8.GetBytes(XamlReleaseNotes));
+            using var XamlToXmlReader = new XamlXmlReader(MemStream, new MarkdownXamlSchemaContext());
+            if (XamlReader.Load(XamlToXmlReader) is not FlowDocument OutputDocument)
+                throw new InvalidOperationException("Error! Release notes converted were not seen to be a FlowDocument type!");
 
-            // Log starting updates and return true
-            this.ViewModelLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
-            this.ViewModelLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
-
-            // Boot the update and return true
-            InstallNewReleaseProcess.Start();
-            InstallNewReleaseProcess.CloseMainWindow();
-            return true;
+            // Return the built flow document object here
+            this.ViewModelLogger.WriteLog($"BUILD AND SAVED RELEASE NOTES FOR VERSION {this.LatestInjectorVersion} CORRECTLY!", LogType.InfoLog);
+            this.ViewModelLogger.WriteLog("RETURNING RELEASE NOTES FLOW DOCUMENT OBJECT NOW...", LogType.InfoLog);
+            return OutputDocument;
         }
     }
 }

@@ -319,7 +319,7 @@ namespace FulcrumInjector
 
             // If no debugger is found, just spawn service instances and wait for creation
             FulcrumEmail.InitializeEmailService();
-            FulcrumDrive.InitializeDriveService();
+            FulcrumDrive.InitializeDriveService(); 
             FulcrumUpdater.InitializeUpdaterService();
             FulcrumWatchdog.InitializeWatchdogService();
 

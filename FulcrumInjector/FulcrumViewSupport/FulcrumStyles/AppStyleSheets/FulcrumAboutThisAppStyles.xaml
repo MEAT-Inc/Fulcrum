@@ -43,6 +43,7 @@
             <!-- Version Value Text Box Style -->
             <Style x:Key="VersionValueText" TargetType="TextBox" BasedOn="{StaticResource StaticReadonlyTextBoxStyle}">
                 <Setter Property="Height" Value="25"/>
+                <Setter Property="IsReadOnly" Value="True"/>
                 <Setter Property="FontFamily" Value="Consolas"/>
                 <Setter Property="Foreground" Value="Yellow"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>

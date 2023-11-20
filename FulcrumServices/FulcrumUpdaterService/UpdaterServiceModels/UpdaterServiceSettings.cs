@@ -1,4 +1,5 @@
-﻿using FulcrumEncryption;
+﻿using System;
+using FulcrumEncryption;
 using FulcrumService;
 using FulcrumUpdaterService.JsonConverters;
 using Newtonsoft.Json;
@@ -14,6 +15,9 @@ namespace FulcrumUpdaterService.UpdaterServiceModels
         // Public properties which do not require encryption or decryption
         public bool ForceUpdateReady { get; set; }
         public string UpdaterOrgName { get; set; }
+        public bool IncludePreReleases { get; set; }
+        public TimeSpan RefreshTimerDelay { get; set; }
+        public bool EnableAutomaticUpdates { get; set; }
 
         // Public properties which need to be decrypted or encrypted on conversion routines
         [EncryptedValue] public string UpdaterRepoName { get; set; }
