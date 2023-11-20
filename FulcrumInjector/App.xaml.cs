@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel.Channels;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -66,21 +67,16 @@ namespace FulcrumInjector
             this._configureInjectorLogging();
             this._configureExceptionHandlers();
 
-            // Configure a single instance and setup encryption. Configure exit routine and parse CLI arguments
+            // Configure our application theme, enforce a single instance, and setup our exit routines
+            this._configureCurrentTheme();
             this._configureSingleInstance();
             this._configureAppExitRoutine();
-            this._configureCryptographicKeys();
 
-            // Configure settings and app theme
-            this._configureCurrentTheme();
+            // Finally, validate our encryption settings, import user settings, and start our services
             this._configureUserSettings();
+            this._configureCryptographicKeys();
+            this._configureInjectorServices();
 
-            // Boot our service instances here 
-            FulcrumEmail.InitializeEmailService();
-            FulcrumDrive.InitializeDriveService();
-            FulcrumUpdater.InitializeUpdaterService();
-            FulcrumWatchdog.InitializeWatchdogService();
-            
             // Log out that all of our startup routines are complete and prepare to open up the main window instance
             this._appLogger.WriteLog(string.Join(string.Empty, Enumerable.Repeat("=", 200)), LogType.WarnLog);
             this._appLogger.WriteLog("ALL REQUIRED FULCRUM INJECTOR STARTUP ROUTINES ARE DONE! MAIN WINDOW OPENING UP NOW...", LogType.InfoLog);
@@ -172,6 +168,20 @@ namespace FulcrumInjector
             };
         }
         /// <summary>
+        /// Configure new theme setup for instance objects.
+        /// </summary>
+        private void _configureCurrentTheme()
+        {
+            // Log infos and set values.
+            this._appLogger?.WriteLog("SETTING UP MAIN APPLICATION THEME VALUES NOW...", LogType.InfoLog);
+
+            // Set theme configurations
+            ThemeManager.Current.SyncTheme();
+            this.ThemeConfiguration = new AppThemeConfiguration();
+            this.ThemeConfiguration.CurrentAppStyleModel = ThemeConfiguration.PresetThemes[0];
+            this._appLogger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
+        }
+        /// <summary>
         /// Checks for an existing fulcrum process object and kill all but the running one.
         /// </summary>
         private void _configureSingleInstance()
@@ -253,6 +263,16 @@ namespace FulcrumInjector
             this._appLogger?.WriteLog("WHEN OUR APP EXITS OUT, IT WILL INVOKE THE REQUESTED METHOD BOUND", LogType.TraceLog);
         }
         /// <summary>
+        /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
+        /// </summary>
+        private void _configureUserSettings()
+        {
+            // Pull our settings objects out from the settings file.
+            FulcrumConstants.FulcrumSettings = FulcrumSettingsShare.GenerateSettingsShare();
+            this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
+            this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
+        }
+        /// <summary>
         /// Validates the encryption key configuration for the injector application. Will allow a chance to
         /// provide keys to the application if no keys are given in the encryption file for debug runs.
         /// </summary>
@@ -278,28 +298,34 @@ namespace FulcrumInjector
             Environment.Exit(0);
         }
         /// <summary>
-        /// Configure new theme setup for instance objects.
+        /// Configures service objects for use inside the injector application.
+        /// Will either boot services in client consumption mode, or update them using debug builds and reboot them
         /// </summary>
-        private void _configureCurrentTheme()
+        private void _configureInjectorServices()
         {
-            // Log infos and set values.
-            this._appLogger?.WriteLog("SETTING UP MAIN APPLICATION THEME VALUES NOW...", LogType.InfoLog);
+            // Begin by checking service installation state values here 
+            this._appLogger?.WriteLog("VALIDATING INJECTOR SERVICE INSTALL LOCATIONS...", LogType.WarnLog);
+            if (!FulcrumServiceErrorWindow.ValidateServiceConfiguration())
+            {
+                // Log out that we're missing one or more services and 
+                this._appLogger?.WriteLog("ERROR! COULD NOT FIND ALL INJECTOR SERVICES!", LogType.ErrorLog);
+                this._appLogger?.WriteLog("EXITING INJECTOR APPLICATION SINCE IS A FATAL ERROR!", LogType.ErrorLog);
+                Environment.Exit(0);
+            }
 
-            // Set theme configurations
-            ThemeManager.Current.SyncTheme();
-            this.ThemeConfiguration = new AppThemeConfiguration();
-            this.ThemeConfiguration.CurrentAppStyleModel = ThemeConfiguration.PresetThemes[0];
-            this._appLogger?.WriteLog("CONFIGURED NEW APP THEME VALUES OK! THEME HAS BEEN APPLIED TO APP INSTANCE!", LogType.InfoLog);
-        }
-        /// <summary>
-        /// Pulls in the user settings from our JSON configuration file and stores them to the injector store 
-        /// </summary>
-        private void _configureUserSettings()
-        {
-            // Pull our settings objects out from the settings file.
-            FulcrumConstants.FulcrumSettings = FulcrumSettingsShare.GenerateSettingsShare();
-            this._appLogger?.WriteLog($"PULLED IN ALL SETTINGS SEGMENTS OK!", LogType.InfoLog);
-            this._appLogger?.WriteLog("IMPORTED SETTINGS OBJECTS CORRECTLY! READY TO GENERATE UI COMPONENTS FOR THEM NOW...");
+            // Log out that we're building these service instances in a release mode for use
+            this._appLogger?.WriteLog("INJECTOR SERVICE CONFIGURATION IS NORMAL!", LogType.InfoLog);
+            this._appLogger?.WriteLog("BOOTING INJECTOR SERVICE INSTANCES NOW...", LogType.WarnLog);
+
+            // If no debugger is found, just spawn service instances and wait for creation
+            FulcrumEmail.InitializeEmailService();
+            FulcrumDrive.InitializeDriveService(); 
+            FulcrumUpdater.InitializeUpdaterService();
+            FulcrumWatchdog.InitializeWatchdogService();
+
+            // Log out that we've booted all of our service instances here
+            this._appLogger?.WriteLog("BOOTED ALL SERVICE TASKS CORRECTLY!", LogType.InfoLog);
+            this._appLogger?.WriteLog("IF SERVICE ROUTINES FAIL TO EXECUTE, PLEASE ENSURE SERVICE INSTANCES ARE ACTIVE ON THIS MACHINE!", LogType.InfoLog);
         }
     }
 }

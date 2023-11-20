@@ -2,13 +2,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
     <?define ProductVersion="!(bind.fileVersion.FULCRUMINJECTOR.EXE)"?>
-
     <!-- Registry Key Name Variables -->
     <?define InstallPathKeyName="InstallPath"?>
-	<?define InstallVersionKeyName="InstallVersion"?>
-	<?define InstallExecutableKeyName="InstallExecutable"?>
-
-	<!-- Product Definitions -->
+    <?define InstallVersionKeyName="InstallVersion"?>
+    <?define InstallExecutableKeyName="InstallExecutable"?>
+    <!-- Product Definitions -->
     <Product Id="*" Name="FulcrumInjector" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
         <!-- Package Metadata Configuration -->
         <Package InstallerVersion="200" Compressed="yes" />
@@ -30,21 +28,21 @@
             <Directory Id="ProgramMenuFolder" />
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="MeatIncProgramFiles" Name="MEAT Inc">
-	                <Component Id="MeatIncRegistryKey" Guid="2EFF94B1-6D86-408D-B758-41C48F1B64BF">
-		                <RegistryKey Root="HKLM" Id="MeatIncKey" Key="SOFTWARE\MEAT Inc" Action="createAndRemoveOnUninstall">
-			                <RegistryValue Id="MeatIncFiles" Name="InstallPath" Action="write" Type="string" Value="[MeatIncProgramFiles]" />
-		                </RegistryKey>
-	                </Component>
-	                <Directory Id="FulcrumInjectorFiles" Name="FulcrumInjector">
-	                    <Component Id="FulcrumInjectorRegistryKey" Guid="7A1F175A-1CEC-431D-BFE0-EABE1A5F2AD5">
-		                    <RegistryKey Root="HKLM" Id="FulcrumInjectorKey" Key="SOFTWARE\MEAT Inc\FulcrumInjector" Action="createAndRemoveOnUninstall">
-			                    <RegistryValue Id="FulcrumInjectorVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="$(var.ProductVersion)" />
-			                    <RegistryValue Id="FulcrumInjectorInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]" />
-			                    <RegistryValue Id="FulcrumInjectorExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]FulcrumInjector.exe" />
-		                    </RegistryKey>
-	                    </Component>
+                    <Component Id="MeatIncRegistryKey" Guid="2EFF94B1-6D86-408D-B758-41C48F1B64BF">
+                        <RegistryKey Root="HKLM" Id="MeatIncKey" Key="SOFTWARE\MEAT Inc" Action="createAndRemoveOnUninstall">
+                            <RegistryValue Id="MeatIncFiles" Name="InstallPath" Action="write" Type="string" Value="[MeatIncProgramFiles]" />
+                        </RegistryKey>
+                    </Component>
+                    <Directory Id="FulcrumInjectorFiles" Name="FulcrumInjector">
+                        <Component Id="FulcrumInjectorRegistryKey" Guid="7A1F175A-1CEC-431D-BFE0-EABE1A5F2AD5">
+                            <RegistryKey Root="HKLM" Id="FulcrumInjectorKey" Key="SOFTWARE\MEAT Inc\FulcrumInjector" Action="createAndRemoveOnUninstall">
+                                <RegistryValue Id="FulcrumInjectorVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="$(var.ProductVersion)" />
+                                <RegistryValue Id="FulcrumInjectorInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]" />
+                                <RegistryValue Id="FulcrumInjectorExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]FulcrumInjector.exe" />
+                            </RegistryKey>
+                        </Component>
                         <Component Id="FulcrumInjectorProgramFiles" Guid="C0DAD1F0-8592-47F5-8282-5A069D9A6F17">
-	                        <File Id="FULCRUMDRIVESERVICE.EXE_1" Name="FulcrumDriveService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumDriveService.exe" />
+                            <File Id="FULCRUMDRIVESERVICE.EXE_1" Name="FulcrumDriveService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumDriveService.exe" />
                             <File Id="FULCRUMEMAILSERVICE.EXE_1" Name="FulcrumEmailService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumEmailService.exe" />
                             <File Id="FULCRUMUPDATERSERVICE.EXE_1" Name="FulcrumUpdaterService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumUpdaterService.exe" />
                             <File Id="FULCRUMWATCHDOGSERVICE.EXE_1" Name="FulcrumWatchdogService.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumWatchdogService.exe" />
@@ -103,17 +101,17 @@
                             <File Id="SYSTEM.MEMORY.XML" Name="System.Memory.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Memory.xml" />
                             <File Id="SYSTEM.NUMERICS.VECTORS.XML" Name="System.Numerics.Vectors.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Numerics.Vectors.xml" />
                             <File Id="SYSTEM.RUNTIME.COMPILERSERVICES.UNSAFE.XML" Name="System.Runtime.CompilerServices.Unsafe.xml" Source="..\FulcrumInjector\bin\$(var.Configuration)\System.Runtime.CompilerServices.Unsafe.xml" />
-	                        <!-- Injector EXE and Shortcuts -->
-	                        <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
-		                        <!-- Start Menu Shortcut -->
-		                        <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
-			                        <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-		                        </Shortcut>
-		                        <!-- Desktop Shortcut -->
-		                        <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
-			                        <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-		                        </Shortcut>
-	                        </File>
+                            <!-- Injector EXE and Shortcuts -->
+                            <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
+                                <!-- Start Menu Shortcut -->
+                                <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+                                    <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+                                </Shortcut>
+                                <!-- Desktop Shortcut -->
+                                <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+                                    <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+                                </Shortcut>
+                            </File>
                         </Component>
                         <Directory Id="FULCRUMSTYLES" Name="FulcrumStyles">
                             <Component Id="FulcrumStyleFiles" Guid="5E38EFAC-D4AC-4823-A7E8-92FF5C6359AC">
@@ -136,6 +134,7 @@
                                 <File Id="FULCRUMABOUTTHISAPPSTYLES.XAML" Name="FulcrumAboutThisAppStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumSimulationPlaybackStyles.xaml" />
                                 <File Id="FULCRUMUPDATERSTYLES.XAML" Name="FulcrumUpdaterStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumUpdaterStyles.xaml" />
                                 <File Id="FULCRUMGOOGLEDRIVESTYLES.XAML" Name="FulcrumGoogleDriveStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumGoogleDriveStyles.xaml" />
+                                <File Id="FULCRUMSERVICEERRORSTYLES.XAML" Name="FulcrumServiceErrorStyles.xaml" Source="..\FulcrumInjector\FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumServiceErrorStyles.xaml" />
                             </Component>
                         </Directory>
                         <Directory Id="FULCRUMICONS" Name="FulcrumIcons">
@@ -173,7 +172,7 @@
                                 <CreateFolder />
                             </Component>
                         </Directory>
-		                <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
+                        <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
                             <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
                                 <CreateFolder />
                             </Component>
@@ -205,13 +204,13 @@
                         </Directory>
                     </Directory>
                     <Directory Id="FulcrumShimFiles" Name="FulcrumShim">
-	                    <Component Id="FulcrumShimRegistryKey" Guid="0D33DD10-646A-4409-A869-C09D092BF638">
-		                    <RegistryKey Id="FulcrumShimKey" Root="HKLM" Key="SOFTWARE\MEAT Inc\FulcrumShim" Action="createAndRemoveOnUninstall">
-								<RegistryValue Id="ShimInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]" />
-								<RegistryValue Id="ShimVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSHIM.DLL)" />
+                        <Component Id="FulcrumShimRegistryKey" Guid="0D33DD10-646A-4409-A869-C09D092BF638">
+                            <RegistryKey Id="FulcrumShimKey" Root="HKLM" Key="SOFTWARE\MEAT Inc\FulcrumShim" Action="createAndRemoveOnUninstall">
+                                <RegistryValue Id="ShimInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]" />
+                                <RegistryValue Id="ShimVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSHIM.DLL)" />
                                 <RegistryValue Id="ShimDllPath" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]FulcrumShim.dll" />
-							</RegistryKey>
-	                    </Component>
+                            </RegistryKey>
+                        </Component>
                         <Component Id="FulcrumShimProgramFiles" Guid="178B7F66-BAFA-44E0-903E-8028D5DFF924">
                             <File Id="FULCRUMSHIM.DLL" Name="FulcrumShim.dll" Source="..\FulcrumShim\$(var.Configuration)\FulcrumShim.dll" />
                             <File Id="CONCRT140.DLL" Name="concrt140.dll" Source="..\FulcrumShim\$(var.Configuration)\concrt140.dll" />
@@ -277,67 +276,47 @@
                         </Component>
                     </Directory>
                     <Directory Id="FulcrumServices" Name="FulcrumServices">
-						<Component Id="FulcrumServicesRegistryKey" Guid="12557D48-30E2-4035-A576-E587D6A9B547">
-							<RegistryKey Root="HKLM" Id="FulcrumServicesKey" Key="SOFTWARE\MEAT Inc\FulcrumServices" Action="createAndRemoveOnUninstall">
-								<RegistryValue Id="ServicesInstallFolder" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumServices]" />
-								<RegistryValue Id="ServiceBaseVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSERVICE.DLL_4)" />
-							</RegistryKey>
-						</Component>
-	                    <Directory Id="FulcrumWatchdogService" Name="FulcrumWatchdogService">
-	                        <Component Id="WatchdogServiceRegistryKey" Guid="1AF8BA36-D9D4-4CF4-A9D6-9EA9D3BD0758">
-		                        <RegistryKey Root="HKLM" Id="WatchdogServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumWatchdog" Action="createAndRemoveOnUninstall">
-			                        <RegistryValue Id="WatchdogServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]" />
-			                        <RegistryValue Id="WatchdogServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMWATCHDOGSERVICE.EXE)" />
-			                        <RegistryValue Id="WatchdogServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]FulcrumWatchdog.exe" />
-		                        </RegistryKey>
-	                        </Component>
-	                        <Component Id="WatchdogServiceProgramFiles" Guid="A53BA067-BCEE-4802-8407-E6948F1AAB4F">
-		                        <File Id="FULCRUMWATCHDOGSERVICE.EXE" Name="FulcrumWatchdogService.exe" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe"/>
-		                        <ServiceInstall
-			                        Id="WatchdogServiceInstaller"
-			                        Type="ownProcess"
-			                        Name="FulcrumWatchdog"
-			                        DisplayName="Fulcrum Watchdog"
-			                        Description="Service controlled by the FulcrumInjector application which allows us to monitor any desired folders/files and perform scheduled actions"
-			                        Start="auto"
-			                        Account="[SERVICEACCOUNT]"
-			                        Password="[SERVICEPASSWORD]"
-			                        ErrorControl="normal"
-			                        Arguments=" /start"/>
-		                        <ServiceControl Id="StartWatchdogService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumWatchdog" Wait="yes" />
+                        <Component Id="FulcrumServicesRegistryKey" Guid="12557D48-30E2-4035-A576-E587D6A9B547">
+                            <RegistryKey Root="HKLM" Id="FulcrumServicesKey" Key="SOFTWARE\MEAT Inc\FulcrumServices" Action="createAndRemoveOnUninstall">
+                                <RegistryValue Id="ServicesInstallFolder" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumServices]" />
+                                <RegistryValue Id="ServiceBaseVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSERVICE.DLL_4)" />
+                            </RegistryKey>
+                        </Component>
+                        <Directory Id="FulcrumWatchdogService" Name="FulcrumWatchdogService">
+                            <Component Id="WatchdogServiceRegistryKey" Guid="1AF8BA36-D9D4-4CF4-A9D6-9EA9D3BD0758">
+                                <RegistryKey Root="HKLM" Id="WatchdogServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumWatchdog" Action="createAndRemoveOnUninstall">
+                                    <RegistryValue Id="WatchdogServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]" />
+                                    <RegistryValue Id="WatchdogServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMWATCHDOGSERVICE.EXE)" />
+                                    <RegistryValue Id="WatchdogServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]FulcrumWatchdogService.exe" />
+                                </RegistryKey>
+                            </Component>
+                            <Component Id="WatchdogServiceProgramFiles" Guid="A53BA067-BCEE-4802-8407-E6948F1AAB4F">
+                                <File Id="FULCRUMWATCHDOGSERVICE.EXE" Name="FulcrumWatchdogService.exe" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe" />
+                                <ServiceInstall Id="WatchdogServiceInstaller" Type="ownProcess" Name="FulcrumWatchdog" DisplayName="Fulcrum Watchdog" Description="Service controlled by the FulcrumInjector application which allows us to monitor any desired folders/files and perform scheduled actions" Start="auto" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" ErrorControl="normal" Arguments=" /start" />
+                                <ServiceControl Id="StartWatchdogService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumWatchdog" Wait="yes" />
                                 <File Id="FULCRUMENCRYPTION.DLL_3" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
-								<File Id="FULCRUMJSON.DLL_3" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumJson.dll" />
-								<File Id="FULCRUMSERVICE.DLL_3" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumService.dll" />
-								<File Id="FULCRUMSUPPORT.DLL_3" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumSupport.dll" />
-								<File Id="NEWTONSOFT.JSON.DLL_4" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
-								<File Id="NLOG.DLL_4" Name="NLog.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\NLog.dll" />
-								<File Id="SHARPLOGGING.DLL_4" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\SharpLogging.dll" />
-								<File Id="FULCRUMWATCHDOGSERVICE.EXE.CONFIG" Name="FulcrumWatchdogService.exe.config" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe.config" />
-							</Component>
+                                <File Id="FULCRUMJSON.DLL_3" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumJson.dll" />
+                                <File Id="FULCRUMSERVICE.DLL_3" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumService.dll" />
+                                <File Id="FULCRUMSUPPORT.DLL_3" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumSupport.dll" />
+                                <File Id="NEWTONSOFT.JSON.DLL_4" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+                                <File Id="NLOG.DLL_4" Name="NLog.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\NLog.dll" />
+                                <File Id="SHARPLOGGING.DLL_4" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\SharpLogging.dll" />
+                                <File Id="FULCRUMWATCHDOGSERVICE.EXE.CONFIG" Name="FulcrumWatchdogService.exe.config" Source="..\FulcrumServices\FulcrumWatchdogService\bin\$(var.Configuration)\FulcrumWatchdogService.exe.config" />
+                            </Component>
                         </Directory>
                         <Directory Id="FulcrumDriveService" Name="FulcrumDriveService">
-	                        <Component Id="DriveServiceRegistryKey" Guid="65E3149A-C942-44AC-9B7C-FDD00B345954">
-		                        <RegistryKey Root="HKLM" Id="DriveServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumDrive" Action="createAndRemoveOnUninstall">
-			                        <RegistryValue Id="DriveServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]" />
-			                        <RegistryValue Id="DriveServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMDRIVESERVICE.EXE)" />
-			                        <RegistryValue Id="DriveServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]FulcrumEmailService.exe" />
-		                        </RegistryKey>
-	                        </Component>
-	                        <Component Id="DriveServiceProgramFiles" Guid="420C72D7-A383-4E5A-9DA5-4AA8A5876EE5">
-		                        <File Id="FULCRUMDRIVESERVICE.EXE" Name="FulcrumDriveService.exe" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe"/>
-		                        <ServiceInstall
-			                        Id="DriveServiceInstaller"
-			                        Type="ownProcess"
-			                        Name="FulcrumDrive"
-			                        DisplayName="Fulcrum Drive"
-			                        Description="Service controlled by the FulcrumInjector application which allows us to browse contents from a Google Drive location"
-			                        Start="auto"
-			                        Account="[SERVICEACCOUNT]"
-			                        Password="[SERVICEPASSWORD]"
-			                        ErrorControl="normal"
-			                        Arguments=" /start"/>
-		                        <ServiceControl Id="StartDriveService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumDrive" Wait="yes" />								
-		                        <File Id="FULCRUMENCRYPTION.DLL" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                            <Component Id="DriveServiceRegistryKey" Guid="65E3149A-C942-44AC-9B7C-FDD00B345954">
+                                <RegistryKey Root="HKLM" Id="DriveServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumDrive" Action="createAndRemoveOnUninstall">
+                                    <RegistryValue Id="DriveServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]" />
+                                    <RegistryValue Id="DriveServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMDRIVESERVICE.EXE)" />
+                                    <RegistryValue Id="DriveServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]FulcrumDriveService.exe" />
+                                </RegistryKey>
+                            </Component>
+                            <Component Id="DriveServiceProgramFiles" Guid="420C72D7-A383-4E5A-9DA5-4AA8A5876EE5">
+                                <File Id="FULCRUMDRIVESERVICE.EXE" Name="FulcrumDriveService.exe" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe" />
+                                <ServiceInstall Id="DriveServiceInstaller" Type="ownProcess" Name="FulcrumDrive" DisplayName="Fulcrum Drive" Description="Service controlled by the FulcrumInjector application which allows us to browse contents from a Google Drive location" Start="auto" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" ErrorControl="normal" Arguments=" /start" />
+                                <ServiceControl Id="StartDriveService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumDrive" Wait="yes" />
+                                <File Id="FULCRUMENCRYPTION.DLL" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
                                 <File Id="FULCRUMJSON.DLL" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumService.dll" />
                                 <File Id="FULCRUMSUPPORT.DLL" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumSupport.dll" />
@@ -351,64 +330,44 @@
                                 <File Id="NLOG.DLL_1" Name="NLog.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGING.DLL_1" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\SharpLogging.dll" />
                                 <File Id="FULCRUMDRIVESERVICE.EXE.CONFIG" Name="FulcrumDriveService.exe.config" Source="..\FulcrumServices\FulcrumDriveService\bin\$(var.Configuration)\FulcrumDriveService.exe.config" />
-	                        </Component>
+                            </Component>
                         </Directory>
                         <Directory Id="FulcrumUpdaterService" Name="FulcrumUpdaterService">
-	                        <Component Id="UpdaterServiceRegistryKey" Guid="D372EBB4-C61A-428A-AF2F-B1115A0A0FCF">
-		                        <RegistryKey Root="HKLM" Id="UpdaterServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumUpdater" Action="createAndRemoveOnUninstall">
-			                        <RegistryValue Id="UpdaterServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]" />
-			                        <RegistryValue Id="UpdaterServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMUPDATERSERVICE.EXE)" />
-			                        <RegistryValue Id="UpdaterServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]FulcrumUpdater.exe" />
-		                        </RegistryKey>
-	                        </Component>
-	                        <Component Id="UpdaterServiceProgramFiles" Guid="5D0D1D69-02A7-4BE3-A76B-CA11F9266819">
-		                        <File Id="FULCRUMUPDATERSERVICE.EXE" Name="FulcrumUpdaterService.exe" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe"/>
-		                        <ServiceInstall
-			                        Id="UpdaterServiceInstaller"
-			                        Type="ownProcess"
-			                        Name="FulcrumUpdater"
-			                        DisplayName="Fulcrum Updater"
-			                        Description="Service controlled by the FulcrumInjector application which allows us to check and install new versions of the application"
-			                        Start="auto"
-			                        Account="[SERVICEACCOUNT]"
-			                        Password="[SERVICEPASSWORD]"
-			                        ErrorControl="normal"
-			                        Arguments=" /start"/>
-		                        <ServiceControl Id="StartUpdaterService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumUpdater" Wait="yes" />
-		                        <File Id="FULCRUMENCRYPTION.DLL_2" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
-								<File Id="FULCRUMJSON.DLL_2" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumJson.dll" />
+                            <Component Id="UpdaterServiceRegistryKey" Guid="D372EBB4-C61A-428A-AF2F-B1115A0A0FCF">
+                                <RegistryKey Root="HKLM" Id="UpdaterServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumUpdater" Action="createAndRemoveOnUninstall">
+                                    <RegistryValue Id="UpdaterServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]" />
+                                    <RegistryValue Id="UpdaterServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMUPDATERSERVICE.EXE)" />
+                                    <RegistryValue Id="UpdaterServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]FulcrumUpdaterService.exe" />
+                                </RegistryKey>
+                            </Component>
+                            <Component Id="UpdaterServiceProgramFiles" Guid="5D0D1D69-02A7-4BE3-A76B-CA11F9266819">
+                                <File Id="FULCRUMUPDATERSERVICE.EXE" Name="FulcrumUpdaterService.exe" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe" />
+                                <ServiceInstall Id="UpdaterServiceInstaller" Type="ownProcess" Name="FulcrumUpdater" DisplayName="Fulcrum Updater" Description="Service controlled by the FulcrumInjector application which allows us to check and install new versions of the application" Start="auto" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" ErrorControl="normal" Arguments=" /start" />
+                                <ServiceControl Id="StartUpdaterService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumUpdater" Wait="yes" />
+                                <File Id="FULCRUMENCRYPTION.DLL_2" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                                <File Id="FULCRUMJSON.DLL_2" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL_2" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumService.dll" />
                                 <File Id="FULCRUMSUPPORT.DLL_2" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumSupport.dll" />
                                 <File Id="NEWTONSOFT.JSON.DLL_3" Name="Newtonsoft.Json.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
                                 <File Id="NLOG.DLL_3" Name="NLog.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="OCTOKIT.DLL_1" Name="Octokit.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\Octokit.dll" />
                                 <File Id="SHARPLOGGING.DLL_3" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\SharpLogging.dll" />
-								<File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
-	                        </Component>
+                                <File Id="FULCRUMUPDATERSERVICE.EXE.CONFIG" Name="FulcrumUpdaterService.exe.config" Source="..\FulcrumServices\FulcrumUpdaterService\bin\$(var.Configuration)\FulcrumUpdaterService.exe.config" />
+                            </Component>
                         </Directory>
-	                    <Directory Id="FulcrumEmailService" Name="FulcrumEmailService">
-	                        <Component Id="EmailServiceRegistryKey" Guid="6C0A5D95-DD66-4995-83F7-92748ADE9429">
-		                        <RegistryKey Root="HKLM" Id="EmailServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumEmail" Action="createAndRemoveOnUninstall">
-			                        <RegistryValue Id="EmailServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]" />
-			                        <RegistryValue Id="EmailServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMEMAILSERVICE.EXE)" />
-			                        <RegistryValue Id="EmailServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]FulcrumEmailService.exe" />
-		                        </RegistryKey>
-	                        </Component>
-	                        <Component Id="EmailServiceProgramFiles" Guid="A71ED1B5-55EE-4B01-AEC5-A3C8DE2AF5C9">
-		                        <File Id="FULCRUMEMAILSERVICE.EXE" Name="FulcrumEmailService.exe" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe"/>
-		                        <ServiceInstall
-			                        Id="EmailServiceInstaller"
-			                        Type="ownProcess"
-			                        Name="FulcrumEmail"
-			                        DisplayName="Fulcrum Email"
-			                        Description="Service controlled by the FulcrumInjector application which allows us to send automated emails to any desired recipients"
-			                        Start="auto"
-			                        Account="[SERVICEACCOUNT]"
-			                        Password="[SERVICEPASSWORD]"
-			                        ErrorControl="normal"
-			                        Arguments=" /start"/>
-		                        <ServiceControl Id="StartEmailService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumEmail" Wait="yes" />
-								<File Id="FULCRUMENCRYPTION.DLL_1" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
+                        <Directory Id="FulcrumEmailService" Name="FulcrumEmailService">
+                            <Component Id="EmailServiceRegistryKey" Guid="6C0A5D95-DD66-4995-83F7-92748ADE9429">
+                                <RegistryKey Root="HKLM" Id="EmailServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumEmail" Action="createAndRemoveOnUninstall">
+                                    <RegistryValue Id="EmailServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]" />
+                                    <RegistryValue Id="EmailServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMEMAILSERVICE.EXE)" />
+                                    <RegistryValue Id="EmailServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]FulcrumEmailService.exe" />
+                                </RegistryKey>
+                            </Component>
+                            <Component Id="EmailServiceProgramFiles" Guid="A71ED1B5-55EE-4B01-AEC5-A3C8DE2AF5C9">
+                                <File Id="FULCRUMEMAILSERVICE.EXE" Name="FulcrumEmailService.exe" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe" />
+                                <ServiceInstall Id="EmailServiceInstaller" Type="ownProcess" Name="FulcrumEmail" DisplayName="Fulcrum Email" Description="Service controlled by the FulcrumInjector application which allows us to send automated emails to any desired recipients" Start="auto" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" ErrorControl="normal" Arguments=" /start" />
+                                <ServiceControl Id="StartEmailService" Start="install" Stop="both" Remove="uninstall" Name="FulcrumEmail" Wait="yes" />
+                                <File Id="FULCRUMENCRYPTION.DLL_1" Name="FulcrumEncryption.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEncryption.dll" />
                                 <File Id="FULCRUMJSON.DLL_1" Name="FulcrumJson.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumJson.dll" />
                                 <File Id="FULCRUMSERVICE.DLL_1" Name="FulcrumService.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumService.dll" />
                                 <File Id="FULCRUMSUPPORT.DLL_1" Name="FulcrumSupport.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumSupport.dll" />
@@ -416,7 +375,7 @@
                                 <File Id="NLOG.DLL_2" Name="NLog.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\NLog.dll" />
                                 <File Id="SHARPLOGGING.DLL_2" Name="SharpLogging.dll" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\SharpLogging.dll" />
                                 <File Id="FULCRUMEMAILSERVICE.EXE.CONFIG" Name="FulcrumEmailService.exe.config" Source="..\FulcrumServices\FulcrumEmailService\bin\$(var.Configuration)\FulcrumEmailService.exe.config" />
-	                        </Component>
+                            </Component>
                         </Directory>
                     </Directory>
                 </Directory>
@@ -424,42 +383,35 @@
         </Directory>
         <!-- Features -->
         <Feature Id="ProductFeature" Title="installer" Level="1">
-
             <!-- Base Registry Keys -->
             <ComponentRef Id="MeatIncRegistryKey" />
             <ComponentRef Id="FulcrumShimRegistryKey" />
             <ComponentRef Id="FulcrumServicesRegistryKey" />
             <ComponentRef Id="FulcrumInjectorRegistryKey" />
-
             <!-- Service Registry Keys -->
             <ComponentRef Id="WatchdogServiceRegistryKey" />
             <ComponentRef Id="DriveServiceRegistryKey" />
             <ComponentRef Id="UpdaterServiceRegistryKey" />
             <ComponentRef Id="EmailServiceRegistryKey" />
-
-			<!-- PassThru Support Keys -->
+            <!-- PassThru Support Keys -->
             <ComponentRef Id="FulcrumShimV0404RegistryKey" />
             <ComponentRef Id="FulcrumShimV0500RegistryKey" />
-
             <!-- Injector Program Files -->
             <ComponentRef Id="FulcrumStyleFiles" />
             <ComponentRef Id="FulcrumResourceFiles" />
             <ComponentRef Id="CreateFulcrumIconsFolder" />
-			<ComponentRef Id="CreateFulcrumImportsFolder" />
+            <ComponentRef Id="CreateFulcrumImportsFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
-			<ComponentRef Id="CreateFulcrumExpressionsFolder" />
-			<ComponentRef Id="CreateFulcrumSimulationsFolder" />
+            <ComponentRef Id="CreateFulcrumExpressionsFolder" />
+            <ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />
-
             <!-- Shim Program Files-->
             <ComponentRef Id="FulcrumShimProgramFiles" />
-            
             <!-- Service Files and Registry Keys -->
             <ComponentRef Id="WatchdogServiceProgramFiles" />
             <ComponentRef Id="DriveServiceProgramFiles" />
             <ComponentRef Id="UpdaterServiceProgramFiles" />
             <ComponentRef Id="EmailServiceProgramFiles" />
-
             <!-- Logging Folders  -->
             <ComponentRef Id="CreateFulcrumLoggingFolder" />
             <ComponentRef Id="CreateFulcrumArchivesFolder" />
@@ -473,15 +425,15 @@
          here for support information entry -->
         <Property Id="ARPCOMMENTS">The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs.</Property>
         <Property Id="ARPCONTACT">
-      Sales:   neo.smith@motorengineeringandtech.com
-      Support: neo.smith@motorengineeringandtech.com
+      Sales:   zack.walsh@meatinc.autos
+      Support: zack.walsh@meatinc.autos
       Phone:   (516) 633-3356
       Fax:     (516) 633-3356
     </Property>
         <!-- Component Refs for App Files And Links -->
-        <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-        <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/FulcrumShim/</Property>
-        <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/FulcrumShim/</Property>
+        <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/Fulcrum/</Property>
+        <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/Fulcrum/</Property>
+        <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/Fulcrum/</Property>
         <Property Id="ARPHELPTELEPHONE">(516)633-3356</Property>
         <!-- UI Configuration -->
         <UI Id="UserInterface">

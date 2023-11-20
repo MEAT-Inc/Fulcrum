@@ -12,9 +12,11 @@ using System.Security.Authentication;
 using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using FulcrumJson;
 using FulcrumService;
+using FulcrumSupport;
 using FulcrumUpdaterService.UpdaterServiceModels;
 using Newtonsoft.Json;
 using Octokit;
@@ -28,11 +30,6 @@ namespace FulcrumUpdaterService
     public partial class FulcrumUpdater : FulcrumServiceBase
     {
         #region Custom Events
-
-        // Event for download progress
-        public EventHandler<DownloadDataCompletedEventArgs> OnUpdaterComplete;
-        public EventHandler<DownloadProgressChangedEventArgs> OnUpdaterProgress;
-
         #endregion //Custom Events
 
         #region Fields
@@ -43,10 +40,16 @@ namespace FulcrumUpdaterService
 
         // Private backing fields for the Git helper, timer, and updater configuration
         private GitHubClient _gitUpdaterClient;                   // The updater client for pulling in versions
-        private readonly Stopwatch _downloadTimer = new();        // Download timer for pulling in versions
         private readonly UpdaterServiceSettings _serviceConfig;   // Updater configuration values
 
+        // Private backing fields for updater background tasks
+        private Task _refreshTask;                                // Task holding our refresh operation
+        private TimeSpan _refreshTime;                            // Timespan to delay for refresh routines
+        private CancellationToken _refreshTaskToken;              // The cancellation token for refreshing
+        private CancellationTokenSource _refreshTokenSource;      // The token source for refreshing
+
         // Private backing fields for our public facing properties
+        private bool _isGitClientAuthorized;                      // Private backing bool value to store if we're authorized or not
         private Release[] _injectorReleases;                      // Collection of all releases found for the injector app
 
         #endregion //Fields
@@ -54,15 +57,12 @@ namespace FulcrumUpdaterService
         #region Properties
 
         // Public facing property holding our authorization state for the updater 
-        public bool IsGitClientAuthorized { get; private set; }
-
-        // Public facing properties holding information about our latest version information
-        public Release[] InjectorReleases
+        public bool IsGitClientAuthorized
         {
             // Pull the value from our service host or the local instance based on client configuration
             get => !this.IsServiceClient
-                ? this._injectorReleases
-                : this.GetPipeMemberValue(nameof(InjectorReleases)) as Release[];
+                ? this._isGitClientAuthorized
+                : bool.Parse(this.GetPipeMemberValue(nameof(IsGitClientAuthorized)).ToString());
 
             private set
             {
@@ -70,26 +70,15 @@ namespace FulcrumUpdaterService
                 if (!this.IsServiceClient)
                 {
                     // Set our value and exit out
-                    this._injectorReleases = value;
+                    this._isGitClientAuthorized = value;
                     return;
                 }
 
                 // If we're using a client instance, invoke a pipe routine
-                if (!this.SetPipeMemberValue(nameof(InjectorReleases), value))
-                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(InjectorReleases)}!");
+                if (!this.SetPipeMemberValue(nameof(IsGitClientAuthorized), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(IsGitClientAuthorized)}!");
             }
         }
-        public string LatestInjectorVersion => this.InjectorVersions[0];
-        public Release LatestInjectorRelease => this.InjectorReleases[0];
-        public string LatestInjectorReleaseNotes => this.LatestInjectorRelease.Body;
-        public string[] InjectorVersions => this.InjectorReleases
-            .Select(ReleaseTag => Regex.Match(ReleaseTag.TagName, @"(\d+(?>\.|))+").Value)
-            .ToArray();
-
-        // TODO: Configure these properties to fire over pipe operations
-        // Time download elapsed and approximate time remaining
-        public string DownloadTimeRemaining { get; private set; }
-        public string DownloadTimeElapsed => this._downloadTimer == null ? "00:00" : this._downloadTimer.Elapsed.ToString().Split('.')[0];
 
         #endregion //Properties
 
@@ -114,7 +103,6 @@ namespace FulcrumUpdaterService
             }
 
             // Log we're building this new service and log out the name we located for it
-            this._downloadTimer = new Stopwatch();
             this._serviceLogger.WriteLog("SPAWNING NEW UPDATER SERVICE!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLED IN A NEW SERVICE NAME OF {this.ServiceName}", LogType.InfoLog);
 
@@ -130,6 +118,70 @@ namespace FulcrumUpdaterService
             this._serviceLogger.WriteLog($"FORCE UPDATES: {this._serviceConfig.ForceUpdateReady}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"REPOSITORY NAME:  {this._serviceConfig.UpdaterRepoName}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"ORGANIZATION NAME: {this._serviceConfig.UpdaterOrgName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"INCLUDING PRE-RELEASES: {(this._serviceConfig.IncludePreReleases ? "YES" : "NO")}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"BACKGROUND REFRESH TIME (SECONDS): {this._serviceConfig.RefreshTimerDelay.TotalSeconds}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"AUTOMATIC UPDATES ENABLED: {(this._serviceConfig.EnableAutomaticUpdates ? "ENABLED" : "DISABLED")}", LogType.TraceLog);
+
+            // Configure our background updater tasks if needed here and exit out once complete
+            if (!this._serviceConfig.EnableAutomaticUpdates) return;
+            
+            // Build a new background refresh task to pull in new injector versions
+            DateTime LastUpdateCheckTime = DateTime.Now;
+            this._refreshTokenSource = new CancellationTokenSource();
+            this._refreshTaskToken = this._refreshTokenSource.Token;
+            this._serviceLogger.WriteLog("BOOTING NEW BACKGROUND UPDATER TASK INSTANCE NOW...", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"BUILT TASK CONTROL OBJECTS AND STORED START TIME OF {LastUpdateCheckTime:D}", LogType.InfoLog);
+
+            // Build the task instance here
+            this._refreshTask = Task.Run(() =>
+            {
+                // Setup our timespan to wait between updates here
+                while (!this._refreshTaskToken.IsCancellationRequested)
+                {
+                    // Log out that we're waiting for our given timespan before checking for updates
+                    this._serviceLogger.WriteLog($"WAITING FOR {this._serviceConfig.RefreshTimerDelay:g} BEFORE CHECKING FOR UPDATES...", LogType.WarnLog);
+
+                    // Wait for our given amount of time here
+                    Thread.Sleep(this._serviceConfig.RefreshTimerDelay);
+                    this._serviceLogger.WriteLog("CHECKING FOR UPDATES NOW...", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"LAST UPDATE CHECK PERFORMED AT {LastUpdateCheckTime:D}", LogType.InfoLog);
+                    LastUpdateCheckTime = DateTime.Now;
+
+                    // Check for an update for the injector app based on the currently installed version of it
+                    this._getInjectorRelease(null, true);
+                    string CurrentVersion = RegistryControl.InjectorVersion.ToString();
+                    if (!this.CheckForUpdate(CurrentVersion, out string LatestVersion))
+                    {
+                        // Log out that no update is ready and continue on
+                        this._serviceLogger.WriteLog("NO UPDATE READY AT THIS TIME!", LogType.InfoLog);
+                        this._serviceLogger.WriteLog($"INJECTOR VERSION {CurrentVersion} IS STILL THE LATEST RELEASE!", LogType.InfoLog);
+                        continue;
+                    }
+
+                    // Log out some information about our version that is ready to be installed
+                    this._serviceLogger.WriteLog("NEW VERSION OF THE INJECTOR IS READY TO BE INSTALLED!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"VERSION {LatestVersion} IS READY FOR INSTALL NOW!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"DOWNLOADING AND INSTALLING VERSION {LatestVersion} NOW...", LogType.WarnLog);
+
+                    try
+                    {
+                        // Download our release version installer and install it here
+                        if (!this.DownloadInjectorInstaller(LatestVersion, out string InstallerPath))
+                            throw new InvalidOperationException($"Error! Failed to download installer for version {LatestVersion}!");
+
+                        // Now invoke the installer to update our injector installation
+                        this._serviceLogger.WriteLog($"DOWNLOADED VERSION {LatestVersion} CORRECTLY! INSTALLING IT NOW...", LogType.InfoLog);
+                        if (!this.InstallInjectorApplication(InstallerPath))
+                            throw new InvalidOperationException($"Error! Failed to invoke a new install routine for version {LatestVersion}!");
+                    }
+                    catch (Exception InstallUpdateEx)
+                    {
+                        // Catch our installer exception and exit out once done
+                        this._serviceLogger.WriteLog("ERROR! FAILED TO DOWNLOAD OR RUN INSTALLER!", LogType.ErrorLog);
+                        this._serviceLogger.WriteException("EXCEPTION DURING UPDATE ROUTINE IS BEING LOGGED BELOW", InstallUpdateEx);
+                    }
+                }
+            }, this._refreshTaskToken);
         }
         /// <summary>
         /// Static CTOR for an update broker instance. Simply pulls out the new singleton instance for our update broker
@@ -183,7 +235,7 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteLog($"CONFIGURING NEW GITHUB CONNECTION HELPER FOR INJECTOR SERVICE...", LogType.InfoLog);
 
                 // Authorize our git client here if needed
-                if (!this._authorizeGitClient()) 
+                if (!this._authorizeGitClient())
                     throw new AuthenticationException("Error! Failed to authorize Git Client for the MEAT Inc Organization!");
 
                 // Log out that our service has been booted without issues
@@ -202,102 +254,203 @@ namespace FulcrumUpdaterService
         /// <summary>
         /// Checks if a version is ready to be updated or not.
         /// </summary>
-        /// <param name="InputVersion">Current Version</param>
+        /// <param name="VersionTag">Current Version</param>
+        /// <param name="LatestVersion">The latest version of the injector application ready to install</param>
         /// <returns>True if updates ready. False if not.</returns>
-        public bool CheckAgainstVersion(string InputVersion)
+        /// <exception cref="InvalidOperationException">Thrown when we're unable to refresh injector versions</exception>
+        public bool CheckForUpdate(string VersionTag, out string LatestVersion)
         {
             // Check if we're using a service instance or not first
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeMethod(nameof(CheckAgainstVersion), InputVersion);
+                var PipeAction = this.ExecutePipeMethod(nameof(CheckForUpdate), VersionTag, string.Empty);
+                LatestVersion = PipeAction.PipeMethodArguments[1].ToString();
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
-            // Validate that the versions exist to compare
-            if (this.InjectorReleases == null) 
-            {
-                // IF no versions are found, then refresh them all now
-                this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                this._refreshInjectorReleases();
-            }
+            // First find our latest injector release object
+            Release LatestInjectorRelease = this._getInjectorRelease();
+            if (LatestInjectorRelease == null) throw new InvalidOperationException("Error! Failed to find latest injector release!");
 
-            // Now compare the versions
-            Version InputVersionParsed = Version.Parse(Regex.Match(InputVersion, @"(\d+(?>\.|))+").Value);
-            Version LatestVersionParsed = Version.Parse(Regex.Match(this.LatestInjectorVersion, @"(\d+(?>\.|))+").Value);
+            // Now compare the versions based on our most recent release
+            Version InputVersionParsed = Version.Parse(Regex.Match(VersionTag, @"(\d+(?>\.|))+").Value);
+            Version LatestVersionParsed = Version.Parse(Regex.Match(LatestInjectorRelease.TagName, @"(\d+(?>\.|))+").Value);
             this._serviceLogger.WriteLog("PARSED VERSIONS CORRECTLY! READY TO COMPARE AND RETURN", LogType.InfoLog);
 
             // Compare and log result
+            LatestVersion = LatestVersionParsed.ToString();
             bool NeedsUpdate = InputVersionParsed < LatestVersionParsed;
             this._serviceLogger.WriteLog($"RESULT FROM VERSION COMPARISON: {NeedsUpdate}", LogType.WarnLog);
             this._serviceLogger.WriteLog("UPDATE CHECK PASSED! PLEASE EXECUTE ACCORDINGLY...", LogType.InfoLog);
             return NeedsUpdate;
         }
         /// <summary>
-        /// Downloads a new release of the injector application and saves it
+        /// Finds the asset URL for the installer needed based on the given version tag
         /// </summary>
-        /// <param name="VersionTag">The tag of the version to download</param>
-        /// <param name="InjectorAssetUrl">The URL of the installer being pulled in</param>
-        /// <returns>The path of our output msi file for the injector application</returns>
-        public string DownloadInjectorRelease(string VersionTag, out string InjectorAssetUrl)
+        /// <param name="VersionTag">The tag of the version to find the URL for</param>
+        /// <returns>The URL of the MSI being returned for this version</returns>
+        /// <exception cref="InvalidOperationException">Thrown when we're unable to refresh injector versions</exception>
+        /// <exception cref="NullReferenceException">Thrown when the version we're looking to pull in can not be found</exception>
+        public string GetInjectorInstallerUrl(string VersionTag)
         {
             // Check if we're using a service instance or not first
             if (this.IsServiceClient)
             {
                 // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeMethod(nameof(DownloadInjectorRelease), VersionTag, string.Empty);
-                InjectorAssetUrl = PipeAction.PipeMethodArguments[1].ToString();
+                var PipeAction = this.ExecutePipeMethod(nameof(GetInjectorInstallerUrl), VersionTag);
                 return PipeAction.PipeCommandResult.ToString();
             }
 
-            // Validate that the versions exist to compare
-            if (this.InjectorReleases == null)
-            {
-                // IF no versions are found, then refresh them all now
-                this._serviceLogger.WriteLog("WARNING! INJECTOR VERSION INFORMATION WAS NOT POPULATED! UPDATING IT NOW...", LogType.WarnLog);
-                this._refreshInjectorReleases();
-            }
-
             // First find our version to use using our version/release lookup tool
-            var ReleaseToUse = this.InjectorReleases.FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
+            var ReleaseToUse = this._getInjectorRelease(VersionTag);
+            if (ReleaseToUse == null) throw new NullReferenceException($"Error! Release version {VersionTag} could not be found!");
             this._serviceLogger.WriteLog("PULLED IN A NEW RELEASE OBJECT TO UPDATE WITH!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
 
             // Now get the asset url and download it here into a temp file
-            InjectorAssetUrl = ReleaseToUse.Assets.FirstOrDefault(AssetObj => AssetObj.BrowserDownloadUrl.EndsWith("msi")).BrowserDownloadUrl;
+            string InjectorAssetUrl = ReleaseToUse?.Assets?.FirstOrDefault(AssetObj => AssetObj.BrowserDownloadUrl.EndsWith("msi"))?.BrowserDownloadUrl;
+            if (string.IsNullOrWhiteSpace(InjectorAssetUrl)) 
+                throw new NullReferenceException($"Error! Unable to find valid release installer for version {VersionTag}!");
+
+            // Pull in our asset download path and store our installer file
             string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "msi");
-            this._serviceLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}");
-            this._serviceLogger.WriteLog($"TEMP PATH FOR ASSET BUILT:   {InjectorAssetPath}");
-
-            // Return the URL of the path to download here
-            WebClient AssetDownloadHelper = new WebClient();
-            AssetDownloadHelper.DownloadProgressChanged += (Sender, Args) =>
-            {
-                // Invoke the event for progress changed if it's not null
-                if (this.OnUpdaterProgress == null) return;
-                this.OnUpdaterProgress?.Invoke(Sender ?? this, Args);
-
-                // Find our approximate time left
-                var ApproximateMillisLeft = this._downloadTimer.ElapsedMilliseconds * Args.TotalBytesToReceive / Args.BytesReceived;
-                TimeSpan ApproximateToSpan = TimeSpan.FromMilliseconds(ApproximateMillisLeft);
-                this.DownloadTimeRemaining = ApproximateToSpan.ToString("mm:ss");
-            };
-            AssetDownloadHelper.DownloadDataCompleted += (Sender, Args) =>
-            {
-                // Invoke the event for progress done if it's not null
-                if (this.OnUpdaterComplete == null) return;
-                this.OnUpdaterComplete.Invoke(Sender ?? this, Args);
-            };
-
-            // Log done building setup and download the version output here
-            this._downloadTimer.Start();
-            this._serviceLogger.WriteLog("BUILT NEW WEB CLIENT FOR DOWNLOADING ASSETS OK! STARTING DOWNLOAD NOW...", LogType.InfoLog);
-            AssetDownloadHelper.DownloadFile(InjectorAssetUrl, InjectorAssetPath); this._downloadTimer.Stop();
-            this._serviceLogger.WriteLog($"TOTAL DOWNLOAD TIME TAKEN: {this.DownloadTimeElapsed}");
-
-            // Return the path of our new asset
-            this._serviceLogger.WriteLog("DOWNLOADED UPDATES OK! RETURNING OUTPUT PATH FOR ASSETS NOW...");
+            this._serviceLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}", LogType.InfoLog);
             return InjectorAssetPath;
+        }
+        /// <summary>
+        /// Finds the release version requested and pulls in the release notes for this version
+        /// </summary>
+        /// <param name="VersionTag">The version we're building release notes for</param>
+        /// <returns>A string value holding our release notes once found</returns>
+        /// <exception cref="InvalidOperationException">Thrown when we're unable to refresh injector versions</exception>
+        public string GetInjectorReleaseNotes(string VersionTag)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(GetInjectorReleaseNotes), VersionTag);
+                return PipeAction.PipeCommandResult.ToString();
+            }
+
+            // Find the release for the given version and return the release notes for it
+            var ReleaseToUse = this._getInjectorRelease(VersionTag);
+            if (ReleaseToUse == null) throw new NullReferenceException($"Error! Release version {VersionTag} could not be found!");
+            this._serviceLogger.WriteLog("PULLED IN A NEW RELEASE OBJECT TO BUILD RELEASE NOTES FOR!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"RELEASE TAG: {ReleaseToUse.TagName}");
+
+            // Return the release notes for this object here if they exist
+            if (string.IsNullOrWhiteSpace(ReleaseToUse.Body)) throw new InvalidOperationException($"Error! No release notes could be found for tag {VersionTag}!"); 
+            this._serviceLogger.WriteLog("FOUND RELEASE NOTES! RETURNING THEM NOW...", LogType.InfoLog);
+            return ReleaseToUse.Body;
+        }
+        /// <summary>
+        /// Installs a new version of the injector application using the given MSI File path
+        /// </summary>
+        /// <param name="InstallerPath">The path to the installer for the injector app</param>
+        /// <returns>True if invoked correctly, false if not</returns>
+        /// <exception cref="FileNotFoundException">Thrown when no installer file can be found</exception>
+        public bool InstallInjectorApplication(string InstallerPath)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(InstallInjectorApplication), InstallerPath);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
+            // Setup our string for the command to run.
+            string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {InstallerPath}";
+            if (!File.Exists(InstallerPath))
+                throw new FileNotFoundException($"Error! Installer \"{InstallerPath}\" could not be found!");
+
+            // Build a process object and setup a CMD line call to install our new version
+            Process InstallNewReleaseProcess = new Process();
+            InstallNewReleaseProcess.StartInfo = new ProcessStartInfo()
+            {
+                Verb = "runas",                   // Set this to run as admin
+                FileName = "cmd.exe",             // Boot a CMD window
+                CreateNoWindow = true,            // Create no window on output
+                UseShellExecute = false,          // Shell execution
+                Arguments = InvokeUpdateString,   // Args to invoke.
+            };
+
+            // Log starting updates and return true
+            this._serviceLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
+            this._serviceLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
+
+            // Boot the update and return true
+            InstallNewReleaseProcess.Start();
+            InstallNewReleaseProcess.CloseMainWindow();
+            return true;
+        }
+        /// <summary>
+        /// Downloads the given version installer for the injector application and stores it in a temp path
+        /// </summary>
+        /// <param name="VersionTag">The version of the injector we're looking to download</param>
+        /// <param name="InstallerPath">The path to the installer pulled in from the repository</param>
+        /// <returns>True if the MSI is pulled in. False if it is not</returns>
+        /// <exception cref="InvalidOperationException">Thrown when we're unable to refresh injector versions</exception>
+        public bool DownloadInjectorInstaller(string VersionTag, out string InstallerPath)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(DownloadInjectorInstaller), VersionTag, string.Empty);
+                InstallerPath = PipeAction.PipeMethodArguments[1].ToString();
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
+            // Get the URL of the asset we're looking to download here
+            this._serviceLogger.WriteLog($"LOCATING ASSET URL FOR VERSION TAG {VersionTag} NOW...", LogType.InfoLog);
+            string AssetDownloadUrl = this.GetInjectorInstallerUrl(VersionTag);
+            if (string.IsNullOrWhiteSpace(AssetDownloadUrl))
+            {
+                // Log out that no release could be found for this version number and return out
+                this._serviceLogger.WriteLog($"ERROR! NO URL COULD BE FOUND FOR AN ASSET BELONGING TO VERSION TAG {VersionTag}!", LogType.ErrorLog);
+                this._serviceLogger.WriteLog("THIS IS A FATAL ISSUE! PLEASE ENSURE YOU PROVIDED A VALID VERSION TAG!", LogType.ErrorLog);
+
+                // Null out the installer path and return false
+                InstallerPath = string.Empty;
+                return false;
+            }
+
+            // Build a new web client and configure a temporary file to download our release installer into
+            Stopwatch DownloadTimer = new Stopwatch();
+            WebClient AssetDownloadHelper = new WebClient();
+            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{VersionTag}.msi");
+            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {VersionTag} NOW...", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+
+            try
+            {
+                // Boot the download timer and kick off our download here
+                DownloadTimer.Start();
+                AssetDownloadHelper.DownloadFile(AssetDownloadUrl, DownloadFilePath);
+                DownloadTimer.Stop();
+
+                // Log out how long this download process took and return out our download path
+                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:mm:ss}", LogType.InfoLog);
+                if (!File.Exists(DownloadFilePath)) throw new FileNotFoundException("Error! Failed to find injector installer after download!");
+
+                // Store our downloaded file in the output path and return true
+                InstallerPath = DownloadFilePath;
+                return true;
+            }
+            catch (Exception DownloadFileEx)
+            {
+                // Catch our exception and log it out here
+                this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD INJECTOR INSTALLER VERSION {VersionTag}!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION THROWN DURING DOWNLOAD ROUTINE IS BEING LOGGED BELOW", DownloadFileEx);
+
+                // Null out our output variables and return out
+                InstallerPath = string.Empty;
+                return false;
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -331,25 +484,58 @@ namespace FulcrumUpdaterService
                 return false;
             }
         }
+
         /// <summary>
-        /// Updates the injector version information on the class instance.
+        /// Pulls in the requested injector release object for the version requested
+        /// If no version is given, the latest release is pulled in 
         /// </summary>
-        private bool _refreshInjectorReleases()
+        /// <param name="VersionTag">Optional version of the release we're looking to download</param>
+        /// <param name="ForceRefresh">Forces refreshing of injector versions or not</param>
+        /// <returns>The release object pulled in for the given version or the latest release if no version provided</returns>
+        /// <exception cref="AuthenticationException">Thrown when our gir client fails to authorize</exception>
+        /// <exception cref="NullReferenceException">Thrown when no releases are found on the repository</exception>
+        private Release _getInjectorRelease(string VersionTag = null, bool ForceRefresh = false)
         {
+            // Log out what operation we're performing now
+            this._serviceLogger.WriteLog((VersionTag == null
+                ? "ATTEMPTING TO FIND LATEST RELEASE FOR THE INJECTOR APP NOW..."
+                : $"ATTEMPTING TO FIND RELEASE {VersionTag} NOW..."), LogType.WarnLog);
+
             // Make sure we're authorized on the GitHub client first 
-            this._serviceLogger.WriteLog("PULLING IN ALL RELEASE VERSIONS NOW...", LogType.WarnLog);
             if (!this._authorizeGitClient())
                 throw new AuthenticationException("Error! Failed to authorize GitHub client for the MEAT Inc Organization!");
 
-            // Pull in the releases and return them out
-            this.InjectorReleases = this._gitUpdaterClient.Repository.Release.GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName).Result.ToArray();
-            this._serviceLogger.WriteLog($"PULLED IN A TOTAL OF {this.InjectorReleases.Length} RELEASE OBJECTS OK! PARSING THEM FOR VERSION INFORMATION NOW...");
+            try
+            {
+                // Pull in the release requested based on a version value and return it out here
+                if (this._injectorReleases == null || ForceRefresh)
+                    this._injectorReleases = this._gitUpdaterClient.Repository.Release
+                    .GetAll(this._serviceConfig.UpdaterOrgName, this._serviceConfig.UpdaterRepoName)
+                    .Result.ToArray();
 
-            // Parse out the version information and return them out
-            this._serviceLogger.WriteLog("RELEASE TAGS LOCATED AND PROCESSED OK! SHOWING BELOW (IF TRACE LOGGING IS ON)", LogType.WarnLog);
-            this._serviceLogger.WriteLog($"RELEASE TAGS BUILT: {string.Join(" | ", this.InjectorVersions)}", LogType.TraceLog);
-            this._serviceLogger.WriteLog($"FOUND LATEST INJECTOR VERSION TO BE {this.LatestInjectorVersion}", LogType.InfoLog);
-            return this.InjectorReleases.Length != 0;
+                // Check if we need a specific version or not
+                Release InjectorRelease = VersionTag == null 
+                    ? this._injectorReleases.FirstOrDefault() 
+                    : this._injectorReleases.FirstOrDefault(ReleaseObj => ReleaseObj.TagName.Contains(VersionTag));
+
+                // If the release object is null, throw a new exception out 
+                if (InjectorRelease == null) 
+                    throw new NullReferenceException($"Error! Could not find injector release {VersionTag}!");
+
+                // Log out information about our pulled injector release
+                this._serviceLogger.WriteLog($"FOUND INJECTOR RELEASE {VersionTag} CORRECTLY!", LogType.InfoLog);
+                this._serviceLogger.WriteLog($"RETURNING OUT RELEASE OBJECT FOR VERSION {VersionTag} NOW...", LogType.InfoLog);
+
+                // Return out based on how many releases are found
+                return InjectorRelease;
+            }
+            catch (Exception FindReleaseEx)
+            {
+                // Log out our exception and exit out false
+                this._serviceLogger.WriteLog($"ERROR! FAILED TO FIND INJECTOR VERSION {VersionTag}!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION THROWN DURING REFRESH ROUTINE IS BEING LOGGED BELOW", FindReleaseEx);
+                return null;
+            }
         }
     }
 }

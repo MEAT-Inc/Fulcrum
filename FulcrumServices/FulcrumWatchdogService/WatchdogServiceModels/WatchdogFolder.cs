@@ -231,6 +231,21 @@ namespace FulcrumWatchdogService.WatchdogServiceModels
             _folderLogger.WriteLog("BUILDING NEW FILESYSTEM WATCHERS FOR THE FILERS REQUESTED NOW...");
             _folderLogger.WriteLog("BUILT NEW COLLECTIONS FOR WATCHDOG FILES AND FILESYSTEM WATCHERS OK!", LogType.InfoLog);
 
+            // If the folder does not exist, create it here so we can avoid bombing
+            if (Directory.Exists(WatchedDirectory)) _folderLogger.WriteLog($"VALIDATED WATCHED DIRECTORY {this._watchedDirectory} EXISTS!", LogType.InfoLog);
+            else 
+            {
+                _folderLogger.WriteLog($"WARNING! WATCHED FOLDER {this._watchedDirectory} DOES NOT EXIST!", LogType.WarnLog);
+                _folderLogger.WriteLog("CREATING FOLDER TO MONITOR FOR FILE CHANGES NOW...", LogType.WarnLog);
+                try { Directory.CreateDirectory(this._watchedDirectory); }
+                catch (Exception CreateWatchedFolderEx)
+                {
+                    // Catch our exception and log out information about the failure
+                    _folderLogger.WriteLog($"ERROR! FAILED TO CREATE WATCHED FOLDER {this._watchedDirectory}!", LogType.ErrorLog);
+                    _folderLogger.WriteException("EXCEPTION DURING FOLDER CREATION IS BEING LOGGED BELOW", CreateWatchedFolderEx);
+                }
+            }
+
             // Loop all of the supported extension types and build watcher objects for each of them
             foreach (string FileExtension in this._watchedFileFilters.Select(ExtValue => $"*{ExtValue}"))
             {
