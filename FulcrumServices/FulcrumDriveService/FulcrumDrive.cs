@@ -269,7 +269,7 @@ namespace FulcrumDriveService
             ListRequest.SupportsTeamDrives = true;
             ListRequest.IncludeTeamDriveItems = true;
             ListRequest.IncludeItemsFromAllDrives = true;
-
+            
             // Build a new PageStreamer to automatically page through results of files and execute the fetch routine
             LocatedObjects = new Google.Apis.Requests.PageStreamer<File, FilesResource.ListRequest, FileList, string>(
                 (_, TokenObj) => ListRequest.PageToken = TokenObj,

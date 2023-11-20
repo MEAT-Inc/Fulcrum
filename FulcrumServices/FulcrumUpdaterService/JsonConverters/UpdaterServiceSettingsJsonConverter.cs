@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FulcrumEncryption;
 using FulcrumJson;
+using FulcrumSupport;
 using FulcrumUpdaterService.UpdaterServiceModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -66,6 +68,9 @@ namespace FulcrumUpdaterService.JsonConverters
                 ValueObject.ForceUpdateReady,
                 ValueObject.UpdaterOrgName,
                 ValueObject.UpdaterRepoName, 
+                ValueObject.IncludePreReleases,
+                ValueObject.EnableAutomaticUpdates,
+                RefreshTimerDelay = ValueObject.RefreshTimerDelay.TotalSeconds,
                 UpdaterUserName = this._useEncryption ? FulcrumEncryptor.Encrypt(ValueObject.UpdaterUserName) : ValueObject.UpdaterUserName,
                 UpdaterSecretKey = this._useEncryption ? FulcrumEncryptor.Encrypt(ValueObject.UpdaterSecretKey) : ValueObject.UpdaterSecretKey,
             });
@@ -102,7 +107,10 @@ namespace FulcrumUpdaterService.JsonConverters
             string UpdaterRepoName = InputObject[nameof(UpdaterServiceSettings.UpdaterRepoName)].Value<string>();
             string UpdaterUserName = InputObject[nameof(UpdaterServiceSettings.UpdaterUserName)].Value<string>();
             string UpdaterSecretKey = InputObject[nameof(UpdaterServiceSettings.UpdaterSecretKey)].Value<string>();
-
+            bool IncludePreReleases = InputObject[nameof(UpdaterServiceSettings.IncludePreReleases)].Value<bool>();
+            bool EnableAutomaticUpdates = InputObject[nameof(UpdaterServiceSettings.EnableAutomaticUpdates)].Value<bool>();
+            TimeSpan RefreshTimerDelay = TimeSpan.FromSeconds(InputObject[nameof(UpdaterServiceSettings.RefreshTimerDelay)].Value<double>());
+            
             // Build a new output object using our pulled properties
             var OutputObject = new UpdaterServiceSettings()
             {
@@ -112,6 +120,9 @@ namespace FulcrumUpdaterService.JsonConverters
                 UpdaterOrgName = UpdaterOrgName,
                 UpdaterRepoName = UpdaterRepoName,
                 ForceUpdateReady = ForceUpdateReady,
+                RefreshTimerDelay = RefreshTimerDelay,
+                IncludePreReleases = IncludePreReleases,
+                EnableAutomaticUpdates = EnableAutomaticUpdates,
                 UpdaterUserName = this._useEncryption ? FulcrumEncryptor.Decrypt(UpdaterUserName) : UpdaterUserName,
                 UpdaterSecretKey = this._useEncryption ? FulcrumEncryptor.Decrypt(UpdaterSecretKey) : UpdaterSecretKey,
             };
