@@ -57,18 +57,26 @@ namespace FulcrumEmailService
             private set => _emailRecipientAddresses = value;
             get
             {
-                // Make sure the list of emails is not null, clean it, and return it out
-                this._emailRecipientAddresses ??= Array.Empty<MailAddress>();
-                List<MailAddress> OutputList = this._emailRecipientAddresses
+                // Make sure the list of emails is not null and that there's at least one entry in it here
+                if (this._emailRecipientAddresses == null || this._emailRecipientAddresses.Length == 0)
+                {
+                    // Build our default list of recipients here based on our configuration
+                    this._emailRecipientAddresses = this._emailSenderConfiguration.DefaultReportRecipients
+                        .Select(DefaultAddress => new MailAddress(DefaultAddress))
+                        .ToArray();
+                }
+
+                // Build a new list of output addresses without duplicates
+                this._emailRecipientAddresses = this._emailRecipientAddresses
                     .GroupBy(MailObj => MailObj.ToString())
                     .Select(MailObj => MailObj.First())
-                    .ToList();
+                    .ToArray();
 
                 // Return our output email address list here
-                return OutputList.ToArray();
+                return this._emailRecipientAddresses;
             }
         }
-        public FileInfo[] DefaultMessageAttachmentFiles { get; private set; }
+        public FileInfo[] DefaultMessageAttachmentFiles { get; private set; } = Array.Empty<FileInfo>();
 
         // Computed properties based on the SMTP and Broker configuration
         public bool SmtpSetupConfigured => this._stmpConfiguration != null;
@@ -152,7 +160,7 @@ namespace FulcrumEmailService
             this._emailSenderConfiguration = this._serviceConfig.SenderConfiguration;
             this._serviceLogger.WriteLog("PULLED CONFIGURATION FOR EMAIL SMTP CORRECTLY!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"SENDER NAME: {this._emailSenderConfiguration.ReportSenderName}", LogType.TraceLog);
-            this._serviceLogger.WriteLog($"SENDER NAME:  {this._emailSenderConfiguration.ReportSenderName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"SENDER ADDRESS: {this._emailSenderConfiguration.ReportSenderEmail}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"INCLUDE SERVICE LOGS:  {(this._emailSenderConfiguration.IncludeServiceLogs ? "YES" : "NO")}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"INCLUDE INJECTOR LOGS: {(this._emailSenderConfiguration.IncludeInjectorLog ? "YES" : "NO")}", LogType.TraceLog);
             this._serviceLogger.WriteLog($"DEFAULT RECIPIENT: {string.Join("," , this._emailSenderConfiguration.DefaultReportRecipients)}", LogType.TraceLog);
@@ -247,7 +255,7 @@ namespace FulcrumEmailService
             {
                 // Invoke our pipe routine for this method if needed and store output results
                 var PipeAction = this.ExecutePipeMethod(nameof(CreateFulcrumMessage));
-                return PipeAction.PipeCommandResult as FulcrumMessage;
+                return JsonConvert.DeserializeObject<FulcrumMessage>(PipeAction.PipeCommandResult.ToString());
             }
 
             // Log out that we're creating a new mail message object here
@@ -257,8 +265,8 @@ namespace FulcrumEmailService
             FulcrumMessage OutputMessage = new FulcrumMessage();
             OutputMessage.SenderAddress = this._emailSenderConfiguration.ReportSenderEmail;
             OutputMessage.MessageBodyContent = this._emailSenderConfiguration.DefaultEmailBodyText;
-            OutputMessage.MessageAttachments.AddRange(this.DefaultMessageAttachmentFiles.Select(FileObj => FileObj.FullName));
-            OutputMessage.RecipientsList.AddRange(this.DefaultRecipientAddresses.Select(RecipientAddress => RecipientAddress.Address));
+            foreach (var DefaultRecipient in this.DefaultRecipientAddresses) OutputMessage.RecipientsList.Add(DefaultRecipient.Address);
+            foreach (var DefaultAttachment in this.DefaultMessageAttachmentFiles) OutputMessage.MessageAttachments.Add(DefaultAttachment.FullName);
 
             // Once built, return our mail message 
             return OutputMessage;

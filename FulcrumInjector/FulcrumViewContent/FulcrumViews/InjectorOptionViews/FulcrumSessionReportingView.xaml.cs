@@ -157,6 +157,19 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
                 return SendResult;
             });
 
+            // Clear our existing content for our mail message object here 
+            if (SendPassed)
+            {
+                this.EmailSubjectText.Text = string.Empty;
+                this.EmailBodyTextContent.Text = string.Empty;
+                this.RecipientAddressEntryBox.Text = string.Empty;
+                this._viewLogger.WriteLog("CLEARED OUT EXISTING EMAIL CONTENT WITHOUT ISSUES!", LogType.InfoLog);
+
+                // Add session log files back in for our new message object here
+                this.ViewModel.AppendSessionLogFiles();
+                this._viewLogger.WriteLog("ADDED DEFAULT ATTACHMENTS FOR MAIL MESSAGES CORRECTLY!", LogType.InfoLog);
+            }
+            
             // Now set the send button based on the result.
             SendingButton.IsEnabled = true;
             SendingButton.Click -= SendEmailButton_OnClick;
