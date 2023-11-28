@@ -4,10 +4,11 @@ using System.Text;
 using System.Windows.Controls;
 using FulcrumEmailService;
 using FulcrumInjector.FulcrumViewSupport;
-using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using SharpLogging;
 using SharpPipes;
+
+// Static using call for importing mail message objects
+using FulcrumMessage = FulcrumEmailService.FulcrumEmail.FulcrumMessage;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionViewModels
 {
@@ -25,6 +26,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         // Private backing fields for our public properties
         private bool _canModifyMessage = true;          // Sets if we're able to modify the text of our email or not 
         private bool _showEmailInfoText = true;         // Sets if we're showing the help information or not 
+        private FulcrumMessage _sessionMessage;         // The message object we're sending for this session
         private FulcrumEmail _sessionReportSender;      // The sending service helper for sending emails
 
         #endregion // Fields
@@ -35,6 +37,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         public bool CanModifyMessage { get => _canModifyMessage; set => PropertyUpdated(value); }
         public bool ShowEmailInfoText { get => _showEmailInfoText; set => PropertyUpdated(value); }
         internal FulcrumEmail SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        internal FulcrumMessage SessionMessage { get => _sessionMessage; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -66,9 +69,24 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
                 throw InitBrokerEx;
             }
 
+            // Store a new mail message object for this session here 
+            this.SessionMessage = this.SessionReportSender.CreateFulcrumMessage();
+            this.ViewModelLogger.WriteLog("BUILT NEW FULCRUM EMAIL MESSAGE OBJECT CORRECTLY!", LogType.InfoLog);
+
+            // Store our session log file on the mail message here
+            string LogFileName = SharpLogBroker.LogFilePath;
+            this.ViewModelLogger.WriteLog($"SESSION LOG FILE NAME WAS SEEN TO BE {LogFileName}");
+            if (this.SessionMessage.MessageAttachments.Contains(LogFileName)) this.ViewModelLogger.WriteLog($"SKIPPING LOG FILE {LogFileName} SINCE IT WAS ALREADY ADDED!", LogType.WarnLog);
+            else
+            {
+                // Add the file and log the path of it out here
+                this.SessionMessage.MessageAttachments.Add(LogFileName);
+                this.ViewModelLogger.WriteLog($"ATTACHED NEW FILE NAMED {LogFileName} INTO SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
+            }
+
             // Log passed. Build in main log file and session logs if any.
             this.ViewModelLogger.WriteLog("EMAIL REPORT BROKER HAS BEEN BUILT OK AND BOUND TO OUR VIEW CONTENT!");
-            this.ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {this.AppendDefaultLogFiles()} OK!");
+            this.ViewModelLogger.WriteLog($"ATTACHED MAIN LOG FILE NAMED: {LogFileName} OK!");
             this.ViewModelLogger.WriteLog("SETUP NEW VIEW MODEL FOR EMAIL BROKER VALUES OK!");
             this.ViewModelLogger.WriteLog("REPORT EMAIL BROKER IS NOW READY FOR USE AND REPORT SENDING!", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"VIEW MODEL TYPE {this.GetType().Name} HAS BEEN CONSTRUCTED CORRECTLY!", LogType.InfoLog);
@@ -77,32 +95,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Appends the current injector log into the email object for including it.
-        /// </summary>
-        /// <returns>Name of the main log file.</returns>
-        public string AppendDefaultLogFiles()
-        {
-            // Log information, find the main log file name, and include it in here.
-            this.ViewModelLogger.WriteLog("INCLUDING MAIN LOG FILE FROM NLOG OUTPUT IN THE LIST OF ATTACHMENTS NOW!", LogType.WarnLog);
-
-            // Get file name. Store and return it
-            string LogFileName = SharpLogBroker.LogFilePath;
-            this.SessionReportSender.AddMessageAttachment(LogFileName);
-            this.ViewModelLogger.WriteLog($"ATTACHED NEW FILE NAMED {LogFileName} INTO SESSION ATTACHMENTS CORRECTLY!", LogType.InfoLog);
-            return LogFileName;
-        }
-        /// <summary>
         /// Pulls in the session logs from our DLL output view.
         /// </summary>
         /// <returns>Strings added</returns>
-        public string[] AppendSessionLogFiles()
+        public bool AppendSessionLogFiles()
         {
             // Log information, pull view from constants and get values.
             this.ViewModelLogger.WriteLog("PULLING IN DLL SESSION LOG FILE ENTRIES NOW...", LogType.InfoLog);
             var FilesLocated = FulcrumConstants.FulcrumDllOutputLogViewModel?.SessionLogs;
             if (FilesLocated == null) {
                 this.ViewModelLogger.WriteLog("ERROR! SESSION LOG OBJECT WAS NULL!", LogType.ErrorLog);
-                return Array.Empty<string>();
+                return false;
             }
 
             // Check how many files we pulled and return.
@@ -115,15 +118,50 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
                     LogType.InfoLog);
 
             // Append them into our list of reports and return.
-            foreach (var MessageAttachment in FilesLocated) {
-                this.SessionReportSender.AddMessageAttachment(MessageAttachment);
-                this.ViewModelLogger.WriteLog($"APPENDED ATTACHMENT FILE: {MessageAttachment} TO REPORT", LogType.TraceLog);
+            foreach (var MessageAttachment in FilesLocated)
+            {
+                // Make sure we don't have this attachment already
+                if (this.SessionMessage.MessageAttachments.Contains(MessageAttachment)) this.ViewModelLogger.WriteLog($"SKIPPING DUPLICATE ATTACHMENT {MessageAttachment}", LogType.WarnLog);
+                else
+                {
+                    // Add the file and log the path of it out here
+                    this.SessionMessage.MessageAttachments.Add(MessageAttachment);
+                    this.ViewModelLogger.WriteLog($"APPENDED ATTACHMENT FILE: {MessageAttachment} TO REPORT", LogType.TraceLog);
+                }
             }
 
             // Return information and return out.
-            this.ViewModelLogger.WriteLog("RETURNING OUTPUT FROM THE SESSION LOG EXTRACTION ROUTINE NOW...", LogType.InfoLog);
-            return FilesLocated.ToArray();
+            return FilesLocated.Count != 0;
         }
+        /// <summary>
+        /// Sends our session message out to the requested recipients
+        /// </summary>
+        /// <returns>True if our message is sent, false if it is not</returns>
+        public bool SendSessionMessage()
+        {
+            // Try and send our message object here
+            this.ViewModelLogger.WriteLog("SENDING FULCRUM MESSAGE OBJECT USING EMAIL SERVICE NOW...", LogType.WarnLog);
+            try
+            {
+                // Send our message out and log completed here
+                if (!this.SessionReportSender.SendFulcrumMessage(this.SessionMessage))
+                    throw new InvalidOperationException("Error! Failed to send FulcrumMessage!"); 
+                
+                // Log out that we've sent our message without issues
+                this.ViewModelLogger.WriteLog("SENT MAIL MESSAGE WITHOUT ISSUES!", LogType.InfoLog);
+                return true; 
+            }
+            catch (Exception SendMessageEx)
+            {
+                // Log out our exception and return failed here
+                this.ViewModelLogger.WriteLog("ERROR! FAILED TO SEND MAIL MESSAGE USING EMAIL SERVICE!", LogType.ErrorLog);
+                this.ViewModelLogger.WriteException("EXCEPTION THROWN DURING SEND ROUTINE IS BEING LOGGED BELOW", SendMessageEx);
+                return false;
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Event object to run when the injector output gets new content.
         /// Pulls log files out from text and saves their contents here.
@@ -140,9 +178,15 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             this.ViewModelLogger.WriteLog("STORING NEW FILE NAME VALUE INTO STORE OBJECT FOR REGISTERED OUTPUT FILES!", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"SESSION LOG FILE BEING APPENDED APPEARED TO HAVE NAME OF {NextSessionLog}", LogType.InfoLog);
 
-            // Try and attach it to our output report helper.
-            if (this.SessionReportSender.AddMessageAttachment(NextSessionLog)) this.ViewModelLogger.WriteLog("ATTACHED REPORT FILE OK!", LogType.InfoLog);
-            else this.ViewModelLogger.WriteLog("FAILED TO ATTACH REPORT INTO OUR OUTPUT CONTENT!", LogType.ErrorLog);
+            // Try and attach it to our output report helper. Build our mail message first if needed here
+            if (this.SessionMessage == null && this.SessionReportSender != null) this.SessionMessage = this.SessionReportSender.CreateFulcrumMessage();
+            if (this.SessionMessage.MessageAttachments.Contains(NextSessionLog)) this.ViewModelLogger.WriteLog($"SKIPPING DUPLICATE ATTACHMENT {NextSessionLog}", LogType.WarnLog);
+            else
+            {
+                // Add the file and log the path of it out here
+                this.SessionMessage.MessageAttachments.Add(NextSessionLog);
+                this.ViewModelLogger.WriteLog($"APPENDED ATTACHMENT FILE: {NextSessionLog} TO REPORT", LogType.TraceLog);
+            }
         }
     }
 }

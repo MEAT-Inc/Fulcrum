@@ -53,8 +53,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger = new SharpLogger(LoggerActions.UniversalLogger);
 
             // Append new session log files.
-            this.ViewModel.AppendSessionLogFiles();
-            this._viewLogger.WriteLog("STORED SESSION LOG FILES INTO EMAIL ATTACHMENTS OK!", LogType.InfoLog);
+            if (this.ViewModel.AppendSessionLogFiles()) this._viewLogger.WriteLog("STORED SESSION LOG FILES INTO EMAIL ATTACHMENTS OK!", LogType.InfoLog);
+            else this._viewLogger.WriteLog("WARNING! NO LOG FILES WERE ADDED TO OUR SESSION MESSAGE!", LogType.WarnLog);
 
             // Build event for our pipe objects to process new pipe content into our output box
             PassThruPipeReader ReaderPipe = PassThruPipeReader.AllocatePipe();
@@ -77,13 +77,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
         {
             // Force show help menu and build email temp text
             if (this.EmailBodyTextContent.Text.Length == 0) {
-                this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumConstants.InjectorEmailConfiguration.DefaultEmailBodyText");
+                this.EmailBodyTextContent.Text = ValueLoaders.GetConfigValue<string>("FulcrumServices.FulcrumEmailService.SenderConfiguration.DefaultEmailBodyText");
                 this._viewLogger.WriteLog("STORED DEFAULT EMAIL TEXT INTO THE VIEW OBJECT CORRECTLY!", LogType.InfoLog);
             }
 
             // Log done building new ViewModel.
             if (this.ViewModel.ShowEmailInfoText) this.ToggleEmailPaneInfoButton_OnClick(null, null);
-            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles;
             this._viewLogger.WriteLog("CONFIGURED VIEW CONTROL VALUES FOR EMAIL REPORTING OUTPUT OK!", LogType.InfoLog);
         }
 
@@ -129,6 +129,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger.WriteLog($"BODY CONTENT OF SENDING OBJECT IS SEEN AS: {BodyContents}", LogType.TraceLog);
             this._viewLogger.WriteLog("SENDING EMAIL OBJECT TO VIEW MODEL FOR FINAL PROCESS AND SEND ROUTINE!", LogType.InfoLog);
 
+            // Update our email object with the requested subject and body content from our view
+            if (!string.IsNullOrWhiteSpace(SendingSubject)) this.ViewModel.SessionMessage.MessageSubject = SendingSubject; 
+            if (!string.IsNullOrWhiteSpace(BodyContents)) this.ViewModel.SessionMessage.MessageBodyContent = BodyContents;
+
             // Set Can modify to false to turn off controls.
             bool SendPassed = await Task.Run(() =>
             {
@@ -144,7 +148,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
                 // Rend out the message request here.
                 var SendTime = new Stopwatch(); SendTime.Start();
-                bool SendResult = this.ViewModel.SessionReportSender.SendMessage(SendingSubject, BodyContents);
+                bool SendResult = this.ViewModel.SendSessionMessage();
                 this._viewLogger.WriteLog($"SENDING ROUTINE HAS COMPLETED! SEND ROUTINE TOOK {SendTime.Elapsed.ToString("g")} TO SEND MESSAGES", LogType.InfoLog);
                 this._viewLogger.WriteLog($"RESULT FROM SEND ROUTINE WAS: {SendResult}", LogType.WarnLog);
 
@@ -183,7 +187,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             string NewTextContent = BoxObject.Text;
 
             // Check if there's even an email to parse out. If none, remove all.
-            if (NewTextContent.Length == 0) { this.ViewModel.SessionReportSender.RemoveRecipient(); }
+            if (NewTextContent.Length == 0) { this.ViewModel.SessionMessage.RecipientsList.Clear(); }
             Regex SendingRegex = new Regex(@"([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)");
             var MatchedEmails = SendingRegex.Matches(NewTextContent);
             if (MatchedEmails.Count == 0) {
@@ -192,14 +196,13 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             }
 
             // Clear out all current address values and then add them back in one at a time.
-            this.ViewModel.SessionReportSender.RemoveRecipient();
-            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.SessionReportSender.AddRecipient(AddressMatch.Value); }
-            string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.EmailRecipientAddresses.Select(MailAddress => MailAddress.Address));
+            foreach (Match AddressMatch in MatchedEmails) { this.ViewModel.SessionMessage.RecipientsList.Add(AddressMatch.Value); }
+            string NewAddressString = string.Join(",", this.ViewModel.SessionReportSender.DefaultRecipientAddresses.Select(MailAddress => MailAddress.Address));
 
             // Now remove address values that don't fly here.
             this._viewLogger.WriteLog($"CURRENT EMAILS: {NewAddressString}", LogType.TraceLog);
             this._viewLogger.WriteLog("UPDATED EMAIL ENTRY TEXTBOX CONTENTS TO REFLECT ONLY VALID EMAILS!", LogType.InfoLog);
-            this.SendMessageButton.IsEnabled = this.ViewModel.SessionReportSender.EmailRecipientAddresses.Length != 0;
+            this.SendMessageButton.IsEnabled = this.ViewModel.SessionReportSender.DefaultRecipientAddresses.Length != 0;
         }
         /// <summary>
         /// Attaches a new file entry into our list of files by showing a file selection dialogue
@@ -224,18 +227,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
             this._viewLogger.WriteLog("OPENING NEW DIALOG OBJECT NOW...", LogType.WarnLog);
             if (SelectAttachmentDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || SelectAttachmentDialog.FileNames.Length == 0) {
                 this._viewLogger.WriteLog("FAILED TO SELECT A NEW FILE OBJECT! EXITING NOW...", LogType.ErrorLog);
-                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles;
                 return;
             }
 
             // Now pull our file objects out and store them on our viewModel
             foreach (var FilePath in SelectAttachmentDialog.FileNames) {
                 this._viewLogger.WriteLog($"ATTACHING FILE OBJECT: {FilePath}", LogType.TraceLog);
-                this.ViewModel.SessionReportSender.AddMessageAttachment(FilePath);
+                this.ViewModel.SessionMessage.MessageAttachments.Add(FilePath);
             }
 
             // Store content for the listbox using the VM Email broker and log complete.
-            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+            this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles;
             this._viewLogger.WriteLog("DONE APPENDING NEW FILE INSTANCES. ATTACHMENTS LISTBOX SHOULD BE UPDATED WITH NEW INFORMATION NOW", LogType.InfoLog);
         }
         /// <summary>
@@ -257,29 +260,29 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorOptionViews
 
                 // Find possible index for file object.
                 this._viewLogger.WriteLog($"FILE OBJECT TEXT WAS FOUND AND PARSED! LOOKING FOR FILE {FileNameBlock.Text}", LogType.InfoLog);
-                int FileIndex = this.ViewModel.SessionReportSender.MessageAttachmentFiles
+                int FileIndex = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles
                     .ToList()
                     .FindIndex(FileObj => string.Equals(FileObj.Name, FileNameBlock.Text, StringComparison.CurrentCultureIgnoreCase));
 
                 // Now ensure the index is valid
-                if (FileIndex > this.ViewModel.SessionReportSender.MessageAttachmentFiles.Length || FileIndex < 0) {
+                if (FileIndex > this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles.Length || FileIndex < 0) {
                     this._viewLogger.WriteLog("INDEX WAS OUT OF RANGE FOR INPUT TEXT VALUE! THIS IS FATAL!", LogType.ErrorLog);
                     throw new IndexOutOfRangeException("INDEX FOR SELECTED OBJECT IS OUTSIDE BOUNDS OF VIEWMODEL SENDING BROKER!");
                 }
 
                 // Store string for name of the file.
-                string FileNameToRemove = this.ViewModel.SessionReportSender.MessageAttachmentFiles[FileIndex].FullName;
+                string FileNameToRemove = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles[FileIndex].FullName;
                 this._viewLogger.WriteLog($"PULLED INDEX VALUE OK! TRYING TO REMOVE FILE NAMED {FileNameToRemove}", LogType.InfoLog);
 
                 // Store modified view binding list into the view model for updating.
-                this.ViewModel.SessionReportSender.RemoveMessageAttachment(FileNameToRemove);
-                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+                this.ViewModel.SessionMessage.MessageAttachments.Remove(FileNameToRemove);
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles;
                 this._viewLogger.WriteLog("REQUEST FOR REMOVAL PROCESSED AND PASSED OK! RETURNING NOW", LogType.InfoLog);
             }
             catch (Exception Ex)
             {
                 // Log failures and return out. Set the content for the listbox to the VM
-                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.MessageAttachmentFiles;
+                this.ReportAttachmentFiles.ItemsSource = this.ViewModel.SessionReportSender.DefaultMessageAttachmentFiles;
                 this._viewLogger.WriteLog("FAILED TO REMOVE FILE DUE TO AN EXCEPTION WHILE TRYING TO FIND FILE NAME OR VALUE!", LogType.ErrorLog);
                 this._viewLogger.WriteException("EXCEPTION IS BEING LOGGED BELOW.", Ex);
             }

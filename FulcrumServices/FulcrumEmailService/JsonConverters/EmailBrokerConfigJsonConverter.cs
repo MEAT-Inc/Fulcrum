@@ -62,7 +62,10 @@ namespace FulcrumEmailService.JsonConverters
             var OutputObject = JObject.FromObject(new
             {
                 ValueObject.ReportSenderName,
-                ValueObject.DefaultReportRecipient,
+                ValueObject.IncludeInjectorLog,
+                ValueObject.IncludeServiceLogs,
+                ValueObject.DefaultEmailBodyText,
+                DefaultReportRecipients = ValueObject.DefaultReportRecipients.ToArray(),
                 ReportSenderEmail = this._useEncryption 
                     ? FulcrumEncryptor.Encrypt(ValueObject.ReportSenderName)
                     : ValueObject.ReportSenderName,
@@ -97,16 +100,25 @@ namespace FulcrumEmailService.JsonConverters
 
             // Read in our properties for the JObject and build a configuration from them
             string ReportSenderName = InputObject[nameof(EmailBrokerConfiguration.ReportSenderName)].Value<string>();
+            bool IncludeInjectorLog = InputObject[nameof(EmailBrokerConfiguration.IncludeInjectorLog)].Value<bool>();
+            bool IncludeServiceLogs = InputObject[nameof(EmailBrokerConfiguration.IncludeServiceLogs)].Value<bool>();
             string ReportSenderEmail = InputObject[nameof(EmailBrokerConfiguration.ReportSenderEmail)].Value<string>();
             string ReportSenderPassword = InputObject[nameof(EmailBrokerConfiguration.ReportSenderPassword)].Value<string>();
-            string DefaultReportRecipient = InputObject[nameof(EmailBrokerConfiguration.DefaultReportRecipient)].Value<string>();
+            string DefaultEmailBodyText = InputObject[nameof(EmailBrokerConfiguration.DefaultEmailBodyText)].Value<string>(); 
+
+            // Build our list of default recipients here
+            JArray RecipientsJArray = JArray.FromObject(InputObject[nameof(EmailBrokerConfiguration.DefaultReportRecipients)]);
+            string[] DefaultReportRecipients = RecipientsJArray.Select(AddressValue => AddressValue.Value<string>()).ToArray();
 
             // Build a new output object using our pulled properties
             var OutputObject = new EmailBrokerConfiguration()
             {
                 // Store the properties of our configuration here and exit out
                 ReportSenderName = ReportSenderName,
-                DefaultReportRecipient = DefaultReportRecipient,
+                IncludeServiceLogs = IncludeServiceLogs,
+                IncludeInjectorLog = IncludeInjectorLog,
+                DefaultEmailBodyText = DefaultEmailBodyText,
+                DefaultReportRecipients = DefaultReportRecipients,
                 ReportSenderEmail = this._useEncryption
                     ? FulcrumEncryptor.Decrypt(ReportSenderEmail)
                     : ReportSenderEmail,

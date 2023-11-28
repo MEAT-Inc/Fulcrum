@@ -178,7 +178,7 @@
                          x:Name="ReportAttachmentFiles"
                          Margin="0,0,0,0" 
                          Style="{StaticResource AttachedFilesListboxStyle}"
-                         DataContext="{Binding Path=SessionReportSender.MessageAttachmentFiles}">
+                         DataContext="{Binding Path=SessionReportSender.DefaultMessageAttachmentFiles}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border Padding="5,5" Margin="-5,0,0,0"
