@@ -20,7 +20,10 @@ namespace FulcrumEmailService.EmailServiceModels
 
         // Public properties which do not require encryption or decryption
         public string ReportSenderName { get; set; }
-        public string DefaultReportRecipient { get; set; }
+        public bool IncludeInjectorLog { get; set; }
+        public bool IncludeServiceLogs { get; set; }
+        public string DefaultEmailBodyText { get; set; }
+        public string[] DefaultReportRecipients { get; set; }
 
         // Public properties which need to be decrypted or encrypted on conversion routines
         [EncryptedValue] public string ReportSenderEmail { get; set; }
