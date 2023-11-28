@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:avEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:io="clr-namespace:System.IO;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="FulcrumSessionReportingView_OnLoaded"
@@ -178,9 +179,9 @@
                          x:Name="ReportAttachmentFiles"
                          Margin="0,0,0,0" 
                          Style="{StaticResource AttachedFilesListboxStyle}"
-                         DataContext="{Binding Path=SessionMessage.MessageAttachments}">
+                         DataContext="{Binding Path=AttachmentInfos}">
                     <ListBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="{x:Type io:FileInfo}">
                             <Border Padding="5,5" Margin="-5,0,0,0"
                                     BorderThickness="2" BorderBrush="{StaticResource DarkGreyThemeColor}">
                                 <Grid Margin="1,0,0,0">

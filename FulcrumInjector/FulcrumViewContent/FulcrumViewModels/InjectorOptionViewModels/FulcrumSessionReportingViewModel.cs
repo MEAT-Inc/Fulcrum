@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
@@ -39,7 +40,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             this.ViewModelLogger.WriteLog($"SESSION LOG FILE BEING APPENDED APPEARED TO HAVE NAME OF {NextSessionLog}", LogType.InfoLog);
 
             // Try and attach it to our output report helper. Build our mail message first if needed here
-            if (this.SessionMessage == null && this.SessionReportSender != null) this.SessionMessage = this.SessionReportSender.CreateFulcrumMessage();
+            if (this.SessionMessage == null && this._sessionReportSender != null) this.SessionMessage = this._sessionReportSender.CreateFulcrumMessage();
             if (this.SessionMessage.MessageAttachments.Contains(NextSessionLog)) this.ViewModelLogger.WriteLog($"SKIPPING DUPLICATE ATTACHMENT {NextSessionLog}", LogType.WarnLog);
             else
             {
@@ -57,6 +58,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
         private bool _canModifyMessage = true;          // Sets if we're able to modify the text of our email or not 
         private bool _showEmailInfoText = true;         // Sets if we're showing the help information or not 
         private FulcrumMessage _sessionMessage;         // The message object we're sending for this session
+        private List<FileInfo> _attachmentInfos;        // Collection of FileInfo objects for message attachments
         private FulcrumEmail _sessionReportSender;      // The sending service helper for sending emails
 
         #endregion // Fields
@@ -69,7 +71,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
 
         // Properties holding information about our report sender and the message being sent
         public FulcrumMessage SessionMessage { get => _sessionMessage; set => PropertyUpdated(value); }
-        internal FulcrumEmail SessionReportSender { get => _sessionReportSender; set => PropertyUpdated(value); }
+        public List<FileInfo> AttachmentInfos { get => _attachmentInfos; set => PropertyUpdated(value); }
 
         #endregion // Properties
 
@@ -102,7 +104,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             }
 
             // Store a new mail message object for this session here 
-            this.SessionMessage = this.SessionReportSender.CreateFulcrumMessage();
+            this.SessionMessage = this._sessionReportSender.CreateFulcrumMessage();
             this.ViewModelLogger.WriteLog("BUILT NEW FULCRUM EMAIL MESSAGE OBJECT CORRECTLY!", LogType.InfoLog);
 
             // Log passed. Build in main log file and session logs if any.
@@ -155,6 +157,10 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
                 }
             }
 
+            // Build a new view model bound file collection for attachments
+            this.AttachmentInfos = this.SessionMessage.MessageAttachments.Select(FileName => new FileInfo(FileName)).ToList();
+            this.ViewModelLogger.WriteLog("BUILT NEW FILE INFORMATION OBJECTS FOR ATTACHED FILES CORRECTLY!", LogType.InfoLog);
+
             // Return information and return out.
             return FilesLocated.Count != 0;
         }
@@ -169,11 +175,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorOptionVie
             try
             {
                 // Send our message out and log completed here
-                if (!this.SessionReportSender.SendFulcrumMessage(this.SessionMessage))
+                if (!this._sessionReportSender.SendFulcrumMessage(this.SessionMessage))
                     throw new InvalidOperationException("Error! Failed to send FulcrumMessage!");
 
                 // Log out that we've sent our message without issues
-                this.SessionMessage = this.SessionReportSender.CreateFulcrumMessage();
+                this.SessionMessage = this._sessionReportSender.CreateFulcrumMessage();
                 this.ViewModelLogger.WriteLog("SENT MAIL MESSAGE WITHOUT ISSUES!", LogType.InfoLog);
                 this.ViewModelLogger.WriteLog("BUILT NEW EMAIL MESSAGE OBJECT FOR NEXT REPORT CORRECTLY!", LogType.InfoLog);
                 return true; 
