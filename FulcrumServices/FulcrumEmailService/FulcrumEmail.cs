@@ -33,14 +33,14 @@ namespace FulcrumEmailService
         #region Fields
 
         // Private backing fields for our email service instance
-        private static FulcrumEmail _serviceInstance;         // Instance of our service object
-        private static readonly object _serviceLock = new();    // Lock object for building service instances
+        private static FulcrumEmail _serviceInstance;                   // Instance of our service object
+        private static readonly object _serviceLock = new();            // Lock object for building service instances
 
         // Private configuration objects for service setup
-        private EmailServiceSettings _serviceConfig;              // Settings configuration for our service
-        private MailAddress[] _emailRecipientAddresses;           // Backing field for email service configuration
-        private EmailSmtpConfiguration _stmpConfiguration;        // Configuration for SMTP Server connections
-        private EmailBrokerConfiguration _emailConfiguration;     // Configuration for the broker instance itself
+        private EmailServiceSettings _serviceConfig;                    // Settings configuration for our service
+        private MailAddress[] _emailRecipientAddresses;                 // Backing field for email service configuration
+        private EmailSmtpConfiguration _stmpConfiguration;              // Configuration for SMTP Server connections
+        private EmailBrokerConfiguration _emailSenderConfiguration;     // Configuration for the broker instance itself
 
         #endregion //Fields
 
@@ -51,44 +51,82 @@ namespace FulcrumEmailService
 
         // Public facing collection of email address properties used to configure sending outgoing messages
         public SmtpClient SendingClient { get; private set; }
-        public MailAddress[] EmailRecipientAddresses
+        public MailAddress EmailSenderAddress => new(this._emailSenderConfiguration.ReportSenderEmail);
+        public MailAddress[] DefaultRecipientAddresses
         {
             private set => _emailRecipientAddresses = value;
             get
             {
-                // Make sure the list of emails is not null. 
-                if (this._emailRecipientAddresses == null && this.DefaultRecipientAddress != null)
+                // Make sure the list of emails is not null and that there's at least one entry in it here
+                if (this._emailRecipientAddresses == null || this._emailRecipientAddresses.Length == 0)
                 {
-                    this._serviceLogger.WriteLog("WARING! NO EMAILS ENTERED YET! RETURNING ONLY OUR DEFAULT MAIL RECIPIENT!", LogType.WarnLog);
-                    return new MailAddress[] { DefaultRecipientAddress };
+                    // Build our default list of recipients here based on our configuration
+                    this._emailRecipientAddresses = this._emailSenderConfiguration.DefaultReportRecipients
+                        .Select(DefaultAddress => new MailAddress(DefaultAddress))
+                        .ToArray();
                 }
 
-                // Combine the output address set with the current default address
-                var OutputList = this.DefaultRecipientAddress == null ?
-                    new List<MailAddress>() :
-                    new List<MailAddress> { DefaultRecipientAddress };
+                // Build a new list of output addresses without duplicates
+                this._emailRecipientAddresses = this._emailRecipientAddresses
+                    .GroupBy(MailObj => MailObj.ToString())
+                    .Select(MailObj => MailObj.First())
+                    .ToArray();
 
-                // Append in existing address values now.
-                if (this._emailRecipientAddresses != null) OutputList.AddRange(this._emailRecipientAddresses);
-
-                // Remove duplicates and return output
-                OutputList = OutputList.GroupBy(MailObj => MailObj.ToString()).Select(MailObj => MailObj.First()).ToList();
-                return OutputList.ToArray();
+                // Return our output email address list here
+                return this._emailRecipientAddresses;
             }
         }
-        public FileInfo[] MessageAttachmentFiles { get; private set; }
+        public FileInfo[] DefaultMessageAttachmentFiles { get; private set; } = Array.Empty<FileInfo>();
 
         // Computed properties based on the SMTP and Broker configuration
-        public bool EmialBrokerConfigured => this._emailConfiguration != null;
         public bool SmtpSetupConfigured => this._stmpConfiguration != null;
-
-        // Public properties holding information about sender addresses
-        public MailAddress EmailSenderAddress => new(this._emailConfiguration.ReportSenderEmail);
-        public MailAddress DefaultRecipientAddress => new(this._emailConfiguration.DefaultReportRecipient);
+        public bool EmialBrokerConfigured => this._emailSenderConfiguration != null;
 
         #endregion //Properties
 
         #region Structs and Classes
+        
+        /// <summary>
+        /// Public class object holding information and configuration for a message to be sent using this email service
+        /// </summary>
+        public class FulcrumMessage
+        {
+            #region Custom Events
+            #endregion // Custom Events
+
+            #region Fields
+            #endregion // Fields
+
+            #region Properties
+
+            // Public facing properties for our email object sender and recipients
+            public string SenderAddress { get; internal set; }
+            public List<string> RecipientsList { get; set; }
+
+            // Public facing properties about our email object content
+            public string MessageSubject { get; set; }
+            public string MessageBodyContent { get; set; }
+            public List<string> MessageAttachments { get; set; }
+
+            #endregion // Properties
+
+            #region Structs and Classes
+            #endregion // Structs and Classes
+
+            // --------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Builds a new FulcrumMessage object to be used for sending messages
+            /// </summary>
+            internal FulcrumMessage()
+            {
+                // Configure new default values for the recipients, attachments, and build a subject
+                this.RecipientsList = new List<string>();
+                this.MessageAttachments = new List<string>();
+                this.MessageSubject = $"Fulcrum Reporting - {DateTime.Now:f}";
+            }
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -119,11 +157,13 @@ namespace FulcrumEmailService
             this._serviceLogger.WriteLog($"SERVICE ENABLED: {this._serviceConfig.ServiceEnabled}", LogType.TraceLog);
 
             // Log out information about our service configuration here
-            this._emailConfiguration = this._serviceConfig.SenderConfiguration;
+            this._emailSenderConfiguration = this._serviceConfig.SenderConfiguration;
             this._serviceLogger.WriteLog("PULLED CONFIGURATION FOR EMAIL SMTP CORRECTLY!", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"SENDER NAME: {this._emailConfiguration.ReportSenderName}", LogType.TraceLog);
-            this._serviceLogger.WriteLog($"SENDER NAME:  {this._emailConfiguration.ReportSenderName}", LogType.TraceLog);
-            this._serviceLogger.WriteLog($"DEFAULT RECIPIENT: {this._emailConfiguration.DefaultReportRecipient}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"SENDER NAME: {this._emailSenderConfiguration.ReportSenderName}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"SENDER ADDRESS: {this._emailSenderConfiguration.ReportSenderEmail}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"INCLUDE SERVICE LOGS:  {(this._emailSenderConfiguration.IncludeServiceLogs ? "YES" : "NO")}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"INCLUDE INJECTOR LOGS: {(this._emailSenderConfiguration.IncludeInjectorLog ? "YES" : "NO")}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"DEFAULT RECIPIENT: {string.Join("," , this._emailSenderConfiguration.DefaultReportRecipients)}", LogType.TraceLog);
 
             // Log out information about our SMTP configuration here
             this._stmpConfiguration = this._serviceConfig.SmtpServerSettings;
@@ -133,8 +173,8 @@ namespace FulcrumEmailService
             this._serviceLogger.WriteLog($"SMTP TIMEOUT: {this._stmpConfiguration.ServerTimeout}", LogType.TraceLog);
 
             // Log information about passed output here.
-            this._serviceLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this._emailConfiguration.ReportSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {this.DefaultRecipientAddress} FOR OUTPUT REPORTS", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"EMAILS WILL BE SENT FROM USER {this._emailSenderConfiguration.ReportSenderName} ({this.EmailSenderAddress}) WHEN USING THIS BROKER INSTANCE", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"OUR DEFAULT RECIPIENT WILL BE SEEN AS {string.Join(",", this._emailSenderConfiguration.DefaultReportRecipients)} FOR OUTPUT REPORTS", LogType.TraceLog);
         }
         /// <summary>
         /// Static CTOR for an email broker instance. Simply pulls out the new singleton instance for our email broker
@@ -205,157 +245,69 @@ namespace FulcrumEmailService
         // --------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Adds a new recipient into our list of recipients.
-        /// Skips the name value if it's already in the list.
+        /// Spawns a new FulcrumMessage object used to configure emails to send out using this service
         /// </summary>
-        /// <param name="NextRecipient">Name to add in.</param>
-        /// <returns>True if adding the user passed (Unique and format is right). False if not.</returns>
-        public bool AddRecipient(string NextRecipient)
+        /// <returns></returns>
+        public FulcrumMessage CreateFulcrumMessage()
         {
-            try
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
             {
-                // Try and make this string an email
-                var TempAddress = new MailAddress(NextRecipient);
-                if (EmailRecipientAddresses.Any(EmailObj => Equals(EmailObj, TempAddress)))
-                {
-                    this._serviceLogger.WriteLog("ADDRESS WAS ALREADY IN OUR LIST OF RECIPIENTS! RETURNING FALSE", LogType.WarnLog);
-                    return false;
-                }
-
-                // Add address here since it does not currently exist.
-                this.EmailRecipientAddresses = this.EmailRecipientAddresses.Append(TempAddress).ToArray();
-                this._serviceLogger.WriteLog("NEW EMAIL PASSED IS A VALID UNIQUE EMAIL! ADDING TO OUR LIST NOW", LogType.InfoLog);
-                return true;
-            }
-            catch
-            {
-                // If it failed, then return false.
-                this._serviceLogger.WriteLog("EMAIL PROVIDED WAS NOT A VALID EMAIL! RETURNING FALSE", LogType.WarnLog);
-                return false;
-            }
-        }
-        /// <summary>
-        /// Clears out the list of recipients to use for sending emails.
-        /// </summary>
-        public bool RemoveRecipient(string RecipientAddress = null)
-        {
-            // Check if the entered recipient is null or not.
-            if (RecipientAddress == null)
-            {
-                // Log Removing all.
-                this._serviceLogger.WriteLog("REMOVING ALL RECIPIENTS FROM LIST OF ENTRIES NOW...", LogType.WarnLog);
-                this.EmailRecipientAddresses = Array.Empty<MailAddress>();
-                return true;
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(CreateFulcrumMessage));
+                return JsonConvert.DeserializeObject<FulcrumMessage>(PipeAction.PipeCommandResult.ToString());
             }
 
-            // Remove only the given name.
-            if (this.EmailRecipientAddresses.All(EmailObj => !string.Equals(EmailObj.ToString(), RecipientAddress, StringComparison.CurrentCultureIgnoreCase)))
-            {
-                this._serviceLogger.WriteLog($"NO EMAIL ADDRESS WITH THE VALUE {RecipientAddress} WAS FOUND!", LogType.WarnLog);
-                return false;
-            }
+            // Log out that we're creating a new mail message object here
+            this._serviceLogger.WriteLog("BUILDING NEW MAIL MESSAGE FOR EMAIL SERVICE NOW...", LogType.InfoLog);
 
-            // Remove value here and return.
-            var StringAddresses = this.EmailRecipientAddresses.Select(EmailObj => EmailObj.ToString().ToUpper());
-            if (!StringAddresses.ToList().Remove(RecipientAddress.ToUpper()))
-            {
-                this._serviceLogger.WriteLog($"FAILED TO REMOVE REQUESED ADDRESS OF {RecipientAddress}!", LogType.WarnLog);
-                return false;
-            }
+            // Build a new message object to configure and return
+            FulcrumMessage OutputMessage = new FulcrumMessage();
+            OutputMessage.SenderAddress = this._emailSenderConfiguration.ReportSenderEmail;
+            OutputMessage.MessageBodyContent = this._emailSenderConfiguration.DefaultEmailBodyText;
+            foreach (var DefaultRecipient in this.DefaultRecipientAddresses) OutputMessage.RecipientsList.Add(DefaultRecipient.Address);
+            foreach (var DefaultAttachment in this.DefaultMessageAttachmentFiles) OutputMessage.MessageAttachments.Add(DefaultAttachment.FullName);
 
-            // Now reset email list contents here.
-            this.EmailRecipientAddresses = StringAddresses.Select(StringAddr => new MailAddress(StringAddr)).ToArray();
-            this._serviceLogger.WriteLog($"REMOVED ADDRESS NAME {RecipientAddress} CORRECTLY! STORING NEW ADDRESS SET NOW...", LogType.InfoLog);
-            return true;
-        }
-        /// <summary>
-        /// Puts a new file path into our list of attachment objects. 
-        /// </summary>
-        /// <param name="PathToAttachment">File to add</param>
-        /// <returns>True if added. False if not.</returns>
-        public bool AddMessageAttachment(string PathToAttachment)
-        {
-            // Check if the list exists at all and if the new path is in it.
-            this.MessageAttachmentFiles ??= Array.Empty<FileInfo>();
-            this._serviceLogger.WriteLog($"ATTACHING FILE {PathToAttachment}", LogType.InfoLog);
-            if (!File.Exists(PathToAttachment))
-            {
-                this._serviceLogger.WriteLog("FILE OBJECT DOES NOT EXIST! CAN NOT ADD IT INTO OUR ATTACHMENT LIST!", LogType.ErrorLog);
-                return false;
-            }
-
-            // Find existing if possible.
-            if (MessageAttachmentFiles.Any(FileObj => FileObj.Name == Path.GetFileName(PathToAttachment)))
-                return false;
-
-            // Log total file count now and add into our list.
-            this._serviceLogger.WriteLog("APPENDING NEW FILE OBJECT INTO OUR LIST OF ATTACHMENTS NOW...", LogType.InfoLog);
-            this.MessageAttachmentFiles = this.MessageAttachmentFiles.Append(new FileInfo(PathToAttachment)).ToArray();
-            return true;
-        }
-        /// <summary>
-        /// Removes a file from the attachment list by passing in the name of it.
-        /// If filtering is on it runs a regex on the names in the system checking if any match the pattern. 
-        /// </summary>
-        /// <param name="NameToRemove">Name of file to remove</param>
-        /// <param name="UseFilter">Filtering on or off</param>
-        /// <returns>True if one or more files get removed. False if not.</returns>
-        public bool RemoveMessageAttachment(string NameToRemove = null, bool UseFilter = false)
-        {
-            // Check for a clear command.
-            if (NameToRemove == null)
-            {
-                // Removes all entries if no value is given.
-                this._serviceLogger.WriteLog("NO NAME FILTER WAS PROVIDED! REMOVING ALL ENTRIES FROM OUR MAIL LIST NOW...");
-                this.MessageAttachmentFiles = Array.Empty<FileInfo>();
-                return true;
-            }
-
-            // Check if the list exists and log file removing
-            this.MessageAttachmentFiles ??= Array.Empty<FileInfo>();
-            this._serviceLogger.WriteLog($"REMOVING FILE NAME {NameToRemove}", LogType.InfoLog);
-            if (UseFilter) this._serviceLogger.WriteLog("WARNING: REGEX FILTERING WAS TURNED ON! USING IT NOW", LogType.WarnLog);
-
-            // Find matches or the file object.
-            var FilesToRemove = this.MessageAttachmentFiles.Where(FileObj =>
-            {
-                // Check if filtering or not.
-                if (UseFilter && Regex.Match(FileObj.FullName, NameToRemove).Success) return true;
-                return NameToRemove.ToUpper().Contains(FileObj.FullName.ToUpper());
-            }).ToList();
-
-            // Check if there's files to pull.
-            if (!FilesToRemove.Any())
-            {
-                this._serviceLogger.WriteLog("NO FILES FOUND TO REMOVE! RETURNING FAILED NOW...", LogType.ErrorLog);
-                return false;
-            }
-
-            // Log how many files to remove and pull them all out.
-            this._serviceLogger.WriteLog($"FILES TO PULL OUT OF THE LIST: {FilesToRemove.Count()}", LogType.InfoLog);
-            this.MessageAttachmentFiles = this.MessageAttachmentFiles.Where(FileObj => !FilesToRemove.Contains(FileObj)).ToArray();
-            return true;
+            // Once built, return our mail message 
+            return OutputMessage;
         }
         /// <summary>
         /// Sends out the resulting report email object when this is called.
         /// </summary>
-        /// <param name="MessageSubject">Subject of the message</param>
-        /// <param name="MessageBodyContent">Body of the message</param>
-        /// <param name="IncludeAttachments">Attachments to include in the message.</param>
+        /// <param name="MessageToSend">The message object being sent out</param>
         /// <returns>True if the message is sent. False if not.</returns>
-        public bool SendMessage(string MessageSubject, string MessageBodyContent, bool IncludeAttachments = true)
+        public bool SendFulcrumMessage(FulcrumMessage MessageToSend)
         {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(SendFulcrumMessage), MessageToSend);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
             // Log information about the startup of this new message object.
-            this._serviceLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {this.EmailRecipientAddresses.Length} RECIPIENTS TITLED {MessageSubject}", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"PREPARING TO SEND OUT A NEW MESSAGE TO {MessageToSend.RecipientsList.Count} RECIPIENTS TITLED {MessageToSend.MessageSubject}", LogType.WarnLog);
             this._serviceLogger.WriteLog("BODY CONTENT OBJECT IS BEING APPENDED INTO A MAILMESSAGE OBJECT NOW...", LogType.WarnLog);
 
+            // Clean up our attachments here
+            MessageToSend.MessageAttachments.AddRange(this.DefaultMessageAttachmentFiles.Select(AttachmentFile => AttachmentFile.FullName));
+            MessageToSend.MessageAttachments = MessageToSend.MessageAttachments
+                .GroupBy(FileName => FileName.ToString())
+                .Select(FileName => FileName.First())
+                .Where(File.Exists)
+                .ToList();
+
             // Update the content of our message with a final output for log file entries and names.
-            var OutputFilesTupleSet = this.MessageAttachmentFiles.Select(FileObj =>
+            var OutputFilesTupleSet = MessageToSend.MessageAttachments.Select(FileObj =>
             {
+                // Spawn a new file info for the attachment given
+                FileInfo AttachmentInfo = new FileInfo(FileObj);
+
                 // Build a new tuple object from the given file and return it.
-                string FileName = FileObj.Name;
-                string FileSizeFormatted = FileObj.Length.ToFileSize();
-                string TimeLastModified = FileObj.LastWriteTime.ToString("f");
+                string FileName = AttachmentInfo.Name;
+                string FileSizeFormatted = AttachmentInfo.Length.ToFileSize();
+                string TimeLastModified = AttachmentInfo.LastWriteTime.ToString("f");
                 return new Tuple<string, string, string>(FileName, FileSizeFormatted, TimeLastModified);
             }).ToArray();
             this._serviceLogger.WriteLog("BUILT NEW TUPLE ARRAY FOR ALL FILE OBJECTS IN USE CORRECTLY!", LogType.InfoLog);
@@ -369,64 +321,68 @@ namespace FulcrumEmailService
                 FileObj => FileObj.Item3
             );
 
-            // Log the output table object here and build out the mailmessage.
-            MessageBodyContent += $"\n\n{string.Concat(Enumerable.Repeat("=", 75))}\n\n{OutputFileTable}";
+            // Log the output table object here and build out the MailMessage.
+            MessageToSend.MessageBodyContent += $"\n\n{string.Concat(Enumerable.Repeat("=", 75))}\n\n{OutputFileTable}";
             this._serviceLogger.WriteLog("BUILT NEW OUTPUT TABLE CORRECTLY! ENTIRE MESSAGE OBJECT AND OUTPUT TABLE IS LOGGED BELOW!", LogType.InfoLog);
             this._serviceLogger.WriteLog($"\n{OutputFileTable}", LogType.TraceLog);
 
-            // Build mail object and send it out.
-            bool OverallStatus = true;
-            foreach (var RecipientAddress in this.EmailRecipientAddresses)
-            {
-                // Build message, send it out, and move to the next one.
-                this._serviceLogger.WriteLog($"SENDING REPORT TO {RecipientAddress.Address}", LogType.TraceLog);
-                MailMessage OutputMessage = new MailMessage(
-                    this.EmailSenderAddress.Address,    // Sender
-                    RecipientAddress.Address,            // Recipient
-                    MessageSubject,                         // Message subject
-                    MessageBodyContent                      // Body content for message.
-                );
+            // Ensure we've got at least once recipient added in here
+            MessageToSend.RecipientsList.AddRange(this.DefaultRecipientAddresses.Select(RecipientAddress => RecipientAddress.Address));
+            MessageToSend.RecipientsList = MessageToSend.RecipientsList
+                .GroupBy(MailObj => MailObj.ToString())
+                .Select(MailObj => MailObj.First())
+                .ToList();
 
-                // File in the attachment objects now.
-                if (!IncludeAttachments) this._serviceLogger.WriteLog("WARNING! ATTACHMENTS WERE NOT REQUESTED!", LogType.WarnLog); 
-                else 
-                {
-                    // Iterate all attachments and store them on our new mail message
-                    this._serviceLogger.WriteLog("ATTACHING FILES TO MESSAGE OBJECT NOW...", LogType.WarnLog);
-                    foreach (var FileInstance in this.MessageAttachmentFiles)
-                        OutputMessage.Attachments.Add(new Attachment(FileInstance.FullName));
+            // Parse our list of recipients and see which ones are valid email addresses
+            Regex SendingRegex = new Regex(@"([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)");
+            var MatchedEmails = SendingRegex.Matches(string.Join(",", MessageToSend.RecipientsList));
+            List<MailAddress> RecipientAddresses = MatchedEmails
+                .Cast<Match>()
+                .Select(AddressMatch => new MailAddress(AddressMatch.Value))
+                .ToList();
 
-                    // Log out how many attachments we've built here
-                    this._serviceLogger.WriteLog("ATTACHMENT PROCESS PASSED WITHOUT ISSUES!", LogType.InfoLog);
-                    this._serviceLogger.WriteLog($"MESSAGE OBJECT NOW CONTAINS A TOTAL OF {OutputMessage.Attachments.Count} ATTACHMENTS", LogType.TraceLog);
-                }
-
-                try
-                {
-                    // Ensure our SMTP server instance has been configured correctly.
-                    if (!this.SmtpSetupConfigured)
-                        throw new InvalidOperationException("Error! SMTP Client configuration is not setup!");
-
-                    // Now fire it off using our SMTP Server instance.
-                    this._serviceLogger.WriteLog($"SENDING OUTPUT MESSAGE TO RECIPIENT {RecipientAddress.Address} NOW...", LogType.WarnLog);
-                    if (this._authorizeEmailClient()) this.SendingClient.Send(OutputMessage);
-                    else throw new AuthenticationException("Error! Failed to authenticate an email client!");
-                    this._serviceLogger.WriteLog($"SENDING ROUTINE PASSED FOR MESSAGE OUTPUT TO CLIENT {RecipientAddress.Address}!", LogType.InfoLog);
-
-                    // Clear out existing attachments from the message here
-                    this.MessageAttachmentFiles = Array.Empty<FileInfo>();
-                }
-                catch (Exception MailEx)
-                {
-                    // Log failures, set the overall output value to false.
-                    OverallStatus = false;
-                    this._serviceLogger.WriteLog($"FAILED TO INVOKE SENDING ROUTINE FOR MESSAGE TO BE SENT TO RECIPIENT {RecipientAddress.Address}!", LogType.ErrorLog);
-                    this._serviceLogger.WriteException("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
-                }
+            // Check to make sure we've got at least one recipient here
+            if (MatchedEmails.Count == 0) {
+                this._serviceLogger.WriteLog("ERROR! NO RECIPIENTS WERE FOUND FOR MAIL MESSAGE CONTENT!", LogType.ErrorLog);
+                return false;
             }
 
-            // Return passed sending
-            return OverallStatus;
+            // Build a new message and append all of our attachments and recipients here
+            MailMessage OutputMessage = new MailMessage();
+            OutputMessage.Body = MessageToSend.MessageBodyContent;
+            OutputMessage.Subject = MessageToSend.MessageSubject;
+            OutputMessage.Sender = new MailAddress(MessageToSend.SenderAddress);
+            foreach (var RecipientAddress in RecipientAddresses) OutputMessage.To.Add(RecipientAddress);
+            foreach (var MessageAttachment in MessageToSend.MessageAttachments) OutputMessage.Attachments.Add(new Attachment(MessageAttachment));
+
+            // Log information out about our mail message built and send it out once built
+            this._serviceLogger.WriteLog("BUILT NEW OUTPUT MAIL MESSAGE FROM INPUT FULCRUM MESSAGE OK!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"MESSAGE OBJECT CONTAINS {OutputMessage.To.Count} RECIPIENTS AND {OutputMessage.Attachments.Count} ATTACHMENTS!", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"RECIPIENTS: {string.Join(",", OutputMessage.To.Select(Recipient => Recipient.Address))}", LogType.TraceLog);
+            this._serviceLogger.WriteLog($"ATTACHMENTS: {string.Join(",", OutputMessage.Attachments.Select(Attachment => Attachment.Name))}", LogType.TraceLog);
+
+            try
+            {
+                // Ensure our SMTP server instance has been configured correctly.
+                if (!this.SmtpSetupConfigured)
+                    throw new InvalidOperationException("Error! SMTP Client configuration is not setup!");
+
+                // Now fire it off using our SMTP Server instance.
+                this._serviceLogger.WriteLog($"SENDING OUTPUT MESSAGE NOW...", LogType.WarnLog);
+                if (this._authorizeEmailClient()) this.SendingClient.Send(OutputMessage);
+                else throw new AuthenticationException("Error! Failed to authenticate an email client!");
+                this._serviceLogger.WriteLog($"MESSAGE WAS SENT CORRECTLY TO ALL REQUESTED RECIPIENTS!", LogType.InfoLog);
+
+                // Return passed once done
+                return true;
+            }
+            catch (Exception MailEx)
+            {
+                // Log failures, set the overall output value to false.
+                this._serviceLogger.WriteLog($"ERROR! FAILED TO SEND OUTPUT MAIL MESSAGE TO RECIPIENTS!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EMAIL EXCEPTION IS BEING LOGGED BELOW.", MailEx);
+                return false;
+            }
         }
 
         // --------------------------------------------------------------------------------------------------------------------------
@@ -453,7 +409,7 @@ namespace FulcrumEmailService
 
                     // SSL Configuration
                     EnableSsl = true,
-                    Credentials = new NetworkCredential(EmailSenderAddress.Address, this._emailConfiguration.ReportSenderPassword),
+                    Credentials = new NetworkCredential(EmailSenderAddress.Address, this._emailSenderConfiguration.ReportSenderPassword),
 
                     // BUG: This is causing some type of auth issues. Removing for testing.
                     // DeliveryMethod = SmtpDeliveryMethod.Network

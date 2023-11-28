@@ -48,6 +48,15 @@
                 <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Lighter_35}"/>
             </Style>
 
+            <!-- File Information Text Style -->
+            <Style x:Key="FileInfoTextStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBase}"/>
+            </Style>
+
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
