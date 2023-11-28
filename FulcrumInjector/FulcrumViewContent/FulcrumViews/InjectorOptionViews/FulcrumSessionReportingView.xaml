@@ -182,40 +182,77 @@
                          DataContext="{Binding Path=AttachmentInfos}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type io:FileInfo}">
-                            <Border Padding="5,5" Margin="-5,0,0,0"
+                            <Border Padding="3,5" Margin="-5,0,-5,0"
                                     BorderThickness="2" BorderBrush="{StaticResource DarkGreyThemeColor}">
-                                <Grid Margin="1,0,0,0">
+                                <Grid Margin="0,0,-15,0" Width="{Binding ElementName=ReportAttachmentFiles, Path=ActualWidth}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="25"/>
+                                    </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="205"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock
-                                        Grid.Column="0"
-                                        Margin="0,5"
-                                        Text="{Binding Path=Name}"
-                                        VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                                        FontSize="13" TextWrapping="Wrap" TextAlignment="Left"
-                                        Foreground="{StaticResource TextColorBase}"/>
-                                    <Border
-                                        Margin="4,-5"
+
+                                    <!-- File Name Information -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FileInfoTextStyle}"
+                                               Grid.ColumnSpan="2" Margin="0,-3,0,0" FontWeight="DemiBold" Foreground="Yellow"
+                                               Text="{Binding Name, Mode=OneWay}"/>
+
+                                    <!-- Delete File Button -->
+                                    <Button
+                                        Grid.Row="0"
                                         Grid.Column="1"
-                                        BorderBrush="{StaticResource DarkGreyThemeColor}"
-                                        BorderThickness="2,0,0,0">
-                                    </Border>
-                                    <Button Grid.Column="2"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Right"
-                                        Click="RemoveAttachmentButton_OnClick">
+                                        Click="RemoveAttachmentButton_OnClick"
+                                        Margin="0,-3,10,0">
                                         <Path Fill="{DynamicResource TextColorBase}" Margin="0,0,0,0">
                                             <Path.Data>
                                                 <PathGeometry Figures="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
                                             </Path.Data>
                                         </Path>
                                         <Button.LayoutTransform>
-                                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                            <ScaleTransform ScaleX=".85" ScaleY=".85"/>
                                         </Button.LayoutTransform>
                                     </Button>
+
+                                    <!-- Splitting Border -->
+                                    <Border
+                                        Margin="-5,2.5,-2,0"
+                                        Width="{Binding ElementName=ReportAttachmentFiles, Path=ActualWidth}"
+                                        Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                        BorderBrush="{StaticResource DarkGreyThemeColor}"
+                                        BorderThickness="0,2,0,0">
+                                    </Border>
+
+                                    <!-- File Size Information -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FileInfoTextStyle}"
+                                               Text="File Size: " FontWeight="DemiBold" Margin="0,5,10,0"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource FileInfoTextStyle}"
+                                               Text="{Binding Length, Mode=OneWay}" Margin="0,5,0,0"/>
+
+                                    <!-- Creation Time Information -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FileInfoTextStyle}"
+                                               Text="Creation Time: " FontWeight="DemiBold" Margin="0,5,10,0"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource FileInfoTextStyle}"
+                                               Text="{Binding LastAccessTime, Mode=OneWay}" Margin="0,5,0,0"/>
+
+                                    <!-- Write Time Information -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource FileInfoTextStyle}"
+                                               Text="Last Write Time: " FontWeight="DemiBold" Margin="0,5,10,0"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource FileInfoTextStyle}"
+                                               Text="{Binding LastAccessTime, Mode=OneWay}" Margin="0,5,0,0"/>
+
+                                    <!-- Splitting Border -->
+                                    <!-- <Border
+                                        Margin="-6,5,0,-5"
+                                        Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
+                                        BorderBrush="{StaticResource DarkGreyThemeColor}"
+                                        BorderThickness="2,0,0,0">
+                                    </Border> -->
                                 </Grid>
                             </Border>
                         </DataTemplate>
