@@ -58,7 +58,7 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="SharpLogger">
-      <Version>2.8.4.358</Version>
+      <Version>2.8.4.360</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
