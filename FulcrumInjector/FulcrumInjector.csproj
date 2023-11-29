@@ -124,28 +124,28 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.5.2.5\lib\net46\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.5.2.7\lib\net46\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=8.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.8.1.1\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="SharpAutoId, Version=0.4.4.166, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpAutoId.0.4.4.166\lib\net472\SharpAutoId.dll</HintPath>
+    <Reference Include="SharpAutoId, Version=0.4.4.167, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpAutoId.0.4.4.167\lib\net472\SharpAutoId.dll</HintPath>
     </Reference>
-    <Reference Include="SharpExpressions, Version=0.5.15.453, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpExpressions.0.5.15.453\lib\net472\SharpExpressions.dll</HintPath>
+    <Reference Include="SharpExpressions, Version=0.5.15.454, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpExpressions.0.5.15.454\lib\net472\SharpExpressions.dll</HintPath>
     </Reference>
-    <Reference Include="SharpLogging, Version=2.8.2.353, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpLogger.2.8.2.353\lib\net472\SharpLogging.dll</HintPath>
+    <Reference Include="SharpLogging, Version=2.8.4.358, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpLogger.2.8.4.358\lib\net472\SharpLogging.dll</HintPath>
     </Reference>
-    <Reference Include="SharpPipes, Version=0.2.4.57, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpPipes.0.2.4.57\lib\net472\SharpPipes.dll</HintPath>
+    <Reference Include="SharpPipes, Version=0.2.4.58, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpPipes.0.2.4.58\lib\net472\SharpPipes.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSimulator, Version=0.13.1.355, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSimulator.0.13.1.355\lib\net472\SharpSimulator.dll</HintPath>
+    <Reference Include="SharpSimulator, Version=0.13.1.356, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpSimulator.0.13.1.356\lib\net472\SharpSimulator.dll</HintPath>
     </Reference>
-    <Reference Include="SharpWrapper, Version=6.2.3.511, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SharpWrapper.6.2.3.511\lib\net472\SharpWrapper.dll</HintPath>
+    <Reference Include="SharpWrapper, Version=6.2.3.513, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\SharpWrapper.6.2.3.513\lib\net472\SharpWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.2\lib\net461\Svg.dll</HintPath>
