@@ -25,6 +25,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         // Private backing fields for our public properties
         private bool _canBootApp;
         private bool _canKillApp;
+        private bool _isEditMode;
         private Process _runningAppProcess;
         private FulcrumOeApplication _runningApp;
         private FulcrumOeApplication _selectedApp;
@@ -37,6 +38,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         // Public properties for the view to bind onto  
         public bool CanBootApp => this.SelectedApp.IsAppUsable;
         public bool CanKillApp  { get => this._canKillApp; set => PropertyUpdated(value); }
+        public bool IsEditMode { get => this._isEditMode; set => PropertyUpdated(value); }
         public FulcrumOeApplication RunningApp { get => this._runningApp; set => PropertyUpdated(value); }
         public FulcrumOeApplication SelectedApp { get => this._selectedApp; set => PropertyUpdated(value); }
         public ObservableCollection<FulcrumOeApplication> InstalledOeApps { get => this._installedOeApps; set => PropertyUpdated(value); }

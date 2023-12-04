@@ -26,7 +26,8 @@
         
         <!-- Title Value -->
         <TextBlock
-            Text="Installed OE Applications" Margin="0,3"
+            Grid.Row="0" Margin="0,3"
+            Text="Installed OE Applications" 
             Style="{StaticResource TitleStringText}"/>
 
         <!-- List of OE Apps -->
@@ -52,11 +53,53 @@
         </ListView>
 
         <!-- Button to control OE Apps -->
-        <Button Grid.Row="2" 
+        <Grid Grid.Row="2" Visibility="{Binding Path=IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Boot Application Button -->
+            <Button
+                Grid.Column="0"
                 x:Name="btnOeApControl" 
                 Content="Select An OE Application"
                 Style="{StaticResource ActionButtonStyle}"
-                Margin="10,0,10,0" Height="30" IsEnabled="False"
+                Margin="8,0,5,0" Height="30" IsEnabled="False"
                 Click="ControlOeApplicationButton_OnClick" VerticalAlignment="Stretch"/>
+
+            <!-- Edit Applications List Button -->
+            <Button
+                Grid.Column="1" 
+                Margin="5,0,8,0" 
+                x:Name="btnEditOeApps" IsEnabled="False"
+                Click="btnEditOeApps_OnClick" Height="30"
+                ToolTip="Editing OE Apps is not yet supported through the GUI!"
+                Content="Edit Apps" Style="{StaticResource ActionButtonStyle}"/>
+        </Grid>
+
+        <!-- Edit Apps Content -->
+        <Grid Grid.Row="2" Visibility="{Binding Path=IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Save and Discard Buttons-->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Save Changes" 
+                    Margin="8,0,4,0" Height="30"
+                    Click="btnSaveOeAppChanges_OnClick"
+                    Style="{StaticResource ActionButtonStyle}"/>
+                <Button Grid.Column="1" Content="Discard Changes"
+                    Margin="4,0,8,0"
+                    Click="btnDiscardOeAppChanges_OnClick"
+                    Style="{StaticResource ActionButtonStyle}"/>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>
