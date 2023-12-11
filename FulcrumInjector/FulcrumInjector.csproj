@@ -215,7 +215,6 @@
     </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumFrameAnimator.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\AppStyleModels\AppStyleEnums.cs" />
-    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumVersionInfo.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumNavMenuItem.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\SettingsModels\FulcrumSettingsShare.cs" />
     <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorCoreViewModels\FulcrumHamburgerCoreViewModel.cs" />

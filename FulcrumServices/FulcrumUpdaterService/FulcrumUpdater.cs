@@ -83,6 +83,18 @@ namespace FulcrumUpdaterService
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Internal enumeration that's used to determine the type of command being invoked onto the updater service
+        /// </summary>
+        internal enum CustomCommands
+        {
+            // Different updater service command actions
+            [Description("Report Version Information")] REPORT_INJECTOR_VERSIONS = 128,
+            [Description("Download Latest Version")] DOWNLOAD_LATEST_VERSION = 129,
+            [Description("Install Latest Version")] INSTALL_LATEST_VERSION = 130,
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -246,6 +258,88 @@ namespace FulcrumUpdaterService
                 // Log out the failure and exit this method
                 this._serviceLogger.WriteLog("ERROR! FAILED TO BOOT NEW UPDATER SERVICE INSTANCE!", LogType.ErrorLog);
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
+            }
+        }
+        /// <summary>
+        /// Override method helper for running custom commands on our Updater Service
+        /// </summary>
+        /// <param name="CommandNumber">The number of the command being run on the updater service</param>
+        protected override void OnCustomCommand(int CommandNumber)
+        {
+            // Validate our command number request here
+            this._serviceLogger.WriteLog($"ATTEMPTING TO INVOKE SERVICE COMMAND {CommandNumber} NOW...", LogType.WarnLog);
+            if (CommandNumber is < 128 or > 130)
+            {
+                // Log out our service command is invalid and print our supported command types
+                this._serviceLogger.WriteLog($"ERROR! COMMAND NUMBER {CommandNumber} IS NOT SUPPORTED!", LogType.ErrorLog);
+                this._serviceLogger.WriteLog("SUPPORTED COMMAND NUMBERS ARE AS FOLLOWS:", LogType.InfoLog);
+                this._serviceLogger.WriteLog("\t128 --> Reports injector installed versions", LogType.InfoLog);
+                this._serviceLogger.WriteLog("\t129 --> Downloads the latest injector version", LogType.InfoLog);
+                this._serviceLogger.WriteLog("\t130 --> Installs the latest injector version", LogType.InfoLog); 
+                return;
+            }
+
+            // Convert our command number into our enumeration type and execute it here
+            CustomCommands CommandType = (CustomCommands)CommandNumber;
+            this._serviceLogger.WriteLog($"PARSED COMMAND TYPE AS: {CommandType.ToDescriptionString()}", LogType.InfoLog);
+            switch (CommandType)
+            {
+                // Case for reporting installed injector version information
+                case CustomCommands.REPORT_INJECTOR_VERSIONS:
+
+                    // Log out what we're executing and return out once complete
+                    this._serviceLogger.WriteLog("PULLING INJECTOR VERSIONS AND REPORTING THEM NOW...", LogType.WarnLog);
+                    this._serviceLogger.WriteLog("INJECTOR VERSIONS ARE BEING REPORTED BELOW", LogType.InfoLog);
+
+                    // Write out our version information here
+                    string[] VersionStrings = FulcrumVersionInfo.ToVersionTable().Split('\n');
+                    foreach (string VersionString in VersionStrings) this._serviceLogger.WriteLog(VersionString); 
+                    return;
+
+                // Case for downloading the latest injector version installer
+                case CustomCommands.INSTALL_LATEST_VERSION:
+                case CustomCommands.DOWNLOAD_LATEST_VERSION:
+                    
+                    // Log out what we're executing and return out once complete
+                    this._serviceLogger.WriteLog("DOWNLOADING LATEST INJECTOR VERSION TO A TEMP FILE NOW...", LogType.WarnLog);
+                    if (CommandType == CustomCommands.DOWNLOAD_LATEST_VERSION) 
+                        this._serviceLogger.WriteLog("TO INSTALL THIS FILE, PLEASE MANUALLY RUN THE INSTALLER FILE DOWNLOADED!", LogType.WarnLog);
+
+                    // Find our latest version number here and invoke a download for it
+                    this._serviceLogger.WriteLog("FINDING LATEST INJECTOR VERSION NOW...");
+                    Release LatestRelease = this._getInjectorRelease(null, true);
+                    this._serviceLogger.WriteLog("LATEST INJECTOR VERSION FOUND!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"LATEST VERSION: {LatestRelease.TagName}", LogType.InfoLog);
+
+                    // Download our latest installer file
+                    this._serviceLogger.WriteLog($"DOWNLOADING RELEASE VERSION {LatestRelease.Name} NOW..."); 
+                    if (!this.DownloadInjectorInstaller(LatestRelease.TagName, out string DownloadedInstallerPath))
+                    {
+                        // Log out there was some kind of failure and exit out
+                        this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD INSTALLER VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
+                        this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
+                        return;
+                    }
+
+                    // Validate our installer exists and exit out
+                    if (!File.Exists(DownloadedInstallerPath))
+                    {
+                        // Log out that our installer file could not be found and exit out
+                        this._serviceLogger.WriteLog($"ERROR! FILE {DownloadedInstallerPath} COULD NOT BE FOUND!", LogType.ErrorLog);
+                        this._serviceLogger.WriteLog($"INSTALLER VERSION {LatestRelease.TagName} COULD NOT BE FOUND!", LogType.ErrorLog);
+                        return;
+                    }
+
+                    // Check if we're installing this file nor not now
+                    this._serviceLogger.WriteLog($"INSTALLER FILE FOR VERSION {LatestRelease.TagName} WAS DOWNLOADED CORRECTLY!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"DOWNLOADED INSTALLER TO: {DownloadedInstallerPath} CORRECTLY!", LogType.InfoLog);
+                    if (CommandType == CustomCommands.DOWNLOAD_LATEST_VERSION) return;
+
+                    // Invoke the install routine here if needed now
+                    this._serviceLogger.WriteLog($"INSTALLING INJECTOR RELEASE {LatestRelease.TagName} NOW...");
+                    this._serviceLogger.WriteLog("HOPEFULLY THIS WORKS CORRECTLY!", LogType.WarnLog);
+                    this.InstallInjectorApplication(DownloadedInstallerPath);
+                    return;
             }
         }
 

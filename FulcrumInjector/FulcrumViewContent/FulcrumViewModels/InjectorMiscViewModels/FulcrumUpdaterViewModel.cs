@@ -11,6 +11,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using FulcrumJson;
+using FulcrumSupport;
 using FulcrumUpdaterService;
 using SharpLogging;
 

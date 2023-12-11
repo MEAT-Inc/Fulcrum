@@ -21,6 +21,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels.SettingsModels;
 using FulcrumInjector.FulcrumViewSupport.FulcrumStyles;
 using FulcrumJson;
+using FulcrumSupport;
 using FulcrumUpdaterService;
 using FulcrumWatchdogService;
 using SharpLogging;
