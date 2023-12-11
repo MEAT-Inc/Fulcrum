@@ -13,8 +13,6 @@ using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using Markdig;
 using SharpLogging;
-using Markdown = Markdig.Wpf.Markdown;
-using XamlReader = System.Windows.Markup.XamlReader;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
 {

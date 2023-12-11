@@ -198,7 +198,6 @@
     <Compile Include="FulcrumViewContent\FulcrumServiceErrorWindow.xaml.cs">
       <DependentUpon>FulcrumServiceErrorWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FulcrumViewSupport\FulcrumModels\FulcrumOeApplication.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\DriveModels\DriveLogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\LogFile.cs" />

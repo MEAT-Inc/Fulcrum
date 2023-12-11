@@ -425,6 +425,12 @@ namespace FulcrumUpdaterService
             this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {VersionTag} NOW...", LogType.InfoLog);
             this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+            if (!File.Exists(DownloadFilePath))
+            {
+                // Ensure our download file path exists before trying to pull it in
+                this._serviceLogger.WriteLog("BUILDING DOWNLOAD PATH FOR INSTALLER FILE!", LogType.WarnLog);
+                File.Create(DownloadFilePath);
+            }
 
             try
             {
