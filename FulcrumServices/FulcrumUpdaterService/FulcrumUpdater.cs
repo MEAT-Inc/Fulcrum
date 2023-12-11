@@ -321,15 +321,6 @@ namespace FulcrumUpdaterService
                         return;
                     }
 
-                    // Validate our installer exists and exit out
-                    if (!File.Exists(DownloadedInstallerPath))
-                    {
-                        // Log out that our installer file could not be found and exit out
-                        this._serviceLogger.WriteLog($"ERROR! FILE {DownloadedInstallerPath} COULD NOT BE FOUND!", LogType.ErrorLog);
-                        this._serviceLogger.WriteLog($"INSTALLER VERSION {LatestRelease.TagName} COULD NOT BE FOUND!", LogType.ErrorLog);
-                        return;
-                    }
-
                     // Check if we're installing this file nor not now
                     this._serviceLogger.WriteLog($"INSTALLER FILE FOR VERSION {LatestRelease.TagName} WAS DOWNLOADED CORRECTLY!", LogType.InfoLog);
                     this._serviceLogger.WriteLog($"DOWNLOADED INSTALLER TO: {DownloadedInstallerPath} CORRECTLY!", LogType.InfoLog);
@@ -338,7 +329,16 @@ namespace FulcrumUpdaterService
                     // Invoke the install routine here if needed now
                     this._serviceLogger.WriteLog($"INSTALLING INJECTOR RELEASE {LatestRelease.TagName} NOW...");
                     this._serviceLogger.WriteLog("HOPEFULLY THIS WORKS CORRECTLY!", LogType.WarnLog);
-                    this.InstallInjectorApplication(DownloadedInstallerPath);
+                    if (!this.InstallInjectorApplication(DownloadedInstallerPath))
+                    {
+                        this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE UPDATE ROUTINE FOR VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
+                        this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
+                        return;
+                    }
+
+                    // Final log entry for shut down sequence. This should really never even be hit.
+                    this._serviceLogger.WriteLog("INJECTOR SERVICES ARE SHUTTING DOWN FOR INSTALLATION OF A NEW PACKAGE NOW...", LogType.InfoLog);
+                    this._serviceLogger.WriteLog("THIS LOG ENTRY SHOULDN'T EVEN BE HIT. IF IT IS, SOMETHING IS ACTIN A FOOL", LogType.WarnLog);
                     return;
             }
         }
@@ -408,9 +408,8 @@ namespace FulcrumUpdaterService
                 throw new NullReferenceException($"Error! Unable to find valid release installer for version {VersionTag}!");
 
             // Pull in our asset download path and store our installer file
-            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "msi");
             this._serviceLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}", LogType.InfoLog);
-            return InjectorAssetPath;
+            return InjectorAssetUrl;
         }
         /// <summary>
         /// Finds the release version requested and pulls in the release notes for this version
@@ -515,7 +514,7 @@ namespace FulcrumUpdaterService
             // Build a new web client and configure a temporary file to download our release installer into
             Stopwatch DownloadTimer = new Stopwatch();
             WebClient AssetDownloadHelper = new WebClient();
-            string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string DownloadFilePath = Path.Combine(AppDataFolder, $"FulcrumInstaller_{VersionTag}.msi");
             this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {VersionTag} NOW...", LogType.InfoLog);
             this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
@@ -550,38 +549,6 @@ namespace FulcrumUpdaterService
 
                 // Null out our output variables and return out
                 InstallerPath = string.Empty;
-                return false;
-            }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Private helper method used to authorize our GitHub client on the MEAT Inc organization
-        /// </summary>
-        /// <returns>True if the client is authorized. False if not</returns>
-        private bool _authorizeGitClient()
-        {
-            try
-            {
-                // Check if we're configured or not already 
-                if (this.IsGitClientAuthorized) return true;
-
-                // Build a new git client here for authorization
-                this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING GIT CLIENT NOW...", LogType.InfoLog);
-                Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
-                this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
-                this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATION WITH BOT LOGIN ACCESS PASSED!", LogType.InfoLog);
-
-                // Return true once completed and mark our client authorized
-                this.IsGitClientAuthorized = true;
-                return true;
-            }
-            catch (Exception AuthEx)
-            {
-                // Log our exception and return false 
-                this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW GIT CLIENT!", LogType.ErrorLog);
-                this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
                 return false;
             }
         }
@@ -624,10 +591,20 @@ namespace FulcrumUpdaterService
                     throw new NullReferenceException($"Error! Could not find injector release {VersionTag}!");
 
                 // Log out information about our pulled injector release
-                this._serviceLogger.WriteLog($"FOUND INJECTOR RELEASE {VersionTag} CORRECTLY!", LogType.InfoLog);
-                this._serviceLogger.WriteLog($"RETURNING OUT RELEASE OBJECT FOR VERSION {VersionTag} NOW...", LogType.InfoLog);
+                if (VersionTag == null)
+                {
+                    // For the latest version, log the found version number out and exit out
+                    this._serviceLogger.WriteLog("FOUND LATEST VERSION FOR INJECTOR APPLICATION CORRECTLY!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"LATEST VERSION WAS SEEN TO BE {InjectorRelease.TagName}!", LogType.InfoLog);
+                }
+                else
+                {
+                    // For specified versions, log out what version is located and exit out
+                    this._serviceLogger.WriteLog($"FOUND INJECTOR RELEASE {VersionTag} CORRECTLY!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"RETURNING OUT RELEASE OBJECT FOR VERSION {VersionTag} NOW...", LogType.InfoLog);
+                }
 
-                // Return out based on how many releases are found
+                // Return out the found injector release object here
                 return InjectorRelease;
             }
             catch (Exception FindReleaseEx)
@@ -636,6 +613,38 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteLog($"ERROR! FAILED TO FIND INJECTOR VERSION {VersionTag}!", LogType.ErrorLog);
                 this._serviceLogger.WriteException("EXCEPTION THROWN DURING REFRESH ROUTINE IS BEING LOGGED BELOW", FindReleaseEx);
                 return null;
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+        
+        /// <summary>
+        /// Private helper method used to authorize our GitHub client on the MEAT Inc organization
+        /// </summary>
+        /// <returns>True if the client is authorized. False if not</returns>
+        private bool _authorizeGitClient()
+        {
+            try
+            {
+                // Check if we're configured or not already 
+                if (this.IsGitClientAuthorized) return true;
+
+                // Build a new git client here for authorization
+                this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING GIT CLIENT NOW...", LogType.InfoLog);
+                Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
+                this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
+                this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATION WITH BOT LOGIN ACCESS PASSED!", LogType.InfoLog);
+
+                // Return true once completed and mark our client authorized
+                this.IsGitClientAuthorized = true;
+                return true;
+            }
+            catch (Exception AuthEx)
+            {
+                // Log our exception and return false 
+                this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW GIT CLIENT!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
+                return false;
             }
         }
     }

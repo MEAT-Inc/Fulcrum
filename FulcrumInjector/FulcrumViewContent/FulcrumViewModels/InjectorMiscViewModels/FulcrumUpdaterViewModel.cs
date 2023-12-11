@@ -159,7 +159,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 throw new InvalidOperationException($"Error! Failed to find injector version {this.LatestInjectorVersion}!");
 
             // Build our download path for the pulled asset/installer version
-            string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string DownloadFilePath = Path.Combine(AppDataFolder, $"FulcrumInstaller_{this.LatestInjectorVersion}.msi");
             this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion} NOW...", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);

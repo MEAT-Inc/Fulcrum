@@ -530,6 +530,8 @@ namespace FulcrumService
             return PipeAction;
         }
 
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Private helper method used to invoke a new pipe action routine onto one of our services
         /// </summary>
