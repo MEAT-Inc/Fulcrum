@@ -515,7 +515,8 @@ namespace FulcrumUpdaterService
             // Build a new web client and configure a temporary file to download our release installer into
             Stopwatch DownloadTimer = new Stopwatch();
             WebClient AssetDownloadHelper = new WebClient();
-            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{VersionTag}.msi");
+            string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string DownloadFilePath = Path.Combine(AppDataFolder, $"FulcrumInstaller_{VersionTag}.msi");
             this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {VersionTag} NOW...", LogType.InfoLog);
             this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
