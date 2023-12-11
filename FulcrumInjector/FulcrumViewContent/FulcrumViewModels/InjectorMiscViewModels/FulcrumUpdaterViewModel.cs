@@ -162,6 +162,12 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
             this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion} NOW...", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+            if (!File.Exists(DownloadFilePath))
+            {
+                // Ensure our download file path exists before trying to pull it in
+                this.ViewModelLogger.WriteLog("BUILDING DOWNLOAD PATH FOR INSTALLER FILE!", LogType.WarnLog);
+                File.Create(DownloadFilePath);
+            }
 
             // Return the URL of the path to download here
             Stopwatch DownloadTimer = new Stopwatch();

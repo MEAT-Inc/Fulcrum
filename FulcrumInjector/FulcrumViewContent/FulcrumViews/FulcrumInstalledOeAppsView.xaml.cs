@@ -146,7 +146,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         {
             // Pull the newly selected OE App model object 
             if (Sender is not ListView SendingListView) return;
-            var SelectedApp = SendingListView.SelectedItem as FulcrumOeApplication;
+            var SelectedApp = SendingListView.SelectedItem as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
 
             // Log out what application is being controlled here
             this._viewLogger.WriteLog(SelectedApp != null

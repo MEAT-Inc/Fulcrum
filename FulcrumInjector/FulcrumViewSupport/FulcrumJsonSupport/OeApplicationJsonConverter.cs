@@ -4,6 +4,7 @@ using System.Linq;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using FulcrumOeApplication = FulcrumInjector.FulcrumViewContent.FulcrumViewModels.FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
 
 namespace FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport
 {
