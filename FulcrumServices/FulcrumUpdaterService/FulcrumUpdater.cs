@@ -173,16 +173,31 @@ namespace FulcrumUpdaterService
                     // Log out some information about our version that is ready to be installed
                     this._serviceLogger.WriteLog("NEW VERSION OF THE INJECTOR IS READY TO BE INSTALLED!", LogType.InfoLog);
                     this._serviceLogger.WriteLog($"VERSION {LatestVersion} IS READY FOR INSTALL NOW!", LogType.InfoLog);
-                    this._serviceLogger.WriteLog($"DOWNLOADING AND INSTALLING VERSION {LatestVersion} NOW...", LogType.WarnLog);
 
                     try
                     {
                         // Download our release version installer and install it here
                         if (!this.DownloadInjectorInstaller(LatestVersion, out string InstallerPath))
                             throw new InvalidOperationException($"Error! Failed to download installer for version {LatestVersion}!");
+                        this._serviceLogger.WriteLog($"DOWNLOADED VERSION {LatestVersion} CORRECTLY! INSTALLING IT NOW...", LogType.InfoLog);
+
+                        // Check if the injector application is open at this time or not.
+                        Process InjectorProcess = Process.GetProcesses("FulcrumInjector").FirstOrDefault();
+                        if (InjectorProcess == null) this._serviceLogger.WriteLog($"DOWNLOADING AND INSTALLING VERSION {LatestVersion} NOW...", LogType.WarnLog);
+                        else
+                        {
+                            // Since we don't want to kill the app if it's running, wait and move on if the injector app is open
+                            this._serviceLogger.WriteLog("WARNING! INJECTOR APPLICATION IS CURRENTLY OPEN! NOT KILLING!", LogType.WarnLog);
+                            this._serviceLogger.WriteLog("WAITING UNTIL THE INJECTOR APPLICATION HAS BEEN CLOSED DOWN BEFORE TRYING TO INSTALL!", LogType.WarnLog);
+                            if (!InjectorProcess.WaitForExit(3600000)) 
+                            {
+                                // If the app stays open for an hour, just move onto our next update check and install it then.
+                                this._serviceLogger.WriteLog("INJECTOR APP SAT OPEN FOR AN HOUR! WAITING UNTIL NEXT UPDATE CHECK ROUTINE TO INSTALL!", LogType.ErrorLog);
+                                continue;
+                            }
+                        }
 
                         // Now invoke the installer to update our injector installation
-                        this._serviceLogger.WriteLog($"DOWNLOADED VERSION {LatestVersion} CORRECTLY! INSTALLING IT NOW...", LogType.InfoLog);
                         if (!this.InstallInjectorApplication(InstallerPath))
                             throw new InvalidOperationException($"Error! Failed to invoke a new install routine for version {LatestVersion}!");
                     }
@@ -477,10 +492,10 @@ namespace FulcrumUpdaterService
                 Verb = "runas",                            // Forces the process to run as the user who invoked it
                 FileName = "cmd.exe",                      // File to invoke (CMD for booting the batch file)
                 CreateNoWindow = false,                    // Specifies if we should make a window for this process
-                UseShellExecute = false,                   // Uses shell execution for direct execution
+                UseShellExecute = false,                   // Uses shell execution or not
                 RedirectStandardError = true,              // Redirects standard output
                 RedirectStandardOutput = true,             // Redirects standard error
-                WorkingDirectory = InstallerDirectory,     // Sets the working directory of the process to our installer path
+                WorkingDirectory = InstallerDirectory,     // Sets the working directory of the process to our installer folder
                 Arguments = $"/C \"{UpdateBatchPath}\"",   // Arguments to pass into the CMD window when booted
             };
             
@@ -496,13 +511,13 @@ namespace FulcrumUpdaterService
             {
                 // Only log out our data for the output if it's not empty
                 if (string.IsNullOrWhiteSpace(ErrorArgs.Data)) return; 
-                this._serviceLogger.WriteLog("[BAT ERROR] >> " + ErrorArgs.Data);
+                this._serviceLogger.WriteLog("[BAT ERROR] >> " + ErrorArgs.Data, LogType.TraceLog);
             };
             UpdaterProcess.OutputDataReceived += (_, OutputArgs) =>
             {
                 // Only log out our data for the output if it's not empty
                 if (string.IsNullOrWhiteSpace(OutputArgs.Data)) return;
-                this._serviceLogger.WriteLog("[BAT OUTPUT] >> " + OutputArgs.Data);
+                this._serviceLogger.WriteLog("[BAT OUTPUT] >> " + OutputArgs.Data, LogType.TraceLog);
             };
 
             // Begin reading the output and error streams for our process
