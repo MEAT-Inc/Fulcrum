@@ -106,4 +106,9 @@
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>net stop FulcrumDrive
+copy /Y "$(TargetPath)*" "C:\Program Files (x86)\MEAT Inc\FulcrumServices\$(ProjectName)"
+net start FulcrumDrive</PostBuildEvent>
+  </PropertyGroup>
 </Project>

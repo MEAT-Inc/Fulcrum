@@ -331,6 +331,7 @@ namespace FulcrumUpdaterService
                     this._serviceLogger.WriteLog("HOPEFULLY THIS WORKS CORRECTLY!", LogType.WarnLog);
                     if (!this.InstallInjectorApplication(DownloadedInstallerPath))
                     {
+                        // Log out there was some kind of issue booting the new injector installer here
                         this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE UPDATE ROUTINE FOR VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
                         this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
                         return;
@@ -455,7 +456,7 @@ namespace FulcrumUpdaterService
             }
 
             // Setup our string for the command to run.
-            string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {InstallerPath}";
+            string InvokeUpdateString = $"/C msiexec /i /passive \"{InstallerPath}\"";
             if (!File.Exists(InstallerPath))
                 throw new FileNotFoundException($"Error! Installer \"{InstallerPath}\" could not be found!");
 
@@ -463,17 +464,16 @@ namespace FulcrumUpdaterService
             Process InstallNewReleaseProcess = new Process();
             InstallNewReleaseProcess.StartInfo = new ProcessStartInfo()
             {
-                Verb = "runas",                   // Set this to run as admin
                 FileName = "cmd.exe",             // Boot a CMD window
                 CreateNoWindow = true,            // Create no window on output
                 UseShellExecute = false,          // Shell execution
                 Arguments = InvokeUpdateString,   // Args to invoke.
             };
-
+            
             // Log starting updates and return true
             this._serviceLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
             this._serviceLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
-
+            
             // Boot the update and return true
             InstallNewReleaseProcess.Start();
             InstallNewReleaseProcess.CloseMainWindow();
@@ -514,17 +514,12 @@ namespace FulcrumUpdaterService
             // Build a new web client and configure a temporary file to download our release installer into
             Stopwatch DownloadTimer = new Stopwatch();
             WebClient AssetDownloadHelper = new WebClient();
+            string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
             string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string DownloadFilePath = Path.Combine(AppDataFolder, $"FulcrumInstaller_{VersionTag}.msi");
-            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {VersionTag} NOW...", LogType.InfoLog);
+            string DownloadFilePath = Path.Combine(AppDataFolder, InstallerName);
+            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {InstallerName} NOW...", LogType.InfoLog);
             this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
-            if (!File.Exists(DownloadFilePath))
-            {
-                // Ensure our download file path exists before trying to pull it in
-                this._serviceLogger.WriteLog("BUILDING DOWNLOAD PATH FOR INSTALLER FILE!", LogType.WarnLog);
-                File.Create(DownloadFilePath);
-            }
 
             try
             {
@@ -534,7 +529,7 @@ namespace FulcrumUpdaterService
                 DownloadTimer.Stop();
 
                 // Log out how long this download process took and return out our download path
-                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:mm:ss}", LogType.InfoLog);
+                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:g}", LogType.InfoLog);
                 if (!File.Exists(DownloadFilePath)) throw new FileNotFoundException("Error! Failed to find injector installer after download!");
 
                 // Store our downloaded file in the output path and return true

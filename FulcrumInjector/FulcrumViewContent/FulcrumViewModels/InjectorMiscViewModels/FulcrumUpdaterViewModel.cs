@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Controls;
@@ -160,16 +161,11 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
 
             // Build our download path for the pulled asset/installer version
             string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string DownloadFilePath = Path.Combine(AppDataFolder, $"FulcrumInstaller_{this.LatestInjectorVersion}.msi");
-            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion} NOW...", LogType.InfoLog);
+            string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
+            string DownloadFilePath = Path.Combine(AppDataFolder, InstallerName);
+            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion.Split('_').Last()} NOW...", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
-            if (!File.Exists(DownloadFilePath))
-            {
-                // Ensure our download file path exists before trying to pull it in
-                this.ViewModelLogger.WriteLog("BUILDING DOWNLOAD PATH FOR INSTALLER FILE!", LogType.WarnLog);
-                File.Create(DownloadFilePath);
-            }
 
             // Return the URL of the path to download here
             Stopwatch DownloadTimer = new Stopwatch();
