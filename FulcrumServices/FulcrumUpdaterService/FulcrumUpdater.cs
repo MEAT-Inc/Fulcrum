@@ -142,7 +142,7 @@ namespace FulcrumUpdaterService
             this._refreshTokenSource = new CancellationTokenSource();
             this._refreshTaskToken = this._refreshTokenSource.Token;
             this._serviceLogger.WriteLog("BOOTING NEW BACKGROUND UPDATER TASK INSTANCE NOW...", LogType.WarnLog);
-            this._serviceLogger.WriteLog($"BUILT TASK CONTROL OBJECTS AND STORED START TIME OF {LastUpdateCheckTime:D}", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"BUILT TASK CONTROL OBJECTS AND STORED START TIME OF {LastUpdateCheckTime:F}", LogType.InfoLog);
 
             // Build the task instance here
             this._refreshTask = Task.Run(() =>
@@ -329,17 +329,11 @@ namespace FulcrumUpdaterService
                     // Invoke the install routine here if needed now
                     this._serviceLogger.WriteLog($"INSTALLING INJECTOR RELEASE {LatestRelease.TagName} NOW...");
                     this._serviceLogger.WriteLog("HOPEFULLY THIS WORKS CORRECTLY!", LogType.WarnLog);
-                    if (!this.InstallInjectorApplication(DownloadedInstallerPath))
-                    {
-                        // Log out there was some kind of issue booting the new injector installer here
-                        this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE UPDATE ROUTINE FOR VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
-                        this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
-                        return;
-                    }
+                    if (this.InstallInjectorApplication(DownloadedInstallerPath)) return;
 
-                    // Final log entry for shut down sequence. This should really never even be hit.
-                    this._serviceLogger.WriteLog("INJECTOR SERVICES ARE SHUTTING DOWN FOR INSTALLATION OF A NEW PACKAGE NOW...", LogType.InfoLog);
-                    this._serviceLogger.WriteLog("THIS LOG ENTRY SHOULDN'T EVEN BE HIT. IF IT IS, SOMETHING IS ACTIN A FOOL", LogType.WarnLog);
+                    // Log out there was some kind of issue booting the new injector installer here
+                    this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE UPDATE ROUTINE FOR VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
+                    this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
                     return;
             }
         }
@@ -455,29 +449,69 @@ namespace FulcrumUpdaterService
                 return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
 
-            // Setup our string for the command to run.
-            string InvokeUpdateString = $"/C msiexec /i /passive \"{InstallerPath}\"";
+            // Make sure our installer exists before moving on
             if (!File.Exists(InstallerPath))
                 throw new FileNotFoundException($"Error! Installer \"{InstallerPath}\" could not be found!");
 
-            // Build a process object and setup a CMD line call to install our new version
-            Process InstallNewReleaseProcess = new Process();
-            InstallNewReleaseProcess.StartInfo = new ProcessStartInfo()
+            // Build a new batch file to run for our installer routines here
+            FileInfo InstallerInfo = new FileInfo(InstallerPath);
+            string InstallerName = InstallerInfo.Name;
+            string InstallerDirectory = InstallerInfo.DirectoryName;
+            string UpdateBatchName = $"InvokeUpdate_{Path.GetFileNameWithoutExtension(InstallerName)}.bat";
+            string UpdateBatchPath = Path.Combine(InstallerDirectory, UpdateBatchName);
+            string InstallerFileContent =
+                "@echo OFF\n" +                                        // Disable echo for input commands
+                "echo Killing existing Injector instances...\n" +      // Log out that we're killing instances of the injector application
+                "taskkill /F /IM FulcrumInjector*\n" +                 // Attempt to kill instances of the FulcrumInjector application
+                "echo Booting FulcrumInjector installer MSI...\n" +    // Log out that we're booting the injector application installer
+                $"msiexec /passive /i \"{InstallerPath}\"";            // Boot the new MSI installer in a passive mode to update the injector
+
+            // Write out our installer file content and ensure it exists once done
+            File.WriteAllText(UpdateBatchPath, InstallerFileContent);
+            if (!File.Exists(UpdateBatchPath))
+                throw new FileNotFoundException($"Error! Failed to build batch file to invoke update for installer \"{InstallerPath}\"!");
+
+            // Build a new process to boot our batch file and invoke an update here
+            ProcessStartInfo UpdaterStartInfo = new ProcessStartInfo
             {
-                FileName = "cmd.exe",             // Boot a CMD window
-                CreateNoWindow = true,            // Create no window on output
-                UseShellExecute = false,          // Shell execution
-                Arguments = InvokeUpdateString,   // Args to invoke.
+                Verb = "runas",                            // Forces the process to run as the user who invoked it
+                FileName = "cmd.exe",                      // File to invoke (CMD for booting the batch file)
+                CreateNoWindow = false,                    // Specifies if we should make a window for this process
+                UseShellExecute = false,                   // Uses shell execution for direct execution
+                RedirectStandardError = true,              // Redirects standard output
+                RedirectStandardOutput = true,             // Redirects standard error
+                WorkingDirectory = InstallerDirectory,     // Sets the working directory of the process to our installer path
+                Arguments = $"/C \"{UpdateBatchPath}\"",   // Arguments to pass into the CMD window when booted
             };
             
-            // Log starting updates and return true
-            this._serviceLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
-            this._serviceLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
-            
-            // Boot the update and return true
-            InstallNewReleaseProcess.Start();
-            InstallNewReleaseProcess.CloseMainWindow();
-            return true;
+            // Log out that we're booting our new updater process now
+            this._serviceLogger.WriteLog("STARTING UPDATER FOR INJECTOR APPLICATION!", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"INVOKING UPDATER BATCH FILE {UpdateBatchPath}!", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"THIS BATCH FILE WILL FIRE INSTALLER {InstallerPath}", LogType.WarnLog);
+            this._serviceLogger.WriteLog("PROCESS OUTPUT WILL BE REDIRECTED TO THIS LOG FILE IF NEEDED!", LogType.WarnLog);
+
+            // Build our process and store the standard output and error information
+            Process UpdaterProcess = Process.Start(UpdaterStartInfo);
+            UpdaterProcess.ErrorDataReceived += (_, ErrorArgs) =>
+            {
+                // Only log out our data for the output if it's not empty
+                if (string.IsNullOrWhiteSpace(ErrorArgs.Data)) return; 
+                this._serviceLogger.WriteLog("[BAT ERROR] >> " + ErrorArgs.Data);
+            };
+            UpdaterProcess.OutputDataReceived += (_, OutputArgs) =>
+            {
+                // Only log out our data for the output if it's not empty
+                if (string.IsNullOrWhiteSpace(OutputArgs.Data)) return;
+                this._serviceLogger.WriteLog("[BAT OUTPUT] >> " + OutputArgs.Data);
+            };
+
+            // Begin reading the output and error streams for our process
+            UpdaterProcess.BeginErrorReadLine();
+            UpdaterProcess.BeginOutputReadLine();
+
+            // Wait for the process to exit out and return based on status
+            UpdaterProcess.WaitForExit();
+            return UpdaterProcess.ExitCode == 0;
         }
         /// <summary>
         /// Downloads the given version installer for the injector application and stores it in a temp path

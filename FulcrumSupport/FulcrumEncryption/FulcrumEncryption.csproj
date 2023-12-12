@@ -57,11 +57,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SharpLogger">
-      <Version>2.8.4.360</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
@@ -75,6 +70,11 @@
       <Project>{550BD088-9E2A-434E-BD46-A8B712ADF313}</Project>
       <Name>FulcrumSupport</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SharpLogger">
+      <Version>2.8.5.361</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
