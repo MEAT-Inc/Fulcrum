@@ -582,9 +582,9 @@ namespace FulcrumUpdaterService
 
             // Build our argument string for the msiexec process 
             string UpdaterArguments =
-                $"/A \"{InstallerPath}\" " +       // Install the package as an administrator
-                $"TARGETDIR=\"C:\\\" " +           // Specify our target install directory
-                $"/L*V \"{InstallerLogFile}\"";    // Sets logging output to the log file name given
+                $"/A \"{InstallerPath}\" " +                     // Install the package as an administrator
+                $"TARGETDIR=\"C:\\Program Files (x86)\\\" " +    // Specify our target install directory
+                $"/L*V \"{InstallerLogFile}\"";                  // Sets logging output to the log file name given
 
             // Build a new process to invoke our installer msi file here
             ProcessStartInfo UpdaterStartInfo = new ProcessStartInfo
