@@ -590,7 +590,7 @@ namespace FulcrumUpdaterService
             ProcessStartInfo UpdaterStartInfo = new ProcessStartInfo
             {
                 // Configuration for process bootup
-                Verb = "runas",                          // Forces the process to run as the user who invoked it
+                Verb = "runas",                          // Forces the process to run with the runas verb
                 UseShellExecute = true,                  // Uses shell execution or not
                 FileName = "msiexec.exe",                // File to invoke. MSIEXEC for installing MSI files
                 Arguments = UpdaterArguments,            // Arguments to pass into the MSIEXEC when booted
