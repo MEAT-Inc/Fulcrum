@@ -160,12 +160,18 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 throw new InvalidOperationException($"Error! Failed to find injector version {this.LatestInjectorVersion}!");
 
             // Build our download path for the pulled asset/installer version
-            string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
-            string DownloadFilePath = Path.Combine(AppDataFolder, InstallerName);
+            string InstallersFolder = Path.Combine(RegistryControl.InjectorInstallPath, "FulcrumInstallers");
+            string DownloadFilePath = Path.Combine(InstallersFolder, InstallerName);
             this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion.Split('_').Last()} NOW...", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+
+            // Make sure our installer download directory exists here 
+            if (!Directory.Exists(InstallersFolder)) {
+                this.ViewModelLogger.WriteLog("WARNING! INSTALLERS FOLDER DID NOT EXIST! BUILDING IT NOW...", LogType.WarnLog);
+                Directory.CreateDirectory(InstallersFolder);
+            }
 
             // Return the URL of the path to download here
             Stopwatch DownloadTimer = new Stopwatch();
