@@ -61,6 +61,7 @@ namespace FulcrumUpdaterService
             InstallArguments.LOGGING;
         public static readonly InstallArguments InjectorArguments =
             InstallArguments.NORMAL_INSTALL |
+            InstallArguments.PASSIVE_INSTALL |
             InstallArguments.LOGGING;
 
         #endregion //Fields
