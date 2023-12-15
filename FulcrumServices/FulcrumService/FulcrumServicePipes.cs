@@ -15,6 +15,7 @@ using FulcrumService.FulcrumServiceModels;
 using FulcrumSupport;
 using Newtonsoft.Json;
 using SharpLogging;
+using System.ServiceProcess;
 
 namespace FulcrumService
 {

@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -96,12 +97,17 @@
       <Version>8.1.1</Version>
     </PackageReference>
     <PackageReference Include="SharpLogger">
-      <Version>2.8.2.353</Version>
+      <Version>2.8.5.361</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>net stop FulcrumUpdater
+copy /Y "$(TargetPath)*" "C:\Program Files (x86)\MEAT Inc\FulcrumServices\$(ProjectName)"
+net start FulcrumUpdater</PostBuildEvent>
   </PropertyGroup>
 </Project>

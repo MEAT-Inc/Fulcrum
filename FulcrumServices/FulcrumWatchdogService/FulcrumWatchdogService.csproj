@@ -76,11 +76,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SharpLogger">
-      <Version>2.8.2.353</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\FulcrumSupport\FulcrumEncryption\FulcrumEncryption.csproj">
       <Project>{39338b62-fa58-497f-b5ca-d078487b2363}</Project>
       <Name>FulcrumEncryption</Name>
@@ -98,9 +93,18 @@
       <Name>FulcrumService</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="SharpLogger">
+      <Version>2.8.5.361</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>net stop FulcrumWatchdog
+copy /Y "$(TargetPath)*" "C:\Program Files (x86)\MEAT Inc\FulcrumServices\$(ProjectName)"
+net start FulcrumWatchdog</PostBuildEvent>
   </PropertyGroup>
 </Project>

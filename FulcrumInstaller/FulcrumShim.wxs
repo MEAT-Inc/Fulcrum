@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
     <?define ProductVersion="!(bind.fileVersion.FULCRUMINJECTOR.EXE)"?>
     <!-- Registry Key Name Variables -->
     <?define InstallPathKeyName="InstallPath"?>
@@ -24,11 +24,23 @@
         <CustomAction Id="PreventDowngrading" Error="A newer version of the FulcrumInjector is already installed!" />
         <!-- Application Contents -->
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="DesktopFolder" />
+	        <!-- Service Account Creation -->
+	        <!-- <Component Id="FulcrumServicesAccount" Guid="59A20A55-601E-4B47-835F-CC75EC59591C">
+				<util:User
+					CreateUser="yes"
+					LogonAsService="yes"
+					UpdateIfExists="yes"
+					RemoveOnUninstall="yes"
+					PasswordNeverExpires="yes"
+					Id="UpdateUserLogonAsService"
+					Name="FulcrumUser"
+				Password="FulcrumUser" />
+			</Component> -->
+	        <Directory Id="DesktopFolder" />
             <Directory Id="ProgramMenuFolder" />
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="MeatIncProgramFiles" Name="MEAT Inc">
-                    <Component Id="MeatIncRegistryKey" Guid="2EFF94B1-6D86-408D-B758-41C48F1B64BF">
+	                <Component Id="MeatIncRegistryKey" Guid="2EFF94B1-6D86-408D-B758-41C48F1B64BF">
                         <RegistryKey Root="HKLM" Id="MeatIncKey" Key="SOFTWARE\MEAT Inc" Action="createAndRemoveOnUninstall">
                             <RegistryValue Id="MeatIncFiles" Name="InstallPath" Action="write" Type="string" Value="[MeatIncProgramFiles]" />
                         </RegistryKey>
@@ -172,7 +184,12 @@
                                 <CreateFolder />
                             </Component>
                         </Directory>
-                        <Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
+                        <Directory Id="FULCRUMINSTALLERS" Name="FulcrumInstallers">
+                            <Component Id="CreateFulcrumInstallersFolder" Guid="D196F52D-38E2-4F50-BCB1-9BAFE3FC5D31">
+                                <CreateFolder />
+                            </Component>
+                        </Directory>
+                    	<Directory Id="FULCRUMLOGS" Name="FulcrumLogs">
                             <Component Id="CreateFulcrumLoggingFolder" Guid="C7E0A478-52A6-4FD8-BADA-13B15E1EF9D8">
                                 <CreateFolder />
                             </Component>
@@ -402,6 +419,7 @@
             <ComponentRef Id="CreateFulcrumIconsFolder" />
             <ComponentRef Id="CreateFulcrumImportsFolder" />
 			<ComponentRef Id="FulcrumInjectorProgramFiles" />
+            <ComponentRef Id="CreateFulcrumInstallersFolder" />
             <ComponentRef Id="CreateFulcrumExpressionsFolder" />
             <ComponentRef Id="CreateFulcrumSimulationsFolder" />
             <ComponentRef Id="CreateFulcrumConversionsFolder" />

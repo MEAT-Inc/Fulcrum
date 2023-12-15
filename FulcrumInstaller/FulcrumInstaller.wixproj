@@ -22,6 +22,14 @@
     <Compile Include="FulcrumShim.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixUIExtension">
       <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
@@ -88,7 +96,7 @@
   <PropertyGroup>
     <PreBuildEvent />
   </PropertyGroup>
-	<Target Name="BeforeBuild">
+  <Target Name="BeforeBuild">
     <GetAssemblyIdentity AssemblyFiles="..\FulcrumInjector\bin\$(Configuration)\FulcrumInjector.exe">
       <Output TaskParameter="Assemblies" ItemName="AsmInfo" />
     </GetAssemblyIdentity>
@@ -97,5 +105,5 @@
     </CreateProperty>
   </Target>
   <Target Name="AfterBuild">
-	</Target>
+  </Target>
 </Project>

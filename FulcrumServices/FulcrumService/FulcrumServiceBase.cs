@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using FulcrumSupport;
 using FulcrumJson;
 using FulcrumService.FulcrumServiceModels;
+using TimeoutException = System.TimeoutException;
 
 namespace FulcrumService
 {
@@ -228,7 +229,9 @@ namespace FulcrumService
             // Find the name of our service type and use it for logger configuration
             this.ServiceType = ServiceType;
             this.ServiceName = this.ServiceType.ToDescriptionString();
+            FulcrumServiceInfo ServiceInfo = GetServiceState(this.ServiceType);
             this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}Service_Logger");
+            this._serviceLogger.WriteLog($"FULCRUM SERVICE: {ServiceInfo.ServiceName} (Version: {ServiceInfo.ServiceVersion}) IS BOOTING...", LogType.WarnLog);
 
             // Build an exception handler to catch all exceptions on our service instance to avoid crashes
             AppDomain CurrentDomain = AppDomain.CurrentDomain;
@@ -247,6 +250,39 @@ namespace FulcrumService
                 // Log out that we've got an actual service instance and return out
                 this._serviceLogger.WriteLog("WARNING! SERVICE BEING BOOTED IS AN ACTUAL SERVICE INSTANCE!", LogType.WarnLog);
                 this._serviceLogger.WriteLog("ALL SERVICE CALLS/COMMANDS EXECUTED WILL BE DONE SO USING JSON ROUTINES FOR PASSING DATA!", LogType.WarnLog);
+
+                try
+                {
+                    // Check if the service is currently running. If it is, stop it so we can consume our pipe
+                    ServiceController InstalledInstance = new ServiceController(this.ServiceName);
+                    if (InstalledInstance.Status != ServiceControllerStatus.Running)
+                    {
+                        // Log out that our service was not seen to be running at this point
+                        this._serviceLogger.WriteLog("SERVICE INSTANCE WAS NOT RUNNING WHEN CHECKED! THIS IS FINE FOR DEBUG BUILDS!");
+                        this._serviceLogger.WriteLog("PIPES SHOULD BE OPEN FOR NEW SERVICE INSTANCES!", LogType.InfoLog);
+                    }
+                    else
+                    {
+                        // Stop the service and wait for it to complete shutting down
+                        this._serviceLogger.WriteLog("STOPPING INSTALLED INSTANCE OF SERVICE OBJECT TO ALLOW PIPE CONSUMPTION...", LogType.InfoLog);
+                        InstalledInstance.Stop();
+                        InstalledInstance.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(120));
+                    }
+                }
+                catch (Exception ServiceShutdownEx)
+                {
+                    // Check for a timeout exception for stopping the service
+                    if (ServiceShutdownEx is TimeoutException)
+                    {
+                        this._serviceLogger.WriteLog($"ERROR! FAILED TO STOP SERVICE {this.ServiceName} WITHIN 120 SECONDS!", LogType.ErrorLog);
+                        this._serviceLogger.WriteLog("THIS IS A FATAL EXCEPTION! PIPE CREATION CAN NOT CONTINUE!", LogType.ErrorLog);
+                        throw;
+                    }
+
+                    // Log out that we were unable to find our service on the local machine
+                    this._serviceLogger.WriteLog($"WARNING! INSTALLED INSTANCE OF SERVICE {this.ServiceName} COULD NOT BE FOUND!", LogType.WarnLog);
+                    this._serviceLogger.WriteLog("IF THIS IS A TRUE DEBUG RUN (BUILT FROM SOURCE AND RUN INSIDE VS, THIS IS NOT A PROBLEM!", LogType.WarnLog);
+                }
             }
             else
             {
@@ -495,6 +531,8 @@ namespace FulcrumService
             // Return our built pipe action values
             return PipeAction;
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Private helper method used to invoke a new pipe action routine onto one of our services
