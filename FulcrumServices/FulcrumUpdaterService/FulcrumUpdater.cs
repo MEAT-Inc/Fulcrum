@@ -54,12 +54,12 @@ namespace FulcrumUpdaterService
         private Release[] _injectorReleases;                      // Collection of all releases found for the injector app
 
         // Public static fields holding pre-defined install argument types
-        public static InstallArguments ServiceArguments =
-            InstallArguments.ADMIN_INSTALL |
+        public static readonly InstallArguments ServiceArguments =
+            InstallArguments.NORMAL_INSTALL |
             InstallArguments.SET_TARGET_DIR |
             InstallArguments.ALL_USERS |
             InstallArguments.LOGGING;
-        public static InstallArguments InjectorArguments =
+        public static readonly InstallArguments InjectorArguments =
             InstallArguments.NORMAL_INSTALL |
             InstallArguments.LOGGING;
 
@@ -692,8 +692,8 @@ namespace FulcrumUpdaterService
             if (Arguments.HasFlag(InstallArguments.LOGGING)) UpdaterArguments += $"/L*V \"{InstallerLogFile}\" ";
 
             // Log out our MSIEXEC command argument string here 
-            this._serviceLogger.WriteLog("BUILT NEW MSIEXEC ARGUMENT STRING FOR INSTALL REQUEST!");
-            this._serviceLogger.WriteLog($"INSTALL ARGUMENT STRING: \"{UpdaterArguments}\"");
+            this._serviceLogger.WriteLog($"INSTALLER ARGUMENT FLAGS: {Arguments}");
+            this._serviceLogger.WriteLog($"INSTALL ARGUMENT STRING:  {UpdaterArguments}");
 
             // Build a new process to invoke our installer msi file here
             ProcessStartInfo UpdaterStartInfo = new ProcessStartInfo
