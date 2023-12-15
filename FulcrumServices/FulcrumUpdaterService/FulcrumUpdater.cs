@@ -53,6 +53,16 @@ namespace FulcrumUpdaterService
         private bool _isGitClientAuthorized;                      // Private backing bool value to store if we're authorized or not
         private Release[] _injectorReleases;                      // Collection of all releases found for the injector app
 
+        // Public static fields holding pre-defined install argument types
+        public static InstallArguments ServiceArguments =
+            InstallArguments.ADMIN_INSTALL |
+            InstallArguments.SET_TARGET_DIR |
+            InstallArguments.ALL_USERS |
+            InstallArguments.LOGGING;
+        public static InstallArguments InjectorArguments =
+            InstallArguments.NORMAL_INSTALL |
+            InstallArguments.LOGGING;
+
         #endregion //Fields
 
         #region Properties
@@ -91,9 +101,24 @@ namespace FulcrumUpdaterService
         internal enum CustomCommands
         {
             // Different updater service command actions
-            [Description("Report Version Information")] REPORT_INJECTOR_VERSIONS = 128,
-            [Description("Download Latest Version")] DOWNLOAD_LATEST_VERSION = 129,
-            [Description("Install Latest Version")] INSTALL_LATEST_VERSION = 130,
+            [Description("Report Version Information")] REPORT_INJECTOR_VERSIONS = 128,     // Reports versions of the Injector Package 
+            [Description("Download Latest Version")]    DOWNLOAD_LATEST_VERSION = 129,      // Downloads and saves the latest installer
+            [Description("Install Latest Version")]     INSTALL_LATEST_VERSION = 130,       // Installs the latest release version
+        }
+        /// <summary>
+        /// Public enumeration holding optional arguments for our installer routines
+        /// NOTE: This enum contains the flags attribute for combining arguments!
+        /// </summary>
+        [Flags] public enum InstallArguments 
+        { 
+            // Different supported updater argument types
+            [Description("Normal Install")]          NORMAL_INSTALL  = 0x00000100,    // Sets normal install (/I flag)
+            [Description("Administrative Install")]  ADMIN_INSTALL   = 0x00000200,    // Sets admin install (/A flag)
+            [Description("Passive Install")]         PASSIVE_INSTALL = 0x00000010,    // Sets a passive install routine
+            [Description("Quiet Install")]           QUIET_INSTALL   = 0x00000020,    // Sets a quiet install routine
+            [Description("Set Install Location")]    SET_TARGET_DIR  = 0x00000001,    // Force sets the install path
+            [Description("Enable All Users")]        ALL_USERS       = 0x00000002,    // Includes ALLUSERS=1 for the installer
+            [Description("Enable Logging")]          LOGGING         = 0x00000004,    // Enables logging for the installer
         }
 
         /// <summary>
@@ -232,7 +257,7 @@ namespace FulcrumUpdaterService
                         }
 
                         // Now invoke the installer to update our injector installation
-                        if (!this.InstallInjectorApplication(InstallerPath))
+                        if (!this.InstallInjectorApplication(InstallerPath, ServiceArguments))
                             throw new InvalidOperationException($"Error! Failed to invoke a new install routine for version {LatestVersion}!");
                     }
                     catch (Exception InstallUpdateEx)
@@ -378,7 +403,7 @@ namespace FulcrumUpdaterService
                     // Invoke the install routine here if needed now
                     this._serviceLogger.WriteLog($"INSTALLING INJECTOR RELEASE {LatestRelease.TagName} NOW...");
                     this._serviceLogger.WriteLog("HOPEFULLY THIS WORKS CORRECTLY!", LogType.WarnLog);
-                    if (this.InstallInjectorApplication(DownloadedInstallerPath)) return;
+                    if (this.InstallInjectorApplication(DownloadedInstallerPath, ServiceArguments)) return;
 
                     // Log out there was some kind of issue booting the new injector installer here
                     this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE UPDATE ROUTINE FOR VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
@@ -517,13 +542,89 @@ namespace FulcrumUpdaterService
             return ReleaseToUse.Body;
         }
         /// <summary>
+        /// Downloads the given version installer for the injector application and stores it in a temp path
+        /// </summary>
+        /// <param name="VersionTag">The version of the injector we're looking to download</param>
+        /// <param name="InstallerPath">The path to the installer pulled in from the repository</param>
+        /// <returns>True if the MSI is pulled in. False if it is not</returns>
+        /// <exception cref="InvalidOperationException">Thrown when we're unable to refresh injector versions</exception>
+        public bool DownloadInjectorInstaller(string VersionTag, out string InstallerPath)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(DownloadInjectorInstaller), VersionTag, string.Empty);
+                InstallerPath = PipeAction.PipeMethodArguments[1].ToString();
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
+            }
+
+            // Get the URL of the asset we're looking to download here
+            this._serviceLogger.WriteLog($"LOCATING ASSET URL FOR VERSION TAG {VersionTag} NOW...", LogType.InfoLog);
+            string AssetDownloadUrl = this.GetInjectorInstallerUrl(VersionTag);
+            if (string.IsNullOrWhiteSpace(AssetDownloadUrl))
+            {
+                // Log out that no release could be found for this version number and return out
+                this._serviceLogger.WriteLog($"ERROR! NO URL COULD BE FOUND FOR AN ASSET BELONGING TO VERSION TAG {VersionTag}!", LogType.ErrorLog);
+                this._serviceLogger.WriteLog("THIS IS A FATAL ISSUE! PLEASE ENSURE YOU PROVIDED A VALID VERSION TAG!", LogType.ErrorLog);
+
+                // Null out the installer path and return false
+                InstallerPath = string.Empty;
+                return false;
+            }
+
+            // Build a new web client and configure a temporary file to download our release installer into
+            Stopwatch DownloadTimer = new Stopwatch();
+            WebClient AssetDownloadHelper = new WebClient();
+            string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
+            string InstallersFolder = Path.Combine(RegistryControl.InjectorInstallPath, "FulcrumInstallers");
+            string DownloadFilePath = Path.Combine(InstallersFolder, InstallerName);
+            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {InstallerName} NOW...", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+
+            // Make sure our installer download directory exists here 
+            if (!Directory.Exists(InstallersFolder))
+            {
+                this._serviceLogger.WriteLog("WARNING! INSTALLERS FOLDER DID NOT EXIST! BUILDING IT NOW...", LogType.WarnLog);
+                Directory.CreateDirectory(InstallersFolder);
+            }
+
+            try
+            {
+                // Boot the download timer and kick off our download here
+                DownloadTimer.Start();
+                AssetDownloadHelper.DownloadFile(AssetDownloadUrl, DownloadFilePath);
+                DownloadTimer.Stop();
+
+                // Log out how long this download process took and return out our download path
+                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:g}", LogType.InfoLog);
+                if (!File.Exists(DownloadFilePath)) throw new FileNotFoundException("Error! Failed to find injector installer after download!");
+
+                // Store our downloaded file in the output path and return true
+                InstallerPath = DownloadFilePath;
+                return true;
+            }
+            catch (Exception DownloadFileEx)
+            {
+                // Catch our exception and log it out here
+                this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD INJECTOR INSTALLER VERSION {VersionTag}!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION THROWN DURING DOWNLOAD ROUTINE IS BEING LOGGED BELOW", DownloadFileEx);
+
+                // Null out our output variables and return out
+                InstallerPath = string.Empty;
+                return false;
+            }
+        }
+        /// <summary>
         /// Installs a new version of the injector application using the given MSI File path
         /// </summary>
         /// <param name="InstallerPath">The path to the installer for the injector app</param>
+        /// <param name="Arguments">Optional arguments for our installer msi command. Defaults to normal logging</param>
         /// <returns>True if invoked correctly, false if not</returns>
         /// <exception cref="FileNotFoundException">Thrown when no installer file can be found</exception>
         /// <exception cref="InvalidOperationException">Thrown when an invalid installer is provided</exception>
-        public bool InstallInjectorApplication(string InstallerPath)
+        public bool InstallInjectorApplication(string InstallerPath, InstallArguments Arguments = InstallArguments.NORMAL_INSTALL | InstallArguments.LOGGING)
         {
             // Check if we're using a service instance or not first
             if (this.IsServiceClient)
@@ -580,11 +681,19 @@ namespace FulcrumUpdaterService
             string InstallerName = Path.GetFileNameWithoutExtension(InstallerInfo.Name);
             string InstallerLogFile = Path.Combine(InstallerDirectory, $"InstallerLog_{InstallerName}.log");
 
-            // Build our argument string for the msiexec process 
-            string UpdaterArguments =
-                $"/A \"{InstallerPath}\" " +                     // Install the package as an administrator
-                $"TARGETDIR=\"C:\\Program Files (x86)\\\" " +    // Specify our target install directory
-                $"/L*V \"{InstallerLogFile}\"";                  // Sets logging output to the log file name given
+            // Build our argument string for the msiexec process based on the arguments provided into this method
+            string UpdaterArguments = string.Empty;
+            if (Arguments.HasFlag(InstallArguments.NORMAL_INSTALL)) UpdaterArguments += $"/I \"{InstallerPath}\" ";
+            if (Arguments.HasFlag(InstallArguments.ADMIN_INSTALL)) UpdaterArguments += $"/A \"{InstallerPath}\" ";
+            if (Arguments.HasFlag(InstallArguments.PASSIVE_INSTALL)) UpdaterArguments += "/PASSIVE ";
+            if (Arguments.HasFlag(InstallArguments.QUIET_INSTALL)) UpdaterArguments += "/QUIET ";
+            if (Arguments.HasFlag(InstallArguments.SET_TARGET_DIR)) UpdaterArguments += $"TARGETDIR=\"C:\\Program Files (x86)\\\" ";
+            if (Arguments.HasFlag(InstallArguments.ALL_USERS)) UpdaterArguments += "ALLUSERS=1 ";
+            if (Arguments.HasFlag(InstallArguments.LOGGING)) UpdaterArguments += $"/L*V \"{InstallerLogFile}\" ";
+
+            // Log out our MSIEXEC command argument string here 
+            this._serviceLogger.WriteLog("BUILT NEW MSIEXEC ARGUMENT STRING FOR INSTALL REQUEST!");
+            this._serviceLogger.WriteLog($"INSTALL ARGUMENT STRING: \"{UpdaterArguments}\"");
 
             // Build a new process to invoke our installer msi file here
             ProcessStartInfo UpdaterStartInfo = new ProcessStartInfo
@@ -616,80 +725,6 @@ namespace FulcrumUpdaterService
 
             // Return out if we've got an exit code of 0 or not 
             return UpdaterProcess.ExitCode == 0;
-        }
-        /// <summary>
-        /// Downloads the given version installer for the injector application and stores it in a temp path
-        /// </summary>
-        /// <param name="VersionTag">The version of the injector we're looking to download</param>
-        /// <param name="InstallerPath">The path to the installer pulled in from the repository</param>
-        /// <returns>True if the MSI is pulled in. False if it is not</returns>
-        /// <exception cref="InvalidOperationException">Thrown when we're unable to refresh injector versions</exception>
-        public bool DownloadInjectorInstaller(string VersionTag, out string InstallerPath)
-        {
-            // Check if we're using a service instance or not first
-            if (this.IsServiceClient)
-            {
-                // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeMethod(nameof(DownloadInjectorInstaller), VersionTag, string.Empty);
-                InstallerPath = PipeAction.PipeMethodArguments[1].ToString();
-                return bool.Parse(PipeAction.PipeCommandResult.ToString());
-            }
-
-            // Get the URL of the asset we're looking to download here
-            this._serviceLogger.WriteLog($"LOCATING ASSET URL FOR VERSION TAG {VersionTag} NOW...", LogType.InfoLog);
-            string AssetDownloadUrl = this.GetInjectorInstallerUrl(VersionTag);
-            if (string.IsNullOrWhiteSpace(AssetDownloadUrl))
-            {
-                // Log out that no release could be found for this version number and return out
-                this._serviceLogger.WriteLog($"ERROR! NO URL COULD BE FOUND FOR AN ASSET BELONGING TO VERSION TAG {VersionTag}!", LogType.ErrorLog);
-                this._serviceLogger.WriteLog("THIS IS A FATAL ISSUE! PLEASE ENSURE YOU PROVIDED A VALID VERSION TAG!", LogType.ErrorLog);
-
-                // Null out the installer path and return false
-                InstallerPath = string.Empty;
-                return false;
-            }
-
-            // Build a new web client and configure a temporary file to download our release installer into
-            Stopwatch DownloadTimer = new Stopwatch();
-            WebClient AssetDownloadHelper = new WebClient();
-            string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
-            string InstallersFolder = Path.Combine(RegistryControl.InjectorInstallPath, "FulcrumInstallers");
-            string DownloadFilePath = Path.Combine(InstallersFolder, InstallerName);
-            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {InstallerName} NOW...", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
-            this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
-
-            // Make sure our installer download directory exists here 
-            if (!Directory.Exists(InstallersFolder)) {
-                this._serviceLogger.WriteLog("WARNING! INSTALLERS FOLDER DID NOT EXIST! BUILDING IT NOW...", LogType.WarnLog);
-                Directory.CreateDirectory(InstallersFolder);
-            }
-
-            try
-            {
-                // Boot the download timer and kick off our download here
-                DownloadTimer.Start();
-                AssetDownloadHelper.DownloadFile(AssetDownloadUrl, DownloadFilePath);
-                DownloadTimer.Stop();
-
-                // Log out how long this download process took and return out our download path
-                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:g}", LogType.InfoLog);
-                if (!File.Exists(DownloadFilePath)) throw new FileNotFoundException("Error! Failed to find injector installer after download!");
-
-                // Store our downloaded file in the output path and return true
-                InstallerPath = DownloadFilePath;
-                return true;
-            }
-            catch (Exception DownloadFileEx)
-            {
-                // Catch our exception and log it out here
-                this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD INJECTOR INSTALLER VERSION {VersionTag}!", LogType.ErrorLog);
-                this._serviceLogger.WriteException("EXCEPTION THROWN DURING DOWNLOAD ROUTINE IS BEING LOGGED BELOW", DownloadFileEx);
-
-                // Null out our output variables and return out
-                InstallerPath = string.Empty;
-                return false;
-            }
         }
 
         /// <summary>
