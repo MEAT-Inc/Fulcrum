@@ -37,24 +37,25 @@ namespace FulcrumEmailService
         private static readonly object _serviceLock = new();            // Lock object for building service instances
 
         // Private configuration objects for service setup
+        private SmtpClient _sendingClient;                              // SMTP client used for sending emails
         private EmailServiceSettings _serviceConfig;                    // Settings configuration for our service
         private MailAddress[] _emailRecipientAddresses;                 // Backing field for email service configuration
         private EmailSmtpConfiguration _stmpConfiguration;              // Configuration for SMTP Server connections
         private EmailBrokerConfiguration _emailSenderConfiguration;     // Configuration for the broker instance itself
 
+        // Private backing fields for service configuration
+        private bool _isEmailServiceAuthorized;                         // Holds the state of our email service
+
         #endregion //Fields
 
         #region Properties
-
-        // Public facing property holding our authorization state for the email client 
-        public bool IsEmailClientAuthorized { get; private set; }
-
-        // Public facing collection of email address properties used to configure sending outgoing messages
-        public SmtpClient SendingClient { get; private set; }
-        public MailAddress EmailSenderAddress => new(this._emailSenderConfiguration.ReportSenderEmail);
-        public MailAddress[] DefaultRecipientAddresses
+        
+        // Private collection of email address properties used to configure sending outgoing messages
+        private MailAddress EmailSenderAddress => new(this._emailSenderConfiguration.ReportSenderEmail);
+        private FileInfo[] DefaultMessageAttachmentFiles { get; set; } = Array.Empty<FileInfo>();
+        private MailAddress[] DefaultRecipientAddresses
         {
-            private set => _emailRecipientAddresses = value;
+            set => _emailRecipientAddresses = value;
             get
             {
                 // Make sure the list of emails is not null and that there's at least one entry in it here
@@ -76,16 +77,45 @@ namespace FulcrumEmailService
                 return this._emailRecipientAddresses;
             }
         }
-        public FileInfo[] DefaultMessageAttachmentFiles { get; private set; } = Array.Empty<FileInfo>();
+
+        // Public facing property holding our authorization state for the email client 
+        public bool IsEmailClientAuthorized
+        {
+            // Pull the value from our service host or the local instance based on client configuration
+            get => !this.IsServiceClient
+                ? this._isEmailServiceAuthorized
+                : bool.Parse(this.GetPipeMemberValue(nameof(IsEmailClientAuthorized)).ToString());
+
+            private set
+            {
+                // Check if we're using a service client or not and set the value accordingly
+                if (!this.IsServiceClient)
+                {
+                    // Set our value and exit out
+                    this._isEmailServiceAuthorized = value;
+                    return;
+                }
+
+                // If we're using a client instance, invoke a pipe routine
+                if (!this.SetPipeMemberValue(nameof(IsEmailClientAuthorized), value))
+                    throw new InvalidOperationException($"Error! Failed to update pipe member {nameof(IsEmailClientAuthorized)}!");
+            }
+        }
 
         // Computed properties based on the SMTP and Broker configuration
-        public bool SmtpSetupConfigured => this._stmpConfiguration != null;
-        public bool EmialBrokerConfigured => this._emailSenderConfiguration != null;
+        public bool SmtpSetupConfigured => 
+            !this.IsServiceClient
+                ? this._stmpConfiguration != null
+                : bool.Parse(this.GetPipeMemberValue(nameof(SmtpSetupConfigured)).ToString());
+        public bool EmailBrokerConfigured =>
+            !this.IsServiceClient
+                ? this._emailSenderConfiguration != null
+                : bool.Parse(this.GetPipeMemberValue(nameof(EmailBrokerConfigured)).ToString());
 
         #endregion //Properties
 
         #region Structs and Classes
-        
+
         /// <summary>
         /// Public class object holding information and configuration for a message to be sent using this email service
         /// </summary>
@@ -369,7 +399,7 @@ namespace FulcrumEmailService
 
                 // Now fire it off using our SMTP Server instance.
                 this._serviceLogger.WriteLog($"SENDING OUTPUT MESSAGE NOW...", LogType.WarnLog);
-                if (this._authorizeEmailClient()) this.SendingClient.Send(OutputMessage);
+                if (this._authorizeEmailClient()) this._sendingClient.Send(OutputMessage);
                 else throw new AuthenticationException("Error! Failed to authenticate an email client!");
                 this._serviceLogger.WriteLog($"MESSAGE WAS SENT CORRECTLY TO ALL REQUESTED RECIPIENTS!", LogType.InfoLog);
 
@@ -400,7 +430,7 @@ namespace FulcrumEmailService
 
                 // First build a new SMTP Client.
                 this._serviceLogger.WriteLog("ATTEMPTING TO CONNECT TO OUR SMTP SERVER NOW...", LogType.WarnLog);
-                this.SendingClient = new SmtpClient
+                this._sendingClient = new SmtpClient
                 {
                     // Setup name and port values and timeout value.
                     Host = this._stmpConfiguration.ServerName,

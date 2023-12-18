@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EnumLibExtensions.cs" />
+    <Compile Include="FulcrumVersionInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -64,7 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SharpLogger">
-      <Version>2.8.2.353</Version>
+      <Version>2.8.5.361</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

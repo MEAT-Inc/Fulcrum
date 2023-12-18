@@ -11,10 +11,9 @@ using System.Xaml;
 using FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels;
 using FulcrumInjector.FulcrumViewSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
+using FulcrumUpdaterService;
 using Markdig;
 using SharpLogging;
-using Markdown = Markdig.Wpf.Markdown;
-using XamlReader = System.Windows.Markup.XamlReader;
 
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
 {
@@ -116,7 +115,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews
 
             // Now request a new install routine from the view model.
             this._viewLogger.WriteLog("BOOTING NEW INSTALLER FOR THE FULCRUM INJECTOR NOW...", LogType.InfoLog);
-            this.ViewModel.GitHubUpdateHelper.InstallInjectorApplication(OutputAssetFile);
+            this.ViewModel.GitHubUpdateHelper.InstallInjectorApplication(OutputAssetFile, FulcrumUpdater.InjectorArguments);
         }
         /// <summary>
         /// Method to pop open hyperlinks from the converted markdown document

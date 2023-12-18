@@ -146,7 +146,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         {
             // Pull the newly selected OE App model object 
             if (Sender is not ListView SendingListView) return;
-            var SelectedApp = SendingListView.SelectedItem as FulcrumOeApplication;
+            var SelectedApp = SendingListView.SelectedItem as FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
 
             // Log out what application is being controlled here
             this._viewLogger.WriteLog(SelectedApp != null
@@ -173,6 +173,46 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
                     ? $"Launch {SelectedApp.OEAppName}"
                     : $"{SelectedApp.OEAppName} Is Missing!";
             }
+        }
+
+        /// <summary>
+        /// Event handler to fire when the user requests to edit the list of installed OE Apps
+        /// </summary>
+        /// <param name="Sender">Sending control for this event</param>
+        /// <param name="E">Event arguments fired along with this event</param>
+        private void btnEditOeApps_OnClick(object Sender, RoutedEventArgs E)
+        {
+            // Check our edit mode state here
+            if (this.ViewModel.IsEditMode) {
+                this._viewLogger.WriteLog("TURNING OFF EDIT MODE FOR OE APPS NOW...", LogType.InfoLog);
+                this.ViewModel.IsEditMode = false;
+            }
+             
+            // Toggle edit mode on our view model
+            this._viewLogger.WriteLog("STARTING EDIT MODE ON OUR VIEW MODEL FOR OE APPS NOW...", LogType.InfoLog);
+            this.ViewModel.IsEditMode = true;
+        }
+        /// <summary>
+        /// Event handler to fire when the user requests to save changes to the list of OE apps
+        /// </summary>
+        /// <param name="Sender">Sending control for this event</param>
+        /// <param name="E">Event arguments fired along with this event</param>
+        private void btnSaveOeAppChanges_OnClick(object Sender, RoutedEventArgs E)
+        {
+            this._viewLogger.WriteLog("TURNING OFF EDIT MODE FOR OE APPS NOW...", LogType.InfoLog);
+            this._viewLogger.WriteLog("SAVING CHANGES FOR OE APPS LIST NOW...", LogType.InfoLog);
+            this.ViewModel.IsEditMode = false;
+        }
+        /// <summary>
+        /// Event handler to fire when the user requests to discard changes to the list of OE apps
+        /// </summary>
+        /// <param name="Sender">Sending control for this event</param>
+        /// <param name="E">Event arguments fired along with this event</param>
+        private void btnDiscardOeAppChanges_OnClick(object Sender, RoutedEventArgs E)
+        {
+            this._viewLogger.WriteLog("TURNING OFF EDIT MODE FOR OE APPS NOW...", LogType.InfoLog);
+            this._viewLogger.WriteLog("DISCARDING CHANGES FOR OE APPS LIST NOW...", LogType.InfoLog);
+            this.ViewModel.IsEditMode = false;
         }
     }
 }

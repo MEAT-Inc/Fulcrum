@@ -1,9 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fulcrumDataConverters="clr-namespace:FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters">
     
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FulcrumControlStyles.xaml"/>
         <ResourceDictionary>
+
+            <!-- Data Converters for View Content -->
+            <fulcrumDataConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <fulcrumDataConverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+
             <!--Main Title Text-->
             <Style x:Key="TitleStringText" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>

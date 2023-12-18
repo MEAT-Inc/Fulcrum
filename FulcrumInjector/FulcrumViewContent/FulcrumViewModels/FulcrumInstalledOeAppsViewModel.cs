@@ -25,6 +25,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         // Private backing fields for our public properties
         private bool _canBootApp;
         private bool _canKillApp;
+        private bool _isEditMode;
         private Process _runningAppProcess;
         private FulcrumOeApplication _runningApp;
         private FulcrumOeApplication _selectedApp;
@@ -37,6 +38,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         // Public properties for the view to bind onto  
         public bool CanBootApp => this.SelectedApp.IsAppUsable;
         public bool CanKillApp  { get => this._canKillApp; set => PropertyUpdated(value); }
+        public bool IsEditMode { get => this._isEditMode; set => PropertyUpdated(value); }
         public FulcrumOeApplication RunningApp { get => this._runningApp; set => PropertyUpdated(value); }
         public FulcrumOeApplication SelectedApp { get => this._selectedApp; set => PropertyUpdated(value); }
         public ObservableCollection<FulcrumOeApplication> InstalledOeApps { get => this._installedOeApps; set => PropertyUpdated(value); }
@@ -44,6 +46,58 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Model object of our OE Applications installed on the system.
+        /// </summary>
+        [JsonConverter(typeof(FulcrumOeApplicationJsonConverter))]
+        public class FulcrumOeApplication
+        {
+            #region Custom Events
+            #endregion //Custom Events
+
+            #region Fields
+            #endregion //Fields
+
+            #region Properties
+
+            // Properties about an OE Application
+            public string OEAppName { get; private set; }
+            public string OEAppPath { get; private set; }
+            public string OEAppVersion { get; private set; }
+            public string OEAppCommand { get; private set; }
+            public string[] OEAppPathList { get; private set; }
+            public bool IsAppUsable => File.Exists(OEAppPath);
+
+            #endregion //Properties
+
+            #region Structs and Classes
+            #endregion //Structs and Classes
+
+            // ------------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Returns hyphenated string object for this app instance
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString() { return $"{OEAppName} - {OEAppPath} - {OEAppVersion} - {OEAppCommand}"; }
+
+            // ------------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Builds a new OE application object from a given set of values.
+            /// </summary>
+            public FulcrumOeApplication(string Name, string Path, string Version = "N/A", string BatLaunchCommand = null, string[] PathSet = null)
+            {
+                // Store values. Append into our list of models.
+                this.OEAppName = Name;
+                this.OEAppPath = Path;
+                this.OEAppVersion = Version;
+                this.OEAppPathList = PathSet ?? new[] { this.OEAppPath };
+                this.OEAppCommand = BatLaunchCommand ?? $"cmd.exe /C \"{OEAppPath}\"";
+            }
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------

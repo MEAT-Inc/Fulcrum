@@ -21,6 +21,7 @@ using FulcrumUpdaterService.UpdaterServiceModels;
 using Newtonsoft.Json;
 using Octokit;
 using SharpLogging;
+using System.Management;
 
 namespace FulcrumUpdaterService
 {
@@ -51,6 +52,17 @@ namespace FulcrumUpdaterService
         // Private backing fields for our public facing properties
         private bool _isGitClientAuthorized;                      // Private backing bool value to store if we're authorized or not
         private Release[] _injectorReleases;                      // Collection of all releases found for the injector app
+
+        // Public static fields holding pre-defined install argument types
+        public static readonly InstallArguments ServiceArguments =
+            InstallArguments.NORMAL_INSTALL |
+            InstallArguments.SET_TARGET_DIR |
+            InstallArguments.ALL_USERS |
+            InstallArguments.LOGGING;
+        public static readonly InstallArguments InjectorArguments =
+            InstallArguments.NORMAL_INSTALL |
+            InstallArguments.PASSIVE_INSTALL |
+            InstallArguments.LOGGING;
 
         #endregion //Fields
 
@@ -83,6 +95,66 @@ namespace FulcrumUpdaterService
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Internal enumeration that's used to determine the type of command being invoked onto the updater service
+        /// </summary>
+        internal enum CustomCommands
+        {
+            // Different updater service command actions
+            [Description("Report Version Information")] REPORT_INJECTOR_VERSIONS = 128,     // Reports versions of the Injector Package 
+            [Description("Download Latest Version")]    DOWNLOAD_LATEST_VERSION = 129,      // Downloads and saves the latest installer
+            [Description("Install Latest Version")]     INSTALL_LATEST_VERSION = 130,       // Installs the latest release version
+        }
+        /// <summary>
+        /// Public enumeration holding optional arguments for our installer routines
+        /// NOTE: This enum contains the flags attribute for combining arguments!
+        /// </summary>
+        [Flags] public enum InstallArguments 
+        { 
+            // Different supported updater argument types
+            [Description("Normal Install")]          NORMAL_INSTALL  = 0x00000100,    // Sets normal install (/I flag)
+            [Description("Administrative Install")]  ADMIN_INSTALL   = 0x00000200,    // Sets admin install (/A flag)
+            [Description("Passive Install")]         PASSIVE_INSTALL = 0x00000010,    // Sets a passive install routine
+            [Description("Quiet Install")]           QUIET_INSTALL   = 0x00000020,    // Sets a quiet install routine
+            [Description("Set Install Location")]    SET_TARGET_DIR  = 0x00000001,    // Force sets the install path
+            [Description("Enable All Users")]        ALL_USERS       = 0x00000002,    // Includes ALLUSERS=1 for the installer
+            [Description("Enable Logging")]          LOGGING         = 0x00000004,    // Enables logging for the installer
+        }
+
+        /// <summary>
+        /// Class object used to hold information about a given release
+        /// </summary>
+        public class ReleaseInformation
+        {
+            #region Custom Events
+            #endregion // Custom Events
+
+            #region Fields
+            #endregion // Fields
+
+            #region Properties
+
+            // Public facing properties holding information about our release information
+            public string VersionTag { get; internal set; }
+            public string ReleaseNotes { get; internal set; }
+            public string InstallerUrl { get; internal set; }
+
+            #endregion // Properties
+
+            #region Structs and Classes
+            #endregion // Structs and Classes
+
+            // --------------------------------------------------------------------------------------------------------------------------------------
+
+            /// <summary>
+            /// Internal CTOR for an release information object.
+            /// Stores tag value for the release in question
+            /// </summary>
+            /// <param name="TagValue">The version tag we're looking up</param>
+            internal ReleaseInformation(string TagValue) { this.VersionTag = TagValue; }
+        }
+
         #endregion //Structs and Classes
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,7 +202,7 @@ namespace FulcrumUpdaterService
             this._refreshTokenSource = new CancellationTokenSource();
             this._refreshTaskToken = this._refreshTokenSource.Token;
             this._serviceLogger.WriteLog("BOOTING NEW BACKGROUND UPDATER TASK INSTANCE NOW...", LogType.WarnLog);
-            this._serviceLogger.WriteLog($"BUILT TASK CONTROL OBJECTS AND STORED START TIME OF {LastUpdateCheckTime:D}", LogType.InfoLog);
+            this._serviceLogger.WriteLog($"BUILT TASK CONTROL OBJECTS AND STORED START TIME OF {LastUpdateCheckTime:F}", LogType.InfoLog);
 
             // Build the task instance here
             this._refreshTask = Task.Run(() =>
@@ -161,17 +233,32 @@ namespace FulcrumUpdaterService
                     // Log out some information about our version that is ready to be installed
                     this._serviceLogger.WriteLog("NEW VERSION OF THE INJECTOR IS READY TO BE INSTALLED!", LogType.InfoLog);
                     this._serviceLogger.WriteLog($"VERSION {LatestVersion} IS READY FOR INSTALL NOW!", LogType.InfoLog);
-                    this._serviceLogger.WriteLog($"DOWNLOADING AND INSTALLING VERSION {LatestVersion} NOW...", LogType.WarnLog);
 
                     try
                     {
                         // Download our release version installer and install it here
                         if (!this.DownloadInjectorInstaller(LatestVersion, out string InstallerPath))
                             throw new InvalidOperationException($"Error! Failed to download installer for version {LatestVersion}!");
+                        this._serviceLogger.WriteLog($"DOWNLOADED VERSION {LatestVersion} CORRECTLY! INSTALLING IT NOW...", LogType.InfoLog);
+
+                        // Check if the injector application is open at this time or not.
+                        Process InjectorProcess = Process.GetProcesses("FulcrumInjector").FirstOrDefault();
+                        if (InjectorProcess == null) this._serviceLogger.WriteLog($"DOWNLOADING AND INSTALLING VERSION {LatestVersion} NOW...", LogType.WarnLog);
+                        else
+                        {
+                            // Since we don't want to kill the app if it's running, wait and move on if the injector app is open
+                            this._serviceLogger.WriteLog("WARNING! INJECTOR APPLICATION IS CURRENTLY OPEN! NOT KILLING!", LogType.WarnLog);
+                            this._serviceLogger.WriteLog("WAITING UNTIL THE INJECTOR APPLICATION HAS BEEN CLOSED DOWN BEFORE TRYING TO INSTALL!", LogType.WarnLog);
+                            if (!InjectorProcess.WaitForExit(3600000)) 
+                            {
+                                // If the app stays open for an hour, just move onto our next update check and install it then.
+                                this._serviceLogger.WriteLog("INJECTOR APP SAT OPEN FOR AN HOUR! WAITING UNTIL NEXT UPDATE CHECK ROUTINE TO INSTALL!", LogType.ErrorLog);
+                                continue;
+                            }
+                        }
 
                         // Now invoke the installer to update our injector installation
-                        this._serviceLogger.WriteLog($"DOWNLOADED VERSION {LatestVersion} CORRECTLY! INSTALLING IT NOW...", LogType.InfoLog);
-                        if (!this.InstallInjectorApplication(InstallerPath))
+                        if (!this.InstallInjectorApplication(InstallerPath, ServiceArguments))
                             throw new InvalidOperationException($"Error! Failed to invoke a new install routine for version {LatestVersion}!");
                     }
                     catch (Exception InstallUpdateEx)
@@ -248,9 +335,120 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteException($"EXCEPTION THROWN FROM THE START ROUTINE IS LOGGED BELOW", StartWatchdogEx);
             }
         }
+        /// <summary>
+        /// Override method helper for running custom commands on our Updater Service
+        /// </summary>
+        /// <param name="CommandNumber">The number of the command being run on the updater service</param>
+        protected override void OnCustomCommand(int CommandNumber)
+        {
+            // Validate our command number request here
+            this._serviceLogger.WriteLog($"ATTEMPTING TO INVOKE SERVICE COMMAND {CommandNumber} NOW...", LogType.WarnLog);
+            if (CommandNumber is < 128 or > 130)
+            {
+                // Log out our service command is invalid and print our supported command types
+                this._serviceLogger.WriteLog($"ERROR! COMMAND NUMBER {CommandNumber} IS NOT SUPPORTED!", LogType.ErrorLog);
+                this._serviceLogger.WriteLog("SUPPORTED COMMAND NUMBERS ARE AS FOLLOWS:", LogType.InfoLog);
+                this._serviceLogger.WriteLog("\t128 --> Reports injector installed versions", LogType.InfoLog);
+                this._serviceLogger.WriteLog("\t129 --> Downloads the latest injector version", LogType.InfoLog);
+                this._serviceLogger.WriteLog("\t130 --> Installs the latest injector version", LogType.InfoLog); 
+                return;
+            }
+
+            // Convert our command number into our enumeration type and execute it here
+            CustomCommands CommandType = (CustomCommands)CommandNumber;
+            this._serviceLogger.WriteLog($"PARSED COMMAND TYPE AS: {CommandType.ToDescriptionString()}", LogType.InfoLog);
+            switch (CommandType)
+            {
+                // Case for reporting installed injector version information
+                case CustomCommands.REPORT_INJECTOR_VERSIONS:
+
+                    // Log out what we're executing and return out once complete
+                    this._serviceLogger.WriteLog("PULLING INJECTOR VERSIONS AND REPORTING THEM NOW...", LogType.WarnLog);
+                    this._serviceLogger.WriteLog("INJECTOR VERSIONS ARE BEING REPORTED BELOW", LogType.InfoLog);
+
+                    // Write out our version information here
+                    string[] VersionStrings = FulcrumVersionInfo.ToVersionTable().Split('\n');
+                    foreach (string VersionString in VersionStrings) this._serviceLogger.WriteLog(VersionString); 
+                    return;
+
+                // Case for downloading the latest injector version installer
+                case CustomCommands.INSTALL_LATEST_VERSION:
+                case CustomCommands.DOWNLOAD_LATEST_VERSION:
+                    
+                    // Log out what we're executing and return out once complete
+                    this._serviceLogger.WriteLog("DOWNLOADING LATEST INJECTOR VERSION TO A TEMP FILE NOW...", LogType.WarnLog);
+                    if (CommandType == CustomCommands.DOWNLOAD_LATEST_VERSION) 
+                        this._serviceLogger.WriteLog("TO INSTALL THIS FILE, PLEASE MANUALLY RUN THE INSTALLER FILE DOWNLOADED!", LogType.WarnLog);
+
+                    // Find our latest version number here and invoke a download for it
+                    this._serviceLogger.WriteLog("FINDING LATEST INJECTOR VERSION NOW...");
+                    Release LatestRelease = this._getInjectorRelease(null, true);
+                    this._serviceLogger.WriteLog("LATEST INJECTOR VERSION FOUND!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"LATEST VERSION: {LatestRelease.TagName}", LogType.InfoLog);
+
+                    // Download our latest installer file
+                    this._serviceLogger.WriteLog($"DOWNLOADING RELEASE VERSION {LatestRelease.Name} NOW..."); 
+                    if (!this.DownloadInjectorInstaller(LatestRelease.TagName, out string DownloadedInstallerPath))
+                    {
+                        // Log out there was some kind of failure and exit out
+                        this._serviceLogger.WriteLog($"ERROR! FAILED TO DOWNLOAD INSTALLER VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
+                        this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
+                        return;
+                    }
+
+                    // Check if we're installing this file nor not now
+                    this._serviceLogger.WriteLog($"INSTALLER FILE FOR VERSION {LatestRelease.TagName} WAS DOWNLOADED CORRECTLY!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"DOWNLOADED INSTALLER TO: {DownloadedInstallerPath} CORRECTLY!", LogType.InfoLog);
+                    if (CommandType == CustomCommands.DOWNLOAD_LATEST_VERSION) return;
+
+                    // Invoke the install routine here if needed now
+                    this._serviceLogger.WriteLog($"INSTALLING INJECTOR RELEASE {LatestRelease.TagName} NOW...");
+                    this._serviceLogger.WriteLog("HOPEFULLY THIS WORKS CORRECTLY!", LogType.WarnLog);
+                    if (this.InstallInjectorApplication(DownloadedInstallerPath, ServiceArguments)) return;
+
+                    // Log out there was some kind of issue booting the new injector installer here
+                    this._serviceLogger.WriteLog($"ERROR! FAILED TO INVOKE UPDATE ROUTINE FOR VERSION {LatestRelease.TagName}!", LogType.ErrorLog);
+                    this._serviceLogger.WriteLog("PLEASE REFER TO THIS LOG FILE FOR A DOWNLOAD EXCEPTION STACK TRACE!", LogType.ErrorLog);
+                    return;
+            }
+        }
 
         // ------------------------------------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Public method used to pull in information about a given release
+        /// </summary>
+        /// <param name="VersionTag">The version we're gathering information for</param>
+        /// <returns>A newly built release information object holding properties of our release version</returns>
+        public ReleaseInformation GetReleaseInformation(string VersionTag)
+        {
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
+            {
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(GetReleaseInformation), VersionTag);
+                return JsonConvert.DeserializeObject<ReleaseInformation>(PipeAction.PipeCommandResult.ToString());
+            }
+
+            // Build a new release information object and store the properties of it here
+            this._serviceLogger.WriteLog($"BUILDING RELEASE INFORMATION FOR RELEASE {VersionTag}...", LogType.InfoLog);
+            ReleaseInformation OutputInformation = new ReleaseInformation(VersionTag)
+            {
+                // Store our installer URL And release notes here
+                InstallerUrl = this.GetInjectorInstallerUrl(VersionTag),
+                ReleaseNotes = this.GetInjectorReleaseNotes(VersionTag)
+            };
+
+            // Log that we built our release information correctly and return it out
+            this._serviceLogger.WriteLog($"BUILT NEW RELEASE INFORMATION FOR VERSION {VersionTag} OK!", LogType.InfoLog);
+            this._serviceLogger.WriteLog("RELEASE VERSION IS BEING REPORTED AS FOLLOWS");
+            this._serviceLogger.WriteLog($"VERSION:       {OutputInformation.VersionTag}");
+            this._serviceLogger.WriteLog($"INSTALLER URL: {OutputInformation.InstallerUrl}");
+            this._serviceLogger.WriteLog($"RELEASE NOTES: {OutputInformation.ReleaseNotes.Substring(0, 20)}...");
+
+            // Return out the built release information here
+            return OutputInformation;
+        }
         /// <summary>
         /// Checks if a version is ready to be updated or not.
         /// </summary>
@@ -314,9 +512,8 @@ namespace FulcrumUpdaterService
                 throw new NullReferenceException($"Error! Unable to find valid release installer for version {VersionTag}!");
 
             // Pull in our asset download path and store our installer file
-            string InjectorAssetPath = Path.ChangeExtension(Path.GetTempFileName(), "msi");
             this._serviceLogger.WriteLog($"RELEASE ASSET FOUND! URL IS: {InjectorAssetUrl}", LogType.InfoLog);
-            return InjectorAssetPath;
+            return InjectorAssetUrl;
         }
         /// <summary>
         /// Finds the release version requested and pulls in the release notes for this version
@@ -344,47 +541,6 @@ namespace FulcrumUpdaterService
             if (string.IsNullOrWhiteSpace(ReleaseToUse.Body)) throw new InvalidOperationException($"Error! No release notes could be found for tag {VersionTag}!"); 
             this._serviceLogger.WriteLog("FOUND RELEASE NOTES! RETURNING THEM NOW...", LogType.InfoLog);
             return ReleaseToUse.Body;
-        }
-        /// <summary>
-        /// Installs a new version of the injector application using the given MSI File path
-        /// </summary>
-        /// <param name="InstallerPath">The path to the installer for the injector app</param>
-        /// <returns>True if invoked correctly, false if not</returns>
-        /// <exception cref="FileNotFoundException">Thrown when no installer file can be found</exception>
-        public bool InstallInjectorApplication(string InstallerPath)
-        {
-            // Check if we're using a service instance or not first
-            if (this.IsServiceClient)
-            {
-                // Invoke our pipe routine for this method if needed and store output results
-                var PipeAction = this.ExecutePipeMethod(nameof(InstallInjectorApplication), InstallerPath);
-                return bool.Parse(PipeAction.PipeCommandResult.ToString());
-            }
-
-            // Setup our string for the command to run.
-            string InvokeUpdateString = $"/C taskkill /F /IM Fulcrum* && msiexec /i {InstallerPath}";
-            if (!File.Exists(InstallerPath))
-                throw new FileNotFoundException($"Error! Installer \"{InstallerPath}\" could not be found!");
-
-            // Build a process object and setup a CMD line call to install our new version
-            Process InstallNewReleaseProcess = new Process();
-            InstallNewReleaseProcess.StartInfo = new ProcessStartInfo()
-            {
-                Verb = "runas",                   // Set this to run as admin
-                FileName = "cmd.exe",             // Boot a CMD window
-                CreateNoWindow = true,            // Create no window on output
-                UseShellExecute = false,          // Shell execution
-                Arguments = InvokeUpdateString,   // Args to invoke.
-            };
-
-            // Log starting updates and return true
-            this._serviceLogger.WriteLog("STARTING INJECTOR UPDATES NOW! THIS WILL KILL OUR INJECTOR INSTANCE!", LogType.WarnLog);
-            this._serviceLogger.WriteLog("BYE BYE BOOKWORM TIME TO KILL", LogType.InfoLog);
-
-            // Boot the update and return true
-            InstallNewReleaseProcess.Start();
-            InstallNewReleaseProcess.CloseMainWindow();
-            return true;
         }
         /// <summary>
         /// Downloads the given version installer for the injector application and stores it in a temp path
@@ -421,10 +577,19 @@ namespace FulcrumUpdaterService
             // Build a new web client and configure a temporary file to download our release installer into
             Stopwatch DownloadTimer = new Stopwatch();
             WebClient AssetDownloadHelper = new WebClient();
-            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{VersionTag}.msi");
-            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {VersionTag} NOW...", LogType.InfoLog);
+            string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
+            string InstallersFolder = Path.Combine(RegistryControl.InjectorInstallPath, "FulcrumInstallers");
+            string DownloadFilePath = Path.Combine(InstallersFolder, InstallerName);
+            this._serviceLogger.WriteLog($"PULLING IN RELEASE VERSION {InstallerName} NOW...", LogType.InfoLog);
             this._serviceLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this._serviceLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
+
+            // Make sure our installer download directory exists here 
+            if (!Directory.Exists(InstallersFolder))
+            {
+                this._serviceLogger.WriteLog("WARNING! INSTALLERS FOLDER DID NOT EXIST! BUILDING IT NOW...", LogType.WarnLog);
+                Directory.CreateDirectory(InstallersFolder);
+            }
 
             try
             {
@@ -434,7 +599,7 @@ namespace FulcrumUpdaterService
                 DownloadTimer.Stop();
 
                 // Log out how long this download process took and return out our download path
-                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:mm:ss}", LogType.InfoLog);
+                this._serviceLogger.WriteLog($"DOWNLOAD COMPLETE! ELAPSED TIME: {DownloadTimer.Elapsed:g}", LogType.InfoLog);
                 if (!File.Exists(DownloadFilePath)) throw new FileNotFoundException("Error! Failed to find injector installer after download!");
 
                 // Store our downloaded file in the output path and return true
@@ -452,37 +617,115 @@ namespace FulcrumUpdaterService
                 return false;
             }
         }
-
-        // ------------------------------------------------------------------------------------------------------------------------------------------
-
         /// <summary>
-        /// Private helper method used to authorize our GitHub client on the MEAT Inc organization
+        /// Installs a new version of the injector application using the given MSI File path
         /// </summary>
-        /// <returns>True if the client is authorized. False if not</returns>
-        private bool _authorizeGitClient()
+        /// <param name="InstallerPath">The path to the installer for the injector app</param>
+        /// <param name="Arguments">Optional arguments for our installer msi command. Defaults to normal logging</param>
+        /// <returns>True if invoked correctly, false if not</returns>
+        /// <exception cref="FileNotFoundException">Thrown when no installer file can be found</exception>
+        /// <exception cref="InvalidOperationException">Thrown when an invalid installer is provided</exception>
+        public bool InstallInjectorApplication(string InstallerPath, InstallArguments Arguments = InstallArguments.NORMAL_INSTALL)
         {
-            try
+            // Check if we're using a service instance or not first
+            if (this.IsServiceClient)
             {
-                // Check if we're configured or not already 
-                if (this.IsGitClientAuthorized) return true;
-
-                // Build a new git client here for authorization
-                this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING GIT CLIENT NOW...", LogType.InfoLog);
-                Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
-                this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
-                this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATION WITH BOT LOGIN ACCESS PASSED!", LogType.InfoLog);
-
-                // Return true once completed and mark our client authorized
-                this.IsGitClientAuthorized = true;
-                return true;
+                // Invoke our pipe routine for this method if needed and store output results
+                var PipeAction = this.ExecutePipeMethod(nameof(InstallInjectorApplication), InstallerPath);
+                return bool.Parse(PipeAction.PipeCommandResult.ToString());
             }
-            catch (Exception AuthEx)
+            
+            // Make sure our installer exists before moving on
+            if (!File.Exists(InstallerPath))
+                throw new FileNotFoundException($"Error! Installer \"{InstallerPath}\" could not be found!");
+            if (!Path.GetExtension(InstallerPath).Contains("msi"))
+                throw new InvalidOperationException("Error! Installer files must be an MSI file type!");
+
+            // Kill existing instances of the injector application here if needed
+            Process[] InjectorProcesses = Process.GetProcesses()
+                .Where(ProcObj => ProcObj.ProcessName.Contains("FulcrumInjector"))
+                .ToArray();         
+
+            // If existing injector processes are found, kill them all one by one
+            if (InjectorProcesses.Length == 0) this._serviceLogger.WriteLog("NO EXISTING INJECTOR PROCESSES FOUND! MOVING ON", LogType.InfoLog); 
+            else 
             {
-                // Log our exception and return false 
-                this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW GIT CLIENT!", LogType.ErrorLog);
-                this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
-                return false;
+                // Log out that we're killing existing processes
+                this._serviceLogger.WriteLog("KILLING EXISTING INJECTOR PROCESSES BEFORE STARTING UPDATE...", LogType.WarnLog);
+                this._serviceLogger.WriteLog($"TOTAL OF {InjectorProcesses.Length} PROCESSES TO BE KILLED");
+
+                // Iterate all of our processes and kill them one by one
+                foreach (var InjectorProcess in InjectorProcesses)
+                {
+                    try
+                    {
+                        // Kill the process here and catch any failures if they're found
+                        this._serviceLogger.WriteLog($"KILLING PROCESS \"{InjectorProcess.ProcessName}\" (PID: {InjectorProcess.Id})...");
+                        InjectorProcess.Kill();
+                    }
+                    catch (Exception KillProcessEx)
+                    {
+                        // Catch the failure and log it out here
+                        this._serviceLogger.WriteLog($"ERROR! FAILED TO KILL PROCESS WITH ID {InjectorProcess.Id}!", LogType.ErrorLog);
+                        this._serviceLogger.WriteException("EXCEPTION THROWN IS BEING LOGGED BELOW", KillProcessEx);
+                    }
+                }
+
+                // Log out we're done killing processes here
+                this._serviceLogger.WriteLog("DONE ATTEMPTING TO KILL PROCESSES FOR INJECTOR APPLICATION!", LogType.WarnLog);
+                this._serviceLogger.WriteLog("HOPEFULLY WE DIDN'T KILL THE WRONG TASK THIS TIME!", LogType.WarnLog);
             }
+
+            // Configure an installer log file here
+            FileInfo InstallerInfo = new FileInfo(InstallerPath);
+            string InstallerDirectory = InstallerInfo.DirectoryName;
+            string InstallerName = Path.GetFileNameWithoutExtension(InstallerInfo.Name);
+            string InstallerLogFile = Path.Combine(InstallerDirectory, $"InstallerLog_{InstallerName}.log");
+
+            // Build our argument string for the msiexec process based on the arguments provided into this method
+            string UpdaterArguments = string.Empty;
+            if (Arguments.HasFlag(InstallArguments.NORMAL_INSTALL)) UpdaterArguments += $"/I \"{InstallerPath}\" ";
+            if (Arguments.HasFlag(InstallArguments.ADMIN_INSTALL)) UpdaterArguments += $"/A \"{InstallerPath}\" ";
+            if (Arguments.HasFlag(InstallArguments.PASSIVE_INSTALL)) UpdaterArguments += "/PASSIVE ";
+            if (Arguments.HasFlag(InstallArguments.QUIET_INSTALL)) UpdaterArguments += "/QUIET ";
+            if (Arguments.HasFlag(InstallArguments.SET_TARGET_DIR)) UpdaterArguments += $"TARGETDIR=\"C:\\Program Files (x86)\\\" ";
+            if (Arguments.HasFlag(InstallArguments.ALL_USERS)) UpdaterArguments += "ALLUSERS=1 ";
+            if (Arguments.HasFlag(InstallArguments.LOGGING)) UpdaterArguments += $"/L*V \"{InstallerLogFile}\" ";
+
+            // Log out our MSIEXEC command argument string here 
+            this._serviceLogger.WriteLog($"INSTALLER ARGUMENT FLAGS: {Arguments}");
+            this._serviceLogger.WriteLog($"INSTALL ARGUMENT STRING:  {UpdaterArguments}");
+
+            // Build a new process to invoke our installer msi file here
+            ProcessStartInfo UpdaterStartInfo = new ProcessStartInfo
+            {
+                // Configuration for process bootup
+                Verb = "runas",                          // Forces the process to run with the runas verb
+                UseShellExecute = true,                  // Uses shell execution or not
+                FileName = "msiexec.exe",                // File to invoke. MSIEXEC for installing MSI files
+                Arguments = UpdaterArguments,            // Arguments to pass into the MSIEXEC when booted
+            };
+
+            // Log out that we're booting our new updater process now
+            this._serviceLogger.WriteLog("STARTING INSTALLER FOR INJECTOR APPLICATION!", LogType.WarnLog);
+            this._serviceLogger.WriteLog($"INSTALLER FILE IS BEING BOOTED FROM PATH: {InstallerPath}");
+            this._serviceLogger.WriteLog($"INSTALLER LOG FILE IS BEING SAVED AS: {InstallerLogFile}");
+
+            // Build our process and store the standard output and error information
+            Process UpdaterProcess = new Process();
+            UpdaterProcess.StartInfo = UpdaterStartInfo;
+
+            // Start the process and wait for it to exit
+            UpdaterProcess.Start();
+            UpdaterProcess.WaitForExit();
+            
+            // Check the status of the process once it's exited
+            this._serviceLogger.WriteLog("INSTALLER PROCESS HAS COMPLETED! CHECKING STATUS OF UPDATE NOW...", LogType.WarnLog);
+            if (UpdaterProcess.ExitCode == 0) this._serviceLogger.WriteLog("INSTALLER PROCESS EXITED WITH CODE 0! THIS IS PERFECT!", LogType.InfoLog);
+            else this._serviceLogger.WriteLog($"WARNING! INSTALLER EXITING WITH EXIT CODE {UpdaterProcess.ExitCode}! THIS MAY BE AN ISSUE", LogType.WarnLog);
+
+            // Return out if we've got an exit code of 0 or not 
+            return UpdaterProcess.ExitCode == 0;
         }
 
         /// <summary>
@@ -523,10 +766,20 @@ namespace FulcrumUpdaterService
                     throw new NullReferenceException($"Error! Could not find injector release {VersionTag}!");
 
                 // Log out information about our pulled injector release
-                this._serviceLogger.WriteLog($"FOUND INJECTOR RELEASE {VersionTag} CORRECTLY!", LogType.InfoLog);
-                this._serviceLogger.WriteLog($"RETURNING OUT RELEASE OBJECT FOR VERSION {VersionTag} NOW...", LogType.InfoLog);
+                if (VersionTag == null)
+                {
+                    // For the latest version, log the found version number out and exit out
+                    this._serviceLogger.WriteLog("FOUND LATEST VERSION FOR INJECTOR APPLICATION CORRECTLY!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"LATEST VERSION WAS SEEN TO BE {InjectorRelease.TagName}!", LogType.InfoLog);
+                }
+                else
+                {
+                    // For specified versions, log out what version is located and exit out
+                    this._serviceLogger.WriteLog($"FOUND INJECTOR RELEASE {VersionTag} CORRECTLY!", LogType.InfoLog);
+                    this._serviceLogger.WriteLog($"RETURNING OUT RELEASE OBJECT FOR VERSION {VersionTag} NOW...", LogType.InfoLog);
+                }
 
-                // Return out based on how many releases are found
+                // Return out the found injector release object here
                 return InjectorRelease;
             }
             catch (Exception FindReleaseEx)
@@ -535,6 +788,38 @@ namespace FulcrumUpdaterService
                 this._serviceLogger.WriteLog($"ERROR! FAILED TO FIND INJECTOR VERSION {VersionTag}!", LogType.ErrorLog);
                 this._serviceLogger.WriteException("EXCEPTION THROWN DURING REFRESH ROUTINE IS BEING LOGGED BELOW", FindReleaseEx);
                 return null;
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
+        
+        /// <summary>
+        /// Private helper method used to authorize our GitHub client on the MEAT Inc organization
+        /// </summary>
+        /// <returns>True if the client is authorized. False if not</returns>
+        private bool _authorizeGitClient()
+        {
+            try
+            {
+                // Check if we're configured or not already 
+                if (this.IsGitClientAuthorized) return true;
+
+                // Build a new git client here for authorization
+                this._serviceLogger.WriteLog("BUILDING AND AUTHORIZING GIT CLIENT NOW...", LogType.InfoLog);
+                Credentials LoginCredentials = new Credentials(this._serviceConfig.UpdaterSecretKey);
+                this._gitUpdaterClient = new GitHubClient(new ProductHeaderValue(this._serviceConfig.UpdaterUserName)) { Credentials = LoginCredentials };
+                this._serviceLogger.WriteLog("BUILT NEW GIT CLIENT FOR UPDATING OK! AUTHENTICATION WITH BOT LOGIN ACCESS PASSED!", LogType.InfoLog);
+
+                // Return true once completed and mark our client authorized
+                this.IsGitClientAuthorized = true;
+                return true;
+            }
+            catch (Exception AuthEx)
+            {
+                // Log our exception and return false 
+                this._serviceLogger.WriteLog("ERROR! FAILED TO AUTHORIZE NEW GIT CLIENT!", LogType.ErrorLog);
+                this._serviceLogger.WriteException("EXCEPTION DURING AUTHORIZATION IS BEING LOGGED BELOW", AuthEx);
+                return false;
             }
         }
     }
