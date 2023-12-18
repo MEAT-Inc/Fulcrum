@@ -61,6 +61,7 @@ namespace FulcrumUpdaterService
             InstallArguments.LOGGING;
         public static readonly InstallArguments InjectorArguments =
             InstallArguments.NORMAL_INSTALL |
+            InstallArguments.PASSIVE_INSTALL |
             InstallArguments.LOGGING;
 
         #endregion //Fields
@@ -624,7 +625,7 @@ namespace FulcrumUpdaterService
         /// <returns>True if invoked correctly, false if not</returns>
         /// <exception cref="FileNotFoundException">Thrown when no installer file can be found</exception>
         /// <exception cref="InvalidOperationException">Thrown when an invalid installer is provided</exception>
-        public bool InstallInjectorApplication(string InstallerPath, InstallArguments Arguments = InstallArguments.NORMAL_INSTALL | InstallArguments.LOGGING)
+        public bool InstallInjectorApplication(string InstallerPath, InstallArguments Arguments = InstallArguments.NORMAL_INSTALL)
         {
             // Check if we're using a service instance or not first
             if (this.IsServiceClient)
