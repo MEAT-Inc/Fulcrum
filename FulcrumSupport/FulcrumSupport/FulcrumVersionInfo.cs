@@ -108,7 +108,7 @@ namespace FulcrumSupport
             if (!Debugger.IsAttached) return RegistryControl.InjectorVersion;
 
             // Build version information from current directory contents
-            Assembly InjectorAssembly = Assembly.GetExecutingAssembly();
+            Assembly InjectorAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
             return InjectorAssembly.GetName()?.Version;
         }
         /// <summary>
