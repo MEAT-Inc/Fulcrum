@@ -21,9 +21,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Title Value -->
         <TextBlock
             Grid.Row="0" Margin="0,3"
@@ -78,96 +78,32 @@
                 Content="Edit Apps" Style="{StaticResource ActionButtonStyle}"/>
         </Grid>
 
-        <!-- Edit Apps Content -->
-        <Grid Grid.Row="2" Visibility="{Binding Path=IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition/>
-                <RowDefinition Height="35"/>
-            </Grid.RowDefinitions>
-
-            <!-- Edit, Delete, Add Buttons -->
-            <Grid Grid.Row="0" Margin="0,0,0,5" IsEnabled="False">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Add App"
-                        Margin="4,0,4,0"
-                        Style="{StaticResource ActionButtonStyle}"/>
-                <Button Grid.Column="1" Content="Edit App" 
-                        Margin="4,0,4,0">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-                <Button Grid.Column="2" Content="Delete App"
-                        Margin="4,0,8,0">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </Grid>
-
-            <!-- OE App Configuration -->
-            <Grid Grid.Row="1" Margin="5,0,10,5">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>  
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14" VerticalAlignment="Center" Text="App Name:"/>
-                <TextBox Grid.Row="0" Grid.Column="1" 
-                         Style="{StaticResource InputTextWithHolder}" 
-                         Tag="Select An App" Margin="5,5,0,0"/>
-                <TextBlock Grid.Row="1" Grid.Column="0" FontSize="14" VerticalAlignment="Center" Text="App Version:"/>
-                <TextBox Grid.Row="1" Grid.Column="1"
-                         Style="{StaticResource InputTextWithHolder}" 
-                         Tag="Select An App" Margin="5,5,0,0"/>
-                <TextBlock Grid.Row="2" Grid.Column="0" FontSize="14" VerticalAlignment="Center" Text="App Path:"/>
-                <TextBox Grid.Row="2" Grid.Column="1" 
-                         Style="{StaticResource InputTextWithHolder}" 
-                         Tag="Select An App" Margin="5,5,0,0"/>
-                <TextBlock Grid.Row="3" Grid.Column="0" FontSize="14" VerticalAlignment="Center" Text="Command:"/>
-                <TextBox Grid.Row="3" Grid.Column="1"
-                         Style="{StaticResource InputTextWithHolder}" 
-                         Tag="Select An App" Margin="5,5,0,0"/>
-            </Grid>
-
-            <!-- Save and Discard Buttons-->
-            <Grid Grid.Row="2" Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Save Changes" 
-                        Margin="8,0,4,0"
-                        Click="btnSaveOeAppChanges_OnClick"
-                        IsEnabled="False"
-                        Style="{StaticResource ActionButtonStyle}"/>
-                <Button Grid.Column="1" Content="Discard Changes"
-                        Margin="4,0,8,0"
-                        Click="btnDiscardOeAppChanges_OnClick"
-                        Style="{StaticResource ActionButtonStyle}"/>
-            </Grid>
+        <!-- Save and Discard Buttons-->
+        <Grid Grid.Row="2" Visibility="{Binding Path=IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"
+              Margin="5,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style x:Key="EditSelectedAppButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=InstalledAppsListView, Path=SelectedIndex}" Value="-1">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Resources>
+            <Button Grid.Column="0" Content="Add" Margin="5,0,0,0"
+                    Style="{StaticResource ActionButtonStyle}" Click="btnAddOeApp_OnClick"/>
+            <Button Grid.Column="1" Content="Edit" Margin="5,0,0,0" 
+                    Style="{DynamicResource EditSelectedAppButtonStyle}" Click="btnEditSelectedApp_OnClick"/>
+            <Button Grid.Column="2" Content="Delete" Margin="5,0,0,0" 
+                    Style="{DynamicResource EditSelectedAppButtonStyle}" Click="btnDeleteOeApp_OnClick"/>
+            <Button Grid.Column="3" Content="Cancel" Margin="5,0,8,0" 
+                    Style="{StaticResource ActionButtonStyle}" Click="btnDiscardOeAppChanges_OnClick" />
         </Grid>
     </Grid>
 </UserControl>
