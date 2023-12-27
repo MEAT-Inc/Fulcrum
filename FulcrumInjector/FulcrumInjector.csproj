@@ -198,6 +198,10 @@
     <Compile Include="FulcrumViewContent\FulcrumServiceErrorWindow.xaml.cs">
       <DependentUpon>FulcrumServiceErrorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FulcrumViewContent\FulcrumViewModels\InjectorMiscViewModels\FulcrumEditOeAppViewModel.cs" />
+    <Compile Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumEditOeAppView.xaml.cs">
+      <DependentUpon>FulcrumEditOeAppView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\DriveModels\DriveLogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\FulcrumModels\FulcrumLogFile.cs" />
     <Compile Include="FulcrumViewSupport\FulcrumModels\LogFileModels\LogFile.cs" />
@@ -321,6 +325,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumEditOeAppView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FulcrumViewContent\FulcrumViews\InjectorMiscViews\FulcrumGoogleDriveView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -378,6 +386,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumDllInjectionTestViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FulcrumViewSupport\FulcrumStyles\AppStyleSheets\FulcrumEditOeAppViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

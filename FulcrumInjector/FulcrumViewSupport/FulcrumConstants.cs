@@ -162,6 +162,8 @@ namespace FulcrumInjector.FulcrumViewSupport
             FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumGoogleDriveView));
         private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumUpdaterSingleton =>
             FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumUpdaterView));
+        private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumEditOeAppSingleton =>
+            FulcrumSingletonContent<UserControl, FulcrumViewModelBase>.LocateSingletonViewInstance(typeof(FulcrumEditOeAppView));
 
         // Private static Singleton instances for Injector Options Content
         private static FulcrumSingletonContent<UserControl, FulcrumViewModelBase> _fulcrumSettingsSingleton =>
@@ -190,6 +192,8 @@ namespace FulcrumInjector.FulcrumViewSupport
         public static FulcrumUpdaterViewModel FulcrumUpdaterViewModel => (FulcrumUpdaterViewModel)_fulcrumUpdaterSingleton.SingletonViewModel;
         public static FulcrumGoogleDriveView FulcrumGoogleDriveView => (FulcrumGoogleDriveView)_fulcrumGoogleDriveSingleton.SingletonUserControl;
         public static FulcrumGoogleDriveViewModel FulcrumGoogleDriveViewModel => (FulcrumGoogleDriveViewModel)_fulcrumGoogleDriveSingleton.SingletonViewModel;
+        public static FulcrumEditOeAppView FulcrumEditOeAppView => (FulcrumEditOeAppView)_fulcrumEditOeAppSingleton.SingletonUserControl;
+        public static FulcrumEditOeAppViewModel FulcrumEditOeAppViewModel => (FulcrumEditOeAppViewModel)_fulcrumEditOeAppSingleton.SingletonViewModel;
 
         // Public facing singleton views and view models for our Injector Options Content
         public static FulcrumSettingsView FulcrumSettingsView => (FulcrumSettingsView)_fulcrumSettingsSingleton.SingletonUserControl;

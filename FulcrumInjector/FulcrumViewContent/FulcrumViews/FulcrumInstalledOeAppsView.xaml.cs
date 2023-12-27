@@ -193,15 +193,31 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
             this.ViewModel.IsEditMode = true;
         }
         /// <summary>
-        /// Event handler to fire when the user requests to save changes to the list of OE apps
+        /// Event handler to fire when the user requests to add a new OE app to our list
         /// </summary>
         /// <param name="Sender">Sending control for this event</param>
         /// <param name="E">Event arguments fired along with this event</param>
-        private void btnSaveOeAppChanges_OnClick(object Sender, RoutedEventArgs E)
+        private void btnAddOeApp_OnClick(object Sender, RoutedEventArgs E)
         {
-            this._viewLogger.WriteLog("TURNING OFF EDIT MODE FOR OE APPS NOW...", LogType.InfoLog);
-            this._viewLogger.WriteLog("SAVING CHANGES FOR OE APPS LIST NOW...", LogType.InfoLog);
-            this.ViewModel.IsEditMode = false;
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Event handler to fire when the user requests to edit the currently selected OE application
+        /// </summary>
+        /// <param name="Sender">Sending control for this event</param>
+        /// <param name="E">Event arguments fired along with this event</param>
+        private void btnEditSelectedApp_OnClick(object Sender, RoutedEventArgs E)
+        {
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Event handler to fire when the user requests to delete the currently selected OE application
+        /// </summary>
+        /// <param name="Sender">Sending control for this event</param>
+        /// <param name="E">Event arguments fired along with this event</param>
+        private void btnDeleteOeApp_OnClick(object Sender, RoutedEventArgs E)
+        {
+            throw new NotImplementedException();
         }
         /// <summary>
         /// Event handler to fire when the user requests to discard changes to the list of OE apps
