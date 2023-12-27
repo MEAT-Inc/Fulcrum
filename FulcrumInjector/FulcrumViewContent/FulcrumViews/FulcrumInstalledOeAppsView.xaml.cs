@@ -199,7 +199,16 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         /// <param name="E">Event arguments fired along with this event</param>
         private void btnAddOeApp_OnClick(object Sender, RoutedEventArgs E)
         {
-            throw new NotImplementedException();
+            // Make sure we've got a valid main window to open our edit content from
+            if (FulcrumConstants.FulcrumMainWindow == null) {
+                this._viewLogger.WriteLog("ERROR! VIEW CONTENT FOR MAIN WINDOW ON OUR CONSTANTS SHARE WAS NULL!", LogType.ErrorLog);
+                return;
+            }
+
+            // Log out what app is being edited once we've got it selected
+            this._viewLogger.WriteLog("TRIGGERING NEW ADD APP ROUTINE FOR AN OE APPLICATION...");
+            FulcrumConstants.FulcrumMainWindow.EditOeAppFlyout.IsOpen = true;
+            FulcrumConstants.FulcrumMainWindow.EditOeApplicationView.CreateNewApplication();
         }
         /// <summary>
         /// Event handler to fire when the user requests to edit the currently selected OE application
@@ -208,7 +217,32 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         /// <param name="E">Event arguments fired along with this event</param>
         private void btnEditSelectedApp_OnClick(object Sender, RoutedEventArgs E)
         {
-            throw new NotImplementedException();
+            // Pull our selected OE app and pass it into our edit routine
+            var SelectedApp = this.ViewModel.SelectedApp;
+            if (SelectedApp == null) {
+                this._viewLogger.WriteLog("ERROR! CAN NOT FIRE OE APP EDIT ROUTINE WHEN NO APP IS SELECTED!", LogType.ErrorLog);
+                return;
+            }
+
+            // Make sure we've got a valid main window to open our edit content from
+            if (FulcrumConstants.FulcrumMainWindow == null) {
+                this._viewLogger.WriteLog("ERROR! VIEW CONTENT FOR MAIN WINDOW ON OUR CONSTANTS SHARE WAS NULL!", LogType.ErrorLog);
+                return;
+            }
+            // Log out what app is being edited once we've got it selected
+            this._viewLogger.WriteLog("TRIGGERING NEW EDIT ROUTINE FOR SELECTED OE APPLICATION...");
+            this._viewLogger.WriteLog($"OE APP BEING UPDATED: {SelectedApp.OEAppName}");
+
+            // Open our flyout to show the edit window and trigger it edit the current app selected
+            FulcrumConstants.FulcrumMainWindow.EditOeAppFlyout.IsOpen = true;
+            if (!FulcrumConstants.FulcrumMainWindow.EditOeApplicationView.SetOeApplication(ref SelectedApp))
+            {
+                // If the result is false no changes are made. Exit out
+                FulcrumConstants.FulcrumMainWindow.EditOeAppFlyout.IsOpen = false;
+                this._viewLogger.WriteLog("ERROR! FAILED TO OPEN A NEW EDIT WINDOW FOR AN OE APPLICATION!", LogType.WarnLog);
+                this._viewLogger.WriteLog($"RETURNING OUT OF EDIT ROUTINE FOR OE APP {SelectedApp.OEAppName} WITHOUT CHANGES!", LogType.WarnLog);
+                return;
+            }
         }
         /// <summary>
         /// Event handler to fire when the user requests to delete the currently selected OE application
@@ -217,7 +251,8 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViews
         /// <param name="E">Event arguments fired along with this event</param>
         private void btnDeleteOeApp_OnClick(object Sender, RoutedEventArgs E)
         {
-            throw new NotImplementedException();
+            // TODO: Build logic for deleting OE applications
+            // throw new NotImplementedException();
         }
         /// <summary>
         /// Event handler to fire when the user requests to discard changes to the list of OE apps

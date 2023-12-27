@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
+// Static using for OE application to reduce clutter in code
+using FulcrumOeApp = FulcrumInjector.FulcrumViewContent.FulcrumViewModels.FulcrumInstalledOeAppsViewModel.FulcrumOeApplication;
+
 namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewModels
 {
     /// <summary>
@@ -17,9 +20,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         #endregion // Custom Events
 
         #region Fields
+
+        // Private backing fields for the selected OE application
+        private FulcrumOeApp _selectedOeApp;        // The OE application we're modifying or adding
+
         #endregion // Fields
 
         #region Properties
+
+        // Public facing properties for our view content to bind onto
+        public FulcrumOeApp SelectedOeApp { get => this._selectedOeApp; set => PropertyUpdated(value); }
+
         #endregion // Properties
 
         #region Structs and Classes
@@ -35,7 +46,7 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
         {
             // Spawn a new logger for this view model instance 
             this.ViewModelLogger = new SharpLogger(LoggerActions.UniversalLogger);
-            this.ViewModelLogger.WriteLog("SETTING UP OE APPLICATION EDIT WINDOW NOW...", LogType.WarnLog);
+            this.ViewModelLogger.WriteLog("SETTING UP OE APPLICATION EDIT WINDOW VIEW MODEL NOW...", LogType.WarnLog);
             this.ViewModelLogger.WriteLog($"VIEWMODEL LOGGER FOR VM {this.GetType().Name} HAS BEEN STARTED OK!", LogType.InfoLog);
         }
 
