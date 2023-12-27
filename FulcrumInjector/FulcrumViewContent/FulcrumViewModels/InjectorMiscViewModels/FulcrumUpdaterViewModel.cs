@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Controls;
@@ -11,6 +12,7 @@ using FulcrumInjector.FulcrumViewSupport.FulcrumDataConverters;
 using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
 using FulcrumInjector.FulcrumViewSupport.FulcrumModels;
 using FulcrumJson;
+using FulcrumSupport;
 using FulcrumUpdaterService;
 using SharpLogging;
 
@@ -158,15 +160,17 @@ namespace FulcrumInjector.FulcrumViewContent.FulcrumViewModels.InjectorMiscViewM
                 throw new InvalidOperationException($"Error! Failed to find injector version {this.LatestInjectorVersion}!");
 
             // Build our download path for the pulled asset/installer version
-            string DownloadFilePath = Path.Combine(Path.GetTempPath(), $"FulcrumInstaller_{this.LatestInjectorVersion}.msi");
-            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion} NOW...", LogType.InfoLog);
+            string InstallerName = Path.ChangeExtension(AssetDownloadUrl.Split('/').Last(), "msi");
+            string InstallersFolder = Path.Combine(RegistryControl.InjectorInstallPath, "FulcrumInstallers");
+            string DownloadFilePath = Path.Combine(InstallersFolder, InstallerName);
+            this.ViewModelLogger.WriteLog($"PULLING IN RELEASE VERSION {this.LatestInjectorVersion.Split('_').Last()} NOW...", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"ASSET DOWNLOAD URL IS {AssetDownloadUrl}", LogType.InfoLog);
             this.ViewModelLogger.WriteLog($"PULLING DOWNLOADED MSI INTO TEMP FILE {DownloadFilePath}", LogType.InfoLog);
-            if (!File.Exists(DownloadFilePath))
-            {
-                // Ensure our download file path exists before trying to pull it in
-                this.ViewModelLogger.WriteLog("BUILDING DOWNLOAD PATH FOR INSTALLER FILE!", LogType.WarnLog);
-                File.Create(DownloadFilePath);
+
+            // Make sure our installer download directory exists here 
+            if (!Directory.Exists(InstallersFolder)) {
+                this.ViewModelLogger.WriteLog("WARNING! INSTALLERS FOLDER DID NOT EXIST! BUILDING IT NOW...", LogType.WarnLog);
+                Directory.CreateDirectory(InstallersFolder);
             }
 
             // Return the URL of the path to download here

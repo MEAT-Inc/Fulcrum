@@ -3,10 +3,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using FulcrumInjector.FulcrumViewSupport.FulcrumJsonSupport;
-using FulcrumSupport;
 
-namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
+namespace FulcrumSupport
 {
     /// <summary>
     /// Class object containing information about the current version of this application
@@ -110,7 +108,7 @@ namespace FulcrumInjector.FulcrumViewSupport.FulcrumModels
             if (!Debugger.IsAttached) return RegistryControl.InjectorVersion;
 
             // Build version information from current directory contents
-            Assembly InjectorAssembly = Assembly.GetExecutingAssembly();
+            Assembly InjectorAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
             return InjectorAssembly.GetName()?.Version;
         }
         /// <summary>

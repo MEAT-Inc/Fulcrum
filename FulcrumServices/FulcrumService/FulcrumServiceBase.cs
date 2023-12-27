@@ -229,7 +229,9 @@ namespace FulcrumService
             // Find the name of our service type and use it for logger configuration
             this.ServiceType = ServiceType;
             this.ServiceName = this.ServiceType.ToDescriptionString();
+            FulcrumServiceInfo ServiceInfo = GetServiceState(this.ServiceType);
             this._serviceLogger = new SharpLogger(LoggerActions.FileLogger, $"{this.ServiceName}Service_Logger");
+            this._serviceLogger.WriteLog($"FULCRUM SERVICE: {ServiceInfo.ServiceName} (Version: {ServiceInfo.ServiceVersion}) IS BOOTING...", LogType.WarnLog);
 
             // Build an exception handler to catch all exceptions on our service instance to avoid crashes
             AppDomain CurrentDomain = AppDomain.CurrentDomain;
@@ -529,6 +531,8 @@ namespace FulcrumService
             // Return our built pipe action values
             return PipeAction;
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Private helper method used to invoke a new pipe action routine onto one of our services
