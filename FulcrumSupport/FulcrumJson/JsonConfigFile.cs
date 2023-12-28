@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -69,6 +70,59 @@ namespace FulcrumJson
         #endregion //Properties
 
         #region Structs and Classes
+
+        /// <summary>
+        /// Public enumeration holding locations for different settings objects
+        /// Holds the flags attribute for combining values from settings entries
+        /// </summary>
+        [Flags] public enum JsonSections : uint
+        {
+            // Base settings entry locations. These are combined with child categories
+            [Description("FulcrumServices")]          FULCRUM_SERVICES              = 0x00400000,   // FulcrumServices
+            [Description("FulcrumOeApplications")]    FULCRUM_OE_APPLICATIONS       = 0x00800000,   // FulcrumOeApplications
+            [Description("FulcrumMenuEntries")]       FULCRUM_MENU_ENTRIES          = 0x01000000,   // FulcrumMenuEntries
+            [Description("FulcrumUserSettings")]      FULCRUM_USER_SETTINGS         = 0x02000000,   // FulcrumUserSettings
+            [Description("FulcrumSimConfigurations")] FULCRUM_SIM_CONFIGURATIONS    = 0x04000000,   // FulcrumSimConfigurations
+            [Description("FulcrumAppThemes")]         FULCRUM_APP_THEMES            = 0x08000000,   // FulcrumAppThemes
+            [Description("FulcrumEncryption")]        FULCRUM_ENCRYPTION            = 0x10000000,   // FulcrumEncryption
+
+            // FulcrumConstants Settings Entries
+            [Description("FulcrumConstants")]              FULCRUM_CONSTANTS                = 0x00100000,                               // FulcrumConstants
+            [Description("AppInstanceName")]                  APP_INSTANCE_NAME             = FULCRUM_CONSTANTS | 0x0000001,            // \__ FulcrumConstants.AppInstanceName
+            [Description("ShimInstanceName")]                 SHIM_INSTANCE_NAME            = FULCRUM_CONSTANTS | 0x0000002,            // \__ FulcrumConstants.ShimInstanceName
+            [Description("InjectorResources")]                INJECTOR_RESOURCES            = FULCRUM_CONSTANTS | 0x0001000,            // \__ FulcrumConstants.InjectorResources
+            [Description("FulcrumXamlPath")]                    FULCRUM_XAML                  = INJECTOR_RESOURCES | 0x0000001,         //     \__ FulcrumConstants.InjectorResources.FulcrumXamlPath
+            [Description("FulcrumIconsPath")]                   FULCRUM_ICONS                 = INJECTOR_RESOURCES | 0x0000002,         //     \__ FulcrumConstants.InjectorResources.FulcrumIconsPath
+            [Description("FulcrumImportFilePath")]              FULCRUM_IMPORTS               = INJECTOR_RESOURCES | 0x0000003,         //     \__ FulcrumConstants.InjectorResources.FulcrumImportFilePath
+            [Description("FulcrumConversionsPath")]             FULCRUM_CONVERSIONS           = INJECTOR_RESOURCES | 0x0000004,         //     \__ FulcrumConstants.InjectorResources.FulcrumConversionsPath
+            [Description("FulcrumExpressionsPath")]             FULCRUM_EXPRESSIONS           = INJECTOR_RESOURCES | 0x0000005,         //     \__ FulcrumConstants.InjectorResources.FulcrumExpressionsPath
+            [Description("FulcrumSimulationsPath")]             FULCRUM_SIMULATIONS           = INJECTOR_RESOURCES | 0x0000006,         //     \__ FulcrumConstants.InjectorResources.FulcrumSimulationsPath
+            [Description("InjectorHardwareRefresh")]          INJECTOR_HARDWARE_REFRESH     = FULCRUM_CONSTANTS | 0x0002000,            // \__ FulcrumConstants.InjectorHardwareRefresh
+            [Description("RefreshDevicesInterval")]             REFRESH_DEVICE_INTERVAL       = INJECTOR_HARDWARE_REFRESH | 0x0000001,  //     \__ FulcrumConstants.InjectorHardwareRefresh.RefreshDevicesInterval
+            [Description("RefreshDLLsInterval")]                REFRESH_DLL_INTERVAL          = INJECTOR_HARDWARE_REFRESH | 0x0000002,  //     \__ FulcrumConstants.InjectorHardwareRefresh.RefreshDLLsInterval
+            [Description("IgnoredDLLNames")]                    IGNORED_DLL_NAMES             = INJECTOR_HARDWARE_REFRESH | 0x0000003,  //     \__ FulcrumConstants.InjectorHardwareRefresh.IgnoredDLLNames
+
+            // FulcrumLogging Settings Entries
+            [Description("FulcrumLogging")]                FULCRUM_LOGGING                  = 0x00200000,                               // FulcrumLogging
+            [Description("LogBrokerConfiguration")]           LOG_BROKER_CONFIG             = FULCRUM_LOGGING | 0x00000001,             // \__ FulcrumLogging.LogBrokerConfiguration
+            [Description("LogBrokerName")]                       LOG_BROKER_NAME            = LOG_BROKER_CONFIG | 0x00000001,           //     \__ FulcrumLogging.LogBrokerConfiguration.LogBrokerName
+            [Description("LogFilePath")]                         LOG_FILE_PATH                 = LOG_BROKER_CONFIG | 0x00000001,        //     \__ FulcrumLogging.LogBrokerConfiguration.LogFilePath
+            [Description("LogFileName")]                         LOG_FILE_NAME                 = LOG_BROKER_CONFIG | 0x00000001,        //     \__ FulcrumLogging.LogBrokerConfiguration.LogFileName
+            [Description("MinLogLevel")]                         MIN_LOG_LEVEL                 = LOG_BROKER_CONFIG | 0x00000001,        //     \__ FulcrumLogging.LogBrokerConfiguration.MinLogLevel
+            [Description("MaxLogLevel")]                         MAX_LOG_LEVEL                 = LOG_BROKER_CONFIG | 0x00000001,        //     \__ FulcrumLogging.LogBrokerConfiguration.MaxLogLevel
+            [Description("LogArchiveConfiguration")]          LOG_ARCHIVER_CONFIG           = FULCRUM_LOGGING | 0x00000002,             // \__ FulcrumLogging.LogArchiverConfiguration
+            [Description("SearchPath")]                          SEARCH_PATH                   = LOG_ARCHIVER_CONFIG | 0x00000001,      //     \__ FulcrumLogging.LogArchiverConfiguration.SearchPath
+            [Description("ArchivePath")]                         ARCHIVE_PATH                  = LOG_ARCHIVER_CONFIG | 0x00000002,      //     \__ FulcrumLogging.LogArchiverConfiguration.ArchivePath
+            [Description("ArchiveFileFilter")]                   ARCHIVE_FILTER                = LOG_ARCHIVER_CONFIG | 0x00000003,      //     \__ FulcrumLogging.LogArchiverConfiguration.ArchiveFileFilter
+            [Description("ArchiveFileSetSize")]                  ARCHIVE_SET_SIZE              = LOG_ARCHIVER_CONFIG | 0x00000004,      //     \__ FulcrumLogging.LogArchiverConfiguration.ArchiveFileSetSize
+            [Description("ArchiveOnFileCount")]                  ARCHIVE_ON_COUNT              = LOG_ARCHIVER_CONFIG | 0x00000005,      //     \__ FulcrumLogging.LogArchiverConfiguration.ArchiveOnFileCount
+            [Description("ArchiveCleanupFileCount")]             ARCHIVE_CLEANUP_COUNT         = LOG_ARCHIVER_CONFIG | 0x00000006,      //     \__ FulcrumLogging.LogArchiverConfiguration.ArchiveCleanupFileCount
+            [Description("SubFolderCleanupFileCount")]           SUB_DIR_FILE_COUNT            = LOG_ARCHIVER_CONFIG | 0x00000007,      //     \__ FulcrumLogging.LogArchiverConfiguration.SubFolderCleanupFileCount
+            [Description("SubFolderRemainingFileCount")]         SUB_DIR_REMAINING_COUNT       = LOG_ARCHIVER_CONFIG | 0x00000008,      //     \__ FulcrumLogging.LogArchiverConfiguration.SubFolderRemainingFileCount
+            [Description("CompressionLevel")]                    COMPRESSION_LEVEL             = LOG_ARCHIVER_CONFIG | 0x00000009,      //     \__ FulcrumLogging.LogArchiverConfiguration.CompressionLevel
+            [Description("CompressionStyle")]                    COMPRESSION_STYLE             = LOG_ARCHIVER_CONFIG | 0x00000010,      //     \__ FulcrumLogging.LogArchiverConfiguration.CompressionStyle
+
+        }
 
         /// <summary>
         /// Class object which holds the definition for an encrypted configuration file section
