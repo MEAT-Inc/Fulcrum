@@ -1,45 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>3.10</ProductVersion>
-    <ProjectGuid>46915009-6e9b-410c-b2bf-0c5e92d556b5</ProjectGuid>
-    <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>FulcrumInstaller</OutputName>
-    <OutputType>Package</OutputType>
-  </PropertyGroup>
+<Project>
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="5.0.2" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="FulcrumShim.wxs" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
   </ItemGroup>
-  <ItemGroup>
-    <WixExtension Include="WixNetFxExtension">
-      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
-      <Name>WixNetFxExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixUtilExtension">
-      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
-      <Name>WixUtilExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixUIExtension">
-      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
-      <Name>WixUIExtension</Name>
-    </WixExtension>
-  </ItemGroup>
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
-  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
-  </Target>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug (No Events)|x86' ">
     <DefineConstants>Debug</DefineConstants>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
@@ -64,9 +32,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release (No Events)|Any CPU' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release (Installed)|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
@@ -93,9 +58,7 @@
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent />
-  </PropertyGroup>
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.2" />
   <Target Name="BeforeBuild">
     <GetAssemblyIdentity AssemblyFiles="..\FulcrumInjector\bin\$(Configuration)\FulcrumInjector.exe">
       <Output TaskParameter="Assemblies" ItemName="AsmInfo" />
@@ -104,6 +67,5 @@
       <Output TaskParameter="Value" PropertyName="TargetName" />
     </CreateProperty>
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
+  <Target Name="AfterBuild"></Target>
 </Project>

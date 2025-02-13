@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<?define UpgradeCode="{b2555316-acc2-49b4-9e78-980025cfb8d8}"?>
     <?define ProductVersion="!(bind.fileVersion.FULCRUMINJECTOR.EXE)"?>
     <!-- Registry Key Name Variables -->
@@ -7,9 +6,8 @@
     <?define InstallVersionKeyName="InstallVersion"?>
     <?define InstallExecutableKeyName="InstallExecutable"?>
     <!-- Product Definitions -->
-    <Product Id="*" Name="FulcrumInjector" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)">
-        <!-- Package Metadata Configuration -->
-        <Package InstallerVersion="200" Compressed="yes" />
+    <Package Name="FulcrumInjector" Language="1033" Version="$(var.ProductVersion)" Manufacturer="MEAT Inc." UpgradeCode="$(var.UpgradeCode)" InstallerVersion="200"><!-- Package Metadata Configuration -->
+        
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
         <!-- Upgrade Information -->
         <Upgrade Id="$(var.UpgradeCode)">
@@ -18,12 +16,87 @@
         </Upgrade>
         <!-- Downgrading and Upgrading Sequences-->
         <InstallExecuteSequence>
-            <RemoveExistingProducts Before="InstallInitialize">PREVIOUSVERSIONINSTALLED&lt;&gt;""</RemoveExistingProducts>
-            <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWERVERSIONINSTALLED&lt;&gt;"" AND NOT Installed</Custom>
+            <RemoveExistingProducts Before="InstallInitialize" Condition="PREVIOUSVERSIONINSTALLED&lt;&gt;&quot;&quot;" />
+            <Custom Action="PreventDowngrading" After="FindRelatedProducts" Condition="NEWERVERSIONINSTALLED&lt;&gt;&quot;&quot; AND NOT Installed" />
         </InstallExecuteSequence>
         <CustomAction Id="PreventDowngrading" Error="A newer version of the FulcrumInjector is already installed!" />
         <!-- Application Contents -->
-        <Directory Id="TARGETDIR" Name="SourceDir">
+        
+        <!-- Features -->
+        <Feature Id="ProductFeature" Title="installer" Level="1">
+            <!-- Base Registry Keys -->
+            <ComponentRef Id="MeatIncRegistryKey" />
+            <ComponentRef Id="FulcrumShimRegistryKey" />
+            <ComponentRef Id="FulcrumServicesRegistryKey" />
+            <ComponentRef Id="FulcrumInjectorRegistryKey" />
+            <!-- Service Registry Keys -->
+            <ComponentRef Id="WatchdogServiceRegistryKey" />
+            <ComponentRef Id="DriveServiceRegistryKey" />
+            <ComponentRef Id="UpdaterServiceRegistryKey" />
+            <ComponentRef Id="EmailServiceRegistryKey" />
+            <!-- PassThru Support Keys -->
+            <ComponentRef Id="FulcrumShimV0404RegistryKey" />
+            <ComponentRef Id="FulcrumShimV0500RegistryKey" />
+            <!-- Injector Program Files -->
+            <ComponentRef Id="FulcrumStyleFiles" />
+            <ComponentRef Id="FulcrumResourceFiles" />
+            <ComponentRef Id="CreateFulcrumIconsFolder" />
+            <ComponentRef Id="CreateFulcrumImportsFolder" />
+			<ComponentRef Id="FulcrumInjectorProgramFiles" />
+            <ComponentRef Id="CreateFulcrumInstallersFolder" />
+            <ComponentRef Id="CreateFulcrumExpressionsFolder" />
+            <ComponentRef Id="CreateFulcrumSimulationsFolder" />
+            <ComponentRef Id="CreateFulcrumConversionsFolder" />
+            <!-- Shim Program Files-->
+            <ComponentRef Id="FulcrumShimProgramFiles" />
+            <!-- Service Files and Registry Keys -->
+            <ComponentRef Id="WatchdogServiceProgramFiles" />
+            <ComponentRef Id="DriveServiceProgramFiles" />
+            <ComponentRef Id="UpdaterServiceProgramFiles" />
+            <ComponentRef Id="EmailServiceProgramFiles" />
+            <!-- Logging Folders  -->
+            <ComponentRef Id="CreateFulcrumLoggingFolder" />
+            <ComponentRef Id="CreateFulcrumArchivesFolder" />
+            <ComponentRef Id="CreateWatchdogServiceLogsFolder" />
+            <ComponentRef Id="CreateDriveServiceLogsFolder" />
+            <ComponentRef Id="CreateEmailServiceLogsFolder" />
+            <ComponentRef Id="CreateUpdaterServiceLogsFolder" />
+        </Feature>
+        <!-- In Control Panel > Add or Remove Programs, applications can have various 
+         entries like phone number and Internet contact information under the Click 
+         here for support information entry -->
+        <Property Id="ARPCOMMENTS" Value="The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs." />
+        <Property Id="ARPCONTACT" Value="Sales: zack.walsh@meatinc.autos Support: zack.walsh@meatinc.autos Phone: (516) 633-3356 Fax: (516) 633-3356" />
+        <!-- Component Refs for App Files And Links -->
+        <Property Id="ARPHELPLINK" Value="https://github.com/MEAT-Inc/Fulcrum/" />
+        <Property Id="ARPURLINFOABOUT" Value="https://github.com/MEAT-Inc/Fulcrum/" />
+        <Property Id="ARPURLUPDATEINFO" Value="https://github.com/MEAT-Inc/Fulcrum/" />
+        <Property Id="ARPHELPTELEPHONE" Value="(516)633-3356" />
+        <!-- UI Configuration -->
+        <UI Id="UserInterface">
+            <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+            <Property Id="WixUI_Mode" Value="Custom" />
+            <!-- Text Setup -->
+            <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+            <!-- Dialogs In Use -->
+            <DialogRef Id="ProgressDlg" />
+            <DialogRef Id="ErrorDlg" />
+            <DialogRef Id="FilesInUse" />
+            <DialogRef Id="FatalError" />
+            <DialogRef Id="UserExit" />
+            <!-- Type of Dialog to show -->
+            <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+        </UI>
+        <!-- UI Type -->
+        <UIRef Id="WixUI_Common" />
+        <!-- Icon Values -->
+        <Property Id="ARPPRODUCTICON" Value="InjectorAppIcon" />
+        <Icon Id="InjectorAppIcon" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
+    
 	        <!-- Service Account Creation -->
 	        <!-- <Component Id="FulcrumServicesAccount" Guid="59A20A55-601E-4B47-835F-CC75EC59591C">
 				<util:User
@@ -36,18 +109,18 @@
 					Name="FulcrumUser"
 				Password="FulcrumUser" />
 			</Component> -->
-	        <Directory Id="DesktopFolder" />
-            <Directory Id="ProgramMenuFolder" />
-            <Directory Id="ProgramFilesFolder">
+	        <StandardDirectory Id="DesktopFolder" />
+            <StandardDirectory Id="ProgramMenuFolder" />
+            <StandardDirectory Id="ProgramFilesFolder">
                 <Directory Id="MeatIncProgramFiles" Name="MEAT Inc">
 	                <Component Id="MeatIncRegistryKey" Guid="2EFF94B1-6D86-408D-B758-41C48F1B64BF">
-                        <RegistryKey Root="HKLM" Id="MeatIncKey" Key="SOFTWARE\MEAT Inc" Action="createAndRemoveOnUninstall">
+                        <RegistryKey Root="HKLM" Id="MeatIncKey" Key="SOFTWARE\MEAT Inc" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                             <RegistryValue Id="MeatIncFiles" Name="InstallPath" Action="write" Type="string" Value="[MeatIncProgramFiles]" />
                         </RegistryKey>
                     </Component>
                     <Directory Id="FulcrumInjectorFiles" Name="FulcrumInjector">
                         <Component Id="FulcrumInjectorRegistryKey" Guid="7A1F175A-1CEC-431D-BFE0-EABE1A5F2AD5">
-                            <RegistryKey Root="HKLM" Id="FulcrumInjectorKey" Key="SOFTWARE\MEAT Inc\FulcrumInjector" Action="createAndRemoveOnUninstall">
+                            <RegistryKey Root="HKLM" Id="FulcrumInjectorKey" Key="SOFTWARE\MEAT Inc\FulcrumInjector" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                 <RegistryValue Id="FulcrumInjectorVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="$(var.ProductVersion)" />
                                 <RegistryValue Id="FulcrumInjectorInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]" />
                                 <RegistryValue Id="FulcrumInjectorExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumInjectorFiles]FulcrumInjector.exe" />
@@ -116,11 +189,11 @@
                             <!-- Injector EXE and Shortcuts -->
                             <File KeyPath="yes" Id="FULCRUMINJECTOR.EXE" Name="FulcrumInjector.exe" Source="..\FulcrumInjector\bin\$(var.Configuration)\FulcrumInjector.exe">
                                 <!-- Start Menu Shortcut -->
-                                <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+                                <Shortcut Id="InjectorStartMenuShortcut" IconIndex="0" Advertise="yes" Directory="ProgramMenuFolder" Icon="InjectorStartMenuAppIcon.exe" WorkingDirectory="FulcrumInjectorFiles" Name="FulcrumInjector - $(var.ProductVersion)" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
                                     <Icon Id="InjectorStartMenuAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
                                 </Shortcut>
                                 <!-- Desktop Shortcut -->
-                                <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FULCRUMINJECTORFILES" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
+                                <Shortcut Id="InjectorDesktopShortcut" IconIndex="0" Advertise="yes" Directory="DesktopFolder" Icon="InjectorDesktopAppIcon.exe" WorkingDirectory="FulcrumInjectorFiles" Name="FulcrumInjector" Description="The Injector is an app which boots an OE Software (or any diagnostic software for that matter), shims it, and sniffs the shit outta it">
                                     <Icon Id="InjectorDesktopAppIcon.exe" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
                                 </Shortcut>
                             </File>
@@ -222,7 +295,7 @@
                     </Directory>
                     <Directory Id="FulcrumShimFiles" Name="FulcrumShim">
                         <Component Id="FulcrumShimRegistryKey" Guid="0D33DD10-646A-4409-A869-C09D092BF638">
-                            <RegistryKey Id="FulcrumShimKey" Root="HKLM" Key="SOFTWARE\MEAT Inc\FulcrumShim" Action="createAndRemoveOnUninstall">
+                            <RegistryKey Id="FulcrumShimKey" Root="HKLM" Key="SOFTWARE\MEAT Inc\FulcrumShim" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                 <RegistryValue Id="ShimInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]" />
                                 <RegistryValue Id="ShimVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSHIM.DLL)" />
                                 <RegistryValue Id="ShimDllPath" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumShimFiles]FulcrumShim.dll" />
@@ -256,7 +329,7 @@
                             <File Id="VCRUNTIME140.DLL" Name="vcruntime140.dll" Source="..\FulcrumShim\$(var.Configuration)\vcruntime140.dll" />
                         </Component>
                         <Component Id="FulcrumShimV0404RegistryKey" Guid="EF5C10AB-C995-429F-A491-7EC723A8D924">
-                            <RegistryKey Id="RegOmegaKey_0404" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc - FulcrumShim (v04.04)" Action="createAndRemoveOnUninstall">
+                            <RegistryKey Id="RegOmegaKey_0404" Root="HKLM" Key="SOFTWARE\PassThruSupport.04.04\MEAT Inc - FulcrumShim (v04.04)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                 <RegistryValue Id="V0404_RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
                                 <RegistryValue Id="V0404_RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
                                 <RegistryValue Id="V0404_RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[MeatIncProgramFiles]\FulcrumInjector\FulcrumInjector.exe" />
@@ -274,7 +347,7 @@
                             </RegistryKey>
                         </Component>
                         <Component Id="FulcrumShimV0500RegistryKey" Guid="0E480A35-76F2-404D-8997-277C99EF4150">
-                            <RegistryKey Id="RegOmegaKey_0500" Root="HKLM" Key="SOFTWARE\PassThruSupport.05.00\MEAT Inc - FulcrumShim (v05.00)" Action="createAndRemoveOnUninstall">
+                            <RegistryKey Id="RegOmegaKey_0500" Root="HKLM" Key="SOFTWARE\PassThruSupport.05.00\MEAT Inc - FulcrumShim (v05.00)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                 <RegistryValue Id="V0500_RegVendor" Name="Vendor" Action="write" Type="string" Value="MEAT Inc" />
                                 <RegistryValue Id="V0500_RegName" Name="Name" Action="write" Type="string" Value="FulcrumShim" />
                                 <RegistryValue Id="V0500_RegConfigApplication" Name="ConfigApplication" Action="write" Type="string" Value="[MeatIncProgramFiles]\FulcrumInjector\FulcrumInjector.exe" />
@@ -294,14 +367,14 @@
                     </Directory>
                     <Directory Id="FulcrumServices" Name="FulcrumServices">
                         <Component Id="FulcrumServicesRegistryKey" Guid="12557D48-30E2-4035-A576-E587D6A9B547">
-                            <RegistryKey Root="HKLM" Id="FulcrumServicesKey" Key="SOFTWARE\MEAT Inc\FulcrumServices" Action="createAndRemoveOnUninstall">
+                            <RegistryKey Root="HKLM" Id="FulcrumServicesKey" Key="SOFTWARE\MEAT Inc\FulcrumServices" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                 <RegistryValue Id="ServicesInstallFolder" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumServices]" />
                                 <RegistryValue Id="ServiceBaseVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMSERVICE.DLL_4)" />
                             </RegistryKey>
                         </Component>
                         <Directory Id="FulcrumWatchdogService" Name="FulcrumWatchdogService">
                             <Component Id="WatchdogServiceRegistryKey" Guid="1AF8BA36-D9D4-4CF4-A9D6-9EA9D3BD0758">
-                                <RegistryKey Root="HKLM" Id="WatchdogServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumWatchdog" Action="createAndRemoveOnUninstall">
+                                <RegistryKey Root="HKLM" Id="WatchdogServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumWatchdog" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                     <RegistryValue Id="WatchdogServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]" />
                                     <RegistryValue Id="WatchdogServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMWATCHDOGSERVICE.EXE)" />
                                     <RegistryValue Id="WatchdogServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumWatchdogService]FulcrumWatchdogService.exe" />
@@ -323,7 +396,7 @@
                         </Directory>
                         <Directory Id="FulcrumDriveService" Name="FulcrumDriveService">
                             <Component Id="DriveServiceRegistryKey" Guid="65E3149A-C942-44AC-9B7C-FDD00B345954">
-                                <RegistryKey Root="HKLM" Id="DriveServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumDrive" Action="createAndRemoveOnUninstall">
+                                <RegistryKey Root="HKLM" Id="DriveServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumDrive" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                     <RegistryValue Id="DriveServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]" />
                                     <RegistryValue Id="DriveServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMDRIVESERVICE.EXE)" />
                                     <RegistryValue Id="DriveServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumDriveService]FulcrumDriveService.exe" />
@@ -351,7 +424,7 @@
                         </Directory>
                         <Directory Id="FulcrumUpdaterService" Name="FulcrumUpdaterService">
                             <Component Id="UpdaterServiceRegistryKey" Guid="D372EBB4-C61A-428A-AF2F-B1115A0A0FCF">
-                                <RegistryKey Root="HKLM" Id="UpdaterServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumUpdater" Action="createAndRemoveOnUninstall">
+                                <RegistryKey Root="HKLM" Id="UpdaterServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumUpdater" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                     <RegistryValue Id="UpdaterServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]" />
                                     <RegistryValue Id="UpdaterServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMUPDATERSERVICE.EXE)" />
                                     <RegistryValue Id="UpdaterServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumUpdaterService]FulcrumUpdaterService.exe" />
@@ -374,7 +447,7 @@
                         </Directory>
                         <Directory Id="FulcrumEmailService" Name="FulcrumEmailService">
                             <Component Id="EmailServiceRegistryKey" Guid="6C0A5D95-DD66-4995-83F7-92748ADE9429">
-                                <RegistryKey Root="HKLM" Id="EmailServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumEmail" Action="createAndRemoveOnUninstall">
+                                <RegistryKey Root="HKLM" Id="EmailServiceKey" Key="SOFTWARE\MEAT Inc\FulcrumServices\FulcrumEmail" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
                                     <RegistryValue Id="EmailServiceInstallPath" Name="$(var.InstallPathKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]" />
                                     <RegistryValue Id="EmailServiceVersion" Name="$(var.InstallVersionKeyName)" Action="write" Type="string" Value="!(bind.fileVersion.FULCRUMEMAILSERVICE.EXE)" />
                                     <RegistryValue Id="EmailServiceExecutable" Name="$(var.InstallExecutableKeyName)" Action="write" Type="string" Value="[FulcrumEmailService]FulcrumEmailService.exe" />
@@ -396,86 +469,6 @@
                         </Directory>
                     </Directory>
                 </Directory>
-            </Directory>
-        </Directory>
-        <!-- Features -->
-        <Feature Id="ProductFeature" Title="installer" Level="1">
-            <!-- Base Registry Keys -->
-            <ComponentRef Id="MeatIncRegistryKey" />
-            <ComponentRef Id="FulcrumShimRegistryKey" />
-            <ComponentRef Id="FulcrumServicesRegistryKey" />
-            <ComponentRef Id="FulcrumInjectorRegistryKey" />
-            <!-- Service Registry Keys -->
-            <ComponentRef Id="WatchdogServiceRegistryKey" />
-            <ComponentRef Id="DriveServiceRegistryKey" />
-            <ComponentRef Id="UpdaterServiceRegistryKey" />
-            <ComponentRef Id="EmailServiceRegistryKey" />
-            <!-- PassThru Support Keys -->
-            <ComponentRef Id="FulcrumShimV0404RegistryKey" />
-            <ComponentRef Id="FulcrumShimV0500RegistryKey" />
-            <!-- Injector Program Files -->
-            <ComponentRef Id="FulcrumStyleFiles" />
-            <ComponentRef Id="FulcrumResourceFiles" />
-            <ComponentRef Id="CreateFulcrumIconsFolder" />
-            <ComponentRef Id="CreateFulcrumImportsFolder" />
-			<ComponentRef Id="FulcrumInjectorProgramFiles" />
-            <ComponentRef Id="CreateFulcrumInstallersFolder" />
-            <ComponentRef Id="CreateFulcrumExpressionsFolder" />
-            <ComponentRef Id="CreateFulcrumSimulationsFolder" />
-            <ComponentRef Id="CreateFulcrumConversionsFolder" />
-            <!-- Shim Program Files-->
-            <ComponentRef Id="FulcrumShimProgramFiles" />
-            <!-- Service Files and Registry Keys -->
-            <ComponentRef Id="WatchdogServiceProgramFiles" />
-            <ComponentRef Id="DriveServiceProgramFiles" />
-            <ComponentRef Id="UpdaterServiceProgramFiles" />
-            <ComponentRef Id="EmailServiceProgramFiles" />
-            <!-- Logging Folders  -->
-            <ComponentRef Id="CreateFulcrumLoggingFolder" />
-            <ComponentRef Id="CreateFulcrumArchivesFolder" />
-            <ComponentRef Id="CreateWatchdogServiceLogsFolder" />
-            <ComponentRef Id="CreateDriveServiceLogsFolder" />
-            <ComponentRef Id="CreateEmailServiceLogsFolder" />
-            <ComponentRef Id="CreateUpdaterServiceLogsFolder" />
-        </Feature>
-        <!-- In Control Panel > Add or Remove Programs, applications can have various 
-         entries like phone number and Internet contact information under the Click 
-         here for support information entry -->
-        <Property Id="ARPCOMMENTS">The Fulcrum. Used to inject J2534 data in real time via pipes and build useable debug logs.</Property>
-        <Property Id="ARPCONTACT">
-      Sales:   zack.walsh@meatinc.autos
-      Support: zack.walsh@meatinc.autos
-      Phone:   (516) 633-3356
-      Fax:     (516) 633-3356
-    </Property>
-        <!-- Component Refs for App Files And Links -->
-        <Property Id="ARPHELPLINK">https://github.com/MEAT-Inc/Fulcrum/</Property>
-        <Property Id="ARPURLINFOABOUT">https://github.com/MEAT-Inc/Fulcrum/</Property>
-        <Property Id="ARPURLUPDATEINFO">https://github.com/MEAT-Inc/Fulcrum/</Property>
-        <Property Id="ARPHELPTELEPHONE">(516)633-3356</Property>
-        <!-- UI Configuration -->
-        <UI Id="UserInterface">
-            <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
-            <Property Id="WixUI_Mode" Value="Custom" />
-            <!-- Text Setup -->
-            <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
-            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
-            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
-            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
-            <!-- Dialogs In Use -->
-            <DialogRef Id="ProgressDlg" />
-            <DialogRef Id="ErrorDlg" />
-            <DialogRef Id="FilesInUse" />
-            <DialogRef Id="FatalError" />
-            <DialogRef Id="UserExit" />
-            <!-- Type of Dialog to show -->
-            <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
-        </UI>
-        <!-- UI Type -->
-        <UIRef Id="WixUI_Common" />
-        <!-- Icon Values -->
-        <Property Id="ARPPRODUCTICON" Value="InjectorAppIcon" />
-        <Icon Id="InjectorAppIcon" SourceFile="..\FulcrumInjector\FulcrumResources\ShimIconProject.ico" />
-    </Product>
+            </StandardDirectory>
+        </Package>
 </Wix>

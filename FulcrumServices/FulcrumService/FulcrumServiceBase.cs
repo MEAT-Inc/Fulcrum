@@ -148,8 +148,8 @@ namespace FulcrumService
                     // Find our current working directory and map up to our injector debug folder
                     string WorkingDirectory = Assembly.GetExecutingAssembly().Location;
                     string[] WorkingDirSplit = WorkingDirectory.Split(Path.DirectorySeparatorChar)
-                        .TakeWhile(PathPart => !PathPart.Contains("FulcrumShim"))
-                        .Append("FulcrumShim\\FulcrumInjector\\bin")
+                        .TakeWhile(PathPart => !PathPart.Contains("Fulcrum"))
+                        .Append("Fulcrum\\FulcrumInjector\\bin")
                         .Append(IsDebugBuild ? "Debug" : "Release")
                         .ToArray();
 
