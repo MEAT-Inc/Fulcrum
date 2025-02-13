@@ -1,4 +1,4 @@
-﻿// Using calls for Assembly Info updating
+// Using calls for Assembly Info updating
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

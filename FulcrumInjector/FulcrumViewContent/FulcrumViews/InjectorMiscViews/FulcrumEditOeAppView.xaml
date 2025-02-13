@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews.FulcrumEditOeAppView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FulcrumInjector.FulcrumViewContent.FulcrumViews.InjectorMiscViews"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <!-- Style Sheets -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumControlStyles.xaml"/>
+                <ResourceDictionary Source="../../../FulcrumViewSupport/FulcrumStyles/AppStyleSheets/FulcrumEditOeAppViewStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Content For Editing OE Application Objects -->
+    <Grid>
+
+        <!-- Placeholder text and close button while under construction -->
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" TextWrapping="Wrap" TextAlignment="Center" Margin="50">
+            <Run Text="ACHTUNG!" Foreground="Yellow" FontWeight="Bold"/>
+            <Run Text="Editing and creating OE applications is not yet supported!"/>
+        </TextBlock>
+        <Button Style="{StaticResource ActionButtonStyle}"
+                Content="Close Edit Window" Click="btnCloseEditWindow_OnClick"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10" Width="150"/>
+    </Grid> 
+</UserControl>

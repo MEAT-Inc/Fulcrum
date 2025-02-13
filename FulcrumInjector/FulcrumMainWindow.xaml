@@ -103,82 +103,45 @@
 
         <!-- Flyouts for About, Updates, and the Drive Helper -->
         <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <mah:FlyoutsControl.Resources>
+                <Style x:Key="FulcrumFlyoutStyle" TargetType="mah:Flyout">
+                    <Style.Resources>
+                        <SolidColorBrush x:Key="BackgroundColorBrush" Color="#020202" Opacity=".90"/>
+                        <DataTemplate x:Key="HeaderTemplate"/>
+                    </Style.Resources>
+                    <Setter Property="Margin" Value="70,85,0,0"/>
+                    <Setter Property="Position" Value="Top"/>
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="600"/>
+                    <Setter Property="Height" Value="520"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor_Darker_35}"/>
+                    <Setter Property="Background" Value="{DynamicResource BackgroundColorBrush}"/>
+                    <Setter Property="HeaderTemplate" Value="{DynamicResource HeaderTemplate}"/>
+                </Style>
+            </mah:FlyoutsControl.Resources>
 
             <!-- About this app flyout-->
-            <mah:Flyout 
-                Margin="70,85,0,0"
-                Position="Top"
-                x:Name="InformationFlyout"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Width="600"
-                Height="520"
-                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
-
-                <!-- Semi Transparent Background -->
-                <mah:Flyout.Background>
-                    <SolidColorBrush Color="#020202" Opacity=".90"/>
-                </mah:Flyout.Background>
-
-                <!-- Empty Header Template -->
-                <mah:Flyout.HeaderTemplate>
-                    <DataTemplate/>
-                </mah:Flyout.HeaderTemplate>
-
-                <!-- Content for About this app-->
+            <mah:Flyout Style="{DynamicResource FulcrumFlyoutStyle}" x:Name="InformationFlyout">
                 <injectorMiscViews:FulcrumAboutThisAppView x:Name="FulcrumAboutThisAppView"/>
             </mah:Flyout>
 
             <!-- Updates Flyout-->
-            <mah:Flyout 
-                Margin="70,85,0,0"
-                Position="Top"
-                x:Name="AppUpdatesFlyout"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Width="600"
-                Height="520"
-                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
-
-                <!-- Semi Transparent Background -->
-                <mah:Flyout.Background>
-                    <SolidColorBrush Color="#020202" Opacity=".90"/>
-                </mah:Flyout.Background>
-
-                <!-- Empty Header Template -->
-                <mah:Flyout.HeaderTemplate>
-                    <DataTemplate/>
-                </mah:Flyout.HeaderTemplate>
-
-
-                <!-- Content for Updater View-->
+            <mah:Flyout Style="{DynamicResource FulcrumFlyoutStyle}" x:Name="AppUpdatesFlyout">
                 <injectorMiscViews:FulcrumUpdaterView x:Name="FulcrumUpdaterView"/>
             </mah:Flyout>
 
             <!-- Drive Flyout-->
-            <mah:Flyout 
-                Margin="70,85,0,0"
-                Position="Top"
-                x:Name="GoogleDriveFlyout"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Width="600"
-                Height="520"
-                BorderThickness="2" BorderBrush="{StaticResource PrimaryColor_Darker_35}">
-
-                <!-- Semi Transparent Background -->
-                <mah:Flyout.Background>
-                    <SolidColorBrush Color="#020202" Opacity=".90"/>
-                </mah:Flyout.Background>
-
-                <!-- Empty Header Template -->
-                <mah:Flyout.HeaderTemplate>
-                    <DataTemplate/>
-                </mah:Flyout.HeaderTemplate>
-
-                <!-- Content for Google Drive Explorer-->
+            <mah:Flyout Style="{DynamicResource FulcrumFlyoutStyle}" x:Name="GoogleDriveFlyout">
                 <injectorMiscViews:FulcrumGoogleDriveView x:Name="FulcrumGoogleDriveView"/>
             </mah:Flyout>
+
+            <!-- Edit/Add OE App Flyout-->
+            <mah:Flyout Style="{DynamicResource FulcrumFlyoutStyle}" x:Name="EditOeAppFlyout">
+                <injectorMiscViews:FulcrumEditOeAppView x:Name="EditOeApplicationView"/>
+            </mah:Flyout>
+
         </mah:FlyoutsControl>
     </Grid>
 </mah:MetroWindow>
